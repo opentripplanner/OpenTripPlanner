@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -44,10 +44,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   ) {
     var fares = fareService.calculateFares(i);
     assertEquals(expectedFare, fares.getFare(FareType.regular));
+    assertFalse(fares.getItineraryProducts().isEmpty());
 
     for (var type : fares.getFareTypes()) {
-      assertTrue(fares.getComponents(type).isEmpty());
-
       var prices = fares
         .getItineraryProducts()
         .stream()

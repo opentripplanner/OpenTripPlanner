@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+import static org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator.generalizedCostComparator;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -11,38 +11,43 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
+import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveBikeRentalWithMostlyWalking;
+import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveNonTransitItinerariesBasedOnGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveParkAndRideWithMostlyWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveOtherThanSameLegsMaxGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DecorateFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimit;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filterchain.DeleteResultHandler;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByAllSameStations;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupBySameRoutesAndStops;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -53,6 +58,7 @@ import org.opentripplanner.transit.model.site.Station;
 /**
  * Create a filter chain based on the given config.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class ItineraryListFilterChainBuilder {
 
   private static final int NOT_SET = -1;
@@ -69,7 +75,7 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer;
+  private Consumer<PageCursorInput> pageCursorInputSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -86,16 +92,16 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
-  private ItineraryListFilter emissionsFilter;
+  private ItineraryDecorator emissionDecorator;
 
   @Sandbox
-  private ItineraryListFilter faresFilter;
+  private ItineraryDecorator fareDecorator;
 
   @Sandbox
-  private ItineraryListFilter rideHailingFilter;
+  private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
-  private ItineraryListFilter stopConsolidationFilter;
+  private ItineraryDecorator stopConsolidationDecorator;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -261,18 +267,15 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed. To
-   * get notified about this a consumer can be added. The 'maxLimit' check is the last thing
-   * happening in the filter-chain after the final sort. So, if another filter removes an itinerary,
-   * the itinerary is not considered with respect to the {@link #withMaxNumberOfItineraries(int)}
-   * limit.
-   *
-   * @param numItinerariesFilterResultsConsumer the consumer to notify when elements are removed.
+   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
+   * The paging service needs this information to adjust the paging cursor. The 'maxLimit' check is
+   * the last thing* happening in the filter-chain after the final sort. So, if another filter
+   * removes an itinerary, the itinerary is not considered with respect to this limit.
    */
-  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultsConsumer(
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer
+  public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
-    this.numItinerariesFilterResultsConsumer = numItinerariesFilterResultsConsumer;
+    this.pageCursorInputSubscriber = pageCursorInputSubscriber;
     return this;
   }
 
@@ -317,13 +320,13 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFaresFilter(ItineraryListFilter filter) {
-    this.faresFilter = filter;
+  public ItineraryListFilterChainBuilder withFareDecorator(ItineraryDecorator decorator) {
+    this.fareDecorator = decorator;
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
-    this.emissionsFilter = emissionsFilter;
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryDecorator emissionDecorator) {
+    this.emissionDecorator = emissionDecorator;
     return this;
   }
 
@@ -339,57 +342,55 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withRideHailingFilter(ItineraryListFilter filter) {
-    this.rideHailingFilter = filter;
-    return this;
-  }
-
-  public ItineraryListFilterChainBuilder withStopConsolidationFilter(
-    @Nullable ItineraryListFilter filter
+  public ItineraryListFilterChainBuilder withRideHailingDecoratingFilter(
+    ItineraryListFilter decoratorFilter
   ) {
-    this.stopConsolidationFilter = filter;
+    this.rideHailingDecorator = decoratorFilter;
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withConsolidatedStopNamesDecorator(
+    @Nullable ItineraryDecorator decorator
+  ) {
+    this.stopConsolidationDecorator = decorator;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withTransitAlerts(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+
+    return this;
+  }
+
+  @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
     if (removeItinerariesWithSameRoutesAndStops) {
-      filters.addAll(buildGroupBySameRoutesAndStopsFilter());
+      filters.add(buildGroupBySameRoutesAndStopsFilter());
     }
 
     if (sameFirstOrLastTripFilter) {
-      filters.add(new SortingFilter(generalizedCostComparator()));
-      addRmFilter(filters, new SameFirstOrLastTripFilter());
+      addSort(filters, generalizedCostComparator());
+      addRemoveFilter(filters, new RemoveIfFirstOrLastTripIsTheSame());
     }
 
     if (minBikeParkingDistance > 0) {
-      filters.add(
+      addRemoveFilter(
+        filters,
         new RemoveItinerariesWithShortStreetLeg(minBikeParkingDistance, TraverseMode.BICYCLE)
       );
     }
 
-    if (accessibilityScore) {
-      filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
-    }
-
-    if (faresFilter != null) {
-      filters.add(faresFilter);
-    }
-
-    if (emissionsFilter != null) {
-      filters.add(emissionsFilter);
-    }
-
-    if (transitAlertService != null) {
-      filters.add(new TransitAlertFilter(transitAlertService, getMultiModalStation));
-    }
-
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostFilterParams != null) {
-      addRmFilter(
+      addRemoveFilter(
         filters,
         new TransitGeneralizedCostFilter(
           transitGeneralizedCostFilterParams.costLimitFunction(),
@@ -400,7 +401,10 @@ public class ItineraryListFilterChainBuilder {
 
     // Filter non-transit itineraries on generalized-cost
     if (nonTransitGeneralizedCostLimit != null) {
-      addRmFilter(filters, new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
+      addRemoveFilter(
+        filters,
+        new RemoveNonTransitItinerariesBasedOnGeneralizedCost(nonTransitGeneralizedCostLimit)
+      );
     }
 
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
@@ -415,28 +419,26 @@ public class ItineraryListFilterChainBuilder {
     {
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        addRmFilter(
+        addRemoveFilter(
           filters,
-          new RemoveTransitIfStreetOnlyIsBetterFilter(
-            removeTransitWithHigherCostThanBestOnStreetOnly
-          )
+          new RemoveTransitIfStreetOnlyIsBetter(removeTransitWithHigherCostThanBestOnStreetOnly)
         );
       }
 
       if (removeTransitIfWalkingIsBetter) {
-        addRmFilter(filters, new RemoveTransitIfWalkingIsBetterFilter());
+        addRemoveFilter(filters, new RemoveTransitIfWalkingIsBetter());
       }
 
       if (removeWalkAllTheWayResults) {
-        addRmFilter(filters, new RemoveWalkOnlyFilter());
+        addRemoveFilter(filters, new RemoveWalkOnlyFilter());
       }
 
       if (bikeRentalDistanceRatio > 0) {
-        addRmFilter(filters, new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
+        addRemoveFilter(filters, new RemoveBikeRentalWithMostlyWalking(bikeRentalDistanceRatio));
       }
 
       if (parkAndRideDurationRatio > 0) {
-        addRmFilter(
+        addRemoveFilter(
           filters,
           new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
         );
@@ -444,49 +446,74 @@ public class ItineraryListFilterChainBuilder {
     }
 
     // Paging related filters - these filters are run after group-by filters to allow a result
-    // outside the page to also take effect inside the window. This is debatable but lead to less
-    // noise, however it is not deterministic because the result depends on the size of the search-window and
-    // where the "cut" between each page is located.
+    // outside the page to also take effect inside the window. This is debatable, but leads to less
+    // noise; However, it is not deterministic because the result depends on the size of the
+    // search-window and where the "cut" between each page is located.
     {
       // Limit to search-window
       if (earliestDepartureTime != null) {
-        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
+        addRemoveFilter(
+          filters,
+          new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow)
+        );
       }
 
       // Remove itineraries present in the page retrieved before this page/search.
       if (itineraryPageCut != null) {
-        addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
+        addRemoveFilter(
+          filters,
+          new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut)
+        );
       }
 
       // Remove itineraries if max limit is set
       if (maxNumberOfItineraries > 0) {
-        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-        addRmFilter(
+        addSort(filters, SortOrderComparator.comparator(sortOrder));
+        addRemoveFilter(
           filters,
           new NumItinerariesFilter(
             maxNumberOfItineraries,
             maxNumberOfItinerariesCropSection,
-            numItinerariesFilterResultsConsumer
+            pageCursorInputSubscriber
           )
         );
       }
     }
 
     // Do the final itineraries sort
-    filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+    addSort(filters, SortOrderComparator.comparator(sortOrder));
 
-    // Sandbox filters to decorate itineraries
+    // Decorate itineraries
+    {
+      if (transitAlertService != null) {
+        addDecorateFilter(
+          filters,
+          new DecorateTransitAlert(transitAlertService, getMultiModalStation)
+        );
+      }
 
-    if (faresFilter != null) {
-      filters.add(faresFilter);
-    }
+      // Sandbox filters to decorate itineraries
 
-    if (rideHailingFilter != null) {
-      filters.add(rideHailingFilter);
-    }
+      if (accessibilityScore) {
+        // TODO: This should be injected to avoid circular dependencies (dep. on sandbox here)
+        addDecorateFilter(filters, new DecorateWithAccessibilityScore(wheelchairMaxSlope));
+      }
 
-    if (stopConsolidationFilter != null) {
-      filters.add(stopConsolidationFilter);
+      if (emissionDecorator != null) {
+        addDecorateFilter(filters, emissionDecorator);
+      }
+
+      if (fareDecorator != null) {
+        addDecorateFilter(filters, fareDecorator);
+      }
+
+      if (rideHailingDecorator != null) {
+        filters.add(rideHailingDecorator);
+      }
+
+      if (stopConsolidationDecorator != null) {
+        addDecorateFilter(filters, stopConsolidationDecorator);
+      }
     }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
@@ -494,37 +521,25 @@ public class ItineraryListFilterChainBuilder {
     return new ItineraryListFilterChain(filters, debugHandler);
   }
 
-  public ItineraryListFilterChainBuilder withTransitAlerts(
-    TransitAlertService transitAlertService,
-    Function<Station, MultiModalStation> getMultiModalStation
-  ) {
-    this.transitAlertService = transitAlertService;
-    this.getMultiModalStation = getMultiModalStation;
-
-    return this;
-  }
-
   /**
    * If enabled, this adds the filter to remove itineraries which have the same stops and routes.
    * These are sometimes called "time-shifted duplicates" but since those terms have so many
    * meanings we chose to use a long, but descriptive name instead.
    */
-  private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
-    return List.of(
-      new GroupByFilter<>(
-        GroupBySameRoutesAndStops::new,
-        List.of(
-          new SortingFilter(SortOrderComparator.comparator(sortOrder)),
-          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
-        )
+  private ItineraryListFilter buildGroupBySameRoutesAndStopsFilter() {
+    return new GroupByFilter<>(
+      GroupBySameRoutesAndStops::new,
+      List.of(
+        new SortingFilter(SortOrderComparator.comparator(sortOrder)),
+        new RemoveFilter(new MaxLimit(GroupBySameRoutesAndStops.TAG, 1))
       )
     );
   }
 
   /**
    * These filters will group the itineraries by the main-legs and reduce the number of itineraries
-   * in each group. The main legs is the legs that together constitute more than a given　percentage
-   * of the total travel distance.
+   * in each group. The main legs are the legs that together constitute more than a given
+   * percentage of the total travel distance.
    * <p>
    * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
    * cost. If there is a tie, the filter look at the number-of-transfers as a tiebreaker.
@@ -559,23 +574,22 @@ public class ItineraryListFilterChainBuilder {
             GroupByAllSameStations::new,
             List.of(
               new SortingFilter(generalizedCostComparator()),
-              new DeletionFlaggingFilter(new MaxLimitFilter(innerGroupName, 1))
+              new RemoveFilter(new MaxLimit(innerGroupName, 1))
             )
           )
         );
       }
 
       if (group.maxCostOtherLegsFactor > 1.0) {
-        var flagger = new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor);
+        var flagger = new RemoveOtherThanSameLegsMaxGeneralizedCost(group.maxCostOtherLegsFactor);
         sysTags.add(flagger.name());
-        addRmFilter(nested, flagger);
+        addRemoveFilter(nested, flagger);
       }
 
-      nested.add(new SortingFilter(generalizedCostComparator()));
+      addSort(nested, generalizedCostComparator());
+      addRemoveFilter(nested, new MaxLimit(tag, group.maxNumOfItinerariesPerGroup));
 
-      addRmFilter(nested, new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup));
-
-      nested.add(new RemoveDeletionFlagForLeastTransfersItinerary(sysTags));
+      nested.add(new KeepItinerariesWithFewestTransfers(sysTags));
 
       groupByFilters.add(
         new GroupByFilter<>(it -> new GroupByDistance(it, group.groupByP), nested)
@@ -589,10 +603,21 @@ public class ItineraryListFilterChainBuilder {
     return maxNumberOfItinerariesCropSection.invert();
   }
 
-  private static void addRmFilter(
+  private static void addSort(List<ItineraryListFilter> filters, SortOrderComparator comparator) {
+    filters.add(new SortingFilter(comparator));
+  }
+
+  private static void addRemoveFilter(
     List<ItineraryListFilter> filters,
-    ItineraryDeletionFlagger removeFilter
+    RemoveItineraryFlagger removeFilter
   ) {
-    filters.add(new DeletionFlaggingFilter(removeFilter));
+    filters.add(new RemoveFilter(removeFilter));
+  }
+
+  private static void addDecorateFilter(
+    List<ItineraryListFilter> filters,
+    ItineraryDecorator decorator
+  ) {
+    filters.add(new DecorateFilter(decorator));
   }
 }

@@ -97,21 +97,23 @@ public class VehicleParkingGroupsLayerTest {
     var config =
       """
       {
-        "vectorTileLayers": [
-          {
-            "name": "vehicleParkingGroups",
-            "type": "VehicleParkingGroup",
-            "mapper": "Digitransit",
-            "maxZoom": 20,
-            "minZoom": 14,
-            "cacheMaxSeconds": 600,
-            "expansionFactor": 0
-          }
-        ]
+        "vectorTiles": {
+          "layers" :[
+            {
+              "name": "vehicleParkingGroups",
+              "type": "VehicleParkingGroup",
+              "mapper": "Digitransit",
+              "maxZoom": 20,
+              "minZoom": 14,
+              "cacheMaxSeconds": 600,
+              "expansionFactor": 0
+            }
+          ]
+        }
       }
       """;
     var nodeAdapter = newNodeAdapterForTest(config);
-    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
+    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
     var builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       graph,
