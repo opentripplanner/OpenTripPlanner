@@ -112,6 +112,26 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addObjOpSafe() {
+    assertEquals(
+      "ToStringBuilderTest{obj: Foo{a: 5, b: 'X'}}",
+      subject().addObjOpSafe("obj", () -> new Foo(5, "X")).toString()
+    );
+    assertEquals("ToStringBuilderTest{}", subject().addObjOpSafe("obj", () -> null).toString());
+    assertEquals(
+      "ToStringBuilderTest{}",
+      subject()
+        .addObjOpSafe(
+          "obj",
+          () -> {
+            throw new IllegalStateException("Ignore");
+          }
+        )
+        .toString()
+    );
+  }
+
+  @Test
   public void addObjOp() {
     var duration = Duration.ofMinutes(1);
     assertEquals(
