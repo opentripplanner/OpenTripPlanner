@@ -340,8 +340,8 @@ public class RouteRequestMapper {
   ) {
     callWith.argument("bikeWalkingReluctance", walking::withReluctance);
     callWith.argument("bikeWalkingSpeed", walking::withSpeed);
-    callWith.argument("bikeSwitchTime", time -> walking.withHopTime((int) time));
-    callWith.argument("bikeSwitchCost", cost -> walking.withHopCost((int) cost));
+    callWith.argument("bikeSwitchTime", time -> walking.withMountDismountTime((int) time));
+    callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }
 
   private static class CallerWithEnvironment {
