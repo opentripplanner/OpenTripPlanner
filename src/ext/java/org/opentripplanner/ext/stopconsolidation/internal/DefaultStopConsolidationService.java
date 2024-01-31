@@ -2,7 +2,9 @@ package org.opentripplanner.ext.stopconsolidation.internal;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
@@ -71,16 +73,28 @@ public class DefaultStopConsolidationService implements StopConsolidationService
     if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
       return stop.getName();
     } else {
-      return repo
-        .groups()
-        .stream()
-        .filter(r -> r.primary().equals(stop.getId()))
-        .flatMap(g -> g.secondaries().stream())
-        .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
-        .findAny()
-        .map(id -> transitModel.getStopModel().getRegularStop(id))
-        .map(RegularStop::getName)
-        .orElseGet(stop::getName);
+      return agencySpecificStop(stop, agency).map(RegularStop::getName).orElseGet(stop::getName);
     }
+  }
+
+  @Override
+  public String agencySpecificCode(StopLocation stop, Agency agency) {
+    if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
+      return stop.getCode();
+    } else {
+      return agencySpecificStop(stop, agency).map(RegularStop::getCode).orElseGet(stop::getCode);
+    }
+  }
+
+  @Nonnull
+  private Optional<RegularStop> agencySpecificStop(StopLocation stop, Agency agency) {
+    return repo
+      .groups()
+      .stream()
+      .filter(r -> r.primary().equals(stop.getId()))
+      .flatMap(g -> g.secondaries().stream())
+      .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
+      .findAny()
+      .map(id -> transitModel.getStopModel().getRegularStop(id));
   }
 }
