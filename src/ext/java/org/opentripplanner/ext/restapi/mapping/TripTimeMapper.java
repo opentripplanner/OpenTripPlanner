@@ -29,7 +29,7 @@ public class TripTimeMapper {
     api.stopCount = domain.getStopCount();
     api.scheduledArrival = domain.getScheduledArrival();
     api.scheduledDeparture = domain.getScheduledDeparture();
-    api.realimeArrival = domain.getRealtimeArrival();
+    api.realtimeArrival = domain.getRealtimeArrival();
     api.realtimeDeparture = domain.getRealtimeDeparture();
     api.arrivalDelay = domain.getArrivalDelay();
     api.departureDelay = domain.getDepartureDelay();

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Envelope;
@@ -19,12 +19,14 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   private I18NString name;
 
-  private Set<StopLocation> stopLocations = new HashSet<>();
+  private List<StopLocation> stopLocations = new ArrayList<>();
 
   private GeometryCollection geometry = new GeometryCollection(
     null,
     GeometryUtils.getGeometryFactory()
   );
+
+  private GeometryCollection encompassingAreaGeometry = null;
 
   private WgsCoordinate centroid;
 
@@ -38,7 +40,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     this.indexCounter = original::getIndex;
     // Optional fields
     this.name = original.getName();
-    this.stopLocations = new HashSet<>(original.getLocations());
+    this.stopLocations = new ArrayList<>(original.getChildLocations());
     this.geometry = (GeometryCollection) original.getGeometry();
     this.centroid = original.getCoordinate();
   }
@@ -50,6 +52,15 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public GroupStopBuilder withName(I18NString name) {
     this.name = name;
+    return this;
+  }
+
+  public GroupStopBuilder withEncompassingAreaGeometries(List<Geometry> geometries) {
+    this.encompassingAreaGeometry =
+      new GeometryCollection(
+        geometries.toArray(new Geometry[0]),
+        GeometryUtils.getGeometryFactory()
+      );
     return this;
   }
 
@@ -82,12 +93,16 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     return this;
   }
 
-  public Set<StopLocation> stopLocations() {
-    return Set.copyOf(stopLocations);
+  public List<StopLocation> stopLocations() {
+    return List.copyOf(stopLocations);
   }
 
   public GeometryCollection geometry() {
     return geometry;
+  }
+
+  public GeometryCollection encompassingAreaGeometry() {
+    return encompassingAreaGeometry;
   }
 
   public WgsCoordinate centroid() {

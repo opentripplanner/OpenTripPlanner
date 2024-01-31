@@ -82,6 +82,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add AreaStop layer to new debug frontend [#5636](https://github.com/opentripplanner/OpenTripPlanner/pull/5636)
 - Allow configuration of vector tiles base path [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
 - Change Transmodel API path to `/otp/transmodel/v3` [#5637](https://github.com/opentripplanner/OpenTripPlanner/pull/5637)
+- Add flexibleArea to GroupStop Quays [#5625](https://github.com/opentripplanner/OpenTripPlanner/pull/5625)
+- Pass-through should override transit-group-priority [#5638](https://github.com/opentripplanner/OpenTripPlanner/pull/5638)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

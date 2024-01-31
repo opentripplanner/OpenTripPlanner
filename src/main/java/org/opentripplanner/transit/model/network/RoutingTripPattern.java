@@ -117,7 +117,7 @@ public class RoutingTripPattern implements DefaultTripPattern, Serializable {
 
   @Override
   public String debugInfo() {
-    return pattern.logName() + " @" + index;
+    return pattern.logName() + " #" + index;
   }
 
   @Override
