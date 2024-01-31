@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -96,5 +97,11 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
       .findAny()
       .map(id -> transitModel.getStopModel().getRegularStop(id));
+  }
+
+  @Override
+  public StopLocation primaryStop(FeedScopedId id) {
+    var primaryId = repo.groups().stream().filter(g -> g.secondaries().contains(id)).map(ConsolidatedStopGroup::primary).findAny().orElse(id);
+    return transitModel.getStopModel().getRegularStop(primaryId);
   }
 }

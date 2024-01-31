@@ -37,7 +37,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
     i.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
         var agency = leg.getAgency();
-        var from = modify(stl.getFrom().stop, agency);
+        var from = service.primaryStop(stl.getFrom().stop.getId());
         var to = modify(stl.getTo().stop, agency);
         return new ConsolidatedStopLeg(stl, from, to);
       } else {

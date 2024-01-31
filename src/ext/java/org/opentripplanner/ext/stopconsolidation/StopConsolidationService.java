@@ -34,4 +34,6 @@ public interface StopConsolidationService {
    */
   I18NString agencySpecificName(StopLocation stop, Agency agency);
   String agencySpecificCode(StopLocation stop, Agency agency);
+
+  StopLocation primaryStop(FeedScopedId id);
 }
