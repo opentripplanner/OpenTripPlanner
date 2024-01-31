@@ -5,6 +5,10 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * A decorating filter that checks if a transit leg contains any primary stops and if it does,
@@ -34,15 +38,28 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
     i.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
         var agency = leg.getAgency();
+        var from= modify(stl.getFrom().stop, agency);
+        var to = modify(stl.getTo().stop, agency);
         return new ConsolidatedStopLeg(
           stl,
-          service.agencySpecificName(stl.getFrom().stop, agency),
-          service.agencySpecificName(stl.getTo().stop, agency)
+          from,
+          to
         );
       } else {
         return leg;
       }
     });
+  }
+
+  private StopLocation modify(StopLocation stop, Agency agency) {
+    if(stop instanceof RegularStop rs){
+      return rs.copy()
+        .withName(service.agencySpecificName(stop, agency))
+        .withCode("XXXXX").build();
+    }
+    else {
+      return stop;
+    }
   }
 
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
