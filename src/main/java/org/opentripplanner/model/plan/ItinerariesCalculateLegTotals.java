@@ -43,13 +43,13 @@ class ItinerariesCalculateLegTotals {
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
-      } else if (leg instanceof StreetLeg streetLeg) {
+      } else if (leg.isStreetLeg()) {
         nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
 
-        if (streetLeg.isWalkingLeg()) {
-          walkDuration = walkDuration.plus(streetLeg.getDuration());
-          walkDistanceMeters = walkDistanceMeters + streetLeg.getDistanceMeters();
+        if (leg.isWalkingLeg()) {
+          walkDuration = walkDuration.plus(leg.getDuration());
+          walkDistanceMeters = walkDistanceMeters + leg.getDistanceMeters();
         }
       } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
         nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
