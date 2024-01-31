@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AccessEgressMapper {
 
-  public static List<DefaultAccessEgress> mapNearbyStops(
+  public static List<RoutingAccessEgress> mapNearbyStops(
     Collection<NearbyStop> accessStops,
     boolean isEgress
   ) {
@@ -23,7 +24,7 @@ public class AccessEgressMapper {
       .collect(Collectors.toList());
   }
 
-  public static Collection<DefaultAccessEgress> mapFlexAccessEgresses(
+  public static Collection<RoutingAccessEgress> mapFlexAccessEgresses(
     Collection<FlexAccessEgress> flexAccessEgresses,
     boolean isEgress
   ) {
@@ -33,7 +34,7 @@ public class AccessEgressMapper {
       .collect(Collectors.toList());
   }
 
-  private static DefaultAccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
+  private static RoutingAccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
     if (!(nearbyStop.stop instanceof RegularStop)) {
       return null;
     }

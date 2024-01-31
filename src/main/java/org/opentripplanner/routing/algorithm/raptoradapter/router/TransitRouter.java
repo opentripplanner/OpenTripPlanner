@@ -23,7 +23,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -172,8 +174,8 @@ public class TransitRouter {
   }
 
   private AccessEgresses fetchAccessEgresses() {
-    final var asyncAccessList = new ArrayList<DefaultAccessEgress>();
-    final var asyncEgressList = new ArrayList<DefaultAccessEgress>();
+    final var asyncAccessList = new ArrayList<RoutingAccessEgress>();
+    final var asyncEgressList = new ArrayList<RoutingAccessEgress>();
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
@@ -208,21 +210,21 @@ public class TransitRouter {
     return new AccessEgresses(accessList, egressList);
   }
 
-  private Collection<DefaultAccessEgress> fetchAccess() {
+  private Collection<? extends RoutingAccessEgress> fetchAccess() {
     debugTimingAggregator.startedAccessCalculating();
     var list = fetchAccessEgresses(ACCESS);
     debugTimingAggregator.finishedAccessCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchEgress() {
+  private Collection<? extends RoutingAccessEgress> fetchEgress() {
     debugTimingAggregator.startedEgressCalculating();
     var list = fetchAccessEgresses(EGRESS);
     debugTimingAggregator.finishedEgressCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchAccessEgresses(AccessEgressType type) {
+  private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
 
     // Prepare access/egress lists
@@ -254,7 +256,7 @@ public class TransitRouter {
       stopCountLimit
     );
 
-    List<DefaultAccessEgress> results = new ArrayList<>(
+    List<RoutingAccessEgress> results = new ArrayList<>(
       AccessEgressMapper.mapNearbyStops(nearbyStops, type.isEgress())
     );
     results = timeshiftRideHailing(streetRequest, type, results);
@@ -274,6 +276,24 @@ public class TransitRouter {
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type.isEgress()));
     }
 
+    if (request.earliestBookingTime() != null) {
+      return results
+        .stream()
+        .map(routingAccessEgress -> {
+          if (routingAccessEgress instanceof FlexAccessEgressAdapter flexAccessEgressAdapter) {
+            return new BookingTimeAccessEgress(
+              flexAccessEgressAdapter,
+              request.dateTime(),
+              request.earliestBookingTime(),
+              serverContext.transitService().getTimeZone()
+            );
+          } else {
+            return routingAccessEgress;
+          }
+        })
+        .toList();
+    }
+
     return results;
   }
 
@@ -287,10 +307,10 @@ public class TransitRouter {
    * This method is a good candidate to be moved to the access/egress filter chain when that has
    * been added.
    */
-  private List<DefaultAccessEgress> timeshiftRideHailing(
+  private List<RoutingAccessEgress> timeshiftRideHailing(
     StreetRequest streetRequest,
     AccessEgressType type,
-    List<DefaultAccessEgress> accessEgressList
+    List<RoutingAccessEgress> accessEgressList
   ) {
     if (streetRequest.mode() != StreetMode.CAR_HAILING) {
       return accessEgressList;

@@ -61,6 +61,14 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
+          .name("earliestBookingTime")
+          .description("Date and time for the earliest time the user can book the journey")
+          .type(gqlUtil.dateTimeScalar)
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
           .name("searchWindow")
           .description(
             "The length of the search-window in minutes. This parameter is optional." +

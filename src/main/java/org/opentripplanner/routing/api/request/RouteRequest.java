@@ -80,6 +80,7 @@ public class RouteRequest implements Cloneable, Serializable {
   private JourneyRequest journey = new JourneyRequest();
 
   private boolean wheelchair = false;
+  private Instant earliestBookingTime;
 
   /* CONSTRUCTORS */
 
@@ -110,6 +111,15 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
     this.preferences = preferences.copyOf().apply(body).build();
+  }
+
+  public Instant earliestBookingTime() {
+    return earliestBookingTime;
+  }
+
+  public RouteRequest setEarliestBookingTime(Instant earliestBookingTime) {
+    this.earliestBookingTime = earliestBookingTime;
+    return this;
   }
 
   void setPreferences(RoutingPreferences preferences) {

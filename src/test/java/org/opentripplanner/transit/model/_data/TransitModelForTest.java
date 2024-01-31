@@ -258,6 +258,10 @@ public class TransitModelForTest {
         return st;
       })
       .toList();
+    return unscheduledTrip(id, stopTimes);
+  }
+
+  public UnscheduledTrip unscheduledTrip(FeedScopedId id, List<StopTime> stopTimes) {
     return UnscheduledTrip
       .of(id)
       .withTrip(trip("flex-trip").build())
