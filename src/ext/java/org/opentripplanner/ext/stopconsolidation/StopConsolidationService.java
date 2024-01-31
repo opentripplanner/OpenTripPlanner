@@ -24,6 +24,8 @@ public interface StopConsolidationService {
    */
   boolean isPrimaryStop(StopLocation stop);
 
+  boolean isSecondaryStop(StopLocation stop);
+
   /**
    * Are any stop consolidations defined?
    */
@@ -36,4 +38,5 @@ public interface StopConsolidationService {
   String agencySpecificCode(StopLocation stop, Agency agency);
 
   StopLocation primaryStop(FeedScopedId id);
+
 }

@@ -59,6 +59,6 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   }
 
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
-    return (service.isPrimaryStop(stl.getFrom().stop) || service.isPrimaryStop(stl.getTo().stop));
+    return (service.isSecondaryStop(stl.getFrom().stop) || service.isPrimaryStop(stl.getTo().stop));
   }
 }

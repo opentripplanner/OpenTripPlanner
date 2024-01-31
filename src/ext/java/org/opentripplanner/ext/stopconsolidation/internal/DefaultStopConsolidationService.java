@@ -65,6 +65,11 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   @Override
+  public boolean isSecondaryStop(StopLocation stop) {
+    return repo.groups().stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
+  }
+
+  @Override
   public boolean isActive() {
     return !repo.groups().isEmpty();
   }
