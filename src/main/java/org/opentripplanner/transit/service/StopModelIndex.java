@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.collection.CollectionsView;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -22,7 +23,8 @@ class StopModelIndex {
 
   private final HashGridSpatialIndex<RegularStop> regularStopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
-  private final HashGridSpatialIndex<AreaStop> locationIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<AreaStop> areaStopSpatialIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<GroupStop> groupStopSpatialIndex = new HashGridSpatialIndex<>();
   private final StopLocation[] stopsByIndex;
 
   /**
@@ -39,10 +41,6 @@ class StopModelIndex {
 
     var allStops = new CollectionsView<StopLocation>(stops, flexStops, groupStops);
     for (StopLocation it : allStops) {
-      if (it instanceof RegularStop regularStop) {
-        var envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
-        regularStopSpatialIndex.insert(envelope, regularStop);
-      }
       stopsByIndex[it.getIndex()] = it;
     }
 
@@ -51,13 +49,31 @@ class StopModelIndex {
         multiModalStationForStations.put(childStation, it);
       }
     }
-    for (AreaStop it : flexStops) {
-      locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
+    for (RegularStop regularStop : stops) {
+      var envelope = new Envelope(regularStop.getCoordinate().asJtsCoordinate());
+      regularStopSpatialIndex.insert(envelope, regularStop);
+    }
+    for (AreaStop areaStop : flexStops) {
+      areaStopSpatialIndex.insert(areaStop.getGeometry().getEnvelopeInternal(), areaStop);
+    }
+    // We only want groupStops with areas in our spatial index. The ones that are defined as a list
+    // of stops have already had the geometries of their child stops added to the regular stop index.
+    Collection<GroupStop> groupStopsWithAreas = groupStops
+      .stream()
+      .filter(it -> it.getEncompassingAreaGeometry().isPresent())
+      .toList();
+    for (GroupStop groupStop : groupStopsWithAreas) {
+      Envelope env = groupStop
+        .getEncompassingAreaGeometry()
+        .map(Geometry::getEnvelopeInternal)
+        .orElseThrow(); // Because we filtered out the ones without areas, this should never throw.
+      groupStopSpatialIndex.insert(env, groupStop);
     }
 
     // Trim the sizes of the indices
     regularStopSpatialIndex.compact();
-    locationIndex.compact();
+    areaStopSpatialIndex.compact();
+    groupStopSpatialIndex.compact();
   }
 
   /**
@@ -80,6 +96,10 @@ class StopModelIndex {
   }
 
   Collection<AreaStop> findAreaStops(Envelope envelope) {
-    return locationIndex.query(envelope);
+    return areaStopSpatialIndex.query(envelope);
+  }
+
+  Collection<GroupStop> findGroupStops(Envelope envelope) {
+    return groupStopSpatialIndex.query(envelope);
   }
 }

@@ -3,6 +3,7 @@ package org.opentripplanner.apis.vectortiles;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.AreaStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.GroupStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
@@ -48,6 +49,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 public class GraphInspectorVectorTileResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
+  private static final LayerParams GROUP_STOPS = new LayerParams("groupStops", GroupStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", AreaStop);
   private static final LayerParams GEOFENCING_ZONES = new LayerParams(
     "geofencingZones",
@@ -57,6 +59,7 @@ public class GraphInspectorVectorTileResource {
   private static final LayerParams VERTICES = new LayerParams("vertices", Vertex);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
+    GROUP_STOPS,
     AREA_STOPS,
     GEOFENCING_ZONES,
     EDGES,
@@ -132,7 +135,7 @@ public class GraphInspectorVectorTileResource {
     // the stops are fast and the edges are relatively slow
     var stopsSource = new VectorSource(
       "stops",
-      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS))
+      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
     );
     var streetSource = new VectorSource(
       "street",
@@ -141,6 +144,7 @@ public class GraphInspectorVectorTileResource {
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
+      GROUP_STOPS.toVectorSourceLayer(stopsSource),
       AREA_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource)
@@ -179,7 +183,12 @@ public class GraphInspectorVectorTileResource {
       case RegularStop -> new StopLayerBuilder<>(
         layerParameters,
         locale,
-        e -> context.transitService().findRegularStop(e)
+        e -> context.transitService().findRegularStops(e)
+      );
+      case GroupStop -> new StopLayerBuilder<>(
+        layerParameters,
+        locale,
+        e -> context.transitService().findGroupStops(e)
       );
       case AreaStop -> new StopLayerBuilder<>(
         layerParameters,

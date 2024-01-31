@@ -173,7 +173,7 @@ class StopAndStationMapper {
     NetexMainAndSubMode transitMode,
     StopPlace stopPlace
   ) {
-    // TODO OTP2 - This assumption is only valid because Norway have a
+    // TODO OTP2 - This assumption is only valid because Norway has a
     //           - national stop register, we should add all stops/quays
     //           - for version resolution.
     // Continue if this is not newest version of quay

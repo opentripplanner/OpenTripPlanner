@@ -40,7 +40,11 @@ public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopL
       .apply(query)
       .stream()
       .map(stop -> {
-        Geometry geometry = stop.getGeometry().copy();
+        Geometry geometry = stop
+          .getEncompassingAreaGeometry()
+          .map(g -> (Geometry) g)
+          .orElse(stop.getGeometry())
+          .copy();
         geometry.setUserData(stop);
         return geometry;
       })
