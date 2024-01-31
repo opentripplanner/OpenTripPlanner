@@ -579,7 +579,7 @@ type Quay implements PlaceInterface {
   ): [EstimatedCall!]! @timingData
   "Geometry for flexible area."
   flexibleArea: Coordinates
-  "the Quays part of an flexible group."
+  "the Quays part of a flexible group."
   flexibleGroup: [Quay]
   id: ID!
   "List of journey patterns servicing this quay"

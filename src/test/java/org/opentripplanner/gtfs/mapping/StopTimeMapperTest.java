@@ -228,6 +228,6 @@ public class StopTimeMapperTest {
     assertInstanceOf(GroupStop.class, mapped.getStop());
 
     var groupStop = (GroupStop) mapped.getStop();
-    assertEquals("[RegularStop{A:1 Stop}]", groupStop.getLocations().toString());
+    assertEquals("[RegularStop{A:1 Stop}]", groupStop.getChildLocations().toString());
   }
 }

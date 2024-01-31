@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +47,18 @@ class ObjectUtilsTest {
         () -> ObjectUtils.requireNotInitialized("old", "new")
       );
     assertEquals("Field is already set! Old value: old, new value: new.", ex.getMessage());
+  }
+
+  @Test
+  void safeGetOrNull() {
+    assertEquals("test", ObjectUtils.safeGetOrNull(() -> "test"));
+    assertEquals(3000, ObjectUtils.safeGetOrNull(() -> Duration.ofSeconds(3).toMillis()));
+    assertNull(ObjectUtils.safeGetOrNull(() -> null));
+    assertNull(
+      ObjectUtils.safeGetOrNull(() -> {
+        throw new NullPointerException("Something went wrong - ignore");
+      })
+    );
   }
 
   @Test
