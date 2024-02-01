@@ -166,7 +166,6 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  void legIndex() {
   void walkSeparateFromBike() {
     var itin = newItinerary(A, T11_00).walk(D2m, B).bicycle(T11_05, T11_15, D).walk(D3m, E).build();
 
