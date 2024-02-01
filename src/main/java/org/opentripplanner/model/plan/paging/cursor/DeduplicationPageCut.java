@@ -29,7 +29,7 @@ record DeduplicationPageCut(
   }
 
   @Override
-  public int getGeneralizedCost() {
+  public int getGeneralizedCostIncludingPenalty() {
     return generalizedCost;
   }
 

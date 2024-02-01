@@ -6,7 +6,10 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.Duration;
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -15,7 +18,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants {
 
   @Test
-  public void filterAwayNothingIfNoWalking() {
+  void filterAwayNothingIfNoWalking() {
     // Given:
     Itinerary i1 = newItinerary(A).bus(21, 6, 7, E).build();
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
@@ -31,7 +34,7 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
   }
 
   @Test
-  public void filterAwayLongTravelTimeWithoutWaitTime() {
+  void filterAwayLongTravelTimeWithoutWaitTime() {
     // Given: a walk itinerary with high cost - do not have any effect on filtering
     Itinerary walk = newItinerary(A, 6).walk(1, E).build();
     walk.setGeneralizedCost(300);
@@ -56,5 +59,52 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
     // Then:
     assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));
+  }
+
+  @Nested
+  class AccessEgressPenalties {
+
+    private static final RemoveTransitIfStreetOnlyIsBetter FLAGGER = new RemoveTransitIfStreetOnlyIsBetter(
+      CostLinearFunction.of(Duration.ZERO, 1.0)
+    );
+
+    @Test
+    void keepBusWithLowCostAndPenalty() {
+      Itinerary walk = newItinerary(A, 6).walk(1, E).build();
+      walk.setGeneralizedCost(300);
+
+      // transit has slightly lower cost, however it also has a high penalty which is
+      // not taken into account when comparing the itineraries
+      Itinerary busWithPenalty = newItinerary(A).bus(21, 6, 8, E).build();
+      busWithPenalty.setGeneralizedCost(299);
+      busWithPenalty.setAccessPenalty(new TimeAndCost(Duration.ZERO, Cost.costOfSeconds(360)));
+
+      // When:
+      var itineraries = List.of(walk, busWithPenalty);
+
+      List<Itinerary> result = FLAGGER.removeMatchesForTest(itineraries);
+
+      // Then:
+      assertEquals(toStr(itineraries), toStr(result));
+    }
+
+    @Test
+    void removeBusWithHighCostAndNoPenalty() {
+      Itinerary walk = newItinerary(A, 6).walk(1, E).build();
+      walk.setGeneralizedCost(300);
+
+      // transit has slightly lower cost, however it also has a high penalty which is
+      // not taken into account when comparing the itineraries
+      Itinerary bus = newItinerary(A).bus(21, 6, 8, E).build();
+      bus.setGeneralizedCost(301);
+
+      // When:
+      var itineraries = List.of(walk, bus);
+
+      List<Itinerary> result = FLAGGER.removeMatchesForTest(itineraries);
+
+      // Then:
+      assertEquals(toStr(List.of(walk)), toStr(result));
+    }
   }
 }
