@@ -40,6 +40,8 @@ public class Itinerary implements ItinerarySortKey {
   private final boolean walkOnly;
   private final boolean streetOnly;
   private final Duration nonTransitDuration;
+  private final Duration walkDuration;
+  private final double walkDistanceMeters;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
@@ -76,6 +78,8 @@ public class Itinerary implements ItinerarySortKey {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
+    this.walkDuration = totals.walkDuration;
+    this.walkDistanceMeters = totals.walkDistanceMeters;
     this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
@@ -678,6 +682,20 @@ public class Itinerary implements ItinerarySortKey {
   @Nullable
   public Emissions getEmissionsPerPerson() {
     return this.emissionsPerPerson;
+  }
+
+  /**
+   * How much walking this itinerary contains, in meters.
+   */
+  public double walkDistanceMeters() {
+    return walkDistanceMeters;
+  }
+
+  /**
+   * How long the walking is contained in this itinerary.
+   */
+  public Duration walkDuration() {
+    return walkDuration;
   }
 
   private static int penaltyCost(TimeAndCost penalty) {

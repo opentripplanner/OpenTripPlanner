@@ -24,6 +24,8 @@
                 co2
             }
             numberOfTransfers
+            walkDistance
+            walkTime
             legs {
                 mode
                 from {
