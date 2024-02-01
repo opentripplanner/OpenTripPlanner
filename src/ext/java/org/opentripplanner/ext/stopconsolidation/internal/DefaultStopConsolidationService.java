@@ -9,10 +9,8 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -75,25 +73,16 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   @Override
-  public I18NString agencySpecificName(StopLocation stop, Agency agency) {
+  public StopLocation agencySpecificStop(StopLocation stop, Agency agency) {
     if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
-      return stop.getName();
+      return stop;
     } else {
-      return agencySpecificStop(stop, agency).map(RegularStop::getName).orElseGet(stop::getName);
-    }
-  }
-
-  @Override
-  public String agencySpecificCode(StopLocation stop, Agency agency) {
-    if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
-      return stop.getCode();
-    } else {
-      return agencySpecificStop(stop, agency).map(RegularStop::getCode).orElseGet(stop::getCode);
+      return agencySpecificStopOpt(stop, agency).orElse(stop);
     }
   }
 
   @Nonnull
-  private Optional<RegularStop> agencySpecificStop(StopLocation stop, Agency agency) {
+  private Optional<StopLocation> agencySpecificStopOpt(StopLocation stop, Agency agency) {
     return repo
       .groups()
       .stream()
@@ -106,7 +95,13 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public StopLocation primaryStop(FeedScopedId id) {
-    var primaryId = repo.groups().stream().filter(g -> g.secondaries().contains(id)).map(ConsolidatedStopGroup::primary).findAny().orElse(id);
+    var primaryId = repo
+      .groups()
+      .stream()
+      .filter(g -> g.secondaries().contains(id))
+      .map(ConsolidatedStopGroup::primary)
+      .findAny()
+      .orElse(id);
     return transitModel.getStopModel().getRegularStop(primaryId);
   }
 }
