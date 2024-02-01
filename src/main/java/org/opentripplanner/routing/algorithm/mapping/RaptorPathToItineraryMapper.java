@@ -134,7 +134,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary itinerary = new Itinerary(legs);
 
     // Map general itinerary fields
-    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()));
     itinerary.setArrivedAtDestinationWithRentedVehicle(
       mapped != null && mapped.isArrivedAtDestinationWithRentedVehicle()
     );
@@ -146,16 +145,21 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
+    var penaltyCost = 0;
     if (accessPathLeg.access() instanceof DefaultAccessEgress ae) {
       itinerary.setAccessPenalty(ae.penalty());
+      penaltyCost += ae.penalty().cost().toSeconds();
     }
 
     if (egressPathLeg.egress() instanceof DefaultAccessEgress ae) {
-      itinerary.setAccessPenalty(ae.penalty());
+      itinerary.setEgressPenalty(ae.penalty());
+      penaltyCost += ae.penalty().cost().toSeconds();
     }
     if (path.isC2Set()) {
       itinerary.setGeneralizedCost2(path.c2());
     }
+
+    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()) - penaltyCost);
 
     return itinerary;
   }
