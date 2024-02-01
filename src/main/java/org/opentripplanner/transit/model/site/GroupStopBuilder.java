@@ -75,7 +75,12 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
       )
     ) {
       throw new RuntimeException(
-        "Unsupported location for GroupStop. Must be Regular or FlexibleArea."
+        String.format(
+          "Unsupported location for %s. Must be %s or %s.",
+          GroupStop.class.getSimpleName(),
+          StopType.REGULAR,
+          StopType.FLEXIBLE_AREA
+        )
       );
     }
 
