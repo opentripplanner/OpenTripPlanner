@@ -61,7 +61,6 @@ public class DirectStreetRouter {
         directRequest.wheelchair(),
         directRequest.preferences().wheelchair()
       );
-
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
