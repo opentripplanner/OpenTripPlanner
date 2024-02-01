@@ -111,7 +111,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       siri.getServiceDelivery().getSituationExchangeDeliveries().isEmpty()
     ) {
       if (siri.getHeartbeatNotification() != null) {
-        LOG.info("Received SIRI heartbeat message");
+        LOG.debug("Received SIRI heartbeat message");
       } else {
         LOG.warn("Empty Siri message for messageId {}", id);
         LOG.debug(message);
