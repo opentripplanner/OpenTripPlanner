@@ -293,7 +293,7 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
-      .stopConsolidationDataSource()
+      .stopConsolidation()
       .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
       .orElse(null);
   }
