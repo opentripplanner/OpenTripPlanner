@@ -1,19 +1,24 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -82,13 +87,13 @@ public class RaptorPathToItineraryMapperTest {
   private static final RegularStop S2 = TEST_MODEL.stop("STOP2", 1.0, 1.0).build();
 
   @ParameterizedTest
-  @ValueSource(strings = { "0", "3000", "-3000" })
-  public void createItineraryTestZeroDurationEgress(int LAST_LEG_COST) {
+  @ValueSource(ints = { 0, 3000, -3000 })
+  void createItineraryTestZeroDurationEgress(int lastLegCost) {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule())
-      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST)));
+      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(lastLegCost)));
 
     int transitLegCost = path.accessLeg().nextLeg().c1();
     int egressLegCost = path.accessLeg().nextLeg().nextLeg().c1();
@@ -106,12 +111,31 @@ public class RaptorPathToItineraryMapperTest {
     );
   }
 
+  @Test
+  @Disabled("Need to write a general test framework to enable this.")
+  void penalty() {
+    // Arrange
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
+
+    var penalty = new TimeAndCost(Duration.ofMinutes(10), Cost.costOfMinutes(10));
+    RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule())
+      .egress(TestAccessEgress.car(2, RaptorCostConverter.toRaptorCost(1000), penalty));
+
+    // Act
+    var itinerary = mapper.createItinerary(path);
+
+    // Assert
+    assertNotNull(itinerary);
+    assertEquals(4708, itinerary.getGeneralizedCost());
+    assertNotEquals(4708, itinerary.getGeneralizedCostIncludingPenalty());
+  }
+
   /**
    * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3 legs
    * are properly mapped in the itinerary.
    */
   @Test
-  public void createItineraryWithOnBoardFlexAccess() {
+  void createItineraryWithOnBoardFlexAccess() {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();

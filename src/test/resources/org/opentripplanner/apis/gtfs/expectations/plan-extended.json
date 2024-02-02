@@ -11,6 +11,8 @@
             "co2" : 123.0
           },
           "numberOfTransfers" : 1,
+          "walkDistance" : 28.0,
+          "walkTime" : 20,
           "legs" : [
             {
               "mode" : "WALK",

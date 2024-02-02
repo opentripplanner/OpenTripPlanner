@@ -75,8 +75,6 @@ public class DefaultFareService implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
 
-  private final float UNKNOWN_FARE_PRICE = -0.01f;
-
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
@@ -119,80 +117,25 @@ public class DefaultFareService implements FareService {
     var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
     ItineraryFares fare = ItineraryFares.empty();
-    boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
-      final Multimap<Leg, FareProductUse> fareProducts = LinkedHashMultimap.create();
-      List<Money> fares = new ArrayList<>();
-      boolean legWithoutRulesFound = false;
-      boolean legsWithoutMatchingRulesFound = false;
       for (String feedId : fareLegsByFeed.keySet()) {
-        ItineraryFares currentFare = ItineraryFares.empty();
         var fareRules = fareRulesForFeed(fareType, feedId);
 
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
-          boolean feedHasFare = populateFare(
-            currentFare,
+          ItineraryFares computedFaresForType = calculateFaresForType(
             currency,
             fareType,
             fareLegsByFeed.get(feedId),
             fareRules
           );
 
-          if (!feedHasFare) {
-            legsWithoutMatchingRulesFound = true;
-          }
-          hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
-
-          fareProducts.putAll(currentFare.getLegProducts());
-          fare.addFare(fareType, currentFare.getFare(fareType));
-
-          fares.add(currentFare.getFare(fareType));
-
-          // If all the legs are from one feed, consider itinerary products
-          if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
-            currentFare
-              .getFareTypes()
-              .forEach(type -> {
-                var money = currentFare.getFare(type);
-                var fareProduct = FareProduct
-                  .of(new FeedScopedId(feedId, type.name()), type.name(), money)
-                  .build();
-                fare.addItineraryProducts(List.of(fareProduct));
-              });
-          }
-        } else {
-          legWithoutRulesFound = true;
+          fare.add(computedFaresForType);
         }
       }
-
-      fare.addFareProductUses(fareProducts);
-
-      // No fares will be discovered after this point
-      if (!hasFare) {
-        continue;
-      }
-
-      // Accumulate the final price of the fare or indicate that no final fare could be found
-      if (legWithoutRulesFound || legsWithoutMatchingRulesFound) {
-        fare.addFare(
-          fareType,
-          Money.ofFractionalAmount(fares.get(0).currency(), UNKNOWN_FARE_PRICE)
-        );
-      } else {
-        fare.addFare(
-          fareType,
-          fares
-            .stream()
-            .reduce(
-              Money.ofFractionalAmount(fare.getFare(fareType).currency(), 0),
-              (r1, r2) -> r1.plus(r2)
-            )
-        );
-      }
     }
-    return hasFare ? fare : null;
+    return fare;
   }
 
   /**
@@ -232,8 +175,7 @@ public class DefaultFareService implements FareService {
    * If our only rule were A-B with a fare of 10, we would have no lowest fare, but we will still
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
-  protected boolean populateFare(
-    ItineraryFares fare,
+  protected ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -242,7 +184,6 @@ public class DefaultFareService implements FareService {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
     Multimap<Leg, FareProductUse> fareProductUses = LinkedHashMultimap.create();
-    int count = 0;
     int start = 0;
     int end = legs.size() - 1;
     while (start <= end) {
@@ -287,14 +228,12 @@ public class DefaultFareService implements FareService {
         });
       }
 
-      ++count;
       start = via + 1;
     }
 
-    var amount = r.resultTable[0][legs.size() - 1];
-    fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
+    var fare = ItineraryFares.empty();
     fare.addFareProductUses(fareProductUses);
-    return count > 0;
+    return fare;
   }
 
   protected Optional<Money> calculateCost(

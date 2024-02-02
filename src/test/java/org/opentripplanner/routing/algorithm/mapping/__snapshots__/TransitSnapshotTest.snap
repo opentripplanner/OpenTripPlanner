@@ -235,33 +235,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:38:41.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -718,33 +693,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:39:22.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -1266,33 +1216,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:53:55.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -1749,33 +1674,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:55:32.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -2297,33 +2197,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T19:08:19.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -3044,33 +2919,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:38:40.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -3530,33 +3380,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T18:54:10.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -4016,33 +3841,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T19:09:40.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -4502,33 +4302,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T19:11:51.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -5028,33 +4803,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "elevationLost" : 0.0,
       "endTime" : "2009-11-17T19:25:05.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
