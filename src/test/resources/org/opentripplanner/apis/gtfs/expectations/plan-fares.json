@@ -183,14 +183,7 @@
               "fareProducts" : [ ]
             }
           ],
-          "fares" : [
-            {
-              "type" : "regular",
-              "cents" : 310,
-              "currency" : "EUR",
-              "components" : []
-            }
-          ]
+          "fares" : [ ]
         }
       ]
     }

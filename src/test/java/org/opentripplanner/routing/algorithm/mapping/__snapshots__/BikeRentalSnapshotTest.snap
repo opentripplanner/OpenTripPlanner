@@ -7,33 +7,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:32:24.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -493,33 +468,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:38:09.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -937,33 +887,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:40:10.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -1277,33 +1202,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:45:24.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -1763,33 +1663,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:54:24.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -2249,33 +2124,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:56:10.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -3264,33 +3114,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:28:51.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -3802,33 +3627,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:35:24.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -4220,33 +4020,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:37:21.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -4612,33 +4387,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:43:51.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -5150,33 +4900,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:51:24.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
@@ -5568,33 +5293,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:56:21.000+00:00",
       "fare" : {
-        "coveringItinerary" : [
-          {
-            "amount" : {
-              "cents" : 200,
-              "currency" : {
-                "currency" : "USD",
-                "currencyCode" : "USD",
-                "defaultFractionDigits" : 2,
-                "symbol" : "$"
-              }
-            },
-            "id" : "prt:regular",
-            "name" : "regular"
-          }
-        ],
         "details" : { },
-        "fare" : {
-          "regular" : {
-            "cents" : 200,
-            "currency" : {
-              "currency" : "USD",
-              "currencyCode" : "USD",
-              "defaultFractionDigits" : 2,
-              "symbol" : "$"
-            }
-          }
-        },
+        "fare" : { },
         "legProducts" : [
           {
             "legIndices" : [
