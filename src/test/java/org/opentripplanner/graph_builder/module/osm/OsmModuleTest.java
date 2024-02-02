@@ -33,6 +33,7 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
@@ -356,7 +357,11 @@ public class OsmModuleTest {
     File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
-    OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();
+    OsmModule loader = OsmModule
+      .of(provider, graph)
+      .withAreaVisibility(!skipVisibility)
+      .withStreetLimitationParameters(new StreetLimitationParameters())
+      .build();
 
     loader.buildGraph();
 

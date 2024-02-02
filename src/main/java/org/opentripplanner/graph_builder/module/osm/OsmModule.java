@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -27,6 +28,7 @@ import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -55,11 +57,13 @@ public class OsmModule implements GraphBuilderModule {
   private final SafetyValueNormalizer normalizer;
   private final VertexGenerator vertexGenerator;
   private final OsmDatabase osmdb;
+  private final StreetLimitationParameters streetLimitationParameters;
 
   OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
+    @Nullable StreetLimitationParameters streetLimitationParameters,
     OsmProcessingParameters params
   ) {
     this.providers = List.copyOf(providers);
@@ -69,6 +73,7 @@ public class OsmModule implements GraphBuilderModule {
     this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
+    this.streetLimitationParameters = streetLimitationParameters;
   }
 
   public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph) {
@@ -94,6 +99,9 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info("Building street graph from OSM");
     build();
     graph.hasStreets = true;
+    if (streetLimitationParameters != null) {
+      streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
+    }
   }
 
   @Override
@@ -550,5 +558,16 @@ public class OsmModule implements GraphBuilderModule {
     params.edgeNamer().recordEdge(way, street);
 
     return street;
+  }
+
+  private float getMaxCarSpeed() {
+    float maxSpeed = 0f;
+    for (OsmProvider provider : providers) {
+      var wps = provider.getWayPropertySet();
+      if (wps.maxUsedCarSpeed > maxSpeed) {
+        maxSpeed = wps.maxUsedCarSpeed;
+      }
+    }
+    return maxSpeed;
   }
 }

@@ -31,6 +31,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
@@ -120,6 +121,7 @@ public class SpeedTest {
         config.flexConfig,
         List.of(),
         null,
+        new StreetLimitationParameters(),
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

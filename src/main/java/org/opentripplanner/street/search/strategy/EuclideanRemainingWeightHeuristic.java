@@ -16,11 +16,22 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
+  private static final Float DEFAULT_MAX_CAR_SPEED = 40f;
+
   private double lat;
   private double lon;
   private double maxStreetSpeed;
   private double walkingSpeed;
   private boolean arriveBy;
+  private float maxCarSpeed;
+
+  public EuclideanRemainingWeightHeuristic() {
+    this(DEFAULT_MAX_CAR_SPEED);
+  }
+
+  public EuclideanRemainingWeightHeuristic(Float maxCarSpeed) {
+    this.maxCarSpeed = maxCarSpeed != null ? maxCarSpeed : DEFAULT_MAX_CAR_SPEED;
+  }
 
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
   //      not work correctly.
@@ -50,7 +61,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   private double getStreetSpeedUpperBound(RoutingPreferences preferences, StreetMode streetMode) {
     // Assume carSpeed > bikeSpeed > walkSpeed
     if (streetMode.includesDriving()) {
-      return preferences.car().speed();
+      return maxCarSpeed;
     }
     if (streetMode.includesBiking()) {
       return preferences.bike().speed();

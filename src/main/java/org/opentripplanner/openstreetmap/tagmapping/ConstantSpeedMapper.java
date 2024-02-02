@@ -31,6 +31,8 @@ class ConstantSpeedFinlandMapper implements OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     props.setCarSpeed("highway=*", speed);
+    props.maxPossibleCarSpeed = 22.22f;
+    props.maxUsedCarSpeed = 22.22f;
     // Read the rest from the default set
     new FinlandMapper().populateProperties(props);
   }

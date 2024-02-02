@@ -56,16 +56,20 @@ public class GraphPathFinder {
 
   private final DataOverlayContext dataOverlayContext;
 
+  private final Float maxCarSpeed;
+
   public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
-    this(traverseVisitor, null);
+    this(traverseVisitor, null, null);
   }
 
   public GraphPathFinder(
     @Nullable TraverseVisitor<State, Edge> traverseVisitor,
-    @Nullable DataOverlayContext dataOverlayContext
+    @Nullable DataOverlayContext dataOverlayContext,
+    @Nullable Float maxCarSpeed
   ) {
     this.traverseVisitor = traverseVisitor;
     this.dataOverlayContext = dataOverlayContext;
+    this.maxCarSpeed = maxCarSpeed;
   }
 
   /**
@@ -81,7 +85,7 @@ public class GraphPathFinder {
 
     StreetSearchBuilder aStar = StreetSearchBuilder
       .of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(
           preferences.maxDirectDuration().valueOf(request.journey().direct().mode())

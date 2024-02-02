@@ -26,7 +26,6 @@
       }
     },
     "car": {
-      "speed": 40,
       "reluctance": 4.0,
       "decelerationSpeed": 2.9,
       "accelerationSpeed": 2.9,

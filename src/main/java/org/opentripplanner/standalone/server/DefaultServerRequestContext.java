@@ -25,6 +25,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TransitService;
 
 @HttpRequestScoped
@@ -47,6 +48,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final VehicleRentalService vehicleRentalService;
   private final EmissionsService emissionsService;
   private final StopConsolidationService stopConsolidationService;
+  private final StreetLimitationParameters streetLimitationParameters;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -66,6 +68,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     EmissionsService emissionsService,
     List<RideHailingService> rideHailingServices,
     StopConsolidationService stopConsolidationService,
+    StreetLimitationParameters streetLimitationParameters,
     FlexConfig flexConfig,
     TraverseVisitor traverseVisitor
   ) {
@@ -85,6 +88,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
     this.stopConsolidationService = stopConsolidationService;
+    this.streetLimitationParameters = streetLimitationParameters;
   }
 
   /**
@@ -105,6 +109,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
+    StreetLimitationParameters streetLimitationParameters,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     return new DefaultServerRequestContext(
@@ -122,6 +127,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       emissionsService,
       rideHailingServices,
       stopConsolidationService,
+      streetLimitationParameters,
       flexConfig,
       traverseVisitor
     );
@@ -197,6 +203,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public StopConsolidationService stopConsolidationService() {
     return stopConsolidationService;
+  }
+
+  @Override
+  public StreetLimitationParameters streetLimitationParameters() {
+    return streetLimitationParameters;
   }
 
   @Override

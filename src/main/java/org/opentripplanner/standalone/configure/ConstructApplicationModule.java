@@ -19,6 +19,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
@@ -36,6 +37,7 @@ public class ConstructApplicationModule {
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
+    StreetLimitationParameters streetLimitationParameters,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
     LauncherRequestDecorator launcherRequestDecorator
@@ -57,6 +59,7 @@ public class ConstructApplicationModule {
       routerConfig.flexConfig(),
       rideHailingServices,
       stopConsolidationService,
+      streetLimitationParameters,
       traverseVisitor
     );
   }

@@ -38,6 +38,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -132,6 +133,7 @@ public class ConstantsForTests {
           .of(osmProvider, graph)
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
+          .withStreetLimitationParameters(new StreetLimitationParameters())
           .build();
         osmModule.buildGraph();
       }
@@ -172,7 +174,10 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
-      OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
+      OsmModule osmModule = OsmModule
+        .of(osmProvider, graph)
+        .withStreetLimitationParameters(new StreetLimitationParameters())
+        .build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {

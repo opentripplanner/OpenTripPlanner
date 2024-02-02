@@ -20,6 +20,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -51,6 +52,7 @@ public class TestServerContext {
       routerConfig.flexConfig(),
       List.of(),
       null,
+      new StreetLimitationParameters(),
       null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());

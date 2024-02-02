@@ -69,7 +69,7 @@ public class DefaultMapperTest {
     wps.addSpeedPicker(getSpeedPicker("highway=motorway", kmhAsMs(100)));
     wps.addSpeedPicker(getSpeedPicker("highway=*", kmhAsMs(35)));
     wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
-    wps.defaultSpeed = kmhAsMs(25);
+    wps.defaultCarSpeed = kmhAsMs(25);
 
     way = new OSMWithTags();
 

@@ -997,7 +997,7 @@ type RoutingParameters {
   "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
   carDropOffTime: Int
   "Max car speed along streets, in meters per second"
-  carSpeed: Float
+  carSpeed: Float @deprecated(reason : "This parameter is no longer configurable.")
   compactLegsByReversedSearch: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
   debugItineraryFilter: Boolean @deprecated(reason : "Use `itineraryFilter.debug` instead.")
   "Option to disable the default filtering of GTFS-RT alerts by time."
