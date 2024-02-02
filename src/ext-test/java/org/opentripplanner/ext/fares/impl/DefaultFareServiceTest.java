@@ -59,6 +59,8 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var legProducts = fare.getLegProducts().get(itin.getTransitLeg(0));
     assertEquals(
       List.of(
+        // reminder: the FareProductUse's id are a (non-random) UUID computed from the start time of the leg
+        // plus some properties from the product itself like the id, price, rider category and medium
         new FareProductUse("1d270201-412b-3b86-80f6-92ab144fa2e5", AIRPORT_TO_CITY_CENTER_PRODUCT)
       ),
       legProducts

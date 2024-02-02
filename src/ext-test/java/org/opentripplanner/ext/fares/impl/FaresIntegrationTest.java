@@ -76,11 +76,12 @@ public class FaresIntegrationTest {
       .toInstant();
 
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
-    var fpu = List.copyOf(fare.getLegProducts().values()).getFirst();
-    assertEquals(List.of(fpu), List.copyOf(fare.getLegProducts().values()));
+    var fpu = List.copyOf(fare.getLegProducts().values());
+    assertEquals(1, fpu.size());
 
-    assertEquals(Money.usDollars(2f), fpu.product().price());
-    assertEquals("prt:19", fpu.product().id().toString());
+    var fp = fpu.getFirst();
+    assertEquals(Money.usDollars(2f), fp.product().price());
+    assertEquals("prt:19", fp.product().id().toString());
 
     // long trip
 
