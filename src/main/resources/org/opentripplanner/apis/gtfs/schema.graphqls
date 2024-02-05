@@ -1645,6 +1645,9 @@ type RideHailingEstimate {
     productName: String
 }
 
+"""
+An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
+"""
 scalar OffsetDateTime
 
 type LegTimes {
