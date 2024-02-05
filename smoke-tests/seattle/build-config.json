@@ -35,7 +35,7 @@
     {
       "type" : "gtfs",
       "feedId" : "monorail",
-      "source" : "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/seattlemonorail-wa-us.zip"
+      "source" : "https://gtfs.sound.obaweb.org/prod/96_gtfs.zip"
     }
   ],
   "transferRequests": [
