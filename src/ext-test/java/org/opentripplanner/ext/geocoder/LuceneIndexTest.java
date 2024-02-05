@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -132,20 +133,16 @@ class LuceneIndexTest {
       }
 
       @Override
-      public List<Agency> getAgenciesForStopLocation(StopLocation stop) {
-        if (stop.equals(ALEXANDERPLATZ_BUS)) {
-          return List.of(BVG);
-        } else {
-          return List.of();
-        }
-      }
-
-      @Override
       public Agency getAgencyForId(FeedScopedId id) {
         if (id.equals(BVG.getId())) {
           return BVG;
         }
         return null;
+      }
+
+      @Override
+      public Set<Route> getRoutesForStop(StopLocation stop) {
+        return Set.of(TransitModelForTest.route("route1").withAgency(BVG).build());
       }
 
       @Override

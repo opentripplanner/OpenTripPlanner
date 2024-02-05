@@ -2,11 +2,13 @@ package org.opentripplanner.ext.geocoder;
 
 import com.google.common.collect.Iterables;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
@@ -59,8 +61,7 @@ class StopClusterMapper {
 
   LuceneStopCluster map(StopLocationsGroup g) {
     var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-    var agencies = transitService
-      .getAgenciesForStopLocationsGroup(g)
+    var agencies = agenciesForStopLocationsGroup(g)
       .stream()
       .map(s -> s.getId().toString())
       .toList();
@@ -75,11 +76,7 @@ class StopClusterMapper {
   }
 
   Optional<LuceneStopCluster> map(StopLocation sl) {
-    var agencies = transitService
-      .getAgenciesForStopLocation(sl)
-      .stream()
-      .map(a -> a.getId().toString())
-      .toList();
+    var agencies = agenciesForStopLocation(sl).stream().map(a -> a.getId().toString()).toList();
     return Optional
       .ofNullable(sl.getName())
       .map(name -> {
@@ -93,6 +90,19 @@ class StopClusterMapper {
           agencies
         );
       });
+  }
+
+  private List<Agency> agenciesForStopLocation(StopLocation stop) {
+    return transitService.getRoutesForStop(stop).stream().map(Route::getAgency).distinct().toList();
+  }
+
+  private List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
+    return group
+      .getChildStops()
+      .stream()
+      .flatMap(sl -> agenciesForStopLocation(sl).stream())
+      .distinct()
+      .toList();
   }
 
   private static StopCluster.Coordinate toCoordinate(WgsCoordinate c) {

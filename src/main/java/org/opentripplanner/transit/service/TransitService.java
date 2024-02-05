@@ -215,16 +215,4 @@ public interface TransitService {
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
   List<TransitMode> getModesOfStopLocation(StopLocation stop);
-
-  /**
-   * Iterates over all child stops, the routes that visit this stop and return a de-duplicated list
-   * of their agencies.
-   */
-  List<Agency> getAgenciesForStopLocationsGroup(StopLocationsGroup group);
-
-  /**
-   * Iterates over all routes that visit this stop location and return a de-duplicated list
-   * of their agencies.
-   */
-  List<Agency> getAgenciesForStopLocation(StopLocation stop);
 }
