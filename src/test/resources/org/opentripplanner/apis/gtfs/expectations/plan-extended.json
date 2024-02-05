@@ -47,6 +47,7 @@
               "generalizedCost" : 40,
               "headsign" : null,
               "trip" : null,
+              "intermediatePlaces" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
@@ -84,6 +85,15 @@
               "trip" : {
                 "tripHeadsign" : "Trip headsign 122"
               },
+              "intermediatePlaces" : [
+                {
+                  "arrival" : "2020-02-02T11:01:00Z",
+                  "departure" : "2020-02-02T11:01:00Z",
+                  "stop" : {
+                    "name" : "B"
+                  }
+                }
+              ],
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
@@ -121,6 +131,15 @@
               "trip" : {
                 "tripHeadsign" : "Trip headsign 439"
               },
+              "intermediatePlaces" : [
+                {
+                  "arrival" : "2020-02-02T11:30:00Z",
+                  "departure" : "2020-02-02T11:30:00Z",
+                  "stop" : {
+                    "name" : "C"
+                  }
+                }
+              ],
               "alerts" : [
                 {
                   "id" : "QWxlcnQ6Rjphbi1hbGVydA",
@@ -176,6 +195,7 @@
               "generalizedCost" : 1000,
               "headsign" : null,
               "trip" : null,
+              "intermediatePlaces" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : {
                 "provider" : {

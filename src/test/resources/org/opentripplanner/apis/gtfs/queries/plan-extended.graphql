@@ -63,6 +63,13 @@
                 trip {
                     tripHeadsign
                 }
+                intermediatePlaces {
+                    arrival
+                    departure
+                    stop {
+                        name
+                    }
+                }
                 alerts {
                     id
                     alertHeaderText
