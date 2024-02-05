@@ -11,7 +11,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * This filter removes all transit results that have a generalized-cost higher than the max-limit
+ * This filter removes all transit results which have a generalized-cost higher than the max-limit
  * computed by the {@link #costLimitFunction} plus the wait cost given by
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.
  */
@@ -36,7 +36,7 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
     List<Itinerary> transitItineraries = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
-      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCost))
+      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCostIncludingPenalty))
       .toList();
 
     return transitItineraries
@@ -46,13 +46,13 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
   }
 
   private boolean generalizedCostExceedsLimit(Itinerary subject, Itinerary transitItinerary) {
-    return subject.getGeneralizedCost() > calculateLimit(subject, transitItinerary);
+    return subject.getGeneralizedCostIncludingPenalty() > calculateLimit(subject, transitItinerary);
   }
 
   private int calculateLimit(Itinerary subject, Itinerary transitItinerary) {
     return (
       costLimitFunction
-        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCost()))
+        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCostIncludingPenalty()))
         .toSeconds() +
       getWaitTimeCost(transitItinerary, subject)
     );

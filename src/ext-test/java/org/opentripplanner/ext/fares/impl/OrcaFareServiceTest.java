@@ -81,7 +81,16 @@ public class OrcaFareServiceTest {
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
     var itinerary = new Itinerary(legs);
     var itineraryFares = orcaFareService.calculateFares(itinerary);
-    assertEquals(expectedPrice, itineraryFares.getFare(fareType));
+    assertEquals(
+      expectedPrice,
+      itineraryFares
+        .getItineraryProducts()
+        .stream()
+        .filter(fareProduct -> fareProduct.name().equals(fareType.name()))
+        .findFirst()
+        .get()
+        .price()
+    );
   }
 
   private static void assertLegFareEquals(
@@ -167,8 +176,7 @@ public class OrcaFareServiceTest {
   @Test
   void calculateFareByLeg() {
     List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
-    ItineraryFares fares = new ItineraryFares();
-    orcaFareService.populateFare(fares, USD, FareType.electronicRegular, rides, null);
+    var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
@@ -489,9 +497,8 @@ public class OrcaFareServiceTest {
       )
     );
 
-    var fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, USD, type, legs, null);
-    assertNotNull(fare.getFare(type));
+    var fare = orcaFareService.calculateFaresForType(USD, type, legs, null);
+    assertFalse(fare.getLegProducts().isEmpty());
   }
 
   @ParameterizedTest
@@ -511,9 +518,8 @@ public class OrcaFareServiceTest {
       )
     );
 
-    var fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, USD, type, legs, null);
-    assertNotNull(fare.getFare(type));
+    var fare = orcaFareService.calculateFaresForType(USD, type, legs, null);
+    assertFalse(fare.getLegProducts().isEmpty());
   }
 
   @Test
