@@ -63,6 +63,8 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    // scheduled to be removed and only here for backwards compatibility
+    addIfEnabled(SandboxAPIGeocoder, GeocoderResource.GeocoderResourceOldPath.class);
     addIfEnabled(SandboxAPITravelTime, TravelTimeResource.class);
 
     // scheduled to be removed
