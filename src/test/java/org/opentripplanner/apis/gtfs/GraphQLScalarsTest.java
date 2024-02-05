@@ -6,6 +6,10 @@ import static org.junit.jupiter.params.provider.Arguments.of;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import graphql.schema.CoercingSerializeException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,9 +18,16 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.json.ObjectMappers;
 
 class GraphQLScalarsTest {
+
+  private static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(
+    LocalDate.of(2024, 2, 4),
+    LocalTime.MIDNIGHT,
+    ZoneOffset.UTC
+  );
 
   static List<Arguments> durationCases() {
     return List.of(
@@ -58,5 +69,27 @@ class GraphQLScalarsTest {
       .ignoringExtraFields()
       .readTree("{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[1,1],[2,2],[0,0]]]}");
     assertEquals(jsonNode.toString(), geoJson.toString());
+  }
+
+  static List<Arguments> offsetDateTimeCases() {
+    return List.of(
+      of(OFFSET_DATE_TIME, "2024-02-04T00:00:00Z"),
+      of(OFFSET_DATE_TIME.plusHours(12).plusMinutes(8).plusSeconds(22), "2024-02-04T12:08:22Z"),
+      of(
+        OFFSET_DATE_TIME.atZoneSameInstant(ZoneIds.BERLIN).toOffsetDateTime(),
+        "2024-02-04T01:00:00+01:00"
+      ),
+      of(
+        OFFSET_DATE_TIME.atZoneSameInstant(ZoneIds.NEW_YORK).toOffsetDateTime(),
+        "2024-02-03T19:00:00-05:00"
+      )
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("offsetDateTimeCases")
+  void duration(OffsetDateTime odt, String expected) {
+    var string = GraphQLScalars.offsetDateTimeScalar.getCoercing().serialize(odt);
+    assertEquals(expected, string);
   }
 }
