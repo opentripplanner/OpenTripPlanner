@@ -221,7 +221,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
     noPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(0).withHopCost(0)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(0).withMountDismountCost(0)))
     );
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
@@ -231,7 +231,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
     withPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(42).withHopCost(23)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(42).withMountDismountCost(23)))
     );
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
