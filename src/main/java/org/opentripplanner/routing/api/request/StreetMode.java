@@ -28,26 +28,12 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    * Walk to a bike rental point, bike to a bike rental drop-off point, and walk the rest of the
    * way. This can include bike rental at fixed locations or free-floating services.
    */
-  BIKE_RENTAL(
-    Feature.ACCESS,
-    Feature.TRANSFER,
-    Feature.EGRESS,
-    Feature.WALKING,
-    Feature.CYCLING,
-    Feature.RENTING
-  ),
+  BIKE_RENTAL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING, Feature.CYCLING, Feature.RENTING),
   /**
    * Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the
    * rest of the way. This can include scooter rental at fixed locations or free-floating services.
    */
-  SCOOTER_RENTAL(
-    Feature.ACCESS,
-    Feature.TRANSFER,
-    Feature.EGRESS,
-    Feature.WALKING,
-    Feature.SCOOTER,
-    Feature.RENTING
-  ),
+  SCOOTER_RENTAL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING, Feature.SCOOTER, Feature.RENTING),
   /**
    * Car only
    * <p>
@@ -69,14 +55,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    * Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    * This can include car rental at fixed locations or free-floating services.
    */
-  CAR_RENTAL(
-    Feature.ACCESS,
-    Feature.TRANSFER,
-    Feature.EGRESS,
-    Feature.WALKING,
-    Feature.DRIVING,
-    Feature.RENTING
-  ),
+  CAR_RENTAL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING, Feature.DRIVING, Feature.RENTING),
 
   /**
    * Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
