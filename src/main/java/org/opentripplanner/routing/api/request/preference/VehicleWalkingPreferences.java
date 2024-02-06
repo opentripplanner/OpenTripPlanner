@@ -19,15 +19,15 @@ public class VehicleWalkingPreferences implements Serializable {
 
   private final double speed;
   private final double reluctance;
-  private final Duration hopTime;
-  private final Cost hopCost;
+  private final Duration mountDismountTime;
+  private final Cost mountDismountCost;
   private final double stairsReluctance;
 
   private VehicleWalkingPreferences() {
     this.speed = 1.33;
     this.reluctance = 5.0;
-    this.hopTime = Duration.ZERO;
-    this.hopCost = Cost.ZERO;
+    this.mountDismountTime = Duration.ZERO;
+    this.mountDismountCost = Cost.ZERO;
     // very high reluctance to carry the bike up/down a flight of stairs
     this.stairsReluctance = 10;
   }
@@ -39,8 +39,8 @@ public class VehicleWalkingPreferences implements Serializable {
   private VehicleWalkingPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.hopTime = Duration.ofSeconds(Units.duration(builder.hopTime));
-    this.hopCost = Cost.costOfSeconds(builder.hopCost);
+    this.mountDismountTime = Duration.ofSeconds(Units.duration(builder.mountDismountTime));
+    this.mountDismountCost = Cost.costOfSeconds(builder.mountDismountCost);
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
   }
 
@@ -73,13 +73,13 @@ public class VehicleWalkingPreferences implements Serializable {
   }
 
   /** Time to get on and off your own vehicle. */
-  public Duration hopTime() {
-    return hopTime;
+  public Duration mountDismountTime() {
+    return mountDismountTime;
   }
 
   /** Cost of getting on and off your own vehicle. */
-  public Cost hopCost() {
-    return hopCost;
+  public Cost mountDismountCost() {
+    return mountDismountCost;
   }
 
   /** Reluctance of walking carrying a vehicle up a flight of stairs. */
@@ -95,15 +95,15 @@ public class VehicleWalkingPreferences implements Serializable {
     return (
       speed == that.speed &&
       reluctance == that.reluctance &&
-      Objects.equals(hopTime, that.hopTime) &&
-      Objects.equals(hopCost, that.hopCost) &&
+      Objects.equals(mountDismountTime, that.mountDismountTime) &&
+      Objects.equals(mountDismountCost, that.mountDismountCost) &&
       stairsReluctance == that.stairsReluctance
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speed, reluctance, hopTime, hopCost, stairsReluctance);
+    return Objects.hash(speed, reluctance, mountDismountTime, mountDismountCost, stairsReluctance);
   }
 
   @Override
@@ -112,8 +112,8 @@ public class VehicleWalkingPreferences implements Serializable {
       .of(VehicleWalkingPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addObj("hopTime", hopTime, DEFAULT.hopTime)
-      .addObj("hopCost", hopCost, DEFAULT.hopCost)
+      .addObj("mountDismountTime", mountDismountTime, DEFAULT.mountDismountTime)
+      .addObj("mountDismountCost", mountDismountCost, DEFAULT.mountDismountCost)
       .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
       .toString();
   }
@@ -123,16 +123,16 @@ public class VehicleWalkingPreferences implements Serializable {
     private final VehicleWalkingPreferences original;
     private double speed;
     private double reluctance;
-    private int hopTime;
-    private int hopCost;
+    private int mountDismountTime;
+    private int mountDismountCost;
     private double stairsReluctance;
 
     private Builder(VehicleWalkingPreferences original) {
       this.original = original;
       this.speed = original.speed;
       this.reluctance = original.reluctance;
-      this.hopTime = (int) original.hopTime.toSeconds();
-      this.hopCost = original.hopCost.toSeconds();
+      this.mountDismountTime = (int) original.mountDismountTime.toSeconds();
+      this.mountDismountCost = original.mountDismountCost.toSeconds();
       this.stairsReluctance = original.stairsReluctance;
     }
 
@@ -146,18 +146,18 @@ public class VehicleWalkingPreferences implements Serializable {
       return this;
     }
 
-    public VehicleWalkingPreferences.Builder withHopTime(Duration hopTime) {
-      this.hopTime = (int) hopTime.toSeconds();
+    public VehicleWalkingPreferences.Builder withMountDismountTime(Duration mountDismountTime) {
+      this.mountDismountTime = (int) mountDismountTime.toSeconds();
       return this;
     }
 
-    public VehicleWalkingPreferences.Builder withHopTime(int hopTime) {
-      this.hopTime = hopTime;
+    public VehicleWalkingPreferences.Builder withMountDismountTime(int mountDismountTime) {
+      this.mountDismountTime = mountDismountTime;
       return this;
     }
 
-    public VehicleWalkingPreferences.Builder withHopCost(int hopCost) {
-      this.hopCost = hopCost;
+    public VehicleWalkingPreferences.Builder withMountDismountCost(int mountDismountCost) {
+      this.mountDismountCost = mountDismountCost;
       return this;
     }
 

@@ -11,8 +11,8 @@ class VehicleWalkingPreferencesTest {
 
   private static final double SPEED = 1.45;
   private static final double RELUCTANCE = 5.5;
-  private static final Duration HOP_TIME = Duration.ofSeconds(15);
-  private static final Cost HOP_COST = Cost.costOfSeconds(20);
+  private static final Duration MOUNT_DISMOUNT_TIME = Duration.ofSeconds(15);
+  private static final Cost MOUNT_DISMOUNT_COST = Cost.costOfSeconds(20);
   private static final double STAIRS_RELUCTANCE = 11;
 
   private final VehicleWalkingPreferences subject = createPreferences();
@@ -28,13 +28,13 @@ class VehicleWalkingPreferencesTest {
   }
 
   @Test
-  void hopTime() {
-    assertEquals(HOP_TIME, subject.hopTime());
+  void mountDismountTime() {
+    assertEquals(MOUNT_DISMOUNT_TIME, subject.mountDismountTime());
   }
 
   @Test
-  void hopCost() {
-    assertEquals(HOP_COST, subject.hopCost());
+  void mountDismountCost() {
+    assertEquals(MOUNT_DISMOUNT_COST, subject.mountDismountCost());
   }
 
   @Test
@@ -57,8 +57,8 @@ class VehicleWalkingPreferencesTest {
       "VehicleWalkingPreferences{" +
       "speed: 1.45, " +
       "reluctance: 5.5, " +
-      "hopTime: PT15S, " +
-      "hopCost: $20, " +
+      "mountDismountTime: PT15S, " +
+      "mountDismountCost: $20, " +
       "stairsReluctance: 11.0}",
       subject.toString()
     );
@@ -69,8 +69,8 @@ class VehicleWalkingPreferencesTest {
       .of()
       .withSpeed(SPEED)
       .withReluctance(RELUCTANCE)
-      .withHopTime(HOP_TIME)
-      .withHopCost(HOP_COST.toSeconds())
+      .withMountDismountTime(MOUNT_DISMOUNT_TIME)
+      .withMountDismountCost(MOUNT_DISMOUNT_COST.toSeconds())
       .withStairsReluctance(STAIRS_RELUCTANCE)
       .build();
   }

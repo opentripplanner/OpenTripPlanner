@@ -55,7 +55,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
         graph.getVehicleParkingService(),
         new DefaultVehicleRentalService(),
         new DefaultRealtimeVehicleService(transitService),
-        GraphFinder.getInstance(graph, transitService::findRegularStop),
+        GraphFinder.getInstance(graph, transitService::findRegularStops),
         new RouteRequest()
       );
   }

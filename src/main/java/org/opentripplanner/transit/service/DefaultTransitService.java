@@ -550,7 +550,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<RegularStop> findRegularStop(Envelope envelope) {
+  public Collection<RegularStop> findRegularStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
     return transitModel.getStopModel().findRegularStops(envelope);
   }
@@ -558,7 +558,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<AreaStop> findAreaStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
-    return transitModel.getStopModel().queryLocationIndex(envelope);
+    return transitModel.getStopModel().findAreaStops(envelope);
   }
 
   @Override
