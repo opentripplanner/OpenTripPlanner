@@ -53,6 +53,7 @@ public class DebugStyleSpec {
   static StyleSpec build(
     VectorSourceLayer regularStops,
     VectorSourceLayer areaStops,
+    VectorSourceLayer groupStops,
     VectorSourceLayer edges,
     VectorSourceLayer vertices
   ) {
@@ -117,6 +118,15 @@ public class DebugStyleSpec {
           .ofId("area-stop")
           .typeFill()
           .vectorSourceLayer(areaStops)
+          .fillColor(GREEN)
+          .fillOpacity(0.5f)
+          .fillOutlineColor(BLACK)
+          .minZoom(6)
+          .maxZoom(MAX_ZOOM),
+        StyleBuilder
+          .ofId("group-stop")
+          .typeFill()
+          .vectorSourceLayer(groupStops)
           .fillColor(GREEN)
           .fillOpacity(0.5f)
           .fillOutlineColor(BLACK)
