@@ -187,7 +187,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<RegularStop> findRegularStop(Envelope envelope);
+  Collection<RegularStop> findRegularStops(Envelope envelope);
 
   Collection<AreaStop> findAreaStops(Envelope envelope);
 
