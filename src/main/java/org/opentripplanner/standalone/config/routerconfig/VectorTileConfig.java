@@ -84,7 +84,17 @@ public class VectorTileConfig
       root
         .of("attribution")
         .since(V2_5)
-        .summary("Set a custom attribution to be returned in `tilejson.json`")
+        .summary("Custom attribution to be returned in `tilejson.json`")
+        .description(
+          """
+          By default the `attribution` property in `tilejson.json` is computed from the names and 
+          URLs of the feed publishers.
+          If the OTP deployment contains many fields, this can become very unwieldy. 
+          
+          This configuration parameter allows you to set the `attribution` to any string you wish,
+          for example `<a href='https://trimet.org/tools'>TriMet, C-Tran, SMART and Friends</a>`.
+          """
+        )
         .asString(DEFAULT.attribution)
     );
   }
