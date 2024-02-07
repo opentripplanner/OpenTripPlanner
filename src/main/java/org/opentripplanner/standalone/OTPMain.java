@@ -113,6 +113,14 @@ public class OTPMain {
     var loadApp = new LoadApplication(cli);
     var config = loadApp.config();
 
+    // optionally check if the config is valid and if not abort the startup process
+    if (cli.configCheck && config.hasInvalidProperties()) {
+      throw new OtpAppException(
+        "Configuration contains invalid properties (see above for details). " +
+        "Please fix your configuration or remove --configCheck from your OTP CLI parameters."
+      );
+    }
+
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
     loadApp.validateConfigAndDataSources();

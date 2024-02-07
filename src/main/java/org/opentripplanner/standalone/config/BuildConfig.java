@@ -719,4 +719,8 @@ Netex data is also often supplied in a ZIP file.
   public NodeAdapter asNodeAdapter() {
     return root;
   }
+
+  public boolean hasInvalidProperties() {
+    return root.hasInvalidProperties();
+  }
 }

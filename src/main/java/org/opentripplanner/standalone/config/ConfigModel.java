@@ -105,4 +105,15 @@ public class ConfigModel {
     OTPFeature.enableFeatures(otpConfig.otpFeatures);
     OTPFeature.logFeatureSetup();
   }
+
+  /**
+   * Checks if any unknown or invalid properties were encountered while loading of the configuration.
+   */
+  public boolean hasInvalidProperties() {
+    return (
+      otpConfig.hasInvalidProperties() ||
+      buildConfig.hasInvalidProperties() ||
+      routerConfig.hasInvalidProperties()
+    );
+  }
 }

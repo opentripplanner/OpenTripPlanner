@@ -150,4 +150,8 @@ public class RouterConfig implements Serializable {
     // Print ONLY the values set, not default values
     return root.toPrettyString();
   }
+
+  public boolean hasInvalidProperties() {
+    return root.hasInvalidProperties();
+  }
 }

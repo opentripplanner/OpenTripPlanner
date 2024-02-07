@@ -71,4 +71,8 @@ public class OtpConfig {
       root.logAllWarnings(LOG::warn);
     }
   }
+
+  public boolean hasInvalidProperties() {
+    return root.hasInvalidProperties();
+  }
 }

@@ -172,6 +172,10 @@ public class NodeAdapter {
     allWarnings().forEach(logger);
   }
 
+  public boolean hasInvalidProperties() {
+    return !unusedParams().isEmpty() || !allWarnings().toList().isEmpty();
+  }
+
   /**
    * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
    * track of unused parameters and cannot generate documentation for the children.
