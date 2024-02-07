@@ -101,7 +101,11 @@ public class VectorTilesResource {
         TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
-    return new TileJson(url, envelope, feedInfos);
+    return serverContext
+      .vectorTileConfig()
+      .attribution()
+      .map(attr -> new TileJson(url, envelope, attr))
+      .orElseGet(() -> new TileJson(url, envelope, feedInfos));
   }
 
   private static LayerBuilder<?> crateLayerBuilder(

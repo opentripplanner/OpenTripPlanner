@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
@@ -36,15 +37,8 @@ public class TileJson implements Serializable {
   public final double[] bounds;
   public final double[] center;
 
-  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
-    attribution =
-      feedInfos
-        .stream()
-        .map(feedInfo ->
-          "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
-        )
-        .collect(Collectors.joining(", "));
-
+  public TileJson(String tileUrl, WorldEnvelope envelope, String attribution) {
+    this.attribution = attribution;
     tiles = new String[] { tileUrl };
 
     bounds =
@@ -57,6 +51,21 @@ public class TileJson implements Serializable {
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };
+  }
+
+  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
+    this(tileUrl, envelope, attributionFromFeedInfo(feedInfos));
+  }
+
+  @Nonnull
+  private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {
+    var attribution = feedInfos
+      .stream()
+      .map(feedInfo ->
+        "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
+      )
+      .collect(Collectors.joining(", "));
+    return attribution;
   }
 
   /**

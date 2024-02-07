@@ -148,6 +148,7 @@ For each layer, the configuration includes:
 
 | Config Parameter                                               |    Type    | Summary                                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------|:----------:|--------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| attribution                                                    |  `string`  | Set a custom attribution to be returned in `tilejson.json`                                 | *Optional* |               |  2.5  |
 | [basePath](#vectorTiles_basePath)                              |  `string`  | The path of the vector tile source URLs in `tilejson.json`.                                | *Optional* |               |  2.5  |
 | [layers](#vectorTiles_layers)                                  | `object[]` | Configuration of the individual layers for the Mapbox vector tiles.                        | *Optional* |               |  2.0  |
 |       type = "stop"                                            |   `enum`   | Type of the layer.                                                                         | *Required* |               |  2.0  |
