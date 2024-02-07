@@ -111,9 +111,9 @@ public class GTFSToOtpTransitServiceMapper {
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
     locationMapper = new LocationMapper(builder.stopModel());
-    // location groups were replaced by stop areas in the spec
-    // this code will go away, please migrate now!
     locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper, builder.stopModel());
+    // the use of stop areas were reverted in the spec
+    // this code will go away, please migrate now!
     stopAreaMapper = new StopAreaMapper(stopMapper, locationMapper, builder.stopModel());
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);

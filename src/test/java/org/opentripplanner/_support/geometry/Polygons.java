@@ -1,14 +1,8 @@
 package org.opentripplanner._support.geometry;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
-import java.util.List;
-import org.geojson.GeoJsonObject;
-import org.geojson.LineString;
 import org.geojson.LngLatAlt;
-import org.geojson.Point;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 
