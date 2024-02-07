@@ -406,7 +406,12 @@ since the search-window is increased with the same amount as the maximum penalty
 the access legs used. In other cases where the access(CAR) is faster than transit the
 performance will be better.
 
-The default is no penalty, if not configured.
+The default values are
+
+- `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `flexible` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 

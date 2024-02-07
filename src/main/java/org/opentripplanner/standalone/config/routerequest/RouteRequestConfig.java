@@ -15,12 +15,16 @@ import static org.opentripplanner.standalone.config.routerequest.VehicleWalkingC
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -455,7 +459,9 @@ ferries, where the check-in process needs to be done in good time before ride.
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
 
-            The default is no penalty, if not configured.
+            The default values are
+            
+            %s
 
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -470,9 +476,15 @@ ferries, where the check-in process needs to be done in good time before ride.
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
-            """
+            """.formatted(
+                    formatPenaltyDefaultValues(dftAccessEgress)
+                  )
               )
-              .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
+              .asEnumMap(
+                StreetMode.class,
+                TimeAndCostPenaltyMapper::map,
+                dftAccessEgress.penalty().asEnumMap()
+              )
           )
           .withMaxDuration(
             cae
@@ -567,6 +579,16 @@ your users receive a timely response. You can also limit the max duration. There
           )
           .asDuration(dft.routingTimeout())
       );
+  }
+
+  private static String formatPenaltyDefaultValues(AccessEgressPreferences dftAccessEgress) {
+    return dftAccessEgress
+      .penalty()
+      .asEnumMap()
+      .entrySet()
+      .stream()
+      .map(s -> "- `%s` = %s".formatted(StringUtils.kebabCase(s.getKey().toString()), s.getValue()))
+      .collect(Collectors.joining("\n"));
   }
 
   private static void mapCarPreferences(NodeAdapter root, CarPreferences.Builder builder) {
