@@ -88,6 +88,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Separate walk time from non-transit time [#5648](https://github.com/opentripplanner/OpenTripPlanner/pull/5648)
 - Remove "fare" [#5645](https://github.com/opentripplanner/OpenTripPlanner/pull/5645)
 - Refactor GroupStopBuilder addLocation method [#5651](https://github.com/opentripplanner/OpenTripPlanner/pull/5651)
+- Remove `VehicleToStopHeuristics` [#5381](https://github.com/opentripplanner/OpenTripPlanner/pull/5381)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
