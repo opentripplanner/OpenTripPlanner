@@ -225,12 +225,20 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: {a:'Foo'} } }");
     assertEquals(
       Map.of(AnEnum.A, new ARecord("Foo")),
-      subject.of("key").asEnumMap(AnEnum.class, ARecord::fromJson)
+      subject.of("key").asEnumMap(AnEnum.class, ARecord::fromJson, Map.of())
     );
     assertEquals(
       Collections.<AnEnum, Boolean>emptyMap(),
-      subject.of("missing-key").asEnumMap(AnEnum.class, ARecord::fromJson)
+      subject.of("missing-key").asEnumMap(AnEnum.class, ARecord::fromJson, Map.of())
     );
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
+  }
+
+  @Test
+  public void asEnumMapWithDefaultValue() {
+    var subject = newNodeAdapterForTest("{}");
+    final Map<AnEnum, ARecord> dflt = Map.of(AnEnum.A, new ARecord("Foo"));
+    assertEquals(dflt, subject.of("key").asEnumMap(AnEnum.class, ARecord::fromJson, dflt));
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
