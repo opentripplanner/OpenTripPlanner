@@ -71,6 +71,7 @@ class StopTimeMapper {
       case Stop stop -> lhs.setStop(stopMapper.map(stop));
       case Location location -> lhs.setStop(locationMapper.map(location));
       case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
+      // only here for backwards compatibility, this will be removed in the future
       case StopArea area -> lhs.setStop(stopAreaMapper.map(area));
       default -> throw new IllegalArgumentException(
         "Unknown location type: %s".formatted(stopLocation)
