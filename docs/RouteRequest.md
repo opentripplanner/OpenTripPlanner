@@ -78,8 +78,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [safety](#rd_bicycle_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
 |       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
 |    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       [hopCost](#rd_bicycle_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
-|       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                         | *Optional* | `"PT0S"`         |  2.0  |
+|       [mountDismountCost](#rd_bicycle_walk_mountDismountCost)                                                |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
+|       [mountDismountTime](#rd_bicycle_walk_mountDismountTime)                                                |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                         | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                    | *Optional* | `5.0`            |  2.1  |
 |       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                            | *Optional* | `1.33`           |  2.1  |
 |       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
@@ -406,7 +406,12 @@ since the search-window is increased with the same amount as the maximum penalty
 the access legs used. In other cases where the access(CAR) is faster than transit the
 performance will be better.
 
-The default is no penalty, if not configured.
+The default values are
+
+- `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `flexible` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -525,7 +530,7 @@ This factor can also include other concerns such as convenience and general cycl
 preferences by taking into account road surface etc.
 
 
-<h3 id="rd_bicycle_walk_hopCost">hopCost</h3>
+<h3 id="rd_bicycle_walk_mountDismountCost">mountDismountCost</h3>
 
 **Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
 **Path:** /routingDefaults/bicycle/walk 
@@ -536,7 +541,7 @@ There are different parameters for the cost of renting or parking a vehicle and 
 not meant for controlling the cost of those events.
 
 
-<h3 id="rd_bicycle_walk_hopTime">hopTime</h3>
+<h3 id="rd_bicycle_walk_mountDismountTime">mountDismountTime</h3>
 
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults/bicycle/walk 

@@ -396,13 +396,13 @@ public class OrcaFareService extends DefaultFareService {
    * one.
    */
   @Override
-  public boolean populateFare(
-    ItineraryFares fare,
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
+    var fare = ItineraryFares.empty();
     ZonedDateTime freeTransferStartTime = null;
     Money cost = Money.ZERO_USD;
     Money orcaFareDiscount = Money.ZERO_USD;
@@ -480,11 +480,12 @@ public class OrcaFareService extends DefaultFareService {
     }
     cost = cost.plus(orcaFareDiscount);
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
-      fare.addFare(fareType, cost);
-      return true;
-    } else {
-      return false;
+      var fp = FareProduct
+        .of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost)
+        .build();
+      fare.addItineraryProducts(List.of(fp));
     }
+    return fare;
   }
 
   /**
