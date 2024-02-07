@@ -77,12 +77,12 @@ public class DefaultStopConsolidationService implements StopConsolidationService
     if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
       return stop;
     } else {
-      return agencySpecificStopOpt(stop, agency).orElse(stop);
+      return findAgencySpecificStop(stop, agency).orElse(stop);
     }
   }
 
   @Nonnull
-  private Optional<StopLocation> agencySpecificStopOpt(StopLocation stop, Agency agency) {
+  private Optional<StopLocation> findAgencySpecificStop(StopLocation stop, Agency agency) {
     return repo
       .groups()
       .stream()
