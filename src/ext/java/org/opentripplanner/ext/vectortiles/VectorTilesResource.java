@@ -28,6 +28,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVeh
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
@@ -81,13 +82,6 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
-    var feedInfos = serverContext
-      .transitService()
-      .getFeedIds()
-      .stream()
-      .map(serverContext.transitService()::getFeedInfo)
-      .filter(Predicate.not(Objects::isNull))
-      .toList();
 
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
@@ -105,7 +99,20 @@ public class VectorTilesResource {
       .vectorTileConfig()
       .attribution()
       .map(attr -> new TileJson(url, envelope, attr))
-      .orElseGet(() -> new TileJson(url, envelope, feedInfos));
+      .orElseGet(() -> {
+        var feedInfos = getFeedInfos();
+        return new TileJson(url, envelope, feedInfos);
+      });
+  }
+
+  private List<FeedInfo> getFeedInfos() {
+    return serverContext
+      .transitService()
+      .getFeedIds()
+      .stream()
+      .map(serverContext.transitService()::getFeedInfo)
+      .filter(Predicate.not(Objects::isNull))
+      .toList();
   }
 
   private static LayerBuilder<?> crateLayerBuilder(

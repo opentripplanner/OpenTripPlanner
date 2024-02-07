@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
@@ -57,17 +56,6 @@ public class TileJson implements Serializable {
     this(tileUrl, envelope, attributionFromFeedInfo(feedInfos));
   }
 
-  @Nonnull
-  private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {
-    var attribution = feedInfos
-      .stream()
-      .map(feedInfo ->
-        "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
-      )
-      .collect(Collectors.joining(", "));
-    return attribution;
-  }
-
   /**
    * Creates a vector source layer URL from a hard-coded path plus information from the incoming
    * HTTP request.
@@ -104,5 +92,15 @@ public class TileJson implements Serializable {
         strippedPath,
         String.join(",", layers)
       );
+  }
+
+  private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {
+    return feedInfos
+      .stream()
+      .map(feedInfo ->
+        "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
+      )
+      .distinct()
+      .collect(Collectors.joining(", "));
   }
 }

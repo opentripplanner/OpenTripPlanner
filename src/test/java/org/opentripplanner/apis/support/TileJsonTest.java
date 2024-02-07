@@ -20,6 +20,15 @@ class TileJsonTest {
     .expandToIncludeStreetEntities(1, 1)
     .expandToIncludeStreetEntities(2, 2)
     .build();
+  private static final FeedInfo FEED_INFO = new FeedInfo(
+    "1",
+    "Trimet",
+    "https://trimet.org",
+    "en",
+    LocalDate.MIN,
+    LocalDate.MIN,
+    "1"
+  );
 
   @ParameterizedTest
   @ValueSource(
@@ -51,22 +60,19 @@ class TileJsonTest {
 
   @Test
   void attributionFromFeedInfo() {
-    var feedInfo = new FeedInfo(
-      "1",
-      "Trimet",
-      "https://trimet.org",
-      "en",
-      LocalDate.MIN,
-      LocalDate.MIN,
-      "1"
-    );
-    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(feedInfo));
+    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO));
+    assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
+  }
+
+  @Test
+  void duplicateAttribution() {
+    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO, FEED_INFO));
     assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
   }
 
   @Test
   void attributionFromOverride() {
-    final String override = "OVERRIDE";
+    var override = "OVERRIDE";
     var tileJson = new TileJson("http://example.com", ENVELOPE, override);
     assertEquals(override, tileJson.attribution);
   }
