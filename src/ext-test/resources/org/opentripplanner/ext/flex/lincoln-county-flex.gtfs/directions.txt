@@ -1,0 +1,11 @@
+route_id,direction_id,direction
+491,0,No direction
+492,0,Northbound
+492,1,Southbound
+493,0,Westbound
+493,1,Eastbound
+495,0,Northbound
+495,1,Southbound
+497,0,Northbound
+497,1,Southbound
+13317,0,No direction

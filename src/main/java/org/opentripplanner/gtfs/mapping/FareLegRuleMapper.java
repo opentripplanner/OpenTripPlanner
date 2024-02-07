@@ -27,13 +27,13 @@ public final class FareLegRuleMapper {
       .stream()
       .map(r -> {
         var fareProductId = mapAgencyAndId(r.getFareProductId());
-        var productsForRule = fareProductMapper.getByFareProductId(fareProductId);
+        var productForRule = fareProductMapper.getByFareProductId(fareProductId);
 
-        if (!productsForRule.isEmpty()) {
+        if (productForRule != null) {
           FareDistance fareDistance = createFareDistance(r);
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule
-            .of(ruleId, productsForRule)
+            .of(ruleId, productForRule)
             .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
             .withNetworkId(r.getNetworkId())
             .withFromAreaId(areaId(r.getFromArea()))

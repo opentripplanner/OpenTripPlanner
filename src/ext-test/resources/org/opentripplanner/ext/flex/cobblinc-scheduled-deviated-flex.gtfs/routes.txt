@@ -1,0 +1,4 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_branding_url,route_color,route_text_color,route_sort_order,continuous_pickup,continuous_drop_off
+090z,1,Zone 1,PUBLIX Super Market,,3,,,7eafd7,FFFFFF,,2,2
+aamr,1,Zone 2,Horseshoe Bend Pizza,,3,,,a9ca95,FFFFFF,,2,2
+po0p,1,Zone 3,Downtown Austell,,3,,,e18160,FFFFFF,,2,2
