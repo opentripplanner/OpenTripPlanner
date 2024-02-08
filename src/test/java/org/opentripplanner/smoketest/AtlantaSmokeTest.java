@@ -62,7 +62,7 @@ public class AtlantaSmokeTest {
       Set.of(FLEX_EGRESS, WALK, TRANSIT)
     );
 
-    var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS");
+    var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK", "BUS");
     var plan = basicRouteTest(req, expectedModes);
     var itineraries = plan.itineraries();
 
