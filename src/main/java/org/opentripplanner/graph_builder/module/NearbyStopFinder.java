@@ -18,8 +18,6 @@ import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.MaxCountSkipEdgeStrategy;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
-import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -85,7 +83,7 @@ public class NearbyStopFinder {
       // We need to accommodate straight line distance (in meters) but when streets are present we
       // use an earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
       // but we don't have much of a choice here. Use the default walking speed to convert.
-      this.directGraphFinder = new DirectGraphFinder(transitService::findRegularStop);
+      this.directGraphFinder = new DirectGraphFinder(transitService::findRegularStops);
     }
   }
 
@@ -205,7 +203,7 @@ public class NearbyStopFinder {
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
-      .setSkipEdgeStrategy(getSkipEdgeStrategy(reverseDirection, request))
+      .setSkipEdgeStrategy(getSkipEdgeStrategy())
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
       .setArriveBy(reverseDirection)
@@ -271,48 +269,14 @@ public class NearbyStopFinder {
     return directGraphFinder.findClosestStops(c0, limitMeters);
   }
 
-  private SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy(
-    boolean reverseDirection,
-    RouteRequest routingRequest
-  ) {
+  private SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
-    // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
-    // search the full durationLimit as this returns way too many stops.
-    // this is both slow and returns suboptimal results as it favours long drives with short
-    // transit legs.
-    // therefore, we use a heuristic based on the number of routes and their mode to determine
-    // what are "good" stops for those accesses. if we have reached a threshold of "good" stops
-    // we stop the access search.
-    if (
-      !reverseDirection &&
-      OTPFeature.VehicleToStopHeuristics.isOn() &&
-      VehicleToStopSkipEdgeStrategy.applicableModes.contains(
-        routingRequest.journey().access().mode()
-      )
-    ) {
-      var strategy = new VehicleToStopSkipEdgeStrategy(
-        transitService::getPatternsForStop,
-        routingRequest.journey().transit().filters()
-      );
-
+    if (maxStopCount > 0) {
+      var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, NearbyStopFinder::hasReachedStop);
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
-    } else if (
-      OTPFeature.VehicleToStopHeuristics.isOn() &&
-      routingRequest.journey().access().mode() == StreetMode.BIKE
-    ) {
-      var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
-      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
-    } else {
-      if (maxStopCount > 0) {
-        var strategy = new MaxCountSkipEdgeStrategy<>(
-          maxStopCount,
-          NearbyStopFinder::hasReachedStop
-        );
-        return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
-      }
-      return durationSkipEdgeStrategy;
     }
+    return durationSkipEdgeStrategy;
   }
 
   private static List<NearbyStop> createDirectlyConnectedStops(
