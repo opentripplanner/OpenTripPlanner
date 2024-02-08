@@ -172,6 +172,9 @@ public class NodeAdapter {
     allWarnings().forEach(logger);
   }
 
+  /**
+   * Checks if any unknown or invalid properties were encountered while loading the configuration.
+   */
   public boolean hasInvalidProperties() {
     return !unusedParams().isEmpty() || !allWarnings().toList().isEmpty();
   }

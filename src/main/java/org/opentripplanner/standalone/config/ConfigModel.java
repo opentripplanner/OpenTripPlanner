@@ -107,7 +107,7 @@ public class ConfigModel {
   }
 
   /**
-   * Checks if any unknown or invalid properties were encountered while loading of the configuration.
+   * Checks if any unknown or invalid properties were encountered while loading the configuration.
    */
   public boolean hasInvalidProperties() {
     return (

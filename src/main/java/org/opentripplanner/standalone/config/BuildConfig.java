@@ -720,6 +720,9 @@ Netex data is also often supplied in a ZIP file.
     return root;
   }
 
+  /**
+   * Checks if any unknown or invalid properties were encountered while loading the configuration.
+   */
   public boolean hasInvalidProperties() {
     return root.hasInvalidProperties();
   }
