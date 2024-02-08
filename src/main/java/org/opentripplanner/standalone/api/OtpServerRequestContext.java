@@ -24,7 +24,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
-import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.model.StreetLimitationParametersService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
@@ -99,7 +99,7 @@ public interface OtpServerRequestContext {
   @Nullable
   StopConsolidationService stopConsolidationService();
 
-  StreetLimitationParameters streetLimitationParameters();
+  StreetLimitationParametersService streetLimitationParametersService();
 
   MeterRegistry meterRegistry();
 

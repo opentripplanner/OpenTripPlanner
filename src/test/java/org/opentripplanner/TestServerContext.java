@@ -20,7 +20,9 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.street.model.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.model.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -52,7 +54,7 @@ public class TestServerContext {
       routerConfig.flexConfig(),
       List.of(),
       null,
-      new StreetLimitationParameters(),
+      createStreetLimitationParametersService(),
       null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
@@ -81,5 +83,9 @@ public class TestServerContext {
 
   public static EmissionsService createEmissionsService() {
     return new DefaultEmissionsService(new EmissionsDataModel());
+  }
+
+  public static StreetLimitationParametersService createStreetLimitationParametersService() {
+    return new DefaultStreetLimitationParametersService(new StreetLimitationParameters());
   }
 }

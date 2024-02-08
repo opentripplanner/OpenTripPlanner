@@ -56,16 +56,16 @@ public class GraphPathFinder {
 
   private final DataOverlayContext dataOverlayContext;
 
-  private final Float maxCarSpeed;
+  private final float maxCarSpeed;
 
   public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
-    this(traverseVisitor, null, null);
+    this(traverseVisitor, null, 40f);
   }
 
   public GraphPathFinder(
     @Nullable TraverseVisitor<State, Edge> traverseVisitor,
     @Nullable DataOverlayContext dataOverlayContext,
-    @Nullable Float maxCarSpeed
+    float maxCarSpeed
   ) {
     this.traverseVisitor = traverseVisitor;
     this.dataOverlayContext = dataOverlayContext;

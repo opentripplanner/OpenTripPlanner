@@ -3,7 +3,6 @@ package org.opentripplanner.street.model;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.Serializable;
-import javax.annotation.Nullable;
 
 /**
  * Holds limits of the street graph.
@@ -13,7 +12,7 @@ import javax.annotation.Nullable;
 @Singleton
 public class StreetLimitationParameters implements Serializable {
 
-  private Float maxCarSpeed = null;
+  private float maxCarSpeed = 40f;
 
   @Inject
   public StreetLimitationParameters() {}
@@ -27,9 +26,9 @@ public class StreetLimitationParameters implements Serializable {
 
   /**
    * If this graph contains car routable streets, this value is the maximum speed limit in m/s.
+   * Defaults to 40 m/s == 144 km/h.
    */
-  @Nullable
-  public Float maxCarSpeed() {
+  public float maxCarSpeed() {
     return maxCarSpeed;
   }
 }

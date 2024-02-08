@@ -35,9 +35,7 @@ public class DirectStreetRouter {
         request.journey().direct().mode()
       )
     ) {
-      var maxCarSpeed = serverContext.streetLimitationParameters().maxCarSpeed() != null
-        ? serverContext.streetLimitationParameters().maxCarSpeed()
-        : 40f;
+      var maxCarSpeed = serverContext.streetLimitationParametersService().getMaxCarSpeed();
       if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices, maxCarSpeed)) {
         return Collections.emptyList();
       }
