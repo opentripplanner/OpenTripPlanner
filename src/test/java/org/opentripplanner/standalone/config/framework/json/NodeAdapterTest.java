@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -555,6 +556,33 @@ public class NodeAdapterTest {
     // Then: expect 'b' to be unused
     subject.logAllWarnings(buf::append);
     assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
+  }
+
+  @Nested
+  class Validation {
+
+    @Test
+    void invalidProperties() {
+      // Given: two parameters a and b
+      NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+
+      // When: Access ONLY parameter 'a', but not 'b'
+      subject.of("foo").asObject().of("a").asBoolean();
+
+      assertTrue(subject.hasInvalidProperties());
+    }
+
+    @Test
+    void valid() {
+      // Given: two parameters a and b
+      NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+
+      var object = subject.of("foo").asObject();
+      object.of("a").asBoolean();
+      object.of("b").asBoolean();
+
+      assertFalse(subject.hasInvalidProperties());
+    }
   }
 
   private static String unusedParams(NodeAdapter subject) {
