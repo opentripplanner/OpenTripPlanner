@@ -19,7 +19,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.street.model.StreetLimitationParametersService;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 

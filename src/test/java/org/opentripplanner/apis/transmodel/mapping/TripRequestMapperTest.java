@@ -48,8 +48,8 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRe
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.street.model.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;

@@ -1,6 +1,7 @@
-package org.opentripplanner.street.model;
+package org.opentripplanner.street.service;
 
 import jakarta.inject.Inject;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 
 public class DefaultStreetLimitationParametersService implements StreetLimitationParametersService {
 

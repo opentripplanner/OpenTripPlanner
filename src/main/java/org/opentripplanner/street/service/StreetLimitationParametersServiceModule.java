@@ -1,8 +1,9 @@
-package org.opentripplanner.street.model;
+package org.opentripplanner.street.service;
 
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 
 /**
  * The service is used during application serve phase, not loading, so we need to provide

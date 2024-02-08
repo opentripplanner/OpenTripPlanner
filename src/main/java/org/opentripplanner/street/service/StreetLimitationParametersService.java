@@ -1,4 +1,4 @@
-package org.opentripplanner.street.model;
+package org.opentripplanner.street.service;
 
 /**
  * A service for fetching limitation parameters of the street graph.

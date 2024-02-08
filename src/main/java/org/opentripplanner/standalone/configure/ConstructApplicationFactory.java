@@ -30,7 +30,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.street.model.StreetLimitationParametersServiceModule;
+import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
