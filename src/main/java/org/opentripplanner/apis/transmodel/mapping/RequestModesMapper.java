@@ -8,11 +8,10 @@ import org.opentripplanner.routing.api.request.StreetMode;
 class RequestModesMapper {
 
   /**
-   * Maps a GraphQL Modes input type to a RequestModes.
-   *
-   * This only maps access, egress, direct & transfer.
-   * Transport modes are now part of filters.
-   * Only in case filters are not present we will use this mapping
+   * Maps GraphQL Modes input type to RequestModes.
+   * <p>
+   * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
+   * Default modes are WALK for access, egress, direct & transfer.
    */
   @SuppressWarnings("unchecked")
   static RequestModes mapRequestModes(Map<String, ?> modesInput) {
