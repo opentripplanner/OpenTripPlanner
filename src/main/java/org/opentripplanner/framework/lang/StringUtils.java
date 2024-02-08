@@ -110,4 +110,13 @@ public class StringUtils {
   public static String quoteReplace(@Nonnull String text) {
     return text.replace('\'', '\"');
   }
+
+  /**
+   * Convert "HELLO_WORLD" or "HellO_WorlD" to "hello-world".
+   * <p>
+   * https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
+   */
+  public static String kebabCase(String input) {
+    return input.toLowerCase().replace('_', '-');
+  }
 }

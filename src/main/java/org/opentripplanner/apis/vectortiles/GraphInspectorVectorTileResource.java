@@ -179,7 +179,7 @@ public class GraphInspectorVectorTileResource {
       case RegularStop -> new StopLayerBuilder<>(
         layerParameters,
         locale,
-        e -> context.transitService().findRegularStop(e)
+        e -> context.transitService().findRegularStops(e)
       );
       case AreaStop -> new StopLayerBuilder<>(
         layerParameters,

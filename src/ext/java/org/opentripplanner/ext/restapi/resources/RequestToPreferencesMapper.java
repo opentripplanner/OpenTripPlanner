@@ -89,8 +89,8 @@ class RequestToPreferencesMapper {
       bike.withWalking(walk -> {
         setIfNotNull(req.bikeWalkingSpeed, walk::withSpeed);
         setIfNotNull(req.bikeWalkingReluctance, walk::withReluctance);
-        setIfNotNull(req.bikeSwitchTime, walk::withHopTime);
-        setIfNotNull(req.bikeSwitchCost, walk::withHopCost);
+        setIfNotNull(req.bikeSwitchTime, walk::withMountDismountTime);
+        setIfNotNull(req.bikeSwitchCost, walk::withMountDismountCost);
       });
     });
   }

@@ -21,22 +21,28 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * OTP simple built-in geocoder used by the debug client.
  */
-@Path("/routers/{ignoreRouterId}/geocode")
+@Path("/geocode")
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
   private final OtpServerRequestContext serverContext;
 
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated
-  @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
-
   public GeocoderResource(@Context OtpServerRequestContext requestContext) {
     serverContext = requestContext;
+  }
+
+  /**
+   * This class is only here for backwards-compatibility. It will be removed in the future.
+   */
+  @Path("/routers/{ignoreRouterId}/geocode")
+  public static class GeocoderResourceOldPath extends GeocoderResource {
+
+    public GeocoderResourceOldPath(
+      @Context OtpServerRequestContext serverContext,
+      @PathParam("ignoreRouterId") String ignore
+    ) {
+      super(serverContext);
+    }
   }
 
   /**
