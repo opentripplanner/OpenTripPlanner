@@ -16,14 +16,19 @@ class RequestModesMapper {
    */
   @SuppressWarnings("unchecked")
   static RequestModes mapRequestModes(Map<String, ?> modesInput) {
-    StreetMode accessMode = (StreetMode) modesInput.get("accessMode");
-    RequestModesBuilder mBuilder = RequestModes
-      .of()
-      .withAccessMode(accessMode)
-      .withEgressMode((StreetMode) modesInput.get("egressMode"))
-      .withDirectMode((StreetMode) modesInput.get("directMode"));
+    RequestModesBuilder mBuilder = RequestModes.of();
 
-    mBuilder.withTransferMode(accessMode == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK);
+    if (modesInput.containsKey("accessMode")) {
+      StreetMode accessMode = (StreetMode) modesInput.get("accessMode");
+      mBuilder.withAccessMode(accessMode);
+      mBuilder.withTransferMode(accessMode == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK);
+    }
+    if (modesInput.containsKey("egressMode")) {
+      mBuilder.withEgressMode((StreetMode) modesInput.get("egressMode"));
+    }
+    if (modesInput.containsKey("directMode")) {
+      mBuilder.withDirectMode((StreetMode) modesInput.get("directMode"));
+    }
 
     return mBuilder.build();
   }
