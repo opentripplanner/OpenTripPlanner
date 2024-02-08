@@ -53,7 +53,10 @@ public class WayPropertySet {
   private final Pattern maxSpeedPattern;
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultCarSpeed;
-  /** The maximum automobile speed that is possible. */
+  /**
+   * The maximum automobile speed that can be defined through OSM speed limit tagging. Car speed
+   * defaults for different way types can be higher than this.
+   */
   public Float maxPossibleCarSpeed;
   /**
    * The maximum automobile speed that has been used. This can be used in heuristics later on to
