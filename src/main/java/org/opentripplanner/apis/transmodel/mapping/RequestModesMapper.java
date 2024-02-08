@@ -13,7 +13,6 @@ class RequestModesMapper {
    * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
    * Default modes are WALK for access, egress, direct & transfer.
    */
-  @SuppressWarnings("unchecked")
   static RequestModes mapRequestModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();
 
