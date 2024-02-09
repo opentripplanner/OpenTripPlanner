@@ -21,9 +21,7 @@ class RequestModesMapperTest {
 
   @Test
   void testMapRequestModesAccessSetReturnsDefaultsForOthers() {
-    Map<String, StreetMode> inputModes = new HashMap<>();
-
-    inputModes.put("accessMode", StreetMode.BIKE);
+    Map<String, StreetMode> inputModes = Map.of("accessMode", StreetMode.BIKE);
 
     RequestModes wantModes = RequestModes
       .of()
