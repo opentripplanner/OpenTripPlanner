@@ -2,7 +2,6 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -12,7 +11,7 @@ class RequestModesMapperTest {
 
   @Test
   void testMapRequestModesEmptyMapReturnsDefaults() {
-    Map<String, StreetMode> inputModes = new HashMap<>();
+    Map<String, StreetMode> inputModes = Map.of();
 
     RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
 
@@ -36,9 +35,7 @@ class RequestModesMapperTest {
 
   @Test
   void testMapRequestModesEgressSetReturnsDefaultsForOthers() {
-    Map<String, StreetMode> inputModes = new HashMap<>();
-
-    inputModes.put("egressMode", StreetMode.CAR);
+    Map<String, StreetMode> inputModes = Map.of("egressMode", StreetMode.CAR);
 
     RequestModes wantModes = RequestModes.of().withEgressMode(StreetMode.CAR).build();
 
@@ -49,9 +46,7 @@ class RequestModesMapperTest {
 
   @Test
   void testMapRequestModesDirectSetReturnsDefaultsForOthers() {
-    Map<String, StreetMode> inputModes = new HashMap<>();
-
-    inputModes.put("directMode", StreetMode.CAR);
+    Map<String, StreetMode> inputModes = Map.of("directMode", StreetMode.CAR);
 
     RequestModes wantModes = RequestModes.of().withDirectMode(StreetMode.CAR).build();
 
