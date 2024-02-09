@@ -14,7 +14,7 @@ migrate to a newer version, you should carefully inspect the logs. If you see me
 this means there are properties in your configuration that are unknown to OTP and therefore likely
 to be a configuration error, perhaps because the schema was changed. In such a case you should
 consult the [feature](Configuration.md#otp-features), [router](RouterConfiguration.md) or 
-[build configuration documentation](BuildConfiguration.md) to find out what he new schema looks like.
+[build configuration documentation](BuildConfiguration.md) to find out what the new schema looks like.
 
 ### Aborting on invalid configuration
 
