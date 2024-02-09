@@ -59,12 +59,12 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
 
   @Override
   public LegTimes start() {
-    return LegTimes.of(getEndTime(), getDepartureDelay());
+    return first.start();
   }
 
   @Override
   public LegTimes end() {
-    return LegTimes.of(getStartTime(), getArrivalDelay());
+    return second.end();
   }
 
   @Override
