@@ -20,6 +20,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.PlanLocation;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
@@ -282,6 +283,16 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> infoUrl();
 
     public DataFetcher<String> phoneNumber();
+  }
+
+  /**
+   * Coordinate (often referred as coordinates), which is used to specify a location using in the
+   * WGS84 coordinate system.
+   */
+  public interface GraphQLCoordinate {
+    public DataFetcher<Double> latitude();
+
+    public DataFetcher<Double> longitude();
   }
 
   public interface GraphQLCoordinates {
@@ -648,6 +659,60 @@ public class GraphQLDataFetchers {
     public DataFetcher<StopArrival> to();
   }
 
+  /**
+   * Plan (result of an itinerary search) that follows
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLPlanConnection {
+    public DataFetcher<Object> destination();
+
+    public DataFetcher<Iterable<Edge<Itinerary>>> edges();
+
+    public DataFetcher<Object> origin();
+
+    public DataFetcher<Object> pageInfo();
+
+    public DataFetcher<Iterable<RoutingError>> routingErrors();
+
+    public DataFetcher<java.time.OffsetDateTime> searchDateTime();
+  }
+
+  /**
+   * Edge outputted by a plan search. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLPlanEdge {
+    public DataFetcher<String> cursor();
+
+    public DataFetcher<Itinerary> node();
+  }
+
+  /** Location that was used in the itinerary search as a origin or destination. */
+  public interface GraphQLPlanLabeledLocation {
+    public DataFetcher<String> label();
+
+    public DataFetcher<PlanLocation> location();
+  }
+
+  /** Union of locations types that could be used in a plan query. */
+  public interface GraphQLPlanLocation extends TypeResolver {}
+
+  /**
+   * Information about pagination in a connection. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLPlanPageInfo {
+    public DataFetcher<String> endCursor();
+
+    public DataFetcher<Boolean> hasNextPage();
+
+    public DataFetcher<Boolean> hasPreviousPage();
+
+    public DataFetcher<java.time.Duration> searchWindowUsed();
+
+    public DataFetcher<String> startCursor();
+  }
+
   /** Stop position at a specific stop. */
   public interface GraphQLPositionAtStop {
     public DataFetcher<Integer> position();
@@ -700,6 +765,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripPattern>> patterns();
 
     public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
+
+    public DataFetcher<Connection<Itinerary>> planConnection();
 
     public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 
@@ -1147,7 +1214,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> wheelchairAccessibleCarSpaces();
   }
 
-  /** Realtime vehicle position */
+  /** Real-time vehicle position */
   public interface GraphQLVehiclePosition {
     public DataFetcher<Double> heading();
 
@@ -1235,6 +1302,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> elevation();
   }
 
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFare {
     public DataFetcher<Integer> cents();
 
@@ -1245,7 +1316,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> type();
   }
 
-  /** Component of the fare (i.e. ticket) for a part of the itinerary */
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFareComponent {
     public DataFetcher<Integer> cents();
 

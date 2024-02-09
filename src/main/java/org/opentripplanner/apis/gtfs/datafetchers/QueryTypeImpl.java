@@ -39,6 +39,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -487,6 +488,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .data(res)
         .localContext(Map.of("locale", request.locale()))
         .build();
+    };
+  }
+
+  @Override
+  public DataFetcher<Connection<Itinerary>> planConnection() {
+    return environment -> {
+      List<Itinerary> itineraries = List.of();
+      return new SimpleListConnection<>(itineraries).get(environment);
     };
   }
 
