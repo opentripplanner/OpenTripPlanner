@@ -14,7 +14,7 @@ public class StreetLimitationParametersServiceModule {
 
   @Provides
   @Singleton
-  public StreetLimitationParametersService provideEmissionsService(
+  public StreetLimitationParametersService provideStreetLimitationParametersService(
     StreetLimitationParameters streetLimitationParameters
   ) {
     return new DefaultStreetLimitationParametersService(streetLimitationParameters) {};
