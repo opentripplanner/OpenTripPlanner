@@ -33,13 +33,17 @@
                 mode
                 start {
                     scheduled
-                    actual
-                    delay
+                    realTime {
+                        predicted
+                        scheduleOffset
+                    }
                 }
                 end {
                     scheduled
-                    actual
-                    delay
+                    realTime {
+                        predicted
+                        scheduleOffset
+                    }
                 }
                 from {
                     name

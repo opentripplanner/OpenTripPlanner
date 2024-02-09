@@ -503,9 +503,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLLegTimes {
-    public DataFetcher<java.time.OffsetDateTime> actual();
-
-    public DataFetcher<java.time.Duration> delay();
+    public DataFetcher<Object> realTime();
 
     public DataFetcher<java.time.OffsetDateTime> scheduled();
   }
@@ -759,6 +757,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
     public DataFetcher<Object> viewer();
+  }
+
+  public interface GraphQLRealtimeInformation {
+    public DataFetcher<java.time.OffsetDateTime> predicted();
+
+    public DataFetcher<java.time.Duration> scheduleOffset();
   }
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
@@ -1256,6 +1260,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> elevation();
   }
 
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFare {
     public DataFetcher<Integer> cents();
 
@@ -1266,7 +1274,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> type();
   }
 
-  /** Component of the fare (i.e. ticket) for a part of the itinerary */
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFareComponent {
     public DataFetcher<Integer> cents();
 

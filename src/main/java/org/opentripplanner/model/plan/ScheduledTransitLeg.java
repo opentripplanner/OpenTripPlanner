@@ -164,12 +164,20 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public LegTimes start() {
-    return LegTimes.of(startTime, getDepartureDelay());
+    if (getRealTime()) {
+      return LegTimes.of(startTime, getDepartureDelay());
+    } else {
+      return LegTimes.ofStatic(startTime);
+    }
   }
 
   @Override
   public LegTimes end() {
-    return LegTimes.of(endTime, getArrivalDelay());
+    if (getRealTime()) {
+      return LegTimes.of(endTime, getArrivalDelay());
+    } else {
+      return LegTimes.ofStatic(endTime);
+    }
   }
 
   @Override

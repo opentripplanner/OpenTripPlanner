@@ -10,13 +10,11 @@
               "mode" : "WALK",
               "start" : {
                 "scheduled" : "2020-02-02T11:00:00Z",
-                "actual" : "2020-02-02T11:00:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T11:00:20Z",
-                "actual" : "2020-02-02T11:00:20Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "from" : {
                 "name" : "A",
@@ -39,13 +37,11 @@
               "mode" : "BUS",
               "start" : {
                 "scheduled" : "2020-02-02T11:01:00Z",
-                "actual" : "2020-02-02T11:01:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T11:15:00Z",
-                "actual" : "2020-02-02T11:15:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "from" : {
                 "name" : "B",
@@ -74,13 +70,11 @@
               "mode" : "RAIL",
               "start" : {
                 "scheduled" : "2020-02-02T11:30:00Z",
-                "actual" : "2020-02-02T11:30:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T11:50:00Z",
-                "actual" : "2020-02-02T11:50:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "from" : {
                 "name" : "C",
@@ -109,13 +103,11 @@
               "mode" : "CAR",
               "start" : {
                 "scheduled" : "2020-02-02T11:50:00Z",
-                "actual" : "2020-02-02T11:50:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T12:00:00Z",
-                "actual" : "2020-02-02T12:00:00Z",
-                "delay" : "PT0S"
+                "realTime" : null
               },
               "from" : {
                 "name" : "D",

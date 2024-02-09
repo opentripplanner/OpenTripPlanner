@@ -1647,18 +1647,24 @@ type RideHailingEstimate {
 
 """
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
-"""
-scalar OffsetDateTime
 
-type LegTimes {
-    scheduled: OffsetDateTime
-    actual: OffsetDateTime
+ISO-8601 allows many different formats but OTP will only return the profile specified in RFC3339.
+"""
+scalar OffsetDateTime @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
+
+type RealtimeInformation {
+    predicted: OffsetDateTime
     """
-    The delay of the vehicle at a certain place.
+    The delay or "earliness" of the vehicle at a certain place.
 
     If the vehicle is early then this is a negative duration.
     """
-    delay: Duration
+    scheduleOffset: Duration
+}
+
+type LegTimes {
+    scheduled: OffsetDateTime
+    realTime: RealtimeInformation
 }
 
 type Leg {
