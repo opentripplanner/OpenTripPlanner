@@ -2,11 +2,13 @@ package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 // TODO VIA: Javadoc
@@ -28,6 +30,9 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> preferredRoutes = List.of();
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
+
+  private List<TransitGroupSelect> priorityGroupsByAgency = new ArrayList<>();
+  private List<TransitGroupSelect> priorityGroupsGlobal = new ArrayList<>();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
   public void setBannedTripsFromString(String ids) {
@@ -50,6 +55,37 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public void setFilters(List<TransitFilter> filters) {
     this.filters = filters;
+  }
+
+  /**
+   * A unique group-id is assigned all patterns grouped by matching select and agency.
+   * In other words, two patterns matching the same select and with the same agency-id
+   * will get the same group-id.
+   * <p>
+   * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
+   */
+  public List<TransitGroupSelect> priorityGroupsByAgency() {
+    return priorityGroupsByAgency;
+  }
+
+  /**
+   * All patterns matching the same select will be assigned the same group-id.
+   */
+  public void addPriorityGroupsByAgency(Collection<TransitGroupSelect> priorityGroupsByAgency) {
+    this.priorityGroupsByAgency.addAll(priorityGroupsByAgency);
+  }
+
+  /**
+   * A unique group-id is assigned all patterns grouped by matching selects.
+   * <p>
+   * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
+   */
+  public List<TransitGroupSelect> priorityGroupsGlobal() {
+    return priorityGroupsGlobal;
+  }
+
+  public void addPriorityGroupsGlobal(Collection<TransitGroupSelect> priorityGroupsGlobal) {
+    this.priorityGroupsGlobal.addAll(priorityGroupsGlobal);
   }
 
   @Deprecated
@@ -147,6 +183,9 @@ public class TransitRequest implements Cloneable, Serializable {
       clone.preferredRoutes = List.copyOf(this.preferredRoutes);
       clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
       clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+      clone.priorityGroupsByAgency = new ArrayList<>(this.priorityGroupsByAgency);
+      clone.priorityGroupsGlobal = new ArrayList<>(this.priorityGroupsGlobal);
+
       // filters are immutable
       clone.setFilters(this.filters);
 

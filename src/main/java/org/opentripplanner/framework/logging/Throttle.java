@@ -1,5 +1,6 @@
 package org.opentripplanner.framework.logging;
 
+import java.time.Duration;
 import org.opentripplanner.framework.time.TimeUtils;
 
 /**
@@ -26,13 +27,20 @@ public class Throttle {
   private long timeout = Long.MIN_VALUE;
   private final String setupInfo;
 
-  Throttle(int quietPeriodMilliseconds) {
-    this.quietPeriodMilliseconds = quietPeriodMilliseconds;
+  /**
+   * Package local to be able to unit test.
+   */
+  Throttle(Duration quietPeriod) {
+    this.quietPeriodMilliseconds = (int) quietPeriod.toMillis();
     this.setupInfo = "(throttle " + TimeUtils.msToString(quietPeriodMilliseconds) + " interval)";
   }
 
   public static Throttle ofOneSecond() {
-    return new Throttle(1000);
+    return new Throttle(Duration.ofSeconds(1));
+  }
+
+  public static Throttle ofOneMinute() {
+    return new Throttle(Duration.ofMinutes(1));
   }
 
   public String setupInfo() {

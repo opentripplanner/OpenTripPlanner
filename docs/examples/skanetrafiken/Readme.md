@@ -35,13 +35,13 @@ To reduced graph size, only data for southern part of Sweden is used.
 OSM data is downloaded from `http://download.geofabrik.de/europe/denmark-latest.osm.pbf`.
 To reduce graph size, only data for northern part of Denmark is used.
 
-## Realtime
+## Real-time
 
-The **Azure Service Bus** is used to propagate SIRI SX and ET realtime messages to OTP.
+The **Azure Service Bus** is used to propagate SIRI SX and ET real-time messages to OTP.
 This is solved through Siri Azure updaters that Skånetrafiken had implemented in OTP. There are
 separate updaters for SIRI SX and ET.
 Those updaters are used to provide data for Swedish traffic (NeTEx). Right now, there is no
-connection to any realtime source for danish traffic (GTFS data).
+connection to any real-time source for danish traffic (GTFS data).
 
 Except for receiving messages from **Service Bus** there are two endpoints through which historical
 ET and SX messages can be downloaded at OTP startup.
@@ -54,8 +54,8 @@ the subscription.
 Once the updaters are done with processing of history messages they will change their status to
 primed,
 and the system will start channeling request to this OTP instance.
-This ensures that no realtime message is omitted and all OTP instance that ran in the
-cluster does have exact same realtime data.
+This ensures that no real-time message is omitted and all OTP instance that ran in the
+cluster does have exact same real-time data.
 Thi means that no matter which instance the client is hitting it will always get the same search
 results.
 

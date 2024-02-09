@@ -4,9 +4,9 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.toGraphQL;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 public class RoutingErrorImpl implements GraphQLDataFetchers.GraphQLRoutingError {

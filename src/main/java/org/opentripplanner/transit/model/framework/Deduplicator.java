@@ -20,7 +20,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  * Does the same thing as String.intern, but for several different types. Java's String.intern uses
  * perm gen space and is broken anyway.
  */
-public class Deduplicator implements Serializable {
+public class Deduplicator implements DeduplicatorService, Serializable {
 
   private static final String ZERO_COUNT = sizeAndCount(0, 0);
 
@@ -50,6 +50,7 @@ public class Deduplicator implements Serializable {
     canonicalLists.clear();
   }
 
+  @Override
   @Nullable
   public BitSet deduplicateBitSet(BitSet original) {
     if (original == null) {
@@ -64,7 +65,7 @@ public class Deduplicator implements Serializable {
     return canonical;
   }
 
-  /** Used to deduplicate time and stop sequence arrays. The same times may occur in many trips. */
+  @Override
   @Nullable
   public int[] deduplicateIntArray(int[] original) {
     if (original == null) {
@@ -80,6 +81,7 @@ public class Deduplicator implements Serializable {
     return canonical.array;
   }
 
+  @Override
   @Nullable
   public String deduplicateString(String original) {
     if (original == null) {
@@ -90,6 +92,7 @@ public class Deduplicator implements Serializable {
     return canonical == null ? original : canonical;
   }
 
+  @Override
   @Nullable
   public String[] deduplicateStringArray(String[] original) {
     if (original == null) {
@@ -104,10 +107,7 @@ public class Deduplicator implements Serializable {
     return canonical.array;
   }
 
-  /**
-   * Used to deduplicate list of via places for stop destinationDisplay. Stops may have the same via
-   * arrays.
-   */
+  @Override
   @Nullable
   public String[][] deduplicateString2DArray(String[][] original) {
     if (original == null) {
@@ -122,6 +122,7 @@ public class Deduplicator implements Serializable {
     return canonical.array;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   @Nullable
   public <T> T deduplicateObject(Class<T> cl, T original) {
@@ -137,6 +138,7 @@ public class Deduplicator implements Serializable {
     return canonical == null ? original : canonical;
   }
 
+  @Override
   @Nullable
   public <T> T[] deduplicateObjectArray(Class<T> type, T[] original) {
     if (original == null) {
@@ -160,6 +162,7 @@ public class Deduplicator implements Serializable {
     return canonical.array();
   }
 
+  @Override
   @Nullable
   public <T> List<T> deduplicateImmutableList(Class<T> clazz, List<T> original) {
     if (original == null) {

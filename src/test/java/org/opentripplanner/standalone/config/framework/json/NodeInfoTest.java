@@ -78,6 +78,15 @@ class NodeInfoTest {
     assertEquals("enum set", createBuilder().withEnumSet(AnEnum.class).build().typeDescription());
   }
 
+  @Test
+  void experimentalFeature() {
+    var subject = createBuilder().withExperimentalFeature().build();
+    assertEquals(NodeInfo.EXPERIMENTAL_FEATURE, subject.description());
+
+    subject = createBuilder().withDescription("Description").withExperimentalFeature().build();
+    assertEquals("Description\n\n" + NodeInfo.EXPERIMENTAL_FEATURE, subject.description());
+  }
+
   private NodeInfoBuilder createBuilder() {
     return NodeInfo
       .of()

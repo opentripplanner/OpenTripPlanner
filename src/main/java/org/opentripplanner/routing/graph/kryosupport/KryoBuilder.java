@@ -15,6 +15,7 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
@@ -63,6 +64,7 @@ public final class KryoBuilder {
     // Add serializers for "immutable" config classes
     kryo.register(RouterConfig.class, new RouterConfigSerializer());
     kryo.register(BuildConfig.class, new BuildConfigSerializer());
+    kryo.register(AtomicInteger.class, new AtomicIntegerSerializer());
 
     UnmodifiableCollectionsSerializer.registerSerializers(kryo);
     // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?

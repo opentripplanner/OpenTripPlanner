@@ -5,6 +5,10 @@ on:
       - dev-2.x
     types: [closed]
 
+# to avoid conflicts, make sure that only one workflow pushes to Github at the same time
+concurrency:
+  group: github-push
+
 jobs:
   changelog-entry:
     if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, 'skip changelog')
@@ -12,7 +16,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
@@ -58,7 +62,7 @@ jobs:
           git config --global user.email 'serialization-version-bot@opentripplanner.org'
 
       - name: Checkout
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 

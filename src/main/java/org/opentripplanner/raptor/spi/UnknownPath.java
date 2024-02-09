@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.spi;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
@@ -72,7 +73,7 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
 
   @Override
   public int c2() {
-    return RaptorCostCalculator.ZERO_COST;
+    return RaptorConstants.NOT_SET;
   }
 
   @Override
@@ -124,9 +125,9 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   public String toString() {
     PathStringBuilder pathBuilder = new PathStringBuilder(null);
     if (departureTime == 0 && arrivalTime == 0) {
-      pathBuilder.summary(c1());
+      pathBuilder.summary(c1(), c2());
     } else {
-      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1());
+      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1(), c2());
     }
     return pathBuilder.toString();
   }

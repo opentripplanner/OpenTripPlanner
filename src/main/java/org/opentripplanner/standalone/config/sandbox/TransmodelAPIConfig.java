@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Collection;
 import java.util.Set;
-import org.opentripplanner.ext.transmodelapi.TransmodelAPIParameters;
+import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**

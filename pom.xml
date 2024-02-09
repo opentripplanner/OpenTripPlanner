@@ -56,20 +56,20 @@
 
 
     <properties>
-        <otp.serialization.version.id>125</otp.serialization.version.id>
+        <otp.serialization.version.id>144</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>30.0</geotools.version>
-        <google.dagger.version>2.48.1</google.dagger.version>
-        <jackson.version>2.15.3</jackson.version>
-        <jersey.version>3.1.3</jersey.version>
-        <junit.version>5.10.1</junit.version>
-        <micrometer.version>1.11.5</micrometer.version>
+        <geotools.version>30.2</geotools.version>
+        <google.dagger.version>2.50</google.dagger.version>
+        <jackson.version>2.16.1</jackson.version>
+        <jersey.version>3.1.5</jersey.version>
+        <junit.version>5.10.2</junit.version>
+        <micrometer.version>1.12.2</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.4.11</logback.version>
-        <lucene.version>9.8.0</lucene.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.14</logback.version>
+        <lucene.version>9.9.1</lucene.version>
+        <slf4j.version>2.0.12</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
-        <siri-java-model.version>1.25</siri-java-model.version>
+        <siri-java-model.version>1.26</siri-java-model.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -78,7 +78,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
-        <plugin.prettier.version>0.21</plugin.prettier.version>
+        <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
     </properties>
@@ -142,7 +142,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.12.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -209,7 +209,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-sources</id>
@@ -242,7 +242,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.5</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -282,7 +282,6 @@
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
-                        --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
@@ -546,21 +545,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.27.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!--
-                this is necessary because async-http-client uses an old netty version that can crash the
-                Java 21 JVM: https://github.com/netty/netty/pull/13640
-
-                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
-            -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>4.1.100.Final</version>
+                <version>26.31.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -703,7 +688,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.13</version>
+            <version>3.0.20</version>
         </dependency>
 
         <!-- TESTING -->
@@ -722,13 +707,13 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.7.0</version>
+            <version>5.10.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -742,7 +727,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.5.0</version>
+            <version>1.6.0</version>
         </dependency>
         <!-- kryo serializers for Guava types !-->
         <dependency>
@@ -754,7 +739,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.3-jre</version>
+            <version>33.0.0-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>
@@ -842,18 +827,11 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
-        <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
-        <dependency>
-            <groupId>org.asynchttpclient</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>2.12.3</version>
-        </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -898,7 +876,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.2.1</version>
+            <version>5.3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -944,14 +922,14 @@
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.27.1</version>
+            <version>0.28.1</version>
         </dependency>
 
         <!-- create zip test files-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.24.0</version>
+            <version>1.25.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -966,6 +944,17 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D ps' parameter:
+                      # mvn test -D ps
+                    -->
+                    <name>ps</name>
+                    <value/>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

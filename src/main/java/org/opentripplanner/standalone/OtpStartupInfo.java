@@ -4,6 +4,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,14 +38,10 @@ public class OtpStartupInfo {
     // This is good when aggregating logs across multiple load balanced instances of OTP
     // Hint: a regexp filter like "^OTP (START|SHUTTING)" will list nodes going up/down
     LOG.info("OTP STARTING UP ({}) using Java {}", projectInfo().getVersionString(), javaVersion());
-    Runtime
-      .getRuntime()
-      .addShutdownHook(
-        new Thread(
-          () -> LOG.info("OTP SHUTTING DOWN ({})", projectInfo().getVersionString()),
-          "server-shutdown-info"
-        )
-      );
+    ApplicationShutdownSupport.addShutdownHook(
+      "server-shutdown-info",
+      () -> LOG.info("OTP SHUTTING DOWN ({})", projectInfo().getVersionString())
+    );
     LOG.info(NEW_LINE + "{}", info());
   }
 

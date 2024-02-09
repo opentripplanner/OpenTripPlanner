@@ -9,7 +9,22 @@ import javax.annotation.Nonnull;
  * A type for containing either a success or a failure type as the result of a computation.
  * <p>
  * It's very similar to the Either or Validation type found in functional programming languages.
+ *
+ * @deprecated This not possible to use inside a constructor - can only return one thing. Which,
+ *     then makes encapsulation harder and leaves the door open to forget. Also, having to create
+ *     error codes, mapping and handling code for hundreds of different possible validation error
+ *     types make changes harder, and cleanup impossible. This is a nice way to design APIs, but
+ *     faced with hundreds or even thousands of different validation error types and the same
+ *     amount of code branches this breaks.
+ *     <p>
+ *     I will use the {@link DataValidationException} for now, but we need to make an error
+ *     handling strategy which take all use-cases and goals into account, also pragmatic goals
+ *     like maintainability. The {@link DataValidationException} is not a solution, but it
+ *     at least it allows me to omit returning all possible error on every method ...
+ *     <p>
+ *     See https://github.com/opentripplanner/OpenTripPlanner/issues/5070
  */
+@Deprecated
 public abstract sealed class Result<T, E> {
 
   private Result() {}

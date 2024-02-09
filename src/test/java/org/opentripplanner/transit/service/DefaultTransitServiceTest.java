@@ -43,6 +43,8 @@ class DefaultTransitServiceTest {
       .build();
 
     var transitModel = new TransitModel(stopModel, new Deduplicator());
+    transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    transitModel.index();
 
     service =
       new DefaultTransitService(transitModel) {

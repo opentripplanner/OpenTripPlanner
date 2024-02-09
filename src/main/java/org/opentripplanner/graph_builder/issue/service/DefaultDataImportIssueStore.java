@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.issue.service;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
@@ -28,6 +29,11 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
     } else {
       this.issues.add(issue);
     }
+  }
+
+  @Override
+  public void add(OtpError issue) {
+    add(issue.errorCode(), issue.messageTemplate(), issue.messageArguments());
   }
 
   @Override

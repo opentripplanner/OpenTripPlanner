@@ -44,6 +44,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -53,14 +54,16 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -118,7 +121,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired realtime data be purged from the graph. */
+  /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
@@ -278,31 +281,36 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        Result<UpdateSuccess, UpdateError> result =
-          switch (tripScheduleRelationship) {
-            case SCHEDULED -> handleScheduledTrip(
-              tripUpdate,
-              tripId,
-              serviceDate,
-              backwardsDelayPropagationType
-            );
-            case ADDED -> validateAndHandleAddedTrip(
-              tripUpdate,
-              tripDescriptor,
-              tripId,
-              serviceDate
-            );
-            case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
-            case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
-            case REPLACEMENT -> validateAndHandleModifiedTrip(
-              tripUpdate,
-              tripDescriptor,
-              tripId,
-              serviceDate
-            );
-            case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
-            case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
-          };
+        Result<UpdateSuccess, UpdateError> result;
+        try {
+          result =
+            switch (tripScheduleRelationship) {
+              case SCHEDULED -> handleScheduledTrip(
+                tripUpdate,
+                tripId,
+                serviceDate,
+                backwardsDelayPropagationType
+              );
+              case ADDED -> validateAndHandleAddedTrip(
+                tripUpdate,
+                tripDescriptor,
+                tripId,
+                serviceDate
+              );
+              case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
+              case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
+              case REPLACEMENT -> validateAndHandleModifiedTrip(
+                tripUpdate,
+                tripDescriptor,
+                tripId,
+                serviceDate
+              );
+              case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+              case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
+            };
+        } catch (DataValidationException e) {
+          result = DataValidationExceptionMapper.toResult(e);
+        }
 
         results.add(result);
         if (result.isFailure()) {
@@ -435,7 +443,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Get new TripTimes based on scheduled timetable
     var result = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
+      .createUpdatedTripTimesFromGTFSRT(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        backwardsDelayPropagationType
+      );
 
     if (result.isFailure()) {
       // necessary so the success type is correct
@@ -702,7 +715,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
-
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
       tripUpdate.getVehicle(),
@@ -880,7 +892,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Create new trip times
-    final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
+    final RealTimeTripTimes newTripTimes = TripTimesFactory.tripTimes(
+      trip,
+      stopTimes,
+      deduplicator
+    );
 
     // Update all times to mark trip times as realtime
     // TODO: should we incorporate the delay field if present?
@@ -940,7 +956,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripIndex == -1) {
         debug(tripId, "Could not cancel scheduled trip because it's not in the timetable");
       } else {
-        final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+        final RealTimeTripTimes newTripTimes = timetable
+          .getTripTimes(tripIndex)
+          .copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
@@ -980,7 +998,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripIndex == -1) {
         debug(tripId, "Could not cancel previously added trip on {}", serviceDate);
       } else {
-        final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+        final RealTimeTripTimes newTripTimes = timetable
+          .getTripTimes(tripIndex)
+          .copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();

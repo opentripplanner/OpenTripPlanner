@@ -37,6 +37,7 @@ markdown_extensions:
     - pymdownx.inlinehilite
     - pymdownx.snippets
     - pymdownx.superfences
+    - admonition
 
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
@@ -67,6 +68,7 @@ nav:
     - Introduction: 'apis/Apis.md'
     - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
     - GTFS GraphQL API: 'apis/GTFS-GraphQL-API.md'
+    - Transmodel (NeTEx) GraphQL API: 'apis/TransmodelApi.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
@@ -93,7 +95,6 @@ nav:
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'
     - Vehicle Rental Service Directory API support: 'sandbox/VehicleRentalServiceDirectory.md'
@@ -105,10 +106,10 @@ nav:
     - Park and Ride API: 'sandbox/ParkAndRideApi.md'
     - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'
-    - Vehicle-to-stop Heuristics: 'sandbox/VehicleToStopHeuristics.md'
     - Geocoder API: 'sandbox/GeocoderAPI.md'
     - Travel Time Isochrones: 'sandbox/TravelTime.md'
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'
     - Fares: 'sandbox/Fares.md'
     - Ride Hailing: 'sandbox/RideHailing.md'
     - Emissions: 'sandbox/Emissions.md'
+    - Stop Consolidation: 'sandbox/StopConsolidation.md'

@@ -16,16 +16,18 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -56,7 +58,7 @@ public class RouteRequestMapper {
     request.setDateTime(
       environment.getArgument("date"),
       environment.getArgument("time"),
-      context.transitService().getTimeZone()
+      ZoneIdFallback.zoneId(context.transitService().getTimeZone())
     );
 
     callWith.argument("wheelchair", request::setWheelchair);
@@ -67,15 +69,15 @@ public class RouteRequestMapper {
     request.withPreferences(preferences -> {
       preferences.withBike(bike -> {
         callWith.argument("bikeReluctance", bike::withReluctance);
-        callWith.argument("bikeWalkingReluctance", bike::withWalkingReluctance);
-        callWith.argument("bikeWalkingSpeed", bike::withWalkingSpeed);
         callWith.argument("bikeSpeed", bike::withSpeed);
-        callWith.argument("bikeSwitchTime", bike::withSwitchTime);
-        callWith.argument("bikeSwitchCost", bike::withSwitchCost);
         callWith.argument("bikeBoardCost", bike::withBoardCost);
 
         if (environment.getArgument("optimize") != null) {
-          bike.withOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
+          bike.withOptimizeType(
+            OptimizationTypeMapper.map(
+              GraphQLTypes.GraphQLOptimizeType.valueOf(environment.getArgument("optimize"))
+            )
+          );
         }
         if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {
@@ -84,22 +86,23 @@ public class RouteRequestMapper {
             callWith.argument("triangle.safetyFactor", triangle::withSafety);
           });
         }
+
+        bike.withParking(parking -> setParkingPreferences(callWith, parking));
+        bike.withRental(rental -> setRentalPreferences(callWith, request, rental));
+        bike.withWalking(walking -> setVehicleWalkingPreferences(callWith, walking));
       });
 
-      preferences.withCar(car -> callWith.argument("carReluctance", car::withReluctance));
+      preferences.withCar(car -> {
+        callWith.argument("carReluctance", car::withReluctance);
+        car.withParking(parking -> setParkingPreferences(callWith, parking));
+        car.withRental(rental -> setRentalPreferences(callWith, request, rental));
+      });
 
       preferences.withWalk(b -> {
         callWith.argument("walkReluctance", b::withReluctance);
         callWith.argument("walkSpeed", b::withSpeed);
         callWith.argument("walkBoardCost", b::withBoardCost);
         callWith.argument("walkSafetyFactor", b::withSafetyFactor);
-      });
-      preferences.withRental(rental -> {
-        callWith.argument(
-          "keepingRentedBicycleAtDestinationCost",
-          rental::withArrivingInRentalVehicleAtDestinationCost
-        );
-        rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
       });
       // TODO Add support for all debug filter variants
       callWith.argument(
@@ -145,10 +148,6 @@ public class RouteRequestMapper {
       });
     });
 
-    callWith.argument(
-      "allowKeepingRentedBicycleAtDestination",
-      request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
-    );
     callWith.argument("arriveBy", request::setArriveBy);
 
     callWith.argument(
@@ -228,35 +227,6 @@ public class RouteRequestMapper {
       // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
     }
 
-    var vehicleRental = request.journey().rental();
-
-    // Deprecated, the next one will override this, if both are set
-    callWith.argument(
-      "allowedBikeRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
-    );
-    callWith.argument(
-      "allowedVehicleRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
-    );
-    callWith.argument(
-      "bannedVehicleRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
-    );
-
-    var parking = request.journey().parking();
-    callWith.argument("parking.unpreferredCost", parking::setUnpreferredCost);
-
-    callWith.argument(
-      "parking.filters",
-      (Collection<Map<String, Object>> filters) -> parking.setFilter(parseFilters(filters))
-    );
-
-    callWith.argument(
-      "parking.preferred",
-      (Collection<Map<String, Object>> filters) -> parking.setPreferred(parseFilters(filters))
-    );
-
     callWith.argument(
       "locale",
       (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
@@ -264,17 +234,16 @@ public class RouteRequestMapper {
     return request;
   }
 
-  private static VehicleParkingFilterRequest parseFilters(Collection<Map<String, Object>> filters) {
-    var not = parseFilters(filters, "not");
-    var select = parseFilters(filters, "select");
-    return new VehicleParkingFilterRequest(not, select);
+  private static Set<String> parseNotFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "not");
+  }
+
+  private static Set<String> parseSelectFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "select");
   }
 
   @Nonnull
-  private static Set<VehicleParkingFilter> parseFilters(
-    Collection<Map<String, Object>> filters,
-    String key
-  ) {
+  private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
     return filters
       .stream()
       .flatMap(f ->
@@ -283,14 +252,12 @@ public class RouteRequestMapper {
       .collect(Collectors.toSet());
   }
 
-  private static Stream<VehicleParkingFilter> parseOperation(
-    Collection<Map<String, Collection<String>>> map
-  ) {
+  private static Stream<String> parseOperation(Collection<Map<String, Collection<String>>> map) {
     return map
       .stream()
-      .map(f -> {
+      .flatMap(f -> {
         var tags = f.getOrDefault("tags", List.of());
-        return new TagsFilter(Set.copyOf(tags));
+        return tags.stream();
       });
   }
 
@@ -312,6 +279,69 @@ public class RouteRequestMapper {
     }
 
     return new GenericLocation(lat, lng);
+  }
+
+  private static void setParkingPreferences(
+    CallerWithEnvironment callWith,
+    VehicleParkingPreferences.Builder parking
+  ) {
+    callWith.argument("parking.unpreferredCost", parking::withUnpreferredVehicleParkingTagCost);
+
+    callWith.argument(
+      "parking.filters",
+      (Collection<Map<String, Object>> filters) -> {
+        parking.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+        parking.withBannedVehicleParkingTags(parseNotFilters(filters));
+      }
+    );
+
+    callWith.argument(
+      "parking.preferred",
+      (Collection<Map<String, Object>> preferred) -> {
+        parking.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+        parking.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+      }
+    );
+  }
+
+  private static void setRentalPreferences(
+    CallerWithEnvironment callWith,
+    RouteRequest request,
+    VehicleRentalPreferences.Builder rental
+  ) {
+    callWith.argument(
+      "keepingRentedBicycleAtDestinationCost",
+      rental::withArrivingInRentalVehicleAtDestinationCost
+    );
+    rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
+    callWith.argument(
+      "allowKeepingRentedBicycleAtDestination",
+      rental::withAllowArrivingInRentedVehicleAtDestination
+    );
+
+    // Deprecated, the next one will override this, if both are set
+    callWith.argument(
+      "allowedBikeRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    );
+    callWith.argument(
+      "allowedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    );
+    callWith.argument(
+      "bannedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withBannedNetworks(new HashSet<>(v))
+    );
+  }
+
+  private static void setVehicleWalkingPreferences(
+    CallerWithEnvironment callWith,
+    VehicleWalkingPreferences.Builder walking
+  ) {
+    callWith.argument("bikeWalkingReluctance", walking::withReluctance);
+    callWith.argument("bikeWalkingSpeed", walking::withSpeed);
+    callWith.argument("bikeSwitchTime", time -> walking.withMountDismountTime((int) time));
+    callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }
 
   private static class CallerWithEnvironment {

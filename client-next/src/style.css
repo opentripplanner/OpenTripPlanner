@@ -1,0 +1,130 @@
+.app {
+  min-width: 810px;
+}
+.navbar-brand {
+  color: #4078bc;
+  margin-top: 20px;
+  margin-right: 14px;
+}
+
+@media (min-width: 2160px) {
+  .top-content {
+    height: 75px;
+  }
+
+  .below-content {
+    height: calc(100vh - 75px);
+  }
+}
+
+@media (max-width: 2159px) {
+  .top-content {
+    height: 150px;
+  }
+
+  .below-content {
+    height: calc(100vh - 150px);
+  }
+}
+
+@media (max-width: 1120px) {
+  .top-content {
+    height: 200px;
+  }
+
+  .below-content {
+    height: calc(100vh - 200px);
+  }
+}
+
+.map-container {
+  width: 100%;
+}
+
+.search-bar {
+  padding-left: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-right: 1rem;
+}
+
+.search-bar-route-button-wrapper {
+  height: 5rem;
+  padding-top: 25px;
+}
+
+.itinerary-list-container {
+  width: 36rem;
+  overflow-y: auto;
+}
+
+.itinerary-header-wrapper {
+  position: relative;
+  background: #0a53be;
+}
+
+.accordion-item-filtered {
+  margin-bottom: 0;
+  background-color: lightpink;
+  --bs-accordion-btn-bg: lightpink;
+  --bs-accordion-active-bg: pink;
+}
+
+.itinerary-header-itinerary-number {
+  position: absolute;
+}
+
+.itinerary-header-itinerary-line {
+  position: absolute;
+  height: 2px;
+  top: 9px;
+  background: #000;
+}
+
+.itinerary-header-itinerary-time {
+  position: absolute;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  width: 38px;
+  height: 15px;
+  text-align: center;
+  top: 2px;
+  padding: 1px;
+}
+
+.itinerary-header-leg-wrapper {
+  position: absolute;
+  height: 22px;
+  font-weight: bold;
+  text-shadow: none;
+  margin-top: -1px;
+  padding-top: 3px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.itinerary-header-leg-icon {
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+}
+
+.itinerary-header-leg-public-code {
+  vertical-align: top;
+  font-size: 14px;
+  padding-left: 2px;
+}
+
+/* debug layer selector */
+
+.maplibregl-ctrl-group.layer-select {
+  padding: 10px;
+}
+.maplibregl-ctrl-group.layer-select label {
+  margin-left: 6px;
+}

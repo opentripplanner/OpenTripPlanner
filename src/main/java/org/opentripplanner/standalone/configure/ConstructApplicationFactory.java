@@ -6,7 +6,10 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
+import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -47,6 +50,8 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
+    StopConsolidationServiceModule.class,
+    InteractiveLauncherModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -73,6 +78,9 @@ public interface ConstructApplicationFactory {
 
   MetricsLogging metricsLogging();
 
+  @Nullable
+  StopConsolidationRepository stopConsolidationRepository();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -89,6 +97,11 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
+
+    @BindsInstance
+    Builder stopConsolidationRepository(
+      @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
 
     @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -63,10 +64,10 @@ public class GraphBuilder implements Runnable {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
-    //DaggerGraphBuilderFactory appFactory = GraphBuilderFactoryDa
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
@@ -80,6 +81,7 @@ public class GraphBuilder implements Runnable {
       .graph(graph)
       .transitModel(transitModel)
       .worldEnvelopeRepository(worldEnvelopeRepository)
+      .stopConsolidationRepository(stopConsolidationRepository)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone());
 
@@ -105,6 +107,11 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.netexModule());
     }
 
+    // Consolidate stops only if a stop consolidation repo has been provided
+    if (hasTransitData && factory.stopConsolidationModule() != null) {
+      graphBuilder.addModule(factory.stopConsolidationModule());
+    }
+
     if (hasTransitData) {
       graphBuilder.addModule(factory.tripPatternNamer());
     }
@@ -114,9 +121,6 @@ public class GraphBuilder implements Runnable {
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
-      if (config.matchBusRoutesToStreets) {
-        graphBuilder.addModule(factory.busRouteStreetMatcher());
-      }
       graphBuilder.addModule(factory.osmBoardingLocationsModule());
     }
 
@@ -156,16 +160,16 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
+    if (OTPFeature.Co2Emissions.isOn()) {
+      graphBuilder.addModule(factory.emissionsModule());
+    }
+
     if (config.dataImportReport) {
       graphBuilder.addModule(factory.dataImportIssueReporter());
     }
 
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
-    }
-
-    if (OTPFeature.Co2Emissions.isOn()) {
-      graphBuilder.addModule(factory.emissionsModule());
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());

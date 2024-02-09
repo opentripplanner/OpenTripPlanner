@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.framework.json;
 import java.util.Arrays;
 import java.util.Optional;
 import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.framework.lang.StringUtils;
 
 public class EnumMapper {
 
@@ -23,15 +24,11 @@ public class EnumMapper {
   }
 
   public static String toString(Enum<?> en) {
-    return kebabCase(en.name());
-  }
-
-  public static String kebabCase(String input) {
-    return input.toLowerCase().replace('_', '-');
+    return StringUtils.kebabCase(en.name());
   }
 
   /**
-   * Used to create a list of all values with description of each value witch can be included
+   * Used to create a list of all values with description of each value which can be included
    * in documentation. The list will look like this:
    * ```
    *  - `on` Turn on.

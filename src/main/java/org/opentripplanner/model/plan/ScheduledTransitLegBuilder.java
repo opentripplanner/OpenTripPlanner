@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -40,6 +39,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     transferToNextLeg = original.getTransferToNextLeg();
     generalizedCost = original.getGeneralizedCost();
     accessibilityScore = original.accessibilityScore();
+    zoneId = original.getZoneId();
   }
 
   public B withTripTimes(TripTimes tripTimes) {

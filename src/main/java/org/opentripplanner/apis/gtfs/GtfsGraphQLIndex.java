@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
@@ -78,8 +77,6 @@ import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.fareComponentImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.fareImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.placeAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
@@ -88,6 +85,7 @@ import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
+import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,8 +127,6 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(debugOutputImpl.class))
         .type(typeWiring.build(DepartureRowImpl.class))
         .type(typeWiring.build(elevationProfileComponentImpl.class))
-        .type(typeWiring.build(fareComponentImpl.class))
-        .type(typeWiring.build(fareImpl.class))
         .type(typeWiring.build(FeedImpl.class))
         .type(typeWiring.build(FeedImpl.class))
         .type(typeWiring.build(GeometryImpl.class))

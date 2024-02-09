@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * A utility class for integer functions.
@@ -59,9 +60,9 @@ public final class IntUtils {
    * Copy int array and shift all values by the given {@code offset}.
    */
   public static int[] shiftArray(int offset, int[] array) {
-    int[] a = new int[array.length];
-    for (int i = 0; i < array.length; i++) {
-      a[i] = array[i] + offset;
+    int[] a = Arrays.copyOf(array, array.length);
+    for (int i = 0; i < array.length; ++i) {
+      a[i] += offset;
     }
     return a;
   }
@@ -86,23 +87,37 @@ public final class IntUtils {
     return Math.sqrt(sum / v.size());
   }
 
-  public static int requireNotNegative(int value) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Negative value not expected: " + value);
+  /**
+   * Check is given {@code value} is in range {@code [min .. max]}. Both {@code min} and
+   * {@code max} is inclusive. Throws a {@link IllegalArgumentException} if not in range.
+   */
+  public static int requireInRange(int value, int min, int max, String field) {
+    if (value < min || value > max) {
+      throw new IllegalArgumentException(
+        "The %s is not in range[%d, %d]: %d".formatted(field(field), min, max, value)
+      );
     }
     return value;
   }
 
   public static int requireInRange(int value, int minInclusive, int maxInclusive) {
-    return requireInRange(value, minInclusive, maxInclusive, "value");
+    return requireInRange(value, minInclusive, maxInclusive, null);
   }
 
-  public static int requireInRange(int value, int minInclusive, int maxInclusive, String field) {
-    if (value < minInclusive || value > maxInclusive) {
+  public static int requireNotNegative(int value, String field) {
+    if (value < 0) {
       throw new IllegalArgumentException(
-        "The %s is not in range[%d, %d]: %d".formatted(field, minInclusive, maxInclusive, value)
+        "Negative value not expected for %s: %d".formatted(field(field), value)
       );
     }
     return value;
+  }
+
+  public static int requireNotNegative(int value) {
+    return requireNotNegative(value, null);
+  }
+
+  private static String field(@Nullable String field) {
+    return field == null ? "value" : '\'' + field + '\'';
   }
 }

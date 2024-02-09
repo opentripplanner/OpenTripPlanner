@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,7 +65,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final Float accessibilityScore;
   private List<FareProductUse> fareProducts = List.of();
 
-  ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
+  protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     this.tripTimes = builder.tripTimes();
     this.tripPattern = builder.tripPattern();
 
@@ -75,7 +76,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.endTime = builder.endTime();
 
     this.serviceDate = builder.serviceDate();
-    this.zoneId = builder.zoneId();
+    this.zoneId = Objects.requireNonNull(builder.zoneId());
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
 
@@ -388,6 +389,9 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   /**
    * Should be used for debug logging only
+   * <p>
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid
+   * spamming logs. Explicit access should be used if needed.
    */
   @Override
   public String toString() {
@@ -406,8 +410,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
       .addObj("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
-      .addObj("legGeometry", legGeometry)
-      .addCol("transitAlerts", transitAlerts)
+      .addColSize("transitAlerts", transitAlerts)
       .addEnum("boardRule", getBoardRule())
       .addEnum("alightRule", getAlightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)

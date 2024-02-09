@@ -21,6 +21,11 @@ public class ToStringBuilderTest {
   private static final ZoneId TIME_ZONE_ID_PARIS = ZoneIds.PARIS;
 
   @Test
+  public void ofName() {
+    assertEquals("Name{}", ToStringBuilder.of("Name").toString());
+  }
+
+  @Test
   public void addFieldIfTrue() {
     assertEquals("ToStringBuilderTest{x}", subject().addBoolIfTrue("x", true).toString());
     assertEquals("ToStringBuilderTest{}", subject().addBoolIfTrue("x", false).toString());
@@ -103,6 +108,26 @@ public class ToStringBuilderTest {
     assertEquals(
       "ToStringBuilderTest{obj: Foo{}}",
       subject().addObj("obj", new Foo(0, null)).toString()
+    );
+  }
+
+  @Test
+  public void addObjOpSafe() {
+    assertEquals(
+      "ToStringBuilderTest{obj: Foo{a: 5, b: 'X'}}",
+      subject().addObjOpSafe("obj", () -> new Foo(5, "X")).toString()
+    );
+    assertEquals("ToStringBuilderTest{}", subject().addObjOpSafe("obj", () -> null).toString());
+    assertEquals(
+      "ToStringBuilderTest{}",
+      subject()
+        .addObjOpSafe(
+          "obj",
+          () -> {
+            throw new IllegalStateException("Ignore");
+          }
+        )
+        .toString()
     );
   }
 

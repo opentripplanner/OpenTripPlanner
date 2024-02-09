@@ -70,9 +70,6 @@ public class TimetableSnapshot {
    */
   private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
 
-  private HashMap<FeedScopedId, TripOnServiceDate> realtimeAddedTripOnServiceDate = new HashMap<>();
-  private HashMap<TripIdAndServiceDate, TripOnServiceDate> realtimeAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
-
   /**
    * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
    * stop. This has to be kept in order for them to be included in the stop times api call on a
@@ -269,10 +266,6 @@ public class TimetableSnapshot {
       transitLayerUpdater.update(dirtyTimetables, timetables);
     }
 
-    ret.realtimeAddedTripOnServiceDate =
-      (HashMap<FeedScopedId, TripOnServiceDate>) this.realtimeAddedTripOnServiceDate.clone();
-    ret.realtimeAddedTripOnServiceDateByTripIdAndServiceDate =
-      (HashMap<TripIdAndServiceDate, TripOnServiceDate>) this.realtimeAddedTripOnServiceDateByTripIdAndServiceDate.clone();
     this.dirtyTimetables.clear();
     this.dirty = false;
 
@@ -372,22 +365,6 @@ public class TimetableSnapshot {
 
   public void setPatternsForStop(SetMultimap<StopLocation, TripPattern> patternsForStop) {
     this.patternsForStop = patternsForStop;
-  }
-
-  public void addLastAddedTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
-    realtimeAddedTripOnServiceDate.put(tripOnServiceDate.getId(), tripOnServiceDate);
-    realtimeAddedTripOnServiceDateByTripIdAndServiceDate.put(
-      tripOnServiceDate.getTripIdAndServiceDate(),
-      tripOnServiceDate
-    );
-  }
-
-  public HashMap<FeedScopedId, TripOnServiceDate> getRealtimeAddedTripOnServiceDate() {
-    return realtimeAddedTripOnServiceDate;
-  }
-
-  public HashMap<TripIdAndServiceDate, TripOnServiceDate> getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate() {
-    return realtimeAddedTripOnServiceDateByTripIdAndServiceDate;
   }
 
   /**

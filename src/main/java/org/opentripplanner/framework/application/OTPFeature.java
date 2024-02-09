@@ -16,20 +16,23 @@ import org.slf4j.LoggerFactory;
 public enum OTPFeature {
   APIBikeRental(true, false, "Enable the bike rental endpoint."),
   APIServerInfo(true, false, "Enable the server info endpoint."),
-  APIGraphInspectorTile(
-    true,
-    false,
-    "Enable the inspector  endpoint for graph information for inspection/debugging purpose."
-  ),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
   ConsiderPatternsForDirectTransfers(
     true,
     false,
     "Enable limiting transfers so that there is only a single transfer to each pattern."
   ),
-  DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
+  DebugUi(
+    true,
+    false,
+    """
+      Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses.
+      Be aware that the map tiles are not a stable API and can change without notice.
+      Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.
+      """
+  ),
   FloatingBike(true, false, "Enable floating bike routing."),
-  GtfsGraphQlApi(true, false, "Enable GTFS GraphQL API."),
+  GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
   GtfsGraphQlApiRentalStationFuzzyMatching(
     false,
     false,
@@ -61,7 +64,12 @@ public enum OTPFeature {
   TransferConstraints(
     true,
     false,
-    "Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little."
+    "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
+  ),
+  TransmodelGraphQlApi(
+    true,
+    true,
+    "Enable the [Transmodel (NeTEx) GraphQL API](apis/TransmodelApi.md)."
   ),
 
   /* Sandbox extension features - Must be turned OFF by default */
@@ -81,10 +89,11 @@ public enum OTPFeature {
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  LegacyRestApi(true, true, "Enable legacy REST API. This API will be removed in the future."),
   RealtimeResolver(
     false,
     true,
-    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data"
   ),
   ReportApi(false, true, "Enable the report API."),
   RestAPIPassInDefaultConfigAsJson(
@@ -95,10 +104,8 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
-  SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
   SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
-  TransferAnalyzer(false, true, "Analyze transfers during graph build."),
-  VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");
+  TransferAnalyzer(false, true, "Analyze transfers during graph build.");
 
   private static final Object TEST_LOCK = new Object();
 

@@ -91,12 +91,12 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
 
   private static List<RaptorModuleTestCase> openInSearchIntervalCases(String access) {
     var expected = new ExpectedList(
-      access + EXP_00_15 + "[0:13 0:31 18m 0tx $1860]",
-      access + EXP_00_20 + "[0:18 0:36 18m 0tx $1860]",
-      access + EXP_00_25 + "[0:23 0:41 18m 0tx $1860]",
-      access + EXP_00_30 + "[0:28 0:46 18m 0tx $1860]",
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m 0tx $1860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m 0tx $1860]"
+      access + EXP_00_15 + "[0:13 0:31 18m Tₓ0 C₁1_860]",
+      access + EXP_00_20 + "[0:18 0:36 18m Tₓ0 C₁1_860]",
+      access + EXP_00_25 + "[0:23 0:41 18m Tₓ0 C₁1_860]",
+      access + EXP_00_30 + "[0:28 0:46 18m Tₓ0 C₁1_860]",
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -138,8 +138,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInSearchIntervalStartSearchNextDayTestCase() {
     String access = "Walk 2m Open(0:00 1:00)";
     var expected = new ExpectedList(
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m 0tx $1860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m 0tx $1860]"
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T24_10, T24_40)
@@ -165,10 +165,10 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInSecondHalfTodayTestCase() {
     String access = "Walk 2m Open(0:23 1:00)";
     var expected = new ExpectedList(
-      access + EXP_00_25 + "[0:23 0:41 18m 0tx $1860]",
-      access + EXP_00_30 + "[0:28 0:46 18m 0tx $1860]",
-      access + EXP_24_15 + "[1:00 0:31+1d 23h31m 0tx $85440]",
-      access + EXP_24_20 + "[1:00 0:36+1d 23h36m 0tx $0000]"
+      access + EXP_00_25 + "[0:23 0:41 18m Tₓ0 C₁1_860]",
+      access + EXP_00_30 + "[0:28 0:46 18m Tₓ0 C₁1_860]",
+      access + EXP_24_15 + "[1:00 0:31+1d 23h31m Tₓ0 C₁85_440]",
+      access + EXP_24_20 + "[1:00 0:36+1d 23h36m Tₓ0 C₁0_000]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -195,12 +195,12 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> openInFirstHalfIntervalTestCase() {
     String access = "Walk 2m Open(0:00 0:20)";
     var expected = new ExpectedList(
-      access + EXP_00_15 + "[0:13 0:31 18m 0tx $1860]",
-      access + EXP_00_20 + "[0:18 0:36 18m 0tx $1860]",
-      access + EXP_00_25 + "[0:20 0:41 21m 0tx $2040]",
-      access + EXP_00_30 + "[0:20 0:46 26m 0tx $0000]",
-      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m 0tx $1860]",
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m 0tx $1860]"
+      access + EXP_00_15 + "[0:13 0:31 18m Tₓ0 C₁1_860]",
+      access + EXP_00_20 + "[0:18 0:36 18m Tₓ0 C₁1_860]",
+      access + EXP_00_25 + "[0:20 0:41 21m Tₓ0 C₁2_040]",
+      access + EXP_00_30 + "[0:20 0:46 26m Tₓ0 C₁0_000]",
+      access + EXP_24_15 + "[0:13+1d 0:31+1d 18m Tₓ0 C₁1_860]",
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]"
     );
 
     return tcBuilderWithMinDuration(T00_00, T24_40)
@@ -231,8 +231,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static List<RaptorModuleTestCase> partiallyOpenIntervalTestNextDayTestCase() {
     String access = "Walk 2m Open(0:18 0:20)";
     var expected = new ExpectedList(
-      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m 0tx $1860]",
-      access + EXP_24_25 + "[0:20+1d 0:41+1d 21m 0tx $2040]"
+      access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₓ0 C₁1_860]",
+      access + EXP_24_25 + "[0:20+1d 0:41+1d 21m Tₓ0 C₁2_040]"
     );
 
     return tcBuilderWithMinDuration(T24_10, T25_00)

@@ -92,7 +92,8 @@ class RaptorRoutingRequestTransitDataCreator {
   static List<TripPatternForDates> merge(
     ZonedDateTime transitSearchTimeZero,
     List<TripPatternForDate> patternForDateList,
-    TransitDataProviderFilter filter
+    TransitDataProviderFilter filter,
+    PriorityGroupConfigurator priorityGroupConfigurator
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
@@ -145,7 +146,8 @@ class RaptorRoutingRequestTransitDataCreator {
             tripPattern,
             tripPattern.getAlightingPossible(),
             BoardAlight.ALIGHT
-          )
+          ),
+          priorityGroupConfigurator.lookupTransitGroupPriorityId(tripPattern.getPattern())
         )
       );
     }
@@ -156,7 +158,8 @@ class RaptorRoutingRequestTransitDataCreator {
   List<TripPatternForDates> createTripPatterns(
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
-    TransitDataProviderFilter filter
+    TransitDataProviderFilter filter,
+    PriorityGroupConfigurator priorityGroupConfigurator
   ) {
     List<TripPatternForDate> tripPatternForDates = getTripPatternsForDateRange(
       additionalPastSearchDays,
@@ -164,7 +167,7 @@ class RaptorRoutingRequestTransitDataCreator {
       filter
     );
 
-    return merge(transitSearchTimeZero, tripPatternForDates, filter);
+    return merge(transitSearchTimeZero, tripPatternForDates, filter, priorityGroupConfigurator);
   }
 
   private static List<TripPatternForDate> filterActiveTripPatterns(

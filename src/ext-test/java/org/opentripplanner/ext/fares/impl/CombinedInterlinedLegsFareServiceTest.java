@@ -65,16 +65,22 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
-    var price = fare.getFare(FareType.regular);
-    assertEquals(totalPrice, price);
-
     var firstLeg = itinerary.getTransitLeg(0);
-    var uses = fare.legProductsFromComponents().get(firstLeg);
+    var uses = fare.getLegProducts().get(firstLeg);
     assertEquals(1, uses.size());
 
     var secondLeg = itinerary.getTransitLeg(1);
-    uses = fare.legProductsFromComponents().get(secondLeg);
+    uses = fare.getLegProducts().get(secondLeg);
     assertEquals(1, uses.size());
+
+    var sum = fare
+      .getLegProducts()
+      .values()
+      .stream()
+      .distinct()
+      .map(p -> p.product().price())
+      .reduce(Money.ZERO_USD, Money::plus);
+    assertEquals(totalPrice, sum);
   }
 
   @Test
@@ -89,17 +95,17 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itinerary);
 
     var firstLeg = itinerary.getTransitLeg(0);
-    var uses = List.copyOf(fare.legProductsFromComponents().get(firstLeg));
+    var uses = List.copyOf(fare.getLegProducts().get(firstLeg));
     assertEquals(1, uses.size());
 
-    var firstLegUse = uses.get(0);
+    var firstLegUse = uses.getFirst();
     assertEquals(tenDollars, firstLegUse.product().price());
 
     var secondLeg = itinerary.getTransitLeg(1);
-    uses = List.copyOf(fare.legProductsFromComponents().get(secondLeg));
+    uses = List.copyOf(fare.getLegProducts().get(secondLeg));
     assertEquals(1, uses.size());
 
-    var secondLegUse = uses.get(0);
+    var secondLegUse = uses.getFirst();
     assertEquals(tenDollars, secondLegUse.product().price());
 
     // the same far product is used for both legs as you only need to buy one

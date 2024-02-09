@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.api.mapping.I18NStringMapper;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 

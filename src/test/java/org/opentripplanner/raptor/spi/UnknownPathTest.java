@@ -14,7 +14,7 @@ class UnknownPathTest {
     assertEquals(1200, subject.endTime());
     assertEquals(3, subject.numberOfTransfers());
     assertEquals(900, subject.durationInSeconds());
-    assertEquals("[0:05 0:20 15m 3tx]", subject.toString());
+    assertEquals("[0:05 0:20 15m Tₓ3]", subject.toString());
   }
 
   @Test
@@ -25,6 +25,6 @@ class UnknownPathTest {
     assertEquals(1200, subject.endTime());
     assertEquals(2, subject.numberOfTransfers());
     assertEquals(900, subject.durationInSeconds());
-    assertEquals("[0:05 0:20 15m 2tx]", subject.toString());
+    assertEquals("[0:05 0:20 15m Tₓ2]", subject.toString());
   }
 }

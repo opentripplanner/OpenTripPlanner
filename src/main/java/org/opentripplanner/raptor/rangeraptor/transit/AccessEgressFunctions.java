@@ -5,12 +5,15 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains functions used by the {@link AccessPaths} and {@link EgressPaths} classes.
@@ -23,8 +26,10 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  */
 public final class AccessEgressFunctions {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AccessEgressFunctions.class);
+
   /**
-   * Filter standard(not multi-criteria) Raptor access and egress paths. A path is pareto optimal
+   * Filter standard (not multi-criteria) Raptor access and egress paths. A path is pareto optimal
    * for a given stop if
    * <ol>
    *     <li>
@@ -47,32 +52,57 @@ public final class AccessEgressFunctions {
    * </ol>
    */
   private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
-    (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
-    r.hasOpeningHours() ||
-    (l.numberOfRides() < r.numberOfRides()) ||
-    (l.durationInSeconds() < r.durationInSeconds());
+    (
+      (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
+      r.hasOpeningHours() ||
+      l.numberOfRides() < r.numberOfRides() ||
+      l.durationInSeconds() < r.durationInSeconds()
+    );
+
+  /**
+   * Filter Multi-criteria Raptor access and egress paths. This can be used to wash
+   * access/egress paths - paths that are not optimal using this should not be passed into
+   * Raptor - it is a bug.
+   */
+  private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (l, r) ->
+    STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
 
-  static Collection<RaptorAccessEgress> removeNoneOptimalPathsForStandardRaptor(
+  /**
+   * Filter non-optimal paths away for the standard search. This method does not
+   * look at the c1 value.
+   */
+  static Collection<RaptorAccessEgress> removeNonOptimalPathsForStandardRaptor(
     Collection<RaptorAccessEgress> paths
   ) {
-    // To avoid too many items in the pareto set we first group the paths by stop,
-    // for each stop we filter it down to the optimal pareto set. We could do this
-    // for multi-criteria as well, but it is likely not so important. The focus for
-    // the mc-set should be that the list of access/egress created in OTP should not
-    // contain to many non-optimal paths.
-    var mapByStop = groupByStop(paths);
-    var set = new ParetoSet<>(STANDARD_COMPARATOR);
-    Collection<RaptorAccessEgress> result = new ArrayList<>();
+    return removeNonOptimalPaths(paths, STANDARD_COMPARATOR);
+  }
 
-    mapByStop.forEachValue(list -> {
-      set.clear();
-      set.addAll(list);
-      result.addAll(set);
-      return true;
-    });
+  /**
+   * Filter non-optimal paths away for the multi-criteria search. This method should in theory
+   * not remove any paths since the caller should not pass in duplicates, but it turns out that
+   * this happens, so we do it.
+   */
+  static Collection<RaptorAccessEgress> removeNonOptimalPathsForMcRaptor(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    var result = removeNonOptimalPaths(paths, MC_COMPARATOR);
+    if (LOG.isDebugEnabled() && result.size() < paths.size()) {
+      var duplicates = new ArrayList<>(paths);
+      duplicates.removeAll(result);
+      // Note! This does not provide enough information to solve/debug this problem, but this is
+      // not a problem in Raptor, so we do not want to add more specific logging here - this does
+      // however document that the problem exist. Turn on debug logging and move the start/end
+      // coordinate around until you see this message.
+      //
+      // See https://github.com/opentripplanner/OpenTripPlanner/issues/5601
+      LOG.warn(
+        "Duplicate access/egress paths passed into raptor:\n\t" +
+        duplicates.stream().map(Objects::toString).collect(Collectors.joining("\n\t"))
+      );
+    }
     return result;
   }
 
@@ -95,6 +125,27 @@ public final class AccessEgressFunctions {
   }
 
   /* private methods */
+
+  /**
+   * Remove relevant access/egress paths. The given set of paths are grouped by stop and
+   * the filtered based on the given pareto comparator.
+   */
+  static Collection<RaptorAccessEgress> removeNonOptimalPaths(
+    Collection<RaptorAccessEgress> paths,
+    ParetoComparator<RaptorAccessEgress> comparator
+  ) {
+    var mapByStop = groupByStop(paths);
+    var set = new ParetoSet<>(comparator);
+    var result = new ArrayList<RaptorAccessEgress>();
+
+    for (int stop : mapByStop.keys()) {
+      var list = mapByStop.get(stop);
+      set.clear();
+      set.addAll(list);
+      result.addAll(set);
+    }
+    return result;
+  }
 
   private static List<RaptorAccessEgress> getOrCreate(
     int key,

@@ -9,8 +9,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -38,20 +40,23 @@ public class Co2EmissionsDataReader {
    */
   public Map<FeedScopedId, Double> readGtfs(File directory) {
     String feedId = "";
-    Map<FeedScopedId, Double> emissionsData = new HashMap<>();
-    try (InputStream feedInfoStream = new FileInputStream(directory + "/feed_info.txt")) {
-      feedId = readFeedId(feedInfoStream);
-    } catch (IOException e) {
-      issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
-      LOG.error("InvalidEmissionData: reading feed_info.txt failed.", e);
+    File feedFile = new File(directory + "/feed_info.txt");
+    File emissionsFile = new File(directory + "/emissions.txt");
+    if (feedFile.exists() && emissionsFile.exists()) {
+      try (InputStream feedInfoStream = new FileInputStream(feedFile)) {
+        feedId = readFeedId(feedInfoStream);
+      } catch (IOException e) {
+        issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
+        LOG.error("InvalidEmissionData: reading feed_info.txt failed.", e);
+      }
+      try (InputStream stream = new FileInputStream(emissionsFile)) {
+        return readEmissions(stream, feedId);
+      } catch (IOException e) {
+        issueStore.add("InvalidEmissionData", "Reading emissions.txt failed.");
+        LOG.error("InvalidEmissionData: reading emissions.txt failed.", e);
+      }
     }
-    try (InputStream stream = new FileInputStream(directory + "/emissions.txt")) {
-      emissionsData = readEmissions(stream, feedId);
-    } catch (IOException e) {
-      issueStore.add("InvalidEmissionData", "Reading emissions.txt failed.");
-      LOG.error("InvalidEmissionData: reading emissions.txt failed.", e);
-    }
-    return emissionsData;
+    return Map.of();
   }
 
   /**
@@ -60,18 +65,21 @@ public class Co2EmissionsDataReader {
    * @return emissions data
    */
   public Map<FeedScopedId, Double> readGtfsZip(File file) {
-    try {
-      ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
-      String feedId = readFeedId(zipFile.getInputStream(zipFile.getEntry("feed_info.txt")));
-      InputStream stream = zipFile.getInputStream(zipFile.getEntry("emissions.txt"));
-      Map<FeedScopedId, Double> emissionsData = readEmissions(stream, feedId);
-      zipFile.close();
-      return emissionsData;
+    try (ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ)) {
+      ZipEntry feedInfo = zipFile.getEntry("feed_info.txt");
+      ZipEntry emissions = zipFile.getEntry("emissions.txt");
+      if (emissions != null && feedInfo != null) {
+        String feedId = readFeedId(zipFile.getInputStream(feedInfo));
+        InputStream stream = zipFile.getInputStream(emissions);
+        Map<FeedScopedId, Double> emissionsData = readEmissions(stream, feedId);
+        zipFile.close();
+        return emissionsData;
+      }
     } catch (IOException e) {
       issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
       LOG.error("InvalidEmissionData: Reading emissions data failed.", e);
     }
-    return null;
+    return Map.of();
   }
 
   private Map<FeedScopedId, Double> readEmissions(InputStream stream, String feedId)
@@ -85,30 +93,44 @@ public class Co2EmissionsDataReader {
       String avgCo2PerVehiclePerKmString = reader.get("avg_co2_per_vehicle_per_km");
       String avgPassengerCountString = reader.get("avg_passenger_count");
 
-      if (avgCo2PerVehiclePerKmString.isEmpty()) {
+      if (!StringUtils.hasValue(routeId)) {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_co2_per_vehicle_per_km is missing in the Emissions.txt for route %s",
+          "Value for routeId is missing in the emissions.txt for line: %s.",
+          reader.getRawRecord()
+        );
+      }
+      if (!StringUtils.hasValue(avgCo2PerVehiclePerKmString)) {}
+      {
+        issueStore.add(
+          "InvalidEmissionData",
+          "Value for avg_co2_per_vehicle_per_km is missing in the emissions.txt for route %s",
           routeId
         );
       }
-      if (avgPassengerCountString.isEmpty()) {
+      if (!StringUtils.hasValue(avgPassengerCountString)) {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_passenger_count is missing in the Emissions.txt for route %s",
+          "Value for avg_passenger_count is missing in the emissions.txt for route %s",
           routeId
         );
       }
-
-      Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
-      Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
-      Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
-        routeId,
-        avgCo2PerVehiclePerMeter,
-        avgPassengerCount
-      );
-      if (emissions.isPresent()) {
-        emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
+      if (
+        StringUtils.hasValue(feedId) &&
+        StringUtils.hasValue(routeId) &&
+        StringUtils.hasValue(avgCo2PerVehiclePerKmString) &&
+        StringUtils.hasValue(avgPassengerCountString)
+      ) {
+        Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
+        Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
+        Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
+          routeId,
+          avgCo2PerVehiclePerMeter,
+          avgPassengerCount
+        );
+        if (emissions.isPresent()) {
+          emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
+        }
       }
     }
     return emissionsData;

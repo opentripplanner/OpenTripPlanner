@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -241,11 +241,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private List<Object> getStops(DataFetchingEnvironment environment) {
-    return getSource(environment)
-      .getStops()
-      .stream()
-      .map(Object.class::cast)
-      .collect(Collectors.toList());
+    return getSource(environment).getStops().stream().map(Object.class::cast).toList();
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {
@@ -253,7 +249,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().realtimeVehicleService();
+    return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

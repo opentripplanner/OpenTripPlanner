@@ -3,12 +3,16 @@ package org.opentripplanner.raptor.rangeraptor.path.configure;
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
+import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
@@ -35,23 +39,26 @@ public class PathConfig<T extends RaptorTripSchedule> {
     this.ctx = context;
   }
 
+  public DestinationArrivalPaths<T> createDestArrivalPathsStdSearch() {
+    return createDestArrivalPaths(ParetoSetCost.NONE, DominanceFunction.noop());
+  }
+
   /**
    * Create a new {@link DestinationArrivalPaths}.
-   * @param includeC1Cost whether to include generalized cost in the pareto set criteria.
-   *                               It will be generated for each leg and a total for the path.
+   * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
    * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
    *               then no c2 comparison will be used.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
-    boolean includeC1Cost,
-    final DominanceFunction c2Comp
+    ParetoSetCost costConfig,
+    DominanceFunction c2Comp
   ) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(includeC1Cost, c2Comp),
+      createPathParetoComparator(costConfig, c2Comp),
       ctx.calculator(),
-      includeC1Cost ? ctx.costCalculator() : null,
+      costConfig.includeC1() ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(includeC1Cost),
+      createPathMapper(costConfig.includeC1()),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
@@ -61,17 +68,30 @@ public class PathConfig<T extends RaptorTripSchedule> {
   /* private members */
 
   private ParetoComparator<RaptorPath<T>> createPathParetoComparator(
-    boolean includeC1,
-    final DominanceFunction c2Comp
+    ParetoSetCost costConfig,
+    DominanceFunction c2Comp
   ) {
-    return paretoComparator(
-      includeC1,
-      ctx.searchParams().timetable(),
-      ctx.searchParams().preferLateArrival(),
-      ctx.searchDirection(),
-      ctx.multiCriteria().relaxC1AtDestination(),
-      c2Comp
-    );
+    // This code goes away when the USE_C1_RELAX_DESTINATION is deleted
+    var relaxC1 =
+      switch (costConfig) {
+        case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> ctx.multiCriteria().relaxC1();
+        case USE_C1_RELAX_DESTINATION -> GeneralizedCostRelaxFunction.of(
+          ctx.multiCriteria().relaxCostAtDestination()
+        );
+        default -> RelaxFunction.NORMAL;
+      };
+
+    return paretoComparator(paretoSetTimeConfig(), costConfig, relaxC1, c2Comp);
+  }
+
+  private ParetoSetTime paretoSetTimeConfig() {
+    boolean preferLatestDeparture =
+      ctx.searchParams().preferLateArrival() != ctx.searchDirection().isInReverse();
+
+    ParetoSetTime timeConfig = ctx.searchParams().timetable()
+      ? ParetoSetTime.USE_TIMETABLE
+      : (preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME : ParetoSetTime.USE_ARRIVAL_TIME);
+    return timeConfig;
   }
 
   private PathMapper<T> createPathMapper(boolean includeCost) {

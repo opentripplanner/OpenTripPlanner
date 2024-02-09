@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.standard;
 
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -182,10 +183,10 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     if (logCount < 3) {
       ++logCount;
       LOG.error(
-        "Traveling back in time is not allowed. Board stop pos: {}, alight stop pos: {}, stop arrival time: {}, trip: {}.",
-        onTrip.findDepartureStopPosition(onTripBoardTime, onTripBoardStop),
+        "Traveling back in time is not allowed. Board time: {}, alight stop pos: {}, stop arrival time: {}, trip: {}.",
+        TimeUtils.timeToStrLong(onTripBoardTime),
         stopPos,
-        stopArrivalTime,
+        TimeUtils.timeToStrLong(stopArrivalTime),
         onTrip
       );
     }

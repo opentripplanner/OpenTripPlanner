@@ -152,8 +152,8 @@ query TransmodelExampleQuery {
 
   let apiFlavor = parameters.flavor || "gtfs";
   let urls = {
-    gtfs: '/otp/routers/default/index/graphql',
-    transmodel: '/otp/routers/default/transmodel/index/graphql'
+    gtfs: '/otp/gtfs/v1',
+    transmodel: '/otp/transmodel/v3'
   }
 
   let defaultQueries = {

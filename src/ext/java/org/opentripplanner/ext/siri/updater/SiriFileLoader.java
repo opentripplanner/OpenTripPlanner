@@ -72,7 +72,7 @@ public class SiriFileLoader implements SiriLoader {
       if (!matchFilename(file)) {
         continue;
       }
-      LOG.info("Process realtime input file: " + file.getAbsolutePath());
+      LOG.info("Process real-time input file: " + file.getAbsolutePath());
       var inProgressFile = newFile(file, SUFFIX_IN_PROGRESS);
       try {
         file.renameTo(inProgressFile);

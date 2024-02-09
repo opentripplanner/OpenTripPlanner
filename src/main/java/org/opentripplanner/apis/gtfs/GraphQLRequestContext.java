@@ -17,7 +17,7 @@ public record GraphQLRequestContext(
   FareService fareService,
   VehicleParkingService vehicleParkingService,
   VehicleRentalService vehicleRentalService,
-  RealtimeVehicleService realtimeVehicleService,
+  RealtimeVehicleService realTimeVehicleService,
   GraphFinder graphFinder,
   RouteRequest defaultRouteRequest
 ) {

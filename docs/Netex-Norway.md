@@ -85,11 +85,11 @@ using OTP's built in testing web client. Try some long trips like Oslo to Bergen
 get long distance trains and flights as alternatives. You might need to increase the walking limit
 above its very low default value.
 
-## Adding SIRI Realtime Data
+## Adding SIRI Real-time Data
 
 Another important feature in OTP2 is the ability to
-use [SIRI realtime data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information).
-Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply realtime updates on top
+use [SIRI real-time data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information).
+Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply real-time updates on top
 of schedule data. While technically a distinct specification from Netex, both Netex and SIRI use the
 Transmodel vocabulary, allowing SIRI messages to reference entities in Netex schedule data. Like
 GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in
@@ -143,6 +143,6 @@ Note that between these SIRI updaters and the GTFS-RT Websocket updater, we now 
 and streaming examples of GTFS-RT "incrementality" semantics, so should be able to finalize that
 part of the specification.
 
-The final updater regularly performs a copy of the realtime data into a format suitable for use by
-OTP2's new Raptor router. Without this updater the realtime data will be received and cataloged, but
+The final updater regularly performs a copy of the real-time data into a format suitable for use by
+OTP2's new Raptor router. Without this updater the real-time data will be received and cataloged, but
 not visible to the router.

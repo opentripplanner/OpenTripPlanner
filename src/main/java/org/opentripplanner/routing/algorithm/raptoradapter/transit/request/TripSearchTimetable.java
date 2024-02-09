@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
  * This interface add two methods the the {@link RaptorTimeTable} to optimize the terip search
  * inside the transit model. They were previously in Raptor, but the trip Search is moded outside
  * of Raptor; We have keep these methods in an interface to be able to reuse the complex TripSearch
- * in tests, witch do not use the transit model {@link TripSchedule}; Hence also the generic type
+ * in tests, which do not use the transit model {@link TripSchedule}; Hence also the generic type
  * on this interface.
  */
 public interface TripSearchTimetable<T extends RaptorTripSchedule> extends RaptorTimeTable<T> {

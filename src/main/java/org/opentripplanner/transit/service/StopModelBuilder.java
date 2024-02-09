@@ -19,8 +19,7 @@ import org.opentripplanner.transit.model.site.Station;
 
 public class StopModelBuilder {
 
-  private final StopModel original;
-  private final AtomicInteger indexCounter;
+  private final AtomicInteger stopIndexCounter;
 
   private final EntityById<RegularStop> regularStopById = new DefaultEntityById<>();
   private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
@@ -29,17 +28,8 @@ public class StopModelBuilder {
   private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
   private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
-  StopModelBuilder(StopModel original) {
-    this.original = original;
-    this.indexCounter = new AtomicInteger(original.stopIndexSize());
-  }
-
-  public StopModel original() {
-    return original;
-  }
-
-  int stopIndexSize() {
-    return indexCounter.get();
+  StopModelBuilder(AtomicInteger stopIndexCounter) {
+    this.stopIndexCounter = stopIndexCounter;
   }
 
   public ImmutableEntityById<RegularStop> regularStopsById() {
@@ -47,7 +37,7 @@ public class StopModelBuilder {
   }
 
   public RegularStopBuilder regularStop(FeedScopedId id) {
-    return RegularStop.of(id, indexCounter::getAndIncrement);
+    return RegularStop.of(id, stopIndexCounter::getAndIncrement);
   }
 
   public RegularStop computeRegularStopIfAbsent(
@@ -104,7 +94,7 @@ public class StopModelBuilder {
   }
 
   public AreaStopBuilder areaStop(FeedScopedId id) {
-    return AreaStop.of(id, indexCounter::getAndIncrement);
+    return AreaStop.of(id, stopIndexCounter::getAndIncrement);
   }
 
   public ImmutableEntityById<AreaStop> areaStopById() {
@@ -122,7 +112,7 @@ public class StopModelBuilder {
   }
 
   public GroupStopBuilder groupStop(FeedScopedId id) {
-    return GroupStop.of(id, indexCounter::getAndIncrement);
+    return GroupStop.of(id, stopIndexCounter::getAndIncrement);
   }
 
   public ImmutableEntityById<GroupStop> groupStopById() {
@@ -155,5 +145,9 @@ public class StopModelBuilder {
 
   public StopModel build() {
     return new StopModel(this);
+  }
+
+  AtomicInteger stopIndexCounter() {
+    return stopIndexCounter;
   }
 }

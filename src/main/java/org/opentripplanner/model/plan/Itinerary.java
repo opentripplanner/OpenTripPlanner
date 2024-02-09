@@ -5,7 +5,10 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -15,6 +18,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -36,13 +40,16 @@ public class Itinerary implements ItinerarySortKey {
   private final boolean walkOnly;
   private final boolean streetOnly;
   private final Duration nonTransitDuration;
+  private final Duration walkDuration;
+  private final double walkDistanceMeters;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
-  private TimeAndCost accessPenalty = null;
-  private TimeAndCost egressPenalty = null;
+  private Integer generalizedCost2 = null;
+  private TimeAndCost accessPenalty = TimeAndCost.ZERO;
+  private TimeAndCost egressPenalty = TimeAndCost.ZERO;
   private int waitTimeOptimizedCost = UNKNOWN;
   private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
@@ -71,6 +78,8 @@ public class Itinerary implements ItinerarySortKey {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
+    this.walkDuration = totals.walkDuration;
+    this.walkDistanceMeters = totals.walkDistanceMeters;
     this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
@@ -189,8 +198,8 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * Remove all deletion flags of this itinerary, in effect undeleting it from the result.
    */
-  public void removeDeletionFlags() {
-    systemNotices.clear();
+  public void removeDeletionFlags(Set<String> removeTags) {
+    systemNotices.removeIf(it -> removeTags.contains(it.tag()));
   }
 
   public boolean isFlaggedForDeletion() {
@@ -202,7 +211,7 @@ public class Itinerary implements ItinerarySortKey {
    * given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
-    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+    return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
@@ -258,6 +267,7 @@ public class Itinerary implements ItinerarySortKey {
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
       .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("generalizedCost2", generalizedCost2)
       .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
@@ -304,7 +314,12 @@ public class Itinerary implements ItinerarySortKey {
       buf.stop(leg.getTo().name.toString());
     }
 
-    buf.summary(RaptorCostConverter.toRaptorCost(generalizedCost));
+    // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
+    // use-case.
+    buf.summary(
+      RaptorCostConverter.toRaptorCost(generalizedCost),
+      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
+    );
 
     return buf.toString();
   }
@@ -372,6 +387,26 @@ public class Itinerary implements ItinerarySortKey {
     return legs;
   }
 
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   * <p>
+   * NOTE: The itinerary is mutable so the transformation is done in-place!
+   */
+  public void transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs =
+      legs
+        .stream()
+        .map(l -> {
+          if (l instanceof TransitLeg tl) {
+            return mapper.apply(tl);
+          } else {
+            return l;
+          }
+        })
+        .toList();
+  }
+
   public Stream<StreetLeg> getStreetLegs() {
     return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
@@ -405,7 +440,7 @@ public class Itinerary implements ItinerarySortKey {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * An alternative to this is to use the `generalized-cost` and use that to indicate which itineraries is the
    * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
    * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
    * street traversal.
@@ -459,7 +494,7 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
-   * by the algorithm. This is relevant for anyone who want to debug an search and tuning the
+   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
@@ -468,8 +503,39 @@ public class Itinerary implements ItinerarySortKey {
     return generalizedCost;
   }
 
+  /**
+   * If a generalized cost is used in the routing algorithm, this is the cost computed plus
+   * the artificial penalty added for access/egresses. This is useful so that itineraries
+   * using only on-street legs don't have an unfair advantage over those combining access/egress with
+   * transit and using a penalty when being processed by the itinerary filter chain.
+   *
+   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   */
+  @Override
+  public int getGeneralizedCostIncludingPenalty() {
+    return generalizedCost + penaltyCost(accessPenalty) + penaltyCost(egressPenalty);
+  }
+
   public void setGeneralizedCost(int generalizedCost) {
     this.generalizedCost = generalizedCost;
+  }
+
+  /**
+   * The transit router allows the usage of a second generalized-cost parameter to be used in
+   * routing. In Raptor this is called c2, but in OTP it is generalized-cost-2. What this cost
+   * represents depends on the use-case and the unit and scale is also given by the use-case.
+   * <p>
+   * Currently, the pass-through search and the transit-priority uses this. This is relevant for
+   * anyone who wants to debug a search and tune the system.
+   * <p>
+   * {@link RaptorConstants#NOT_SET} indicate that the cost is not set/computed.
+   */
+  public Optional<Integer> getGeneralizedCost2() {
+    return Optional.ofNullable(generalizedCost2);
+  }
+
+  public void setGeneralizedCost2(Integer generalizedCost2) {
+    this.generalizedCost2 = generalizedCost2;
   }
 
   @Nullable
@@ -478,6 +544,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setAccessPenalty(TimeAndCost accessPenalty) {
+    Objects.requireNonNull(accessPenalty);
     this.accessPenalty = accessPenalty;
   }
 
@@ -487,6 +554,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setEgressPenalty(TimeAndCost egressPenalty) {
+    Objects.requireNonNull(egressPenalty);
     this.egressPenalty = egressPenalty;
   }
 
@@ -614,5 +682,23 @@ public class Itinerary implements ItinerarySortKey {
   @Nullable
   public Emissions getEmissionsPerPerson() {
     return this.emissionsPerPerson;
+  }
+
+  /**
+   * How much walking this itinerary contains, in meters.
+   */
+  public double walkDistanceMeters() {
+    return walkDistanceMeters;
+  }
+
+  /**
+   * How long the walking is contained in this itinerary.
+   */
+  public Duration walkDuration() {
+    return walkDuration;
+  }
+
+  private static int penaltyCost(TimeAndCost penalty) {
+    return penalty.cost().toSeconds();
   }
 }

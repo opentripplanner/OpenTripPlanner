@@ -159,7 +159,8 @@ public class HeuristicsAdapter implements Heuristics {
   private record AggregatedResults(
     int minJourneyTravelDuration,
     int minJourneyNumOfTransfers,
-    int earliestArrivalTime
+    int earliestArrivalTime,
+    boolean reached
   ) {
     private static AggregatedResults create(
       TransitCalculator<?> calculator,
@@ -185,7 +186,7 @@ public class HeuristicsAdapter implements Heuristics {
           );
 
           for (RaptorAccessEgress it : list) {
-            // Prevent transfer(walking) and the egress witch start with walking
+            // Prevent transfer(walking) and the egress which start with walking
             if (!(it.stopReachedOnBoard() || stopReachedByTransit)) {
               continue;
             }
@@ -204,7 +205,8 @@ public class HeuristicsAdapter implements Heuristics {
       return new AggregatedResults(
         bestJourneyTravelDuration,
         bestJourneyNumOfTransfers,
-        bestArrivalTime
+        bestArrivalTime,
+        bestArrivalTime != NOT_SET
       );
     }
   }

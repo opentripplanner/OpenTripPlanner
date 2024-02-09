@@ -4,8 +4,10 @@ import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
 
 /** User/trip cost/time/slack/reluctance search config. */
@@ -21,7 +23,6 @@ public final class RoutingPreferences implements Serializable {
   private final WheelchairPreferences wheelchair;
   private final BikePreferences bike;
   private final CarPreferences car;
-  private final VehicleRentalPreferences rental;
   private final SystemPreferences system;
   private final ItineraryFilterPreferences itineraryFilter;
 
@@ -33,7 +34,6 @@ public final class RoutingPreferences implements Serializable {
     this.wheelchair = WheelchairPreferences.DEFAULT;
     this.bike = BikePreferences.DEFAULT;
     this.car = CarPreferences.DEFAULT;
-    this.rental = VehicleRentalPreferences.DEFAULT;
     this.system = SystemPreferences.DEFAULT;
     this.itineraryFilter = ItineraryFilterPreferences.DEFAULT;
   }
@@ -46,7 +46,6 @@ public final class RoutingPreferences implements Serializable {
     this.street = requireNonNull(builder.street());
     this.bike = requireNonNull(builder.bike());
     this.car = requireNonNull(builder.car());
-    this.rental = requireNonNull(builder.rental());
     this.system = requireNonNull(builder.system());
     this.itineraryFilter = requireNonNull(builder.itineraryFilter());
   }
@@ -91,8 +90,29 @@ public final class RoutingPreferences implements Serializable {
     return car;
   }
 
-  public VehicleRentalPreferences rental() {
-    return rental;
+  /**
+   * Get parking preferences for the traverse mode. Note, only car and bike are supported.
+   */
+  public VehicleParkingPreferences parking(TraverseMode mode) {
+    return mode == TraverseMode.CAR ? car.parking() : bike.parking();
+  }
+
+  /**
+   * Get rental preferences for the traverse mode. Note, only car, scooter and bike are supported.
+   *
+   * TODO make scooter preferences independent of bike
+   */
+  public VehicleRentalPreferences rental(TraverseMode mode) {
+    return mode == TraverseMode.CAR ? car.rental() : bike.rental();
+  }
+
+  /**
+   * Get rental preferences for the traverse mode. Note, only car, scooter and bike are supported.
+   *
+   * TODO make scooter preferences independent of bike
+   */
+  public VehicleRentalPreferences rental(StreetMode mode) {
+    return mode == StreetMode.CAR_RENTAL ? car.rental() : bike.rental();
   }
 
   @Nonnull
@@ -109,11 +129,44 @@ public final class RoutingPreferences implements Serializable {
    */
   public double getSpeed(TraverseMode mode, boolean walkingBike) {
     return switch (mode) {
-      case WALK -> walkingBike ? bike.walkingSpeed() : walk.speed();
+      case WALK -> walkingBike ? bike.walking().speed() : walk.speed();
       case BICYCLE -> bike.speed();
       case CAR -> car.speed();
       default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     };
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    RoutingPreferences that = (RoutingPreferences) o;
+    return (
+      Objects.equals(transit, that.transit) &&
+      Objects.equals(transfer, that.transfer) &&
+      Objects.equals(walk, that.walk) &&
+      Objects.equals(street, that.street) &&
+      Objects.equals(wheelchair, that.wheelchair) &&
+      Objects.equals(bike, that.bike) &&
+      Objects.equals(car, that.car) &&
+      Objects.equals(system, that.system) &&
+      Objects.equals(itineraryFilter, that.itineraryFilter)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      transit,
+      transfer,
+      walk,
+      street,
+      wheelchair,
+      bike,
+      car,
+      system,
+      itineraryFilter
+    );
   }
 
   public static class Builder {
@@ -126,7 +179,6 @@ public final class RoutingPreferences implements Serializable {
     private WheelchairPreferences wheelchair = null;
     private BikePreferences bike = null;
     private CarPreferences car = null;
-    private VehicleRentalPreferences rental = null;
     private SystemPreferences system = null;
     private ItineraryFilterPreferences itineraryFilter = null;
 
@@ -204,15 +256,6 @@ public final class RoutingPreferences implements Serializable {
 
     public Builder withCar(Consumer<CarPreferences.Builder> body) {
       this.car = ifNotNull(this.car, original.car).copyOf().apply(body).build();
-      return this;
-    }
-
-    public VehicleRentalPreferences rental() {
-      return rental == null ? original.rental : rental;
-    }
-
-    public Builder withRental(Consumer<VehicleRentalPreferences.Builder> body) {
-      this.rental = ifNotNull(this.rental, original.rental).copyOf().apply(body).build();
       return this;
     }
 

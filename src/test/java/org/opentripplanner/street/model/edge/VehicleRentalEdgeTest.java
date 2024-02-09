@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -219,15 +218,18 @@ class VehicleRentalEdgeTest {
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 
-    var rentalRequest = new VehicleRentalRequest();
     this.request =
       StreetSearchRequest
         .of()
         .withMode(mode)
-        .withRental(rentalRequest)
         .withPreferences(preferences ->
           preferences
-            .withRental(rental -> rental.withUseAvailabilityInformation(useRealtime).build())
+            .withCar(car ->
+              car.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
+            )
+            .withBike(bike ->
+              bike.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
+            )
             .build()
         )
         .build();

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,6 +85,12 @@ public class AreaStop
     return url;
   }
 
+  @Nonnull
+  @Override
+  public StopType getStopType() {
+    return StopType.FLEXIBLE_AREA;
+  }
+
   @Override
   public String getFirstZoneAsString() {
     return zoneId;
@@ -101,6 +108,14 @@ public class AreaStop
   @Override
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  /**
+   * Returns the geometry of area that defines the stop, in this case the same as getGeometry.
+   */
+  @Override
+  public Optional<Geometry> getEncompassingAreaGeometry() {
+    return Optional.of(geometry);
   }
 
   @Override

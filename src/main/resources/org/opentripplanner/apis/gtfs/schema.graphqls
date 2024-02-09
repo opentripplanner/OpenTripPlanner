@@ -1136,6 +1136,10 @@ type Emissions {
     co2: Grams
 }
 
+"""
+This type is only here for backwards-compatibility and this API will never return it anymore.
+Please use the leg's `fareProducts` instead.
+"""
 type fare {
     type: String @deprecated
 
@@ -1152,7 +1156,10 @@ type fare {
     components: [fareComponent] @deprecated
 }
 
-"""Component of the fare (i.e. ticket) for a part of the itinerary"""
+"""
+This type is only here for backwards-compatibility and this API will never return it anymore.
+Please use the leg's `fareProducts` instead.
+"""
 type fareComponent {
     """ID of the ticket type. Corresponds to `fareId` in **TicketType**."""
     fareId: String @deprecated
@@ -1205,7 +1212,10 @@ enum FeedAlertType {
 }
 
 enum FilterPlaceType {
-    """Stops"""
+    """
+    Stops.
+    NOTE: if this is selected at the same time as `STATION`, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
     STOP
 
     """Departure rows"""
@@ -1222,6 +1232,13 @@ enum FilterPlaceType {
 
     """Parking lots that contain spaces for cars"""
     CAR_PARK
+
+
+    """
+    Stations.
+    NOTE: if this is selected at the same time as `STOP`, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
+    STATION
 }
 
 type Geometry {
@@ -1314,6 +1331,9 @@ input InputCoordinates {
 input InputFilters {
     """Stops to include by GTFS id."""
     stops: [String]
+
+    """Stations to include by GTFS id."""
+    stations: [String]
 
     """Routes to include by GTFS id."""
     routes: [String]
@@ -2091,13 +2111,22 @@ type Itinerary {
     """
     accessibilityScore: Float
 
+    """
+    How many transfers are part of this itinerary.
+
+    Notes:
+     - Interlined/stay-seated transfers do not increase this count.
+     - Transferring from a flex to a fixed schedule trip and vice versa increases this count.
+    """
+    numberOfTransfers: Int!
+
     #
     # deprecated fields
     #
 
     """
     Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
-    will be removed in the future.
+    and always returns an empty list. Use the leg's `fareProducts` instead.
     """
     fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 }
@@ -3497,7 +3526,7 @@ type QueryType {
         filterByModes: [Mode]
 
         """Only include places that match one of the given GTFS ids."""
-        filterByIds: InputFilters
+        filterByIds: InputFilters @deprecated(reason: "Not actively maintained")
         before: String
         after: String
         first: Int

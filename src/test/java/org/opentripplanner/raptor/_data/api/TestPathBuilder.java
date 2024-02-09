@@ -8,6 +8,7 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.path.PathBuilder;
@@ -31,6 +32,7 @@ public class TestPathBuilder implements RaptorTestConstants {
   private final RaptorSlackProvider slackProvider;
   private PathBuilder<TestTripSchedule> builder;
   private int startTime;
+  private int c2 = RaptorConstants.NOT_SET;
 
   public TestPathBuilder(
     RaptorSlackProvider slackProvider,
@@ -45,6 +47,12 @@ public class TestPathBuilder implements RaptorTestConstants {
    */
   public TestPathBuilder(@Nullable RaptorCostCalculator<TestTripSchedule> costCalculator) {
     this(new DefaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK), costCalculator);
+  }
+
+  /** Assign c2 value for path. TODO: Add c2 value for each leg. */
+  public TestPathBuilder c2(int c2) {
+    this.c2 = c2;
+    return this;
   }
 
   /**
@@ -114,8 +122,14 @@ public class TestPathBuilder implements RaptorTestConstants {
     );
   }
 
-  public RaptorPath<TestTripSchedule> egress(TestAccessEgress transfer) {
-    builder.egress(transfer);
+  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
+    builder.access(access);
+    return builder;
+  }
+
+  public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {
+    builder.egress(egress);
+    builder.c2(c2);
     return builder.build();
   }
 

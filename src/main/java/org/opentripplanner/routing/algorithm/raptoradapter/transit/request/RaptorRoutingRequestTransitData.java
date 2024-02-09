@@ -91,7 +91,8 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     List<TripPatternForDates> tripPatterns = transitDataCreator.createTripPatterns(
       additionalPastSearchDays,
       additionalFutureSearchDays,
-      filter
+      filter,
+      createTransitGroupPriorityConfigurator(request)
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
@@ -240,5 +241,16 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
+  }
+
+  private PriorityGroupConfigurator createTransitGroupPriorityConfigurator(RouteRequest request) {
+    if (request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
+      return PriorityGroupConfigurator.empty();
+    }
+    var transitRequest = request.journey().transit();
+    return PriorityGroupConfigurator.of(
+      transitRequest.priorityGroupsByAgency(),
+      transitRequest.priorityGroupsGlobal()
+    );
   }
 }

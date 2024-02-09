@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 
 /**
@@ -52,7 +53,7 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
   }
 
   /**
-   * Creates a special builder, witch used together with the
+   * Creates a special builder, which used together with the
    * {@link Builder#buildOrDefault(TimeSlopeSafetyTriangle)} can return a new instance or the
    * default value if no values are set. This is useful in the APIs where we want to fall back to
    * the default {@link TimeSlopeSafetyTriangle}, if no values are set. If only one or two values
@@ -107,6 +108,13 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
     public Builder withSafety(double safety) {
       this.safety = safety;
       return this;
+    }
+
+    /**
+     * Returns true if none of the values are set (i.e. all values are zero).
+     */
+    public boolean isEmpty() {
+      return doubleEquals(time, ZERO) && doubleEquals(slope, ZERO) && doubleEquals(safety, ZERO);
     }
 
     public TimeSlopeSafetyTriangle build() {

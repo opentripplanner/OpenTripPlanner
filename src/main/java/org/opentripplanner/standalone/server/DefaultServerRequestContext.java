@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -23,6 +23,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -38,13 +39,14 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final TileRendererManager tileRendererManager;
-  private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
+  private final VectorTileConfig vectorTileConfig;
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
   private final EmissionsService emissionsService;
+  private final StopConsolidationService stopConsolidationService;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -57,14 +59,15 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
     TileRendererManager tileRendererManager,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     EmissionsService emissionsService,
     List<RideHailingService> rideHailingServices,
-    TraverseVisitor traverseVisitor,
-    FlexConfig flexConfig
+    StopConsolidationService stopConsolidationService,
+    FlexConfig flexConfig,
+    TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -72,7 +75,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.tileRendererManager = tileRendererManager;
-    this.vectorTileLayers = vectorTileLayers;
+    this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
     this.flexConfig = flexConfig;
     this.traverseVisitor = traverseVisitor;
@@ -81,6 +84,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
+    this.stopConsolidationService = stopConsolidationService;
   }
 
   /**
@@ -93,13 +97,14 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     MeterRegistry meterRegistry,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     @Nullable EmissionsService emissionsService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
+    @Nullable StopConsolidationService stopConsolidationService,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     return new DefaultServerRequestContext(
@@ -110,14 +115,15 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       meterRegistry,
       raptorConfig,
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
-      vectorTileLayers,
+      vectorTileConfig,
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
       rideHailingServices,
-      traverseVisitor,
-      flexConfig
+      stopConsolidationService,
+      flexConfig,
+      traverseVisitor
     );
   }
 
@@ -189,6 +195,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public StopConsolidationService stopConsolidationService() {
+    return stopConsolidationService;
+  }
+
+  @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
   }
@@ -209,8 +220,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
-    return vectorTileLayers;
+  public VectorTileConfig vectorTileConfig() {
+    return vectorTileConfig;
   }
 
   @Override

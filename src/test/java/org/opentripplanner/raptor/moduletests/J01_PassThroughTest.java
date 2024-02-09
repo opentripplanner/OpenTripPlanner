@@ -28,35 +28,35 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 
-/*
-FEATURE UNDER TEST
-
-Raptor should be able to handle route request with a specified pass-through point.
-If a stop point is specified as pass-through point in the request then all the results returned
-from raptor should include this stop point either as alight or board point for a trip or as an
-intermediate point in the trip.
-
-It should be possible to specify more than one pass through point. The result should include stop
-points in the order as they were specified in the request. Only alternatives that passes through
-all the stop point should be included in the result.
-
-In order to support stop areas raptor should also support multiple stop points in the same pass-through
-group. It should be possible to define both stop A and B as a pass-through. Then alternatives that
-pass either stop A or B should not be dropped.
+/**
+ * FEATURE UNDER TEST
+ *
+ * Raptor should be able to handle route request with a specified pass-through point.
+ * If a stop point is specified as pass-through point in the request then all the results returned
+ * from raptor should include this stop point either as alight or board point for a trip or as an
+ * intermediate point in the trip.
+ *
+ * It should be possible to specify more than one pass through point. The result should include
+ * stop points in the order as they were specified in the request. Only alternatives that pass
+ * through all the stop point should be included in the result.
+ *
+ * In order to support stop areas raptor should also support multiple stop points in the same
+ * pass-through group. It should be possible to define both stop A and B as a pass-through. Then
+ * alternatives that pass either stop A or B should not be dropped.
  */
-public class J01_PassThroughTest {
+class J01_PassThroughTest {
 
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
     point("B&C", STOP_B, STOP_C)
   );
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
     point("B", STOP_B),
     point("C", STOP_C)
   );
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
     point("B", STOP_B),
     point("D", STOP_D)
   );
@@ -86,7 +86,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Pass-through stop point as a last point in the journey.")
-  public void passThroughPointOnEgress() {
+  void passThroughPointOnEgress() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -110,14 +110,14 @@ public class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   @Test
   @DisplayName("Pass-through stop point as a first point in the journey.")
-  public void passThroughPointOnAccess() {
+  void passThroughPointOnAccess() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -144,14 +144,14 @@ public class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   @Test
   @DisplayName("Pass-through stop point as an intermediate point in the journey.")
-  public void passThroughPointInTheMiddle() {
+  void passThroughPointInTheMiddle() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -175,14 +175,14 @@ public class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   @Test
   @DisplayName("Multiple pass-through stop points")
-  public void multiplePassThroughPoints() {
+  void multiplePassThroughPoints() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -208,14 +208,14 @@ public class J01_PassThroughTest {
     // Verify that Raptor generated journey with a transfer to r2 so that both pass-through points
     //  are included
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:02 0:10 ~ C ~ BUS R2 0:15 0:50 ~ F ~ Walk 30s [0:01:30 0:50:30 49m 1tx $4300]",
+      "Walk 30s ~ A ~ BUS R1 0:02 0:10 ~ C ~ BUS R2 0:15 0:50 ~ F ~ Walk 30s [0:01:30 0:50:30 49m Tₓ1 C₁4_300 C₂2]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   @Test
   @DisplayName("Pass-through order")
-  public void passThroughOrder() {
+  void passThroughOrder() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -237,14 +237,14 @@ public class J01_PassThroughTest {
 
     // Verify that only route with correct pass-through order is returned
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:04:30 0:20:30 16m 0tx $1620]",
+      "Walk 30s ~ A ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:04:30 0:20:30 16m Tₓ0 C₁1_620 C₂2]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   @Test
   @DisplayName("Multiple stops in same pass-through group")
-  public void passThroughGroup() {
+  void passThroughGroup() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -270,8 +270,9 @@ public class J01_PassThroughTest {
     // Verify that both routes are included as a valid result
     assertEquals(
       """
-        Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s 0tx $1440]
-        Walk 30s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:30 0:15:30 12m 0tx $1380]""",
+      Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s Tₓ0 C₁1_440 C₂1]
+      Walk 30s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:30 0:15:30 12m Tₓ0 C₁1_380 C₂1]
+      """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }

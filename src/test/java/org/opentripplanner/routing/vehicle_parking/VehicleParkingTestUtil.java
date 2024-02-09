@@ -1,12 +1,7 @@
 package org.opentripplanner.routing.vehicle_parking;
 
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingTestUtil {
@@ -38,23 +33,5 @@ public class VehicleParkingTestUtil {
       .availability(vehiclePlaces)
       .entrance(entrance)
       .build();
-  }
-
-  public static void createStreet(
-    StreetVertex from,
-    StreetVertex to,
-    StreetTraversalPermission permissions
-  ) {
-    new StreetEdgeBuilder<>()
-      .withFromVertex(from)
-      .withToVertex(to)
-      .withGeometry(
-        GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
-      )
-      .withName(String.format("%s%s street", from.getDefaultName(), to.getDefaultName()))
-      .withMeterLength(1)
-      .withPermission(permissions)
-      .withBack(false)
-      .buildAndConnect();
   }
 }

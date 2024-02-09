@@ -7,7 +7,7 @@ on:
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for') && !startsWith(github.event.head_commit.message ,'Upgrade debug client to version')
     runs-on: performance-test
     strategy:
       fail-fast: false
@@ -60,14 +60,14 @@ jobs:
             profile: extended
 
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v4
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         with:
           fetch-depth: 0
 
       - name: Set up JDK
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: temurin

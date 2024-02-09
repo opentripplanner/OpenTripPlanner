@@ -79,11 +79,11 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       return new RaptorResponse<>(
         Collections.emptyList(),
         null,
-        originalRequest,
         // If a trip exist(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
-        // performed. This enable the client to page to the next window
-        requestWithDynamicSearchParams(originalRequest)
+        // performed. This enables the client to page to the next window
+        requestWithDynamicSearchParams(originalRequest),
+        false
       );
     }
   }
@@ -146,8 +146,9 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     return new RaptorResponse<>(
       result.extractPaths(),
       new DefaultStopArrivals(result),
-      originalRequest,
-      request
+      request,
+      // This method is not run unless the heuristic reached the destination
+      true
     );
   }
 

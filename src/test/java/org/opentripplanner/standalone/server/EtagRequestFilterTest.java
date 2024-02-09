@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.glassfish.jersey.message.internal.OutboundMessageContext;
 import org.glassfish.jersey.message.internal.Statuses;
@@ -17,6 +16,7 @@ import org.glassfish.jersey.server.ContainerResponse;
 import org.jets3t.service.utils.Mimetypes;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.test.support.VariableSource;
 
 class EtagRequestFilterTest {
@@ -44,7 +44,7 @@ class EtagRequestFilterTest {
     byte[] entity,
     String expectedEtag
   ) throws IOException {
-    var request = request(method);
+    var request = HttpForTest.containerRequest(method);
     var response = response(status, request);
     var headers = response.getHeaders();
     headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, responseContentType);
@@ -65,7 +65,7 @@ class EtagRequestFilterTest {
   @VariableSource("ifNoneMatchCases")
   void ifNoneMatch(String ifNoneMatch, int expectedStatus, byte[] expectedEntity)
     throws IOException {
-    var request = request("GET");
+    var request = HttpForTest.containerRequest("GET");
     request.header(EtagRequestFilter.HEADER_IF_NONE_MATCH, ifNoneMatch);
     var response = response(200, request);
     var headers = response.getHeaders();
@@ -91,10 +91,5 @@ class EtagRequestFilterTest {
   @Nonnull
   private static byte[] bytes(String input) {
     return input.getBytes(StandardCharsets.UTF_8);
-  }
-
-  @Nonnull
-  private static ContainerRequest request(String method) {
-    return new ContainerRequest(null, null, method, null, new MapPropertiesDelegate(), null);
   }
 }
