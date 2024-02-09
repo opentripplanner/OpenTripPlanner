@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -63,7 +64,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
-    @Nullable StreetLimitationParameters streetLimitationParameters,
+    @Nonnull StreetLimitationParameters streetLimitationParameters,
     OsmProcessingParameters params
   ) {
     this.providers = List.copyOf(providers);
@@ -73,7 +74,7 @@ public class OsmModule implements GraphBuilderModule {
     this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
-    this.streetLimitationParameters = streetLimitationParameters;
+    this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }
 
   public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph) {
@@ -99,9 +100,7 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info("Building street graph from OSM");
     build();
     graph.hasStreets = true;
-    if (streetLimitationParameters != null) {
-      streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
-    }
+    streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
   }
 
   @Override
