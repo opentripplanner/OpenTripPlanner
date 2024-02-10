@@ -2,10 +2,23 @@
 
 ## Preamble
 
-GTFS and Netex define accessibility primarily in terms of binary access for wheelchair users: it's
-either on or off. Whilst it is the desire of the OTP developers to broaden the scope of
-accessibility the lack of data limits us to use this definition in the implementation and in this
-document.
+In this document and in OTP, the term "accessibility" is used with what has become its most common 
+meaning: design of products, devices, services, vehicles, or environments to ensure they are usable by 
+people with disabilities. It has other meanings in other contexts (see below).
+While accessibility is a complex subject, at this point GTFS and Netex mostly represent it very
+simply as a yes/no possibility of wheelchair use. While OTP developers hope to broaden the
+scope and nuance of accessibility support in OTP, the lack of detailed data from data producers
+currently limits implementation and discussion in this document to this binary 
+"wheelchair accessible" definition.
+
+The term "accessibility" has a completely separate, unrelated definition in the fields of
+spatial analysis, urban transportation planning, and associated social sciences, where it refers to
+quantitative indicators of how well-connected a particular location is to people or opportunities.
+OpenTripPlanner has been widely used in research settings for the calculation of such accessibility
+indicators. If this is what you're looking for, see the [documentation section on isochrones](sandbox/TravelTime.md).
+Although this meaning of the term dates back many decades, it is less well known and has become a
+source of confusion, so the academic and planning communities are gradually shifting to the 
+expression "access to opportunities", often shortened to "access".
 
 ## Unknown data
 
