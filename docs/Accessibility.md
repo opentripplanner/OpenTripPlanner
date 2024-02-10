@@ -15,7 +15,7 @@ The term "accessibility" has a completely separate, unrelated definition in the 
 spatial analysis, urban transportation planning, and associated social sciences, where it refers to
 quantitative indicators of how well-connected a particular location is to people or opportunities.
 OpenTripPlanner has been widely used in research settings for the calculation of such accessibility
-indicators. If this is what you're looking for, see the [documentation section on isochrones](sandbox/TravelTime.md).
+indicators. If this is what you're looking for, see the documentation sections [on isochrones](sandbox/TravelTime.md) and [analysis](Version-Comparison.md/#analysis).
 Although this meaning of the term dates back many decades, it is less well known and has become a
 source of confusion, so the academic and planning communities are gradually shifting to the 
 expression "access to opportunities", often shortened to "access".
