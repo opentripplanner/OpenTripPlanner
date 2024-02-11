@@ -52,6 +52,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.plan.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
@@ -61,7 +62,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -86,6 +86,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -178,6 +179,23 @@ class GraphQLIntegrationTest {
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
       .build();
+
+    i1.transformTransitLegs(tl -> {
+      if(tl instanceof ScheduledTransitLeg stl){
+        var x= new ScheduledTransitLegBuilder<>(stl);
+        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+
+        for(var i=0;  i < rtt.getNumStops();i++){
+
+          var time = rtt.getArrivalTime(i);
+          rtt.updateArrivalTime(i, time + 10*60);
+
+        }
+        return x.withTripTimes(rtt).build();
+
+      }
+      else return tl;
+    });
 
     var busLeg = i1.getTransitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
