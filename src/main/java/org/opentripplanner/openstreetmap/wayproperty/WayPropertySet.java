@@ -240,10 +240,10 @@ public class WayPropertySet {
       getMetersSecondFromSpeed(way.getTag("maxspeed"));
 
     if (speed != null) {
-      // Too low or too high speed limit indicates an error in the data, we use default speed
-      // limits for the way type in that case.
+      // Too low (less than 5 km/h or too high speed limit indicates an error in the data,
+      // we use default speed limits for the way type in that case.
       // The small epsilon is to account for possible rounding errors.
-      if (speed < 0.0001 || speed > maxPossibleCarSpeed + 0.0001) {
+      if (speed < 1.387 || speed > maxPossibleCarSpeed + 0.0001) {
         var id = way.getId();
         var link = way.url();
         issueStore.add(

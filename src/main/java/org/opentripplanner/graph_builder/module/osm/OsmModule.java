@@ -548,11 +548,6 @@ public class OsmModule implements GraphBuilderModule {
       seb.withBogusName(true);
     }
 
-    // < 0.04: account for
-    if (carSpeed < 0.04) {
-      issueStore.add(new StreetCarSpeedZero(way));
-    }
-
     StreetEdge street = seb.buildAndConnect();
     params.edgeNamer().recordEdge(way, street);
 
