@@ -618,6 +618,7 @@ public class GraphQLTypes {
     SAFEST_STREETS,
     SAFE_STREETS,
     SHORTEST_DURATION,
+    TRIANGLE,
   }
 
   public static class GraphQLDepartureRowStoptimesArgs {
@@ -4055,6 +4056,7 @@ public class GraphQLTypes {
     SAFEST_STREETS,
     SAFE_STREETS,
     SHORTEST_DURATION,
+    TRIANGLE,
   }
 
   public static class GraphQLScooterPreferencesInput {

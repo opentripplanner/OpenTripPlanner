@@ -8,6 +8,11 @@ This is only worth it when the execution is long running, i.e. more than ~50 mil
 """
 directive @async on FIELD_DEFINITION
 
+"""
+Exactly one of the fields on an input object must be set and non-null while all others are omitted.
+"""
+directive @oneOf on INPUT_OBJECT
+
 schema {
     query: QueryType
 }
@@ -3011,14 +3016,15 @@ type BookingInfo {
 """
 What criteria should be used when optimizing a cycling route.
 """
-input CyclingOptimizationInput @oneOf {
+input CyclingOptimizationInput {
     """
     Use one of the predefined optimization types.
     """
-    type: CyclingOptimizationType
+    type: CyclingOptimizationType!
 
     """
-    Define optimization by weighing three criteria.
+    Define optimization by weighing three criteria. This should only be used when
+    optimization type is `TRIANGLE`.
     """
     triangle: TriangleCyclingFactorsInput
 }
@@ -3055,19 +3061,26 @@ enum CyclingOptimizationType {
     by taking into account road surface etc. This option was previously called `GREENWAYS`.
     """
     SAFEST_STREETS
+
+    """
+    Allows more fine-tuned configuration of how much different optimization criteria are considered in
+    routing. If this is defined, `triangle` values should be set as well.
+    """
+    TRIANGLE
 }
 
 """
 What criteria should be used when optimizing a scooter route.
 """
-input ScooterOptimizationInput @oneOf {
+input ScooterOptimizationInput {
     """
     Use one of the predefined optimization types.
     """
-    type: ScooterOptimizationType
+    type: ScooterOptimizationType!
 
     """
-    Define optimization by weighing three criteria.
+    Define optimization by weighing three criteria. This should only be used when
+    optimization type is `TRIANGLE`.
     """
     triangle: TriangleScooterFactorsInput
 }
@@ -3108,6 +3121,12 @@ enum ScooterOptimizationType {
     This option was previously called `GREENWAYS`.
     """
     SAFEST_STREETS
+
+    """
+    Allows more fine-tuned configuration of how much different optimization criteria are considered in
+    routing. If this is defined, `triangle` values should be set as well.
+    """
+    TRIANGLE
 }
 
 """
