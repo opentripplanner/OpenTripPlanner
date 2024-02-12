@@ -15,10 +15,9 @@ import org.opentripplanner.transit.service.StopModelBuilder;
 
 /**
  * For a while GTFS Flex location groups were replaced by GTFS Fares v2 stop areas. After a few
- * months, this decision was reverted and a new style of location groups we re-added to the Flex
+ * months, this decision was reverted and a new style of location groups were re-added to the Flex
  * spec.
- * <p>
- * Arcadis tooling still produces stop areas and for a while we will support both. Please don't rely
+ * @deprecated Arcadis tooling still produces stop areas and for a while we will support both. Please don't rely
  * on this as the class will be removed in the future!
  */
 @Deprecated
