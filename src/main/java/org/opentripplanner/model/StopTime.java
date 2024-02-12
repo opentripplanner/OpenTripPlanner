@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -50,6 +51,14 @@ public final class StopTime implements Comparable<StopTime> {
 
   private int flexWindowEnd = MISSING_VALUE;
 
+  private double meanDurationFactor = MISSING_VALUE;
+
+  private Duration meanDurationOffset = Duration.ZERO;
+
+  private double safeDurationFactor = MISSING_VALUE;
+
+  private Duration safeDurationOffset = Duration.ZERO;
+
   // Disabled by default
   private PickDrop flexContinuousPickup = PickDrop.NONE;
 
@@ -61,28 +70,6 @@ public final class StopTime implements Comparable<StopTime> {
   private BookingInfo pickupBookingInfo;
 
   public StopTime() {}
-
-  public StopTime(StopTime st) {
-    this.trip = st.trip;
-    this.stop = st.stop;
-    this.arrivalTime = st.arrivalTime;
-    this.departureTime = st.departureTime;
-    this.timepoint = st.timepoint;
-    this.stopSequence = st.stopSequence;
-    this.stopHeadsign = st.stopHeadsign;
-    this.routeShortName = st.routeShortName;
-    this.pickupType = st.pickupType;
-    this.dropOffType = st.dropOffType;
-    this.shapeDistTraveled = st.shapeDistTraveled;
-    this.farePeriodId = st.farePeriodId;
-    this.flexWindowStart = st.flexWindowStart;
-    this.flexWindowEnd = st.flexWindowEnd;
-    this.flexContinuousPickup = st.flexContinuousPickup;
-    this.flexContinuousDropOff = st.flexContinuousDropOff;
-    this.dropOffBookingInfo = st.dropOffBookingInfo;
-    this.pickupBookingInfo = st.pickupBookingInfo;
-    this.headsignVias = st.headsignVias;
-  }
 
   /**
    * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
@@ -308,6 +295,22 @@ public final class StopTime implements Comparable<StopTime> {
       TimeUtils.timeToStrLong(getDepartureTime()) +
       ")"
     );
+  }
+
+  public void setMeanDurationFactor(double meanDurationFactor) {
+    this.meanDurationFactor = meanDurationFactor;
+  }
+
+  public void setMeanDurationOffset(Duration meanDurationOffset) {
+    this.meanDurationOffset = meanDurationOffset;
+  }
+
+  public void setSafeDurationOffset(Duration safeDurationOffset) {
+    this.safeDurationOffset = safeDurationOffset;
+  }
+
+  public void setSafeDurationFactor(double safeDurationFactor) {
+    this.safeDurationFactor = safeDurationFactor;
   }
 
   private static int getAvailableTime(int... times) {

@@ -1,5 +1,8 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.onebusaway.gtfs.model.StopTime.MISSING_VALUE;
+
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,6 +105,19 @@ class StopTimeMapper {
     lhs.setFarePeriodId(rhs.getFarePeriodId());
     lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
     lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
+    if(rhs.getMeanDurationOffset() != MISSING_VALUE) {
+      lhs.setMeanDurationFactor(rhs.getMeanDurationFactor());
+    }
+    if(rhs.getMeanDurationOffset() != MISSING_VALUE) {
+      lhs.setMeanDurationOffset(Duration.ofSeconds((long) rhs.getMeanDurationOffset()));
+    }
+    if(rhs.getSafeDurationFactor() != MISSING_VALUE){
+      lhs.setSafeDurationFactor(rhs.getSafeDurationFactor());
+    }
+    if(rhs.getSafeDurationOffset()!= MISSING_VALUE){
+      lhs.setSafeDurationOffset(Duration.ofSeconds((long) rhs.getSafeDurationOffset()));
+    }
+
     lhs.setFlexContinuousPickup(
       PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousPickup())
     );
