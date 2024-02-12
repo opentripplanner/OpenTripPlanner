@@ -94,15 +94,15 @@ Most people want to get routing results out of OTP, so lets see the query for th
                 mode
                 start {
                     scheduled
-                    realTime {
-                        predicted
+                    estimated {
+                        time
                         scheduleOffset
                     }
                 }
                 end {
                     scheduled
-                    realTime {
-                        predicted
+                    estimated {
+                        time
                         scheduleOffset
                     }
                 }

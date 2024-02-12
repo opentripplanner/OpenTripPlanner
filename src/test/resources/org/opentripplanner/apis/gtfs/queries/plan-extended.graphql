@@ -33,15 +33,15 @@
                 mode
                 start {
                     scheduled
-                    realTime {
-                        predicted
+                    estimated {
+                        time
                         scheduleOffset
                     }
                 }
                 end {
                     scheduled
-                    realTime {
-                        predicted
+                    estimated {
+                        time
                         scheduleOffset
                     }
                 }

@@ -52,7 +52,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.plan.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
@@ -116,6 +115,7 @@ class GraphQLIntegrationTest {
     .parse("2023-02-15T12:03:28+01:00")
     .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
+  private static final int TEN_MINUTES = 10 * 60;
 
   private static GraphQLRequestContext context;
 
@@ -180,22 +180,7 @@ class GraphQLIntegrationTest {
       .carHail(D10m, E)
       .build();
 
-    i1.transformTransitLegs(tl -> {
-      if(tl instanceof ScheduledTransitLeg stl){
-        var x= new ScheduledTransitLegBuilder<>(stl);
-        var rtt = (RealTimeTripTimes) stl.getTripTimes();
-
-        for(var i=0;  i < rtt.getNumStops();i++){
-
-          var time = rtt.getArrivalTime(i);
-          rtt.updateArrivalTime(i, time + 10*60);
-
-        }
-        return x.withTripTimes(rtt).build();
-
-      }
-      else return tl;
-    });
+    add10MinuteDelay(i1);
 
     var busLeg = i1.getTransitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
@@ -296,6 +281,20 @@ class GraphQLIntegrationTest {
         finder,
         new RouteRequest()
       );
+  }
+
+  private static void add10MinuteDelay(Itinerary i1) {
+    i1.transformTransitLegs(tl -> {
+      if (tl instanceof ScheduledTransitLeg stl) {
+        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+
+        for (var i = 0; i < rtt.getNumStops(); i++) {
+          rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
+          rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+        }
+      }
+      return tl;
+    });
   }
 
   @FilePatternSource(pattern = "src/test/resources/org/opentripplanner/apis/gtfs/queries/*.graphql")

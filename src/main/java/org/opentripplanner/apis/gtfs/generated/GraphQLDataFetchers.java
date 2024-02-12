@@ -503,7 +503,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLLegTimes {
-    public DataFetcher<Object> realTime();
+    public DataFetcher<Object> estimated();
 
     public DataFetcher<java.time.OffsetDateTime> scheduled();
   }
@@ -759,10 +759,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> viewer();
   }
 
-  public interface GraphQLRealtimeInformation {
-    public DataFetcher<java.time.OffsetDateTime> predicted();
-
+  public interface GraphQLRealtimeEstimate {
     public DataFetcher<java.time.Duration> scheduleOffset();
+
+    public DataFetcher<java.time.OffsetDateTime> time();
   }
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */

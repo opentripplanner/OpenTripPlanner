@@ -10,11 +10,11 @@
               "mode" : "WALK",
               "start" : {
                 "scheduled" : "2020-02-02T11:00:00Z",
-                "realTime" : null
+                "estimated" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T11:00:20Z",
-                "realTime" : null
+                "estimated" : null
               },
               "from" : {
                 "name" : "A",
@@ -36,12 +36,18 @@
             {
               "mode" : "BUS",
               "start" : {
-                "scheduled" : "2020-02-02T11:01:00Z",
-                "realTime" : null
+                "scheduled" : "2020-02-02T10:51:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:01:00Z",
+                  "scheduleOffset" : "PT10M"
+                }
               },
               "end" : {
-                "scheduled" : "2020-02-02T11:15:00Z",
-                "realTime" : null
+                "scheduled" : "2020-02-02T11:05:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:15:00Z",
+                  "scheduleOffset" : "PT10M"
+                }
               },
               "from" : {
                 "name" : "B",
@@ -69,12 +75,18 @@
             {
               "mode" : "RAIL",
               "start" : {
-                "scheduled" : "2020-02-02T11:30:00Z",
-                "realTime" : null
+                "scheduled" : "2020-02-02T11:20:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:30:00Z",
+                  "scheduleOffset" : "PT10M"
+                }
               },
               "end" : {
-                "scheduled" : "2020-02-02T11:50:00Z",
-                "realTime" : null
+                "scheduled" : "2020-02-02T11:40:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:50:00Z",
+                  "scheduleOffset" : "PT10M"
+                }
               },
               "from" : {
                 "name" : "C",
@@ -103,11 +115,11 @@
               "mode" : "CAR",
               "start" : {
                 "scheduled" : "2020-02-02T11:50:00Z",
-                "realTime" : null
+                "estimated" : null
               },
               "end" : {
                 "scheduled" : "2020-02-02T12:00:00Z",
-                "realTime" : null
+                "estimated" : null
               },
               "from" : {
                 "name" : "D",
