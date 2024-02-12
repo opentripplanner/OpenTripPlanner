@@ -100,8 +100,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       Leg source = getSource(environment);
       return new StopArrival(
         source.getFrom(),
-        source.getStartTime(),
-        source.getStartTime(),
+        source.start(),
+        source.start(),
         source.getBoardStopPosInPattern(),
         source.getBoardingGtfsStopSequence()
       );
@@ -144,7 +144,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       return intermediateStops
         .stream()
-        .map(intermediateStop -> intermediateStop.place.stop)
+        .map(intermediateStop -> intermediateStop.place().stop)
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
     };
@@ -244,8 +244,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       Leg source = getSource(environment);
       return new StopArrival(
         source.getTo(),
-        source.getEndTime(),
-        source.getEndTime(),
+        source.end(),
+        source.end(),
         source.getAlightStopPosInPattern(),
         source.getAlightGtfsStopSequence()
       );

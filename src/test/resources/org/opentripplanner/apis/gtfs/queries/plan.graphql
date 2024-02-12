@@ -39,15 +39,31 @@
                     name
                     lat
                     lon
-                    departure
-                    arrival
+                    departure {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
+                    arrival {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
                 }
                 to {
                     name
                     lat
                     lon
-                    departure
-                    arrival
+                    departure {
+                        scheduled
+                    }
+                    arrival {
+                        scheduled
+                    }
                 }
                 route {
                     gtfsId

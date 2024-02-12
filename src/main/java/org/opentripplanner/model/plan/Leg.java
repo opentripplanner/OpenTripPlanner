@@ -455,7 +455,7 @@ public interface Leg {
   default Set<FareZone> getFareZones() {
     var intermediate = getIntermediateStops()
       .stream()
-      .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
+      .flatMap(stopArrival -> stopArrival.place().stop.getFareZones().stream());
 
     var start = getFareZones(this.getFrom());
     var end = getFareZones(this.getTo());

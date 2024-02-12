@@ -279,10 +279,29 @@ public class ScheduledTransitLeg implements TransitLeg {
     for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
       StopLocation stop = tripPattern.getStop(i);
 
+      final var arrivalTime = ServiceDateUtils.toZonedDateTime(
+        serviceDate,
+        zoneId,
+        tripTimes.getArrivalTime(i)
+      );
+      final var departureTime = ServiceDateUtils.toZonedDateTime(
+        serviceDate,
+        zoneId,
+        tripTimes.getDepartureTime(i)
+      );
+
+      var arrival = LegTimes.ofStatic(arrivalTime);
+      var departure = LegTimes.ofStatic(departureTime);
+
+      if (getRealTime()) {
+        arrival = LegTimes.of(arrivalTime, tripTimes.getArrivalDelay(i));
+        departure = LegTimes.of(departureTime, tripTimes.getDepartureDelay(i));
+      }
+
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getArrivalTime(i)),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getDepartureTime(i)),
+        arrival,
+        departure,
         i,
         tripTimes.gtfsSequenceOfStopIndex(i)
       );

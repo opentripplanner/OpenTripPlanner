@@ -340,7 +340,7 @@ public class LegType {
               return (
                 stops
                   .stream()
-                  .map(stop -> stop.place.stop)
+                  .map(stop -> stop.place().stop)
                   .filter(Objects::nonNull)
                   .collect(Collectors.toList())
               );

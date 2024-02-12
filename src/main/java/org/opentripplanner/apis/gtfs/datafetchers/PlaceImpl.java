@@ -2,12 +2,12 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVertexType;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.StopPosition.PositionAtStop;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.model.plan.LegTimes;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
@@ -19,14 +19,14 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Override
-  public DataFetcher<OffsetDateTime> arrival() {
-    return environment -> getSource(environment).arrival.toOffsetDateTime();
+  public DataFetcher<LegTimes> arrival() {
+    return environment -> getSource(environment).arrival();
   }
 
   @Deprecated
   @Override
   public DataFetcher<Long> arrivalTime() {
-    return environment -> getSource(environment).arrival.toInstant().toEpochMilli();
+    return environment -> getSource(environment).arrival().time().toInstant().toEpochMilli();
   }
 
   @Override
@@ -37,7 +37,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   @Override
   public DataFetcher<VehicleRentalPlace> bikeRentalStation() {
     return environment -> {
-      Place place = getSource(environment).place;
+      Place place = getSource(environment).place();
 
       if (!place.vertexType.equals(VertexType.VEHICLERENTAL)) {
         return null;
@@ -54,35 +54,35 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Deprecated
   @Override
-  public DataFetcher<OffsetDateTime> departure() {
-    return environment -> getSource(environment).departure.toOffsetDateTime();
+  public DataFetcher<LegTimes> departure() {
+    return environment -> getSource(environment).departure();
   }
 
   @Override
   public DataFetcher<Long> departureTime() {
-    return environment -> getSource(environment).departure.toInstant().toEpochMilli();
+    return environment -> getSource(environment).departure().time().toInstant().toEpochMilli();
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).place.coordinate.latitude();
+    return environment -> getSource(environment).place().coordinate.latitude();
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).place.coordinate.longitude();
+    return environment -> getSource(environment).place().coordinate.longitude();
   }
 
   @Override
   public DataFetcher<String> name() {
     return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).place.name, environment);
+      GraphQLUtils.getTranslation(getSource(environment).place().name, environment);
   }
 
   @Override
   public DataFetcher<VehicleRentalVehicle> rentalVehicle() {
     return environment -> {
-      Place place = getSource(environment).place;
+      Place place = getSource(environment).place();
 
       if (
         !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
@@ -97,13 +97,13 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> getSource(environment).place.stop;
+    return environment -> getSource(environment).place().stop;
   }
 
   @Override
   public DataFetcher<StopPosition> stopPosition() {
     return environment -> {
-      var seq = getSource(environment).gtfsStopSequence;
+      var seq = getSource(environment).gtfsStopSequence();
       if (seq != null) {
         return new PositionAtStop(seq);
       } else {
@@ -120,7 +120,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   @Override
   public DataFetcher<VehicleRentalStation> vehicleRentalStation() {
     return environment -> {
-      Place place = getSource(environment).place;
+      Place place = getSource(environment).place();
 
       if (
         !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
@@ -136,7 +136,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   @Override
   public DataFetcher<String> vertexType() {
     return environment -> {
-      var place = getSource(environment).place;
+      var place = getSource(environment).place();
       return switch (place.vertexType) {
         case NORMAL -> GraphQLVertexType.NORMAL.name();
         case TRANSIT -> GraphQLVertexType.TRANSIT.name();
@@ -147,7 +147,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   }
 
   private VehicleParking getBikePark(DataFetchingEnvironment environment) {
-    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    var vehicleParkingWithEntrance = getSource(environment).place().vehicleParkingWithEntrance;
     if (
       vehicleParkingWithEntrance == null ||
       !vehicleParkingWithEntrance.getVehicleParking().hasBicyclePlaces()
@@ -159,7 +159,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   }
 
   private VehicleParking getCarPark(DataFetchingEnvironment environment) {
-    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    var vehicleParkingWithEntrance = getSource(environment).place().vehicleParkingWithEntrance;
     if (
       vehicleParkingWithEntrance == null ||
       !vehicleParkingWithEntrance.getVehicleParking().hasAnyCarPlaces()
@@ -171,7 +171,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   }
 
   private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {
-    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    var vehicleParkingWithEntrance = getSource(environment).place().vehicleParkingWithEntrance;
     if (vehicleParkingWithEntrance == null) {
       return null;
     }

@@ -110,15 +110,31 @@ Most people want to get routing results out of OTP, so lets see the query for th
                     name
                     lat
                     lon
-                    departure
-                    arrival
+                    departure {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
+                    arrival {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
                 }
                 to {
                     name
                     lat
                     lon
-                    departure
-                    arrival
+                    departure {
+                        scheduled
+                    }
+                    arrival {
+                        scheduled
+                    }
                 }
                 route {
                     gtfsId

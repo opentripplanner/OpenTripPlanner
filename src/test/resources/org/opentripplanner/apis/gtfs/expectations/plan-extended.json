@@ -89,8 +89,20 @@
               },
               "intermediatePlaces" : [
                 {
-                  "arrival" : "2020-02-02T11:11:00Z",
-                  "departure" : "2020-02-02T11:11:00Z",
+                  "arrival" : {
+                    "scheduled" : "2020-02-02T11:01:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:11:00Z",
+                      "scheduleOffset" : "PT10M"
+                    }
+                  },
+                  "departure" : {
+                    "scheduled" : "2020-02-02T11:01:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:11:00Z",
+                      "scheduleOffset" : "PT10M"
+                    }
+                  },
                   "stop" : {
                     "name" : "B"
                   }
@@ -139,8 +151,20 @@
               },
               "intermediatePlaces" : [
                 {
-                  "arrival" : "2020-02-02T11:40:00Z",
-                  "departure" : "2020-02-02T11:40:00Z",
+                  "arrival" : {
+                    "scheduled" : "2020-02-02T11:30:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:40:00Z",
+                      "scheduleOffset" : "PT10M"
+                    }
+                  },
+                  "departure" : {
+                    "scheduled" : "2020-02-02T11:30:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:40:00Z",
+                      "scheduleOffset" : "PT10M"
+                    }
+                  },
                   "stop" : {
                     "name" : "C"
                   }

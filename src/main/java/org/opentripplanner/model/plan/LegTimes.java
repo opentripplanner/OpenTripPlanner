@@ -19,5 +19,14 @@ public record LegTimes(@Nonnull ZonedDateTime scheduled, @Nullable RealtimeEstim
   public static LegTimes ofStatic(ZonedDateTime staticTime) {
     return new LegTimes(staticTime, null);
   }
+
+  public ZonedDateTime time() {
+    if (estimated == null) {
+      return scheduled;
+    } else {
+      return estimated.time;
+    }
+  }
+
   record RealtimeEstimate(ZonedDateTime time, Duration scheduleOffset) {}
 }

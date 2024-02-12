@@ -68,8 +68,20 @@
                     tripHeadsign
                 }
                 intermediatePlaces {
-                    arrival
-                    departure
+                    arrival {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
+                    departure {
+                        scheduled
+                        estimated {
+                            time
+                            scheduleOffset
+                        }
+                    }
                     stop {
                         name
                     }

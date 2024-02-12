@@ -20,15 +20,25 @@
                 "name" : "A",
                 "lat" : 5.0,
                 "lon" : 8.0,
-                "departure" : "2020-02-02T11:00:00Z",
-                "arrival" : "2020-02-02T11:00:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:00:00Z",
+                  "estimated" : null
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:00:00Z",
+                  "estimated" : null
+                }
               },
               "to" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departure" : "2020-02-02T11:00:20Z",
-                "arrival" : "2020-02-02T11:00:20Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:00:20Z"
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:00:20Z"
+                }
               },
               "route" : null,
               "legGeometry" : null
@@ -53,15 +63,31 @@
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departure" : "2020-02-02T11:01:00Z",
-                "arrival" : "2020-02-02T11:01:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T10:51:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:01:00Z",
+                    "scheduleOffset" : "PT10M"
+                  }
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T10:51:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:01:00Z",
+                    "scheduleOffset" : "PT10M"
+                  }
+                }
               },
               "to" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departure" : "2020-02-02T11:15:00Z",
-                "arrival" : "2020-02-02T11:15:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:05:00Z"
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:05:00Z"
+                }
               },
               "route" : {
                 "gtfsId" : "F:BUS",
@@ -92,15 +118,31 @@
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departure" : "2020-02-02T11:30:00Z",
-                "arrival" : "2020-02-02T11:30:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:20:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:30:00Z",
+                    "scheduleOffset" : "PT10M"
+                  }
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:20:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:30:00Z",
+                    "scheduleOffset" : "PT10M"
+                  }
+                }
               },
               "to" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departure" : "2020-02-02T11:50:00Z",
-                "arrival" : "2020-02-02T11:50:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:40:00Z"
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:40:00Z"
+                }
               },
               "route" : {
                 "gtfsId" : "F:2",
@@ -125,15 +167,25 @@
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departure" : "2020-02-02T11:50:00Z",
-                "arrival" : "2020-02-02T11:50:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T11:50:00Z",
+                  "estimated" : null
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T11:50:00Z",
+                  "estimated" : null
+                }
               },
               "to" : {
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
-                "departure" : "2020-02-02T12:00:00Z",
-                "arrival" : "2020-02-02T12:00:00Z"
+                "departure" : {
+                  "scheduled" : "2020-02-02T12:00:00Z"
+                },
+                "arrival" : {
+                  "scheduled" : "2020-02-02T12:00:00Z"
+                }
               },
               "route" : null,
               "legGeometry" : null

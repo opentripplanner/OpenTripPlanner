@@ -2292,10 +2292,10 @@ type Place {
     lon: Float!
 
     "The time the rider will arrive at the place."
-    arrival: OffsetDateTime
+    arrival: LegTimes
 
     "The time the rider will depart the place."
-    departure: OffsetDateTime
+    departure: LegTimes
 
     """The stop related to the place."""
     stop: Stop
