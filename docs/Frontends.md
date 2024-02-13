@@ -46,7 +46,7 @@ That said, there are two main Javascript-based web user interfaces that are gene
 - The [Digitransit UI](https://github.com/HSLdevcom/digitransit-ui), part of the Finnish Digitransit project.
 - The [OpenTripPlanner React UI](https://github.com/opentripplanner/otp-react-redux), developed and maintained by [Arcadis IBI](https://www.ibigroup.com)'s [transit routing team](https://www.ibigroup.com/ibi-products/transit-routing/).
 
-**Digitransit** is an open-source public transportation project, originally created in Finland to replace existing nationwide and regional journey planning solutions in 2014. Digitransit has since been used around the world in other projects, for example in Germany. It is a joint project of Helsinki Transit Authority (HSL), Fintraffic, and Waltti Solutions.
+**Digitransit** is an open-source public transportation project, originally created in Finland to replace existing nationwide and regional journey planning solutions in 2014. Digitransit has since been used around the world in other projects, for example in Germany. It is a joint project of Helsinki Regional Transport Authority (HSL), Fintraffic, and Waltti Solutions.
 
 **Arcadis IBI** has for several years actively developed, deployed, and maintained instances of the React-based OTP UI, systematically contributing their improvements back to the original repositories under the OpenTripPlanner organization: 
 - https://github.com/opentripplanner/otp-ui
