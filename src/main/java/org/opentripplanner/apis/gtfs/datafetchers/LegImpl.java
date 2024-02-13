@@ -18,7 +18,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTimes;
+import org.opentripplanner.model.plan.LegTimeEvent;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -79,7 +79,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTimes> end() {
+  public DataFetcher<LegTimeEvent> end() {
     return environment -> getSource(environment).end();
   }
 
@@ -223,7 +223,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTimes> start() {
+  public DataFetcher<LegTimeEvent> start() {
     return environment -> getSource(environment).start();
   }
 

@@ -60,7 +60,7 @@ config:
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
-    LegTimes: org.opentripplanner.model.plan.LegTimes#LegTimes
+    LegTimeEvent: org.opentripplanner.model.plan.LegTimeEvent#LegTimeEvent
     Mode: String
     OccupancyStatus: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus#GraphQLOccupancyStatus
     TransitMode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode

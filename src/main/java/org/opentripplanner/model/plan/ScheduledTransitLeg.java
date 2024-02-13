@@ -163,20 +163,20 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public LegTimes start() {
+  public LegTimeEvent start() {
     if (getRealTime()) {
-      return LegTimes.of(startTime, getDepartureDelay());
+      return LegTimeEvent.of(startTime, getDepartureDelay());
     } else {
-      return LegTimes.ofStatic(startTime);
+      return LegTimeEvent.ofStatic(startTime);
     }
   }
 
   @Override
-  public LegTimes end() {
+  public LegTimeEvent end() {
     if (getRealTime()) {
-      return LegTimes.of(endTime, getArrivalDelay());
+      return LegTimeEvent.of(endTime, getArrivalDelay());
     } else {
-      return LegTimes.ofStatic(endTime);
+      return LegTimeEvent.ofStatic(endTime);
     }
   }
 
@@ -290,12 +290,12 @@ public class ScheduledTransitLeg implements TransitLeg {
         tripTimes.getDepartureTime(i)
       );
 
-      var arrival = LegTimes.ofStatic(arrivalTime);
-      var departure = LegTimes.ofStatic(departureTime);
+      var arrival = LegTimeEvent.ofStatic(arrivalTime);
+      var departure = LegTimeEvent.ofStatic(departureTime);
 
       if (getRealTime()) {
-        arrival = LegTimes.of(arrivalTime, tripTimes.getArrivalDelay(i));
-        departure = LegTimes.of(departureTime, tripTimes.getDepartureDelay(i));
+        arrival = LegTimeEvent.of(arrivalTime, tripTimes.getArrivalDelay(i));
+        departure = LegTimeEvent.of(departureTime, tripTimes.getDepartureDelay(i));
       }
 
       StopArrival visit = new StopArrival(

@@ -69,13 +69,13 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
-  public LegTimes start() {
-    return LegTimes.ofStatic(startTime);
+  public LegTimeEvent start() {
+    return LegTimeEvent.ofStatic(startTime);
   }
 
   @Override
-  public LegTimes end() {
-    return LegTimes.ofStatic(endTime);
+  public LegTimeEvent end() {
+    return LegTimeEvent.ofStatic(endTime);
   }
 
   @Override

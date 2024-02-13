@@ -1497,7 +1497,10 @@ type DefaultFareProduct implements FareProduct {
 }
 
 type Itinerary {
+    "Time when the user leaves from the origin."
     start: OffsetDateTime
+
+    "Time when the user leaves arrives at the destination."
     end: OffsetDateTime
 
     """Duration of the trip on this itinerary, in seconds."""
@@ -1662,15 +1665,28 @@ type RealtimeEstimate {
     scheduleOffset: Duration
 }
 
-type LegTimes {
-    scheduled: OffsetDateTime
+"""
+Time information about a passenger at a certain place. May contain real-time information if
+available.
+"""
+type LegTimeEvent {
+    "The scheduled time of the event."
+    scheduled: OffsetDateTime!
+    "The estimated time of the event, if available."
     estimated: RealtimeEstimate
 }
 
 type Leg {
 
-    start: LegTimes
-    end: LegTimes
+    """
+    The time when the leg starts including real-time information, if available.
+    """
+    start: LegTimeEvent
+
+    """
+    The time when the leg ends including real-time information, if available.
+    """
+    end: LegTimeEvent
 
     """The mode (e.g. `WALK`) used when traversing this leg."""
     mode: Mode
@@ -2291,11 +2307,17 @@ type Place {
     """Longitude of the place (WGS 84)"""
     lon: Float!
 
-    "The time the rider will arrive at the place."
-    arrival: LegTimes
+    """
+    The time the rider will arrive at the place. This also includes real-time information
+    if available.
+    """
+    arrival: LegTimeEvent
 
-    "The time the rider will depart the place."
-    departure: LegTimes
+    """
+    The time the rider will depart the place. This also includes real-time information
+    if available.
+    """
+    departure: LegTimeEvent
 
     """The stop related to the place."""
     stop: Stop

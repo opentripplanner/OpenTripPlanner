@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTimes;
+import org.opentripplanner.model.plan.LegTimeEvent;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -58,12 +58,12 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public LegTimes start() {
+  public LegTimeEvent start() {
     return first.start();
   }
 
   @Override
-  public LegTimes end() {
+  public LegTimeEvent end() {
     return second.end();
   }
 
