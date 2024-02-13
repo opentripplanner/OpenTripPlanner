@@ -10,6 +10,11 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
+/**
+ * A vector tile layer for {@link GroupStop}s inside the vector tile bounds. The builder does not
+ * query for the GroupStops to draw, but instead uses the geometries of the GroupStops that are
+ * passed to the constructor.
+ */
 public class GroupStopLayerBuilder extends LayerBuilder<StopLocation> {
 
   private final List<Geometry> geometries;
