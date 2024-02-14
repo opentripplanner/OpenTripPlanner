@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.OptionalDouble;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -313,6 +314,13 @@ public final class StopTime implements Comparable<StopTime> {
     this.safeDurationFactor = safeDurationFactor;
   }
 
+  public OptionalDouble meanDurationFactor() {
+    if (meanDurationFactor == MISSING_VALUE) {
+      return OptionalDouble.empty();
+    }
+    return OptionalDouble.of(meanDurationFactor);
+  }
+
   private static int getAvailableTime(int... times) {
     for (var time : times) {
       if (time != MISSING_VALUE) {
@@ -321,5 +329,12 @@ public final class StopTime implements Comparable<StopTime> {
     }
 
     return MISSING_VALUE;
+  }
+
+  /**
+   * Does this stop time define a flex window?
+   */
+  public boolean hasFlexWindow() {
+    return flexWindowStart != MISSING_VALUE || flexWindowEnd != MISSING_VALUE;
   }
 }

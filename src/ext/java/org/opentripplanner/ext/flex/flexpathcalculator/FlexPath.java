@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 import org.locationtech.jts.geom.LineString;
 
@@ -31,5 +32,10 @@ public class FlexPath {
       geometry = geometrySupplier.get();
     }
     return geometry;
+  }
+
+  public FlexPath withDurationFactors(float factor, Duration offset) {
+    int updatedDuration = (int) ((durationSeconds * factor) + offset.toSeconds());
+    return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
   }
 }

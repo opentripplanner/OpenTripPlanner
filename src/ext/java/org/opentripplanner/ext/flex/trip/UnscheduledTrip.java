@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
+import org.opentripplanner.ext.flex.flexpathcalculator.DurationFactorCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
@@ -81,8 +82,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    *  - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> hasFlexWindow = st ->
-      st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> hasContinuousStops = stopTime ->
       stopTime.getFlexContinuousDropOff() != NONE || stopTime.getFlexContinuousPickup() != NONE;
     if (stopTimes.isEmpty()) {
@@ -90,9 +89,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     } else if (stopTimes.stream().anyMatch(hasContinuousStops)) {
       return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
-      return stopTimes.stream().anyMatch(hasFlexWindow);
+      return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);
     } else {
-      return stopTimes.stream().allMatch(hasFlexWindow);
+      return stopTimes.stream().allMatch(StopTime::hasFlexWindow);
     }
   }
 
@@ -120,6 +119,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     } else {
       indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
     }
+
+    var updatedCalculator = new DurationFactorCalculator(calculator);
+
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices
       // if you cannot alight at an index, the trip is not possible
@@ -137,7 +139,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
           alightStop.index,
           alightStop.stop,
           date,
-          calculator,
+          updatedCalculator,
           config
         )
       );

@@ -105,16 +105,16 @@ class StopTimeMapper {
     lhs.setFarePeriodId(rhs.getFarePeriodId());
     lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
     lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
-    if(rhs.getMeanDurationOffset() != MISSING_VALUE) {
+    if (rhs.getMeanDurationOffset() != MISSING_VALUE) {
       lhs.setMeanDurationFactor(rhs.getMeanDurationFactor());
     }
-    if(rhs.getMeanDurationOffset() != MISSING_VALUE) {
+    if (rhs.getMeanDurationOffset() != MISSING_VALUE) {
       lhs.setMeanDurationOffset(Duration.ofSeconds((long) rhs.getMeanDurationOffset()));
     }
-    if(rhs.getSafeDurationFactor() != MISSING_VALUE){
+    if (rhs.getSafeDurationFactor() != MISSING_VALUE) {
       lhs.setSafeDurationFactor(rhs.getSafeDurationFactor());
     }
-    if(rhs.getSafeDurationOffset()!= MISSING_VALUE){
+    if (rhs.getSafeDurationOffset() != MISSING_VALUE) {
       lhs.setSafeDurationOffset(Duration.ofSeconds((long) rhs.getSafeDurationOffset()));
     }
 
