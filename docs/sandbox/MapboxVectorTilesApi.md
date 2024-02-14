@@ -169,12 +169,13 @@ For each layer, the configuration includes:
 
 Custom attribution to be returned in `tilejson.json`
 
-By default the `attribution` property in `tilejson.json` is computed from the names and
+By default the, `attribution` property in `tilejson.json` is computed from the names and
 URLs of the feed publishers.
 If the OTP deployment contains many fields, this can become very unwieldy.
 
-This configuration parameter allows you to set the `attribution` to any string you wish,
-for example `<a href='https://trimet.org/tools'>TriMet, C-Tran, SMART and Friends</a>`.
+This configuration parameter allows you to set the `attribution` to any string you wish
+including HTML tags,
+for example `<a href='https://trimet.org/mod'>Regional Partners</a>`.
 
 
 <h4 id="vectorTiles_basePath">basePath</h4>

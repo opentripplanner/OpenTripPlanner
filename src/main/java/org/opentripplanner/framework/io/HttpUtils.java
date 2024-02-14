@@ -47,6 +47,6 @@ public final class HttpUtils {
    * https://stackoverflow.com/questions/66042952/http-proxy-behavior-for-x-forwarded-host-header
    */
   private static String extractHost(String xForwardedFor) {
-    return Arrays.stream(xForwardedFor.split(",")).map(String::strip).toList().getFirst();
+    return Arrays.stream(xForwardedFor.split(",")).map(String::strip).findFirst().get();
   }
 }

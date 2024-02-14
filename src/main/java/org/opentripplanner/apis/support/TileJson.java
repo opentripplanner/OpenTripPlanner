@@ -98,7 +98,7 @@ public class TileJson implements Serializable {
     return feedInfos
       .stream()
       .map(feedInfo ->
-        "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
+        "<a href='%s'>%s</a>".formatted(feedInfo.getPublisherUrl(), feedInfo.getPublisherName())
       )
       .distinct()
       .collect(Collectors.joining(", "));
