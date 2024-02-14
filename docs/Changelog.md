@@ -90,6 +90,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Refactor GroupStopBuilder addLocation method [#5651](https://github.com/opentripplanner/OpenTripPlanner/pull/5651)
 - Remove `VehicleToStopHeuristics` [#5381](https://github.com/opentripplanner/OpenTripPlanner/pull/5381)
 - Set defaults of the modes WALK, even if one and not the others are set [#5675](https://github.com/opentripplanner/OpenTripPlanner/pull/5675)
+- Reduce flex default access/egress penalty [#5674](https://github.com/opentripplanner/OpenTripPlanner/pull/5674)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
