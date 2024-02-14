@@ -18,6 +18,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 
@@ -25,7 +26,7 @@ public class GraphQLScalars {
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
   public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
 
-  public static GraphQLScalarType polylineScalar = GraphQLScalarType
+  public static final GraphQLScalarType polylineScalar = GraphQLScalarType
     .newScalar()
     .name("Polyline")
     .description(
@@ -54,7 +55,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
+  public static final GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
     .newScalar()
     .name("OffsetDateTime")
     .coercing(
@@ -66,23 +67,45 @@ public class GraphQLScalars {
             return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
           } else if (dataFetcherResult instanceof OffsetDateTime odt) {
             return odt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-          } else return null;
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
         }
 
         @Override
         public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
-          return null;
+          if (input instanceof CharSequence cs) {
+            return OffsetDateTimeParser.parseLeniently(cs).orElseThrow(() -> valueException(input));
+          }
+          throw valueException(input);
         }
 
         @Override
         public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
-          return null;
+          if (input instanceof StringValue sv) {
+            return OffsetDateTimeParser
+              .parseLeniently(sv.getValue())
+              .orElseThrow(() -> literalException(input));
+          }
+          throw literalException(input);
+        }
+
+        private static CoercingParseValueException valueException(Object input) {
+          return new CoercingParseValueException("Cannot parse %s".formatted(input));
+        }
+
+        private static CoercingParseLiteralException literalException(Object input) {
+          return new CoercingParseLiteralException("Cannot parse %s".formatted(input));
         }
       }
     )
     .build();
 
-  public static GraphQLScalarType geoJsonScalar = GraphQLScalarType
+  public static final GraphQLScalarType geoJsonScalar = GraphQLScalarType
     .newScalar()
     .name("GeoJson")
     .description("Geographic data structures in JSON format. See: https://geojson.org/")
@@ -110,7 +133,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+  public static final GraphQLScalarType graphQLIDScalar = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(
@@ -150,7 +173,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType gramsScalar = GraphQLScalarType
+  public static final GraphQLScalarType gramsScalar = GraphQLScalarType
     .newScalar()
     .name("Grams")
     .coercing(
