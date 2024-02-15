@@ -234,8 +234,9 @@ public class StreetEdge
         case WALK -> walkingBike
           ? preferences.bike().walking().speed()
           : preferences.walk().speed();
-        case BICYCLE, SCOOTER -> preferences.bike().speed();
+        case BICYCLE -> preferences.bike().speed();
         case CAR -> getCarSpeed();
+        case SCOOTER -> preferences.scooter().speed();
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
       };
 
@@ -1098,7 +1099,7 @@ public class StreetEdge
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE, SCOOTER -> bicycleTraversalCost(preferences, speed);
+        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(preferences, traverseMode, speed);
         case WALK -> walkingTraversalCosts(
           preferences,
           traverseMode,
@@ -1213,10 +1214,17 @@ public class StreetEdge
   }
 
   @Nonnull
-  private TraversalCosts bicycleTraversalCost(RoutingPreferences pref, double speed) {
+  private TraversalCosts bicycleOrScooterTraversalCost(
+    RoutingPreferences pref,
+    TraverseMode mode,
+    double speed
+  ) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
-    switch (pref.bike().optimizeType()) {
+    var optimizeType = mode == TraverseMode.BICYCLE
+      ? pref.bike().optimizeType()
+      : pref.scooter().optimizeType();
+    switch (optimizeType) {
       case SAFEST_STREETS -> {
         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
         if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
@@ -1232,20 +1240,17 @@ public class StreetEdge
         double quick = getEffectiveBikeDistance();
         double safety = getEffectiveBicycleSafetyDistance();
         double slope = getEffectiveBikeDistanceForWorkCost();
-        weight =
-          quick *
-          pref.bike().optimizeTriangle().time() +
-          slope *
-          pref.bike().optimizeTriangle().slope() +
-          safety *
-          pref.bike().optimizeTriangle().safety();
+        var triangle = mode == TraverseMode.BICYCLE
+          ? pref.bike().optimizeTriangle()
+          : pref.scooter().optimizeTriangle();
+        weight = quick * triangle.time() + slope * triangle.slope() + safety * triangle.safety();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;
     }
     var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
       pref,
-      TraverseMode.BICYCLE,
+      mode,
       false,
       isStairs()
     );

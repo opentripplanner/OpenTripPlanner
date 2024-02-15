@@ -7,11 +7,10 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
-class BikePreferencesTest {
+class ScooterPreferencesTest {
 
   public static final double SPEED = 2.0;
   public static final double RELUCTANCE = 1.2;
-  public static final int BOARD_COST = 660;
   public static final TimeSlopeSafetyTriangle TRIANGLE = TimeSlopeSafetyTriangle
     .of()
     .withSlope(1)
@@ -19,16 +18,13 @@ class BikePreferencesTest {
   public static final VehicleRoutingOptimizeType OPTIMIZE_TYPE =
     VehicleRoutingOptimizeType.TRIANGLE;
   public static final int RENTAL_PICKUP_TIME = 30;
-  public static final int PARK_COST = 30;
 
-  private final BikePreferences subject = BikePreferences
+  private final ScooterPreferences subject = ScooterPreferences
     .of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
-    .withBoardCost(BOARD_COST)
     .withOptimizeType(OPTIMIZE_TYPE)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
-    .withParking(parking -> parking.withCost(PARK_COST).build())
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
 
@@ -40,11 +36,6 @@ class BikePreferencesTest {
   @Test
   void reluctance() {
     assertEquals(RELUCTANCE, subject.reluctance());
-  }
-
-  @Test
-  void boardCost() {
-    assertEquals(BOARD_COST, subject.boardCost());
   }
 
   @Test
@@ -64,15 +55,9 @@ class BikePreferencesTest {
   }
 
   @Test
-  void parking() {
-    var vehicleParking = VehicleParkingPreferences.of().withCost(PARK_COST).build();
-    assertEquals(vehicleParking, subject.parking());
-  }
-
-  @Test
   void testOfAndCopyOf() {
     // Return same object if no value is set
-    assertSame(BikePreferences.DEFAULT, BikePreferences.of().build());
+    assertSame(ScooterPreferences.DEFAULT, ScooterPreferences.of().build());
     assertSame(subject, subject.copyOf().build());
   }
 
@@ -86,13 +71,11 @@ class BikePreferencesTest {
 
   @Test
   void testToString() {
-    assertEquals("BikePreferences{}", BikePreferences.DEFAULT.toString());
+    assertEquals("ScooterPreferences{}", ScooterPreferences.DEFAULT.toString());
     assertEquals(
-      "BikePreferences{" +
+      "ScooterPreferences{" +
       "speed: 2.0, " +
       "reluctance: 1.2, " +
-      "boardCost: $660, " +
-      "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
@@ -103,20 +86,20 @@ class BikePreferencesTest {
 
   @Test
   void testForcedTriangleOptimization() {
-    var trianglePreferences = BikePreferences
+    var trianglePreferences = ScooterPreferences
       .of()
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, trianglePreferences.optimizeType());
 
-    var conflictingPreferences = BikePreferences
+    var conflictingPreferences = ScooterPreferences
       .of()
       .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, conflictingPreferences.optimizeType());
 
-    var emptyTrianglePreferences = BikePreferences
+    var emptyTrianglePreferences = ScooterPreferences
       .of()
       .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.build())

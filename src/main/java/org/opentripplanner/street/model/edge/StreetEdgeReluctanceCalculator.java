@@ -25,6 +25,7 @@ class StreetEdgeReluctanceCalculator {
         case WALK -> walkingBike ? pref.bike().walking().reluctance() : pref.walk().reluctance();
         case BICYCLE -> pref.bike().reluctance();
         case CAR -> pref.car().reluctance();
+        case SCOOTER -> pref.scooter().reluctance();
         default -> throw new IllegalArgumentException(
           "getReluctance(): Invalid mode " + traverseMode
         );

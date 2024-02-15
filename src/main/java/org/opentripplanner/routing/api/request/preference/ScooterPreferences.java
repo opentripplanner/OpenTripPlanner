@@ -8,63 +8,55 @@ import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANG
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 /**
- * The bike preferences contain all speed, reluctance, cost and factor preferences for biking
+ * The scooter preferences contain all speed, reluctance, cost and factor preferences for scooter
  * related to street and transit routing. The values are normalized(rounded) so the class can used
  * as a cache key.
+ *
+ * Only Scooter rental is supported currently.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class BikePreferences implements Serializable {
+public final class ScooterPreferences implements Serializable {
 
-  public static final BikePreferences DEFAULT = new BikePreferences();
+  public static final ScooterPreferences DEFAULT = new ScooterPreferences();
 
   private final double speed;
   private final double reluctance;
-  private final Cost boardCost;
-  private final VehicleParkingPreferences parking;
   private final VehicleRentalPreferences rental;
   private final VehicleRoutingOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
-  private final VehicleWalkingPreferences walking;
 
-  private BikePreferences() {
+  private ScooterPreferences() {
     this.speed = 5;
     this.reluctance = 2.0;
-    this.boardCost = Cost.costOfMinutes(10);
-    this.parking = VehicleParkingPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
     this.optimizeType = SAFE_STREETS;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
-    this.walking = VehicleWalkingPreferences.DEFAULT;
   }
 
-  private BikePreferences(Builder builder) {
+  private ScooterPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.boardCost = builder.boardCost;
-    this.parking = builder.parking;
     this.rental = builder.rental;
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
-    this.walking = builder.walking;
   }
 
-  public static BikePreferences.Builder of() {
+  public static ScooterPreferences.Builder of() {
     return new Builder(DEFAULT);
   }
 
-  public BikePreferences.Builder copyOf() {
+  public ScooterPreferences.Builder copyOf() {
     return new Builder(this);
   }
 
   /**
-   * Default: 5 m/s, ~11 mph, a random bicycling speed
+   * Default: 5 m/s, ~11 mph, a random scooter speed
    */
   public double speed() {
     return speed;
@@ -72,20 +64,6 @@ public final class BikePreferences implements Serializable {
 
   public double reluctance() {
     return reluctance;
-  }
-
-  /**
-   * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. This
-   * is in addition to the cost of the transfer(biking) and waiting-time. It is also in addition to
-   * the {@link TransferPreferences#cost()}.
-   */
-  public int boardCost() {
-    return boardCost.toSeconds();
-  }
-
-  /** Parking preferences that can be different per request */
-  public VehicleParkingPreferences parking() {
-    return parking;
   }
 
   /** Rental preferences that can be different per request */
@@ -104,83 +82,57 @@ public final class BikePreferences implements Serializable {
     return optimizeTriangle;
   }
 
-  /** Bike walking preferences that can be different per request */
-  public VehicleWalkingPreferences walking() {
-    return walking;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    BikePreferences that = (BikePreferences) o;
+    ScooterPreferences that = (ScooterPreferences) o;
     return (
       doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
-      boardCost.equals(that.boardCost) &&
-      Objects.equals(parking, that.parking) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
-      optimizeTriangle.equals(that.optimizeTriangle) &&
-      Objects.equals(walking, that.walking)
+      optimizeTriangle.equals(that.optimizeTriangle)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      speed,
-      reluctance,
-      boardCost,
-      parking,
-      rental,
-      optimizeType,
-      optimizeTriangle,
-      walking
-    );
+    return Objects.hash(speed, reluctance, rental, optimizeType, optimizeTriangle);
   }
 
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(BikePreferences.class)
+      .of(ScooterPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addObj("boardCost", boardCost, DEFAULT.boardCost)
-      .addObj("parking", parking, DEFAULT.parking)
       .addObj("rental", rental, DEFAULT.rental)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
-      .addObj("walking", walking, DEFAULT.walking)
       .toString();
   }
 
   @SuppressWarnings("UnusedReturnValue")
   public static class Builder {
 
-    private final BikePreferences original;
+    private final ScooterPreferences original;
     private double speed;
     private double reluctance;
-    private Cost boardCost;
-    private VehicleParkingPreferences parking;
     private VehicleRentalPreferences rental;
     private VehicleRoutingOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
-    private VehicleWalkingPreferences walking;
 
-    public Builder(BikePreferences original) {
+    public Builder(ScooterPreferences original) {
       this.original = original;
       this.speed = original.speed;
       this.reluctance = original.reluctance;
-      this.boardCost = original.boardCost;
-      this.parking = original.parking;
       this.rental = original.rental;
       this.optimizeType = original.optimizeType;
       this.optimizeTriangle = original.optimizeTriangle;
-      this.walking = original.walking;
     }
 
-    public BikePreferences original() {
+    public ScooterPreferences original() {
       return original;
     }
 
@@ -199,20 +151,6 @@ public final class BikePreferences implements Serializable {
 
     public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
-      return this;
-    }
-
-    public Cost boardCost() {
-      return boardCost;
-    }
-
-    public Builder withBoardCost(int boardCost) {
-      this.boardCost = Cost.costOfSeconds(boardCost);
-      return this;
-    }
-
-    public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
-      this.parking = ifNotNull(this.parking, original.parking).copyOf().apply(body).build();
       return this;
     }
 
@@ -252,18 +190,13 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public Builder withWalking(Consumer<VehicleWalkingPreferences.Builder> body) {
-      this.walking = ifNotNull(this.walking, original.walking).copyOf().apply(body).build();
-      return this;
-    }
-
     public Builder apply(Consumer<Builder> body) {
       body.accept(this);
       return this;
     }
 
-    public BikePreferences build() {
-      var value = new BikePreferences(this);
+    public ScooterPreferences build() {
+      var value = new ScooterPreferences(this);
       return original.equals(value) ? original : value;
     }
   }
