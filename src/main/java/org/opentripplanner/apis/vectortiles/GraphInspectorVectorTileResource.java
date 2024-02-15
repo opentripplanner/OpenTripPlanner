@@ -3,6 +3,7 @@ package org.opentripplanner.apis.vectortiles;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.AreaStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.GroupStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
@@ -35,6 +36,7 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.edge.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
+import org.opentripplanner.inspector.vector.stop.GroupStopLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
@@ -49,6 +51,7 @@ public class GraphInspectorVectorTileResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", AreaStop);
+  private static final LayerParams GROUP_STOPS = new LayerParams("groupStops", GroupStop);
   private static final LayerParams GEOFENCING_ZONES = new LayerParams(
     "geofencingZones",
     GeofencingZones
@@ -58,6 +61,7 @@ public class GraphInspectorVectorTileResource {
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
+    GROUP_STOPS,
     GEOFENCING_ZONES,
     EDGES,
     VERTICES
@@ -128,11 +132,11 @@ public class GraphInspectorVectorTileResource {
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
     var base = HttpUtils.getBaseAddress(uri, headers);
 
-    // these two could also be loaded together but are put into separate sources because
+    // these could also be loaded together but are put into separate sources because
     // the stops are fast and the edges are relatively slow
     var stopsSource = new VectorSource(
       "stops",
-      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS))
+      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
     );
     var streetSource = new VectorSource(
       "street",
@@ -142,6 +146,7 @@ public class GraphInspectorVectorTileResource {
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
       AREA_STOPS.toVectorSourceLayer(stopsSource),
+      GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource)
     );
@@ -179,12 +184,18 @@ public class GraphInspectorVectorTileResource {
       case RegularStop -> new StopLayerBuilder<>(
         layerParameters,
         locale,
-        e -> context.transitService().findRegularStop(e)
+        e -> context.transitService().findRegularStops(e)
       );
       case AreaStop -> new StopLayerBuilder<>(
         layerParameters,
         locale,
         e -> context.transitService().findAreaStops(e)
+      );
+      case GroupStop -> new GroupStopLayerBuilder(
+        layerParameters,
+        locale,
+        // There are not many GroupStops, so we can just list them all.
+        context.transitService().listGroupStops()
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
       case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);

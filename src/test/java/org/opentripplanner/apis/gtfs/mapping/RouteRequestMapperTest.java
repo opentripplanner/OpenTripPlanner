@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
-import static org.opentripplanner.routing.core.BicycleOptimizeType.TRIANGLE;
+import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_STREETS;
+import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -55,7 +55,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
         graph.getVehicleParkingService(),
         new DefaultVehicleRentalService(),
         new DefaultRealtimeVehicleService(transitService),
-        GraphFinder.getInstance(graph, transitService::findRegularStop),
+        GraphFinder.getInstance(graph, transitService::findRegularStops),
         new RouteRequest()
       );
   }

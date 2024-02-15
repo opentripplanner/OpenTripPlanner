@@ -75,7 +75,7 @@ export function MapView({
         }}
         // it's unfortunate that you have to list these layers here.
         // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
-        interactiveLayerIds={['regular-stop', 'area-stop', 'vertex', 'edge', 'link']}
+        interactiveLayerIds={['regular-stop', 'area-stop', 'group-stop', 'vertex', 'edge', 'link']}
         onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload
         hash={true}

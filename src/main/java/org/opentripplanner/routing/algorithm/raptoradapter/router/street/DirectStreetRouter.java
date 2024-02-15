@@ -96,6 +96,8 @@ public class DirectStreetRouter {
       distanceLimit = durationLimit * preferences.car().speed();
     } else if (mode.includesBiking()) {
       distanceLimit = durationLimit * preferences.bike().speed();
+    } else if (mode.includesScooter()) {
+      distanceLimit = durationLimit * preferences.scooter().speed();
     } else if (mode.includesWalking()) {
       distanceLimit = durationLimit * preferences.walk().speed();
     } else {

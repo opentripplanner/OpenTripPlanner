@@ -94,13 +94,12 @@ public class GroupStop
 
   /**
    * Returns the geometry of the area that encompasses the bounds of this StopLocation group. If the
-   * group is defined only as a list of stops, this will return the same as getGeometry. If on the
-   * other hand the group is defined as an area and the stops are inferred from that area, then this
-   * will return the geometry of the area.
+   * group is defined as all the stops within an area, then this will return the geometry of the
+   * area. If the group is defined simply as a list of stops, this will return an empty optional.
    */
   @Override
   public Optional<? extends Geometry> getEncompassingAreaGeometry() {
-    return Optional.ofNullable(encompassingAreaGeometry).or(() -> Optional.of(geometry));
+    return Optional.ofNullable(encompassingAreaGeometry);
   }
 
   @Override

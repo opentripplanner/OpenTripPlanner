@@ -2,18 +2,18 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 public final class OptimizationTypeMapper {
 
   @Nonnull
-  public static BicycleOptimizeType map(GraphQLTypes.GraphQLOptimizeType optimizeType) {
+  public static VehicleRoutingOptimizeType map(GraphQLTypes.GraphQLOptimizeType optimizeType) {
     return switch (optimizeType) {
-      case QUICK -> BicycleOptimizeType.SHORTEST_DURATION;
-      case FLAT -> BicycleOptimizeType.FLAT_STREETS;
-      case SAFE -> BicycleOptimizeType.SAFE_STREETS;
-      case GREENWAYS -> BicycleOptimizeType.SAFEST_STREETS;
-      case TRIANGLE -> BicycleOptimizeType.TRIANGLE;
+      case QUICK -> VehicleRoutingOptimizeType.SHORTEST_DURATION;
+      case FLAT -> VehicleRoutingOptimizeType.FLAT_STREETS;
+      case SAFE -> VehicleRoutingOptimizeType.SAFE_STREETS;
+      case GREENWAYS -> VehicleRoutingOptimizeType.SAFEST_STREETS;
+      case TRIANGLE -> VehicleRoutingOptimizeType.TRIANGLE;
     };
   }
 }

@@ -17,9 +17,10 @@ class DebugStyleSpecTest {
     var vectorSource = new VectorSource("vectorSource", "https://example.com");
     var regularStops = new VectorSourceLayer(vectorSource, "stops");
     var areaStops = new VectorSourceLayer(vectorSource, "stops");
+    var groupStops = new VectorSourceLayer(vectorSource, "stops");
     var edges = new VectorSourceLayer(vectorSource, "edges");
     var vertices = new VectorSourceLayer(vectorSource, "vertices");
-    var spec = DebugStyleSpec.build(regularStops, areaStops, edges, vertices);
+    var spec = DebugStyleSpec.build(regularStops, areaStops, groupStops, edges, vertices);
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     var expectation = RESOURCES.fileToString("style.json");

@@ -40,7 +40,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -255,14 +255,14 @@ public class TripRequestMapperTest implements PlanTestConstants {
   public void testBikeTriangleFactors() {
     Map<String, Object> arguments = Map.of(
       "bicycleOptimisationMethod",
-      BicycleOptimizeType.TRIANGLE,
+      VehicleRoutingOptimizeType.TRIANGLE,
       "triangleFactors",
       Map.of("safety", 0.1, "slope", 0.1, "time", 0.8)
     );
 
     var req1 = TripRequestMapper.createRequest(executionContext(arguments));
 
-    assertEquals(BicycleOptimizeType.TRIANGLE, req1.preferences().bike().optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, req1.preferences().bike().optimizeType());
     assertEquals(
       new TimeSlopeSafetyTriangle(0.8, 0.1, 0.1),
       req1.preferences().bike().optimizeTriangle()
@@ -272,18 +272,18 @@ public class TripRequestMapperTest implements PlanTestConstants {
   @Test
   void testDefaultTriangleFactors() {
     var req2 = TripRequestMapper.createRequest(executionContext(Map.of()));
-    assertEquals(BicycleOptimizeType.SAFE_STREETS, req2.preferences().bike().optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, req2.preferences().bike().optimizeType());
     assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req2.preferences().bike().optimizeTriangle());
   }
 
-  static Stream<Arguments> noTriangleCases = BicycleOptimizeType
+  static Stream<Arguments> noTriangleCases = VehicleRoutingOptimizeType
     .nonTriangleValues()
     .stream()
     .map(Arguments::of);
 
   @ParameterizedTest
   @VariableSource("noTriangleCases")
-  public void testBikeTriangleFactorsHasNoEffect(BicycleOptimizeType bot) {
+  public void testBikeTriangleFactorsHasNoEffect(VehicleRoutingOptimizeType bot) {
     Map<String, Object> arguments = Map.of(
       "bicycleOptimisationMethod",
       bot,
