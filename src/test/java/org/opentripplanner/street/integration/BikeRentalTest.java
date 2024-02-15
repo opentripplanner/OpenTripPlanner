@@ -620,7 +620,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     request.withPreferences(preferences ->
       preferences.withBike(bike ->
         bike.withRental(rental ->
-          rental.withPickupTime(42).withPickupCost(62).withDropoffCost(33).withDropoffTime(15)
+          rental.withPickupTime(42).withPickupCost(62).withDropOffCost(33).withDropOffTime(15)
         )
       )
     );

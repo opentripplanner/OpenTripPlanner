@@ -63,8 +63,8 @@ There are several ways to get involved:
 
 * Create pull requests citing the relevant issue.
 
-* Join developer meetings hosted twice a week. Check the specific times
-  on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com)
+* Join developer meetings hosted twice a week. Check the specific times and URLs 
+  on [this page](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md#developer-meetings)
 
 ### Branches and Branch Protection
 

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -375,7 +374,7 @@ public class NetexMapper {
         transitBuilder.stopModel().withAreaStop(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.stopModel().withGroupStop(groupStop);
-        for (var child : groupStop.getLocations()) {
+        for (var child : groupStop.getChildLocations()) {
           if (child instanceof AreaStop areaStop) {
             transitBuilder.stopModel().withAreaStop(areaStop);
           }

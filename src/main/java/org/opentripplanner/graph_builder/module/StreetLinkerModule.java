@@ -97,7 +97,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
           .stream()
           .filter(GroupStop.class::isInstance)
           .map(GroupStop.class::cast)
-          .flatMap(g -> g.getLocations().stream().filter(RegularStop.class::isInstance))
+          .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
           .toList()
       );
     }

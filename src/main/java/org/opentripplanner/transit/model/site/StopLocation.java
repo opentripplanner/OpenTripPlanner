@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -42,6 +43,9 @@ public interface StopLocation extends LogInfo {
 
   @Nullable
   I18NString getUrl();
+
+  @Nonnull
+  StopType getStopType();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in
@@ -121,6 +125,14 @@ public interface StopLocation extends LogInfo {
   @Nullable
   Geometry getGeometry();
 
+  /**
+   * The geometry of the area that encompasses the bounds of the stop area. If the stop is defined
+   * as a point, this is null.
+   */
+  default Optional<? extends Geometry> getEncompassingAreaGeometry() {
+    return Optional.empty();
+  }
+
   @Nullable
   default ZoneId getTimeZone() {
     return null;
@@ -134,6 +146,14 @@ public interface StopLocation extends LogInfo {
   }
 
   boolean isPartOfSameStationAs(StopLocation alternativeStop);
+
+  /**
+   * Returns the child locations of this location, for example StopLocations within a GroupStop.
+   */
+  @Nullable
+  default List<StopLocation> getChildLocations() {
+    return null;
+  }
 
   @Override
   default String logName() {

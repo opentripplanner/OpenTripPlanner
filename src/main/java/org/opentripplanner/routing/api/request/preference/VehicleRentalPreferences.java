@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -17,38 +17,38 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 public final class VehicleRentalPreferences implements Serializable {
 
   public static final VehicleRentalPreferences DEFAULT = new VehicleRentalPreferences();
-  private final int pickupTime;
+  private final Duration pickupTime;
   private final Cost pickupCost;
-  private final int dropoffTime;
-  private final Cost dropoffCost;
+  private final Duration dropOffTime;
+  private final Cost dropOffCost;
 
   private final boolean useAvailabilityInformation;
-  private final double arrivingInRentalVehicleAtDestinationCost;
+  private final Cost arrivingInRentalVehicleAtDestinationCost;
   private final boolean allowArrivingInRentedVehicleAtDestination;
 
   private final Set<String> allowedNetworks;
   private final Set<String> bannedNetworks;
 
   private VehicleRentalPreferences() {
-    this.pickupTime = 60;
+    this.pickupTime = Duration.ofMinutes(1);
     this.pickupCost = Cost.costOfMinutes(2);
-    this.dropoffTime = 30;
-    this.dropoffCost = Cost.costOfSeconds(30);
+    this.dropOffTime = Duration.ofSeconds(30);
+    this.dropOffCost = Cost.costOfSeconds(30);
     this.useAvailabilityInformation = false;
-    this.arrivingInRentalVehicleAtDestinationCost = 0;
+    this.arrivingInRentalVehicleAtDestinationCost = Cost.costOfSeconds(0);
     this.allowArrivingInRentedVehicleAtDestination = false;
     this.allowedNetworks = Set.of();
     this.bannedNetworks = Set.of();
   }
 
   private VehicleRentalPreferences(Builder builder) {
-    this.pickupTime = builder.pickupTime;
+    this.pickupTime = Duration.ofSeconds(Units.duration(builder.pickupTime));
     this.pickupCost = builder.pickupCost;
-    this.dropoffTime = builder.dropoffTime;
-    this.dropoffCost = builder.dropoffCost;
+    this.dropOffTime = Duration.ofSeconds(Units.duration(builder.dropOffTime));
+    this.dropOffCost = builder.dropOffCost;
     this.useAvailabilityInformation = builder.useAvailabilityInformation;
     this.arrivingInRentalVehicleAtDestinationCost =
-      DoubleUtils.roundTo1Decimal(builder.arrivingInRentalVehicleAtDestinationCost);
+      builder.arrivingInRentalVehicleAtDestinationCost;
     this.allowArrivingInRentedVehicleAtDestination =
       builder.allowArrivingInRentedVehicleAtDestination;
     this.allowedNetworks = builder.allowedNetworks;
@@ -64,7 +64,7 @@ public final class VehicleRentalPreferences implements Serializable {
   }
 
   /** Time to rent a vehicle */
-  public int pickupTime() {
+  public Duration pickupTime() {
     return pickupTime;
   }
 
@@ -72,18 +72,18 @@ public final class VehicleRentalPreferences implements Serializable {
    * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost
    * and trouble.
    */
-  public int pickupCost() {
-    return pickupCost.toSeconds();
+  public Cost pickupCost() {
+    return pickupCost;
   }
 
   /** Time to drop-off a rented vehicle */
-  public int dropoffTime() {
-    return dropoffTime;
+  public Duration dropOffTime() {
+    return dropOffTime;
   }
 
   /** Cost of dropping-off a rented vehicle */
-  public int dropoffCost() {
-    return dropoffCost.toSeconds();
+  public Cost dropOffCost() {
+    return dropOffCost;
   }
 
   /**
@@ -97,7 +97,7 @@ public final class VehicleRentalPreferences implements Serializable {
   /**
    * The cost of arriving at the destination with the rented vehicle, to discourage doing so.
    */
-  public double arrivingInRentalVehicleAtDestinationCost() {
+  public Cost arrivingInRentalVehicleAtDestinationCost() {
     return arrivingInRentalVehicleAtDestinationCost;
   }
 
@@ -127,16 +127,15 @@ public final class VehicleRentalPreferences implements Serializable {
     if (o == null || getClass() != o.getClass()) return false;
     VehicleRentalPreferences that = (VehicleRentalPreferences) o;
     return (
-      pickupTime == that.pickupTime &&
+      Objects.equals(pickupTime, that.pickupTime) &&
       Objects.equals(pickupCost, that.pickupCost) &&
-      dropoffTime == that.dropoffTime &&
-      Objects.equals(dropoffCost, that.dropoffCost) &&
+      Objects.equals(dropOffTime, that.dropOffTime) &&
+      Objects.equals(dropOffCost, that.dropOffCost) &&
       useAvailabilityInformation == that.useAvailabilityInformation &&
-      Double.compare(
+      Objects.equals(
         that.arrivingInRentalVehicleAtDestinationCost,
         arrivingInRentalVehicleAtDestinationCost
-      ) ==
-      0 &&
+      ) &&
       allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
       allowedNetworks.equals(that.allowedNetworks) &&
       bannedNetworks.equals(that.bannedNetworks)
@@ -148,8 +147,8 @@ public final class VehicleRentalPreferences implements Serializable {
     return Objects.hash(
       pickupTime,
       pickupCost,
-      dropoffTime,
-      dropoffCost,
+      dropOffTime,
+      dropOffCost,
       useAvailabilityInformation,
       arrivingInRentalVehicleAtDestinationCost,
       allowArrivingInRentedVehicleAtDestination,
@@ -162,12 +161,12 @@ public final class VehicleRentalPreferences implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(VehicleRentalPreferences.class)
-      .addDurationSec("pickupTime", pickupTime, DEFAULT.pickupTime)
+      .addDuration("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
-      .addDurationSec("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
-      .addObj("dropoffCost", dropoffCost, DEFAULT.dropoffCost)
+      .addDuration("dropOffTime", dropOffTime, DEFAULT.dropOffTime)
+      .addObj("dropOffCost", dropOffCost, DEFAULT.dropOffCost)
       .addBoolIfTrue("useAvailabilityInformation", useAvailabilityInformation)
-      .addNum(
+      .addObj(
         "arrivingInRentalVehicleAtDestinationCost",
         arrivingInRentalVehicleAtDestinationCost,
         DEFAULT.arrivingInRentalVehicleAtDestinationCost
@@ -186,20 +185,20 @@ public final class VehicleRentalPreferences implements Serializable {
     private final VehicleRentalPreferences original;
     private int pickupTime;
     private Cost pickupCost;
-    private int dropoffTime;
-    private Cost dropoffCost;
+    private int dropOffTime;
+    private Cost dropOffCost;
     private boolean useAvailabilityInformation;
-    private double arrivingInRentalVehicleAtDestinationCost;
+    private Cost arrivingInRentalVehicleAtDestinationCost;
     private boolean allowArrivingInRentedVehicleAtDestination;
     private Set<String> allowedNetworks;
     private Set<String> bannedNetworks;
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
-      this.pickupTime = Units.duration(original.pickupTime);
+      this.pickupTime = (int) original.pickupTime.toSeconds();
       this.pickupCost = original.pickupCost;
-      this.dropoffTime = Units.duration(original.dropoffTime);
-      this.dropoffCost = original.dropoffCost;
+      this.dropOffTime = (int) original.dropOffTime.toSeconds();
+      this.dropOffCost = original.dropOffCost;
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;
@@ -218,18 +217,28 @@ public final class VehicleRentalPreferences implements Serializable {
       return this;
     }
 
+    public Builder withPickupTime(Duration pickupTime) {
+      this.pickupTime = (int) pickupTime.toSeconds();
+      return this;
+    }
+
     public Builder withPickupCost(int pickupCost) {
       this.pickupCost = Cost.costOfSeconds(pickupCost);
       return this;
     }
 
-    public Builder withDropoffTime(int dropoffTime) {
-      this.dropoffTime = dropoffTime;
+    public Builder withDropOffTime(int dropOffTime) {
+      this.dropOffTime = dropOffTime;
       return this;
     }
 
-    public Builder withDropoffCost(int dropoffCost) {
-      this.dropoffCost = Cost.costOfSeconds(dropoffCost);
+    public Builder withDropOffTime(Duration dropOffTime) {
+      this.dropOffTime = (int) dropOffTime.toSeconds();
+      return this;
+    }
+
+    public Builder withDropOffCost(int dropOffCost) {
+      this.dropOffCost = Cost.costOfSeconds(dropOffCost);
       return this;
     }
 
@@ -239,9 +248,10 @@ public final class VehicleRentalPreferences implements Serializable {
     }
 
     public Builder withArrivingInRentalVehicleAtDestinationCost(
-      double arrivingInRentalVehicleAtDestinationCost
+      int arrivingInRentalVehicleAtDestinationCost
     ) {
-      this.arrivingInRentalVehicleAtDestinationCost = arrivingInRentalVehicleAtDestinationCost;
+      this.arrivingInRentalVehicleAtDestinationCost =
+        Cost.costOfSeconds(arrivingInRentalVehicleAtDestinationCost);
       return this;
     }
 

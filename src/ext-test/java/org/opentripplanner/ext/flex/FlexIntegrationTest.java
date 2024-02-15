@@ -32,6 +32,7 @@ import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
@@ -224,6 +225,11 @@ public class FlexIntegrationTest {
     request.setTo(to);
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
+    request.withPreferences(p ->
+      p.withStreet(s ->
+        s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+      )
+    );
 
     var modes = request.journey().modes().copyOf();
     modes.withEgressMode(FLEXIBLE);

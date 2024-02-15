@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
@@ -37,7 +37,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   protected List<Geometry> getGeometries(Envelope query) {
     return transitService
-      .findRegularStop(query)
+      .findRegularStops(query)
       .stream()
       .map(stop -> {
         Geometry point = stop.getGeometry();

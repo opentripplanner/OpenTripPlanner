@@ -26,7 +26,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   //      not work correctly.
   public void initialize(
     StreetMode streetMode,
-    Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     boolean arriveBy,
     RoutingPreferences preferences
@@ -55,6 +54,9 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     }
     if (streetMode.includesBiking()) {
       return preferences.bike().speed();
+    }
+    if (streetMode.includesScooter()) {
+      return preferences.scooter().speed();
     }
     return preferences.walk().speed();
   }

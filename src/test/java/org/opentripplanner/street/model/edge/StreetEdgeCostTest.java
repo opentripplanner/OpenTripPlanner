@@ -159,7 +159,9 @@ class StreetEdgeCostTest {
       .buildAndConnect();
 
     var req = StreetSearchRequest.of();
-    req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
+    req.withPreferences(p ->
+      p.withBike(b -> b.withWalking(w -> w.withStairsReluctance(stairsReluctance)))
+    );
     req.withMode(StreetMode.BIKE);
     var result = traverse(stairsEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);

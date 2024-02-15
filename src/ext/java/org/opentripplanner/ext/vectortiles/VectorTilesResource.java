@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.glassfish.grizzly.http.server.Request;
-import org.opentripplanner.api.model.TileJson;
+import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -28,6 +28,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVeh
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
@@ -66,7 +67,7 @@ public class VectorTilesResource {
       z,
       locale,
       Arrays.asList(requestedLayers.split(",")),
-      serverContext.vectorTileLayers().layers(),
+      serverContext.vectorTileConfig().layers(),
       VectorTilesResource::crateLayerBuilder,
       serverContext
     );
@@ -81,23 +82,37 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
-    var feedInfos = serverContext
+
+    List<String> rLayers = Arrays.asList(requestedLayers.split(","));
+
+    var url = serverContext
+      .vectorTileConfig()
+      .basePath()
+      .map(overrideBasePath ->
+        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
+      )
+      .orElseGet(() ->
+        TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
+      );
+
+    return serverContext
+      .vectorTileConfig()
+      .attribution()
+      .map(attr -> new TileJson(url, envelope, attr))
+      .orElseGet(() -> {
+        var feedInfos = getFeedInfos();
+        return new TileJson(url, envelope, feedInfos);
+      });
+  }
+
+  private List<FeedInfo> getFeedInfos() {
+    return serverContext
       .transitService()
       .getFeedIds()
       .stream()
       .map(serverContext.transitService()::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))
       .toList();
-
-    return new TileJson(
-      uri,
-      headers,
-      requestedLayers,
-      ignoreRouterId,
-      "vectorTiles",
-      envelope,
-      feedInfos
-    );
   }
 
   private static LayerBuilder<?> crateLayerBuilder(

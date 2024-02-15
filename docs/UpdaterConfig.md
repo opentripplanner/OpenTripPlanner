@@ -8,8 +8,8 @@
 
 # Updater configuration
 
-This section covers all options that can be set in the *router-config.json* in the 
-[updaters](RouterConfiguration.md) section.
+This section covers options that can be set in the updaters section of `router-config.json`. 
+See the parameter summary and examples in the router configuration documentation
 
 Real-time data are those that are not added to OTP during the graph build phase but during runtime.
 
@@ -164,37 +164,51 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- stop-time-updater END -->
 
+### Streaming TripUpdates via MQTT
 
-### TripUpdates via WebSocket
+This updater connects to an MQTT broker and processes TripUpdates in a streaming fashion. This means
+that they will be applied individually in near-realtime rather than in batches at a certain interval.
 
-This updater doesn't poll a data source but opens a persistent connection to the GTFS-RT provider, 
-which then sends incremental updates immediately as they become available.
+This system powers the realtime updates in Helsinki and more information can be found 
+[on Github](https://github.com/HSLdevcom/transitdata).
 
-The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
-provides this kind of streaming, incremental updates over a websocket rather than a single large
-file.
-
-<!-- websocket-gtfs-rt-updater BEGIN -->
+<!-- mqtt-gtfs-rt-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
-|-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
-| type = "websocket-gtfs-rt-updater"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
-| feedId                                                                |  `string` | TODO                     | *Required* |                      |  1.5  |
-| reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
-| url                                                                   |  `string` | TODO                     | *Optional* |                      |  1.5  |
+| Config Parameter                                                      |    Type   | Summary                                      |  Req./Opt. | Default Value        | Since |
+|-----------------------------------------------------------------------|:---------:|----------------------------------------------|:----------:|----------------------|:-----:|
+| type = "mqtt-gtfs-rt-updater"                                         |   `enum`  | The type of the updater.                     | *Required* |                      |  1.5  |
+| [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled. | *Optional* | `"required-no-data"` |  2.2  |
+| feedId                                                                |  `string` | The feed id to apply the updates to.         | *Required* |                      |  2.0  |
+| fuzzyTripMatching                                                     | `boolean` | Whether to match trips fuzzily.              | *Optional* | `false`              |  2.0  |
+| qos                                                                   | `integer` | QOS level.                                   | *Optional* | `0`                  |  2.0  |
+| topic                                                                 |  `string` | The topic to subscribe to.                   | *Required* |                      |  2.0  |
+| url                                                                   |  `string` | URL of the MQTT broker.                      | *Required* |                      |  2.0  |
 
 
 ##### Parameter details
 
-<h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__6__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
-**Path:** /updaters/[7]   
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
+**Path:** /updaters/[6]   
 **Enum values:** `required-no-data` | `required` | `always`
 
-TODO
+How backwards propagation should be handled.
+
+  REQUIRED_NO_DATA:
+  Default value. Only propagates delays backwards when it is required to ensure that the times
+  are increasing, and it sets the NO_DATA flag on the stops so these automatically updated times
+  are not exposed through APIs.
+
+  REQUIRED:
+  Only propagates delays backwards when it is required to ensure that the times are increasing.
+  The updated times are exposed through APIs.
+
+  ALWAYS:
+  Propagates delays backwards on stops with no estimates regardless if it's required or not.
+  The updated times are exposed through APIs.
+
 
 
 
@@ -205,15 +219,17 @@ TODO
 {
   "updaters" : [
     {
-      "type" : "websocket-gtfs-rt-updater",
-      "feedId" : "ov"
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://pred.rt.hsl.fi",
+      "topic" : "gtfsrt/v2/fi/hsl/tu",
+      "feedId" : "HSL",
+      "fuzzyTripMatching" : true
     }
   ]
 }
 ```
 
-<!-- websocket-gtfs-rt-updater END -->
-
+<!-- mqtt-gtfs-rt-updater END -->
 
 ### Vehicle Positions
 
@@ -231,24 +247,24 @@ The information is downloaded in a single HTTP request and polled regularly.
 | frequency                   |    `duration`   | How often the positions should be updated.                                 | *Optional* | `"PT1M"`      |  2.2  |
 | fuzzyTripMatching           |    `boolean`    | Whether to match trips fuzzily.                                            | *Optional* | `false`       |  2.5  |
 | url                         |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
-| [features](#u__6__features) |    `enum set`   | Which features of GTFS RT vehicle positions should be loaded into OTP.     | *Optional* |               |  2.5  |
-| [headers](#u__6__headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
+| [features](#u__7__features) |    `enum set`   | Which features of GTFS RT vehicle positions should be loaded into OTP.     | *Optional* |               |  2.5  |
+| [headers](#u__7__headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
 
-<h4 id="u__6__features">features</h4>
+<h4 id="u__7__features">features</h4>
 
 **Since version:** `2.5` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[6]   
+**Path:** /updaters/[7]   
 **Enum values:** `position` | `stop-position` | `occupancy`
 
 Which features of GTFS RT vehicle positions should be loaded into OTP.
 
-<h4 id="u__6__headers">headers</h4>
+<h4 id="u__7__headers">headers</h4>
 
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[6] 
+**Path:** /updaters/[7] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 

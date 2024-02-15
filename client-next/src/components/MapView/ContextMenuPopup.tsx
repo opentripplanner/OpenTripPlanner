@@ -1,5 +1,5 @@
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { LngLat, Popup } from 'react-map-gl';
+import { LngLat, Popup } from 'react-map-gl/maplibre';
 import { Button, ButtonGroup } from 'react-bootstrap';
 
 export function ContextMenuPopup({

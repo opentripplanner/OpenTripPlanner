@@ -67,7 +67,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                               | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
-| [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                                   | *Optional* |               |  2.0  |
+| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                             | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -451,34 +451,73 @@ Used to group requests when monitoring OTP.
     ]
   },
   "routingDefaults" : {
-    "walkSpeed" : 1.3,
-    "bikeSpeed" : 5,
-    "carSpeed" : 40,
     "numItineraries" : 12,
     "transferPenalty" : 0,
-    "walkReluctance" : 4.0,
-    "bikeReluctance" : 5.0,
-    "bikeWalkingReluctance" : 10.0,
-    "bikeStairsReluctance" : 150.0,
-    "carReluctance" : 10.0,
-    "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
     "elevatorBoardTime" : 90,
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "escalatorReluctance" : 1.5,
-    "vehicleRental" : {
-      "pickupCost" : 120,
-      "dropOffTime" : 30,
-      "dropOffCost" : 30
+    "bicycle" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "boardCost" : 600,
+      "walk" : {
+        "reluctance" : 10.0,
+        "stairsReluctance" : 150.0
+      },
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "1m",
+        "cost" : 120
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
     },
-    "bikeParkTime" : "1m",
-    "bikeParkCost" : 120,
-    "carDropoffTime" : 120,
+    "car" : {
+      "speed" : 40,
+      "reluctance" : 10,
+      "decelerationSpeed" : 2.9,
+      "accelerationSpeed" : 2.9,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "5m",
+        "cost" : 600
+      }
+    },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
+    },
+    "walk" : {
+      "speed" : 1.3,
+      "reluctance" : 4.0,
+      "stairsReluctance" : 1.65,
+      "boardCost" : 600,
+      "escalatorReluctance" : 1.5
+    },
     "waitReluctance" : 1.0,
-    "walkBoardCost" : 600,
-    "bikeBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
     "boardSlackForMode" : {
@@ -515,8 +554,6 @@ Used to group requests when monitoring OTP.
       "minBikeParkingDistance" : 300,
       "debug" : "limit-to-search-window"
     },
-    "carDecelerationSpeed" : 2.9,
-    "carAccelerationSpeed" : 2.9,
     "ignoreRealtimeUpdates" : false,
     "geoidElevation" : false,
     "maxJourneyDuration" : "36h",
@@ -602,58 +639,61 @@ Used to group requests when monitoring OTP.
   "transmodelApi" : {
     "hideFeedId" : true
   },
-  "vectorTileLayers" : [
-    {
-      "name" : "stops",
-      "type" : "Stop",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "stations",
-      "type" : "Station",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 12,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "rentalPlaces",
-      "type" : "VehicleRental",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    },
-    {
-      "name" : "rentalVehicle",
-      "type" : "VehicleRentalVehicle",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60
-    },
-    {
-      "name" : "rentalStation",
-      "type" : "VehicleRentalStation",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "vehicleParking",
-      "type" : "VehicleParking",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    }
-  ],
+  "vectorTiles" : {
+    "basePath" : "/otp_ct/vectorTiles",
+    "layers" : [
+      {
+        "name" : "stops",
+        "type" : "Stop",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "stations",
+        "type" : "Station",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 12,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "rentalPlaces",
+        "type" : "VehicleRental",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      },
+      {
+        "name" : "rentalVehicle",
+        "type" : "VehicleRentalVehicle",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60
+      },
+      {
+        "name" : "rentalStation",
+        "type" : "VehicleRentalStation",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "vehicleParking",
+        "type" : "VehicleParking",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      }
+    ]
+  },
   "timetableUpdates" : {
     "purgeExpiredData" : false,
     "maxSnapshotFrequency" : "2s"
@@ -728,6 +768,13 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://pred.rt.hsl.fi",
+      "topic" : "gtfsrt/v2/fi/hsl/tu",
+      "feedId" : "HSL",
+      "fuzzyTripMatching" : true
+    },
+    {
       "type" : "vehicle-positions",
       "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId" : "1",
@@ -739,10 +786,6 @@ Used to group requests when monitoring OTP.
       "features" : [
         "position"
       ]
-    },
-    {
-      "type" : "websocket-gtfs-rt-updater",
-      "feedId" : "ov"
     },
     {
       "type" : "siri-et-updater",

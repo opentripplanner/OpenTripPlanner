@@ -121,7 +121,7 @@ public class TransitRouter {
     );
 
     // Prepare transit search
-    var raptorRequest = RaptorRequestMapper.mapRequest(
+    var raptorRequest = RaptorRequestMapper.<TripSchedule>mapRequest(
       request,
       transitSearchTimeZero,
       serverContext.raptorConfig().isMultiThreaded(),
@@ -232,6 +232,8 @@ public class TransitRouter {
       accessRequest.withPreferences(p -> {
         p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
         p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+        p.withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
+        );
       });
     }
 

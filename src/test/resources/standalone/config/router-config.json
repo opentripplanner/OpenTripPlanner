@@ -12,34 +12,73 @@
     ]
   },
   "routingDefaults": {
-    "walkSpeed": 1.3,
-    "bikeSpeed": 5,
-    "carSpeed": 40,
     "numItineraries": 12,
     "transferPenalty": 0,
-    "walkReluctance": 4.0,
-    "bikeReluctance": 5.0,
-    "bikeWalkingReluctance": 10.0,
-    "bikeStairsReluctance": 150.0,
-    "carReluctance": 10.0,
-    "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
     "elevatorBoardTime": 90,
     "elevatorBoardCost": 90,
     "elevatorHopTime": 20,
     "elevatorHopCost": 20,
-    "escalatorReluctance": 1.5,
-    "vehicleRental": {
-      "pickupCost": 120,
-      "dropOffTime": 30,
-      "dropOffCost": 30
+    "bicycle": {
+      "speed": 5,
+      "reluctance": 5.0,
+      "boardCost": 600,
+      "walk": {
+        "reluctance": 10.0,
+        "stairsReluctance": 150.0
+      },
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      },
+      "parking": {
+        "time": "1m",
+        "cost": 120
+      },
+      "triangle": {
+        "safety": 0.4,
+        "flatness": 0.3,
+        "time": 0.3
+      }
     },
-    "bikeParkTime": "1m",
-    "bikeParkCost": 120,
-    "carDropoffTime": 120,
+    "car": {
+      "speed": 40,
+      "reluctance": 10,
+      "decelerationSpeed": 2.9,
+      "accelerationSpeed": 2.9,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      },
+      "parking": {
+        "time": "5m",
+        "cost": 600
+      }
+    },
+    "scooter": {
+      "speed": 5,
+      "reluctance": 5.0,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      },
+      "triangle": {
+        "safety": 0.4,
+        "flatness": 0.3,
+        "time": 0.3
+      }
+    },
+    "walk": {
+      "speed": 1.3,
+      "reluctance": 4.0,
+      "stairsReluctance": 1.65,
+      "boardCost": 600,
+      "escalatorReluctance": 1.5
+    },
     "waitReluctance": 1.0,
-    "walkBoardCost": 600,
-    "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)
@@ -55,11 +94,14 @@
     "accessEgress": {
       "maxDuration": "45m",
       "maxDurationForMode": {
-	"BIKE_RENTAL": "20m"
+        "BIKE_RENTAL": "20m"
       },
       "maxStopCount": 500,
       "penalty": {
-        "FLEXIBLE" : { "timePenalty": "2m + 1.1t", "costFactor": 1.7 }
+        "FLEXIBLE": {
+          "timePenalty": "2m + 1.1t",
+          "costFactor": 1.7
+        }
       }
     },
     "itineraryFilters": {
@@ -74,14 +116,16 @@
       "minBikeParkingDistance": 300,
       "debug": "limit-to-search-window"
     },
-    "carDecelerationSpeed": 2.9,
-    "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",
     "unpreferred": {
-      "agencies": ["HSL:123"],
-      "routes": ["HSL:456"]
+      "agencies": [
+        "HSL:123"
+      ],
+      "routes": [
+        "HSL:456"
+      ]
     },
     "unpreferredCost": "10m + 2.0 x",
     "streetRoutingTimeout": "5s",
@@ -135,8 +179,15 @@
       "PREFERRED": 0
     },
     "transferCacheRequests": [
-      { "modes": "WALK"                                                     },
-      { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
+      {
+        "modes": "WALK"
+      },
+      {
+        "modes": "WALK",
+        "wheelchairAccessibility": {
+          "enabled": true
+        }
+      }
     ]
   },
   "vehicleRentalServiceDirectory": {
@@ -151,61 +202,64 @@
   "transmodelApi": {
     "hideFeedId": true
   },
-  "vectorTileLayers": [
-    {
-      "name": "stops",
-      "type": "Stop",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600
-    },
-    {
-      "name": "stations",
-      "type": "Station",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 12,
-      "cacheMaxSeconds": 600
-    },
-    {
-      "name": "rentalPlaces",
-      // all rental places: stations and free-floating vehicles
-      "type": "VehicleRental",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60,
-      "expansionFactor": 0.25
-    },
-    {
-      "name": "rentalVehicle",
-      // just free-floating vehicles
-      "type": "VehicleRentalVehicle",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60
-    },
-    {
-      "name": "rentalStation",
-      // just rental stations
-      "type": "VehicleRentalStation",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600
-    },
-    {
-      "name": "vehicleParking",
-      "type": "VehicleParking",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60,
-      "expansionFactor": 0.25
-    }
-  ],
+  "vectorTiles": {
+    "basePath": "/otp_ct/vectorTiles",
+    "layers": [
+      {
+        "name": "stops",
+        "type": "Stop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "stations",
+        "type": "Station",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 12,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "rentalPlaces",
+        // all rental places: stations and free-floating vehicles
+        "type": "VehicleRental",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      },
+      {
+        "name": "rentalVehicle",
+        // just free-floating vehicles
+        "type": "VehicleRentalVehicle",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60
+      },
+      {
+        "name": "rentalStation",
+        // just rental stations
+        "type": "VehicleRentalStation",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "vehicleParking",
+        "type": "VehicleParking",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      }
+    ]
+  },
   "timetableUpdates": {
     "purgeExpiredData": false,
     "maxSnapshotFrequency": "2s"
@@ -283,6 +337,14 @@
         "Authorization": "A-Token"
       }
     },
+    // Streaming GTFS-RT TripUpdates through an MQTT broker
+    {
+      "type": "mqtt-gtfs-rt-updater",
+      "url": "tcp://pred.rt.hsl.fi",
+      "topic": "gtfsrt/v2/fi/hsl/tu",
+      "feedId": "HSL",
+      "fuzzyTripMatching": true
+    },
     // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL API
     {
       "type": "vehicle-positions",
@@ -293,12 +355,9 @@
         "Header-Name": "Header-Value"
       },
       "fuzzyTripMatching": false,
-      "features": ["position"]
-    },
-    // Streaming differential GTFS-RT TripUpdates over websockets
-    {
-      "type": "websocket-gtfs-rt-updater",
-      "feedId": "ov"
+      "features": [
+        "position"
+      ]
     },
     // Siri-ET over HTTP
     {
@@ -342,8 +401,10 @@
       "clientSecret": "very-secret",
       "wheelchairAccessibleProductId": "545de0c4-659f-49c6-be65-0d5e448dffd5",
       "bannedProductIds": [
-        "1196d0dd-423b-4a81-a1d8-615367d3a365", "f58761e5-8dd5-4940-a472-872f1236c596"
+        "1196d0dd-423b-4a81-a1d8-615367d3a365",
+        "f58761e5-8dd5-4940-a472-872f1236c596"
       ]
     }
   ]
 }
+

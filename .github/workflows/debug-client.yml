@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
         if: github.event_name == 'pull_request'
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -42,6 +42,7 @@ jobs:
         run: |
           npm install
           npm run build -- --base https://cdn.jsdelivr.net/gh/opentripplanner/debug-client-assets@main/${VERSION}/
+          npm run coverage
 
       - name: Deploy compiled assets to repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'

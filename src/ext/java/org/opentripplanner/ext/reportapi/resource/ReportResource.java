@@ -17,8 +17,10 @@ import org.opentripplanner.ext.reportapi.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
+import org.opentripplanner.ext.reportapi.model.TransitGroupPriorityReport;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -33,11 +35,13 @@ public class ReportResource {
 
   private final TransferService transferService;
   private final TransitService transitService;
+  private final RouteRequest defaultRequest;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OtpServerRequestContext requestContext) {
     this.transferService = requestContext.transitService().getTransferService();
     this.transitService = requestContext.transitService();
+    this.defaultRequest = requestContext.defaultRouteRequest();
   }
 
   @GET
@@ -78,6 +82,16 @@ public class ReportResource {
         "attachment; filename=\"" + osmWayPropertySet + "-bicycle-safety.csv\""
       )
       .build();
+  }
+
+  @GET
+  @Path("/transit/group/priorities")
+  @Produces(MediaType.TEXT_PLAIN)
+  public String getTransitGroupPriorities() {
+    return TransitGroupPriorityReport.build(
+      transitService.getAllTripPatterns(),
+      defaultRequest.journey().transit()
+    );
   }
 
   @GET

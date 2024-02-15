@@ -26,7 +26,7 @@ To enable this you need to add the feature to `otp-config.json`.
 
 The required geocode API for Stop and From/To searches in the debug client.
 
-Path: `/otp/routers/{routerId}/geocode`
+Path: `/otp/geocode`
 
 It supports the following URL parameters:
 
@@ -40,12 +40,12 @@ It supports the following URL parameters:
 #### Stop clusters
 
 A stop cluster is a deduplicated groups of stops. This means that for any stop that has a parent
-station only the parent is returned and for stops that have identical names and are very close
+station only the parent is returned and for stops that have _identical_ names and are very close
 to each other, only one is returned.
 
-This is useful for a general purpose fuzzy "stop" search.
+This is useful for a general purpose fuzzy stop search.
 
-Path: `/otp/routers/{routerId}/geocode/stopClusters`
+Path: `/otp/geocode/stopClusters`
 
 It supports the following URL parameters:
 

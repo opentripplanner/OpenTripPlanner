@@ -8,14 +8,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.lang.ArrayUtils;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitPriorityGroup32n;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * This class dynamically builds an index of transit-group-ids from the
- * provided {@link TransitPriorityGroupSelect}s while serving the caller with
+ * provided {@link TransitGroupSelect}s while serving the caller with
  * group-ids for each requested pattern. It is made for optimal
  * performance, since it is used in request scope.
  * <p>
@@ -44,7 +44,7 @@ public class PriorityGroupConfigurator {
    */
   private static final int GROUP_INDEX_COUNTER_START = 1;
 
-  private final int baseGroupId = TransitPriorityGroup32n.groupId(GROUP_INDEX_COUNTER_START);
+  private final int baseGroupId = TransitGroupPriority32n.groupId(GROUP_INDEX_COUNTER_START);
   private int groupIndexCounter = GROUP_INDEX_COUNTER_START;
   private final boolean enabled;
   private final PriorityGroupMatcher[] agencyMatchers;
@@ -63,8 +63,8 @@ public class PriorityGroupConfigurator {
   }
 
   private PriorityGroupConfigurator(
-    Collection<TransitPriorityGroupSelect> byAgency,
-    Collection<TransitPriorityGroupSelect> global
+    Collection<TransitGroupSelect> byAgency,
+    Collection<TransitGroupSelect> global
   ) {
     this.agencyMatchers = PriorityGroupMatcher.of(byAgency);
     this.globalMatchers = PriorityGroupMatcher.of(global);
@@ -80,8 +80,8 @@ public class PriorityGroupConfigurator {
   }
 
   public static PriorityGroupConfigurator of(
-    Collection<TransitPriorityGroupSelect> byAgency,
-    Collection<TransitPriorityGroupSelect> global
+    Collection<TransitGroupSelect> byAgency,
+    Collection<TransitGroupSelect> global
   ) {
     if (Stream.of(byAgency, global).allMatch(Collection::isEmpty)) {
       return empty();
@@ -94,16 +94,14 @@ public class PriorityGroupConfigurator {
    * <p>
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
-  public int lookupTransitPriorityGroupId(RoutingTripPattern tripPattern) {
+  public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
     if (!enabled || tripPattern == null) {
       return baseGroupId;
     }
 
-    var p = tripPattern.getPattern();
-
     for (var it : agencyMatchersIds) {
-      if (it.matcher().match(p)) {
-        var agencyId = p.getRoute().getAgency().getId();
+      if (it.matcher().match(tripPattern)) {
+        var agencyId = tripPattern.getRoute().getAgency().getId();
         int groupId = it.ids().get(agencyId);
 
         if (groupId < 0) {
@@ -115,7 +113,7 @@ public class PriorityGroupConfigurator {
     }
 
     for (var it : globalMatchersIds) {
-      if (it.matcher.match(p)) {
+      if (it.matcher.match(tripPattern)) {
         return it.groupId();
       }
     }
@@ -128,7 +126,7 @@ public class PriorityGroupConfigurator {
   }
 
   private int nextGroupId() {
-    return TransitPriorityGroup32n.groupId(++groupIndexCounter);
+    return TransitGroupPriority32n.groupId(++groupIndexCounter);
   }
 
   /** Pair of matcher and groupId. Used only inside this class. */

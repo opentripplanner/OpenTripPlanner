@@ -9,6 +9,9 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -92,5 +95,20 @@ public class StreetModelForTest {
     StreetTraversalPermission permissions
   ) {
     return streetEdge(from, to, 1, permissions);
+  }
+
+  public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
+    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder
+      .of()
+      .withLatitude(-122.575133)
+      .withLongitude(45.456773);
+    if (formFactor == RentalFormFactor.SCOOTER) {
+      rentalVehicleBuilder.withVehicleScooter();
+    } else if (formFactor == RentalFormFactor.BICYCLE) {
+      rentalVehicleBuilder.withVehicleBicycle();
+    } else if (formFactor == RentalFormFactor.CAR) {
+      rentalVehicleBuilder.withVehicleCar();
+    }
+    return new VehicleRentalPlaceVertex(rentalVehicleBuilder.build());
   }
 }

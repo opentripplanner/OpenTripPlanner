@@ -10,7 +10,7 @@ class StreetEdgeReluctanceCalculator {
 
   /**
    * Compute reluctance for a regular street section. Note! This does not apply if in a wheelchair,
-   * see {@link #computeWheelchairReluctance(RouteRequest, double, boolean, boolean)}.
+   * see {@link #computeWheelchairReluctance(RoutingPreferences, double, boolean, boolean)}.
    */
   static double computeReluctance(
     RoutingPreferences pref,
@@ -22,9 +22,10 @@ class StreetEdgeReluctanceCalculator {
       return pref.walk().stairsReluctance();
     } else {
       return switch (traverseMode) {
-        case WALK -> walkingBike ? pref.bike().walkingReluctance() : pref.walk().reluctance();
+        case WALK -> walkingBike ? pref.bike().walking().reluctance() : pref.walk().reluctance();
         case BICYCLE -> pref.bike().reluctance();
         case CAR -> pref.car().reluctance();
+        case SCOOTER -> pref.scooter().reluctance();
         default -> throw new IllegalArgumentException(
           "getReluctance(): Invalid mode " + traverseMode
         );
