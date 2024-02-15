@@ -22,6 +22,7 @@ import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.client.model.LegMode;
 import org.opentripplanner.client.model.Route;
 import org.opentripplanner.client.model.TripPlan;
+import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
@@ -99,8 +100,8 @@ public class SeattleSmokeTest {
       new SmokeTestRequest(esperance, shoreline, modes),
       List.of("BUS")
     );
-    var itin = plan.itineraries().get(0);
-    var flexLeg = itin.transitLegs().get(0);
+    var itin = plan.itineraries().getFirst();
+    var flexLeg = itin.transitLegs().getFirst();
     assertEquals(CCSWW_ROUTE, flexLeg.route().name());
     assertEquals(CCSWW_ROUTE, flexLeg.route().agency().name());
   }
@@ -133,7 +134,32 @@ public class SeattleSmokeTest {
       .map(Route::mode)
       .map(Objects::toString)
       .collect(Collectors.toSet());
-    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
+    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS", "RAIL"), modes);
+  }
+
+  @Test
+  public void sharedStop() throws IOException {
+    Coordinate OLIVE_WAY = new Coordinate(47.61309420, -122.336314916);
+    Coordinate MOUNTAINLAKE_TERRACE = new Coordinate(47.78682093, -122.315694093);
+    var tpr = TripPlanParameters
+      .builder()
+      .withFrom(OLIVE_WAY)
+      .withTo(MOUNTAINLAKE_TERRACE)
+      .withModes(BUS, WALK)
+      .withTime(SmokeTest.weekdayAtNoon().withHour(14).withMinute(30))
+      .build();
+    var plan = SmokeTest.API_CLIENT.plan(tpr);
+    var itineraries = plan.itineraries();
+
+    var first = itineraries.getFirst();
+    var leg = first.transitLegs().getFirst();
+    assertEquals("510", leg.route().shortName().get());
+    assertEquals("Sound Transit", leg.route().agency().name());
+
+    var stop = leg.from().stop().get();
+    assertEquals("Olive Way & 6th Ave", stop.name());
+    assertEquals("kcm:1040", stop.id());
+    assertEquals("1040", stop.code().get());
   }
 
   @Test

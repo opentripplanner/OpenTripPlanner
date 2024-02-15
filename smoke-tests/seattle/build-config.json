@@ -34,6 +34,21 @@
     },
     {
       "type" : "gtfs",
+      "feedId" : "pierce",
+      "source" : "https://gtfs.sound.obaweb.org/prod/3_gtfs.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "soundtransit",
+      "source" : "https://gtfs.sound.obaweb.org/prod/40_gtfs.zip"
+    },
+    {
+      "type" : "gtfs",
+      "feedId" : "commtrans",
+      "source" : "https://picsapi.commtrans.org/download/liveGTFS.zip"
+    },
+    {
+      "type" : "gtfs",
       "feedId" : "monorail",
       "source" : "https://gtfs.sound.obaweb.org/prod/96_gtfs.zip"
     }
@@ -48,5 +63,6 @@
         "enabled": true
       }
     }
-  ]
+  ],
+  "stopConsolidationFile":"consolidated-stops.csv"
 }

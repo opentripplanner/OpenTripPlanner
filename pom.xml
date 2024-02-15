@@ -949,7 +949,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>otp-client</artifactId>
-            <version>0.0.24</version>
+            <version>0.0.27</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
