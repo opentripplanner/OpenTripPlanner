@@ -19,7 +19,7 @@
   "dependencies": {
     "@googlemaps/polyline-codec": "1.0.28",
     "bootstrap": "5.3.1",
-    "graphql": "16.8.0",
+    "graphql": "16.8.1",
     "graphql-request": "6.1.0",
     "maplibre-gl": "3.6.2",
     "react": "18.2.0",
