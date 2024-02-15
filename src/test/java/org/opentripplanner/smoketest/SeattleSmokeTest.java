@@ -133,7 +133,7 @@ public class SeattleSmokeTest {
       .map(Route::mode)
       .map(Objects::toString)
       .collect(Collectors.toSet());
-    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
+    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS", "RAIL"), modes);
   }
 
   @Test
