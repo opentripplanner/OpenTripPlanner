@@ -63,5 +63,6 @@
         "enabled": true
       }
     }
-  ]
+  ],
+  "stopConsolidationFile":"consolidated-stops.csv"
 }
