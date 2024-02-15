@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -41,5 +42,5 @@ public interface StopConsolidationService {
   /**
    * For a given stop id return the primary stop if it is part of a consolidated stop group.
    */
-  StopLocation primaryStop(FeedScopedId id);
+  Optional<StopLocation> primaryStop(FeedScopedId id);
 }
