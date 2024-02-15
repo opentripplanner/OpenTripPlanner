@@ -154,6 +154,12 @@ public class SeattleSmokeTest {
     var first = itineraries.getFirst();
     var leg = first.transitLegs().getFirst();
     assertEquals("510", leg.route().shortName().get());
+    assertEquals("Sound Transit", leg.route().agency().name());
+
+    var stop = leg.from().stop().get();
+    assertEquals("Olive Way & 6th Ave", stop.name());
+    assertEquals("kcm:1040", stop.id());
+    assertEquals("1040", stop.code().get());
   }
 
   @Test
