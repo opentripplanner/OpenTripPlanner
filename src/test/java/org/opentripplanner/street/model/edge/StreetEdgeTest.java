@@ -18,7 +18,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -221,7 +221,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
     noPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(0).withHopCost(0)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(0).withMountDismountCost(0)))
     );
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
@@ -231,7 +231,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
     withPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(42).withHopCost(23)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(42).withMountDismountCost(23)))
     );
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
@@ -357,7 +357,7 @@ public class StreetEdgeTest {
         .withBike(bike ->
           bike
             .withSpeed(SPEED)
-            .withOptimizeType(BicycleOptimizeType.TRIANGLE)
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
             .withReluctance(1)
         )

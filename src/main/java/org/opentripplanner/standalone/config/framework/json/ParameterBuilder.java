@@ -303,14 +303,15 @@ public class ParameterBuilder {
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
     Class<E> enumType,
-    Function<NodeAdapter, T> typeMapper
+    Function<NodeAdapter, T> typeMapper,
+    Map<E, T> defaultValue
   ) {
     info.withOptional().withEnumMap(enumType, OBJECT);
 
     var mapNode = buildObject();
 
     if (mapNode.isEmpty()) {
-      return Map.of();
+      return defaultValue;
     }
     EnumMap<E, T> result = new EnumMap<>(enumType);
 

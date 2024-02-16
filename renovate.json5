@@ -32,7 +32,15 @@
     },
     {
       "matchFiles": ["client-next/package.json"],
-      "enabled": false
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Debug UI dependencies (non-major)",
+      "schedule": ["on the first day of the week"],
+      "assignees": ["testower"]
+    },
+    {
+      "matchFiles": ["client-next/package.json"],
+      "matchUpdateTypes": ["major"],
+      "assignees": ["testower"]
     },
     // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
     {

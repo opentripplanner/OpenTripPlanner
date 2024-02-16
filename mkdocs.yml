@@ -106,7 +106,6 @@ nav:
     - Park and Ride API: 'sandbox/ParkAndRideApi.md'
     - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'
-    - Vehicle-to-stop Heuristics: 'sandbox/VehicleToStopHeuristics.md'
     - Geocoder API: 'sandbox/GeocoderAPI.md'
     - Travel Time Isochrones: 'sandbox/TravelTime.md'
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'

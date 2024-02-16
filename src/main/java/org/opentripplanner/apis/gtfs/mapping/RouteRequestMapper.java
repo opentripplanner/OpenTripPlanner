@@ -28,7 +28,7 @@ import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferenc
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -79,7 +79,7 @@ public class RouteRequestMapper {
             )
           );
         }
-        if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+        if (bike.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {
             callWith.argument("triangle.timeFactor", triangle::withTime);
             callWith.argument("triangle.slopeFactor", triangle::withSlope);
@@ -96,6 +96,28 @@ public class RouteRequestMapper {
         callWith.argument("carReluctance", car::withReluctance);
         car.withParking(parking -> setParkingPreferences(callWith, parking));
         car.withRental(rental -> setRentalPreferences(callWith, request, rental));
+      });
+
+      preferences.withScooter(scooter -> {
+        callWith.argument("bikeReluctance", scooter::withReluctance);
+        callWith.argument("bikeSpeed", scooter::withSpeed);
+
+        if (environment.getArgument("optimize") != null) {
+          scooter.withOptimizeType(
+            OptimizationTypeMapper.map(
+              GraphQLTypes.GraphQLOptimizeType.valueOf(environment.getArgument("optimize"))
+            )
+          );
+        }
+        if (scooter.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
+          scooter.withOptimizeTriangle(triangle -> {
+            callWith.argument("triangle.timeFactor", triangle::withTime);
+            callWith.argument("triangle.slopeFactor", triangle::withSlope);
+            callWith.argument("triangle.safetyFactor", triangle::withSafety);
+          });
+        }
+
+        scooter.withRental(rental -> setRentalPreferences(callWith, request, rental));
       });
 
       preferences.withWalk(b -> {
@@ -340,8 +362,8 @@ public class RouteRequestMapper {
   ) {
     callWith.argument("bikeWalkingReluctance", walking::withReluctance);
     callWith.argument("bikeWalkingSpeed", walking::withSpeed);
-    callWith.argument("bikeSwitchTime", time -> walking.withHopTime((int) time));
-    callWith.argument("bikeSwitchCost", cost -> walking.withHopCost((int) cost));
+    callWith.argument("bikeSwitchTime", time -> walking.withMountDismountTime((int) time));
+    callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }
 
   private static class CallerWithEnvironment {

@@ -37,7 +37,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   protected List<Geometry> getGeometries(Envelope query) {
     return transitService
-      .findRegularStop(query)
+      .findRegularStops(query)
       .stream()
       .map(stop -> {
         Geometry point = stop.getGeometry();

@@ -3,6 +3,7 @@ package org.opentripplanner.framework.io;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import org.apache.hc.core5.http.ContentType;
 
 public final class HttpUtils {
@@ -31,7 +32,7 @@ public final class HttpUtils {
 
     String host;
     if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
-      host = headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst();
+      host = extractHost(headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst());
     } else if (headers.getRequestHeader(HEADER_HOST) != null) {
       host = headers.getRequestHeader(HEADER_HOST).getFirst();
     } else {
@@ -39,5 +40,13 @@ public final class HttpUtils {
     }
 
     return protocol + "://" + host;
+  }
+
+  /**
+   * The X-Forwarded-Host header can contain a comma-separated list so we account for that.
+   * https://stackoverflow.com/questions/66042952/http-proxy-behavior-for-x-forwarded-host-header
+   */
+  private static String extractHost(String xForwardedFor) {
+    return Arrays.stream(xForwardedFor.split(",")).map(String::strip).findFirst().get();
   }
 }

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 class BikePreferencesTest {
 
@@ -16,7 +16,8 @@ class BikePreferencesTest {
     .of()
     .withSlope(1)
     .build();
-  public static final BicycleOptimizeType OPTIMIZE_TYPE = BicycleOptimizeType.TRIANGLE;
+  public static final VehicleRoutingOptimizeType OPTIMIZE_TYPE =
+    VehicleRoutingOptimizeType.TRIANGLE;
   public static final int RENTAL_PICKUP_TIME = 30;
   public static final int PARK_COST = 30;
 
@@ -106,20 +107,20 @@ class BikePreferencesTest {
       .of()
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
-    assertEquals(BicycleOptimizeType.TRIANGLE, trianglePreferences.optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, trianglePreferences.optimizeType());
 
     var conflictingPreferences = BikePreferences
       .of()
-      .withOptimizeType(BicycleOptimizeType.SAFE_STREETS)
+      .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
-    assertEquals(BicycleOptimizeType.TRIANGLE, conflictingPreferences.optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, conflictingPreferences.optimizeType());
 
     var emptyTrianglePreferences = BikePreferences
       .of()
-      .withOptimizeType(BicycleOptimizeType.SAFE_STREETS)
+      .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.build())
       .build();
-    assertEquals(BicycleOptimizeType.SAFE_STREETS, emptyTrianglePreferences.optimizeType());
+    assertEquals(VehicleRoutingOptimizeType.SAFE_STREETS, emptyTrianglePreferences.optimizeType());
   }
 }

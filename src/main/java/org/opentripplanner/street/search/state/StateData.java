@@ -87,7 +87,9 @@ public class StateData implements Cloneable {
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      rentalPreferences.allowArrivingInRentedVehicleAtDestination(),
+      rentalPreferences != null
+        ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
+        : false,
       stateDataConstructor
     );
   }
@@ -102,7 +104,9 @@ public class StateData implements Cloneable {
     var stateDatas = getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      rentalPreferences.allowArrivingInRentedVehicleAtDestination(),
+      rentalPreferences != null
+        ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
+        : false,
       StateData::new
     );
 

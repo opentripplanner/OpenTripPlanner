@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -69,6 +68,22 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
   }
 
   public GroupStopBuilder addLocation(StopLocation location) {
+    if (
+      !(
+        location.getStopType() == StopType.REGULAR ||
+        location.getStopType() == StopType.FLEXIBLE_AREA
+      )
+    ) {
+      throw new RuntimeException(
+        String.format(
+          "Unsupported location for %s. Must be %s or %s.",
+          GroupStop.class.getSimpleName(),
+          StopType.REGULAR,
+          StopType.FLEXIBLE_AREA
+        )
+      );
+    }
+
     stopLocations.add(location);
 
     int numGeometries = geometry.getNumGeometries();
@@ -76,17 +91,8 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     for (int i = 0; i < numGeometries; i++) {
       newGeometries[i] = geometry.getGeometryN(i);
     }
-    if (location instanceof RegularStop) {
-      WgsCoordinate coordinate = location.getCoordinate();
-      Envelope envelope = new Envelope(coordinate.asJtsCoordinate());
-      double xscale = Math.cos(coordinate.latitude() * Math.PI / 180);
-      envelope.expandBy(100 / xscale, 100);
-      newGeometries[numGeometries] = GeometryUtils.getGeometryFactory().toGeometry(envelope);
-    } else if (location instanceof AreaStop) {
-      newGeometries[numGeometries] = location.getGeometry();
-    } else {
-      throw new RuntimeException("Unknown location type");
-    }
+    newGeometries[numGeometries] = location.getGeometry();
+
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
     centroid = new WgsCoordinate(geometry.getCentroid());
 

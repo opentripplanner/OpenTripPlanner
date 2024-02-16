@@ -18,18 +18,23 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class VectorTileConfig
   implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
 
-  public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null);
+  public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null, null);
   private final List<LayerParameters<VectorTilesResource.LayerType>> layers;
 
   @Nullable
   private final String basePath;
 
+  @Nullable
+  private final String attribution;
+
   VectorTileConfig(
     Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers,
-    @Nullable String basePath
+    @Nullable String basePath,
+    @Nullable String attribution
   ) {
     this.layers = List.copyOf(layers);
     this.basePath = basePath;
+    this.attribution = attribution;
   }
 
   @Override
@@ -39,6 +44,10 @@ public class VectorTileConfig
 
   public Optional<String> basePath() {
     return Optional.ofNullable(basePath);
+  }
+
+  public Optional<String> attribution() {
+    return Optional.ofNullable(attribution);
   }
 
   public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
@@ -71,7 +80,23 @@ public class VectorTileConfig
           is expected to be handled by a proxy.
           """
         )
-        .asString(DEFAULT.basePath)
+        .asString(DEFAULT.basePath),
+      root
+        .of("attribution")
+        .since(V2_5)
+        .summary("Custom attribution to be returned in `tilejson.json`")
+        .description(
+          """
+          By default the, `attribution` property in `tilejson.json` is computed from the names and 
+          URLs of the feed publishers.
+          If the OTP deployment contains many feeds, this can become very unwieldy. 
+          
+          This configuration parameter allows you to set the `attribution` to any string you wish 
+          including HTML tags,
+          for example `<a href='https://trimet.org/mod'>Regional Partners</a>`.
+          """
+        )
+        .asString(DEFAULT.attribution)
     );
   }
 
