@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -94,6 +95,8 @@ public interface TransitService {
   Collection<StopLocation> listStopLocations();
 
   Collection<RegularStop> listRegularStops();
+
+  Collection<GroupStop> listGroupStops();
 
   StopLocation getStopLocation(FeedScopedId parseId);
 

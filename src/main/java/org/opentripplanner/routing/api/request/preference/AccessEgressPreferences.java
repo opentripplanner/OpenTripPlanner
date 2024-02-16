@@ -25,12 +25,16 @@ public final class AccessEgressPreferences implements Serializable {
     TimePenalty.of(ofMinutes(20), 2f),
     1.5
   );
+  private static final TimeAndCostPenalty FLEX_DEFAULT_PENALTY = TimeAndCostPenalty.of(
+    TimePenalty.of(ofMinutes(10), 1.3f),
+    1.3
+  );
   private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = TimeAndCostPenaltyForEnum
     .of(StreetMode.class)
     .with(StreetMode.CAR_TO_PARK, DEFAULT_PENALTY)
     .with(StreetMode.CAR_HAILING, DEFAULT_PENALTY)
     .with(StreetMode.CAR_RENTAL, DEFAULT_PENALTY)
-    .with(StreetMode.FLEXIBLE, DEFAULT_PENALTY)
+    .with(StreetMode.FLEXIBLE, FLEX_DEFAULT_PENALTY)
     .build();
 
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();

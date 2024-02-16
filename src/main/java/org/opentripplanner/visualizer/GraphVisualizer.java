@@ -64,7 +64,7 @@ import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
@@ -490,6 +490,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           // there should be a ui element for walk distance and optimize type
           .withOptimizeType(getSelectedOptimizeType())
       );
+      preferences.withScooter(scooter ->
+        scooter
+          .withSpeed(Float.parseFloat(bikeSpeed.getText()))
+          // there should be a ui element for walk distance and optimize type
+          .withOptimizeType(getSelectedOptimizeType())
+      );
     });
 
     System.out.println("--------");
@@ -547,20 +553,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
   }
 
-  BicycleOptimizeType getSelectedOptimizeType() {
+  VehicleRoutingOptimizeType getSelectedOptimizeType() {
     if (opQuick.isSelected()) {
-      return BicycleOptimizeType.SHORTEST_DURATION;
+      return VehicleRoutingOptimizeType.SHORTEST_DURATION;
     }
     if (opSafe.isSelected()) {
-      return BicycleOptimizeType.SAFE_STREETS;
+      return VehicleRoutingOptimizeType.SAFE_STREETS;
     }
     if (opFlat.isSelected()) {
-      return BicycleOptimizeType.FLAT_STREETS;
+      return VehicleRoutingOptimizeType.FLAT_STREETS;
     }
     if (opGreenways.isSelected()) {
-      return BicycleOptimizeType.SAFEST_STREETS;
+      return VehicleRoutingOptimizeType.SAFEST_STREETS;
     }
-    return BicycleOptimizeType.SHORTEST_DURATION;
+    return VehicleRoutingOptimizeType.SHORTEST_DURATION;
   }
 
   private Container makeDiffTab() {

@@ -1,0 +1,2 @@
+agency_id,agency_url,agency_lang,agency_name,agency_phone,agency_timezone,agency_fare_url
+89,http://www.co.lincoln.or.us/transit/,en,Lincoln County Transit,541-265-4900,America/Los_Angeles,http://www.co.lincoln.or.us/transit/page/fare-schedule

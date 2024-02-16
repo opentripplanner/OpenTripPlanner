@@ -5,10 +5,10 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * When planning a bicycle route what should be optimized for. Optimize types are basically
- * combined presets of routing parameters, except for triangle.
+ * When planning a bicycle or scooter route what should be optimized for. Optimize types are
+ * basically combined presets of routing parameters, except for triangle.
  */
-public enum BicycleOptimizeType {
+public enum VehicleRoutingOptimizeType {
   /** This was previously called QUICK */
   SHORTEST_DURATION,
   /** This was previously called SAFE */
@@ -19,14 +19,14 @@ public enum BicycleOptimizeType {
   SAFEST_STREETS,
   TRIANGLE;
 
-  private static final Set<BicycleOptimizeType> NON_TRIANGLE_VALUES = Collections.unmodifiableSet(
+  private static final Set<VehicleRoutingOptimizeType> NON_TRIANGLE_VALUES = Collections.unmodifiableSet(
     EnumSet.complementOf(EnumSet.of(TRIANGLE))
   );
 
   /**
-   * Return all values that are not {@link BicycleOptimizeType#TRIANGLE}.
+   * Return all values that are not {@link VehicleRoutingOptimizeType#TRIANGLE}.
    */
-  public static Set<BicycleOptimizeType> nonTriangleValues() {
+  public static Set<VehicleRoutingOptimizeType> nonTriangleValues() {
     return NON_TRIANGLE_VALUES;
   }
 }

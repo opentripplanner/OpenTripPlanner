@@ -18,7 +18,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -357,7 +357,7 @@ public class StreetEdgeTest {
         .withBike(bike ->
           bike
             .withSpeed(SPEED)
-            .withOptimizeType(BicycleOptimizeType.TRIANGLE)
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
             .withReluctance(1)
         )
