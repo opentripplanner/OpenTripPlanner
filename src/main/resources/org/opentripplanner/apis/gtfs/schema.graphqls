@@ -1040,7 +1040,7 @@ type Coordinate {
 """
 Either a latitude or a longitude as a WGS84 format floating point number.
 """
-scalar CoordinateValue
+scalar CoordinateValue @specifiedBy(url: "https://earth-info.nga.mil/?dir=wgs84&action=wgs84")
 
 type Coordinates {
     """Latitude (WGS 84)"""
@@ -1257,7 +1257,7 @@ type Geometry {
     points: Polyline
 }
 
-scalar GeoJson
+scalar GeoJson @specifiedBy(url: "https://www.rfcreader.com/#rfc7946")
 
 scalar Grams
 
@@ -1418,7 +1418,7 @@ input InputPreferred {
 """
 Locale in the format defined in [RFC5646](https://datatracker.ietf.org/doc/html/rfc5646). For example, `en` or `en-US`.
 """
-scalar Locale
+scalar Locale @specifiedBy(url: "https://www.rfcreader.com/#rfc5646")
 
 """
 Preferences for car parking facilities used during the routing.
@@ -2169,12 +2169,12 @@ type Money {
 """
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
 """
-scalar OffsetDateTime
+scalar OffsetDateTime @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
 
 """
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
-scalar Duration
+scalar Duration @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
 
 type RideHailingProvider {
     "The ID of the ride hailing provider."
@@ -3381,7 +3381,7 @@ List of coordinates in an encoded polyline format (see
 https://developers.google.com/maps/documentation/utilities/polylinealgorithm).
 The value appears in JSON as a string.
 """
-scalar Polyline
+scalar Polyline @specifiedBy(url: "https://developers.google.com/maps/documentation/utilities/polylinealgorithm")
 
 """
 Additional qualifier for a transport mode.
