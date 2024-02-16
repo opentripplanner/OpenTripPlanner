@@ -1,0 +1,7 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes,eligibility_restricted,continuous_pickup,continuous_drop_off
+89,491,,Newport City Loop,"Runs every day through Newport, with stops from South Beach and OCCC to north of Agate Beach.",3,https://www.nworegontransit.org/routes/newport_city_loop/,145098,ffffff,1,,0,1,1
+89,495,,North County,"Runs every day between Newport and Rose Lodge, with stops in Depoe Bay, Lincoln City, and more.",3,https://www.nworegontransit.org/routes/north_county/,145098,ffffff,2,,0,1,1
+89,497,,South County,Service running Monday - Saturday connecting Newport and Yachats.,3,https://www.nworegontransit.org/routes/south_county/,145098,ffffff,3,,0,1,1
+89,493,,East County,"Service running Monday - Saturday connecting Newport, Toledo, and Siletz.",3,https://www.nworegontransit.org/routes/east_county/,145098,ffffff,4,,0,1,1
+89,13317,,Dial-a-Ride,,3,https://www.nworegontransit.org/dial-a-ride-lct/,,,7,,0,1,1
+89,492,,Lincoln City Loop,"Service along Hwy 101, from Chinook Winds and the DMV down to Cutler City.",3,https://www.nworegontransit.org/routes/lincoln_city_loop/,145098,ffffff,8,,0,1,1

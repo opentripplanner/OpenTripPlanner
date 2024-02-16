@@ -24,13 +24,11 @@ public abstract class FlexTest {
 
   private static final ResourceLoader RES = ResourceLoader.of(FlexTest.class);
 
-  protected static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs.zip");
-  protected static final File COBB_FLEX_GTFS = RES.file(
-    "cobblinc-scheduled-deviated-flex.gtfs.zip"
-  );
+  protected static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
+  protected static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
   protected static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
   protected static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
-  protected static final File LINCOLN_COUNTY_GBFS = RES.file("lincoln-county-flex.gtfs.zip");
+  protected static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
   protected static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
 
   protected static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();

@@ -1,0 +1,210 @@
+stop_id,stop_code,platform_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,position,direction,wheelchair_boarding
+2328350,1,,Burlingame,,39.2121564,-106.8540989,1106,,0,,America/Denver,,,0
+2328351,3,,Railroad Ave + 4th St,,39.5327769,-107.7832192,1098,,0,,America/Denver,,,0
+2328352,4,,Rifle Park & Ride,,39.5295802,-107.7839413,1098,,0,,America/Denver,,,0
+2328353,5,,Rifle Park & Ride,,39.5297863,-107.782801,1098,,0,,America/Denver,,,0
+2328354,6,,Cottonwood,,39.5351465,-107.7514352,1098,,0,,America/Denver,,,0
+2328355,7,,Cottonwood,,39.5347469,-107.752879,1098,,0,,America/Denver,,,0
+2328356,8,,Firehouse,,39.5469135,-107.6559429,1099,,0,,America/Denver,,,0
+2328357,9,,Firehouse,,39.5471145,-107.656117,1099,,0,,America/Denver,,,0
+2328358,11,,Main St + 6th St,,39.5715695,-107.5367173,1100,,0,,America/Denver,,,0
+2328359,13,,New Castle Park & Ride,,39.5686094,-107.5177807,1100,,0,,America/Denver,,,0
+2328360,14,,Hwy 82 + Spring Valley Rd DV,,39.4731844,-107.2698784,1101,,0,,America/Denver,,,0
+2328361,16,,Aspen Glen UV,,39.4338934,-107.2481524,1102,,0,,America/Denver,,,0
+2328362,17,,Aspen Glen DV,,39.4334914,-107.2471423,1102,,0,,America/Denver,,,0
+2328363,18,,Ranch at Roaring Fork UV,,39.4096122,-107.1680813,1103,,0,,America/Denver,,,0
+2328364,19,,Ranch at Roaring Fork DV,,39.4100434,-107.1686952,1103,,0,,America/Denver,,,0
+2328365,20,,Hwy 82 + Catherine Store Rd UV,,39.4074331,-107.1515694,1103,,0,,America/Denver,,,0
+2328366,21,,Hwy 82 + Catherine Store Rd DV,,39.4079187,-107.1519757,1103,,0,,America/Denver,,,0
+2328367,24,,JW Dr + Buckskin Dr,,39.402235,-107.1060161,1103,,0,,America/Denver,,,0
+2328368,23,,JW Dr + Buckskin Dr,,39.4023175,-107.1061259,1103,,0,,America/Denver,,,0
+2328370,26,,JW Dr + El Jebel Rd,,39.399166,-107.0906096,1103,,0,,America/Denver,,,0
+2328371,27,,JW Dr + El Jebel Rd,,39.3992904,-107.0905679,1103,,0,,America/Denver,,,0
+2328372,32,,Holland Hills UV,,39.3502804,-107.0164364,1104,,0,,America/Denver,,,0
+2328373,33,,Holland Hills DV,,39.3505342,-107.0161299,1104,,0,,America/Denver,,,0
+2328374,34,,Basalt Park & Ride UV,,39.3637262,-107.0342952,1104,,0,,America/Denver,,,0
+2328375,35,,Basalt Park & Ride DV,,39.3641702,-107.0343771,1104,,0,,America/Denver,,,0
+2328376,36,,Downtown Basalt,,39.3682789,-107.0352647,1104,,0,,America/Denver,,,0
+2328377,38,,Two Rivers Rd + Hillcrest Dr UV,,39.3703228,-107.0694615,1104,,0,,America/Denver,,,0
+2328378,39,,Two Rivers Rd + Hillcrest Dr DV,,39.3704106,-107.0693268,1104,,0,,America/Denver,,,0
+2328379,40,,Hwy 82 + Original Rd UV,,39.374812,-107.0761848,1104,,0,,America/Denver,,,0
+2328380,41,,Hwy 82 + Original Rd DV,,39.3755531,-107.0762178,1104,,0,,America/Denver,,,0
+2328381,42,,Wingo Junction UV,,39.3445621,-107.0092657,1104,,0,,America/Denver,,,0
+2328382,43,,Wingo Junction DV,,39.3447255,-107.00883,1104,,0,,America/Denver,,,0
+2328383,45,,Hwy 82 + Lazy Glen Way DV,,39.3411738,-107.001078,1104,,0,,America/Denver,,,0
+2328384,47,,Old Snowmass DV,,39.3310756,-106.9841513,1104,,0,,America/Denver,,,0
+2328385,48,,Hwy 82 + Smith Way,,39.2601978,-106.8872061,1105,,0,,America/Denver,,,0
+2328386,49,,Hwy 82 + Juniper Hill Rd,,39.2602783,-106.8882142,1105,,0,,America/Denver,,,0
+2328387,50,,Hwy 82 + Aspen Village Rd UV,,39.2938112,-106.9192436,1105,,0,,America/Denver,,,0
+2328388,52,,Hallam St + 8th St,,39.1948303,-106.831528,1106,,0,,America/Denver,,,0
+2328389,53,,Hallam St + 8th St,,39.1949386,-106.8311884,1106,,0,,America/Denver,,,0
+2328390,57,,Aspen High School,,39.1896615,-106.850021,1106,,0,,America/Denver,,,0
+2328391,58,,River Bend,,39.3044015,-106.9313321,1105,,0,,America/Denver,,,0
+2328392,59,,Woody Creek Tavern,,39.2750759,-106.8872046,1105,,0,,America/Denver,,,0
+2328393,60,,Truscott DV,,39.2004047,-106.8471105,1106,,0,,America/Denver,,,0
+2328394,61,,Cemetery Ln + Pitkin Mesa Dr,,39.2057283,-106.8388666,1106,,0,,America/Denver,,,0
+2328395,62,,Cemetery Ln + Silver King Dr,,39.2040241,-106.8393728,1106,,0,,America/Denver,,,0
+2328396,63,,Cemetery Ln + Alta Vista Dr,,39.2017705,-106.8372785,1106,,0,,America/Denver,,,0
+2328398,65,,Hwy 82 + Cemetery Ln,,39.1956562,-106.8361109,1106,,0,,America/Denver,,,0
+2328399,66,,Main St + 2nd St,,39.1920549,-106.8253224,1106,,0,,America/Denver,,,0
+2328400,67,,Main St + Galena St,,39.1903625,-106.818294,1106,,0,,America/Denver,,,0
+2328401,68,,Brush Creek Rd + Meadow Rd Downhill,,39.221685,-106.9322302,1106,,0,,America/Denver,,,0
+2328402,71,,W/J Ranch,,39.2546177,-106.8774285,1106,,0,,America/Denver,,,0
+2328403,72,,Brush Creek Rd + Medicine Bow Rd Uphill,,39.2480963,-106.8873063,1106,,0,,America/Denver,,,0
+2328404,73,,Grand Ave + 20th St,,39.5317353,-107.3254169,1101,,0,,America/Denver,,,0
+2328405,74,,Grand Ave + 20th St,,39.5314066,-107.3251664,1101,,0,,America/Denver,,,0
+2328406,75,,Grand Ave + 14th St,,39.5386515,-107.3251589,1101,,0,,America/Denver,,,0
+2328407,76,,Grand Ave + 14th St,,39.538779,-107.3249128,1101,,0,,America/Denver,,,0
+2328408,77,,Grand Ave + 9th St,,39.5450443,-107.324664,1101,,0,,America/Denver,,,0
+2328409,78,,Grand Ave + 9th St,,39.5445299,-107.3249808,1101,,0,,America/Denver,,,0
+2328411,81,,West Glenwood Mall,,39.561712,-107.362008,1101,,0,,America/Denver,,,0
+2328412,82,,AABC Airport DV,,39.2199816,-106.8624272,1106,,0,,America/Denver,,,0
+2328413,83,,Hwy 82 + Service Center Rd DV,,39.2250182,-106.8661367,1106,,0,,America/Denver,,,0
+2328414,84,,Hwy 82 + Service Center Rd UV,,39.2236535,-106.8659236,1106,,0,,America/Denver,,,0
+2328419,95,,Brush Creek Ranch Uphill,,39.239445,-106.8967031,1106,,0,,America/Denver,,,0
+2328420,96,,West Glenwood Park & Ride,,39.557798,-107.353762,1101,,0,,America/Denver,,,0
+2328421,97,,Rubey Park Transit Center,,39.1874678,-106.8196421,1106,,0,,America/Denver,,,0
+2328422,98,,Castle Ridge,,39.1898496,-106.8378997,1106,,0,,America/Denver,,,0
+2328423,99,,Aspen Chapel,,39.1941664,-106.8397086,1106,,0,,America/Denver,,,0
+2328424,100,,Main St + 4th St,,39.192663,-106.8282863,1106,,0,,America/Denver,,,0
+2328426,102,,Hunter Creek II,,39.1937907,-106.8143236,1106,,0,,America/Denver,,,0
+2328427,103,,Centennial,,39.1929926,-106.810668,1106,,0,,America/Denver,,,0
+2328428,104,,Park Cir + Park Ave,,39.1895546,-106.8101613,1106,,0,,America/Denver,,,0
+2328429,105,,Walking Bridge,,39.1879874,-106.8103618,1106,,0,,America/Denver,,,0
+2328430,106,,Hwy 82 + Crystal Lake Rd,,39.1837517,-106.8076383,1106,,0,,America/Denver,,,0
+2328431,109,,7th St + Bleeker St,,39.1934403,-106.8311076,1106,,0,,America/Denver,,,0
+2328433,111,,Aspen Highlands,,39.1820227,-106.856464,1106,,0,,America/Denver,,,0
+2328435,113,,Maroon Creek Rd + Glenn Gary Dr,,39.1865452,-106.852944,1106,,0,,America/Denver,,,0
+2328436,115,,Parks Department,,39.1962437,-106.8354984,1106,,0,,America/Denver,,,0
+2328437,116,,Spring St + Durant Ave,,39.1869466,-106.8168396,1106,,0,,America/Denver,,,0
+2328438,117,,Glenwood Rec Center,,39.5521217,-107.340499,1101,,0,,America/Denver,,,0
+2328439,118,,Rio Grande Park,,39.1928982,-106.8181745,1106,,0,,America/Denver,,,0
+2328440,119,,Smuggler,,39.1929372,-106.8121559,1106,,0,,America/Denver,,,0
+2328441,120,,Chateau Eau Claire,,39.1866579,-106.8116507,1106,,0,,America/Denver,,,0
+2328442,121,,Hwy 82 + Aspen Village Rd DV,,39.2949182,-106.9200341,1105,,0,,America/Denver,,,0
+2328443,122,,Hwy 82 + Twining Flats Rd UV,,39.2689549,-106.8908455,1105,,0,,America/Denver,,,0
+2328444,123,,Hwy 82 + Twining Flats Rd DV,,39.2682433,-106.8900234,1105,,0,,America/Denver,,,0
+2328446,346,,Brush Creek Park & Ride,,39.2506932,-106.883231,1106,,0,,America/Denver,,,0
+2328447,126,,Maroon Creek Rd + Hwy 82,,39.194943,-106.8407215,1106,,0,,America/Denver,,,0
+2328448,127,,Paepcke Park,,39.1914793,-106.8225732,1106,,0,,America/Denver,,,0
+2328449,128,,Paepcke Park,,39.1911959,-106.8223149,1106,,0,,America/Denver,,,0
+2328450,129,,Main St + 2nd St,,39.1916809,-106.8246537,1106,,0,,America/Denver,,,0
+2328451,130,,Highlands Villas,,39.1848176,-106.8545617,1106,,0,,America/Denver,,,0
+2328452,131,,Highlands Villas,,39.1855944,-106.8539912,1106,,0,,America/Denver,,,0
+2328453,132,,Cemetery Ln + Red Butte Dr,,39.2100919,-106.8396737,1106,,0,,America/Denver,,,0
+2328454,133,,Main St + Spring St,,39.1898705,-106.8158966,1106,,0,,America/Denver,,,0
+2328455,134,,Town Park Station Uphill,,39.2255451,-106.923751,1106,,0,,America/Denver,,,0
+2328456,135,,Town Park Station Downhill,,39.2253084,-106.924154,1106,,0,,America/Denver,,,0
+2328457,137,,Brush Creek Rd + Sinclair Rd Uphill,,39.2170702,-106.9353096,1106,,0,,America/Denver,,,0
+2328458,138,,Brush Creek Rd + Sinclair Rd Downhill,,39.217094,-106.9349678,1106,,0,,America/Denver,,,0
+2328459,139,,Brush Creek Rd + Meadow Rd Uphill,,39.2217927,-106.9324063,1106,,0,,America/Denver,,,0
+2328460,141,,Brush Creek Rd + Wood Rd Downhill,,39.2102772,-106.9465938,1106,,0,,America/Denver,,,0
+2328461,142,,Castle Creek Rd + Marolt Pl,,39.193134,-106.83921,1106,,0,,America/Denver,,,0
+2328462,143,,Maroon Creek Rd + Hwy 82,,39.1949944,-106.8409735,1106,,0,,America/Denver,,,0
+2328463,144,,Aspen Country Inn DV,,39.2031618,-106.8533951,1106,,0,,America/Denver,,,0
+2328464,145,,Aspen Country Inn UV,,39.2028028,-106.8532723,1106,,0,,America/Denver,,,0
+2328465,146,,Buttermilk UV,,39.2072058,-106.8598525,1106,,0,,America/Denver,,,0
+2328466,147,,Buttermilk DV,,39.208812,-106.8606625,1106,,0,,America/Denver,,,0
+2328467,148,,Truscott UV,,39.2005864,-106.8480043,1106,,0,,America/Denver,,,0
+2328468,149,,Brush Creek Rd + Faraway Rd Downhill,,39.2112077,-106.9420585,1106,,0,,America/Denver,,,0
+2328469,150,,Brush Creek Rd + Faraway Rd Uphill,,39.2112199,-106.9427912,1106,,0,,America/Denver,,,0
+2328470,151,,Snowmass Mall,,39.2072349,-106.9547481,1106,,0,,America/Denver,,,0
+2328471,152,,Stonebridge Inn Downhill,,39.2082865,-106.9527745,1106,,0,,America/Denver,,,0
+2328472,153,,Metro Park,,39.544295,-107.7824,1098,,0,,America/Denver,,,0
+2328473,154,,Railroad Ave + 5th St,,39.5335664,-107.7837327,1098,,0,,America/Denver,,,0
+2328474,155,,Original St + Durant Ave,,39.1867946,-106.8154369,1106,,0,,America/Denver,,,0
+2328475,156,,Main St + Hunter St,,39.1902534,-106.8166637,1106,,0,,America/Denver,,,0
+2328476,157,,Gondola,,39.1871681,-106.8182175,1106,,0,,America/Denver,,,0
+2328477,158,,Harmony Rd,,39.2095751,-106.8595612,1106,,0,,America/Denver,,,0
+2328478,159,,Harmony Rd,,39.2093693,-106.8594527,1106,,0,,America/Denver,,,0
+2328479,160,,Hwy 82 + Roundabout DV,,39.1968561,-106.841764,1106,,0,,America/Denver,,,0
+2328480,161,,Hwy 82 + Roundabout UV,,39.1947723,-106.8412705,1106,,0,,America/Denver,,,0
+2328481,162,,Hunter Creek,,39.1949297,-106.8154434,1106,,0,,America/Denver,,,0
+2328482,163,,Hyman Ave + Mill St,,39.1890676,-106.8197908,1106,,0,,America/Denver,,,0
+2328483,164,,Main St + 6th St,,39.1929374,-106.8296259,1106,,0,,America/Denver,,,0
+2328484,167,,Cemetery Ln + Pitkin Mesa Dr,,39.205825,-106.838745,1106,,0,,America/Denver,,,0
+2328485,169,,Glenwood Meadows,,39.5544092,-107.3445613,1101,,0,,America/Denver,,,0
+2328486,170,,Hwy 6 + Lyon Blvd,,39.5470657,-107.6438244,1099,,0,,America/Denver,,,0
+2328487,171,,Cemetery,,39.2004645,-106.8360138,1106,,0,,America/Denver,,,0
+2328488,172,,Aspen Rec Center,,39.1887653,-106.8507134,1106,,0,,America/Denver,,,0
+2328489,174,,Cemetery Ln + Snowbunny Ln,,39.203973,-106.8391687,1106,,0,,America/Denver,,,0
+2328490,176,,Aspen City Market,,39.1874027,-106.8160947,1106,,0,,America/Denver,,,0
+2328491,177,,Hwy 6 + Lyon Blvd,,39.5468426,-107.6435272,1099,,0,,America/Denver,,,0
+2328492,178,,Main St + 6th St,,39.5713661,-107.5367143,1100,,0,,America/Denver,,,0
+2328493,179,,New Castle Park & Ride,,39.568165,-107.5171804,1100,,0,,America/Denver,,,0
+2328496,183,,Grand Ave + 11th St,,39.5429828,-107.3247399,1101,,0,,America/Denver,,,0
+2328497,184,,Parks Department,,39.1960218,-106.8357036,1106,,0,,America/Denver,,,0
+2328498,185,,W 6th St,,39.5513964,-107.3280704,1101,,0,,America/Denver,,,0
+2328499,186,,Hwy 6 + Traver Trail,,39.5545434,-107.331408,1101,,0,,America/Denver,,,0
+2328500,187,,Elks Lodge,,39.5605603,-107.3466953,1101,,0,,America/Denver,,,0
+2328501,188,,Johnson Park,,39.5612665,-107.3527267,1101,,0,,America/Denver,,,0
+2328503,191,,Cemetery Ln + Castle Creek Dr,,39.1984287,-106.8353835,1106,,0,,America/Denver,,,0
+2328505,193,,Cemetery Ln + Sierra Vista Dr,,39.2034239,-106.8387359,1106,,0,,America/Denver,,,0
+2328507,197,,Hwy 6 + Traver Trail,,39.5541458,-107.3309757,1101,,0,,America/Denver,,,0
+2328508,198,,W 6th St,,39.5507987,-107.3278873,1101,,0,,America/Denver,,,0
+2328509,199,,Grand Ave + 11th St,,39.5425682,-107.3250401,1101,,0,,America/Denver,,,0
+2328510,200,,27th St Station,,39.5249492,-107.3219652,1101,,0,,America/Denver,,,0
+2328511,201,,LUPINE DR,,39.1811732,-106.8009104,1106,,0,,America/Denver,,,0
+2328512,202,,Carbondale Park & Ride,,39.4096699,-107.2222285,1102,,0,,America/Denver,,,0
+2328513,203,,Main St + Hwy 133,,39.4012301,-107.2188748,1102,,0,,America/Denver,,,0
+2328514,204,,Downtown Basalt,,39.3684948,-107.0352083,1104,,0,,America/Denver,,,0
+2328515,206,,JW Dr + Deer Run,,39.4014793,-107.1012168,1103,,0,,America/Denver,,,0
+2328516,207,,Carbondale Pool,,39.4004717,-107.2137067,1102,,0,,America/Denver,,,0
+2328517,208,,Roaring Fork Marketplace,,39.5198855,-107.3195571,1101,,0,,America/Denver,,,0
+2328518,209,,Hwy 82 + Spring Valley Rd UV,,39.4735932,-107.270835,1101,,0,,America/Denver,,,0
+2328519,210,,JW Dr + Deer Run,,39.4019035,-107.1016194,1103,,0,,America/Denver,,,0
+2328520,211,,Hwy 82 + Lazy Glen Way UV,,39.3403638,-106.9997386,1104,,0,,America/Denver,,,0
+2328521,212,,Old Snowmass UV,,39.3309901,-106.9854632,1104,,0,,America/Denver,,,0
+2328522,213,,AABC Airport UV,,39.2187319,-106.8622598,1106,,0,,America/Denver,,,0
+2328523,214,,Glenwood Meadows,,39.5541727,-107.3449144,1101,,0,,America/Denver,,,0
+2328524,215,,Glenwood Rec Center,,39.55186,-107.339869,1101,,0,,America/Denver,,,0
+2328525,216,,Base Village,,39.209691898128,-106.948203760519,1106,,0,,America/Denver,,,0
+2328526,217,,Brush Creek Rd + Owl Creek Rd Downhill,,39.2136065,-106.9392528,1106,,0,,America/Denver,,,0
+2328527,218,,Brush Creek Rd + Owl Creek Rd Uphill,,39.2135251,-106.9395856,1106,,0,,America/Denver,,,0
+2328528,219,,Brush Creek Rd + Wood Rd Uphill,,39.2106934,-106.9476109,1106,,0,,America/Denver,,,0
+2328529,220,,Brush Creek Rd + Hawk Ridge Ln Uphill,,39.2098893,-106.955459,1106,,0,,America/Denver,,,0
+2328530,221,,Brush Creek Rd + Divide Rd Uphill,,39.2080861,-106.9571466,1106,,0,,America/Denver,,,0
+2328531,326,,8th St + Colorado Ave,,39.5466454,-107.3261772,1101,,0,,America/Denver,,,0
+2328532,223,,Brush Creek Ranch Downhill,,39.2395362,-106.8963172,1106,,0,,America/Denver,,,0
+2328533,224,,Hwy 82 + Watson Divide Rd DV,,39.3000647,-106.9296864,1105,,0,,America/Denver,,,0
+2328534,225,,Main St + 4th St,,39.1921931,-106.8271134,1106,,0,,America/Denver,,,0
+2328535,227,,Hwy 82 + Watson Divide Rd UV,,39.2997221,-106.9298881,1105,,0,,America/Denver,,,0
+2328536,229,,Main St + Hwy 133,,39.4010951,-107.218188,1102,,0,,America/Denver,,,0
+2328537,231,,Phillips Trailer Park,,39.311609,-106.9347202,1105,,0,,America/Denver,,,0
+2328538,233,,Benedict Music Tent,,39.1981463,-106.8271564,1106,,0,,America/Denver,,,0
+2328539,234,,Ute Ave,,39.1807928,-106.81081,1106,,0,,America/Denver,,,0
+2328540,235,,Buttermilk Base Area,,39.2062243,-106.86119,1106,,0,,America/Denver,,,0
+2328541,236,,Aspen St + Cooper Ave,,39.1888368,-106.822267,1106,,0,,America/Denver,,,0
+2328542,237,,Main St + 1st St,,39.1915349,-106.824,1106,,0,,America/Denver,,,0
+2328543,238,,Main St + 1st St,,39.1918428,-106.8243008,1106,,0,,America/Denver,,,0
+2328545,240,,Chateau Eau Claire,,39.1865658,-106.8118884,1106,,0,,America/Denver,,,0
+2328546,241,,Hwy 82 + Stillwater Rd,,39.1807373,-106.8017657,1106,,0,,America/Denver,,,0
+2328547,242,,Hwy 82 + Roaring Fork Dr,,39.1817241,-106.8029377,1106,,0,,America/Denver,,,0
+2328548,243,,Hwy 82 + McSkimming Rd,,39.1844416,-106.807849,1106,,0,,America/Denver,,,0
+2328550,245,,Aspen Library,,39.1909714,-106.819035,1106,,0,,America/Denver,,,0
+2328551,247,,Original St + Durant Ave,,39.186897,-106.8155864,1106,,0,,America/Denver,,,0
+2328552,248,,Garmisch St + Hopkins Ave,,39.1910095,-106.8230207,1106,,0,,America/Denver,,,0
+2328553,249,,Lift 1,,39.1879681,-106.8228492,1106,,0,,America/Denver,,,0
+2328554,250,,Rio Grande Parking Garage,,39.1908435,-106.8180475,1106,,0,,America/Denver,,,0
+2328555,251,,Gondola,,39.1868741,-106.8174943,1106,,0,,America/Denver,,,0
+2328556,253,,Rio Grande Park,,39.1925874,-106.8186136,1106,,0,,America/Denver,,,0
+2328558,301,,Hwy 6 + 135 Rd,,39.5613028,-107.3549464,1101,,0,,America/Denver,,,0
+2328559,302,,Woody Creek Tavern,,39.2749804,-106.8869906,1105,,0,,America/Denver,,,0
+2328562,307,,River Bend,,39.3044949,-106.9313009,1105,,0,,America/Denver,,,0
+2328564,309,,El Jebel Park & Ride DV,,39.3935995,-107.0893553,1103,,0,,America/Denver,,,0
+2328565,310,,El Jebel Park & Ride UV,,39.3931003,-107.0893221,1103,,0,,America/Denver,,,0
+2328566,311,,Willits DV,,39.387427,-107.0816453,1103,,0,,America/Denver,,,0
+2328567,312,,Willits UV,,39.3862914,-107.081463,1103,,0,,America/Denver,,,0
+2328568,313,,Hwy 6 + Soccer Field Rd,,39.5614344,-107.3596361,1101,,0,,America/Denver,,,0
+2328569,314,,Hwy 6 + Soccer Field Rd,,39.5616058,-107.3588267,1101,,0,,America/Denver,,,0
+2328571,317,,6th St + Colorado Ave,,39.4015975,-107.2127926,1102,,0,,America/Denver,,,0
+2328573,320,,9th St + Colorado Ave,,39.5454955,-107.3257079,1101,,0,,America/Denver,,,0
+2329757,,,Gilstrap Court,,39.5598297,-107.3635161,,,0,,America/Denver,,,0
+2329758,,,Kids Plex,,39.5581672,-107.3564402,,,0,,America/Denver,,,0
+2329759,,,Valley View Hospital,,39.5321645,-107.322841,1101,,0,,America/Denver,,,0
+2335852,195,,Maroon Bells,,39.0997929,-106.9422779,,,0,,America/Denver,,,0
+2526385,246,,Bucksbaum Campus,,39.1786345,-106.8394966,,,0,,America/Denver,,,0
+2613904,85,,Roaring Fork Marketplace,,39.5203575,-107.3199738,,,0,,America/Denver,,,0
+2613905,252,,Burlingame MAA Housing,,39.209949,-106.8603257,,,0,,America/Denver,,,0
+2618227,348,,Cemetery,,39.199796,-106.83593,1106,,0,,America/Denver,,,0
+2735292,350,,Maroon Creek Rd + High School Rd,,39.1931844406718,-106.845075900748,1106,,0,,America/Denver,,,0
