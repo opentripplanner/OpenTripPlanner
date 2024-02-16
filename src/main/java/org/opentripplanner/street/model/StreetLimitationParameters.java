@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.io.Serializable;
 
 /**
@@ -9,7 +8,6 @@ import java.io.Serializable;
  * <p>
  * TODO this can be expanded to include some fields from the {@link org.opentripplanner.routing.graph.Graph}.
  */
-@Singleton
 public class StreetLimitationParameters implements Serializable {
 
   private float maxCarSpeed = StreetConstants.DEFAULT_MAX_CAR_SPEED;

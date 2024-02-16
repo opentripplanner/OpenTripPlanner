@@ -1,13 +1,13 @@
 package org.opentripplanner.street.service;
 
-import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 
+@Singleton
 public class DefaultStreetLimitationParametersService implements StreetLimitationParametersService {
 
   private final StreetLimitationParameters streetLimitationParameters;
 
-  @Inject
   public DefaultStreetLimitationParametersService(
     StreetLimitationParameters streetLimitationParameters
   ) {
