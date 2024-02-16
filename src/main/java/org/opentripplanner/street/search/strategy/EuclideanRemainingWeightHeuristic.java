@@ -5,6 +5,7 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -16,7 +17,7 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
-  private static final Float DEFAULT_MAX_CAR_SPEED = 40f;
+  private static final Float DEFAULT_MAX_CAR_SPEED = StreetConstants.DEFAULT_MAX_CAR_SPEED;
 
   private double lat;
   private double lon;

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Singleton
 public class StreetLimitationParameters implements Serializable {
 
-  private float maxCarSpeed = 40f;
+  private float maxCarSpeed = StreetConstants.DEFAULT_MAX_CAR_SPEED;
 
   @Inject
   public StreetLimitationParameters() {}

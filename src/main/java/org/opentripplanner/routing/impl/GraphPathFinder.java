@@ -15,6 +15,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -59,7 +60,7 @@ public class GraphPathFinder {
   private final float maxCarSpeed;
 
   public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
-    this(traverseVisitor, null, 40f);
+    this(traverseVisitor, null, StreetConstants.DEFAULT_MAX_CAR_SPEED);
   }
 
   public GraphPathFinder(
