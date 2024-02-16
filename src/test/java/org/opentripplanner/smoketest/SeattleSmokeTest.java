@@ -18,12 +18,15 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.client.model.LegMode;
 import org.opentripplanner.client.model.Route;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
+import org.opentripplanner.smoketest.util.RequestCombinationsBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 @Tag("smoke-test")
@@ -31,19 +34,21 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 public class SeattleSmokeTest {
 
   private static final String CCSWW_ROUTE = "Volunteer Services: Northwest";
-  Coordinate sodo = new Coordinate(47.5811, -122.3290);
-  Coordinate clydeHill = new Coordinate(47.6316, -122.2173);
+  static final Coordinate SODO = new Coordinate(47.5811, -122.3290);
+  static final Coordinate CLYDE_HILL = new Coordinate(47.6316, -122.2173);
 
-  Coordinate ronaldBogPark = new Coordinate(47.75601664, -122.33141);
+  static final Coordinate RONALD_BOG_PARK = new Coordinate(47.75601664, -122.33141);
 
-  Coordinate esperance = new Coordinate(47.7957, -122.3470);
-  Coordinate shoreline = new Coordinate(47.7568, -122.3483);
+  static final Coordinate ESPERANCE = new Coordinate(47.7957, -122.3470);
+  static final Coordinate SHORELINE = new Coordinate(47.7568, -122.3483);
+  static final Coordinate MOUNTAINLAKE_TERRACE = new Coordinate(47.78682093, -122.315694093);
+  static final Coordinate OLIVE_WAY = new Coordinate(47.61309420, -122.336314916);
 
   @Test
   public void acrossTheCity() {
     var modes = Set.of(TRANSIT, WALK);
     var plan = SmokeTest.basicRouteTest(
-      new SmokeTestRequest(sodo, clydeHill, modes),
+      new SmokeTestRequest(SODO, CLYDE_HILL, modes),
       List.of("WALK", "BUS", "WALK", "BUS", "WALK")
     );
 
@@ -66,8 +71,8 @@ public class SeattleSmokeTest {
 
     private TripPlan testAccessibleRouting(float walkReluctance) throws IOException {
       var req = new TripPlanParametersBuilder()
-        .withFrom(sodo)
-        .withTo(clydeHill)
+        .withFrom(SODO)
+        .withTo(CLYDE_HILL)
         .withTime(SmokeTest.weekdayAtNoon())
         .withWheelchair(true)
         .withModes(TRANSIT)
@@ -90,14 +95,17 @@ public class SeattleSmokeTest {
   @Test
   public void flexAndTransit() {
     var modes = Set.of(WALK, BUS, FLEX_DIRECT, FLEX_EGRESS, FLEX_ACCESS);
-    SmokeTest.basicRouteTest(new SmokeTestRequest(shoreline, ronaldBogPark, modes), List.of("BUS"));
+    SmokeTest.basicRouteTest(
+      new SmokeTestRequest(SHORELINE, RONALD_BOG_PARK, modes),
+      List.of("BUS")
+    );
   }
 
   @Test
   public void ccswwIntoKingCounty() {
     var modes = Set.of(WALK, FLEX_DIRECT);
     var plan = SmokeTest.basicRouteTest(
-      new SmokeTestRequest(esperance, shoreline, modes),
+      new SmokeTestRequest(ESPERANCE, SHORELINE, modes),
       List.of("BUS")
     );
     var itin = plan.itineraries().getFirst();
@@ -110,7 +118,7 @@ public class SeattleSmokeTest {
   public void ccswwIntoSnohomishCounty() {
     var modes = Set.of(WALK, FLEX_DIRECT);
     var plan = SmokeTest.basicRouteTest(
-      new SmokeTestRequest(shoreline, esperance, modes),
+      new SmokeTestRequest(SHORELINE, ESPERANCE, modes),
       List.of("BUS", "WALK")
     );
     var walkAndFlex = plan
@@ -139,8 +147,6 @@ public class SeattleSmokeTest {
 
   @Test
   public void sharedStop() throws IOException {
-    Coordinate OLIVE_WAY = new Coordinate(47.61309420, -122.336314916);
-    Coordinate MOUNTAINLAKE_TERRACE = new Coordinate(47.78682093, -122.315694093);
     var tpr = TripPlanParameters
       .builder()
       .withFrom(OLIVE_WAY)
@@ -160,6 +166,23 @@ public class SeattleSmokeTest {
     assertEquals("Olive Way & 6th Ave", stop.name());
     assertEquals("kcm:1040", stop.id());
     assertEquals("1040", stop.code().get());
+  }
+
+  static List<TripPlanParameters> buildCombinations() {
+    return new RequestCombinationsBuilder()
+      .withLocations(SODO, ESPERANCE, CLYDE_HILL, RONALD_BOG_PARK, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
+      .withModes(TRANSIT, WALK)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .includeWheelchair()
+      .includeArriveBy()
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("buildCombinations")
+  public void accessibleRouting(TripPlanParameters params) throws IOException {
+    var tripPlan = SmokeTest.API_CLIENT.plan(params);
+    assertFalse(tripPlan.transitItineraries().isEmpty());
   }
 
   @Test

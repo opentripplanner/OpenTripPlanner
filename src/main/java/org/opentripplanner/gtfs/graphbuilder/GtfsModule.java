@@ -355,6 +355,9 @@ public class GtfsModule implements GraphBuilderModule {
       transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
       transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
     }
+    for (var transferRule : store.getAllEntitiesForType(FareLegRule.class)) {
+      transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
+    }
     for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
       pathway.getId().setAgencyId(reader.getDefaultAgencyId());
     }

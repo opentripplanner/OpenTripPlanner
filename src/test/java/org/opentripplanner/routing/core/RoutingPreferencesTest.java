@@ -49,6 +49,16 @@ public class RoutingPreferencesTest {
   }
 
   @Test
+  public void copyOfWithScooterChanges() {
+    var pref = new RoutingPreferences();
+    var copy = pref.copyOf().withScooter(b -> b.withReluctance(2.5)).build();
+
+    assertNotSame(pref, copy);
+    assertNotSame(pref.scooter(), copy.scooter());
+    assertSame(pref.walk(), copy.walk());
+  }
+
+  @Test
   public void copyOfWithWalkChanges() {
     var pref = new RoutingPreferences();
     var copy = pref.copyOf().withWalk(w -> w.withReluctance(2.5)).build();

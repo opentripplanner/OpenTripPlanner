@@ -1,0 +1,2 @@
+feed_publisher_url,feed_publisher_name,feed_lang,feed_version,feed_license,feed_contact_email,feed_contact_url,feed_start_date,feed_end_date,feed_id
+http://www.trilliumtransit.com,"Trillium Solutions, Inc.",en,UTC: 03-Aug-2021 18:42,,support+test+rfta-co-us@trilliumtransit.com,http://support.trilliumtransit.com,20201126,20211124,1696

@@ -2,8 +2,8 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
-import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
-import static org.opentripplanner.routing.core.BicycleOptimizeType.TRIANGLE;
+import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_STREETS;
+import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 /**
  * The bike preferences contain all speed, reluctance, cost and factor preferences for biking
@@ -29,7 +29,7 @@ public final class BikePreferences implements Serializable {
   private final Cost boardCost;
   private final VehicleParkingPreferences parking;
   private final VehicleRentalPreferences rental;
-  private final BicycleOptimizeType optimizeType;
+  private final VehicleRoutingOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
   private final VehicleWalkingPreferences walking;
 
@@ -96,7 +96,7 @@ public final class BikePreferences implements Serializable {
   /**
    * The set of characteristics that the user wants to optimize for -- defaults to SAFE_STREETS.
    */
-  public BicycleOptimizeType optimizeType() {
+  public VehicleRoutingOptimizeType optimizeType() {
     return optimizeType;
   }
 
@@ -164,7 +164,7 @@ public final class BikePreferences implements Serializable {
     private Cost boardCost;
     private VehicleParkingPreferences parking;
     private VehicleRentalPreferences rental;
-    private BicycleOptimizeType optimizeType;
+    private VehicleRoutingOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
     private VehicleWalkingPreferences walking;
 
@@ -221,11 +221,11 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public BicycleOptimizeType optimizeType() {
+    public VehicleRoutingOptimizeType optimizeType() {
       return optimizeType;
     }
 
-    public Builder withOptimizeType(BicycleOptimizeType optimizeType) {
+    public Builder withOptimizeType(VehicleRoutingOptimizeType optimizeType) {
       this.optimizeType = optimizeType;
       return this;
     }

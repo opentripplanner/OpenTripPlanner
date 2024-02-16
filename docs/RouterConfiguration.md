@@ -496,6 +496,20 @@ Used to group requests when monitoring OTP.
         "cost" : 600
       }
     },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
+    },
     "walk" : {
       "speed" : 1.3,
       "reluctance" : 4.0,

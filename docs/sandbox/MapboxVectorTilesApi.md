@@ -148,6 +148,7 @@ For each layer, the configuration includes:
 
 | Config Parameter                                               |    Type    | Summary                                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------|:----------:|--------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [attribution](#vectorTiles_attribution)                        |  `string`  | Custom attribution to be returned in `tilejson.json`                                       | *Optional* |               |  2.5  |
 | [basePath](#vectorTiles_basePath)                              |  `string`  | The path of the vector tile source URLs in `tilejson.json`.                                | *Optional* |               |  2.5  |
 | [layers](#vectorTiles_layers)                                  | `object[]` | Configuration of the individual layers for the Mapbox vector tiles.                        | *Optional* |               |  2.0  |
 |       type = "stop"                                            |   `enum`   | Type of the layer.                                                                         | *Required* |               |  2.0  |
@@ -160,6 +161,22 @@ For each layer, the configuration includes:
 
 
 #### Details
+
+<h4 id="vectorTiles_attribution">attribution</h4>
+
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Path:** /vectorTiles 
+
+Custom attribution to be returned in `tilejson.json`
+
+By default the, `attribution` property in `tilejson.json` is computed from the names and
+URLs of the feed publishers.
+If the OTP deployment contains many feeds, this can become very unwieldy.
+
+This configuration parameter allows you to set the `attribution` to any string you wish
+including HTML tags,
+for example `<a href='https://trimet.org/mod'>Regional Partners</a>`.
+
 
 <h4 id="vectorTiles_basePath">basePath</h4>
 
