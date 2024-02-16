@@ -55,7 +55,7 @@ public class Model implements Serializable {
     }
   }
 
-  private void save() {
+  void save() {
     try {
       var mapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
       mapper.writeValue(MODEL_FILE, this);
