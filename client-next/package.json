@@ -46,7 +46,7 @@
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.3",
-    "jsdom": "23.2.0",
+    "jsdom": "24.0.0",
     "prettier": "3.0.3",
     "typescript": "5.2.2",
     "vite": "4.4.9",
