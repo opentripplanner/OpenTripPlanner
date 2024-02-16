@@ -104,8 +104,12 @@ public class OtpDataStore {
 
     streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
-    stopConsolidation = findSingleSource(config.stopConsolidation(), "", CONFIG);
     buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
+
+    if (config.stopConsolidation() != null) {
+      stopConsolidation =
+        findSourceUsingAllRepos(it -> it.findCompositeSource(config.stopConsolidation(), CONFIG));
+    }
 
     addAll(Arrays.asList(streetGraph, graph, buildReportDir));
 
