@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import jakarta.xml.bind.JAXBException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClient;
@@ -68,18 +69,19 @@ public class SiriHttpLoader implements SiriLoader {
     String requestorRef
   ) {
     try {
-      return otpHttpClient.postXmlAndMap(
-        url,
-        serviceRequest,
-        timeout,
-        requestHeaders.asMap(),
-        is -> {
-          requestTimer.responseFetched();
-          Siri siri = SiriHelper.unmarshal(is);
-          requestTimer.responseUnmarshalled();
-          return Optional.of(siri);
-        }
-      );
+      final OtpHttpClient.ResponseMapper<Optional<Siri>> responseMapper = (is) -> {
+        requestTimer.responseFetched();
+        Siri siri = SiriHelper.unmarshal(is);
+        requestTimer.responseUnmarshalled();
+        return Optional.of(siri);
+      };
+      return otpHttpClient.getAndMap(URI.create(url), timeout, requestHeaders.asMap(), responseMapper);
+//      return otpHttpClient.postXmlAndMap(
+//        url,
+//        serviceRequest,
+//        timeout,
+//        requestHeaders.asMap(),
+//      );
     } finally {
       LOG.info(
         "Updating SIRI-{} [{}]: Create req: {} ms, Fetching data: {} ms, Unmarshalling: {} ms",
@@ -121,7 +123,6 @@ public class SiriHttpLoader implements SiriLoader {
     }
 
     /**
-     *
      * @return time spent creating the request body.
      */
     long creating() {
@@ -129,15 +130,13 @@ public class SiriHttpLoader implements SiriLoader {
     }
 
     /**
-     *
-     * @return time spent fetching the response.
+     * @return time spent fetching the response, or -1 if the fetch never completed.
      */
     long fetching() {
-      return fetchedAt - createdAt;
+      return (fetchedAt == 0) ? -1 : fetchedAt - createdAt;
     }
 
     /**
-     *
      * @return time spent unmarshalling the response.
      */
     long unmarshalling() {

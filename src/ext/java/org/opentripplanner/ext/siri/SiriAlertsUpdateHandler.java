@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.siri.mapper.AffectsMapper;
 import org.opentripplanner.ext.siri.mapper.SiriSeverityMapper;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -29,6 +30,8 @@ import uk.org.siri.siri20.DefaultedTextStructure;
 import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
 import uk.org.siri.siri20.InfoLinkStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.PtConsequenceStructure;
+import uk.org.siri.siri20.PtConsequencesStructure;
 import uk.org.siri.siri20.PtSituationElement;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
@@ -173,7 +176,10 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    alert.addEntites(affectsMapper.mapAffects(situation.getAffects()));
+      //situation.getAffects();
+      for (PtConsequenceStructure ptc : situation.getConsequences().getConsequences()) {
+        alert.addEntites(affectsMapper.mapAffects(ptc.getAffects()));
+      }
 
     if (alert.entities().isEmpty()) {
       LOG.info(
@@ -182,6 +188,7 @@ public class SiriAlertsUpdateHandler {
       );
       alert.addEntity(new EntitySelector.Unknown("Alert had no entities that could be handled"));
     }
+    // LOG.info("Alert matched {} entities.", alert.entities().size());
 
     alert.withType(situation.getReportType());
 

@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 public class OtpHttpClient implements AutoCloseable {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClient.class);
-  private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
+  private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
   private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
 
