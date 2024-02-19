@@ -220,7 +220,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    */
   @Test
   void parseContinuousPickup() {
-    var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GBFS);
+    var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GTFS);
     assertNotNull(lincolnGraph);
   }
 

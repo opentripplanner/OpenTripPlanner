@@ -89,7 +89,7 @@ public class VectorTileConfig
           """
           By default the, `attribution` property in `tilejson.json` is computed from the names and 
           URLs of the feed publishers.
-          If the OTP deployment contains many fields, this can become very unwieldy. 
+          If the OTP deployment contains many feeds, this can become very unwieldy. 
           
           This configuration parameter allows you to set the `attribution` to any string you wish 
           including HTML tags,
