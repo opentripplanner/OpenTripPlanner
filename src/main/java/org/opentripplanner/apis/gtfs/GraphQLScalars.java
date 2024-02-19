@@ -79,11 +79,9 @@ public class GraphQLScalars {
         @Override
         public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof CharSequence cs) {
-            return OffsetDateTimeParser
-              .parseLeniently(cs)
-              .orElseThrow(CoercingParseValueException::new);
+            return OffsetDateTimeParser.parseLeniently(cs).orElseThrow(() -> valueException(input));
           }
-          throw new CoercingParseValueException();
+          throw valueException(input);
         }
 
         @Override
@@ -94,6 +92,12 @@ public class GraphQLScalars {
               .orElseThrow(CoercingParseLiteralException::new);
           }
           throw new CoercingParseLiteralException();
+        }
+
+        private static CoercingParseValueException valueException(Object input) {
+          return new CoercingParseValueException(
+            "Cannot parse %s into an OffsetDateTime.".formatted(input)
+          );
         }
       }
     )
