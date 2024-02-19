@@ -132,7 +132,10 @@ public class GraphQLScalars {
         @Override
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
-            return validateCoordinate(doubleValue);
+            return validateCoordinate(doubleValue)
+              .orElseThrow(() ->
+                new CoercingParseValueException("Not a valid WGS84 coordinate value")
+              );
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -141,22 +144,27 @@ public class GraphQLScalars {
 
         @Override
         public Double parseLiteral(Object input) throws CoercingParseLiteralException {
+          var validationException = new CoercingParseLiteralException(
+            "Not a valid WGS84 coordinate value"
+          );
           if (input instanceof FloatValue coordinate) {
-            return validateCoordinate(coordinate.getValue().doubleValue());
+            return validateCoordinate(coordinate.getValue().doubleValue())
+              .orElseThrow(() -> validationException);
           }
           if (input instanceof IntValue coordinate) {
-            return validateCoordinate(coordinate.getValue().doubleValue());
+            return validateCoordinate(coordinate.getValue().doubleValue())
+              .orElseThrow(() -> validationException);
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
         }
 
-        private static double validateCoordinate(double coordinate) {
+        private static Optional<Double> validateCoordinate(double coordinate) {
           if (coordinate >= -180.001 && coordinate <= 180.001) {
-            return coordinate;
+            return Optional.of(coordinate);
           }
-          throw new CoercingParseLiteralException("Not a valid WGS84 coordinate value");
+          return Optional.empty();
         }
       }
     )
