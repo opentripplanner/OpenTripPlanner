@@ -78,9 +78,11 @@ config:
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
-    PlanConnection: graphql.relay.Connection#Connection<Itinerary>
-    PlanEdge: graphql.relay.Edge#Edge<Itinerary>
+    PlanConnection: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
+    PlanEdge: graphql.relay.DefaultEdge#DefaultEdge<Itinerary>
+    PlanLabeledLocation: org.opentripplanner.apis.gtfs.model.PlanLabeledLocation#PlanLabeledLocation
     PlanLocation: org.opentripplanner.apis.gtfs.model.PlanLocation#PlanLocation
+    PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: String
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route

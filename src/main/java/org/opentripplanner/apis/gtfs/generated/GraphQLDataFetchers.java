@@ -2,6 +2,7 @@
 package org.opentripplanner.apis.gtfs.generated;
 
 import graphql.relay.Connection;
+import graphql.relay.DefaultEdge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
@@ -20,7 +21,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.PlanLabeledLocation;
 import org.opentripplanner.apis.gtfs.model.PlanLocation;
+import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
@@ -664,13 +667,13 @@ public class GraphQLDataFetchers {
    * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLPlanConnection {
-    public DataFetcher<Object> destination();
+    public DataFetcher<PlanLabeledLocation> destination();
 
-    public DataFetcher<Iterable<Edge<Itinerary>>> edges();
+    public DataFetcher<Iterable<DefaultEdge<Itinerary>>> edges();
 
-    public DataFetcher<Object> origin();
+    public DataFetcher<PlanLabeledLocation> origin();
 
-    public DataFetcher<Object> pageInfo();
+    public DataFetcher<PlanPageInfo> pageInfo();
 
     public DataFetcher<Iterable<RoutingError>> routingErrors();
 
@@ -766,7 +769,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
 
-    public DataFetcher<Connection<Itinerary>> planConnection();
+    public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> planConnection();
 
     public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 

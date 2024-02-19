@@ -30,6 +30,7 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.RouteRequestMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
@@ -39,7 +40,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -481,21 +481,17 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
-      RouteRequest request = RouteRequestMapper.toRouteRequest(environment, context);
-      RoutingResponse res = context.routingService().route(request);
-      return DataFetcherResult
-        .<RoutingResponse>newResult()
-        .data(res)
-        .localContext(Map.of("locale", request.locale()))
-        .build();
+      RouteRequest request = LegacyRouteRequestMapper.toRouteRequest(environment, context);
+      return getPlanResult(context, request);
     };
   }
 
   @Override
-  public DataFetcher<Connection<Itinerary>> planConnection() {
+  public DataFetcher<DataFetcherResult<RoutingResponse>> planConnection() {
     return environment -> {
-      List<Itinerary> itineraries = List.of();
-      return new SimpleListConnection<>(itineraries).get(environment);
+      GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
+      RouteRequest request = RouteRequestMapper.toRouteRequest(environment, context);
+      return getPlanResult(context, request);
     };
   }
 
@@ -940,6 +936,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().graphFinder();
+  }
+
+  private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {
+    RoutingResponse res = context.routingService().route(request);
+    return DataFetcherResult
+      .<RoutingResponse>newResult()
+      .data(res)
+      .localContext(Map.of("locale", request.locale()))
+      .build();
   }
 
   protected static List<TransitAlert> filterAlerts(

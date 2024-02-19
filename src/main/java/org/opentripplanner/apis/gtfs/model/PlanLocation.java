@@ -2,11 +2,25 @@ package org.opentripplanner.apis.gtfs.model;
 
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.TypeResolver;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model.site.StopLocation;
 
-public interface PlanLocation extends GraphQLDataFetchers.GraphQLPlanLocation {
+public class PlanLocation implements TypeResolver {
+
   @Override
-  default GraphQLObjectType getType(TypeResolutionEnvironment env) {
+  public GraphQLObjectType getType(TypeResolutionEnvironment env) {
+    Object o = env.getObject();
+    GraphQLSchema schema = env.getSchema();
+
+    if (o instanceof StopLocation) {
+      return schema.getObjectType("Stop");
+    }
+    if (o instanceof WgsCoordinate) {
+      return schema.getObjectType("Coordinate");
+    }
+
     return null;
   }
 }
