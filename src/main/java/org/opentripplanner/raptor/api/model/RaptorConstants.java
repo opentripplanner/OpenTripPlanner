@@ -22,6 +22,11 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class RaptorConstants {
 
   /**
+   * Zero (0) constant used inside Raptor.
+   */
+  public static final int ZERO = 0;
+
+  /**
    * This constant is used to indicate that a value is not set. This applies to parameters of type
    * {@code generalized-cost}, {@code link min-travel-time} and {@code duration} inside Raptor.
    * Most of these types are "positive" numbers, but we want Raptor to be robust and work even

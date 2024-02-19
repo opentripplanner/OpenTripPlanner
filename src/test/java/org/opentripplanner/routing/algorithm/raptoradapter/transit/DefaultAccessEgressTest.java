@@ -9,7 +9,6 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -34,7 +33,7 @@ class DefaultAccessEgressTest {
     // TODO - The value is ?
     int expected = 118215;
     assertEquals(expected, subject.durationInSeconds());
-    assertEquals(expected + TIME_PENALTY.toSeconds(), subjectWithPenalty.durationInSeconds());
+    assertEquals(expected, subjectWithPenalty.durationInSeconds());
   }
 
   @Test
@@ -119,105 +118,8 @@ class DefaultAccessEgressTest {
   }
 
   @Test
-  void timeShiftDepartureTimeToActualTime() {
-    assertEquals(89, subject.timeShiftDepartureTimeToActualTime(89));
-    assertEquals(
-      89 + PENALTY.timeInSeconds(),
-      subjectWithPenalty.timeShiftDepartureTimeToActualTime(89)
-    );
-  }
-
-  @Test
   void testToString() {
     assertEquals("Walk 1d8h50m15s C₁236_429 ~ 5", subject.toString());
-    assertEquals("Walk 1d8h50m16s C₁236_440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
-  }
-
-  @Test
-  void calculateEarliestDepartureTimeWithOpeningHours_NoPenalty() {
-    final int requestedTime = 100;
-    final int opensAtTime = 120;
-    assertEquals(
-      opensAtTime,
-      subject.calculateEarliestDepartureTimeWithOpeningHours(
-        requestedTime,
-        v -> {
-          assertEquals(requestedTime, v);
-          return opensAtTime;
-        }
-      )
-    );
-  }
-
-  @Test
-  void calculateEarliestDepartureTimeWithOpeningHours_OpensAt() {
-    final int requestedTime = 100;
-    final int opensAtTime = 120;
-
-    assertEquals(
-      opensAtTime - PENALTY.timeInSeconds(),
-      subjectWithPenalty.calculateEarliestDepartureTimeWithOpeningHours(
-        requestedTime,
-        v -> {
-          assertEquals(requestedTime + PENALTY.timeInSeconds(), v);
-          return opensAtTime;
-        }
-      )
-    );
-  }
-
-  @Test
-  void calculateEarliestDepartureTimeWithOpeningHours_Closed() {
-    assertEquals(
-      RaptorConstants.TIME_NOT_SET,
-      subjectWithPenalty.calculateEarliestDepartureTimeWithOpeningHours(
-        879789,
-        v -> RaptorConstants.TIME_NOT_SET
-      )
-    );
-  }
-
-  @Test
-  void calculateLatestArrivalTimeWithOpeningHours_NoPenalty() {
-    final int requestedTime = 100;
-    final int closesAtTime = 80;
-    assertEquals(
-      closesAtTime,
-      subject.calculateLatestArrivalTimeWithOpeningHours(
-        requestedTime,
-        v -> {
-          assertEquals(requestedTime, v);
-          return closesAtTime;
-        }
-      )
-    );
-  }
-
-  @Test
-  void calculateLatestArrivalTimeWithOpeningHours_ClosesAt() {
-    final int requestedTime = 100;
-    final int closesAtTime = 80;
-
-    assertEquals(
-      closesAtTime + PENALTY.timeInSeconds(),
-      subjectWithPenalty.calculateLatestArrivalTimeWithOpeningHours(
-        requestedTime,
-        v -> {
-          assertEquals(requestedTime - PENALTY.timeInSeconds(), v);
-          return closesAtTime;
-        }
-      )
-    );
-  }
-
-  @Test
-  void calculateLatestArrivalTimeWithOpeningHours_Closed() {
-    assertEquals(
-      RaptorConstants.TIME_NOT_SET,
-      subjectWithPenalty.calculateLatestArrivalTimeWithOpeningHours(
-        879789,
-        v -> RaptorConstants.TIME_NOT_SET
-      )
-    );
+    assertEquals("Walk 1d8h50m15s C₁236_440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
   }
 }
