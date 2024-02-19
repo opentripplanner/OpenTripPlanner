@@ -37,6 +37,13 @@ class DefaultAccessEgressTest {
   }
 
   @Test
+  void timePenalty() {
+    int expected = (int) TIME_PENALTY.toSeconds();
+    assertEquals(expected, subject.timePenalty());
+    assertEquals(expected, subjectWithPenalty.timePenalty());
+  }
+
+  @Test
   void stop() {
     assertEquals(STOP, subject.stop());
   }

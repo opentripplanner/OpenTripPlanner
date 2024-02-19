@@ -55,6 +55,11 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
+  public int timePenalty() {
+    return penalty.timeInSeconds();
+  }
+
+  @Override
   public int stop() {
     return stop;
   }

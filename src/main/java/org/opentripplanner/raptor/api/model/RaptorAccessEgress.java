@@ -45,6 +45,35 @@ public interface RaptorAccessEgress {
    */
   int durationInSeconds();
 
+  /**
+   * Raptor can add an optional time-penalty to a access/egress to make it less favourable compared
+   * with other access/egress/transit options (paths). The penalty is a virtual extra duration of
+   * time added inside Raptor when comparing time. The penalty does not propagate the c1 or c2 cost
+   * values. This feature is useful when you want to limit the access/egress and the access/egress
+   * is FASTER than the preferred option.
+   * <p>
+   * For example, for Park&Ride, driving all the way to the
+   * destination is very often the best option when looking at the time criteria. When an
+   * increasing time-penalty is applied to access/egress with driving then driving less become
+   * more favorable. This also improves perfomance, since we usually add a very high cost to
+   * driving - making all park&ride access legs optimal - forcing Raptor to compute a path for
+   * every option. The short drives are optimal on cost, and the long are optimal on time. In the
+   * case of park&ride the time-penalty enables Raptor to choose one of the shortest access/egress
+   * paths over the longer ones.
+   * <p>
+   * Another example is FLEX, where we in many use-cases want regular transit to win if there is
+   * an offer. Only in the case where the FLEX is the only solution we want it to be presented.
+   * To achieve this, we must add an extra duration to the time of the FLEX access/egress - it does
+   * not help to just edd extra cost - witch makes both FLEX optimal on time and transit optimal on
+   * cost. Many optimal access paths have an inpact on performance as vell.
+   * <p>
+   *
+   * The unit is seconds and default value is 0 seconds.
+   */
+  default int timePenalty() {
+    return RaptorConstants.ZERO;
+  }
+
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
   // The methods below should be only overridden when an RaptorAccessEgress is only available at
   // specific times, such as flexible transit, TNC or shared vehicle schemes with limited opening
