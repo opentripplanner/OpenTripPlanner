@@ -6,18 +6,21 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public record LegTimeEvent(@Nonnull ZonedDateTime scheduled, @Nullable RealtimeEstimate estimated) {
-  public LegTimeEvent {
+/**
+ * A scheduled time of a transit vehicle at a certain location with a optional realtime information.
+ */
+public record LegTime(@Nonnull ZonedDateTime scheduled, @Nullable RealtimeEstimate estimated) {
+  public LegTime {
     Objects.requireNonNull(scheduled);
   }
   @Nonnull
-  public static LegTimeEvent of(ZonedDateTime realtime, int delaySecs) {
+  public static LegTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new LegTimeEvent(realtime.minus(delay), new RealtimeEstimate(realtime, delay));
+    return new LegTime(realtime.minus(delay), new RealtimeEstimate(realtime, delay));
   }
   @Nonnull
-  public static LegTimeEvent ofStatic(ZonedDateTime staticTime) {
-    return new LegTimeEvent(staticTime, null);
+  public static LegTime ofStatic(ZonedDateTime staticTime) {
+    return new LegTime(staticTime, null);
   }
 
   public ZonedDateTime time() {

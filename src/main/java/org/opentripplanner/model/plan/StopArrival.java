@@ -15,8 +15,8 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  */
 public record StopArrival(
   Place place,
-  LegTimeEvent arrival,
-  LegTimeEvent departure,
+  LegTime arrival,
+  LegTime departure,
   Integer stopPosInPattern,
   Integer gtfsStopSequence
 ) {

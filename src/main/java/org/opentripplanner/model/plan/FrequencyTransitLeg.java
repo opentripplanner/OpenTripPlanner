@@ -55,8 +55,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        LegTimeEvent.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
-        LegTimeEvent.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
         i,
         tripTimes.gtfsSequenceOfStopIndex(i)
       );

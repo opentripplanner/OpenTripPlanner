@@ -1669,7 +1669,7 @@ type RealtimeEstimate {
 Time information about a passenger at a certain place. May contain real-time information if
 available.
 """
-type LegTimeEvent {
+type LegTime {
     "The scheduled time of the event."
     scheduled: OffsetDateTime!
     "The estimated time of the event, if available."
@@ -1681,12 +1681,12 @@ type Leg {
     """
     The time when the leg starts including real-time information, if available.
     """
-    start: LegTimeEvent
+    start: LegTime
 
     """
     The time when the leg ends including real-time information, if available.
     """
-    end: LegTimeEvent
+    end: LegTime
 
     """The mode (e.g. `WALK`) used when traversing this leg."""
     mode: Mode
@@ -2311,13 +2311,13 @@ type Place {
     The time the rider will arrive at the place. This also includes real-time information
     if available.
     """
-    arrival: LegTimeEvent
+    arrival: LegTime
 
     """
     The time the rider will depart the place. This also includes real-time information
     if available.
     """
-    departure: LegTimeEvent
+    departure: LegTime
 
     """The stop related to the place."""
     stop: Stop

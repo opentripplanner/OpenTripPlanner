@@ -16,7 +16,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTimeEvent;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -86,13 +86,13 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public LegTimeEvent start() {
-    return LegTimeEvent.of(startTime, getArrivalDelay());
+  public LegTime start() {
+    return LegTime.of(startTime, getArrivalDelay());
   }
 
   @Override
-  public LegTimeEvent end() {
-    return LegTimeEvent.of(endTime, getDepartureDelay());
+  public LegTime end() {
+    return LegTime.of(endTime, getDepartureDelay());
   }
 
   @Override

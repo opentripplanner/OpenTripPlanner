@@ -36,7 +36,7 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTimeEvent;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -445,7 +445,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<LegTimeEvent> end();
+    public DataFetcher<LegTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -487,7 +487,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<LegTimeEvent> start();
+    public DataFetcher<LegTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -502,7 +502,11 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> walkingBike();
   }
 
-  public interface GraphQLLegTimeEvent {
+  /**
+   * Time information about a passenger at a certain place. May contain real-time information if
+   * available.
+   */
+  public interface GraphQLLegTime {
     public DataFetcher<Object> estimated();
 
     public DataFetcher<java.time.OffsetDateTime> scheduled();
@@ -591,7 +595,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
-    public DataFetcher<LegTimeEvent> arrival();
+    public DataFetcher<LegTime> arrival();
 
     public DataFetcher<Long> arrivalTime();
 
@@ -601,7 +605,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleParking> carPark();
 
-    public DataFetcher<LegTimeEvent> departure();
+    public DataFetcher<LegTime> departure();
 
     public DataFetcher<Long> departureTime();
 
