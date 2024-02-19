@@ -32,7 +32,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class RouteRequestMapper {
+public class LegacyRouteRequestMapper {
 
   @Nonnull
   public static RouteRequest toRouteRequest(
