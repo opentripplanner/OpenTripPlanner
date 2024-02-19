@@ -31,6 +31,23 @@ public class RouteRequestMapper {
     request.setFrom(parseGenericLocation(args.getGraphQLOrigin()));
     request.setTo(parseGenericLocation(args.getGraphQLDestination()));
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
+    if (args.getGraphQLSearchWindow() != null) {
+      request.setSearchWindow(args.getGraphQLSearchWindow());
+    }
+
+    if (args.getGraphQLBefore() != null) {
+      request.setPageCursorFromEncoded(args.getGraphQLBefore());
+      if (args.getGraphQLLast() != null) {
+        request.setNumItineraries(args.getGraphQLLast());
+      }
+    } else if (args.getGraphQLAfter() != null) {
+      request.setPageCursorFromEncoded(args.getGraphQLAfter());
+      if (args.getGraphQLFirst() != null) {
+        request.setNumItineraries(args.getGraphQLFirst());
+      }
+    } else if (args.getGraphQLNumberOfItineraries() != null) {
+      request.setNumItineraries(args.getGraphQLNumberOfItineraries());
+    }
 
     return request;
   }
