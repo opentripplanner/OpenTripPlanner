@@ -4266,12 +4266,12 @@ type QueryType {
         """
         The origin where the search starts. Usually coordinates but can also be a stop location.
         """
-        origin: PlanLabeledLocationInput
+        origin: PlanLabeledLocationInput!
 
         """
         The destination where the search ends. Usually coordinates but can also be a stop location.
         """
-        destination: PlanLabeledLocationInput
+        destination: PlanLabeledLocationInput!
 
         """
         Street and transit modes used during the search. This also includes options to only return
