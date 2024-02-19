@@ -92,36 +92,22 @@ Most people want to get routing results out of OTP, so lets see the query for th
             end
             legs {
                 mode
-                start {
-                    scheduled
-                    estimated {
-                        time
-                        scheduleOffset
-                    }
-                }
-                end {
-                    scheduled
-                    estimated {
-                        time
-                        scheduleOffset
-                    }
-                }
                 from {
                     name
                     lat
                     lon
                     departure {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                     arrival {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                 }
@@ -130,10 +116,18 @@ Most people want to get routing results out of OTP, so lets see the query for th
                     lat
                     lon
                     departure {
-                        scheduled
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
                     }
                     arrival {
-                        scheduled
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
                     }
                 }
                 route {
