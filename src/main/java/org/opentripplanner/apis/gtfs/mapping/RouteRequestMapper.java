@@ -8,6 +8,8 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class RouteRequestMapper {
@@ -49,7 +51,40 @@ public class RouteRequestMapper {
       request.setNumItineraries(args.getGraphQLNumberOfItineraries());
     }
 
+    request.withPreferences(preferences -> setPreferences(preferences, args));
+
     return request;
+  }
+
+  private static void setPreferences(
+    RoutingPreferences.Builder prefs,
+    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
+  ) {
+    prefs.withItineraryFilter(filters ->
+      setItineraryFilters(filters, args.getGraphQLItineraryFilter())
+    );
+  }
+
+  private static void setItineraryFilters(
+    ItineraryFilterPreferences.Builder filterPreferences,
+    GraphQLTypes.GraphQLPlanItineraryFilterInput filters
+  ) {
+    if (filters.getGraphQLItineraryFilterDebugProfile() != null) {
+      filterPreferences.withDebug(
+        ItineraryFilterDebugProfileMapper.map(filters.getGraphQLItineraryFilterDebugProfile())
+      );
+    }
+    if (filters.getGraphQLGroupSimilarityKeepOne() != null) {
+      filterPreferences.withGroupSimilarityKeepOne(filters.getGraphQLGroupSimilarityKeepOne());
+    }
+    if (filters.getGraphQLGroupSimilarityKeepThree() != null) {
+      filterPreferences.withGroupSimilarityKeepThree(filters.getGraphQLGroupSimilarityKeepThree());
+    }
+    if (filters.getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier() != null) {
+      filterPreferences.withGroupedOtherThanSameLegsMaxCostMultiplier(
+        filters.getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier()
+      );
+    }
   }
 
   private static GenericLocation parseGenericLocation(

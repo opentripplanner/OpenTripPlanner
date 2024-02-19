@@ -15,6 +15,7 @@ import graphql.schema.GraphQLScalarType;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -264,25 +265,66 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType ratioScalar = GraphQLScalarType
+  public static final GraphQLScalarType ratioScalar = GraphQLScalarType
     .newScalar()
     .name("Ratio")
     .coercing(
-      new Coercing<OffsetDateTime, String>() {
+      new Coercing<Double, Double>() {
         @Override
-        public String serialize(@Nonnull Object dataFetcherResult)
+        public Double serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
-          return null;
+          var validationException = new CoercingSerializeException(
+            "Value is under 0 or greater than 1."
+          );
+          if (dataFetcherResult instanceof Double doubleValue) {
+            return validateRatio(doubleValue).orElseThrow(() -> validationException);
+          } else if (dataFetcherResult instanceof Float floatValue) {
+            return validateRatio(floatValue.doubleValue()).orElseThrow(() -> validationException);
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s as a ratio".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
         }
 
         @Override
-        public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
-          return null;
+        public Double parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof Double doubleValue) {
+            return validateRatio(doubleValue)
+              .orElseThrow(() ->
+                new CoercingParseValueException("Value is under 0 or greater than 1.")
+              );
+          }
+          throw new CoercingParseValueException(
+            "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
+          );
         }
 
         @Override
-        public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
-          return null;
+        public Double parseLiteral(Object input) throws CoercingParseLiteralException {
+          var validationException = new CoercingParseLiteralException(
+            "Value is under 0 or greater than 1."
+          );
+          if (input instanceof FloatValue coordinate) {
+            return validateRatio(coordinate.getValue().doubleValue())
+              .orElseThrow(() -> validationException);
+          }
+          if (input instanceof IntValue coordinate) {
+            return validateRatio(coordinate.getValue().doubleValue())
+              .orElseThrow(() -> validationException);
+          }
+          throw new CoercingParseLiteralException(
+            "Expected a number, got: " + input.getClass().getSimpleName()
+          );
+        }
+
+        private static Optional<Double> validateRatio(double ratio) {
+          if (ratio >= -0.001 && ratio <= 1.001) {
+            return Optional.of(ratio);
+          }
+          return Optional.empty();
         }
       }
     )
