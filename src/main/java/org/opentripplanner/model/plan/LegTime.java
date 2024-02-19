@@ -9,9 +9,9 @@ import javax.annotation.Nullable;
 /**
  * A scheduled time of a transit vehicle at a certain location with a optional realtime information.
  */
-public record LegTime(@Nonnull ZonedDateTime scheduled, @Nullable RealtimeEstimate estimated) {
+public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealtimeEstimate estimated) {
   public LegTime {
-    Objects.requireNonNull(scheduled);
+    Objects.requireNonNull(scheduledTime);
   }
   @Nonnull
   public static LegTime of(ZonedDateTime realtime, int delaySecs) {
@@ -23,13 +23,21 @@ public record LegTime(@Nonnull ZonedDateTime scheduled, @Nullable RealtimeEstima
     return new LegTime(staticTime, null);
   }
 
+  /**
+   * The most up-to-date time available: if realtime data is available it is returned, if not then
+   * the scheduled one is.
+   */
   public ZonedDateTime time() {
     if (estimated == null) {
-      return scheduled;
+      return scheduledTime;
     } else {
       return estimated.time;
     }
   }
 
-  record RealtimeEstimate(ZonedDateTime time, Duration scheduleOffset) {}
+  /**
+   * Realtime information about a vehicle at a certain place.
+   * @param delay Delay or "earliness" of a vehicle. Earliness is expressed as a negative number.
+   */
+  record RealtimeEstimate(ZonedDateTime time, Duration delay) {}
 }

@@ -21,36 +21,22 @@
             end
             legs {
                 mode
-                start {
-                    scheduled
-                    estimated {
-                        time
-                        scheduleOffset
-                    }
-                }
-                end {
-                    scheduled
-                    estimated {
-                        time
-                        scheduleOffset
-                    }
-                }
                 from {
                     name
                     lat
                     lon
                     departure {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                     arrival {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                 }
@@ -59,10 +45,18 @@
                     lat
                     lon
                     departure {
-                        scheduled
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
                     }
                     arrival {
-                        scheduled
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
                     }
                 }
                 route {

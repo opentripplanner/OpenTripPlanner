@@ -509,7 +509,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLLegTime {
     public DataFetcher<Object> estimated();
 
-    public DataFetcher<java.time.OffsetDateTime> scheduled();
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
   /** A span of time. */
@@ -764,7 +764,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLRealtimeEstimate {
-    public DataFetcher<java.time.Duration> scheduleOffset();
+    public DataFetcher<java.time.Duration> delay();
 
     public DataFetcher<java.time.OffsetDateTime> time();
   }

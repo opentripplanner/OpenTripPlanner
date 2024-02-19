@@ -32,23 +32,37 @@
             legs {
                 mode
                 start {
-                    scheduled
+                    scheduledTime
                     estimated {
                         time
-                        scheduleOffset
+                        delay
                     }
                 }
                 end {
-                    scheduled
+                    scheduledTime
                     estimated {
                         time
-                        scheduleOffset
+                        delay
                     }
                 }
                 from {
                     name
                     lat
                     lon
+                    departure {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
                     departureTime
                     arrivalTime
                 }
@@ -56,6 +70,20 @@
                     name
                     lat
                     lon
+                    departure {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
                     departureTime
                     arrivalTime
                 }
@@ -69,17 +97,17 @@
                 }
                 intermediatePlaces {
                     arrival {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                     departure {
-                        scheduled
+                        scheduledTime
                         estimated {
                             time
-                            scheduleOffset
+                            delay
                         }
                     }
                     stop {
