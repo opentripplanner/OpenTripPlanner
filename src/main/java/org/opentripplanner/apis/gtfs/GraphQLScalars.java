@@ -3,6 +3,8 @@ package org.opentripplanner.apis.gtfs;
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.language.FloatValue;
+import graphql.language.IntValue;
 import graphql.language.StringValue;
 import graphql.relay.Relay;
 import graphql.schema.Coercing;
@@ -18,6 +20,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 
@@ -54,7 +57,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
+  public static final GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
     .newScalar()
     .name("OffsetDateTime")
     .coercing(
@@ -66,41 +69,93 @@ public class GraphQLScalars {
             return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
           } else if (dataFetcherResult instanceof OffsetDateTime odt) {
             return odt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-          } else return null;
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
         }
 
         @Override
         public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
-          return null;
+          if (input instanceof CharSequence cs) {
+            return OffsetDateTimeParser.parseLeniently(cs).orElseThrow(() -> valueException(input));
+          }
+          throw valueException(input);
         }
 
         @Override
         public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
-          return null;
+          if (input instanceof StringValue sv) {
+            return OffsetDateTimeParser
+              .parseLeniently(sv.getValue())
+              .orElseThrow(() -> literalException(input));
+          }
+          throw literalException(input);
+        }
+
+        private static CoercingParseValueException valueException(Object input) {
+          return new CoercingParseValueException("Cannot parse %s".formatted(input));
+        }
+
+        private static CoercingParseLiteralException literalException(Object input) {
+          return new CoercingParseLiteralException("Cannot parse %s".formatted(input));
         }
       }
     )
     .build();
 
-  public static GraphQLScalarType coordinateValueScalar = GraphQLScalarType
+  public static final GraphQLScalarType coordinateValueScalar = GraphQLScalarType
     .newScalar()
     .name("CoordinateValue")
     .coercing(
-      new Coercing<OffsetDateTime, String>() {
+      new Coercing<Double, Double>() {
         @Override
-        public String serialize(@Nonnull Object dataFetcherResult)
+        public Double serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
-          return null;
+          if (dataFetcherResult instanceof Double doubleValue) {
+            return doubleValue;
+          } else if (dataFetcherResult instanceof Float floatValue) {
+            return floatValue.doubleValue();
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s as a coordinate number".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
         }
 
         @Override
-        public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
-          return null;
+        public Double parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof Double doubleValue) {
+            return validateCoordinate(doubleValue);
+          }
+          throw new CoercingParseValueException(
+            "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
+          );
         }
 
         @Override
-        public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
-          return null;
+        public Double parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof FloatValue coordinate) {
+            return validateCoordinate(coordinate.getValue().doubleValue());
+          }
+          if (input instanceof IntValue coordinate) {
+            return validateCoordinate(coordinate.getValue().doubleValue());
+          }
+          throw new CoercingParseLiteralException(
+            "Expected a number, got: " + input.getClass().getSimpleName()
+          );
+        }
+
+        private static double validateCoordinate(double coordinate) {
+          if (coordinate >= -180.001 && coordinate <= 180.001) {
+            return coordinate;
+          }
+          throw new CoercingParseLiteralException("Not a valid WGS84 coordinate value");
         }
       }
     )
