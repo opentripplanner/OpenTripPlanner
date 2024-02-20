@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
+import net.opengis.gml._3.DirectPositionType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
@@ -62,5 +63,21 @@ public class WgsCoordinateMapperTest {
       new SimplePoint_VersionStructure()
         .withLocation(new LocationStructure().withLatitude(LATITUDE));
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+  }
+
+  @Test
+  public void handleCoordinateWithGmlPosition() {
+    LocationStructure locationStructure = new LocationStructure()
+      .withPos(new DirectPositionType().withValue(LONGITUDE_VALUE, LATITUDE_VALUE));
+
+    SimplePoint_VersionStructure point = new SimplePoint_VersionStructure()
+      .withLocation(locationStructure);
+
+    // When map coordinates
+    WgsCoordinate c = WgsCoordinateMapper.mapToDomain(point);
+
+    // Then verify coordinate
+    assertEquals(LONGITUDE_VALUE, c.longitude(), DELTA);
+    assertEquals(LATITUDE_VALUE, c.latitude(), DELTA);
   }
 }
