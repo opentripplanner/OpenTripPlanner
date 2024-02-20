@@ -14,6 +14,7 @@ class AgencyTest {
   private static final String ID = "1";
   private static final String BRANDING_URL = "http://branding.aaa.com";
   private static final String NAME = "name";
+  private static final String SHORT_NAME = "shortname";
   private static final String URL = "http://info.aaa.com";
   private static final String TIMEZONE = "Europe/Oslo";
   private static final String PHONE = "+47 95566333";
@@ -23,6 +24,7 @@ class AgencyTest {
   private static final Agency subject = Agency
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
+    .withShortName(SHORT_NAME)
     .withUrl(URL)
     .withTimezone(TIMEZONE)
     .withPhone(PHONE)
@@ -48,6 +50,7 @@ class AgencyTest {
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
+    assertEquals(SHORT_NAME, copy.getShortName());
     assertEquals("v2", copy.getName());
     assertEquals(URL, copy.getUrl());
     assertEquals(TIMEZONE, copy.getTimezone().getId());
@@ -62,6 +65,7 @@ class AgencyTest {
     assertTrue(subject.sameAs(subject.copy().build()));
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
     assertFalse(subject.sameAs(subject.copy().withTimezone("CET").build()));
     assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));

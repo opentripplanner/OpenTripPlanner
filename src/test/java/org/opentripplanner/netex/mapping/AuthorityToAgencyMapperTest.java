@@ -14,6 +14,7 @@ public class AuthorityToAgencyMapperTest {
 
   private static final String ID = "ID";
   private static final String NAME = "Olsen";
+  private static final String SHORT_NAME = "Short";
   private static final String URL = "http://olsen.no/help";
   private static final String PHONE = "+47 88882222";
   private static final String TIME_ZONE = "CET";
@@ -24,7 +25,7 @@ public class AuthorityToAgencyMapperTest {
   @Test
   public void mapAgency() {
     // Given
-    Authority authority = authority(ID, NAME, URL, PHONE);
+    Authority authority = authority(ID, NAME, SHORT_NAME, URL, PHONE);
 
     // When mapped
     Agency a = mapper.mapAuthorityToAgency(authority);
@@ -32,6 +33,7 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertEquals(ID, a.getId().getId());
     assertEquals(NAME, a.getName());
+    assertEquals(SHORT_NAME, a.getShortName());
     assertEquals(TIME_ZONE, a.getTimezone().getId());
     assertEquals(URL, a.getUrl());
     assertEquals(PHONE, a.getPhone());
@@ -40,7 +42,7 @@ public class AuthorityToAgencyMapperTest {
   @Test
   public void mapAgencyWithoutOptionalElements() {
     // Given
-    Authority authority = authority(ID, NAME, null, null);
+    Authority authority = authority(ID, NAME, null, null, null);
 
     // When mapped
     Agency a = mapper.mapAuthorityToAgency(authority);
@@ -48,6 +50,7 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertNull(a.getUrl());
     assertNull(a.getPhone());
+    assertNull(a.getShortName());
   }
 
   @Test
@@ -64,9 +67,10 @@ public class AuthorityToAgencyMapperTest {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static Authority authority(String id, String name, String url, String phone) {
+  private static Authority authority(String id, String name, String shortName, String url, String phone) {
     return new Authority()
       .withId(id)
+      .withShortName(new MultilingualString().withValue(shortName))
       .withName(new MultilingualString().withValue(name))
       .withContactDetails(new ContactStructure().withUrl(url).withPhone(phone));
   }
