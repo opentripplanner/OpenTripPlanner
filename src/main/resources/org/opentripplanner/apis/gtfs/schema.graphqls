@@ -1655,6 +1655,7 @@ ISO-8601 allows many different formats but OTP will only return the profile spec
 """
 scalar OffsetDateTime @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
 
+"Real-time estimates for a vehicle at a certain place."
 type RealtimeEstimate {
     time: OffsetDateTime!
     """
@@ -1672,7 +1673,7 @@ available.
 type LegTime {
     "The scheduled time of the event."
     scheduledTime: OffsetDateTime!
-    "The estimated time of the event, if available."
+    "The estimated time of the event. If no real-time information is available, this is null,"
     estimated: RealtimeEstimate
 }
 
@@ -1681,12 +1682,12 @@ type Leg {
     """
     The time when the leg starts including real-time information, if available.
     """
-    start: LegTime
+    start: LegTime!
 
     """
     The time when the leg ends including real-time information, if available.
     """
-    end: LegTime
+    end: LegTime!
 
     """The mode (e.g. `WALK`) used when traversing this leg."""
     mode: Mode

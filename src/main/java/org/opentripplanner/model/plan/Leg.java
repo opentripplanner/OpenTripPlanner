@@ -200,7 +200,14 @@ public interface Leg {
     return null;
   }
 
+  /**
+   * The time (including realtime information) when the leg starts.
+   */
   LegTime start();
+
+  /**
+   * The time (including realtime information) when the leg ends..
+   */
   LegTime end();
 
   /**
