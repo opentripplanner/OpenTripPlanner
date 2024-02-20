@@ -25,29 +25,6 @@ public class AccessPaths {
   }
 
   /**
-   * Return the transfer arriving at the stop on-street(walking) grouped by Raptor round. The Raptor
-   * round is calculated from the number of rides in the transfer.
-   */
-  public TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides() {
-    return arrivedOnStreetByNumOfRides;
-  }
-
-  /**
-   * Return the transfer arriving at the stop on-board a transit(flex) service grouped by Raptor
-   * round. The Raptor round is calculated from the number of rides in the transfer.
-   */
-  public TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides() {
-    return arrivedOnBoardByNumOfRides;
-  }
-
-  public int calculateMaxNumberOfRides() {
-    return Math.max(
-      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
-      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
-    );
-  }
-
-  /**
    * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
    * Standard and BestTime states do not. To get a deterministic behavior, we filter the paths and
    * return the paths with the shortest duration for non-multi-criteria search. If two paths have
@@ -69,6 +46,33 @@ public class AccessPaths {
     return new AccessPaths(
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
       groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
+    );
+  }
+
+  /**
+   * Return the transfer arriving at the stop on-street(walking) grouped by Raptor round. The Raptor
+   * round is calculated from the number of rides in the transfer.
+   * <p>
+   * If no access exists for the given round, an empty list is returned.
+   */
+  public List<RaptorAccessEgress> arrivedOnStreetByNumOfRides(int round) {
+    return emptyListIfNull(arrivedOnStreetByNumOfRides.get(round));
+  }
+
+  /**
+   * Return the transfer arriving at the stop on-board a transit(flex) service grouped by Raptor
+   * round. The Raptor round is calculated from the number of rides in the transfer.
+   * <p>
+   * If no access exists for the given round, an empty list is returned.
+   */
+  public List<RaptorAccessEgress> arrivedOnBoardByNumOfRides(int round) {
+    return emptyListIfNull(arrivedOnBoardByNumOfRides.get(round));
+  }
+
+  public int calculateMaxNumberOfRides() {
+    return Math.max(
+      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
+      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
     );
   }
 
@@ -98,5 +102,15 @@ public class AccessPaths {
       }
     }
     return false;
+  }
+
+  /**
+   * This method returns an empty list if the given input list is {@code null}.
+   */
+  private List<RaptorAccessEgress> emptyListIfNull(List<RaptorAccessEgress> list) {
+    if (list == null) {
+      return List.of();
+    }
+    return list;
   }
 }

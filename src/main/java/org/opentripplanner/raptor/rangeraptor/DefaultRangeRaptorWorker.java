@@ -261,11 +261,11 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   }
 
   private void findAccessOnStreetForRound() {
-    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides().get(round()));
+    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
   }
 
   private void findAccessOnBoardForRound() {
-    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides().get(round()));
+    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
   }
 
   /**
@@ -273,10 +273,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * scheduled search at the next-earlier minute.
    */
   private void addAccessPaths(Collection<RaptorAccessEgress> accessPaths) {
-    if (accessPaths == null) {
-      return;
-    }
-
     for (RaptorAccessEgress it : accessPaths) {
       int departureTime = calculator.departureTime(it, iterationDepartureTime);
 
