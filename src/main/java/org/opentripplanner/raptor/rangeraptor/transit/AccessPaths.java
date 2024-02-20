@@ -49,9 +49,9 @@ public class AccessPaths {
 
   /**
    * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
-   * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths and
+   * Standard and BestTime states do not. To get a deterministic behavior, we filter the paths and
    * return the paths with the shortest duration for non-multi-criteria search. If two paths have
-   * the same duration the first one is picked. Note! If the access/egress paths contains flex as
+   * the same duration, the first one is picked. Note! If the access/egress paths contains flex as
    * well, then we need to look at mode for arriving at tha stop as well. A Flex arrive-on-board can
    * be used with a transfer even if the time is worse compared with walking.
    * <p>
@@ -63,10 +63,24 @@ public class AccessPaths {
     } else {
       paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
+
+    paths = decorateWithTimePenaltyLogic(paths);
+
     return new AccessPaths(
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
       groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
     );
+  }
+
+  /**
+   * Decorate access to implement time-penalty. This decoration will do the necessary
+   * adjustments to apply the penalty in the raptor algorithm. See the decorator class for more
+   * info. The original access object is returned if it does not have a time-penalty set.
+   */
+  private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    return paths.stream().map(it -> it.timePenalty() > 0 ? new AccessWithPenalty(it) : it).toList();
   }
 
   /** Raptor uses this information to optimize boarding of the first trip */

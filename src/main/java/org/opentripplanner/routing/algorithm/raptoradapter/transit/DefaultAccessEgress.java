@@ -35,6 +35,9 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     }
     this.stop = other.stop();
     this.durationInSeconds = other.durationInSeconds();
+    // In the API we have a cost associated with the time-penalty. In Raptor, there is no
+    // association between the time-penalty and the cost. So, we add the time-penalty cost to
+    // the generalized cost here. In logic later on, we will remove it.
     this.generalizedCost = other.c1() + penalty.cost().toCentiSeconds();
     this.penalty = penalty;
     this.lastState = other.getLastState();
