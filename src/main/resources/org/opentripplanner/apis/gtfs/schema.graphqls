@@ -5232,14 +5232,9 @@ Costs related to using a transit mode.
 """
 input TransitModePreferenceCostInput {
     """
-    A static cost that is added each time a transit mode is used.
-    """
-    cost: Cost
-
-    """
     A cost multiplier of transit leg travel time.
     """
-    reluctance: Reluctance
+    reluctance: Reluctance!
 }
 
 """

@@ -4627,26 +4627,16 @@ public class GraphQLTypes {
 
   public static class GraphQLTransitModePreferenceCostInput {
 
-    private org.opentripplanner.framework.model.Cost cost;
     private Double reluctance;
 
     public GraphQLTransitModePreferenceCostInput(Map<String, Object> args) {
       if (args != null) {
-        this.cost = (org.opentripplanner.framework.model.Cost) args.get("cost");
         this.reluctance = (Double) args.get("reluctance");
       }
     }
 
-    public org.opentripplanner.framework.model.Cost getGraphQLCost() {
-      return this.cost;
-    }
-
     public Double getGraphQLReluctance() {
       return this.reluctance;
-    }
-
-    public void setGraphQLCost(org.opentripplanner.framework.model.Cost cost) {
-      this.cost = cost;
     }
 
     public void setGraphQLReluctance(Double reluctance) {
