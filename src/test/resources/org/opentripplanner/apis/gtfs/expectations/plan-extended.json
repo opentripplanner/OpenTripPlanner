@@ -30,11 +30,11 @@
                 "name" : "A",
                 "lat" : 5.0,
                 "lon" : 8.0,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:00:00Z",
                   "estimated" : null
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:00:00Z",
                   "estimated" : null
                 },
@@ -45,11 +45,11 @@
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:00:20Z",
                   "estimated" : null
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:00:20Z",
                   "estimated" : null
                 },
@@ -86,14 +86,14 @@
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T10:51:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
                     "time" : "2020-02-02T11:01:00Z"
                   }
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T10:51:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
@@ -107,14 +107,14 @@
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:05:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
                     "time" : "2020-02-02T11:15:00Z"
                   }
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:05:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
@@ -176,14 +176,14 @@
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:20:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
                     "time" : "2020-02-02T11:30:00Z"
                   }
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:20:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
@@ -197,14 +197,14 @@
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:40:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
                     "time" : "2020-02-02T11:50:00Z"
                   }
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:40:00Z",
                   "estimated" : {
                     "delay" : "PT10M",
@@ -280,11 +280,11 @@
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T11:50:00Z",
                   "estimated" : null
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T11:50:00Z",
                   "estimated" : null
                 },
@@ -295,11 +295,11 @@
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
-                "departure" : {
+                "arrival" : {
                   "scheduledTime" : "2020-02-02T12:00:00Z",
                   "estimated" : null
                 },
-                "arrival" : {
+                "departure" : {
                   "scheduledTime" : "2020-02-02T12:00:00Z",
                   "estimated" : null
                 },

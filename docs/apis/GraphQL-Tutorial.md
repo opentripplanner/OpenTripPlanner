@@ -96,14 +96,14 @@ Most people want to get routing results out of OTP, so lets see the query for th
                     name
                     lat
                     lon
-                    departure {
+                    arrival {
                         scheduledTime
                         estimated {
                             time
                             delay
                         }
                     }
-                    arrival {
+                    departure {
                         scheduledTime
                         estimated {
                             time
@@ -115,14 +115,14 @@ Most people want to get routing results out of OTP, so lets see the query for th
                     name
                     lat
                     lon
-                    departure {
+                    arrival {
                         scheduledTime
                         estimated {
                             time
                             delay
                         }
                     }
-                    arrival {
+                    departure {
                         scheduledTime
                         estimated {
                             time

@@ -49,14 +49,14 @@
                     name
                     lat
                     lon
-                    departure {
+                    arrival {
                         scheduledTime
                         estimated {
                             delay
                             time
                         }
                     }
-                    arrival {
+                    departure {
                         scheduledTime
                         estimated {
                             delay
@@ -70,14 +70,14 @@
                     name
                     lat
                     lon
-                    departure {
+                    arrival {
                         scheduledTime
                         estimated {
                             delay
                             time
                         }
                     }
-                    arrival {
+                    departure {
                         scheduledTime
                         estimated {
                             delay
