@@ -9,14 +9,14 @@ import javax.annotation.Nullable;
 /**
  * A scheduled time of a transit vehicle at a certain location with a optional realtime information.
  */
-public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealtimeEstimate estimated) {
+public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealTimeEstimate estimated) {
   public LegTime {
     Objects.requireNonNull(scheduledTime);
   }
   @Nonnull
   public static LegTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new LegTime(realtime.minus(delay), new RealtimeEstimate(realtime, delay));
+    return new LegTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
   }
   @Nonnull
   public static LegTime ofStatic(ZonedDateTime staticTime) {
@@ -39,5 +39,5 @@ public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealtimeEs
    * Realtime information about a vehicle at a certain place.
    * @param delay Delay or "earliness" of a vehicle. Earliness is expressed as a negative number.
    */
-  record RealtimeEstimate(ZonedDateTime time, Duration delay) {}
+  record RealTimeEstimate(ZonedDateTime time, Duration delay) {}
 }

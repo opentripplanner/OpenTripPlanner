@@ -87,12 +87,12 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public LegTime start() {
-    return LegTime.of(startTime, getArrivalDelay());
+    return LegTime.ofStatic(startTime);
   }
 
   @Override
   public LegTime end() {
-    return LegTime.of(endTime, getDepartureDelay());
+    return LegTime.ofStatic(endTime);
   }
 
   @Override

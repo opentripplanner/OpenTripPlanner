@@ -1656,7 +1656,7 @@ ISO-8601 allows many different formats but OTP will only return the profile spec
 scalar OffsetDateTime @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
 
 "Real-time estimates for a vehicle at a certain place."
-type RealtimeEstimate {
+type RealTimeEstimate {
     time: OffsetDateTime!
     """
     The delay or "earliness" of the vehicle at a certain place.
@@ -1674,7 +1674,7 @@ type LegTime {
     "The scheduled time of the event."
     scheduledTime: OffsetDateTime!
     "The estimated time of the event. If no real-time information is available, this is null,"
-    estimated: RealtimeEstimate
+    estimated: RealTimeEstimate
 }
 
 type Leg {
