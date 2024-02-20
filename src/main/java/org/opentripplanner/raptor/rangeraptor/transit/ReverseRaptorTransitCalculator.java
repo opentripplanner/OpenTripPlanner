@@ -32,8 +32,8 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
     // goes with destination and 'latestArrivalTime()' match origin.
     this(
       s.latestArrivalTime(),
-      s.routerSearchWindowInSeconds(),
-      s.routerEarliestDepartureTime(),
+      s.searchWindowInSeconds(),
+      s.earliestDepartureTime(),
       t.iterationDepartureStepInSeconds()
     );
   }

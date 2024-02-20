@@ -39,8 +39,8 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
     @Nullable IntPredicate acceptC2AtDestination
   ) {
     this(
-      s.routerEarliestDepartureTime(),
-      s.routerSearchWindowInSeconds(),
+      s.earliestDepartureTime(),
+      s.searchWindowInSeconds(),
       s.latestArrivalTime(),
       t.iterationDepartureStepInSeconds(),
       acceptC2AtDestination

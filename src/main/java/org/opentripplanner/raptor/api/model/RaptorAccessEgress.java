@@ -68,7 +68,7 @@ public interface RaptorAccessEgress {
    * cost. Many optimal access paths have an inpact on performance as vell.
    * <p>
    *
-   * The unit is seconds and default value is 0 seconds.
+   * The unit is seconds and the default value is 0 seconds.
    */
   default int timePenalty() {
     return RaptorConstants.ZERO;
@@ -99,16 +99,16 @@ public interface RaptorAccessEgress {
   int latestArrivalTime(int requestedArrivalTime);
 
   /**
-   * This method should return {@code true} if, and only if the instance have restricted
+   * This method should return {@code true} if, and only if the instance has restricted
    * opening-hours.
    */
   boolean hasOpeningHours();
 
   /**
    * Return the opening hours in a short human-readable way for the departure at the origin. Do
-   * not parse this, this should only be used for things like testing, debugging and logging.
+   * not parse this. This should only be used for things like testing, debugging and logging.
    * <p>
-   * This method return {@code null} if there is no opening hours, see {@link #hasOpeningHours()}.
+   * This method return {@code null} if there are no opening hours, see {@link #hasOpeningHours()}.
    */
   @Nullable
   default String openingHoursToString() {
