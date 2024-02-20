@@ -67,7 +67,13 @@ public class AuthorityToAgencyMapperTest {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static Authority authority(String id, String name, String shortName, String url, String phone) {
+  private static Authority authority(
+    String id,
+    String name,
+    String shortName,
+    String url,
+    String phone
+  ) {
     return new Authority()
       .withId(id)
       .withShortName(new MultilingualString().withValue(shortName))

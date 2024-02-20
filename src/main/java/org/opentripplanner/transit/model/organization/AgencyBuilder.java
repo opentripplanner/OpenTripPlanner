@@ -34,6 +34,7 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
   public String getName() {
     return name;
   }
+
   public String getShortName() {
     return shortName;
   }
@@ -42,6 +43,7 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
     this.name = name;
     return this;
   }
+
   public AgencyBuilder withShortName(String shortName) {
     this.shortName = shortName;
     return this;

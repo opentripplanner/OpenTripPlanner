@@ -31,8 +31,8 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
     String nameValue = (builder.getName() != null && !builder.getName().isBlank())
       ? builder.getName()
       : builder.getShortName() != null && !builder.getShortName().isBlank()
-      ? builder.getShortName()
-      : null;
+        ? builder.getShortName()
+        : null;
 
     // Required fields
     this.name = assertHasValue(nameValue, "Missing mandatory name on Agency %s", builder.getId());
@@ -63,6 +63,7 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
   public String getName() {
     return logName();
   }
+
   @Nullable
   public String getShortName() {
     return shortName;
