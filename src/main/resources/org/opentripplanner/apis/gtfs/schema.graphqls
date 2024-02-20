@@ -4261,7 +4261,7 @@ type QueryType {
         is a possibility that more itineraries are used later on (limiting the number of returned itineraries
         does not affect the performance by a lot but can affect the network bandwidth usage).
         """
-        numberOfItineraries: Int
+        numberOfItineraries: Int = 50
 
         """
         The origin where the search starts. Usually coordinates but can also be a stop location.
