@@ -80,4 +80,15 @@ public class WgsCoordinateMapperTest {
     assertEquals(LONGITUDE_VALUE, c.longitude(), DELTA);
     assertEquals(LATITUDE_VALUE, c.latitude(), DELTA);
   }
+
+  @Test
+  public void handleCoordinateWithIncompleteGmlPosition() {
+    LocationStructure locationStructure = new LocationStructure()
+      .withPos(new DirectPositionType().withValue(LONGITUDE_VALUE));
+
+    SimplePoint_VersionStructure point = new SimplePoint_VersionStructure()
+      .withLocation(locationStructure);
+
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(point));
+  }
 }
