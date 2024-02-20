@@ -112,4 +112,19 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
   public int hashCode() {
     return Objects.hash(delegate);
   }
+
+  /**
+   * Use this method to remove a decorator of the given type.
+   */
+  public static RaptorAccessEgress removeRaptorDecoratorIfItExist(
+    RaptorAccessEgress path,
+    Class<? extends AbstractAccessEgressDecorator> decoratorClazz
+  ) {
+    if (path == null) {
+      return null;
+    }
+    return path.getClass() == decoratorClazz
+      ? ((AbstractAccessEgressDecorator) path).delegate()
+      : path;
+  }
 }

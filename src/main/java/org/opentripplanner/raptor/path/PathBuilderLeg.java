@@ -15,6 +15,8 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessWithPenalty;
+import org.opentripplanner.raptor.rangeraptor.transit.EgressWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
@@ -351,6 +353,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
     var accessPath = asAccessLeg().streetPath;
     int cost = cost(costCalculator, accessPath);
+
+    accessPath = AccessWithPenalty.removeDecoratorIfItExist(accessPath);
+
     return new AccessPathLeg<>(accessPath, fromTime, toTime, cost, nextLeg);
   }
 
@@ -447,7 +452,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider
   ) {
     int cost = egressCost(costCalculator, slackProvider);
-    return new EgressPathLeg<>(asEgressLeg().streetPath, fromTime, toTime, cost);
+    var egressPath = asEgressLeg().streetPath;
+
+    egressPath = EgressWithPenalty.removeDecoratorIfItExist(egressPath);
+
+    return new EgressPathLeg<>(egressPath, fromTime, toTime, cost);
   }
 
   /**

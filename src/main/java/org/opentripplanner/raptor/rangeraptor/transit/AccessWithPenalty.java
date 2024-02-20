@@ -24,4 +24,13 @@ public class AccessWithPenalty extends AbstractAccessEgressDecorator {
   public int earliestDepartureTime(int requestedDepartureTime) {
     return delegate().earliestDepartureTime(requestedDepartureTime + delegate().timePenalty());
   }
+
+  /**
+   * This class is used internally in Raptor to decorate an access path. This method removes the
+   * decorator and returns the original access path if decorated. If not, the given path is
+   * returned.
+   */
+  public static RaptorAccessEgress removeDecoratorIfItExist(RaptorAccessEgress path) {
+    return removeRaptorDecoratorIfItExist(path, AccessWithPenalty.class);
+  }
 }
