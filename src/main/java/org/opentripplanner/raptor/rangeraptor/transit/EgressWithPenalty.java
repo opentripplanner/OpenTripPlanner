@@ -7,8 +7,8 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 /**
  * This decorator will add the time penalty to the duration of the egress and adjust the
  * `requestedDepartureTime` when time-shifting the egress according to opening-hours.
- *
- * TODO PEN - Write more
+ * <p>
+ * @see AccessWithPenalty for more info on time-penalty.
  */
 public class EgressWithPenalty extends AbstractAccessEgressDecorator {
 

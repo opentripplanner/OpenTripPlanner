@@ -25,6 +25,11 @@ public class RaptorConstants {
   public static final int ZERO = 0;
 
   /**
+   * One minute is 60 seconds - iteration departure times are usually increased by one minute.
+   */
+  public static final int ONE_MINUTE = 60;
+
+  /**
    * This constant is used to indicate that a value is not set. This applies to parameters of type
    * {@code generalized-cost}, {@code link min-travel-time} and {@code duration} inside Raptor.
    * Most of these types are "positive" numbers, but we want Raptor to be robust and work even

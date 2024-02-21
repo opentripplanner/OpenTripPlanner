@@ -87,7 +87,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
-    this.accessPaths = accessPaths(request);
+    this.accessPaths = accessPaths(tuningParameters.iterationDepartureStepInSeconds(), request);
     this.egressPaths = egressPaths(request);
     this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker =
@@ -314,11 +314,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
       : p -> slackProvider.alightSlack(p.slackIndex());
   }
 
-  private static AccessPaths accessPaths(RaptorRequest<?> request) {
+  private static AccessPaths accessPaths(int iterationStep, RaptorRequest<?> request) {
     boolean forward = request.searchDirection().isForward();
     var params = request.searchParams();
     var paths = forward ? params.accessPaths() : params.egressPaths();
-    return AccessPaths.create(paths, request.profile());
+    return AccessPaths.create(iterationStep, paths, request.profile());
   }
 
   private static EgressPaths egressPaths(RaptorRequest<?> request) {

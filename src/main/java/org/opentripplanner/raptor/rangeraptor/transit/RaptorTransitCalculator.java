@@ -148,10 +148,14 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
     int fromStop
   );
 
-  default int timePlusPenalty(int time, RaptorAccessEgress accessEgress) {
-    return accessEgress.hasTimePenalty() ? plusDuration(time, accessEgress.timePenalty()) : time;
-  }
-
+  /**
+   * This method removes the time-penalty from the given time if the provided accessEgress has
+   * a time-penalty, if not the given time is returned without any change.
+   * <p>
+   * You may use this method to enforce time constraints like the arriveBy time passed into Raptor.
+   * This should not be applied to the time Raptor uses for the comparison, like in the ParetoSet.
+   * The arrival-times used in a pareto-set must include the time-penalty.
+   */
   default int timeMinusPenalty(int time, RaptorAccessEgress accessEgress) {
     return accessEgress.hasTimePenalty() ? minusDuration(time, accessEgress.timePenalty()) : time;
   }

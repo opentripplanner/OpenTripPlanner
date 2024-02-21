@@ -7,8 +7,13 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 /**
  * This decorator will add the time penalty to the duration of the access and adjust the
  * `requestedDepartureTime` when time-shifting the access according to opening-hours.
- *
- * TODO PEN - Write more
+ * <p>
+ * The time-penalty should be invisible outside the Raptor algorithm and should not be part of the
+ * leg start and end times in the result. Inside Raptor the time-penalty is included in times used
+ * for comparing arrivals (comparing paths for optimality). In some cases, we need to exclude the
+ * time-penalty. Checking for limits like 'arrive-by'(in the forward search) and 'depart-after'(in
+ * the reverse search) requires that the time is without the time-penalty. This class does not
+ * do these checks.
  */
 public class AccessWithPenalty extends AbstractAccessEgressDecorator {
 

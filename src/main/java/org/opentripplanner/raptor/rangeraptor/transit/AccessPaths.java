@@ -11,19 +11,30 @@ import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.raptor.spi.IntIterator;
+import org.opentripplanner.raptor.util.IntIterators;
 
 public class AccessPaths {
 
+  private final int iterationStep;
+  private final int maxTimePenalty;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
-  private int timePenaltyLimit = RaptorConstants.TIME_NOT_SET;
+  private int iterationTimePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
   private AccessPaths(
+    int iterationStep,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides
   ) {
+    this.iterationStep = iterationStep;
     this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
     this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;
+    this.maxTimePenalty =
+      Math.max(
+        maxTimePenalty(arrivedOnBoardByNumOfRides),
+        maxTimePenalty(arrivedOnStreetByNumOfRides)
+      );
   }
 
   /**
@@ -36,7 +47,11 @@ public class AccessPaths {
    * <p>
    * This method is static and package local to enable unit-testing.
    */
-  public static AccessPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
+  public static AccessPaths create(
+    int iterationStep,
+    Collection<RaptorAccessEgress> paths,
+    RaptorProfile profile
+  ) {
     if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
     } else {
@@ -46,6 +61,7 @@ public class AccessPaths {
     paths = decorateWithTimePenaltyLogic(paths);
 
     return new AccessPaths(
+      iterationStep,
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
       groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
     );
@@ -58,7 +74,7 @@ public class AccessPaths {
    * If no access exists for the given round, an empty list is returned.
    */
   public List<RaptorAccessEgress> arrivedOnStreetByNumOfRides(int round) {
-    return emptyListIfNull(arrivedOnStreetByNumOfRides.get(round));
+    return filterOnTimePenaltyLimitIfExist(arrivedOnStreetByNumOfRides.get(round));
   }
 
   /**
@@ -68,7 +84,7 @@ public class AccessPaths {
    * If no access exists for the given round, an empty list is returned.
    */
   public List<RaptorAccessEgress> arrivedOnBoardByNumOfRides(int round) {
-    return emptyListIfNull(arrivedOnBoardByNumOfRides.get(round));
+    return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
   public int calculateMaxNumberOfRides() {
@@ -76,6 +92,39 @@ public class AccessPaths {
       Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
       Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
     );
+  }
+
+  public IntIterator iterateOverPathsWithPenalty(final int earliestDepartureTime) {
+    if (!hasTimePenalty()) {
+      return IntIterators.empty();
+    }
+    // In the first iteration, we want the time-limit to be zero and the raptor-iteration-time
+    // to be one step before the earliest-departure-time in the search-window. This will include
+    // all access with a penalty in the first iteration. Then
+    this.iterationTimePenaltyLimit = -iterationStep;
+    final int raptorIterationStartTime = earliestDepartureTime - iterationStep;
+
+    return new IntIterator() {
+      @Override
+      public boolean hasNext() {
+        return AccessPaths.this.iterationTimePenaltyLimit + iterationStep < maxTimePenalty;
+      }
+
+      @Override
+      public int next() {
+        AccessPaths.this.iterationTimePenaltyLimit += iterationStep;
+        return raptorIterationStartTime - AccessPaths.this.iterationTimePenaltyLimit;
+      }
+    };
+  }
+
+  private int maxTimePenalty(TIntObjectMap<List<RaptorAccessEgress>> col) {
+    return col
+      .valueCollection()
+      .stream()
+      .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
+      .max()
+      .orElse(RaptorConstants.TIME_NOT_SET);
   }
 
   /**
@@ -98,7 +147,7 @@ public class AccessPaths {
   }
 
   private boolean hasTimePenalty() {
-    return timePenaltyLimit != RaptorConstants.TIME_NOT_SET;
+    return maxTimePenalty != RaptorConstants.TIME_NOT_SET;
   }
 
   private static boolean hasTimeDependentAccess(TIntObjectMap<List<RaptorAccessEgress>> map) {
@@ -111,11 +160,19 @@ public class AccessPaths {
   }
 
   /**
+   * This method will filter the given list of access using the time-penalty-limit - if the
+   * limit set. If the limit is not set, then the given list is returned. This only filters the
+   * list after all iterations are done, and we start iterating over the vertual minutes to allow
+   * itineraries with a time-penalty to be included, even if the start before the search-window.
+   * <p>
    * This method returns an empty list if the given input list is {@code null}.
    */
-  private List<RaptorAccessEgress> emptyListIfNull(List<RaptorAccessEgress> list) {
+  private List<RaptorAccessEgress> filterOnTimePenaltyLimitIfExist(List<RaptorAccessEgress> list) {
     if (list == null) {
       return List.of();
+    }
+    if (hasTimePenalty()) {
+      return list.stream().filter(e -> e.timePenalty() > iterationTimePenaltyLimit).toList();
     }
     return list;
   }

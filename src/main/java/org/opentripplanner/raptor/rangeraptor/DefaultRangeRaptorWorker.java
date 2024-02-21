@@ -135,10 +135,15 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
       while (it.hasNext()) {
-        OTPRequestTimeoutException.checkForTimeout();
-        // Run the raptor search for this particular iteration departure time
-        iterationDepartureTime = it.next();
-        lifeCycle.setupIteration(iterationDepartureTime);
+        setupIteration(it.next());
+        runRaptorForMinute();
+      }
+
+      // Iterate over virtual departure times - this is needed to allow access with a time-penalty
+      // which falls outside the search-window due to the penalty to be added to the result.
+      final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
+      while (as.hasNext()) {
+        setupIteration(as.next());
         runRaptorForMinute();
       }
     });
@@ -260,12 +265,25 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     });
   }
 
+  private int round() {
+    return roundTracker.round();
+  }
+
   private void findAccessOnStreetForRound() {
     addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
   }
 
   private void findAccessOnBoardForRound() {
     addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
+  }
+
+  /**
+   * Run the raptor search for this particular iteration departure time
+   */
+  private void setupIteration(int iterationDepartureTime) {
+    OTPRequestTimeoutException.checkForTimeout();
+    this.iterationDepartureTime = iterationDepartureTime;
+    lifeCycle.setupIteration(this.iterationDepartureTime);
   }
 
   /**
@@ -278,13 +296,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
       // Access must be available after the iteration departure time
       if (departureTime != RaptorConstants.TIME_NOT_SET) {
-        // TODO TP - Is this ok?
-        transitWorker.setAccessToStop(it, calculator.timeMinusPenalty(departureTime, it));
+        transitWorker.setAccessToStop(it, departureTime);
       }
     }
-  }
-
-  private int round() {
-    return roundTracker.round();
   }
 }
