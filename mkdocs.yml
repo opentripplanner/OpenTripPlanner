@@ -64,6 +64,7 @@ nav:
     - Netex and SIRI: 'Netex-Norway.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
+    - Frontends: 'Frontends.md'
 - APIs:
     - Introduction: 'apis/Apis.md'
     - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
