@@ -121,15 +121,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return flexAndWalk(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
   }
 
-  // TODO Fix: imeAndCost penalty is an otp model thing - nothing to do with Raptor
-  public static TestAccessEgress car(int stop, int durationInSeconds, Object penalty) {
-    return new Builder(stop, durationInSeconds)
-      .withFree()
-      .withCost(durationInSeconds)
-      //.withPenalty(penalty)
-      .build();
-  }
-
   /** Create a flex access arriving at given stop by walking. */
   public static TestAccessEgress flexAndWalk(
     int stop,
