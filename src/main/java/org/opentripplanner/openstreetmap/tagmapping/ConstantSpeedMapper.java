@@ -31,10 +31,9 @@ class ConstantSpeedFinlandMapper implements OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     props.setCarSpeed("highway=*", speed);
-    props.maxPossibleCarSpeed = 22.22f;
-    props.maxUsedCarSpeed = 22.22f;
     // Read the rest from the default set
     new FinlandMapper().populateProperties(props);
+    props.maxPossibleCarSpeed = speed;
   }
 
   @Override
@@ -42,6 +41,14 @@ class ConstantSpeedFinlandMapper implements OsmTagMapper {
     /*
      * Set the same 80 km/h speed for all roads, so that car routing finds shortest path
      */
+    return speed;
+  }
+
+  @Override
+  public Float getMaxUsedCarSpeed(WayPropertySet wayPropertySet) {
+    // This is needed because the way property set uses normal speed limits from Finland mapper
+    // to set the walk safety limits which resets the maximum used car speed to be something else
+    // than what is used for the street edge car speeds.
     return speed;
   }
 }

@@ -556,9 +556,9 @@ public class OsmModule implements GraphBuilderModule {
   private float getMaxCarSpeed() {
     float maxSpeed = 0f;
     for (OsmProvider provider : providers) {
-      var wps = provider.getWayPropertySet();
-      if (wps.maxUsedCarSpeed > maxSpeed) {
-        maxSpeed = wps.maxUsedCarSpeed;
+      var carSpeed = provider.getOsmTagMapper().getMaxUsedCarSpeed(provider.getWayPropertySet());
+      if (carSpeed > maxSpeed) {
+        maxSpeed = carSpeed;
       }
     }
     return maxSpeed;
