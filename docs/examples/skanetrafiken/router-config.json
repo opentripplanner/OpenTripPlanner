@@ -44,7 +44,8 @@
       "type": "siri-azure-sx-updater",
       "topic": "<topic_name>",
       "feedId": "<feed_id>",
-      "servicebus-url": "<service_bus_url>",
+      "authenticationType": "FederatedIdentity",
+      "fullyQualifiedNamespace":  "<fully_qualified_namespace>",
       "customMidnight": 4,
       "history": {
         "url": "<history_endpoint_url>",

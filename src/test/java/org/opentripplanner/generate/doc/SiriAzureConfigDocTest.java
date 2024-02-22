@@ -23,13 +23,16 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @GeneratesDocumentation
-public class SiriConfigDocTest {
+public class SiriAzureConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "sandbox/siri/SiriUpdater.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/siri/SiriUpdater.md");
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "sandbox/siri/SiriAzureUpdater.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/siri/SiriAzureUpdater.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater", "siri-sx-updater");
+  private static final Set<String> INCLUDE_UPDATERS = Set.of(
+    "siri-azure-et-updater",
+    "siri-azure-sx-updater"
+  );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 

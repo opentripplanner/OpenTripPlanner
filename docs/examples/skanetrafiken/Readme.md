@@ -93,6 +93,9 @@ id from the message. In case OTP was not able to find corresponding trip additio
 performed based on arrival-times/stop-patterns from the ET message. This feature turned off by default but can be
 activated by adding *fuzzyTripMatching* property to updater configuration. 
 
+### FederatedIdentity
+It is also possible to connect to Service Bus through FederatedIdentity. Change **authenticationType** to
+**FederatedIdentity** and provide **fullyQualifiedNamespace** in router-config.
 
 
 
