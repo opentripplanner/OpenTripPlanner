@@ -68,6 +68,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final AccessPaths accessPaths;
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
+  @Nullable
+  private final IntPredicate acceptC2AtDestination;
+
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
@@ -79,14 +82,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
     RaptorTransitDataProvider<T> transit,
-    IntPredicate acceptC2AtDestination
+    @Nullable IntPredicate acceptC2AtDestination
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
     this.accessPaths = accessPaths(request);
     this.egressPaths = egressPaths(request);
-    this.calculator = createCalculator(request, tuningParameters, acceptC2AtDestination);
+    this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker =
       new RoundTracker(
         nRounds(),
@@ -94,6 +97,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         lifeCycle()
       );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
+    this.acceptC2AtDestination = acceptC2AtDestination;
   }
 
   public AccessPaths accessPaths() {
@@ -169,6 +173,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   public RaptorTimers performanceTimers() {
     return request.performanceTimers();
+  }
+
+  @Nullable
+  public IntPredicate acceptC2AtDestination() {
+    return acceptC2AtDestination;
   }
 
   /** Number of stops in transit graph. */
@@ -268,14 +277,13 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   private static <T extends RaptorTripSchedule> RaptorTransitCalculator<T> createCalculator(
     RaptorRequest<T> r,
-    RaptorTuningParameters t,
-    IntPredicate acceptC2AtDestination
+    RaptorTuningParameters t
   ) {
     var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
 
     if (forward) {
-      return new ForwardRaptorTransitCalculator<>(s, t, acceptC2AtDestination);
+      return new ForwardRaptorTransitCalculator<>(s, t);
     } else {
       return new ReverseRaptorTransitCalculator<>(s, t);
     }
