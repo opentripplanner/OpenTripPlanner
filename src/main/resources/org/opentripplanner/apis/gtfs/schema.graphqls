@@ -1699,7 +1699,7 @@ input PlanTransitModesInput {
     transfer: [PlanTransferMode!]
 
     """
-    Transit modes and reluctancies associated with them. Each defined mode can be used in
+    Transit modes and reluctances associated with them. Each defined mode can be used in
     an itinerary but doesn't have to be. If direct search is not disabled, there can be an
     itinerary without any transit legs. By default, all transit modes are usable.
     """
