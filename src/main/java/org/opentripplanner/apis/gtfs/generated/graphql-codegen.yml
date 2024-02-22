@@ -80,8 +80,6 @@ config:
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     PlanConnection: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     PlanEdge: graphql.relay.DefaultEdge#DefaultEdge<Itinerary>
-    PlanLabeledLocation: org.opentripplanner.apis.gtfs.model.PlanLabeledLocation#PlanLabeledLocation
-    PlanLocation: org.opentripplanner.apis.gtfs.model.PlanLocation#PlanLocation
     PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: String
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection

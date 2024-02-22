@@ -1564,22 +1564,6 @@ input PlanItineraryFilterInput {
 }
 
 """
-Location that was used in the itinerary search as a origin or destination.
-"""
-type PlanLabeledLocation {
-    """
-    A location used in a plan query. This can be null if a stop location ID was specified as an input
-    location but a stop location with that ID does not exist.
-    """
-    location: PlanLocation
-
-    """
-    A label that was attached to the location.
-    """
-    label: String
-}
-
-"""
 Plan location settings. Location must be set. Label is optional
 and used for naming the location.
 """
@@ -1595,11 +1579,6 @@ input PlanLabeledLocationInput {
     """
     label: String
 }
-
-"""
-Union of locations types that could be used in a plan query.
-"""
-union PlanLocation = Stop | Coordinate
 
 """
 Plan location. Either a coordinate or a stop location should be defined.
@@ -3329,16 +3308,6 @@ type PlanConnection {
     What was the starting point for the itinerary search.
     """
     searchDateTime: OffsetDateTime
-
-    """
-    Origin of the itinerary search.
-    """
-    origin: PlanLabeledLocation!
-
-    """
-    Destination of the itinerary search.
-    """
-    destination: PlanLabeledLocation!
 
     """
     Errors faced during the routing search.

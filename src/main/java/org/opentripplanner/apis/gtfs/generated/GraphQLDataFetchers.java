@@ -21,8 +21,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
-import org.opentripplanner.apis.gtfs.model.PlanLabeledLocation;
-import org.opentripplanner.apis.gtfs.model.PlanLocation;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -667,11 +665,7 @@ public class GraphQLDataFetchers {
    * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLPlanConnection {
-    public DataFetcher<PlanLabeledLocation> destination();
-
     public DataFetcher<Iterable<DefaultEdge<Itinerary>>> edges();
-
-    public DataFetcher<PlanLabeledLocation> origin();
 
     public DataFetcher<PlanPageInfo> pageInfo();
 
@@ -689,16 +683,6 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Itinerary> node();
   }
-
-  /** Location that was used in the itinerary search as a origin or destination. */
-  public interface GraphQLPlanLabeledLocation {
-    public DataFetcher<String> label();
-
-    public DataFetcher<PlanLocation> location();
-  }
-
-  /** Union of locations types that could be used in a plan query. */
-  public interface GraphQLPlanLocation extends TypeResolver {}
 
   /**
    * Information about pagination in a connection. Part of the
