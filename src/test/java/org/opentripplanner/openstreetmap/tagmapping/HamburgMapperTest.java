@@ -24,25 +24,23 @@ public class HamburgMapperTest {
 
     boolean generalNoThroughTraffic = mapper.isGeneralNoThroughTraffic(way);
 
-    Assertions.assertFalse(generalNoThroughTraffic,
-      "access=customers and customers=hvv should not be considered through-traffic");
+    Assertions.assertFalse(
+      generalNoThroughTraffic,
+      "access=customers and customers=hvv should not be considered through-traffic"
+    );
   }
 
   @ParameterizedTest
-  @CsvSource(value = {
-    "no",
-    "destination",
-    "private",
-    "customers",
-    "delivery"
-  })
+  @CsvSource(value = { "no", "destination", "private", "customers", "delivery" })
   public void shouldDisallowThroughTraffic_WhenNoCustomersHVV(String access) {
     OSMWithTags way = new OSMWithTags();
     way.addTag("access", access);
 
     boolean generalNoThroughTraffic = mapper.isGeneralNoThroughTraffic(way);
 
-    Assertions.assertTrue(generalNoThroughTraffic,
-      "access={no, destination, private, customers, delivery} should be blocked in general");
+    Assertions.assertTrue(
+      generalNoThroughTraffic,
+      "access={no, destination, private, customers, delivery} should be blocked in general"
+    );
   }
 }
