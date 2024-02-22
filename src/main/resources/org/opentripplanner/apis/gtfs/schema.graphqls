@@ -4219,7 +4219,9 @@ type QueryType {
         itineraries are either closest to the defined earliest departure time or to the latest arrival
         time. It can make sense to search for more itineraries that what is immediately needed if there
         is a possibility that more itineraries are used later on (limiting the number of returned itineraries
-        does not affect the performance by a lot but can affect the network bandwidth usage).
+        does not affect the performance by a lot but can affect the network bandwidth usage). During the
+        search for next or previous pages with `after` or `before` cursors, this field is ignored and
+        `first` or `last` should be used instead.
         """
         numberOfItineraries: Int = 50
 
