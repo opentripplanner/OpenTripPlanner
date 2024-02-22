@@ -42,13 +42,13 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
     s1.incrementWeight(1);
     s1.setBackMode(null);
 
-    var rentalPreferences = s0.getPreferences().rental(s0.getRequest().mode());
-    if (
-      s0.isRentingVehicleFromStation() &&
-      s0.mayKeepRentedVehicleAtDestination() &&
-      rentalPreferences.allowArrivingInRentedVehicleAtDestination()
-    ) {
-      s1.incrementWeight(rentalPreferences.arrivingInRentalVehicleAtDestinationCost().toSeconds());
+    if (s0.isRentingVehicleFromStation() && s0.mayKeepRentedVehicleAtDestination()) {
+      var rentalPreferences = s0.getPreferences().rental(s0.getRequest().mode());
+      if (rentalPreferences.allowArrivingInRentedVehicleAtDestination()) {
+        s1.incrementWeight(
+          rentalPreferences.arrivingInRentalVehicleAtDestinationCost().toSeconds()
+        );
+      }
     }
 
     return s1.makeStateArray();

@@ -64,6 +64,7 @@ nav:
     - Netex and SIRI: 'Netex-Norway.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
+    - Frontends: 'Frontends.md'
 - APIs:
     - Introduction: 'apis/Apis.md'
     - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
@@ -106,7 +107,6 @@ nav:
     - Park and Ride API: 'sandbox/ParkAndRideApi.md'
     - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'
-    - Vehicle-to-stop Heuristics: 'sandbox/VehicleToStopHeuristics.md'
     - Geocoder API: 'sandbox/GeocoderAPI.md'
     - Travel Time Isochrones: 'sandbox/TravelTime.md'
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'

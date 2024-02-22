@@ -2,7 +2,6 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -25,12 +24,22 @@ public interface StopConsolidationService {
   boolean isPrimaryStop(StopLocation stop);
 
   /**
+   * Is the given stop a secondary stop as defined by the stop consolidation configuration?
+   */
+  boolean isSecondaryStop(StopLocation stop);
+
+  /**
    * Are any stop consolidations defined?
    */
   boolean isActive();
 
   /**
-   * For a given primary stop look up the name as it was originally defined in the agency's feed.
+   * For a given primary stop look up secondary feed as it was originally defined in the agency's feed.
    */
-  I18NString agencySpecificName(StopLocation stop, Agency agency);
+  StopLocation agencySpecificStop(StopLocation stop, Agency agency);
+
+  /**
+   * For a given stop id return the primary stop if it is part of a consolidated stop group.
+   */
+  StopLocation primaryStop(FeedScopedId id);
 }

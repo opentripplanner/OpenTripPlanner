@@ -107,7 +107,9 @@ public final class TripScheduleWithOffset implements TripSchedule {
   public String toString() {
     return ToStringBuilder
       .of(TripScheduleWithOffset.class)
-      .addObj("trip", pattern.debugInfo())
+      .addObj("info", pattern.debugInfo())
+      .addObjOpSafe("id", () -> tripTimes.getTrip().getId())
+      .addObjOpSafe("pattern.id", () -> pattern.getTripPattern().getPattern().getId())
       .addServiceTime("depart", secondsOffset + getOriginalTripTimes().getDepartureTime(0))
       .toString();
   }

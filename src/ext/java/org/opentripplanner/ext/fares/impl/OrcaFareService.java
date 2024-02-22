@@ -23,12 +23,8 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OrcaFareService extends DefaultFareService {
-
-  private static final Logger LOG = LoggerFactory.getLogger(OrcaFareService.class);
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 
@@ -400,13 +396,13 @@ public class OrcaFareService extends DefaultFareService {
    * one.
    */
   @Override
-  public boolean populateFare(
-    ItineraryFares fare,
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
+    var fare = ItineraryFares.empty();
     ZonedDateTime freeTransferStartTime = null;
     Money cost = Money.ZERO_USD;
     Money orcaFareDiscount = Money.ZERO_USD;
@@ -484,11 +480,12 @@ public class OrcaFareService extends DefaultFareService {
     }
     cost = cost.plus(orcaFareDiscount);
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
-      fare.addFare(fareType, cost);
-      return true;
-    } else {
-      return false;
+      var fp = FareProduct
+        .of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost)
+        .build();
+      fare.addItineraryProducts(List.of(fp));
     }
+    return fare;
   }
 
   /**

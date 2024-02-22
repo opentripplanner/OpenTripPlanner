@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.transmodel._support.TestDataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 class BikePreferencesMapperTest {
 
@@ -23,7 +23,7 @@ class BikePreferencesMapperTest {
       Arguments.of("bikeSpeed", 10.0, "BikePreferences{speed: 10.0}"),
       Arguments.of(
         "bicycleOptimisationMethod",
-        BicycleOptimizeType.TRIANGLE,
+        VehicleRoutingOptimizeType.TRIANGLE,
         "BikePreferences{optimizeType: TRIANGLE}"
       ),
       // No effect unless BicycleOptimize is TRIANGLE
@@ -64,7 +64,7 @@ class BikePreferencesMapperTest {
   @ParameterizedTest
   @MethodSource("mapBikePreferencesOptimizeTriangleTestCases")
   void testMapBikePreferencesOptimizeTriangle(String field, Object value, String expected) {
-    var preferences = BikePreferences.of().withOptimizeType(BicycleOptimizeType.TRIANGLE);
+    var preferences = BikePreferences.of().withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE);
     mapBikePreferences(preferences, TestDataFetcherDecorator.of(field, value));
     assertEquals(
       "BikePreferences{optimizeType: TRIANGLE, optimizeTriangle: " + expected + "}",

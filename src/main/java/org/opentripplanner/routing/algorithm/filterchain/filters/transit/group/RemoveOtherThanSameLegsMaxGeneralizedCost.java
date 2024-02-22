@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * This filter remove itineraries, which use the same trips for most of their legs, but where some
+ * This filter removes itineraries, which use the same trips for most of their legs, but where some
  * itineraries have a much higher cost for the other legs. This is similar to {@link
  * org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
  * but is used together with {@link GroupByFilter} to filter within the groups.
@@ -79,7 +79,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     // Find the lowest cost for any itinerary
     OptionalInt minimumCost = itineraries
       .stream()
-      .mapToInt(itinerary -> itinerary.getGeneralizedCost())
+      .mapToInt(Itinerary::getGeneralizedCostIncludingPenalty)
       .min();
 
     if (minimumCost.isEmpty()) {
@@ -93,7 +93,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
 
     return itineraries
       .stream()
-      .filter(it -> it.getGeneralizedCost() > maxLimit)
+      .filter(it -> it.getGeneralizedCostIncludingPenalty() > maxLimit)
       .collect(Collectors.toList());
   }
 }

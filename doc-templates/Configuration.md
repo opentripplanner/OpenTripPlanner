@@ -128,8 +128,8 @@ you can run the following bash command:
 - `head -c 29 Graph.obj ==>  OpenTripPlannerGraph;0000007;` (file header)
 - `head -c 28 Graph.obj | tail -c 7 ==>  0000007`  (version id)
 
-The Maven _pom.xml_, the _META-INF/MANIFEST.MF_, the OTP command line(`--serVerId`), log start-up
-messages and all OTP APIs can be used to get the OTP Serialization Version Id.
+The Maven _pom.xml_, the _META-INF/MANIFEST.MF_, the OTP command line(`--serializationVersionId`), 
+log start-up messages and all OTP APIs can be used to get the OTP Serialization Version Id.
 
 ## Include file directive
 

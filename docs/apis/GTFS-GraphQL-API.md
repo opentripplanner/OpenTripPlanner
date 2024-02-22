@@ -5,6 +5,9 @@ used heavily by [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
 
 [otp-react-redux](https://github.com/opentripplanner/otp-react-redux) has also migrated to this API in 2023.
 
+There is also a [Java client](https://github.com/opentripplanner/otp-java-client) available which
+makes it easy to use this API in a Java application.
+
 ## URLs 
  - GraphQL endpoint: [`http://localhost:8080/otp/gtfs/v1`](http://localhost:8080/otp/gtfs/v1)
  - HTML schema documentation: [https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)

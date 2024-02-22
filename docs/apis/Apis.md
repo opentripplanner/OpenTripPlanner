@@ -18,7 +18,7 @@ entities on a vector map.
 The [Actuator API](../sandbox/ActuatorAPI.md) provides endpoints for checking the health status of the
 OTP instance and reading live application metrics. 
 
-The [Geocoder API](../sandbox/GeocoderAPI.md) allows you to geocode street corners and stop names.
+The [Geocoder API](../sandbox/GeocoderAPI.md) allows you to geocode stop names and codes.
 
 ## Legacy APIs (to be removed)
 

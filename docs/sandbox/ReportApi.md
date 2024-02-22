@@ -32,6 +32,8 @@ This module mounts an endpoint for generating reports under `otp/report`. Availa
     - [German version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=germany)
     - [UK version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=uk)
     - [Finnish version](http://localhost:8080/otp/report/bicycle-safety.csv?osmWayPropertySet=finland)
+- [/otp/report/transit/group/priorities](http://localhost:8080/otp/report/transit/group/priorities):
+  List all transit groups used for transit-group-priority (Competition neutral planning).   
 
 ### Configuration
 

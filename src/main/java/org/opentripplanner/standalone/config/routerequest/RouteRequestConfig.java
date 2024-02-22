@@ -15,15 +15,20 @@ import static org.opentripplanner.standalone.config.routerequest.VehicleWalkingC
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
@@ -181,6 +186,7 @@ travel time `x` (in seconds).
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
+    preferences.withScooter(it -> mapScooterPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
@@ -455,7 +461,9 @@ ferries, where the check-in process needs to be done in good time before ride.
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
 
-            The default is no penalty, if not configured.
+            The default values are
+            
+            %s
 
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -470,9 +478,15 @@ ferries, where the check-in process needs to be done in good time before ride.
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
-            """
+            """.formatted(
+                    formatPenaltyDefaultValues(dftAccessEgress)
+                  )
               )
-              .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
+              .asEnumMap(
+                StreetMode.class,
+                TimeAndCostPenaltyMapper::map,
+                dftAccessEgress.penalty().asEnumMap()
+              )
           )
           .withMaxDuration(
             cae
@@ -569,6 +583,16 @@ your users receive a timely response. You can also limit the max duration. There
       );
   }
 
+  private static String formatPenaltyDefaultValues(AccessEgressPreferences dftAccessEgress) {
+    return dftAccessEgress
+      .penalty()
+      .asEnumMap()
+      .entrySet()
+      .stream()
+      .map(s -> "- `%s` = %s".formatted(StringUtils.kebabCase(s.getKey().toString()), s.getValue()))
+      .collect(Collectors.joining("\n"));
+  }
+
   private static void mapCarPreferences(NodeAdapter root, CarPreferences.Builder builder) {
     var dft = builder.original();
     NodeAdapter c = root.of("car").since(V2_5).summary("Car preferences.").asObject();
@@ -618,6 +642,41 @@ your users receive a timely response. You can also limit the max duration. There
           .asDouble(dft.decelerationSpeed())
       )
       .withParking(it -> mapParking(c, it))
+      .withRental(it -> mapRental(c, it));
+  }
+
+  private static void mapScooterPreferences(NodeAdapter root, ScooterPreferences.Builder builder) {
+    var dft = builder.original();
+    NodeAdapter c = root.of("scooter").since(V2_5).summary("Scooter preferences.").asObject();
+    builder
+      .withSpeed(
+        c
+          .of("speed")
+          .since(V2_0)
+          .summary("Max scooter speed along streets, in meters per second")
+          .asDouble(dft.speed())
+      )
+      .withReluctance(
+        c
+          .of("reluctance")
+          .since(V2_0)
+          .summary(
+            "A multiplier for how bad scooter travel is, compared to being in transit for equal lengths of time."
+          )
+          .asDouble(dft.reluctance())
+      )
+      .withOptimizeType(
+        c
+          .of("optimization")
+          .since(V2_0)
+          .summary("The set of characteristics that the user wants to optimize for.")
+          .description(
+            "If the triangle optimization is used, it's enough to just define the triangle parameters"
+          )
+          .asEnum(dft.optimizeType())
+      )
+      // triangle overrides the optimization type if defined
+      .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(c, it))
       .withRental(it -> mapRental(c, it));
   }
 

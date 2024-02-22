@@ -67,7 +67,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                               | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
-| [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                                   | *Optional* |               |  2.0  |
+| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                             | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -496,6 +496,20 @@ Used to group requests when monitoring OTP.
         "cost" : 600
       }
     },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
+    },
     "walk" : {
       "speed" : 1.3,
       "reluctance" : 4.0,
@@ -625,58 +639,61 @@ Used to group requests when monitoring OTP.
   "transmodelApi" : {
     "hideFeedId" : true
   },
-  "vectorTileLayers" : [
-    {
-      "name" : "stops",
-      "type" : "Stop",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "stations",
-      "type" : "Station",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 12,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "rentalPlaces",
-      "type" : "VehicleRental",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    },
-    {
-      "name" : "rentalVehicle",
-      "type" : "VehicleRentalVehicle",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60
-    },
-    {
-      "name" : "rentalStation",
-      "type" : "VehicleRentalStation",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "vehicleParking",
-      "type" : "VehicleParking",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    }
-  ],
+  "vectorTiles" : {
+    "basePath" : "/otp_ct/vectorTiles",
+    "layers" : [
+      {
+        "name" : "stops",
+        "type" : "Stop",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "stations",
+        "type" : "Station",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 12,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "rentalPlaces",
+        "type" : "VehicleRental",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      },
+      {
+        "name" : "rentalVehicle",
+        "type" : "VehicleRentalVehicle",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60
+      },
+      {
+        "name" : "rentalStation",
+        "type" : "VehicleRentalStation",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "vehicleParking",
+        "type" : "VehicleParking",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      }
+    ]
+  },
   "timetableUpdates" : {
     "purgeExpiredData" : false,
     "maxSnapshotFrequency" : "2s"

@@ -78,8 +78,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [safety](#rd_bicycle_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
 |       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
 |    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       [hopCost](#rd_bicycle_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
-|       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                         | *Optional* | `"PT0S"`         |  2.0  |
+|       [mountDismountCost](#rd_bicycle_walk_mountDismountCost)                                                |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
+|       [mountDismountTime](#rd_bicycle_walk_mountDismountTime)                                                |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                         | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                    | *Optional* | `5.0`            |  2.1  |
 |       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                            | *Optional* | `1.33`           |  2.1  |
 |       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
@@ -125,6 +125,24 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`            |  2.2  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                         | `enum map of duration` | Limit direct route duration per street mode.                                                                                                   | *Optional* |                  |  2.2  |
+| scooter                                                                                                      |        `object`        | Scooter preferences.                                                                                                                           | *Optional* |                  |  2.5  |
+|    [optimization](#rd_scooter_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe-streets"` |  2.0  |
+|    reluctance                                                                                                |        `double`        | A multiplier for how bad scooter travel is, compared to being in transit for equal lengths of time.                                            | *Optional* | `2.0`            |  2.0  |
+|    speed                                                                                                     |        `double`        | Max scooter speed along streets, in meters per second                                                                                          | *Optional* | `5.0`            |  2.0  |
+|    rental                                                                                                    |        `object`        | Vehicle rental options                                                                                                                         | *Optional* |                  |  2.3  |
+|       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                | *Optional* | `false`          |  2.2  |
+|       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
+|       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                             | *Optional* | `"PT30S"`        |  2.0  |
+|       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                       | *Optional* | `0`              |  2.2  |
+|       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
+|       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
+|       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                              | *Optional* | `false`          |  2.0  |
+|       [allowedNetworks](#rd_scooter_rental_allowedNetworks)                                                  |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
+|       [bannedNetworks](#rd_scooter_rental_bannedNetworks)                                                    |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
+|    [triangle](#rd_scooter_triangle)                                                                          |        `object`        | Triangle optimization criteria.                                                                                                                | *Optional* |                  |  2.5  |
+|       flatness                                                                                               |        `double`        | Relative importance of flat terrain (range 0-1).                                                                                               | *Optional* | `0.0`            |  2.0  |
+|       [safety](#rd_scooter_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
+|       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
 | [transferOptimization](#rd_transferOptimization)                                                             |        `object`        | Optimize where a transfer between to trip happens.                                                                                             | *Optional* |                  |  2.1  |
 |    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                               |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                                      | *Optional* | `1.0`            |  2.1  |
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                                 |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                                     | *Optional* | `0.0`            |  2.1  |
@@ -406,7 +424,12 @@ since the search-window is increased with the same amount as the maximum penalty
 the access legs used. In other cases where the access(CAR) is faster than transit the
 performance will be better.
 
-The default is no penalty, if not configured.
+The default values are
+
+- `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `flexible` = (timePenalty: 10m + 1.30 t, costFactor: 1.30)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -525,7 +548,7 @@ This factor can also include other concerns such as convenience and general cycl
 preferences by taking into account road surface etc.
 
 
-<h3 id="rd_bicycle_walk_hopCost">hopCost</h3>
+<h3 id="rd_bicycle_walk_mountDismountCost">mountDismountCost</h3>
 
 **Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
 **Path:** /routingDefaults/bicycle/walk 
@@ -536,7 +559,7 @@ There are different parameters for the cost of renting or parking a vehicle and 
 not meant for controlling the cost of those events.
 
 
-<h3 id="rd_bicycle_walk_hopTime">hopTime</h3>
+<h3 id="rd_bicycle_walk_mountDismountTime">mountDismountTime</h3>
 
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults/bicycle/walk 
@@ -827,6 +850,50 @@ Override the settings in `maxDirectStreetDuration` for specific street modes. Th
 done because some street modes searches are much more resource intensive than others.
 
 
+<h3 id="rd_scooter_optimization">optimization</h3>
+
+**Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
+**Path:** /routingDefaults/scooter   
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
+
+The set of characteristics that the user wants to optimize for.
+
+If the triangle optimization is used, it's enough to just define the triangle parameters
+
+<h3 id="rd_scooter_rental_allowedNetworks">allowedNetworks</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/scooter/rental 
+
+The vehicle rental networks which may be used. If empty all networks may be used.
+
+<h3 id="rd_scooter_rental_bannedNetworks">bannedNetworks</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/scooter/rental 
+
+The vehicle rental networks which may not be used. If empty, no networks are banned.
+
+<h3 id="rd_scooter_triangle">triangle</h3>
+
+**Since version:** `2.5` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/scooter 
+
+Triangle optimization criteria.
+
+Optimization type doesn't need to be defined if these values are defined.
+
+<h3 id="rd_scooter_triangle_safety">safety</h3>
+
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`   
+**Path:** /routingDefaults/scooter/triangle 
+
+Relative importance of safety (range 0-1).
+
+This factor can also include other concerns such as convenience and general cyclist
+preferences by taking into account road surface etc.
+
+
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
 **Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -1091,6 +1158,20 @@ include stairs as a last result.
       "parking" : {
         "time" : "5m",
         "cost" : 600
+      }
+    },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
       }
     },
     "walk" : {

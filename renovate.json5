@@ -25,14 +25,21 @@
         "com.microsoft.azure:azure-servicebus",
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus",
-        "io.netty:netty-bom"
+        "com.azure:azure-messaging-servicebus"
       ],
       "enabled": false
     },
     {
       "matchFiles": ["client-next/package.json"],
-      "enabled": false
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Debug UI dependencies (non-major)",
+      "schedule": ["on the first day of the week"],
+      "assignees": ["testower"]
+    },
+    {
+      "matchFiles": ["client-next/package.json"],
+      "matchUpdateTypes": ["major"],
+      "assignees": ["testower"]
     },
     // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
     {

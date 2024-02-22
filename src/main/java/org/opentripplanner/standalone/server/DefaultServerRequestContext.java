@@ -8,7 +8,6 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -24,6 +23,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -39,7 +39,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final TileRendererManager tileRendererManager;
-  private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
+  private final VectorTileConfig vectorTileConfig;
   private final FlexConfig flexConfig;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
@@ -59,7 +59,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
     TileRendererManager tileRendererManager,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
@@ -75,7 +75,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.tileRendererManager = tileRendererManager;
-    this.vectorTileLayers = vectorTileLayers;
+    this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
     this.flexConfig = flexConfig;
     this.traverseVisitor = traverseVisitor;
@@ -97,7 +97,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     MeterRegistry meterRegistry,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
@@ -115,7 +115,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       meterRegistry,
       raptorConfig,
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
-      vectorTileLayers,
+      vectorTileConfig,
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
@@ -220,8 +220,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
-    return vectorTileLayers;
+  public VectorTileConfig vectorTileConfig() {
+    return vectorTileConfig;
   }
 
   @Override

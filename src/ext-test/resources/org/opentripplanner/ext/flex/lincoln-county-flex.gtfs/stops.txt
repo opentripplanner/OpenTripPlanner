@@ -1,0 +1,17 @@
+stop_id,stop_code,platform_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,position,direction,wheelchair_boarding
+2456756,517,,3rd Street and Pontiac Street (Yachats Log Church),,44.3116263048855,-124.105422953253,,,0,,America/Los_Angeles,,,0
+2456757,539,,Waldport Clinic,,44.416184,-124.076029,,,0,,America/Los_Angeles,,,0
+2456758,538,,Dollar General,,44.427015,-124.065051,,,0,,America/Los_Angeles,,,0
+2456760,526,,Hwy 101 and NE 17th Street,,44.6506199947377,-124.052895474438,,,0,,America/Los_Angeles,,,0
+2456766,531,,22nd Street at Beach Club,,44.98137,-124.00641,,,0,,America/Los_Angeles,,,0
+2483495,503,,Walmart (Loop Route Only),,44.656229016403,-124.053896609126,,,0,,America/Los_Angeles,,,0
+2483496,525,,Applegate Street and 11th Street,,44.53911,-123.37108,,,0,,America/Los_Angeles,,,0
+2483497,524,,Main Street and 14th Street,,44.54015,-123.36601,,,0,,America/Los_Angeles,,,0
+2483498,523,,26th Street and SW Western Boulevard (Hilton Garden Inn),,44.55767,-123.2788,,,0,,America/Los_Angeles,,,0
+2483499,522,,Corvallis Transit Center,,44.5650440489089,-123.263958606787,,,0,,America/Los_Angeles,,,0
+2483500,521,,"Amtrak Station, Albany",,44.63053,-123.10286,,,0,,America/Los_Angeles,,,0
+2483502,518,,Corvallis Samaritan Hospital,,44.60378,-123.25316,,,0,,America/Los_Angeles,,,0
+2501902,652,,Toledo Park N' Ride,,44.624176,-123.939461,,,0,,America/Los_Angeles,,,0
+2501903,653,,Crystal Creek Loop and Highway 20,,44.628989,-123.768486,,,0,,America/Los_Angeles,,,0
+2501904,655,,South Beach Hatfield MSC,,44.622928,-124.046618,,,0,,America/Los_Angeles,,,0
+2502256,654,,Crystal Creek Loop and Highway 20,,44.6291635407879,-123.768060788296,,,0,,America/Los_Angeles,,,0

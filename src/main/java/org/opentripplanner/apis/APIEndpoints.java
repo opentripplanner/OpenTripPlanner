@@ -54,6 +54,8 @@ public class APIEndpoints {
     // scheduled to be removed and only here for backwards compatibility
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.GtfsGraphQLAPIOldPath.class);
     addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.class);
+    // scheduled to be removed and only here for backwards compatibility
+    addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.TransmodelAPIOldPath.class);
 
     // Sandbox extension APIs
     addIfEnabled(ActuatorAPI, ActuatorAPI.class);
@@ -61,6 +63,8 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    // scheduled to be removed and only here for backwards compatibility
+    addIfEnabled(SandboxAPIGeocoder, GeocoderResource.GeocoderResourceOldPath.class);
     addIfEnabled(SandboxAPITravelTime, TravelTimeResource.class);
 
     // scheduled to be removed

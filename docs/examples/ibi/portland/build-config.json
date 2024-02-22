@@ -6,7 +6,7 @@
   "transitFeeds": [
     {
       "type": "gtfs",
-      "feedId": "trimet",
+      "feedId": "TriMet",
       "source": "https://developer.trimet.org/schedule/gtfs.zip"
     }
   ]

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 
 /**
@@ -137,7 +138,7 @@ public record NodeInfo(
    */
   public String toMarkdownString(Object value) {
     if (enumType != null) {
-      value = EnumMapper.kebabCase(value.toString());
+      value = StringUtils.kebabCase(value.toString());
     }
     return type.quote(value);
   }

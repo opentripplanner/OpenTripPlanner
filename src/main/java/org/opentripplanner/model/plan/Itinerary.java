@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -39,14 +40,16 @@ public class Itinerary implements ItinerarySortKey {
   private final boolean walkOnly;
   private final boolean streetOnly;
   private final Duration nonTransitDuration;
+  private final Duration walkDuration;
+  private final double walkDistanceMeters;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
   private Integer generalizedCost2 = null;
-  private TimeAndCost accessPenalty = null;
-  private TimeAndCost egressPenalty = null;
+  private TimeAndCost accessPenalty = TimeAndCost.ZERO;
+  private TimeAndCost egressPenalty = TimeAndCost.ZERO;
   private int waitTimeOptimizedCost = UNKNOWN;
   private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
@@ -75,6 +78,8 @@ public class Itinerary implements ItinerarySortKey {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
+    this.walkDuration = totals.walkDuration;
+    this.walkDistanceMeters = totals.walkDistanceMeters;
     this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
@@ -489,13 +494,26 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
-   * by the algorithm. This is relevant for anyone who want to debug an search and tuning the
+   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  /**
+   * If a generalized cost is used in the routing algorithm, this is the cost computed plus
+   * the artificial penalty added for access/egresses. This is useful so that itineraries
+   * using only on-street legs don't have an unfair advantage over those combining access/egress with
+   * transit and using a penalty when being processed by the itinerary filter chain.
+   *
+   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   */
+  @Override
+  public int getGeneralizedCostIncludingPenalty() {
+    return generalizedCost + penaltyCost(accessPenalty) + penaltyCost(egressPenalty);
   }
 
   public void setGeneralizedCost(int generalizedCost) {
@@ -526,6 +544,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setAccessPenalty(TimeAndCost accessPenalty) {
+    Objects.requireNonNull(accessPenalty);
     this.accessPenalty = accessPenalty;
   }
 
@@ -535,6 +554,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setEgressPenalty(TimeAndCost egressPenalty) {
+    Objects.requireNonNull(egressPenalty);
     this.egressPenalty = egressPenalty;
   }
 
@@ -662,5 +682,23 @@ public class Itinerary implements ItinerarySortKey {
   @Nullable
   public Emissions getEmissionsPerPerson() {
     return this.emissionsPerPerson;
+  }
+
+  /**
+   * How much walking this itinerary contains, in meters.
+   */
+  public double walkDistanceMeters() {
+    return walkDistanceMeters;
+  }
+
+  /**
+   * How long the walking is contained in this itinerary.
+   */
+  public Duration walkDuration() {
+    return walkDuration;
+  }
+
+  private static int penaltyCost(TimeAndCost penalty) {
+    return penalty.cost().toSeconds();
   }
 }

@@ -11,7 +11,7 @@ public class ApiTripTimeShort implements Serializable {
   public int stopCount;
   public int scheduledArrival = UNDEFINED;
   public int scheduledDeparture = UNDEFINED;
-  public int realimeArrival = UNDEFINED;
+  public int realtimeArrival = UNDEFINED;
   public int realtimeDeparture = UNDEFINED;
   public int arrivalDelay = UNDEFINED;
   public int departureDelay = UNDEFINED;
