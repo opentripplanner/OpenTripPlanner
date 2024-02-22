@@ -1591,12 +1591,10 @@ input PlanLocationInput @oneOf {
 
     """
     Stop, station, a group of stop places or multimodal stop place that should be used as
-    a location for the search. The stop place can be used in two ways:
-    1. As a location where one should depart from or arrive to on transit depending on if
-       its used as an origin or a destination
-    2. As coordinates where the search can start or end but it's not required to use this stop
-       place for a direct transit connnection.
-    Note, either coordinates or a stop location should be defined.
+    a location for the search. The trip doesn't have to use the given stop location for a
+    transit connection as it's possible to start walking to another stop from the given
+    location. If a station or a group of stop places is provided, a stop that makes the most
+    sense for the journey is picked as the location within the station or group of stop places.
     """
     stopLocation: PlanStopLocationInput
 }
@@ -1625,11 +1623,10 @@ input PlanPreferencesInput {
 
 """
 Stop, station, a group of stop places or multimodal stop place that should be used as
-a location for the search. The stop place can be used in two ways:
-1. As a location where one should depart from or arrive to on transit depending on if
-    its used as an origin or a destination
-2. As coordinates where the search can start or end but it's not required to use this stop
-    place for a direct transit connnection.
+a location for the search. The trip doesn't have to use the given stop location for a
+transit connection as it's possible to start walking to another stop from the given
+location. If a station or a group of stop places is provided, a stop that makes the most
+sense for the journey is picked as the location within the station or group of stop places.
 """
 input PlanStopLocationInput {
     """
@@ -1637,12 +1634,6 @@ input PlanStopLocationInput {
     should be `FeedId:StopLocationId`.
     """
     stopLocationId: String!
-
-    """
-    If set as true, one must either board or alight from this stop location. Otherwise,
-    it's optional and alternatively one can just walk to or from this location.
-    """
-    strict: Boolean = false
 }
 
 """

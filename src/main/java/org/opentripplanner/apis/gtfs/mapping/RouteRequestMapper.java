@@ -107,7 +107,6 @@ public class RouteRequestMapper {
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
     if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && transit.size() > 0) {
-      // TODO what to do with the static cost?
       var reluctanceForMode = transit
         .stream()
         .filter(mode -> mode.containsKey("cost"))
@@ -204,10 +203,8 @@ public class RouteRequestMapper {
   ) {
     var stopLocation = locationInput.getGraphQLLocation().getGraphQLStopLocation();
     if (stopLocation.getGraphQLStopLocationId() != null) {
-      // TODO implement strict
       var stopId = stopLocation.getGraphQLStopLocationId();
       if (FeedScopedId.isValidString(stopId)) {
-        // TODO make label field that is only the label
         return new GenericLocation(
           locationInput.getGraphQLLabel(),
           FeedScopedId.parse(stopId),

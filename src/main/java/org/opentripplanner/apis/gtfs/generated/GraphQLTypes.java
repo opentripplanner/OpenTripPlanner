@@ -1818,12 +1818,10 @@ public class GraphQLTypes {
   public static class GraphQLPlanStopLocationInput {
 
     private String stopLocationId;
-    private Boolean strict;
 
     public GraphQLPlanStopLocationInput(Map<String, Object> args) {
       if (args != null) {
         this.stopLocationId = (String) args.get("stopLocationId");
-        this.strict = (Boolean) args.get("strict");
       }
     }
 
@@ -1831,16 +1829,8 @@ public class GraphQLTypes {
       return this.stopLocationId;
     }
 
-    public Boolean getGraphQLStrict() {
-      return this.strict;
-    }
-
     public void setGraphQLStopLocationId(String stopLocationId) {
       this.stopLocationId = stopLocationId;
-    }
-
-    public void setGraphQLStrict(Boolean strict) {
-      this.strict = strict;
     }
   }
 
