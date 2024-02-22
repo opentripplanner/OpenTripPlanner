@@ -59,7 +59,7 @@ public class RouteRequestMapper {
       request.setNumItineraries(args.getGraphQLNumberOfItineraries());
     }
 
-    request.withPreferences(preferences -> setPreferences(preferences, args, environment));
+    request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));
 
     setModes(request, args.getGraphQLModes(), environment);
 
@@ -68,13 +68,16 @@ public class RouteRequestMapper {
 
   private static void setPreferences(
     RoutingPreferences.Builder prefs,
+    RouteRequest request,
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
   ) {
+    var preferenceArgs = args.getGraphQLPreferences();
     prefs.withItineraryFilter(filters ->
       setItineraryFilters(filters, args.getGraphQLItineraryFilter())
     );
     prefs.withTransit(transit -> setTransitPreferences(transit, args, environment));
+    setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
   }
 
   private static void setItineraryFilters(
@@ -120,6 +123,15 @@ public class RouteRequestMapper {
           )
         );
       preferences.setReluctanceForMode(reluctanceForMode);
+    }
+  }
+
+  private static void setAccessibilityPreferences(
+    RouteRequest request,
+    GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
+  ) {
+    if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
+      request.setWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled());
     }
   }
 
