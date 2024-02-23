@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
+import org.opentripplanner.ext.vectortiles.layers.areastops.AreaStopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -123,6 +124,7 @@ public class VectorTilesResource {
     return switch (layerParameters.type()) {
       case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
+      case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
         context.vehicleRentalService(),
         layerParameters,
@@ -153,6 +155,7 @@ public class VectorTilesResource {
   public enum LayerType {
     Stop,
     Station,
+    AreaStop,
     VehicleRental,
     VehicleRentalVehicle,
     VehicleRentalStation,
