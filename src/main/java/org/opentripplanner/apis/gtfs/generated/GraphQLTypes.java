@@ -137,7 +137,7 @@ public class GraphQLTypes {
 
     private List<GraphQLParkingFilterInput> filters;
     private List<GraphQLParkingFilterInput> preferred;
-    private Integer unpreferredCost;
+    private org.opentripplanner.framework.model.Cost unpreferredCost;
 
     public GraphQLBicycleParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -147,7 +147,8 @@ public class GraphQLTypes {
         if (args.get("preferred") != null) {
           this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
         }
-        this.unpreferredCost = (Integer) args.get("unpreferredCost");
+        this.unpreferredCost =
+          (org.opentripplanner.framework.model.Cost) args.get("unpreferredCost");
       }
     }
 
@@ -159,7 +160,7 @@ public class GraphQLTypes {
       return this.preferred;
     }
 
-    public Integer getGraphQLUnpreferredCost() {
+    public org.opentripplanner.framework.model.Cost getGraphQLUnpreferredCost() {
       return this.unpreferredCost;
     }
 
@@ -171,7 +172,9 @@ public class GraphQLTypes {
       this.preferred = preferred;
     }
 
-    public void setGraphQLUnpreferredCost(Integer unpreferredCost) {
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.framework.model.Cost unpreferredCost
+    ) {
       this.unpreferredCost = unpreferredCost;
     }
   }
@@ -451,7 +454,7 @@ public class GraphQLTypes {
 
     private List<GraphQLParkingFilterInput> filters;
     private List<GraphQLParkingFilterInput> preferred;
-    private Integer unpreferredCost;
+    private org.opentripplanner.framework.model.Cost unpreferredCost;
 
     public GraphQLCarParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -461,7 +464,8 @@ public class GraphQLTypes {
         if (args.get("preferred") != null) {
           this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
         }
-        this.unpreferredCost = (Integer) args.get("unpreferredCost");
+        this.unpreferredCost =
+          (org.opentripplanner.framework.model.Cost) args.get("unpreferredCost");
       }
     }
 
@@ -473,7 +477,7 @@ public class GraphQLTypes {
       return this.preferred;
     }
 
-    public Integer getGraphQLUnpreferredCost() {
+    public org.opentripplanner.framework.model.Cost getGraphQLUnpreferredCost() {
       return this.unpreferredCost;
     }
 
@@ -485,7 +489,9 @@ public class GraphQLTypes {
       this.preferred = preferred;
     }
 
-    public void setGraphQLUnpreferredCost(Integer unpreferredCost) {
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.framework.model.Cost unpreferredCost
+    ) {
       this.unpreferredCost = unpreferredCost;
     }
   }

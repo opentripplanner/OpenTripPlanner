@@ -1435,7 +1435,7 @@ input CarParkingPreferencesInput {
     at least one of the preferred conditions, will receive this extra cost and therefore avoided if
     preferred options are available.
     """
-    unpreferredCost: Int
+    unpreferredCost: Cost
 
     """
     If non-empty every parking facility that doesn't match this set of conditions will
@@ -1459,7 +1459,7 @@ input BicycleParkingPreferencesInput {
     at least one of the preferred conditions, will receive this extra cost and therefore avoided if
     preferred options are available.
     """
-    unpreferredCost: Int
+    unpreferredCost: Cost
 
     """
     If non-empty every parking facility that doesn't match this set of conditions will
