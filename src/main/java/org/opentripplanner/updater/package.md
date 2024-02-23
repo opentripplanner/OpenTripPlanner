@@ -1,6 +1,24 @@
 # Realtime Updaters
 
-## Realtime Concurrency Overview
+## Realtime Data Sources
+
+Published transit data is broadly divided into two categories, which represent different time scales. On one hand we have scheduled data (also called static or theoretical data), and on the other hand realtime (or dynamic) data. Scheduled data is supplied in GTFS or NeTEx format, with the corresponding realtime data supplied in the [GTFS-RT](https://gtfs.org/realtime/reference/) and [SIRI](https://www.siri-cen.eu/) formats, respectively. This package contains code that retrieves and decodes realtime data, then layers it on top of the static transit data in a live OTP instance while it continues to handle routing requests.
+
+Different data producers might update their scheduled data every month, week, or day. Realtime data then covers any changes to service at a timescale shorter than that of a given producer's scheduled data. Broadly speaking, realtime data represents short-term unexpected or unplanned changes that modify the planned schedules, and could require changes to journeys that the riders would not expect from the schedule. OpenTripPlanner uses three main categories of realtime data which are summarized in the table below. The SIRI specification includes more types, but OTP handles only these three that correspond to the three GTFS-RT types.
+
+| GTFS-RT Name                                                                     | SIRI Name                | Description                                                           |
+|----------------------------------------------------------------------------------|--------------------------|-----------------------------------------------------------------------|
+| [Service Alert](https://gtfs.org/realtime/reference/#message-alert)              | Situation Exchange (SX)  | Text descriptions relevant to riders using a particular route or stop |
+| [Trip Update](https://gtfs.org/realtime/reference/#message-tripupdate)           | Estimated Timetable (ET) | Observed or expected arrival and departure times for near-term trips  |
+| [Vehicle Position](https://gtfs.org/realtime/reference/#message-vehicleposition) | Vehicle Monitoring (VM)  | Physical location of vehicles currently providing service             |
+
+GTFS-RT takes the form of binary protocol buffer messages that are typically fetched over HTTP. On the other hand, the SIRI specification originally described SOAP remote procedure calls retrieving an XML representation of the messages. Various projects instead adopted simple HTTP GET requests passing parameters in the URL and returning a JSON representation. The latter approach was eventually officially recognized as "SIRI Lite".
+
+Because OTP handles both GTFS-RT and SIRI data sources, there will often be two equivalent classes for retrieving and interpreting a particular kind of realtime data. For example, there is a SiriAlertsUpdateHandler and an AlertsUpdateHandler. The SIRI variants are typically prefixed with `Siri` while the GTFS-RT ones have no prefix for historical reasons (the GTFS-RT versions were originally the only ones). These should perhaps be renamed with a `GtfsRt` prefix for symmetry. Once the incoming messages have been decoded, they will ideally be mapped into a single internal class that was originally derived from GTFS-RT but has been extended to cover all information afforded by both GTFS and SIRI. For example, both classes mentioned above produce TransitAlert instances. These uniform internal representations can then be applied to the internal transit model using a single mechanism, independent of the message source type.
+
+In practice, OTP does not yet use a single uniform internal representation for each of the three main message types. Particularly for TripUpdates/SIRI-ET, a lot of custom behavior was introduced for the SIRI case which led to a split between the two implementations. Our aim is to eventually merge the two systems back into one. NOTE: the comments on source code may be deceptive in cases where classes were copied and altered to handle SIRI data. This was sometimes done under time pressure to resolve production bugs. In these situations some comments were inadvertently duplicated without being updated. For example, despite many comments and field names mentioning "trip updates", SIRI estimated timetables are not converted into an internal TripUpdate object. A very notable case is the two implementations of TimetableSnapshotProvider: TimetableSnapshotSource and SiriTimetableSnapshotSource should really be a single implementation operating on internal data types independent of SIRI or GTFS-RT.
+
+## Realtime Concurrency
 
 The following approach to realtime concurrency was devised around 2013 when OTP first started consuming realtime data that affected routing results rather than just displaying messages. At first, the whole realtime system followed this approach. Some aspects of this system were maintained in subsequent work over the years, but because the details and rationale were not fully documented, misinterpretations and subtle inconsistencies were introduced.
 
@@ -8,7 +26,7 @@ On 11 January 2024 a team of OTP developers reviewed this realtime concurrency a
 
 The following is a sequence diagram showing how threads are intended to communicate. Unlike some common forms of sequence diagrams, time is on the horizontal axis here. Each horizontal line represents either a thread of execution (handling incoming realtime messages or routing requests) or a queue or buffer data structure. Dotted lines represent object references being handed off, and solid lines represent data being copied.
 
-![Architecture diagram](images/updater-threads-queues.svg)
+![Realtime sequence diagram](images/updater-threads-queues.svg)
 
 At the top of the diagram are the GraphUpdater implementations. These fall broadly into two categories: polling updaters and streaming updaters. Polling updaters periodically send a request to server (often just a simple HTTP server) which returns a file containing the latest version of the updates. Streaming updaters are generally built around libraries implementing message-oriented protocols such as AMQP or WebSockets, which fire a callback each time a new message is received. Polling updaters tend to return a full dataset describing the entire system state on each polling operation, while streaming updaters tend to receive incremental messages targeting individual transit trips. As such, polling updaters execute relatively infrequently (perhaps every minute or two) and process large responses, while streaming updaters execute very frequently (often many times per second) and operate on small messages in short bursts. Polling updaters are simpler in many ways and make use of common HTTP server components, but they introduce significant latency and redundant communication. Streaming updaters require more purpose-built or custom-configured components including message brokers, but bandwidth consumption and latency are lower, allowing routing results to reflect vehicle delays and positions immediately after they're reported.
 
@@ -20,7 +38,31 @@ This writable buffer of transit data is periodically made immutable and swapped 
 
 This is essentially a multi-version snapshot concurrency control system, inspired by widely used database engines (and in fact informed by books on transactional database design). The end result is a system where 1) writing operations are simple to reason about and cannot conflict because only one write happens at a time; 2) multiple read operations (including routing requests) can occur concurrently; 3) read operations do not need to pause while writes are happening; 4) read operations see only fully completed write operations, never partial writes; and 5) each read operation sees a consistent, unchanging view of the transit data.
 
-Importantly, no locking is necessary, though some form of synchronization is applied during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. (While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.)
+An important characteristic of this approach is that _no locking is necessary_. However, some form of synchronization is used during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.
 
 Arguably the process of creating an immutable live snapshot (and a corresponding new writable buffer) should be handled by a GraphWriterRunnable on the single graph updater thread. This would serve to defer any queued modifications until the new buffer is in place, without introducing any further locking mechanisms.
+
+## Full Dataset versus Incremental Messages
+
+The GTFS-RT specification includes an "incrementality" field. The specification says this field is unsupported and its behavior is undefined, but in practice people have been using this field since around 2013 in a fairly standardized way. An effort is underway to document its usage and update the standard (see https://github.com/google/transit/issues/84).
+
+GTFS-RT messages are most commonly distributed by HTTP GET polling. In this method, the consumer (OTP) has to make a request each time it wants to check for updates, and will receive all messages about all parts of the transit system at once, including messages it's already seen before. The incrementality field allows for some other options. As used in practice, there are three main aspects:
+
+- **Differential vs. full-dataset:** The incrementality field can take on two values: differential and full_dataset. In full-dataset mode, you'll get one big FeedMessage containing every update for every trip or vehicle. In differential mode, you'll receive updates for each trip or vehicle as they stream in, either individually or in small blocks. This may include a guarantee that an update will be provided on every entity at least once every n minutes, or alternatively the producer sending the full dataset when you first connect, then sending only changes. Once you're in differential mode, this opens up the possibilities below.
+
+ - **Poll vs. push:** In practice differential messages are usually distributed individually or in small blocks via a message queue. This means the notifications are pushed by the message queueing system as soon as they arrive, rather than pulled by the consumer via occasional polling. It would in principle also be possible to provide differential updates by polling, with the producer actively tracking the last time each consumer polled (sessions), or the consumer including the producer-supplied timestamp of its last fetch, but we are not aware of any such implementations. Combining differential+push means that vehicle positions and trip updates can be received immediately after the vehicles report their positions. In some places vehicles provide updates every few seconds, so their position is genuinely known in real time.
+
+- **Message filtering:** Message queue systems often allow filtering by topic. A continuous stream of immediate small push messages is already an improvement over full dataset fetching, but if you only care about one route (for an arrival time display panel for example) you don't want to continuously receive and parse thousands of messages per second looking for the relevant ones. So rather than a "firehose" of every message, you subscribe to a topic that includes only messages for that one route. You then receive a single message every few seconds with the latest predictions for the routes you care about.
+
+The latency and bandwidth advantages of differential message passing systems are evident, particularly in large (national/metropolitan) realtime passenger information systems created through an intentional and thorough design process.
+
+SIRI allows for both polling and pub-sub approaches to message distribution. These correspond to the full dataset and differential modes described for GTFS-RT. 
+
+## SIRI Resources
+
+- The official SIRI standardization page: https://www.siri-cen.eu/
+- Entur page on SIRI and GTFS-RT: https://developer.entur.org/pages-real-time-intro
+- Original proposal and description of SIRI Lite (in French): http://www.normes-donnees-tc.org/wp-content/uploads/2017/01/Proposition-Profil-SIRI-Lite-initial-v1-2.pdf
+- UK Government SIRI VM guidance: https://www.gov.uk/government/publications/technical-guidance-publishing-location-data-using-the-bus-open-data-service-siri-vm/technical-guidance-siri-vm
+- Wikipedia page: https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information#
 
