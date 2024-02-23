@@ -1,10 +1,13 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class HamburgMapperTest {
@@ -24,21 +27,21 @@ public class HamburgMapperTest {
 
     boolean generalNoThroughTraffic = mapper.isGeneralNoThroughTraffic(way);
 
-    Assertions.assertFalse(
+    assertFalse(
       generalNoThroughTraffic,
       "access=customers and customers=hvv should not be considered through-traffic"
     );
   }
 
   @ParameterizedTest
-  @CsvSource(value = { "no", "destination", "private", "customers", "delivery" })
+  @ValueSource(strings = { "no", "destination", "private", "customers", "delivery" })
   public void shouldDisallowThroughTraffic_WhenNoCustomersHVV(String access) {
     OSMWithTags way = new OSMWithTags();
     way.addTag("access", access);
 
     boolean generalNoThroughTraffic = mapper.isGeneralNoThroughTraffic(way);
 
-    Assertions.assertTrue(
+    assertTrue(
       generalNoThroughTraffic,
       "access={no, destination, private, customers, delivery} should be blocked in general"
     );
