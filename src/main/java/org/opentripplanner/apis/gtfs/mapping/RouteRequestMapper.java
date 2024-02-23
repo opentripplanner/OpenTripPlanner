@@ -2,19 +2,28 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -28,7 +37,6 @@ public class RouteRequestMapper {
     GraphQLRequestContext context
   ) {
     RouteRequest request = context.defaultRouteRequest();
-
     var args = new GraphQLTypes.GraphQLQueryTypePlanConnectionArgs(environment.getArguments());
     var dateTime = args.getGraphQLDateTime();
     if (dateTime.getGraphQLEarliestDeparture() != null) {
@@ -66,6 +74,33 @@ public class RouteRequestMapper {
     return request;
   }
 
+  static Set<String> parseNotFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "not");
+  }
+
+  static Set<String> parseSelectFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "select");
+  }
+
+  @Nonnull
+  private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
+    return filters
+      .stream()
+      .flatMap(f ->
+        parseOperation((Collection<Map<String, Collection<String>>>) f.getOrDefault(key, List.of()))
+      )
+      .collect(Collectors.toSet());
+  }
+
+  private static Stream<String> parseOperation(Collection<Map<String, Collection<String>>> map) {
+    return map
+      .stream()
+      .flatMap(f -> {
+        var tags = f.getOrDefault("tags", List.of());
+        return tags.stream();
+      });
+  }
+
   private static void setPreferences(
     RoutingPreferences.Builder prefs,
     RouteRequest request,
@@ -77,6 +112,7 @@ public class RouteRequestMapper {
       setItineraryFilters(filters, args.getGraphQLItineraryFilter())
     );
     prefs.withTransit(transit -> setTransitPreferences(transit, args, environment));
+    setStreetPreferences(prefs, preferenceArgs.getGraphQLStreet(), environment);
     setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
   }
 
@@ -123,6 +159,236 @@ public class RouteRequestMapper {
           )
         );
       preferences.setReluctanceForMode(reluctanceForMode);
+    }
+  }
+
+  private static void setStreetPreferences(
+    RoutingPreferences.Builder preferences,
+    GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
+    DataFetchingEnvironment environment
+  ) {
+    if (args != null) {
+      preferences.withBike(bicycle ->
+        setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
+      );
+      preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
+    }
+  }
+
+  private static void setBicyclePreferences(
+    BikePreferences.Builder preferences,
+    GraphQLTypes.GraphQLBicyclePreferencesInput args,
+    DataFetchingEnvironment environment
+  ) {
+    if (args != null) {
+      var speed = args.getGraphQLSpeed();
+      if (speed != null) {
+        preferences.withSpeed(speed);
+      }
+      var reluctance = args.getGraphQLReluctance();
+      if (reluctance != null) {
+        preferences.withReluctance(reluctance);
+      }
+      var boardCost = args.getGraphQLBoardCost();
+      if (boardCost != null) {
+        preferences.withBoardCost(boardCost.toSeconds());
+      }
+      preferences.withWalking(walk -> setBicycleWalkPreferences(walk, args.getGraphQLWalk()));
+      preferences.withParking(parking ->
+        setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
+      );
+      preferences.withRental(rental -> setBicycleRentalPreferences(rental, args.getGraphQLRental())
+      );
+      setBicycleOptimization(preferences, args.getGraphQLOptimization());
+    }
+  }
+
+  private static void setBicycleWalkPreferences(
+    VehicleWalkingPreferences.Builder preferences,
+    GraphQLTypes.GraphQLBicycleWalkPreferencesInput args
+  ) {
+    if (args != null) {
+      var speed = args.getGraphQLSpeed();
+      if (speed != null) {
+        preferences.withSpeed(speed);
+      }
+      var mountTime = args.getGraphQLMountDismountTime();
+      if (mountTime != null) {
+        preferences.withMountDismountTime(mountTime);
+      }
+      var cost = args.getGraphQLCost();
+      if (cost != null) {
+        var reluctance = cost.getGraphQLReluctance();
+        if (reluctance != null) {
+          preferences.withReluctance(reluctance);
+        }
+        var mountCost = cost.getGraphQLMountDismountCost();
+        if (mountCost != null) {
+          preferences.withMountDismountCost(mountCost.toSeconds());
+        }
+      }
+    }
+  }
+
+  private static void setBicycleParkingPreferences(
+    VehicleParkingPreferences.Builder preferences,
+    GraphQLTypes.GraphQLBicycleParkingPreferencesInput args,
+    DataFetchingEnvironment environment
+  ) {
+    if (args != null) {
+      var unpreferredCost = args.getGraphQLUnpreferredCost();
+      if (unpreferredCost != null) {
+        preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
+      }
+      var filters = getParkingFilters(environment, "bicycle");
+      preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+      preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
+      var preferred = getParkingPreferred(environment, "bicycle");
+      preferences.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+      preferences.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+    }
+  }
+
+  /**
+   * This methods returns required/banned parking tags of the given type from argument structure:
+   * preferences.street.type.parking.filters. This methods circumvents a bug in graphql-codegen as
+   * getting a list of input objects is not possible through using the generated types in
+   * {@link GraphQLTypes}.
+   * <p>
+   * TODO this ugliness can be removed when the bug gets fixed
+   */
+  @Nonnull
+  private static Collection<Map<String, Object>> getParkingFilters(
+    DataFetchingEnvironment environment,
+    String type
+  ) {
+    var parking = getParking(environment, type);
+    var filters = parking != null && parking.containsKey("filters")
+      ? getParking(environment, type).get("filters")
+      : null;
+    return filters != null ? (Collection<Map<String, Object>>) filters : List.of();
+  }
+
+  /**
+   * This methods returns preferred/unpreferred parking tags of the given type from argument
+   * structure: preferences.street.type.parking.preferred. This methods circumvents a bug in
+   * graphql-codegen as getting a list of input objects is not possible through using the generated
+   * types in {@link GraphQLTypes}.
+   * <p>
+   * TODO this ugliness can be removed when the bug gets fixed
+   */
+  @Nonnull
+  private static Collection<Map<String, Object>> getParkingPreferred(
+    DataFetchingEnvironment environment,
+    String type
+  ) {
+    var parking = getParking(environment, type);
+    var preferred = parking != null && parking.containsKey("preferred")
+      ? getParking(environment, type).get("preferred")
+      : null;
+    return preferred != null ? (Collection<Map<String, Object>>) preferred : List.of();
+  }
+
+  /**
+   * This methods returns parking preferences of the given type from argument structure:
+   * preferences.street.type.parking. This methods circumvents a bug in graphql-codegen as getting a
+   * list of input objects is not possible through using the generated types in
+   * {@link GraphQLTypes}.
+   * <p>
+   * TODO this ugliness can be removed when the bug gets fixed
+   */
+  @Nullable
+  private static Map<String, Object> getParking(DataFetchingEnvironment environment, String type) {
+    return (
+      (Map<String, Object>) (
+        (Map<String, Object>) (
+          (Map<String, Object>) ((Map<String, Object>) environment.getArgument("preferences")).get(
+              "street"
+            )
+        ).get(type)
+      ).get("parking")
+    );
+  }
+
+  private static void setBicycleRentalPreferences(
+    VehicleRentalPreferences.Builder preferences,
+    GraphQLTypes.GraphQLBicycleRentalPreferencesInput args
+  ) {
+    if (args != null) {
+      var allowedNetworks = args.getGraphQLAllowedNetworks();
+      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
+      }
+      var bannedNetworks = args.getGraphQLBannedNetworks();
+      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
+      }
+      var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
+      if (destinationPolicy != null) {
+        var allowed = destinationPolicy.getGraphQLAllowKeeping();
+        preferences.withAllowArrivingInRentedVehicleAtDestination(Boolean.TRUE.equals(allowed));
+        var cost = destinationPolicy.getGraphQLKeepingCost();
+        if (cost != null) {
+          preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
+        }
+      }
+    }
+  }
+
+  private static void setBicycleOptimization(
+    BikePreferences.Builder preferences,
+    GraphQLTypes.GraphQLCyclingOptimizationInput args
+  ) {
+    if (args != null) {
+      var type = args.getGraphQLType();
+      var mappedType = type != null ? BicycleOptimizationTypeMapper.map(type) : null;
+      if (mappedType != null) {
+        preferences.withOptimizeType(mappedType);
+      }
+      var triangleArgs = args.getGraphQLTriangle();
+      if (isBicycleTriangleSet(triangleArgs)) {
+        preferences.withForcedOptimizeTriangle(triangle -> {
+          triangle
+            .withSlope(triangleArgs.getGraphQLFlatness())
+            .withSafety(triangleArgs.getGraphQLSafety())
+            .withTime(triangleArgs.getGraphQLTime());
+        });
+      }
+    }
+  }
+
+  private static boolean isBicycleTriangleSet(
+    GraphQLTypes.GraphQLTriangleCyclingFactorsInput args
+  ) {
+    return (
+      args != null &&
+      args.getGraphQLFlatness() != null &&
+      args.getGraphQLSafety() != null &&
+      args.getGraphQLTime() != null
+    );
+  }
+
+  private static void setWalkPreferences(
+    WalkPreferences.Builder preferences,
+    GraphQLTypes.GraphQLWalkPreferencesInput args
+  ) {
+    if (args != null) {
+      var speed = args.getGraphQLSpeed();
+      if (speed != null) {
+        preferences.withSpeed(speed);
+      }
+      var reluctance = args.getGraphQLReluctance();
+      if (reluctance != null) {
+        preferences.withReluctance(reluctance);
+      }
+      var walkSafetyFactor = args.getGraphQLWalkSafetyFactor();
+      if (walkSafetyFactor != null) {
+        preferences.withSafetyFactor(walkSafetyFactor);
+      }
+      var boardCost = args.getGraphQLBoardCost();
+      if (boardCost != null) {
+        preferences.withBoardCost(boardCost.toSeconds());
+      }
     }
   }
 
