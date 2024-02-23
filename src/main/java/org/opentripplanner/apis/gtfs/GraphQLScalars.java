@@ -20,6 +20,7 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
@@ -165,6 +166,50 @@ public class GraphQLScalars {
             return Optional.of(coordinate);
           }
           return Optional.empty();
+        }
+      }
+    )
+    .build();
+
+  public static final GraphQLScalarType costScalar = GraphQLScalarType
+    .newScalar()
+    .name("Cost")
+    .coercing(
+      new Coercing<Cost, Integer>() {
+        @Override
+        public Integer serialize(@Nonnull Object dataFetcherResult)
+          throws CoercingSerializeException {
+          if (dataFetcherResult instanceof Integer intValue) {
+            return intValue;
+          } else if (dataFetcherResult instanceof Cost costValue) {
+            return costValue.toSeconds();
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s as a cost".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
+        }
+
+        @Override
+        public Cost parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof Integer intValue) {
+            return Cost.costOfSeconds(intValue);
+          }
+          throw new CoercingParseValueException(
+            "Expected an integer, got %s %s".formatted(input.getClass().getSimpleName(), input)
+          );
+        }
+
+        @Override
+        public Cost parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof IntValue intValue) {
+            return Cost.costOfSeconds(intValue.getValue().intValue());
+          }
+          throw new CoercingParseLiteralException(
+            "Expected an integer, got: " + input.getClass().getSimpleName()
+          );
         }
       }
     )

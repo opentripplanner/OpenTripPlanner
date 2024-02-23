@@ -115,14 +115,9 @@ class GtfsGraphQLIndex {
         .scalar(GraphQLScalars.offsetDateTimeScalar)
         .scalar(GraphQLScalars.ratioScalar)
         .scalar(GraphQLScalars.coordinateValueScalar)
+        .scalar(GraphQLScalars.costScalar)
         .scalar(ExtendedScalars.GraphQLLong)
         .scalar(ExtendedScalars.Locale)
-        .scalar(
-          ExtendedScalars
-            .newAliasedScalar("Cost")
-            .aliasedScalar(ExtendedScalars.NonNegativeInt)
-            .build()
-        )
         .scalar(
           ExtendedScalars
             .newAliasedScalar("Speed")
