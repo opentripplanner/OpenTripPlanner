@@ -68,10 +68,14 @@ public interface RaptorAccessEgress {
    * cost. Many optimal access paths have an inpact on performance as vell.
    * <p>
    *
-   * The unit is seconds and the default value is 0 seconds.
+   * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
    */
   default int timePenalty() {
-    return RaptorConstants.ZERO;
+    return RaptorConstants.TIME_NOT_SET;
+  }
+
+  default boolean hasTimePenalty() {
+    return timePenalty() != RaptorConstants.TIME_NOT_SET;
   }
 
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */

@@ -147,4 +147,12 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
     RaptorTransitDataProvider<T> transitDataProvider,
     int fromStop
   );
+
+  default int timePlusPenalty(int time, RaptorAccessEgress accessEgress) {
+    return accessEgress.hasTimePenalty() ? plusDuration(time, accessEgress.timePenalty()) : time;
+  }
+
+  default int timeMinusPenalty(int time, RaptorAccessEgress accessEgress) {
+    return accessEgress.hasTimePenalty() ? minusDuration(time, accessEgress.timePenalty()) : time;
+  }
 }

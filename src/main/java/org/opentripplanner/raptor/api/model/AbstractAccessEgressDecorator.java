@@ -41,6 +41,11 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
   }
 
   @Override
+  public boolean hasTimePenalty() {
+    return delegate.hasTimePenalty();
+  }
+
+  @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
     return delegate.earliestDepartureTime(requestedDepartureTime);
   }
@@ -94,6 +99,11 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
   @Override
   public String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     return delegate.asString(includeStop, includeCost, summary);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
 
   @Override

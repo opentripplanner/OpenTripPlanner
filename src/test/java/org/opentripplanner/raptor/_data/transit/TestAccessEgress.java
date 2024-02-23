@@ -168,6 +168,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return copyOf().withClosed().build();
   }
 
+  public TestAccessEgress withTimePenalty(int timePenalty) {
+    return this.copyOf().withTimePenalty(timePenalty).build();
+  }
+
   public Builder copyOf() {
     return new Builder(this);
   }
@@ -285,7 +289,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.stop = stop;
       this.durationInSeconds = durationInSeconds;
       this.c1 = walkCost(durationInSeconds);
-      this.timePenalty = RaptorConstants.ZERO;
+      this.timePenalty = RaptorConstants.TIME_NOT_SET;
     }
 
     Builder(TestAccessEgress original) {
@@ -322,7 +326,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return this;
     }
 
-    Builder withPenalty(int timePenalty) {
+    Builder withTimePenalty(int timePenalty) {
       this.timePenalty = timePenalty;
       return this;
     }

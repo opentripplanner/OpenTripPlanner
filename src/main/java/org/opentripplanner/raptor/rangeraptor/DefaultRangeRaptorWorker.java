@@ -278,7 +278,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
       // Access must be available after the iteration departure time
       if (departureTime != RaptorConstants.TIME_NOT_SET) {
-        transitWorker.setAccessToStop(it, departureTime - it.timePenalty());
+        // TODO TP - Is this ok?
+        transitWorker.setAccessToStop(it, calculator.timeMinusPenalty(departureTime, it));
       }
     }
   }

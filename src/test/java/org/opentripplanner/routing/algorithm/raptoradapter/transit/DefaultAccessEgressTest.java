@@ -9,6 +9,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -39,7 +40,7 @@ class DefaultAccessEgressTest {
   @Test
   void timePenalty() {
     int expected = (int) TIME_PENALTY.toSeconds();
-    assertEquals(0, subject.timePenalty());
+    assertEquals(RaptorConstants.TIME_NOT_SET, subject.timePenalty());
     assertEquals(expected, subjectWithPenalty.timePenalty());
   }
 

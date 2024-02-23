@@ -9,12 +9,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 
 public class AccessPaths {
 
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
+  private int timePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
   private AccessPaths(
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
@@ -84,7 +86,7 @@ public class AccessPaths {
   private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths.stream().map(it -> it.timePenalty() > 0 ? new AccessWithPenalty(it) : it).toList();
+    return paths.stream().map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it).toList();
   }
 
   /** Raptor uses this information to optimize boarding of the first trip */
@@ -93,6 +95,10 @@ public class AccessPaths {
       hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
       hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
     );
+  }
+
+  private boolean hasTimePenalty() {
+    return timePenaltyLimit != RaptorConstants.TIME_NOT_SET;
   }
 
   private static boolean hasTimeDependentAccess(TIntObjectMap<List<RaptorAccessEgress>> map) {

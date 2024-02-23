@@ -82,7 +82,7 @@ public class EgressPaths {
   private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths.stream().map(it -> it.timePenalty() > 0 ? new EgressWithPenalty(it) : it).toList();
+    return paths.stream().map(it -> it.hasTimePenalty() ? new EgressWithPenalty(it) : it).toList();
   }
 
   private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {

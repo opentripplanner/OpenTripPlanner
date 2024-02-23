@@ -257,10 +257,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   private Optional<String> rejectArrivalIfItExceedsTimeLimit(ArrivalView<T> destArrival) {
-    int arrivalTime = transitCalculator.minusDuration(
-      destArrival.arrivalTime(),
-      destArrival.egressPath().egress().timePenalty()
-    );
+    var egress = destArrival.egressPath().egress();
+    int arrivalTime = transitCalculator.timeMinusPenalty(destArrival.arrivalTime(), egress);
     if (transitCalculator.exceedsTimeLimit(arrivalTime)) {
       return Optional.of(transitCalculator.exceedsTimeLimitReason());
     }
