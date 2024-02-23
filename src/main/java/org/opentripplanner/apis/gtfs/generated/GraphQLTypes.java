@@ -592,7 +592,7 @@ public class GraphQLTypes {
           new GraphQLTriangleCyclingFactorsInput((Map<String, Object>) args.get("triangle"));
         if (args.get("type") instanceof GraphQLCyclingOptimizationType) {
           this.type = (GraphQLCyclingOptimizationType) args.get("type");
-        } else {
+        } else if (args.get("type") != null) {
           this.type = GraphQLCyclingOptimizationType.valueOf((String) args.get("type"));
         }
       }
@@ -624,7 +624,6 @@ public class GraphQLTypes {
     SAFEST_STREETS,
     SAFE_STREETS,
     SHORTEST_DURATION,
-    TRIANGLE,
   }
 
   public static class GraphQLDepartureRowStoptimesArgs {
@@ -1614,7 +1613,7 @@ public class GraphQLTypes {
         if (args.get("itineraryFilterDebugProfile") instanceof GraphQLItineraryFilterDebugProfile) {
           this.itineraryFilterDebugProfile =
             (GraphQLItineraryFilterDebugProfile) args.get("itineraryFilterDebugProfile");
-        } else {
+        } else if (args.get("itineraryFilterDebugProfile") != null) {
           this.itineraryFilterDebugProfile =
             GraphQLItineraryFilterDebugProfile.valueOf(
               (String) args.get("itineraryFilterDebugProfile")
@@ -1907,7 +1906,7 @@ public class GraphQLTypes {
           new GraphQLTransitModePreferenceCostInput((Map<String, Object>) args.get("cost"));
         if (args.get("mode") instanceof GraphQLTransitMode) {
           this.mode = (GraphQLTransitMode) args.get("mode");
-        } else {
+        } else if (args.get("mode") != null) {
           this.mode = GraphQLTransitMode.valueOf((String) args.get("mode"));
         }
       }
@@ -2739,7 +2738,7 @@ public class GraphQLTypes {
         this.omitCanceled = (Boolean) args.get("omitCanceled");
         if (args.get("optimize") instanceof GraphQLOptimizeType) {
           this.optimize = (GraphQLOptimizeType) args.get("optimize");
-        } else {
+        } else if (args.get("optimize") != null) {
           this.optimize = GraphQLOptimizeType.valueOf((String) args.get("optimize"));
         }
         this.pageCursor = (String) args.get("pageCursor");
@@ -4020,7 +4019,7 @@ public class GraphQLTypes {
           new GraphQLTriangleScooterFactorsInput((Map<String, Object>) args.get("triangle"));
         if (args.get("type") instanceof GraphQLScooterOptimizationType) {
           this.type = (GraphQLScooterOptimizationType) args.get("type");
-        } else {
+        } else if (args.get("type") != null) {
           this.type = GraphQLScooterOptimizationType.valueOf((String) args.get("type"));
         }
       }
@@ -4052,7 +4051,6 @@ public class GraphQLTypes {
     SAFEST_STREETS,
     SAFE_STREETS,
     SHORTEST_DURATION,
-    TRIANGLE,
   }
 
   public static class GraphQLScooterPreferencesInput {
@@ -4700,12 +4698,12 @@ public class GraphQLTypes {
       if (args != null) {
         if (args.get("mode") instanceof GraphQLMode) {
           this.mode = (GraphQLMode) args.get("mode");
-        } else {
+        } else if (args.get("mode") != null) {
           this.mode = GraphQLMode.valueOf((String) args.get("mode"));
         }
         if (args.get("qualifier") instanceof GraphQLQualifier) {
           this.qualifier = (GraphQLQualifier) args.get("qualifier");
-        } else {
+        } else if (args.get("qualifier") != null) {
           this.qualifier = GraphQLQualifier.valueOf((String) args.get("qualifier"));
         }
       }
