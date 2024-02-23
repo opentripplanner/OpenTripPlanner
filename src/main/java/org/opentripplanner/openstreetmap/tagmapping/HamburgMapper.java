@@ -25,8 +25,8 @@ public class HamburgMapper extends GermanyMapper {
   }
 
   private boolean isAllowedThroughTrafficForHVV(String access, String customers) {
-    boolean isAccessCustomers = access.equals("customers");
-    boolean isHVV = customers.equals("HVV");
+    boolean isAccessCustomers = "customers".equals(access);
+    boolean isHVV = "HVV".equals(customers);
     return isAccessCustomers && isHVV;
   }
 }
