@@ -30,7 +30,11 @@ class AreaStopsLayerBuilderTest {
     .withGeometry(Polygons.BERLIN)
     .build();
 
-  private final TransitModel transitModel = new TransitModel(stopModelBuilder.withAreaStop(AREA_STOP).build(), new Deduplicator());
+  private final TransitModel transitModel = new TransitModel(
+    stopModelBuilder.withAreaStop(AREA_STOP).build(),
+    new Deduplicator()
+  );
+
   record Layer(
     String name,
     VectorTilesResource.LayerType type,
@@ -41,13 +45,26 @@ class AreaStopsLayerBuilderTest {
     double expansionFactor
   )
     implements LayerParameters<VectorTilesResource.LayerType> {}
+
   @Test
   void getAreaStops() {
-
     transitModel.index();
 
-    var layer = new Layer("areaStops", VectorTilesResource.LayerType.AreaStop, "Digitransit", 20, 1, 10, .25);
-    var subject = new AreaStopsLayerBuilder(new DefaultTransitService(transitModel), layer, Locale.ENGLISH);
+    var layer = new Layer(
+      "areaStops",
+      VectorTilesResource.LayerType.AreaStop,
+      "Digitransit",
+      20,
+      1,
+      10,
+      .25
+    );
+
+    var subject = new AreaStopsLayerBuilder(
+      new DefaultTransitService(transitModel),
+      layer,
+      Locale.ENGLISH
+    );
     var geometries = subject.getGeometries(AREA_STOP.getGeometry().getEnvelopeInternal());
     assertEquals(List.of(Polygons.BERLIN), geometries);
   }
