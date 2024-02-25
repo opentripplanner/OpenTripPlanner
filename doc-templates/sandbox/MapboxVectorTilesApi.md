@@ -50,6 +50,14 @@ The feature must be configured in `router-config.json` as follows
         "cacheMaxSeconds": 600
       },
       {
+        "name": "areaStops",
+        "type": "AreaStop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      {
         "name": "stations",
         "type": "Station",
         "mapper": "Digitransit",
@@ -136,6 +144,7 @@ For each layer, the configuration includes:
 - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
 - `type` which tells the type of the layer. Currently supported:
     - `Stop`
+    - `AreaStop`
     - `Station`
     - `VehicleRental`: all rental places: stations and free-floating vehicles
     - `VehicleRentalVehicle`: free-floating rental vehicles
