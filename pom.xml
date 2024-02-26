@@ -866,7 +866,11 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>21.3</version>
+            <!--
+              We can use 21.4 when it's released
+              (https://github.com/graphql-java/graphql-java/pull/3365)
+            -->
+            <version>0.0.0-2024-02-23T10-00-36-19a50f7</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
