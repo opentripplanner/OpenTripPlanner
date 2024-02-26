@@ -117,4 +117,11 @@ public class IntIterators {
   public static IntIterator singleValueIterator(final int value) {
     return intIncIterator(value, value + 1);
   }
+
+  /**
+   * Return an empty iterator. All calls to {@link IntIterator#hasNext()} will return {@code false}.
+   */
+  public static IntIterator empty() {
+    return intIncIterator(0, 0);
+  }
 }
