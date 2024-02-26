@@ -17,6 +17,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
+import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
@@ -172,6 +173,7 @@ public class RouteRequestMapper {
       preferences.withBike(bicycle ->
         setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
       );
+      preferences.withCar(car -> setCarPreferences(car, args.getGraphQLCar(), environment));
       preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
       preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
     }
@@ -368,6 +370,59 @@ public class RouteRequestMapper {
       args.getGraphQLSafety() != null &&
       args.getGraphQLTime() != null
     );
+  }
+
+  private static void setCarPreferences(
+    CarPreferences.Builder preferences,
+    GraphQLTypes.GraphQLCarPreferencesInput args,
+    DataFetchingEnvironment environment
+  ) {
+    if (args != null) {
+      var reluctance = args.getGraphQLReluctance();
+      if (reluctance != null) {
+        preferences.withReluctance(reluctance);
+      }
+      preferences.withParking(parking ->
+        setCarParkingPreferences(parking, args.getGraphQLParking(), environment)
+      );
+      preferences.withRental(rental -> setCarRentalPreferences(rental, args.getGraphQLRental()));
+    }
+  }
+
+  private static void setCarParkingPreferences(
+    VehicleParkingPreferences.Builder preferences,
+    GraphQLTypes.GraphQLCarParkingPreferencesInput args,
+    DataFetchingEnvironment environment
+  ) {
+    if (args != null) {
+      var unpreferredCost = args.getGraphQLUnpreferredCost();
+      if (unpreferredCost != null) {
+        preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
+      }
+      var filters = getParkingFilters(environment, "car");
+      preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+      preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
+      var preferred = getParkingPreferred(environment, "car");
+      preferences.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+      preferences.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+    }
+  }
+
+  private static void setCarRentalPreferences(
+    VehicleRentalPreferences.Builder preferences,
+    GraphQLTypes.GraphQLCarRentalPreferencesInput args
+  ) {
+    if (args != null) {
+      var allowedNetworks = args.getGraphQLAllowedNetworks();
+      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
+      }
+      var bannedNetworks = args.getGraphQLBannedNetworks();
+      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
+      }
+      // TODO validate if station based car systems work before adding destination policy
+    }
   }
 
   private static void setScooterPreferences(
