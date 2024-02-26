@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import org.opentripplanner.raptor.api.model.AbstractAccessEgressDecorator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
  * This decorator will add the time penalty to the duration of the access and adjust the
@@ -22,7 +23,11 @@ public class AccessWithPenalty extends AbstractAccessEgressDecorator {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    return delegate().earliestDepartureTime(requestedDepartureTime + delegate().timePenalty());
+    final int dt = delegate().timePenalty();
+    int adjustedTime = delegate().earliestDepartureTime(requestedDepartureTime + dt);
+    return adjustedTime == RaptorConstants.TIME_NOT_SET
+      ? RaptorConstants.TIME_NOT_SET
+      : adjustedTime - dt;
   }
 
   /**
