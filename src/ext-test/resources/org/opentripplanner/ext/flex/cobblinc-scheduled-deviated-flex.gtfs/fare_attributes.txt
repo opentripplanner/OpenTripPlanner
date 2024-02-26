@@ -1,0 +1,2 @@
+fare_id,price,currency_type,payment_method,transfers,agency_id,transfer_duration
+flex-adult,2.50,USD,0,0,1,

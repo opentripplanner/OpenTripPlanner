@@ -20,7 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.ext.restapi.mapping.LegacyBicycleOptimizeType;
+import org.opentripplanner.ext.restapi.mapping.LegacyVehicleRoutingOptimizeType;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -239,17 +239,15 @@ public abstract class RoutingResource {
   protected Double triangleTimeFactor;
 
   /**
-   * The set of characteristics that the user wants to optimize for. @See OptimizeType.
+   * The set of characteristics that the user wants to optimize for in bicycle and scooter routing.
+   * @See OptimizeType.
    *
    * @deprecated TODO OTP2 this should be completely removed and done only with individual cost
    * parameters
-   * Also: apparently OptimizeType only affects BICYCLE mode traversal of
-   * street segments. If this is the case it should be very well
-   * documented and carried over into the Enum name.
    */
   @Deprecated
   @QueryParam("optimize")
-  protected LegacyBicycleOptimizeType bikeOptimizeType;
+  protected LegacyVehicleRoutingOptimizeType bikeOptimizeType;
 
   /**
    * The set of modes that a user is willing to use, with qualifiers stating whether vehicles should

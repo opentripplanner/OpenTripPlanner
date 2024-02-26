@@ -18,6 +18,7 @@ import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
@@ -30,7 +31,7 @@ class VehicleRentalEdgeTest {
   VehicleRentalPlaceVertex vertex;
 
   @Test
-  void testRentingWithAvailableVehicles() {
+  void testRentingWithAvailableBikes() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3);
 
     var s1 = rent();
@@ -49,7 +50,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithNoAvailableVehiclesAndNoRealtimeUsage() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3, false, true, false);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3, false, true, false, false);
 
     var s1 = rent();
 
@@ -76,7 +77,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithNoAvailableSpacesAndOverloading() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, true, true);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, true, true, false);
 
     var s1 = rentAndDropOff();
 
@@ -85,7 +86,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningWithNoAvailableSpacesAndNoRealtimeUsage() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, false, true, false);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, false, true, false, false);
 
     var s1 = rentAndDropOff();
 
@@ -94,7 +95,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingFromClosedStation() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, false, true);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, false, true, false);
 
     var s1 = rent();
 
@@ -103,13 +104,13 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningToClosedStation() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, true, true);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, true, true, false);
 
     var s1 = rent();
 
     assertFalse(State.isEmpty(s1));
 
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, false, true);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, false, true, false);
 
     var s2 = dropOff(s1[0]);
 
@@ -118,15 +119,78 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
-    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, false, true, false);
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, false, true, false, false);
 
     var s1 = rentAndDropOff();
 
     assertFalse(State.isEmpty(s1));
   }
 
+  @Test
+  void testRentingWithFreeFloatingBicycle() {
+    initFreeFloatingEdgeAndRequest(StreetMode.BIKE_RENTAL, RentalFormFactor.BICYCLE, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
+  @Test
+  void testRentingWithFreeFloatingScooter() {
+    initFreeFloatingEdgeAndRequest(StreetMode.SCOOTER_RENTAL, RentalFormFactor.SCOOTER, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
+  @Test
+  void testRentingWithFreeFloatingCar() {
+    initFreeFloatingEdgeAndRequest(StreetMode.CAR_RENTAL, RentalFormFactor.CAR, false);
+
+    var s1 = rent();
+
+    assertFalse(State.isEmpty(s1));
+  }
+
+  @Test
+  void testBannedBicycleNetworkStation() {
+    initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, false, true, true, true);
+
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testBannedBicycleNetworkFreeFloating() {
+    initFreeFloatingEdgeAndRequest(StreetMode.BIKE_RENTAL, RentalFormFactor.BICYCLE, true);
+
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testBannedScooterNetworkFreeFloating() {
+    initFreeFloatingEdgeAndRequest(StreetMode.SCOOTER_RENTAL, RentalFormFactor.SCOOTER, true);
+
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testBannedCarNetworkFreeFloating() {
+    initFreeFloatingEdgeAndRequest(StreetMode.CAR_RENTAL, RentalFormFactor.CAR, true);
+
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
   private void initEdgeAndRequest(StreetMode mode, int vehicles, int spaces) {
-    initEdgeAndRequest(mode, vehicles, spaces, false, true, true);
+    initEdgeAndRequest(mode, vehicles, spaces, false, true, true, false);
   }
 
   @Nested
@@ -204,7 +268,8 @@ class VehicleRentalEdgeTest {
     int spaces,
     boolean overloadingAllowed,
     boolean stationOn,
-    boolean useRealtime
+    boolean useRealtime,
+    boolean banNetwork
   ) {
     var station = TestVehicleRentalStationBuilder
       .of()
@@ -218,17 +283,49 @@ class VehicleRentalEdgeTest {
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 
+    Set<String> bannedNetworks = banNetwork ? Set.of(station.getNetwork()) : Set.of();
+
     this.request =
       StreetSearchRequest
         .of()
         .withMode(mode)
         .withPreferences(preferences ->
           preferences
-            .withCar(car ->
-              car.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
-            )
             .withBike(bike ->
-              bike.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
+              bike.withRental(rental ->
+                rental
+                  .withUseAvailabilityInformation(useRealtime)
+                  .withBannedNetworks(bannedNetworks)
+              )
+            )
+            .build()
+        )
+        .build();
+  }
+
+  private void initFreeFloatingEdgeAndRequest(
+    StreetMode mode,
+    RentalFormFactor formFactor,
+    boolean banNetwork
+  ) {
+    this.vertex = StreetModelForTest.rentalVertex(formFactor);
+
+    vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
+
+    Set<String> bannedNetworks = banNetwork
+      ? Set.of(this.vertex.getStation().getNetwork())
+      : Set.of();
+
+    this.request =
+      StreetSearchRequest
+        .of()
+        .withMode(mode)
+        .withPreferences(preferences ->
+          preferences
+            .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+            .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+            .withScooter(scooter ->
+              scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
             )
             .build()
         )

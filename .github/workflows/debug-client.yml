@@ -42,6 +42,7 @@ jobs:
         run: |
           npm install
           npm run build -- --base https://cdn.jsdelivr.net/gh/opentripplanner/debug-client-assets@main/${VERSION}/
+          npm run coverage
 
       - name: Deploy compiled assets to repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'

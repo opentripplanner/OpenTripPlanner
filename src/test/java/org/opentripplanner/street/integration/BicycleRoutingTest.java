@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -76,7 +76,7 @@ public class BicycleRoutingTest {
     request.setFrom(from);
     request.setTo(to);
     request.withPreferences(p ->
-      p.withBike(it -> it.withOptimizeType(BicycleOptimizeType.SHORTEST_DURATION))
+      p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
     );
 
     request.journey().direct().setMode(StreetMode.BIKE);

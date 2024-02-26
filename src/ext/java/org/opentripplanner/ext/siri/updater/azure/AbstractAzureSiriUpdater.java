@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
+  private final AuthenticationType authenticationType;
+  private final String fullyQualifiedNamespace;
   private final String configRef;
   private final String serviceBusUrl;
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
@@ -63,6 +66,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
     this.configRef = config.configRef();
+    this.authenticationType = config.getAuthenticationType();
+    this.fullyQualifiedNamespace = config.getFullyQualifiedNamespace();
     this.serviceBusUrl = config.getServiceBusUrl();
     this.topicName = config.getTopicName();
     this.dataInitializationUrl = config.getDataInitializationUrl();
@@ -105,10 +110,17 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     }
 
     // Client with permissions to create subscription
-    serviceBusAdmin =
-      new ServiceBusAdministrationClientBuilder()
-        .connectionString(serviceBusUrl)
-        .buildAsyncClient();
+    if (authenticationType == AuthenticationType.FederatedIdentity) {
+      serviceBusAdmin =
+        new ServiceBusAdministrationClientBuilder()
+          .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
+          .buildAsyncClient();
+    } else if (authenticationType == AuthenticationType.SharedAccessKey) {
+      serviceBusAdmin =
+        new ServiceBusAdministrationClientBuilder()
+          .connectionString(serviceBusUrl)
+          .buildAsyncClient();
+    }
 
     // If Idle more then one day, then delete subscription so we don't have old obsolete subscriptions on Azure Service Bus
     var options = new CreateSubscriptionOptions();

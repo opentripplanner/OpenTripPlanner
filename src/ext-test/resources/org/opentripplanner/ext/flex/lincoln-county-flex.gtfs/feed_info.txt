@@ -1,0 +1,2 @@
+feed_publisher_url,feed_publisher_name,feed_lang,feed_version,feed_license,feed_contact_email,feed_contact_url,feed_start_date,feed_end_date,feed_id
+http://www.trilliumtransit.com,"Trillium Solutions, Inc.",en,UTC: 22-Dec-2020 22:38,,support+test+lincolncounty-or-us@trilliumtransit.com,http://support.trilliumtransit.com,20201222,20220101,lincolncounty-or-us

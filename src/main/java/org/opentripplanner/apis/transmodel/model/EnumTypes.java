@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -64,11 +64,11 @@ public class EnumTypes {
   public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType
     .newEnum()
     .name("BicycleOptimisationMethod")
-    .value("quick", BicycleOptimizeType.SHORTEST_DURATION)
-    .value("safe", BicycleOptimizeType.SAFE_STREETS)
-    .value("flat", BicycleOptimizeType.FLAT_STREETS)
-    .value("greenways", BicycleOptimizeType.SAFEST_STREETS)
-    .value("triangle", BicycleOptimizeType.TRIANGLE)
+    .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)
+    .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS)
+    .value("flat", VehicleRoutingOptimizeType.FLAT_STREETS)
+    .value("greenways", VehicleRoutingOptimizeType.SAFEST_STREETS)
+    .value("triangle", VehicleRoutingOptimizeType.TRIANGLE)
     .build();
 
   public static final GraphQLEnumType BIKES_ALLOWED = GraphQLEnumType

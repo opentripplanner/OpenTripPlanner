@@ -341,7 +341,7 @@ public class RouteRequestMapper {
   ) {
     if (args != null) {
       var type = args.getGraphQLType();
-      var mappedType = type != null ? BicycleOptimizationTypeMapper.map(type) : null;
+      var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
       if (mappedType != null) {
         preferences.withOptimizeType(mappedType);
       }

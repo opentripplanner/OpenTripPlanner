@@ -9,4 +9,8 @@ export default defineConfig({
     outDir: 'output',
     emptyOutDir: true,
   },
+  // @ts-ignore
+  test: {
+    environment: 'jsdom',
+  },
 });

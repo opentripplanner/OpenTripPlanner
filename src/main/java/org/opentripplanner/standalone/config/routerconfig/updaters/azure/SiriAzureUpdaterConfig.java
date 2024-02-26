@@ -1,12 +1,15 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters.azure;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import org.opentripplanner.ext.siri.updater.azure.AuthenticationType;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -18,24 +21,61 @@ public abstract class SiriAzureUpdaterConfig {
     NodeAdapter c
   ) {
     parameters.setConfigRef(configRef);
-    parameters.setServiceBusUrl(c.of("servicebus-url").since(NA).summary("TODO").asString(null));
-    parameters.setTopicName(c.of("topic").since(NA).summary("TODO").asString(null));
-    parameters.setFeedId(c.of("feedId").since(NA).summary("TODO").asString(null));
+    parameters.setServiceBusUrl(
+      c
+        .of("servicebus-url")
+        .since(V2_2)
+        .summary("Service Bus connection used for authentication.")
+        .description(
+          "Has to be present for authenticationMethod SharedAccessKey. This should be Primary/Secondary connection string from service bus."
+        )
+        .asString(null)
+    );
+    parameters.setTopicName(
+      c.of("topic").since(V2_2).summary("Service Bus topic to connect to.").asString(null)
+    );
+    parameters.setFeedId(
+      c
+        .of("feedId")
+        .since(V2_2)
+        .summary("The ID of the feed to apply the updates to.")
+        .asString(null)
+    );
     parameters.setFuzzyTripMatching(
-      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false)
+      c
+        .of("fuzzyTripMatching")
+        .since(V2_2)
+        .summary("Whether to apply fuzzyTripMatching on the updates")
+        .asBoolean(false)
+    );
+    parameters.setFullyQualifiedNamespace(
+      c
+        .of("fullyQualifiedNamespace")
+        .since(V2_5)
+        .summary("Service Bus fully qualified namespace used for authentication.")
+        .description("Has to be present for authenticationMethod FederatedIdentity.")
+        .asString(null)
+    );
+    parameters.setAuthenticationType(
+      c
+        .of("authenticationType")
+        .since(V2_5)
+        .summary("Which authentication type to use")
+        .asEnum(AuthenticationType.SharedAccessKey)
     );
 
     if (c.exist("history")) {
       NodeAdapter history = c
         .of("history")
-        .since(NA)
-        .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .since(V2_2)
+        .summary("Configuration for fetching historical data on startup")
         .asObject();
       parameters.setDataInitializationUrl(
-        history.of("url").since(NA).summary("TODO").asString(null)
+        history.of("url").since(NA).summary("Endpoint to fetch from").asString(null)
       );
-      parameters.setTimeout(history.of("timeout").since(NA).summary("TODO").asInt(300000));
+      parameters.setTimeout(
+        history.of("timeout").since(NA).summary("Timeout in milliseconds").asInt(300000)
+      );
     }
   }
 
