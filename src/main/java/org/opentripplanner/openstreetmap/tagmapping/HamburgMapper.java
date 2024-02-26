@@ -16,17 +16,6 @@ public class HamburgMapper extends GermanyMapper {
     String access = way.getTag("access");
     boolean isNoThroughTraffic = doesTagValueDisallowThroughTraffic(access);
 
-    if (isNoThroughTraffic && way.hasTag("customers")) {
-      String customers = way.getTag("customers");
-      return !isAllowedThroughTrafficForHVV(access, customers);
-    }
-
-    return isNoThroughTraffic;
-  }
-
-  private boolean isAllowedThroughTrafficForHVV(String access, String customers) {
-    boolean isAccessCustomers = "customers".equals(access);
-    boolean isHVV = "HVV".equals(customers);
-    return isAccessCustomers && isHVV;
+    return isNoThroughTraffic && !way.isTag("customers", "HVV");
   }
 }
