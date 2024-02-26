@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.api.model;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
+import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -123,7 +123,7 @@ public interface RaptorAccessEgress {
     // assumes the access/egress is a continuous period without gaps withing 24 hours from the
     // opening. We ignore the access/egress duration. This is ok for test, debugging and logging.
     int edt = earliestDepartureTime(0);
-    int lat = latestArrivalTime(edt + SECONDS_IN_A_DAY);
+    int lat = latestArrivalTime(edt + (int) ChronoUnit.DAYS.getDuration().toSeconds());
 
     if (edt == TIME_NOT_SET || lat == TIME_NOT_SET) {
       return "closed";

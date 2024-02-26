@@ -3,7 +3,7 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;

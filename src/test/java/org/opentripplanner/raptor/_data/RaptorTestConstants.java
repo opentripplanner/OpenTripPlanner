@@ -27,6 +27,13 @@ public interface RaptorTestConstants {
   int D20m = durationInSeconds("20m");
   int D24h = durationInSeconds("24h");
 
+  /**
+   * There are 86400 seconds in a "normal" day(24 * 60 * 60). This is used for testing, logging
+   * and debugging, but does not base any important logic on this. A day with changes in
+   * daylight-saving-time does not have this number of seconds.
+   */
+  int SECONDS_IN_A_DAY = (int) D24h;
+
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);
   int T00_01 = hm2time(0, 1);
