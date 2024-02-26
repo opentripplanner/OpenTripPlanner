@@ -69,7 +69,7 @@ public class VectorTilesResource {
       locale,
       Arrays.asList(requestedLayers.split(",")),
       serverContext.vectorTileConfig().layers(),
-      VectorTilesResource::crateLayerBuilder,
+      VectorTilesResource::createLayerBuilder,
       serverContext
     );
   }
@@ -116,7 +116,7 @@ public class VectorTilesResource {
       .toList();
   }
 
-  private static LayerBuilder<?> crateLayerBuilder(
+  private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     OtpServerRequestContext context
