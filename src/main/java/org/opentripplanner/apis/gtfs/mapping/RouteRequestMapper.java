@@ -19,6 +19,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
@@ -171,6 +172,7 @@ public class RouteRequestMapper {
       preferences.withBike(bicycle ->
         setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
       );
+      preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
       preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
     }
   }
@@ -359,6 +361,75 @@ public class RouteRequestMapper {
 
   private static boolean isBicycleTriangleSet(
     GraphQLTypes.GraphQLTriangleCyclingFactorsInput args
+  ) {
+    return (
+      args != null &&
+      args.getGraphQLFlatness() != null &&
+      args.getGraphQLSafety() != null &&
+      args.getGraphQLTime() != null
+    );
+  }
+
+  private static void setScooterPreferences(
+    ScooterPreferences.Builder preferences,
+    GraphQLTypes.GraphQLScooterPreferencesInput args
+  ) {
+    if (args != null) {
+      var speed = args.getGraphQLSpeed();
+      if (speed != null) {
+        preferences.withSpeed(speed);
+      }
+      var reluctance = args.getGraphQLReluctance();
+      if (reluctance != null) {
+        preferences.withReluctance(reluctance);
+      }
+      preferences.withRental(rental -> setScooterRentalPreferences(rental, args.getGraphQLRental())
+      );
+      setScooterOptimization(preferences, args.getGraphQLOptimization());
+    }
+  }
+
+  private static void setScooterRentalPreferences(
+    VehicleRentalPreferences.Builder preferences,
+    GraphQLTypes.GraphQLScooterRentalPreferencesInput args
+  ) {
+    if (args != null) {
+      var allowedNetworks = args.getGraphQLAllowedNetworks();
+      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
+      }
+      var bannedNetworks = args.getGraphQLBannedNetworks();
+      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+        preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
+      }
+      // TODO validate if station based scooter systems work before adding destination policy
+    }
+  }
+
+  private static void setScooterOptimization(
+    ScooterPreferences.Builder preferences,
+    GraphQLTypes.GraphQLScooterOptimizationInput args
+  ) {
+    if (args != null) {
+      var type = args.getGraphQLType();
+      var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
+      if (mappedType != null) {
+        preferences.withOptimizeType(mappedType);
+      }
+      var triangleArgs = args.getGraphQLTriangle();
+      if (isScooterTriangleSet(triangleArgs)) {
+        preferences.withForcedOptimizeTriangle(triangle -> {
+          triangle
+            .withSlope(triangleArgs.getGraphQLFlatness())
+            .withSafety(triangleArgs.getGraphQLSafety())
+            .withTime(triangleArgs.getGraphQLTime());
+        });
+      }
+    }
+  }
+
+  private static boolean isScooterTriangleSet(
+    GraphQLTypes.GraphQLTriangleScooterFactorsInput args
   ) {
     return (
       args != null &&
