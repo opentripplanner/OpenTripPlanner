@@ -10,6 +10,9 @@ public class StringUtils {
 
   /**
    * Regex to find unprintable characters like newlines and 'ZERO WIDTH SPACE' (U+200B).
+   * <p>
+   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in the
+   * middle of a word.
    */
   private static final String INVISIBLE_CHARS_REGEX = "\\p{C}";
   /**
@@ -137,7 +140,7 @@ public class StringUtils {
    * Note that "regular" whitespace characters like U+0020 and U+2000 are considered visible and
    * therefore not removed.
    */
-  public static String removeInvisibleChars(String input) {
-    return INVISIBLE_CHARS_PATTERN.matcher(input).replaceAll("");
+  public static boolean containsInvisibleCharacters(String input) {
+    return INVISIBLE_CHARS_PATTERN.matcher(input).find();
   }
 }

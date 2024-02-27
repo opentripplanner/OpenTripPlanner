@@ -59,9 +59,14 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * Parses a string consisting of concatenated FeedScopedIds to a List
    */
   public static List<FeedScopedId> parseList(String s) {
+    if (StringUtils.containsInvisibleCharacters(s)) {
+      throw new IllegalArgumentException(
+        "The input string '%s' contains invisible characters which is not allowed.".formatted(s)
+      );
+    }
     return Arrays
       .stream(s.split(","))
-      .map(input -> StringUtils.removeInvisibleChars(input).strip())
+      .map(String::strip)
       .filter(i -> !i.isBlank())
       .map(FeedScopedId::parse)
       .toList();

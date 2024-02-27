@@ -3,6 +3,7 @@ package org.opentripplanner.framework.lang;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -85,8 +86,16 @@ class StringUtilsTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = { "\u200B", "\n", "\t" })
-  void removeInvisibleChars(String input) {
-    assertEquals("", StringUtils.removeInvisibleChars(input));
+  @ValueSource(
+    strings = { "\u200B", "\n", "\t", "\thello", "f\noo", "\ntri\nmet:123\t", "tri\u200Bmet:123" }
+  )
+  void containsInvisibleChars(String input) {
+    assertTrue(StringUtils.containsInvisibleCharacters(input));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "", " ", "hello", " hello", " fo o " })
+  void noInvisibleChars(String input) {
+    assertFalse(StringUtils.containsInvisibleCharacters(input));
   }
 }
