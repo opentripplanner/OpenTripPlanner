@@ -1853,26 +1853,26 @@ type Leg {
     """
     The date and time when this leg begins. Format: Unix timestamp in milliseconds.
     """
-    startTime: Long @deprecated(reason: "Use `start.actual` instead which contains timezone information.")
+    startTime: Long @deprecated(reason: "Use `start.estimated.time` instead which contains timezone information.")
 
     """
     The date and time when this leg ends. Format: Unix timestamp in milliseconds.
     """
-    endTime: Long @deprecated(reason: "Use `end.actual` instead which contains timezone information.")
+    endTime: Long @deprecated(reason: "Use `end.estimated.time` instead which contains timezone information.")
 
     """
     For transit leg, the offset from the scheduled departure time of the boarding
     stop in this leg, i.e. scheduled time of departure at boarding stop =
     `startTime - departureDelay`
     """
-    departureDelay: Int @deprecated(reason: "Use `end.delay` instead.")
+    departureDelay: Int @deprecated(reason: "Use `end.estimated.delay` instead.")
 
     """
     For transit leg, the offset from the scheduled arrival time of the alighting
     stop in this leg, i.e. scheduled time of arrival at alighting stop = `endTime
     - arrivalDelay`
     """
-    arrivalDelay: Int @deprecated(reason: "Use `start.delay` instead.")
+    arrivalDelay: Int @deprecated(reason: "Use `start.estimated.delay` instead.")
 
 }
 
