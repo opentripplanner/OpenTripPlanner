@@ -48,6 +48,7 @@ public class RouteRequestMapper {
       request.setDateTime(args.getGraphQLDateTime().getGraphQLEarliestDeparture().toInstant());
     } else if (dateTime.getGraphQLLatestArrival() != null) {
       request.setDateTime(args.getGraphQLDateTime().getGraphQLLatestArrival().toInstant());
+      request.setArriveBy(true);
     } else {
       request.setDateTime(Instant.now());
     }
