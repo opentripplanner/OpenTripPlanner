@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;
 
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.AgencyBuilder;
@@ -33,15 +34,17 @@ class AuthorityToAgencyMapper {
    * Map authority and time zone to OTP agency.
    */
   Agency mapAuthorityToAgency(Authority source) {
-    String agencyName = source.getName() != null ? source.getName().getValue() : null;
+    String agencyName = source.getName() != null &&
+      StringUtils.hasValue(source.getName().getValue())
+      ? source.getName().getValue()
+      : null;
 
     String agencyShortName = source.getShortName() != null &&
-      source.getShortName().getValue() != null &&
-      !source.getShortName().getValue().isBlank()
+      StringUtils.hasValue(source.getShortName().getValue())
       ? source.getShortName().getValue()
       : null;
 
-    String mainName = agencyName != null && !agencyName.isBlank() ? agencyName : agencyShortName;
+    String mainName = agencyName != null ? agencyName : agencyShortName;
 
     AgencyBuilder target = Agency
       .of(idFactory.createId(source.getId()))
