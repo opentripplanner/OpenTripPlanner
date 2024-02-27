@@ -4260,8 +4260,10 @@ type QueryType {
         after: String
 
         """
-        How many new itineraries should at maximum be returned in forward pagination. This parameter is
-        part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+        How many new itineraries should at maximum be returned in forward pagination. It's recommended to
+        use the same value as was used for the `numberOfItineraries` in the original search for optimal
+        performance. This parameter is part of the
+        [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
         and should be used together with the `after` parameter.
         """
         first: Int
@@ -4276,8 +4278,10 @@ type QueryType {
         before: String
 
         """
-        How many new itineraries should at maximum be returned in backwards pagination. This parameter is
-        part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+        How many new itineraries should at maximum be returned in backwards pagination. It's recommended to
+        use the same value as was used for the `numberOfItineraries` in the original search for optimal
+        performance. This parameter is part of the
+        [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
         and should be used together with the `before` parameter.
         """
         last: Int
