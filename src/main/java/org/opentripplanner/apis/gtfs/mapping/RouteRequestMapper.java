@@ -21,6 +21,7 @@ import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
+import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
@@ -113,7 +114,9 @@ public class RouteRequestMapper {
     prefs.withItineraryFilter(filters ->
       setItineraryFilters(filters, args.getGraphQLItineraryFilter())
     );
-    prefs.withTransit(transit -> setTransitPreferences(transit, args, environment));
+    prefs.withTransit(transit -> {
+      prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
+    });
     setStreetPreferences(prefs, preferenceArgs.getGraphQLStreet(), environment);
     setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
   }
@@ -141,7 +144,8 @@ public class RouteRequestMapper {
   }
 
   private static void setTransitPreferences(
-    TransitPreferences.Builder preferences,
+    TransitPreferences.Builder transitPreferences,
+    TransferPreferences.Builder transferPreferences,
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
   ) {
@@ -160,7 +164,60 @@ public class RouteRequestMapper {
             mode -> (Double) ((Map<String, Object>) mode.get("cost")).get("reluctance")
           )
         );
-      preferences.setReluctanceForMode(reluctanceForMode);
+      transitPreferences.setReluctanceForMode(reluctanceForMode);
+    }
+    var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
+    if (transitArgs != null) {
+      var board = transitArgs.getGraphQLBoard();
+      if (board != null) {
+        var slack = board.getGraphQLSlack();
+        if (slack != null) {
+          transitPreferences.withDefaultBoardSlackSec((int) slack.toSeconds());
+        }
+        var waitReluctance = board.getGraphQLWaitReluctance();
+        if (waitReluctance != null) {
+          transferPreferences.withWaitReluctance(waitReluctance);
+        }
+      }
+      var alight = transitArgs.getGraphQLAlight();
+      if (alight != null) {
+        var slack = alight.getGraphQLSlack();
+        if (slack != null) {
+          transitPreferences.withDefaultAlightSlackSec((int) slack.toSeconds());
+        }
+      }
+      var transfer = transitArgs.getGraphQLTransfer();
+      if (transfer != null) {
+        var cost = transfer.getGraphQLCost();
+        if (cost != null) {
+          transferPreferences.withCost(cost.toSeconds());
+        }
+        var slack = transfer.getGraphQLSlack();
+        if (slack != null) {
+          transferPreferences.withSlack((int) slack.toSeconds());
+        }
+        var maxTransfers = transfer.getGraphQLMaximumTransfers();
+        if (maxTransfers != null) {
+          transferPreferences.withMaxTransfers(maxTransfers);
+        }
+        var additionalTransfers = transfer.getGraphQLMaximumAdditionalTransfers();
+        if (additionalTransfers != null) {
+          transferPreferences.withMaxAdditionalTransfers(additionalTransfers);
+        }
+      }
+      var timetable = transitArgs.getGraphQLTimetable();
+      if (timetable != null) {
+        var excludeUpdates = timetable.getGraphQLExcludeRealTimeUpdates();
+        transitPreferences.setIgnoreRealtimeUpdates(Boolean.TRUE.equals(excludeUpdates));
+        var includePlannedCancellations = timetable.getGraphQLIncludePlannedCancellations();
+        transitPreferences.setIncludePlannedCancellations(
+          Boolean.TRUE.equals(includePlannedCancellations)
+        );
+        var includeRealtimeCancellations = timetable.getGraphQLIncludeRealTimeCancellations();
+        transitPreferences.setIncludeRealtimeCancellations(
+          Boolean.TRUE.equals(includeRealtimeCancellations)
+        );
+      }
     }
   }
 
