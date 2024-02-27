@@ -34,21 +34,13 @@ class AuthorityToAgencyMapper {
    * Map authority and time zone to OTP agency.
    */
   Agency mapAuthorityToAgency(Authority source) {
-    String agencyName = source.getName() != null &&
-      StringUtils.hasValue(source.getName().getValue())
-      ? source.getName().getValue()
-      : null;
-
-    String agencyShortName = source.getShortName() != null &&
-      StringUtils.hasValue(source.getShortName().getValue())
-      ? source.getShortName().getValue()
-      : null;
-
-    String mainName = agencyName != null ? agencyName : agencyShortName;
+    String name = MultilingualStringMapper.nullableValueOf(source.getName());
+    String shortName = MultilingualStringMapper.nullableValueOf(source.getShortName());
+    String agencyName = StringUtils.hasValue(name) ? name : shortName;
 
     AgencyBuilder target = Agency
       .of(idFactory.createId(source.getId()))
-      .withName(mainName)
+      .withName(agencyName)
       .withTimezone(timeZone);
 
     withOptional(
