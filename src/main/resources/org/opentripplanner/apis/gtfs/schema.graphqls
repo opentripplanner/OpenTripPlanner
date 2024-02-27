@@ -378,24 +378,6 @@ input DestinationBicyclePolicyInput {
 }
 
 """
-Is it possible to arrive to the destination with a rented car and does it
-come with an extra cost.
-"""
-input DestinationCarPolicyInput {
-    """
-    For networks that require station drop-off, should the routing engine offer results that go directly to the destination without dropping off the rental car first.
-    """
-    allowKeeping: Boolean
-
-    """
-    Cost associated with arriving to the destination with a rented car.
-    No cost is applied if arriving to the destination after dropping off the rented
-    car.
-    """
-    keepingCost: Cost
-}
-
-"""
 Is it possible to arrive to the destination with a rented scooter and does it
 come with an extra cost.
 """
@@ -4347,12 +4329,6 @@ input ScooterRentalPreferencesInput {
 Preferences related to car rental (station based or floating car rental).
 """
 input CarRentalPreferencesInput {
-    """
-    Is it possible to arrive to the destination with a rented car and does it
-    come with an extra cost.
-    """
-    destinationCarPolicy: DestinationCarPolicyInput
-
     """
     Rental networks which can be potentially used as part of an itinerary.
     """

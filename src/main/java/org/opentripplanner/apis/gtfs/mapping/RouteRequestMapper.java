@@ -480,7 +480,6 @@ public class RouteRequestMapper {
       if (bannedNetworks != null && bannedNetworks.size() > 0) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
-      // TODO validate if station based car systems work before adding destination policy
     }
   }
 
@@ -516,7 +515,15 @@ public class RouteRequestMapper {
       if (bannedNetworks != null && bannedNetworks.size() > 0) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
-      // TODO validate if station based scooter systems work before adding destination policy
+      var destinationPolicy = args.getGraphQLDestinationScooterPolicy();
+      if (destinationPolicy != null) {
+        var allowed = destinationPolicy.getGraphQLAllowKeeping();
+        preferences.withAllowArrivingInRentedVehicleAtDestination(Boolean.TRUE.equals(allowed));
+        var cost = destinationPolicy.getGraphQLKeepingCost();
+        if (cost != null) {
+          preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
+        }
+      }
     }
   }
 

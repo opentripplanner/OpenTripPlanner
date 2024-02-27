@@ -541,16 +541,11 @@ public class GraphQLTypes {
 
     private List<String> allowedNetworks;
     private List<String> bannedNetworks;
-    private GraphQLDestinationCarPolicyInput destinationCarPolicy;
 
     public GraphQLCarRentalPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         this.allowedNetworks = (List<String>) args.get("allowedNetworks");
         this.bannedNetworks = (List<String>) args.get("bannedNetworks");
-        this.destinationCarPolicy =
-          new GraphQLDestinationCarPolicyInput(
-            (Map<String, Object>) args.get("destinationCarPolicy")
-          );
       }
     }
 
@@ -562,22 +557,12 @@ public class GraphQLTypes {
       return this.bannedNetworks;
     }
 
-    public GraphQLDestinationCarPolicyInput getGraphQLDestinationCarPolicy() {
-      return this.destinationCarPolicy;
-    }
-
     public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
       this.allowedNetworks = allowedNetworks;
     }
 
     public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
       this.bannedNetworks = bannedNetworks;
-    }
-
-    public void setGraphQLDestinationCarPolicy(
-      GraphQLDestinationCarPolicyInput destinationCarPolicy
-    ) {
-      this.destinationCarPolicy = destinationCarPolicy;
     }
   }
 
@@ -691,35 +676,6 @@ public class GraphQLTypes {
     private org.opentripplanner.framework.model.Cost keepingCost;
 
     public GraphQLDestinationBicyclePolicyInput(Map<String, Object> args) {
-      if (args != null) {
-        this.allowKeeping = (Boolean) args.get("allowKeeping");
-        this.keepingCost = (org.opentripplanner.framework.model.Cost) args.get("keepingCost");
-      }
-    }
-
-    public Boolean getGraphQLAllowKeeping() {
-      return this.allowKeeping;
-    }
-
-    public org.opentripplanner.framework.model.Cost getGraphQLKeepingCost() {
-      return this.keepingCost;
-    }
-
-    public void setGraphQLAllowKeeping(Boolean allowKeeping) {
-      this.allowKeeping = allowKeeping;
-    }
-
-    public void setGraphQLKeepingCost(org.opentripplanner.framework.model.Cost keepingCost) {
-      this.keepingCost = keepingCost;
-    }
-  }
-
-  public static class GraphQLDestinationCarPolicyInput {
-
-    private Boolean allowKeeping;
-    private org.opentripplanner.framework.model.Cost keepingCost;
-
-    public GraphQLDestinationCarPolicyInput(Map<String, Object> args) {
       if (args != null) {
         this.allowKeeping = (Boolean) args.get("allowKeeping");
         this.keepingCost = (org.opentripplanner.framework.model.Cost) args.get("keepingCost");
