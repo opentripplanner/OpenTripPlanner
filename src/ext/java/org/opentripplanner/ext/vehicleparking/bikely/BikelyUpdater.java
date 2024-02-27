@@ -26,7 +26,7 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
   private final String feedId;
 
   public BikelyUpdater(BikelyUpdaterParameters parameters) {
-    super(parameters.url(), JSON_PARSE_PATH, parameters.httpHeaders());
+    super(parameters.url().toString(), JSON_PARSE_PATH, parameters.httpHeaders());
     this.feedId = parameters.feedId();
   }
 
@@ -34,20 +34,19 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
   protected VehicleParking parseElement(JsonNode jsonNode) {
     var vehicleParkId = new FeedScopedId(feedId, jsonNode.get("id").asText());
 
-    var address = jsonNode.get("address");
     var workingHours = jsonNode.get("workingHours");
 
-    var lat = address.get("latitude").asDouble();
-    var lng = address.get("longitude").asDouble();
+    var lat = jsonNode.get("latitude").asDouble();
+    var lng = jsonNode.get("longitude").asDouble();
     var coord = new WgsCoordinate(lat, lng);
 
     var name = new NonLocalizedString(jsonNode.path("name").asText());
 
-    var totalSpots = jsonNode.get("totalParkingSpots").asInt();
-    var freeSpots = jsonNode.get("availableParkingSpots").asInt();
-    var isUnderMaintenance = workingHours.get("isUnderMaintenance").asBoolean();
+    var totalSpots = jsonNode.get("totalStandardSpots").asInt();
+    var freeSpots = jsonNode.get("availableStandardSpots").asInt();
+    var isUnderMaintenance = jsonNode.get("isInMaintenance").asBoolean();
 
-    LocalizedString note = toNote(jsonNode.get("price"));
+    LocalizedString note = toNote(jsonNode);
 
     VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
       builder
@@ -75,8 +74,8 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
     var startPriceAmount = price.get("startPriceAmount").floatValue();
     var mainPriceAmount = price.get("mainPriceAmount").floatValue();
 
-    var startPriceDurationHours = price.get("startPriceDurationHours").asInt();
-    var mainPriceDurationHours = price.get("mainPriceDurationHours").asInt();
+    var startPriceDurationHours = price.get("startPriceDuration").asInt();
+    var mainPriceDurationHours = price.get("mainPriceDuration").asInt();
 
     if (startPriceAmount == 0 && mainPriceAmount == 0) {
       return new LocalizedString("price.free");
