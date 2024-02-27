@@ -651,6 +651,14 @@ Used to group requests when monitoring OTP.
         "cacheMaxSeconds" : 600
       },
       {
+        "name" : "areaStops",
+        "type" : "AreaStop",
+        "mapper" : "OTPRR",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
         "name" : "stations",
         "type" : "Station",
         "mapper" : "Digitransit",

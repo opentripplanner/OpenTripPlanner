@@ -14,12 +14,12 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-public class DigitransitAreaStopPropertyMapper extends PropertyMapper<AreaStop> {
+public class AreaStopPropertyMapper extends PropertyMapper<AreaStop> {
 
   private final Function<StopLocation, Collection<Route>> getRoutesForStop;
   private final I18NStringMapper i18NStringMapper;
 
-  protected DigitransitAreaStopPropertyMapper(
+  protected AreaStopPropertyMapper(
     Function<StopLocation, Collection<Route>> getRoutesForStop,
     Locale locale
   ) {
@@ -27,11 +27,8 @@ public class DigitransitAreaStopPropertyMapper extends PropertyMapper<AreaStop> 
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  protected static DigitransitAreaStopPropertyMapper create(
-    TransitService transitService,
-    Locale locale
-  ) {
-    return new DigitransitAreaStopPropertyMapper(transitService::getRoutesForStop, locale);
+  protected static AreaStopPropertyMapper create(TransitService transitService, Locale locale) {
+    return new AreaStopPropertyMapper(transitService::getRoutesForStop, locale);
   }
 
   @Override

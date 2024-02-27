@@ -16,8 +16,8 @@ import org.opentripplanner.transit.service.TransitService;
 public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
   static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers = Map.of(
-    MapperType.Digitransit,
-    DigitransitAreaStopPropertyMapper::create
+    MapperType.OTPRR,
+    AreaStopPropertyMapper::create
   );
   private final TransitService transitService;
 
@@ -48,6 +48,6 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
   }
 
   enum MapperType {
-    Digitransit,
+    OTPRR,
   }
 }

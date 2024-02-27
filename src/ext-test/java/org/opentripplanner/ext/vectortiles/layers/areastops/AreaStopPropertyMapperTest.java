@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.StopModel;
 
-class DigitransitAreaStopPropertyMapperTest {
+class AreaStopPropertyMapperTest {
 
   private static final TransitModelForTest MODEL = new TransitModelForTest(StopModel.of());
   private static final AreaStop STOP = MODEL.areaStopForTest("123", Polygons.BERLIN);
@@ -24,7 +24,7 @@ class DigitransitAreaStopPropertyMapperTest {
 
   @Test
   void map() {
-    var mapper = new DigitransitAreaStopPropertyMapper(
+    var mapper = new AreaStopPropertyMapper(
       ignored -> List.of(ROUTE_WITH_COLOR, ROUTE_WITHOUT_COLOR),
       Locale.ENGLISH
     );

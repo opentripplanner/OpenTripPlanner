@@ -53,7 +53,7 @@ class AreaStopsLayerBuilderTest {
     var layer = new Layer(
       "areaStops",
       VectorTilesResource.LayerType.AreaStop,
-      "Digitransit",
+      "OTPRR",
       20,
       1,
       10,
