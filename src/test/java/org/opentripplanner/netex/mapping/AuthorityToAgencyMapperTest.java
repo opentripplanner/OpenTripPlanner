@@ -33,7 +33,6 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertEquals(ID, a.getId().getId());
     assertEquals(NAME, a.getName());
-    assertEquals(SHORT_NAME, a.getShortName());
     assertEquals(TIME_ZONE, a.getTimezone().getId());
     assertEquals(URL, a.getUrl());
     assertEquals(PHONE, a.getPhone());
@@ -50,7 +49,18 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertNull(a.getUrl());
     assertNull(a.getPhone());
-    assertNull(a.getShortName());
+  }
+
+  @Test
+  public void mapAgencyWithShortName() {
+    // Given
+    Authority authority = authority(ID, null, SHORT_NAME, null, null);
+
+    // When mapped
+    Agency a = mapper.mapAuthorityToAgency(authority);
+
+    // Then expect
+    assertEquals(SHORT_NAME, a.getName());
   }
 
   @Test

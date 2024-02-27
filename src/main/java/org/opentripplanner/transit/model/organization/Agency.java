@@ -17,7 +17,6 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> implements LogInfo {
 
   private final String name;
-  private final String shortName;
   private final ZoneId timezone;
   private final String url;
   private final String lang;
@@ -27,16 +26,9 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
 
   Agency(AgencyBuilder builder) {
     super(builder.getId());
-    // Fill agency name, if not exists take short name
-    String nameValue = (builder.getName() != null && !builder.getName().isBlank())
-      ? builder.getName()
-      : builder.getShortName() != null && !builder.getShortName().isBlank()
-        ? builder.getShortName()
-        : null;
-
     // Required fields
-    this.name = assertHasValue(nameValue, "Missing mandatory name on Agency %s", builder.getId());
-    this.shortName = builder.getShortName();
+    this.name =
+      assertHasValue(builder.getName(), "Missing mandatory name on Agency %s", builder.getId());
 
     this.timezone =
       ZoneId.of(
@@ -62,11 +54,6 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
   @Nonnull
   public String getName() {
     return logName();
-  }
-
-  @Nullable
-  public String getShortName() {
-    return shortName;
   }
 
   @Nonnull
@@ -116,7 +103,6 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
-      Objects.equals(shortName, other.shortName) &&
       Objects.equals(timezone, other.timezone) &&
       Objects.equals(url, other.url) &&
       Objects.equals(lang, other.lang) &&

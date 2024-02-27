@@ -7,7 +7,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> {
 
   private String name;
-  private String shortName;
   private String timezone;
   private String url;
   private String lang;
@@ -22,7 +21,6 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
   AgencyBuilder(@Nonnull Agency original) {
     super(original);
     this.name = original.getName();
-    this.shortName = original.getShortName();
     this.timezone = original.getTimezone().getId();
     this.url = original.getUrl();
     this.lang = original.getLang();
@@ -35,17 +33,8 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
     return name;
   }
 
-  public String getShortName() {
-    return shortName;
-  }
-
   public AgencyBuilder withName(String name) {
     this.name = name;
-    return this;
-  }
-
-  public AgencyBuilder withShortName(String shortName) {
-    this.shortName = shortName;
     return this;
   }
 

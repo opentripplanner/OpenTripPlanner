@@ -34,14 +34,18 @@ class AuthorityToAgencyMapper {
    */
   Agency mapAuthorityToAgency(Authority source) {
     String agencyName = source.getName() != null ? source.getName().getValue() : null;
-    String agencyShortName = source.getShortName() != null
+
+    String agencyShortName = source.getShortName() != null &&
+      source.getShortName().getValue() != null &&
+      !source.getShortName().getValue().isBlank()
       ? source.getShortName().getValue()
       : null;
 
+    String mainName = agencyName != null && !agencyName.isBlank() ? agencyName : agencyShortName;
+
     AgencyBuilder target = Agency
       .of(idFactory.createId(source.getId()))
-      .withName(agencyName)
-      .withShortName(agencyShortName)
+      .withName(mainName)
       .withTimezone(timeZone);
 
     withOptional(
