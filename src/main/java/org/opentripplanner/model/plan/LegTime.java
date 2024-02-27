@@ -13,11 +13,13 @@ public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealTimeEs
   public LegTime {
     Objects.requireNonNull(scheduledTime);
   }
+
   @Nonnull
   public static LegTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
     return new LegTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
   }
+
   @Nonnull
   public static LegTime ofStatic(ZonedDateTime staticTime) {
     return new LegTime(staticTime, null);
