@@ -206,7 +206,7 @@ public interface Leg {
   LegTime start();
 
   /**
-   * The time (including realtime information) when the leg ends..
+   * The time (including realtime information) when the leg ends.
    */
   LegTime end();
 
