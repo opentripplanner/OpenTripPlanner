@@ -58,7 +58,10 @@ public class BikelyUpdaterTest {
     assertEquals(10, capacity.getBicycleSpaces());
 
     var freeParkingLots = parkingLots.get(2);
-    assertEquals("First 12 hour(s) is NOK0.00, afterwards NOK10.00 per 1 hour(s)", freeParkingLots.getNote().toString(Locale.ENGLISH));
+    assertEquals(
+      "First 12 hour(s) is NOK0.00, afterwards NOK10.00 per 1 hour(s)",
+      freeParkingLots.getNote().toString(Locale.ENGLISH)
+    );
 
     assertEquals(VehicleParkingState.OPERATIONAL, first.getState());
 

@@ -34,8 +34,6 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
   protected VehicleParking parseElement(JsonNode jsonNode) {
     var vehicleParkId = new FeedScopedId(feedId, jsonNode.get("id").asText());
 
-    var workingHours = jsonNode.get("workingHours");
-
     var lat = jsonNode.get("latitude").asDouble();
     var lng = jsonNode.get("longitude").asDouble();
     var coord = new WgsCoordinate(lat, lng);
