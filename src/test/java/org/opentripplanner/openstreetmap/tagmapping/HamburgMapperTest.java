@@ -28,7 +28,7 @@ public class HamburgMapperTest {
 
     assertFalse(
       generalNoThroughTraffic,
-      "access=customers and customers=hvv should not be considered through-traffic"
+      "access=customers and customers=hvv should allow through-traffic"
     );
   }
 
