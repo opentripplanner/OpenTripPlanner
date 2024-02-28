@@ -38,7 +38,7 @@ import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
-class RouteRequestMapperTest implements PlanTestConstants {
+class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static final GraphQLRequestContext context;
 
