@@ -27,6 +27,7 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuil
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
@@ -264,23 +265,20 @@ public class OtpHttpClient implements AutoCloseable {
     Map<String, String> headers,
     ResponseMapper<T> contentMapper
   ) {
-    URL downloadUrl;
-    try {
-      downloadUrl = uri.toURL();
-    } catch (MalformedURLException e) {
-      throw new OtpHttpClientException(e);
-    }
-    String proto = downloadUrl.getProtocol();
-    if (proto.equals("http") || proto.equals("https")) {
-      return executeAndMap(new HttpGet(uri), timeout, headers, contentMapper);
-    } else {
-      // Local file probably, try standard java
-      try (InputStream is = downloadUrl.openStream()) {
-        return contentMapper.apply(is);
-      } catch (Exception e) {
-        throw new OtpHttpClientException(e);
-      }
-    }
+    return sendAndMap(new HttpGet(uri), uri, timeout, headers, contentMapper);
+  }
+
+  public <T> T postJsonAndMap(
+    URI uri,
+    JsonNode jsonBody,
+    Duration timeout,
+    Map<String, String> headers,
+    ResponseMapper<T> contentMapper
+  ) {
+    var request = new HttpPost(uri);
+    request.setEntity(new StringEntity(jsonBody.toString()));
+    request.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON);
+    return sendAndMap(request, uri, timeout, headers, contentMapper);
   }
 
   /**
@@ -397,6 +395,32 @@ public class OtpHttpClient implements AutoCloseable {
       return httpClient.execute(httpRequest, responseHandler);
     } catch (IOException e) {
       throw new OtpHttpClientException(e);
+    }
+  }
+
+  private <T> T sendAndMap(
+    HttpUriRequestBase request,
+    URI uri,
+    Duration timeout,
+    Map<String, String> headers,
+    ResponseMapper<T> contentMapper
+  ) {
+    URL downloadUrl;
+    try {
+      downloadUrl = uri.toURL();
+    } catch (MalformedURLException e) {
+      throw new OtpHttpClientException(e);
+    }
+    String proto = downloadUrl.getProtocol();
+    if (proto.equals("http") || proto.equals("https")) {
+      return executeAndMap(request, timeout, headers, contentMapper);
+    } else {
+      // Local file probably, try standard java
+      try (InputStream is = downloadUrl.openStream()) {
+        return contentMapper.apply(is);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
+      }
     }
   }
 
