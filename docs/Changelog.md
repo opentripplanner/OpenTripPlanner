@@ -95,6 +95,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add GroupStop layer to new debug frontend [#5666](https://github.com/opentripplanner/OpenTripPlanner/pull/5666)
 - Update to newest version of GTFS Flex location groups [#5655](https://github.com/opentripplanner/OpenTripPlanner/pull/5655)
 - Use NeTEx authority short name if name is not present [#5698](https://github.com/opentripplanner/OpenTripPlanner/pull/5698)
+- Add Hamburg OSM mapper [#5701](https://github.com/opentripplanner/OpenTripPlanner/pull/5701)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
