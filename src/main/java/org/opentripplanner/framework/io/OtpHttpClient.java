@@ -268,6 +268,10 @@ public class OtpHttpClient implements AutoCloseable {
     return sendAndMap(new HttpGet(uri), uri, timeout, headers, contentMapper);
   }
 
+  /**
+   * Send an HTTP POST request with Content-Type: application/json. The body of the request
+   * is defined by {@code jsonBody}.
+   */
   public <T> T postJsonAndMap(
     URI uri,
     JsonNode jsonBody,
