@@ -121,6 +121,13 @@
       ],
       "automerge": true,
       "schedule": "after 11pm and before 5am every weekday"
+    },
+    {
+      "description": "give some projects time to publish a changelog before opening the PR",
+      "matchPackagePrefixes": [
+        "com.google.dagger:"
+      ],
+      "minimumReleaseAge": "1 week"
     }
   ],
   "timezone": "Europe/Berlin"
