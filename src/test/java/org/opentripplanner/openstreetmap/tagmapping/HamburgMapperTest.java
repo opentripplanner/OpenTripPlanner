@@ -9,6 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
+/**
+ * @author Maintained by HBT (geofox-team@hbt.de)
+ */
 public class HamburgMapperTest {
 
   private HamburgMapper mapper;

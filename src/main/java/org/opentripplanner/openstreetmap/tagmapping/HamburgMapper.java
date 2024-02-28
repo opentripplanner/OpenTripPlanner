@@ -8,6 +8,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @see GermanyMapper
  * @see OsmTagMapper
  * @see DefaultMapper
+ * 
+ * @author Maintained by HBT (geofox-team@hbt.de)
  */
 public class HamburgMapper extends GermanyMapper {
 
