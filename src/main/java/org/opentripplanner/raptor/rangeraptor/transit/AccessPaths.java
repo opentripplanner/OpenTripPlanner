@@ -8,26 +8,40 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.IntIterators;
 
+/**
+ * This class is responsible for performing Raptor-specific functionality on access-paths. It
+ * groups paths based on number-of-trips(FLEX mainly) and stop-arrival "mode" (on-board or on-foot).
+ * This is used to insert the access into the Raptor rounds at the correct moment (round), so
+ * the number-of-transfers criteria become correct.
+ * <p>
+ * This class also provides an iterator to iterate over iteration steps in the Raptor algorithm
+ * to cover extra minutes outside the search-window for access with a time-penalty.
+ */
 public class AccessPaths {
 
   private final int iterationStep;
   private final int maxTimePenalty;
+  private final IntUnaryOperator iterationOp;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
   private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
   private int iterationTimePenaltyLimit = RaptorConstants.TIME_NOT_SET;
 
   private AccessPaths(
     int iterationStep,
+    IntUnaryOperator iterationOp,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
     TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides
   ) {
     this.iterationStep = iterationStep;
+    this.iterationOp = iterationOp;
     this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
     this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;
     this.maxTimePenalty =
@@ -50,7 +64,8 @@ public class AccessPaths {
   public static AccessPaths create(
     int iterationStep,
     Collection<RaptorAccessEgress> paths,
-    RaptorProfile profile
+    RaptorProfile profile,
+    SearchDirection searchDirection
   ) {
     if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
@@ -62,6 +77,7 @@ public class AccessPaths {
 
     return new AccessPaths(
       iterationStep,
+      iterationOp(searchDirection),
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
       groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
     );
@@ -100,9 +116,9 @@ public class AccessPaths {
     }
     // In the first iteration, we want the time-limit to be zero and the raptor-iteration-time
     // to be one step before the earliest-departure-time in the search-window. This will include
-    // all access with a penalty in the first iteration. Then
+    // all access with a penalty in the first iteration. Then:
     this.iterationTimePenaltyLimit = -iterationStep;
-    final int raptorIterationStartTime = earliestDepartureTime - iterationStep;
+    final int raptorIterationStartTime = earliestDepartureTime - signedIterationStep(iterationStep);
 
     return new IntIterator() {
       @Override
@@ -113,7 +129,9 @@ public class AccessPaths {
       @Override
       public int next() {
         AccessPaths.this.iterationTimePenaltyLimit += iterationStep;
-        return raptorIterationStartTime - AccessPaths.this.iterationTimePenaltyLimit;
+        return (
+          raptorIterationStartTime - signedIterationStep(AccessPaths.this.iterationTimePenaltyLimit)
+        );
       }
     };
   }
@@ -175,5 +193,21 @@ public class AccessPaths {
       return list.stream().filter(e -> e.timePenalty() > iterationTimePenaltyLimit).toList();
     }
     return list;
+  }
+
+  /**
+   * When searching forward, we step back in time (minus), and when searching in reverse, we
+   * step forward in time (plus).
+   */
+  private int signedIterationStep(int value) {
+    return iterationOp.applyAsInt(value);
+  }
+
+  /**
+   * We step back/forward in Raptor depending on the search direction.
+   * @see #signedIterationStep(int)
+   */
+  private static IntUnaryOperator iterationOp(SearchDirection searchDirection) {
+    return searchDirection.isForward() ? (int step) -> step : (int step) -> -step;
   }
 }

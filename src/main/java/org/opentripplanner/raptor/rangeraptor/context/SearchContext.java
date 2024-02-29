@@ -318,7 +318,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     boolean forward = request.searchDirection().isForward();
     var params = request.searchParams();
     var paths = forward ? params.accessPaths() : params.egressPaths();
-    return AccessPaths.create(iterationStep, paths, request.profile());
+    return AccessPaths.create(iterationStep, paths, request.profile(), request.searchDirection());
   }
 
   private static EgressPaths egressPaths(RaptorRequest<?> request) {

@@ -40,7 +40,7 @@ public class AccessWithPenalty extends AbstractAccessEgressDecorator {
    * decorator and returns the original access path if decorated. If not, the given path is
    * returned.
    */
-  public static RaptorAccessEgress removeDecoratorIfItExist(RaptorAccessEgress path) {
-    return removeRaptorDecoratorIfItExist(path, AccessWithPenalty.class);
+  public RaptorAccessEgress removeDecorator() {
+    return delegate();
   }
 }

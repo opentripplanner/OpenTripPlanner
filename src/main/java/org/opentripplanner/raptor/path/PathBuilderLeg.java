@@ -353,9 +353,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
     var accessPath = asAccessLeg().streetPath;
     int cost = cost(costCalculator, accessPath);
-
-    accessPath = AccessWithPenalty.removeDecoratorIfItExist(accessPath);
-
     return new AccessPathLeg<>(accessPath, fromTime, toTime, cost, nextLeg);
   }
 
@@ -453,9 +450,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   ) {
     int cost = egressCost(costCalculator, slackProvider);
     var egressPath = asEgressLeg().streetPath;
-
-    egressPath = EgressWithPenalty.removeDecoratorIfItExist(egressPath);
-
     return new EgressPathLeg<>(egressPath, fromTime, toTime, cost);
   }
 
@@ -703,12 +697,22 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     final RaptorAccessEgress streetPath;
 
     MyStreetLeg(RaptorAccessEgress streetPath) {
-      this.streetPath = streetPath;
+      this.streetPath = removeTimePenaltyDecorator(streetPath);
     }
 
     @Override
     public boolean hasRides() {
       return streetPath.hasRides();
+    }
+
+    private static RaptorAccessEgress removeTimePenaltyDecorator(RaptorAccessEgress path) {
+      if (path instanceof AccessWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      if (path instanceof EgressWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      return path;
     }
   }
 

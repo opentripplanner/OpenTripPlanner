@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
+import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
+import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.STANDARD;
 
@@ -107,7 +109,8 @@ class AccessPathsTest implements RaptorTestConstants {
         FLEX_B,
         FLEX_WALK_B
       ),
-      MULTI_CRITERIA
+      MULTI_CRITERIA,
+      FORWARD
     );
 
     var iterator = accessPaths.iterateOverPathsWithPenalty(600);
@@ -143,11 +146,63 @@ class AccessPathsTest implements RaptorTestConstants {
   }
 
   @Test
+  void iterateOverPathsWithPenaltyInReversDirection() {
+    // Expected at departure 540
+    var flexFastWithPenalty = FLEX_FAST.withTimePenalty(60);
+
+    // Expected at departure 540 and 480
+    var flexTxWithPenalty = FLEX_TX2.withTimePenalty(61);
+
+    // Expected at departure 540, 480 and 420
+    var walkFastWithPenalty = WALK_FAST.withTimePenalty(121);
+
+    // Without time-penalty, the iterator should be empty
+    var accessPaths = AccessPaths.create(
+      60,
+      List.of(flexFastWithPenalty, flexTxWithPenalty, walkFastWithPenalty, WALK_B, FLEX_B),
+      STANDARD,
+      REVERSE
+    );
+
+    var iterator = accessPaths.iterateOverPathsWithPenalty(600);
+
+    // First iteration
+    assertTrue(iterator.hasNext());
+    assertEquals(660, iterator.next());
+    expect(accessPaths.arrivedOnStreetByNumOfRides(0), walkFastWithPenalty);
+    expect(accessPaths.arrivedOnBoardByNumOfRides(1));
+    expect(accessPaths.arrivedOnStreetByNumOfRides(1));
+    expect(accessPaths.arrivedOnBoardByNumOfRides(2), flexTxWithPenalty);
+    expect(accessPaths.arrivedOnStreetByNumOfRides(2));
+    expect(accessPaths.arrivedOnBoardByNumOfRides(3), flexFastWithPenalty);
+    expect(accessPaths.arrivedOnStreetByNumOfRides(3));
+    expect(accessPaths.arrivedOnBoardByNumOfRides(4));
+    expect(accessPaths.arrivedOnStreetByNumOfRides(4));
+
+    // Second iteration
+    assertTrue(iterator.hasNext());
+    assertEquals(720, iterator.next());
+    expect(accessPaths.arrivedOnStreetByNumOfRides(0), walkFastWithPenalty);
+    expect(accessPaths.arrivedOnBoardByNumOfRides(2), flexTxWithPenalty);
+    expect(accessPaths.arrivedOnBoardByNumOfRides(3));
+
+    // Third iteration
+    assertTrue(iterator.hasNext());
+    assertEquals(780, iterator.next());
+    expect(accessPaths.arrivedOnStreetByNumOfRides(0), walkFastWithPenalty);
+    expect(accessPaths.arrivedOnBoardByNumOfRides(2));
+    expect(accessPaths.arrivedOnBoardByNumOfRides(3));
+
+    assertFalse(iterator.hasNext());
+  }
+
+  @Test
   void hasTimeDependentAccess() {
     var accessPaths = AccessPaths.create(
       60,
       List.of(WALK_FAST, walk(STOP_A, 20).openingHours(1200, 2400)),
-      STANDARD
+      STANDARD,
+      FORWARD
     );
     assertTrue(accessPaths.hasTimeDependentAccess(), "Time dependent access is better.");
 
@@ -155,7 +210,8 @@ class AccessPathsTest implements RaptorTestConstants {
       AccessPaths.create(
         60,
         List.of(WALK_FAST, walk(STOP_A, 50).openingHours(1200, 2400)),
-        STANDARD
+        STANDARD,
+        REVERSE
       );
     assertFalse(accessPaths.hasTimeDependentAccess(), "Time dependent access is worse.");
   }
@@ -196,6 +252,6 @@ class AccessPathsTest implements RaptorTestConstants {
       FLEX_BAD,
       FLEX_B
     );
-    return AccessPaths.create(60, accessPaths, profile);
+    return AccessPaths.create(60, accessPaths, profile, FORWARD);
   }
 }

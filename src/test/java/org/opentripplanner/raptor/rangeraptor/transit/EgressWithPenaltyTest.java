@@ -7,7 +7,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 
 class EgressWithPenaltyTest {
 
@@ -73,10 +72,7 @@ class EgressWithPenaltyTest {
   @Test
   void removeDecoratorIfItExist() {
     var original = walk(STOP, DURATION).withTimePenalty(PENALTY);
-    RaptorAccessEgress subject = new EgressWithPenalty(original);
-
-    assertSame(original, EgressWithPenalty.removeDecoratorIfItExist(subject));
-    assertSame(original, EgressWithPenalty.removeDecoratorIfItExist(original));
-    assertSame(null, EgressWithPenalty.removeDecoratorIfItExist(null));
+    var subject = new EgressWithPenalty(original);
+    assertSame(original, subject.removeDecorator());
   }
 }

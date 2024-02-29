@@ -140,11 +140,13 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       }
 
       // Iterate over virtual departure times - this is needed to allow access with a time-penalty
-      // which falls outside the search-window due to the penalty to be added to the result.
-      final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
-      while (as.hasNext()) {
-        setupIteration(as.next());
-        runRaptorForMinute();
+      // which falls outside the search-window due to the added time-penalty.
+      if (!calculator.oneIterationOnly()) {
+        final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
+        while (as.hasNext()) {
+          setupIteration(as.next());
+          runRaptorForMinute();
+        }
       }
     });
     return state.results();
