@@ -35,14 +35,16 @@ public class DirectStreetRouter {
         request.journey().direct().mode()
       )
     ) {
-      if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices)) {
+      var maxCarSpeed = serverContext.streetLimitationParametersService().getMaxCarSpeed();
+      if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices, maxCarSpeed)) {
         return Collections.emptyList();
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
-        serverContext.dataOverlayContext(request)
+        serverContext.dataOverlayContext(request),
+        maxCarSpeed
       );
       List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(
         directRequest,
@@ -69,7 +71,8 @@ public class DirectStreetRouter {
 
   private static boolean straightLineDistanceIsWithinLimit(
     RouteRequest request,
-    TemporaryVerticesContainer vertexContainer
+    TemporaryVerticesContainer vertexContainer,
+    float maxCarSpeed
   ) {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
@@ -77,7 +80,7 @@ public class DirectStreetRouter {
       vertexContainer.getFromVertices().iterator().next().getCoordinate(),
       vertexContainer.getToVertices().iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(request);
+    return distance < calculateDistanceMaxLimit(request, maxCarSpeed);
   }
 
   /**
@@ -85,7 +88,7 @@ public class DirectStreetRouter {
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RouteRequest.
    */
-  private static double calculateDistanceMaxLimit(RouteRequest request) {
+  private static double calculateDistanceMaxLimit(RouteRequest request, float maxCarSpeed) {
     var preferences = request.preferences();
     double distanceLimit;
     StreetMode mode = request.journey().direct().mode();
@@ -93,7 +96,7 @@ public class DirectStreetRouter {
     double durationLimit = preferences.street().maxDirectDuration().valueOf(mode).toSeconds();
 
     if (mode.includesDriving()) {
-      distanceLimit = durationLimit * preferences.car().speed();
+      distanceLimit = durationLimit * maxCarSpeed;
     } else if (mode.includesBiking()) {
       distanceLimit = durationLimit * preferences.bike().speed();
     } else if (mode.includesScooter()) {

@@ -27,6 +27,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -180,6 +181,8 @@ public class GraphSerializationTest {
   ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
+    var streetLimitationParameters = new StreetLimitationParameters();
+    streetLimitationParameters.initMaxCarSpeed(40);
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
       originalTransitModel,
@@ -188,7 +191,8 @@ public class GraphSerializationTest {
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),
       emissionsDataModel,
-      null
+      null,
+      streetLimitationParameters
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);

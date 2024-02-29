@@ -17,6 +17,7 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 public class DefaultMapperTest {
 
   private WayPropertySet wps;
+  private OsmTagMapper mapper;
   float epsilon = 0.01f;
 
   @BeforeEach
@@ -25,6 +26,7 @@ public class DefaultMapperTest {
     DefaultMapper source = new DefaultMapper();
     source.populateProperties(wps);
     this.wps = wps;
+    this.mapper = source;
   }
 
   /**
@@ -69,7 +71,7 @@ public class DefaultMapperTest {
     wps.addSpeedPicker(getSpeedPicker("highway=motorway", kmhAsMs(100)));
     wps.addSpeedPicker(getSpeedPicker("highway=*", kmhAsMs(35)));
     wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
-    wps.defaultSpeed = kmhAsMs(25);
+    wps.defaultCarSpeed = kmhAsMs(25);
 
     way = new OSMWithTags();
 
@@ -108,6 +110,8 @@ public class DefaultMapperTest {
     assertSpeed(4.305559158325195, "15.5 km/h");
     assertSpeed(22.347200393676758, "50 mph");
     assertSpeed(22.347200393676758, "50.0 mph");
+
+    assertEquals(wps.maxUsedCarSpeed, mapper.getMaxUsedCarSpeed(wps));
   }
 
   @Test

@@ -5,6 +5,7 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -16,11 +17,22 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
+  private static final Float DEFAULT_MAX_CAR_SPEED = StreetConstants.DEFAULT_MAX_CAR_SPEED;
+
   private double lat;
   private double lon;
   private double maxStreetSpeed;
   private double walkingSpeed;
   private boolean arriveBy;
+  private float maxCarSpeed;
+
+  public EuclideanRemainingWeightHeuristic() {
+    this(DEFAULT_MAX_CAR_SPEED);
+  }
+
+  public EuclideanRemainingWeightHeuristic(Float maxCarSpeed) {
+    this.maxCarSpeed = maxCarSpeed != null ? maxCarSpeed : DEFAULT_MAX_CAR_SPEED;
+  }
 
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
   //      not work correctly.
@@ -50,7 +62,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   private double getStreetSpeedUpperBound(RoutingPreferences preferences, StreetMode streetMode) {
     // Assume carSpeed > bikeSpeed > walkSpeed
     if (streetMode.includesDriving()) {
-      return preferences.car().speed();
+      return maxCarSpeed;
     }
     if (streetMode.includesBiking()) {
       return preferences.bike().speed();

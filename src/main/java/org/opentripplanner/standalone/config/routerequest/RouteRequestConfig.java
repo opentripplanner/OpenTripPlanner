@@ -597,13 +597,6 @@ your users receive a timely response. You can also limit the max duration. There
     var dft = builder.original();
     NodeAdapter c = root.of("car").since(V2_5).summary("Car preferences.").asObject();
     builder
-      .withSpeed(
-        c
-          .of("speed")
-          .since(V2_0)
-          .summary("Max car speed along streets, in meters per second")
-          .asDouble(dft.speed())
-      )
       .withReluctance(
         c
           .of("reluctance")

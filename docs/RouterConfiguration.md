@@ -482,7 +482,6 @@ Used to group requests when monitoring OTP.
       }
     },
     "car" : {
-      "speed" : 40,
       "reluctance" : 10,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,

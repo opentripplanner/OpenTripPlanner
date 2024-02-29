@@ -92,7 +92,7 @@ public class TurnCostTest {
     proto = new RouteRequest();
     proto.withPreferences(preferences ->
       preferences
-        .withCar(it -> it.withSpeed(1.0).withReluctance(1.0))
+        .withCar(it -> it.withReluctance(1.0))
         .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
         .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
         .withWalk(walk -> walk.withSpeed(1.0).withStairsReluctance(1.0).withReluctance(1.0))
