@@ -10,13 +10,13 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
@@ -93,72 +93,38 @@ public class DatedServiceJourneyQuery {
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .dataFetcher(environment -> {
-        Stream<TripOnServiceDate> stream = GqlUtil
-          .getTransitService(environment)
-          .getAllTripOnServiceDates()
-          .stream();
-
+        var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
         var serviceJourneys = mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"));
+        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
         var privateCodes = environment.<List<String>>getArgument("privateCodes");
         var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
-        var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
-        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
 
-        if (!lines.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              lines.contains(tripOnServiceDate.getTrip().getRoute().getId())
-            );
+        if (operatingDays == null || operatingDays.isEmpty()) {
+          throw new IllegalArgumentException("At least one operatingDay must be provided.");
         }
 
-        if (!serviceJourneys.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              serviceJourneys.contains(tripOnServiceDate.getTrip().getId())
-            );
-        }
+        TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
+          .of(operatingDays)
+          .withAuthorities(authorities)
+          .withLines(lines)
+          .withServiceJourneys(serviceJourneys)
+          .withReplacementFor(replacementFor);
 
         if (privateCodes != null && !privateCodes.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              privateCodes.contains(tripOnServiceDate.getTrip().getNetexInternalPlanningCode())
-            );
+          tripOnServiceDateRequestBuilder =
+            tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
         }
-
-        // At least one operationg day is required
-        var days = operatingDays.stream().toList();
-
-        stream =
-          stream.filter(tripOnServiceDate -> days.contains(tripOnServiceDate.getServiceDate()));
 
         if (alterations != null && !alterations.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              alterations.contains(tripOnServiceDate.getTripAlteration())
-            );
+          tripOnServiceDateRequestBuilder =
+            tripOnServiceDateRequestBuilder.withAlterations(alterations);
         }
 
-        if (!authorities.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              authorities.contains(tripOnServiceDate.getTrip().getRoute().getAgency().getId())
-            );
-        }
-
-        if (!replacementFor.isEmpty()) {
-          stream =
-            stream.filter(tripOnServiceDate ->
-              !tripOnServiceDate.getReplacementFor().isEmpty() &&
-              tripOnServiceDate
-                .getReplacementFor()
-                .stream()
-                .anyMatch(replacement -> replacementFor.contains(replacement.getId()))
-            );
-        }
-
-        return stream.toList();
+        return GqlUtil
+          .getTransitService(environment)
+          .getTripOnServiceDates(tripOnServiceDateRequestBuilder.build());
       })
       .build();
   }
