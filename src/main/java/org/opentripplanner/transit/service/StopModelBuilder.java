@@ -48,12 +48,17 @@ public class StopModelBuilder {
   }
 
   public StopModelBuilder withRegularStop(RegularStop stop) {
+    if (regularStopById.containsKey(stop.getId())) {
+      throw new IllegalArgumentException(
+        "StopModelBuilder %s already contains a stop with the id %s".formatted(this, stop.getId())
+      );
+    }
     regularStopById.add(stop);
     return this;
   }
 
   public StopModelBuilder withRegularStops(Collection<RegularStop> stops) {
-    regularStopById.addAll(stops);
+    stops.forEach(this::withRegularStop);
     return this;
   }
 

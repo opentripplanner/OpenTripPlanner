@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import com.google.common.collect.Sets;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
@@ -70,6 +71,23 @@ public class StopModel implements Serializable {
   private StopModel(StopModel main, StopModel child) {
     this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
+
+    // check that there are no intersection of ids
+    var intersection = Sets.intersection(
+      main.regularStopById.keySet(),
+      child.regularStopById.keySet()
+    );
+    if (!intersection.isEmpty()) {
+      var firstTen = intersection.stream().limit(10).toList();
+      LOG.error(
+        "Two stop models define ids where both feed id and stop id is identical: {}",
+        firstTen
+      );
+      LOG.error("Is the same feed id used several times?");
+      throw new IllegalArgumentException(
+        "Two stop models define identical stop ids: %s".formatted(firstTen)
+      );
+    }
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
     this.groupOfStationsById =
       MapUtils.combine(main.groupOfStationsById, child.groupOfStationsById);
