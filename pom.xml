@@ -65,7 +65,7 @@
         <junit.version>5.10.2</junit.version>
         <micrometer.version>1.12.2</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.5.0</logback.version>
+        <logback.version>1.5.1</logback.version>
         <lucene.version>9.9.1</lucene.version>
         <slf4j.version>2.0.12</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
