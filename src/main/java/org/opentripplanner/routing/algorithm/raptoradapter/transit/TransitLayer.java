@@ -119,9 +119,11 @@ public class TransitLayer {
 
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
+    tripPatternsRunningOnDate.addAll(getTripPatternsRunningOnDateCopy(date.plusDays(1)));
     return tripPatternsRunningOnDate
       .stream()
       .filter(t -> t.getLocalDate().equals(date))
+      .distinct()
       .collect(Collectors.toList());
   }
 
