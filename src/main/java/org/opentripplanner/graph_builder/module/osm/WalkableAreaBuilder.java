@@ -505,7 +505,7 @@ public class WalkableAreaBuilder {
 
       float carSpeed = areaEntity
         .getOsmProvider()
-        .getWayPropertySet()
+        .getOsmTagMapper()
         .getCarSpeedForWay(areaEntity, false);
 
       double length = SphericalDistanceLibrary.distance(

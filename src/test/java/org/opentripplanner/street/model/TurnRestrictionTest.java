@@ -94,9 +94,7 @@ public class TurnRestrictionTest {
   public void testForwardDefault() {
     var request = new RouteRequest();
 
-    request.withPreferences(preferences ->
-      preferences.withCar(it -> it.withSpeed(1.0)).withWalk(w -> w.withSpeed(1.0))
-    );
+    request.withPreferences(preferences -> preferences.withWalk(w -> w.withSpeed(1.0)));
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
       .of()
@@ -156,7 +154,6 @@ public class TurnRestrictionTest {
   @Test
   public void testForwardAsCar() {
     var request = new RouteRequest();
-    request.withPreferences(p -> p.withCar(it -> it.withSpeed(1.0)));
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
       .of()

@@ -10,8 +10,6 @@ import org.opentripplanner.framework.model.Cost;
 
 class CarPreferencesTest {
 
-  private static final double SPEED = 20.111;
-  private static final double EXPECTED_SPEED = 20.0;
   private static final double RELUCTANCE = 5.111;
   private static final double EXPECTED_RELUCTANCE = 5.1;
   private static final int PICKUP_TIME = 600;
@@ -23,7 +21,6 @@ class CarPreferencesTest {
 
   private final CarPreferences subject = CarPreferences
     .of()
-    .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
     .withPickupTime(Duration.ofSeconds(PICKUP_TIME))
     .withPickupCost(PICKUP_COST)
@@ -32,11 +29,6 @@ class CarPreferencesTest {
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
     .withParking(parking -> parking.withCost(PARK_COST).build())
     .build();
-
-  @Test
-  void speed() {
-    assertEquals(EXPECTED_SPEED, subject.speed());
-  }
 
   @Test
   void reluctance() {
@@ -82,8 +74,8 @@ class CarPreferencesTest {
     assertSame(subject, subject.copyOf().build());
 
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().withSpeed(0.0).build();
-    var same = other.copyOf().withSpeed(SPEED).build();
+    var other = subject.copyOf().withReluctance(0.0).build();
+    var same = other.copyOf().withReluctance(RELUCTANCE).build();
     assertEqualsAndHashCode(subject, other, same);
   }
 
@@ -92,7 +84,6 @@ class CarPreferencesTest {
     assertEquals("CarPreferences{}", CarPreferences.DEFAULT.toString());
     assertEquals(
       "CarPreferences{" +
-      "speed: 20.0, " +
       "reluctance: 5.1, " +
       "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
