@@ -110,6 +110,11 @@ public class AccessPaths {
     );
   }
 
+  /**
+   * This is used in the main "minutes" iteration to iterate over the extra minutes needed to
+   * include access with time-penalty. This method returns an iterator for the minutes in front of
+   * the normal search window starting at the given {@code earliestDepartureTime}.
+   */
   public IntIterator iterateOverPathsWithPenalty(final int earliestDepartureTime) {
     if (!hasTimePenalty()) {
       return IntIterators.empty();
