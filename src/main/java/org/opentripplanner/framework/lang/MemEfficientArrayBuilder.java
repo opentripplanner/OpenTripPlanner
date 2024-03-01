@@ -5,13 +5,13 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 /**
- * This array builder is used to minimize creating new objects(arrays). It takes an array as base,
+ * This array builder is used to minimize the creation of new objects (arrays). It takes an array as base,
  * the original array. A new array is created only if there are differences.
  * <p>
  * A common case is that one original is updated several times. In this case, you can use the
- * {@link #build(Object[])}, too also make sure the existing update is reused (deduplicated).
+ * {@link #build(Object[])} method to also make sure that the existing update is reused (deduplicated).
  * <p>
- * Arrays are mutable, so be careful this class helps you reuse the original if it has the same
+ * Arrays are mutable, so be careful as this class helps you reuse the original if it has the same
  * values. It protects the original while in scope, but you should only use it if you do not
  * modify the original or the result on the outside. This builder does not help protect the arrays.
  */
