@@ -161,7 +161,7 @@ public final class TripPattern
 
   /**
    * Return the "original"/planned stop pattern as a builder. This is used when a realtime-update
-   * contains a full set of stops/pickup/droppoff for a pattern. This will wipe out any changes
+   * contains a full set of stops/pickup/dropoff for a pattern. This will wipe out any changes
    * to the stop-pattern from previous updates.
    * <p>
    * Be aware, if the same update is applied twice, then the first instance will be reused to avoid
