@@ -13,12 +13,12 @@ jobs:
     if: github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v6.0.1
+      - uses: actions/stale@v5.0.0
         id: stale
         with:
           stale-issue-message: 'This issue is stale because it has been open 90 days with no activity. Remove stale label or comment or this will be closed in 30 days'
           days-before-stale: 90
           days-before-close: 30
-          operations-per-run: 260
+          operations-per-run: 180
           exempt-issue-labels: 'Roadmap'
           ascending: true

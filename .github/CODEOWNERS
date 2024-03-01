@@ -1,9 +1,0 @@
-# See https://help.github.com/articles/about-codeowners/
-
-# Members of the following team will be notified of each pull request, 
-# and merging PRs requires approval by a member of this team.
-* @opentripplanner/otp-review-team
-
-# The default team above could be overridden for changes to documentation.
-# TODO: reduce acceptance requirements or expand to a larger team
-docs/* @opentripplanner/otp-review-team
