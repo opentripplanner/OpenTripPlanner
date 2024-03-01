@@ -35,7 +35,9 @@ class GraphQLScalarsTest {
     return List.of(
       of(Duration.ofMinutes(30), "PT30M"),
       of(Duration.ofHours(23), "PT23H"),
-      of(Duration.ofMinutes(-10), "PT-10M")
+      of(Duration.ofMinutes(-10), "-PT10M"),
+      of(Duration.ofMinutes(-90), "-PT1H30M"),
+      of(Duration.ofMinutes(-184), "-PT3H4M")
     );
   }
 

@@ -1625,9 +1625,9 @@ type Money {
 """"
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 
-Negative durations are formatted like `PT-10M`.
+Negative durations are formatted like `-PT10M`.
 """
-scalar Duration
+scalar Duration @specifiedBy(url:"https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)")
 
 type RideHailingProvider {
     "The ID of the ride hailing provider."
