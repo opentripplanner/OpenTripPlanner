@@ -40,7 +40,7 @@ public class AreaStopPropertyMapper extends PropertyMapper<AreaStop> {
       .filter(Objects::nonNull)
       .distinct()
       // the MVT spec explicitly doesn't cover how to encode arrays
-      // https://docs.mapbox.com/data/tilesets/guides/vector-tiles-standards/
+      // https://docs.mapbox.com/data/tilesets/guides/vector-tiles-standards/#what-the-spec-doesnt-cover
       .collect(Collectors.joining(","));
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
