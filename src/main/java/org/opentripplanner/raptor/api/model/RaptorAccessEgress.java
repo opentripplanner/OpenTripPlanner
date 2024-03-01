@@ -55,7 +55,7 @@ public interface RaptorAccessEgress {
    * For example, for Park&Ride, driving all the way to the
    * destination is very often the best option when looking at the time criteria. When an
    * increasing time-penalty is applied to access/egress with driving then driving less become
-   * more favorable. This also improves perfomance, since we usually add a very high cost to
+   * more favorable. This also improves performance, since we usually add a very high cost to
    * driving - making all park&ride access legs optimal - forcing Raptor to compute a path for
    * every option. The short drives are optimal on cost, and the long are optimal on time. In the
    * case of park&ride the time-penalty enables Raptor to choose one of the shortest access/egress

@@ -179,7 +179,7 @@ public class AccessPaths {
 
   /**
    * This method will filter the given list of access using the time-penalty-limit - if the
-   * limit set. If the limit is not set, then the given list is returned. This only filters the
+   * limit is set. If the limit is not set, then the given list is returned. This only filters the
    * list after all iterations are done, and we start iterating over the vertual minutes to allow
    * itineraries with a time-penalty to be included, even if the start before the search-window.
    * <p>
