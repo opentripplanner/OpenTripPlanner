@@ -4152,7 +4152,7 @@ type QueryType {
         used correctly to get meaningful itineraries).
         """
         startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
-    ): Plan @async
+    ): Plan @async @deprecated(reason: "Use planConnection instead")
 
     """
     Plan (itinerary) search that follows
