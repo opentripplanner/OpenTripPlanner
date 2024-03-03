@@ -144,7 +144,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       return intermediateStops
         .stream()
-        .map(intermediateStop -> intermediateStop.place().stop)
+        .map(intermediateStop -> intermediateStop.place.stop)
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
     };

@@ -38,11 +38,11 @@ public class PlaceMapper {
 
   public ApiPlace mapStopArrival(StopArrival domain) {
     return mapPlace(
-      domain.place(),
-      domain.arrival().time(),
-      domain.departure().time(),
-      domain.stopPosInPattern(),
-      domain.gtfsStopSequence()
+      domain.place,
+      domain.arrival.time(),
+      domain.departure.time(),
+      domain.stopPosInPattern,
+      domain.gtfsStopSequence
     );
   }
 

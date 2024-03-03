@@ -81,7 +81,7 @@ public class AlertToLegMapper {
     if (leg.getIntermediateStops() != null) {
       Set<StopCondition> stopConditions = StopCondition.PASSING;
       for (StopArrival visit : leg.getIntermediateStops()) {
-        if (visit.place().stop instanceof RegularStop stop) {
+        if (visit.place.stop instanceof RegularStop stop) {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
           alerts.addAll(
@@ -91,8 +91,8 @@ public class AlertToLegMapper {
             )
           );
 
-          ZonedDateTime stopArrival = visit.arrival().scheduledTime();
-          ZonedDateTime stopDeparture = visit.departure().scheduledTime();
+          ZonedDateTime stopArrival = visit.arrival.scheduledTime();
+          ZonedDateTime stopDeparture = visit.departure.scheduledTime();
 
           addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
         }

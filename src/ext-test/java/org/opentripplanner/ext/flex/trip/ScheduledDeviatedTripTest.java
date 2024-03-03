@@ -185,7 +185,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var intermediateStops = leg.getIntermediateStops();
     assertEquals(1, intermediateStops.size());
-    assertEquals("zone_1", intermediateStops.get(0).place().stop.getId().getId());
+    assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
     EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
     assertThatPolylinesAreEqual(
