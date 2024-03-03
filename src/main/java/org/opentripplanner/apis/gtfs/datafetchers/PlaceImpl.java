@@ -88,8 +88,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Override
   public DataFetcher<String> name() {
-    return environment ->
-    {
+    return environment -> {
       StopArrival stopArrival = getSource(environment);
       return GraphQLUtils.getTranslation(stopArrival.place.name, environment);
     };

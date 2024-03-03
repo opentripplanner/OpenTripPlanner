@@ -7,6 +7,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  * along a route.
  */
 public final class StopArrival {
+
   public final Place place;
   public final LegTime arrival;
   public final LegTime departure;
