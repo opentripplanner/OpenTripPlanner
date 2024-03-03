@@ -2,8 +2,10 @@ package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -27,9 +29,9 @@ class OffsetDateTimeParserTest {
 
   @ParameterizedTest
   @MethodSource("successfulCases")
-  void parse(String input) {
+  void parse(String input) throws ParseException {
     var res = OffsetDateTimeParser.parseLeniently(input);
-    assertTrue(res.get().isEqual(TIME));
+    assertTrue(res.isEqual(TIME));
   }
 
   static List<String> failedCases() {
@@ -39,7 +41,11 @@ class OffsetDateTimeParserTest {
   @ParameterizedTest
   @MethodSource("failedCases")
   void failed(String input) {
-    var res = OffsetDateTimeParser.parseLeniently(input);
-    assertTrue(res.isEmpty());
+    Assertions.assertThrows(
+      ParseException.class,
+      () -> {
+        OffsetDateTimeParser.parseLeniently(input);
+      }
+    );
   }
 }

@@ -1,10 +1,10 @@
 package org.opentripplanner.framework.time;
 
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
 
 public class OffsetDateTimeParser {
 
@@ -30,13 +30,13 @@ public class OffsetDateTimeParser {
   /**
    * Parses a ISO-8601 string into am OffsetDateTime instance allowing the offset to be both in
    * '02:00' and '0200' format.
+   * @throws ParseException if the string cannot be parsed
    */
-  public static Optional<OffsetDateTime> parseLeniently(CharSequence input) {
+  public static OffsetDateTime parseLeniently(CharSequence input) throws ParseException {
     try {
-      var result = OffsetDateTime.parse(input, LENIENT_PARSER);
-      return Optional.of(result);
+      return OffsetDateTime.parse(input, LENIENT_PARSER);
     } catch (DateTimeParseException e) {
-      return Optional.empty();
+      throw new ParseException(e.getParsedString(), e.getErrorIndex());
     }
   }
 }

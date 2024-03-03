@@ -10,6 +10,7 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -79,25 +80,33 @@ public class GraphQLScalars {
         @Override
         public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof CharSequence cs) {
-            return OffsetDateTimeParser.parseLeniently(cs).orElseThrow(() -> valueException(input));
+            try {
+              return OffsetDateTimeParser.parseLeniently(cs);
+            } catch (ParseException e) {
+              int errorOffset = e.getErrorOffset();
+              throw new CoercingParseValueException(
+                "Cannot parse %s into an OffsetDateTime. Error at character index %s".formatted(
+                    input,
+                    errorOffset
+                  )
+              );
+            }
           }
-          throw valueException(input);
+          throw new CoercingParseValueException(
+            "Cannot parse %s into an OffsetDateTime. Must be a string."
+          );
         }
 
         @Override
         public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof StringValue sv) {
-            return OffsetDateTimeParser
-              .parseLeniently(sv.getValue())
-              .orElseThrow(CoercingParseLiteralException::new);
+            try {
+              return OffsetDateTimeParser.parseLeniently(sv.getValue());
+            } catch (ParseException e) {
+              throw new CoercingSerializeException();
+            }
           }
           throw new CoercingParseLiteralException();
-        }
-
-        private static CoercingParseValueException valueException(Object input) {
-          return new CoercingParseValueException(
-            "Cannot parse %s into an OffsetDateTime.".formatted(input)
-          );
         }
       }
     )
