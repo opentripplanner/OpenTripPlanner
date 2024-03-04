@@ -15,7 +15,7 @@ class GraphQLScalarsTest {
 
   @Test
   void duration() {
-    var string = GraphQLScalars.durationScalar.getCoercing().serialize(Duration.ofMinutes(30));
+    var string = GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(Duration.ofMinutes(30));
     assertEquals("PT30M", string);
   }
 
@@ -23,7 +23,7 @@ class GraphQLScalarsTest {
   void nonDuration() {
     Assertions.assertThrows(
       CoercingSerializeException.class,
-      () -> GraphQLScalars.durationScalar.getCoercing().serialize(new Object())
+      () -> GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(new Object())
     );
   }
 
@@ -38,7 +38,7 @@ class GraphQLScalarsTest {
         new Coordinate(0, 0),
       }
     );
-    var geoJson = GraphQLScalars.geoJsonScalar.getCoercing().serialize(polygon);
+    var geoJson = GraphQLScalars.GEOJSON_SCALAR.getCoercing().serialize(polygon);
 
     var jsonNode = ObjectMappers
       .ignoringExtraFields()

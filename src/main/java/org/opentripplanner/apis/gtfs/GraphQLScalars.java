@@ -26,11 +26,11 @@ import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 
-  private static final ObjectMapper geoJsonMapper = new ObjectMapper()
+  private static final ObjectMapper GEOJSON_MAPPER = new ObjectMapper()
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
-  public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
+  public static final GraphQLScalarType DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
 
-  public static GraphQLScalarType polylineScalar = GraphQLScalarType
+  public static final GraphQLScalarType POLYLINE_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Polyline")
     .description(
@@ -59,7 +59,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
+  public static final GraphQLScalarType OFFSET_DATETIME_SCALAR = GraphQLScalarType
     .newScalar()
     .name("OffsetDateTime")
     .coercing(
@@ -109,7 +109,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType coordinateValueScalar = GraphQLScalarType
+  public static final GraphQLScalarType COORDINATE_VALUE_SCALAR = GraphQLScalarType
     .newScalar()
     .name("CoordinateValue")
     .coercing(
@@ -171,7 +171,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType costScalar = GraphQLScalarType
+  public static final GraphQLScalarType COST_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Cost")
     .coercing(
@@ -234,7 +234,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType geoJsonScalar = GraphQLScalarType
+  public static GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()
     .name("GeoJson")
     .description("Geographic data structures in JSON format. See: https://geojson.org/")
@@ -244,7 +244,7 @@ public class GraphQLScalars {
         public JsonNode serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Geometry) {
             var geom = (Geometry) dataFetcherResult;
-            return geoJsonMapper.valueToTree(geom);
+            return GEOJSON_MAPPER.valueToTree(geom);
           }
           return null;
         }
@@ -262,7 +262,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+  public static GraphQLScalarType GRAPHQL_ID_SCALAR = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(
@@ -302,7 +302,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType gramsScalar = GraphQLScalarType
+  public static GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Grams")
     .coercing(
@@ -337,7 +337,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType ratioScalar = GraphQLScalarType
+  public static final GraphQLScalarType RATIO_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Ratio")
     .coercing(
@@ -402,7 +402,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType reluctanceScalar = GraphQLScalarType
+  public static final GraphQLScalarType RELUCTANCE_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Reluctance")
     .coercing(
