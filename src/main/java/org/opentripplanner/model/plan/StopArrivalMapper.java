@@ -16,9 +16,9 @@ class StopArrivalMapper {
   private final TripTimes tripTimes;
 
   public StopArrivalMapper(ZoneId zoneId, LocalDate serviceDate, TripTimes tripTimes) {
-    this.zoneId = zoneId;
-    this.serviceDate = serviceDate;
-    this.tripTimes = tripTimes;
+    this.zoneId = Objects.requireNonNull(zoneId);
+    this.serviceDate = Objects.requireNonNull(serviceDate);
+    this.tripTimes = Objects.requireNonNull(tripTimes);
   }
 
   StopArrival map(int i, StopLocation stop, boolean realTime) {
