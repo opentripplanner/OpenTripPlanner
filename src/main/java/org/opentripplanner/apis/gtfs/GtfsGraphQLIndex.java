@@ -106,12 +106,12 @@ class GtfsGraphQLIndex {
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
-        .scalar(GraphQLScalars.durationScalar)
-        .scalar(GraphQLScalars.polylineScalar)
-        .scalar(GraphQLScalars.geoJsonScalar)
-        .scalar(GraphQLScalars.graphQLIDScalar)
-        .scalar(GraphQLScalars.gramsScalar)
-        .scalar(GraphQLScalars.offsetDateTimeScalar)
+        .scalar(GraphQLScalars.DURATION_SCALAR)
+        .scalar(GraphQLScalars.POLYLINE_SCALAR)
+        .scalar(GraphQLScalars.GEOJSON_SCALAR)
+        .scalar(GraphQLScalars.GRAPHQLID_SCALAR)
+        .scalar(GraphQLScalars.GRAMS_SCALAR)
+        .scalar(GraphQLScalars.OFFSET_DATETIME_SCALAR)
         .scalar(ExtendedScalars.GraphQLLong)
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))

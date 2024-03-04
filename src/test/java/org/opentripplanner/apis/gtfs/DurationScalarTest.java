@@ -27,7 +27,7 @@ public class DurationScalarTest {
   @ParameterizedTest
   @MethodSource("durationCases")
   void duration(Duration duration, String expected) {
-    var string = GraphQLScalars.durationScalar.getCoercing().serialize(duration);
+    var string = GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(duration);
     assertEquals(expected, string);
   }
 
@@ -35,7 +35,7 @@ public class DurationScalarTest {
   void nonDuration() {
     Assertions.assertThrows(
       CoercingSerializeException.class,
-      () -> GraphQLScalars.durationScalar.getCoercing().serialize(new Object())
+      () -> GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(new Object())
     );
   }
 }

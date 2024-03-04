@@ -21,7 +21,7 @@ class GeoJsonScalarTest {
         new Coordinate(0, 0),
       }
     );
-    var geoJson = GraphQLScalars.geoJsonScalar.getCoercing().serialize(polygon);
+    var geoJson = GraphQLScalars.GEOJSON_SCALAR.getCoercing().serialize(polygon);
 
     var jsonNode = ObjectMappers
       .ignoringExtraFields()

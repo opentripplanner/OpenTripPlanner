@@ -40,21 +40,21 @@ public class OffsetDateTimeScalarTest {
   @ParameterizedTest
   @MethodSource("offsetDateTimeCases")
   void serializeOffsetDateTime(OffsetDateTime odt, String expected) {
-    var string = GraphQLScalars.offsetDateTimeScalar.getCoercing().serialize(odt);
+    var string = GraphQLScalars.OFFSET_DATETIME_SCALAR.getCoercing().serialize(odt);
     assertEquals(expected, string);
   }
 
   @ParameterizedTest
   @MethodSource("offsetDateTimeCases")
   void parseOffsetDateTime(OffsetDateTime expected, String input) {
-    var odt = GraphQLScalars.offsetDateTimeScalar.getCoercing().parseValue(input);
+    var odt = GraphQLScalars.OFFSET_DATETIME_SCALAR.getCoercing().parseValue(input);
     assertEquals(expected, odt);
   }
 
   @ParameterizedTest
   @MethodSource("offsetDateTimeCases")
   void parseOffsetDateTimeLiteral(OffsetDateTime expected, String input) {
-    var odt = GraphQLScalars.offsetDateTimeScalar
+    var odt = GraphQLScalars.OFFSET_DATETIME_SCALAR
       .getCoercing()
       .parseLiteral(new StringValue(input));
     assertEquals(expected, odt);

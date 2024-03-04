@@ -25,9 +25,9 @@ public class GraphQLScalars {
 
   private static final ObjectMapper geoJsonMapper = new ObjectMapper()
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
-  public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
+  public static GraphQLScalarType DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
 
-  public static final GraphQLScalarType polylineScalar = GraphQLScalarType
+  public static final GraphQLScalarType POLYLINE_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Polyline")
     .description(
@@ -56,7 +56,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
+  public static final GraphQLScalarType OFFSET_DATETIME_SCALAR = GraphQLScalarType
     .newScalar()
     .name("OffsetDateTime")
     .coercing(
@@ -112,7 +112,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType geoJsonScalar = GraphQLScalarType
+  public static final GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()
     .name("GeoJson")
     .description("Geographic data structures in JSON format. See: https://geojson.org/")
@@ -140,7 +140,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+  public static final GraphQLScalarType GRAPHQLID_SCALAR = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(
@@ -180,7 +180,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType gramsScalar = GraphQLScalarType
+  public static final GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Grams")
     .coercing(
