@@ -66,7 +66,7 @@ public class VehicleParkingUpdaterConfig {
       );
       case BIKELY -> new BikelyUpdaterParameters(
         updaterRef,
-        c.of("url").since(V2_3).summary("URL of the locations endpoint.").asString(null),
+        c.of("url").since(V2_3).summary("URL of the locations endpoint.").asUri(null),
         feedId,
         c
           .of("frequency")

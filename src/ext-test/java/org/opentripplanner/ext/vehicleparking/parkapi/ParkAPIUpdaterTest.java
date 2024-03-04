@@ -13,20 +13,23 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class ParkAPIUpdaterTest {
 
   private static final Duration FREQUENCY = Duration.ofSeconds(30);
+  private static final ResourceLoader LOADER = ResourceLoader.of(ParkAPIUpdaterTest.class);
+  private static final String REUTLINGEN_URL = LOADER.uri("parkapi-reutlingen.json").toString();
+  private static final String HERRENBERG_URL = LOADER.uri("herrenberg.json").toString();
 
   @Test
   void parseCars() {
-    var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
     var timeZone = ZoneIds.BERLIN;
     var parameters = new ParkAPIUpdaterParameters(
       "",
-      url,
+      REUTLINGEN_URL,
       "park-api",
       FREQUENCY,
       HttpHeaders.empty(),
@@ -66,11 +69,10 @@ public class ParkAPIUpdaterTest {
 
   @Test
   void parseCarsWithoutTimeZone() {
-    var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
     ZoneId timeZone = null;
     var parameters = new ParkAPIUpdaterParameters(
       "",
-      url,
+      REUTLINGEN_URL,
       "park-api",
       FREQUENCY,
       HttpHeaders.empty(),
@@ -99,10 +101,9 @@ public class ParkAPIUpdaterTest {
 
   @Test
   void parseHerrenbergOpeningHours() {
-    var url = "file:src/ext-test/resources/vehicleparking/parkapi/herrenberg.json";
     var parameters = new ParkAPIUpdaterParameters(
       "",
-      url,
+      HERRENBERG_URL,
       "park-api",
       FREQUENCY,
       HttpHeaders.empty(),
