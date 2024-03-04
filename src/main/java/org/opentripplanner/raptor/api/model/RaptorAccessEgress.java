@@ -54,8 +54,8 @@ public interface RaptorAccessEgress {
    * <p>
    * For example, for Park&Ride, driving all the way to the
    * destination is very often the best option when looking at the time criteria. When an
-   * increasing time-penalty is applied to access/egress with driving then driving less become
-   * more favorable. This also improves performance, since we usually add a very high cost to
+   * increasing time-penalty is applied to a car access/egress, then driving become less
+   * favorable. This also improves performance, since we usually add a very high cost to
    * driving - making all park&ride access legs optimal - forcing Raptor to compute a path for
    * every option. The short drives are optimal on cost, and the long are optimal on time. In the
    * case of park&ride the time-penalty enables Raptor to choose one of the shortest access/egress
@@ -64,8 +64,8 @@ public interface RaptorAccessEgress {
    * Another example is FLEX, where we in many use-cases want regular transit to win if there is
    * an offer. Only in the case where the FLEX is the only solution we want it to be presented.
    * To achieve this, we must add an extra duration to the time of the FLEX access/egress - it does
-   * not help to just edd extra cost - witch makes both FLEX optimal on time and transit optimal on
-   * cost. Many optimal access paths have an inpact on performance as vell.
+   * not help to just add extra cost - which makes both FLEX optimal on time and transit optimal on
+   * cost. Keeping a large number of optimal access paths has a negative impact on performance as well.
    * <p>
    *
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
