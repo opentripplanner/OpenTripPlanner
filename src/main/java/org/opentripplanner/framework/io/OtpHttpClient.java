@@ -36,6 +36,7 @@ import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
 import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
+import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,6 +139,7 @@ public class OtpHttpClient implements AutoCloseable {
 
     HttpClientBuilder httpClientBuilder = HttpClients
       .custom()
+      .setUserAgent("OpenTripPlanner %s".formatted(OtpProjectInfo.projectInfo().version.toString()))
       .setConnectionManager(connectionManager)
       .setDefaultRequestConfig(requestConfig(timeout));
 
