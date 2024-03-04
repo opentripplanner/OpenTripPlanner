@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -56,7 +57,9 @@ public class RouteRequestMapper {
     request.setTo(parseGenericLocation(args.getGraphQLDestination()));
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
     if (args.getGraphQLSearchWindow() != null) {
-      request.setSearchWindow(args.getGraphQLSearchWindow());
+      request.setSearchWindow(
+        DurationUtils.requireNonNegativeLarge(args.getGraphQLSearchWindow(), "searchWindow")
+      );
     }
 
     if (args.getGraphQLBefore() != null) {
@@ -175,7 +178,9 @@ public class RouteRequestMapper {
       if (board != null) {
         var slack = board.getGraphQLSlack();
         if (slack != null) {
-          transitPreferences.withDefaultBoardSlackSec((int) slack.toSeconds());
+          transitPreferences.withDefaultBoardSlackSec(
+            (int) DurationUtils.requireNonNegativeMedium(slack, "board slack").toSeconds()
+          );
         }
         var waitReluctance = board.getGraphQLWaitReluctance();
         if (waitReluctance != null) {
@@ -186,7 +191,9 @@ public class RouteRequestMapper {
       if (alight != null) {
         var slack = alight.getGraphQLSlack();
         if (slack != null) {
-          transitPreferences.withDefaultAlightSlackSec((int) slack.toSeconds());
+          transitPreferences.withDefaultAlightSlackSec(
+            (int) DurationUtils.requireNonNegativeMedium(slack, "alight slack").toSeconds()
+          );
         }
       }
       var transfer = transitArgs.getGraphQLTransfer();
@@ -197,7 +204,9 @@ public class RouteRequestMapper {
         }
         var slack = transfer.getGraphQLSlack();
         if (slack != null) {
-          transferPreferences.withSlack((int) slack.toSeconds());
+          transferPreferences.withSlack(
+            (int) DurationUtils.requireNonNegativeMedium(slack, "transfer slack").toSeconds()
+          );
         }
         var maxTransfers = transfer.getGraphQLMaximumTransfers();
         if (maxTransfers != null) {
@@ -278,7 +287,9 @@ public class RouteRequestMapper {
       }
       var mountTime = args.getGraphQLMountDismountTime();
       if (mountTime != null) {
-        preferences.withMountDismountTime(mountTime);
+        preferences.withMountDismountTime(
+          DurationUtils.requireNonNegativeShort(mountTime, "bicycle mount dismount time")
+        );
       }
       var cost = args.getGraphQLCost();
       if (cost != null) {

@@ -176,6 +176,8 @@ public class GraphQLScalars {
     .name("Cost")
     .coercing(
       new Coercing<Cost, Integer>() {
+        private static final int MAX_COST = 1000000;
+
         @Override
         public Integer serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
@@ -195,6 +197,14 @@ public class GraphQLScalars {
         @Override
         public Cost parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Integer intValue) {
+            if (intValue < 0) {
+              throw new CoercingParseValueException("Cost cannot be negative");
+            }
+            if (intValue > MAX_COST) {
+              throw new CoercingParseValueException(
+                "Cost cannot be greater than %d".formatted(MAX_COST)
+              );
+            }
             return Cost.costOfSeconds(intValue);
           }
           throw new CoercingParseValueException(
@@ -205,7 +215,16 @@ public class GraphQLScalars {
         @Override
         public Cost parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof IntValue intValue) {
-            return Cost.costOfSeconds(intValue.getValue().intValue());
+            var value = intValue.getValue().intValue();
+            if (value < 0) {
+              throw new CoercingParseLiteralException("Cost cannot be negative");
+            }
+            if (value > MAX_COST) {
+              throw new CoercingParseLiteralException(
+                "Cost cannot be greater than %d".formatted(MAX_COST)
+              );
+            }
+            return Cost.costOfSeconds(value);
           }
           throw new CoercingParseLiteralException(
             "Expected an integer, got: " + input.getClass().getSimpleName()
@@ -378,6 +397,75 @@ public class GraphQLScalars {
             return Optional.of(ratio);
           }
           return Optional.empty();
+        }
+      }
+    )
+    .build();
+
+  public static final GraphQLScalarType reluctanceScalar = GraphQLScalarType
+    .newScalar()
+    .name("Reluctance")
+    .coercing(
+      new Coercing<Double, Double>() {
+        private static final double MAX_Reluctance = 100000;
+
+        @Override
+        public Double serialize(@Nonnull Object dataFetcherResult)
+          throws CoercingSerializeException {
+          if (dataFetcherResult instanceof Double doubleValue) {
+            return doubleValue;
+          } else if (dataFetcherResult instanceof Float floatValue) {
+            return floatValue.doubleValue();
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s as a reluctance".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
+        }
+
+        @Override
+        public Double parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof Double doubleValue) {
+            if (Double.doubleToRawLongBits(doubleValue) < 0) {
+              throw new CoercingParseValueException("Reluctance cannot be negative");
+            }
+            if (doubleValue > MAX_Reluctance + 0.001) {
+              throw new CoercingParseValueException(
+                "Reluctance cannot be greater than %s".formatted(MAX_Reluctance)
+              );
+            }
+            return doubleValue;
+          }
+          throw new CoercingParseValueException(
+            "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
+          );
+        }
+
+        @Override
+        public Double parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof FloatValue reluctance) {
+            return validateLiteral(reluctance.getValue().doubleValue());
+          }
+          if (input instanceof IntValue reluctance) {
+            return validateLiteral(reluctance.getValue().doubleValue());
+          }
+          throw new CoercingParseLiteralException(
+            "Expected a number, got: " + input.getClass().getSimpleName()
+          );
+        }
+
+        private static double validateLiteral(double reluctance) {
+          if (Double.doubleToRawLongBits(reluctance) < 0) {
+            throw new CoercingParseLiteralException("Reluctance cannot be negative");
+          }
+          if (reluctance > MAX_Reluctance + 0.001) {
+            throw new CoercingParseLiteralException(
+              "Reluctance cannot be greater than %s".formatted(MAX_Reluctance)
+            );
+          }
+          return reluctance;
         }
       }
     )
