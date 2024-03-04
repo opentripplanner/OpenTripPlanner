@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Objects;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripTimes;
