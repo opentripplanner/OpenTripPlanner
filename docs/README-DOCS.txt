@@ -8,3 +8,5 @@ In short, to preview the documentation as you work on it:
 
 $ pip install -r docs/requirements.txt
 $ mkdocs serve
+
+If you create any new documentation pages, be sure to update the `nav:` section of `mkdocs.yml` in the root of the repository to ensure that your page is included in the table of contents and documentation navigation tree.

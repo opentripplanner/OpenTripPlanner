@@ -82,7 +82,7 @@ GBFS form factors:
 ## Other updaters in sandboxes
 
 - [Vehicle parking](sandbox/VehicleParking.md)
-- [Siri over HTTP](sandbox/SiriUpdater.md)
-- [Siri over Azure Message Bus](sandbox/SiriAzureUpdater.md)
+- [Siri over HTTP](sandbox/siri/SiriUpdater.md)
+- [Siri over Azure Message Bus](sandbox/siri/SiriAzureUpdater.md)
 - [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 
