@@ -134,11 +134,10 @@ public class StringUtils {
   }
 
   /**
-   * Removes unprintable control characters like newlines, tabs and invisible whitespace
+   * Detects unprintable control characters like newlines, tabs and invisible whitespace
    * like 'ZERO WIDTH SPACE' (U+200B) that don't have an immediate visual representation.
    * <p>
-   * Note that "regular" whitespace characters like U+0020 and U+2000 are considered visible and
-   * therefore not removed.
+   * Note that "regular" whitespace characters like U+0020 and U+2000 are considered visible.
    */
   public static boolean containsInvisibleCharacters(String input) {
     return INVISIBLE_CHARS_PATTERN.matcher(input).find();
