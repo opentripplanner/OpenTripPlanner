@@ -30,13 +30,13 @@ public class TripOnServiceDateRequest {
     List<LocalDate> operatingDays,
     List<TripAlteration> alterations
   ) {
-    this.authorities = authorities;
-    this.lines = lines;
-    this.serviceJourneys = serviceJourneys;
-    this.replacementFor = replacementFor;
-    this.privateCodes = privateCodes;
-    this.alterations = alterations;
-    this.operatingDays = operatingDays;
+    this.authorities = List.copyOf(authorities);
+    this.lines = List.copyOf(lines);
+    this.serviceJourneys = List.copyOf(serviceJourneys);
+    this.replacementFor = List.copyOf(replacementFor);
+    this.privateCodes = List.copyOf(privateCodes);
+    this.alterations = List.copyOf(alterations);
+    this.operatingDays = List.copyOf(operatingDays);
   }
 
   public static TripOnServiceDateRequestBuilder of(List<LocalDate> operatingDays) {

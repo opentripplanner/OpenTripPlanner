@@ -1,14 +1,11 @@
 package org.opentripplanner.transit.model.filter.transit;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
-import org.opentripplanner.transit.model.filter.expr.AndMatcher;
 import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
+import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.filter.expr.OrMatcher;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
@@ -23,85 +20,16 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 public class TripOnServiceDateMatcherFactory {
 
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
-    List<Matcher<TripOnServiceDate>> matchers = new ArrayList<>();
+    ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
-    matchers.add(
-      or(
-        request
-          .getOperatingDays()
-          .stream()
-          .map(TripOnServiceDateMatcherFactory::operatingDay)
-          .toList()
-      )
-    );
-
-    if (!request.getAuthorities().isEmpty()) {
-      matchers.add(
-        or(
-          request
-            .getAuthorities()
-            .stream()
-            .map(TripOnServiceDateMatcherFactory::authorityId)
-            .toList()
-        )
-      );
-    }
-
-    if (!request.getLines().isEmpty()) {
-      matchers.add(
-        or(request.getLines().stream().map(TripOnServiceDateMatcherFactory::routeId).toList())
-      );
-    }
-
-    if (!request.getServiceJourneys().isEmpty()) {
-      matchers.add(
-        or(
-          request
-            .getServiceJourneys()
-            .stream()
-            .map(TripOnServiceDateMatcherFactory::serviceJourneyId)
-            .toList()
-        )
-      );
-    }
-
-    if (!request.getReplacementFor().isEmpty()) {
-      matchers.add(
-        or(
-          request
-            .getReplacementFor()
-            .stream()
-            .map(TripOnServiceDateMatcherFactory::replacementFor)
-            .toList()
-        )
-      );
-    }
-
-    if (!request.getPrivateCodes().isEmpty()) {
-      matchers.add(
-        or(
-          request
-            .getPrivateCodes()
-            .stream()
-            .map(TripOnServiceDateMatcherFactory::privateCode)
-            .toList()
-        )
-      );
-    }
-
-    if (!request.getAlterations().isEmpty()) {
-      matchers.add(
-        or(
-          request
-            .getAlterations()
-            .stream()
-            .map(TripOnServiceDateMatcherFactory::alteration)
-            .toList()
-        )
-      );
-    }
-
-    return and(matchers);
+    expr.or(request.getOperatingDays(), TripOnServiceDateMatcherFactory::operatingDay);
+    expr.or(request.getAuthorities(), TripOnServiceDateMatcherFactory::authorityId);
+    expr.or(request.getLines(), TripOnServiceDateMatcherFactory::routeId);
+    expr.or(request.getServiceJourneys(), TripOnServiceDateMatcherFactory::serviceJourneyId);
+    expr.or(request.getReplacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
+    expr.or(request.getPrivateCodes(), TripOnServiceDateMatcherFactory::privateCode);
+    expr.or(request.getAlterations(), TripOnServiceDateMatcherFactory::alteration);
+    return expr.build();
   }
 
   static Matcher<TripOnServiceDate> authorityId(FeedScopedId id) {
@@ -138,13 +66,5 @@ public class TripOnServiceDateMatcherFactory {
 
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {
     return new EqualityMatcher<>("alteration", alteration, TripOnServiceDate::getTripAlteration);
-  }
-
-  static Matcher<TripOnServiceDate> and(List<Matcher<TripOnServiceDate>> matchers) {
-    return AndMatcher.of(matchers);
-  }
-
-  static Matcher<TripOnServiceDate> or(List<Matcher<TripOnServiceDate>> matchers) {
-    return OrMatcher.of(matchers);
   }
 }
