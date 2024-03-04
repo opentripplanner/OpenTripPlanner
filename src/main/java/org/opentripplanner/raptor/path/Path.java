@@ -19,9 +19,9 @@ import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 
 /**
- * The result of a Raptor search is a path describing the one possible journey. The path is then
+ * The result of a Raptor search is a path describing the one possible journey. The path is the
  * main DTO part of the Raptor result, but it is also used internally in Raptor. Hence, it is a bit
- * more complex, and it has more responsiblilites than it should.
+ * more complex, and it has more responsiblilities than it should.
  * <p>
  * To improve the design, Raptor should not use the path internally. Instead, there should
  * be a special destination arrival that could take over the Raptor responsibilities. The
