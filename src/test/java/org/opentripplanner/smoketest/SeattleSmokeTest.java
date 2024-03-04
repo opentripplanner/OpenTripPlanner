@@ -142,7 +142,8 @@ public class SeattleSmokeTest {
       .map(Route::mode)
       .map(Objects::toString)
       .collect(Collectors.toSet());
-    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS", "RAIL"), modes);
+    // for some reason the monorail feed says its route is of type rail
+    assertEquals(Set.of("TRAM", "FERRY", "BUS", "RAIL"), modes);
   }
 
   @Test
