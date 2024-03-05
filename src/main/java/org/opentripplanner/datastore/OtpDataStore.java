@@ -108,7 +108,7 @@ public class OtpDataStore {
 
     if (config.stopConsolidation() != null) {
       stopConsolidation =
-        findSourceUsingAllRepos(it -> it.findCompositeSource(config.stopConsolidation(), CONFIG));
+        findSingleSource(config.stopConsolidation(), config.stopConsolidation().toString(), GTFS);
     }
 
     addAll(Arrays.asList(streetGraph, graph, buildReportDir));
