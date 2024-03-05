@@ -140,7 +140,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType GRAPHQLID_SCALAR = GraphQLScalarType
+  public static final GraphQLScalarType GRAPHQL_ID_SCALAR = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(

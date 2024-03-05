@@ -109,7 +109,7 @@ class GtfsGraphQLIndex {
         .scalar(GraphQLScalars.DURATION_SCALAR)
         .scalar(GraphQLScalars.POLYLINE_SCALAR)
         .scalar(GraphQLScalars.GEOJSON_SCALAR)
-        .scalar(GraphQLScalars.GRAPHQLID_SCALAR)
+        .scalar(GraphQLScalars.GRAPHQL_ID_SCALAR)
         .scalar(GraphQLScalars.GRAMS_SCALAR)
         .scalar(GraphQLScalars.OFFSET_DATETIME_SCALAR)
         .scalar(ExtendedScalars.GraphQLLong)
