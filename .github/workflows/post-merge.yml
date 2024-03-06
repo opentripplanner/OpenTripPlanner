@@ -1,0 +1,83 @@
+name: Post-merge
+on:
+  pull_request_target:
+    branches:
+      - dev-2.x
+    types: [closed]
+
+# to avoid conflicts, make sure that only one workflow pushes to Github at the same time
+concurrency:
+  group: github-push
+
+jobs:
+  changelog-entry:
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, 'skip changelog')
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+
+      - name: Configure git user
+        run: |
+          git config --global user.name 'OTP Changelog Bot'
+          git config --global user.email 'changelog-bot@opentripplanner.org'
+
+      - name: Generate changelog entry from PR information
+        run: |
+          # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+          ITEM="${TITLE} [#${NUMBER}](${URL})"
+          TEMP_FILE=docs/Changelog.generated.md
+          FILE=docs/Changelog.md
+          awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
+          mv $TEMP_FILE $FILE
+          git add $FILE
+          git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
+          git pull --rebase origin dev-2.x
+          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
+        env:
+          # Use environment variables to prevent injection attack
+          TITLE: ${{ github.event.pull_request.title }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          URL: ${{ github.event.pull_request.html_url }}
+
+  serialization-version:
+    # if you have a dependent job that is skipped (ie. you want to bump the version but not have a changelog entry) you must add
+    # always() before your actual condition you want for the job
+    #   https://github.com/actions/runner/issues/491#issuecomment-660122693
+    if: always() && github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && contains(github.event.pull_request.labels.*.name, 'bump serialization id')
+    runs-on: ubuntu-latest
+    needs: [changelog-entry]
+    steps:
+
+      - name: Install xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+
+      - name: Configure git user
+        run: |
+          git config --global user.name 'OTP Serialization Version Bot'
+          git config --global user.email 'serialization-version-bot@opentripplanner.org'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+
+      - name: Bump serialization version
+        run: |
+          version=`xmllint --xpath "//*[local-name()='otp.serialization.version.id']/text()" pom.xml`
+          bumped=$((version+1))
+          sed -Ei "s/<otp\.serialization\.version\.id>.*<\/otp\.serialization\.version\.id>/<otp\.serialization\.version\.id>${bumped}<\/otp\.serialization\.version\.id>/" pom.xml 
+ 
+          git add pom.xml
+          git commit -m "Bump serialization version id for #${NUMBER}"
+          # just for safety as the Github repo is eventually consistent, therefore this push competes with the changelog entry one
+          git pull --rebase origin dev-2.x
+          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
+        env:
+          # Use environment variables to prevent injection attack
+          NUMBER: ${{ github.event.pull_request.number }}
