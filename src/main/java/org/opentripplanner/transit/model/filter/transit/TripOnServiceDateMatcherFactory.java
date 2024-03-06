@@ -22,13 +22,13 @@ public class TripOnServiceDateMatcherFactory {
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
-    expr.or(request.getOperatingDays(), TripOnServiceDateMatcherFactory::operatingDay);
-    expr.or(request.getAuthorities(), TripOnServiceDateMatcherFactory::authorityId);
-    expr.or(request.getLines(), TripOnServiceDateMatcherFactory::routeId);
-    expr.or(request.getServiceJourneys(), TripOnServiceDateMatcherFactory::serviceJourneyId);
-    expr.or(request.getReplacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
-    expr.or(request.getPrivateCodes(), TripOnServiceDateMatcherFactory::privateCode);
-    expr.or(request.getAlterations(), TripOnServiceDateMatcherFactory::alteration);
+    expr.or(request.operatingDays(), TripOnServiceDateMatcherFactory::operatingDay);
+    expr.or(request.authorities(), TripOnServiceDateMatcherFactory::authorityId);
+    expr.or(request.lines(), TripOnServiceDateMatcherFactory::routeId);
+    expr.or(request.serviceJourneys(), TripOnServiceDateMatcherFactory::serviceJourneyId);
+    expr.or(request.replacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
+    expr.or(request.privateCodes(), TripOnServiceDateMatcherFactory::privateCode);
+    expr.or(request.alterations(), TripOnServiceDateMatcherFactory::alteration);
     return expr.build();
   }
 

@@ -43,31 +43,31 @@ public class TripOnServiceDateRequest {
     return new TripOnServiceDateRequestBuilder(operatingDays);
   }
 
-  public List<FeedScopedId> getAuthorities() {
+  public List<FeedScopedId> authorities() {
     return authorities;
   }
 
-  public List<FeedScopedId> getLines() {
+  public List<FeedScopedId> lines() {
     return lines;
   }
 
-  public List<FeedScopedId> getServiceJourneys() {
+  public List<FeedScopedId> serviceJourneys() {
     return serviceJourneys;
   }
 
-  public List<FeedScopedId> getReplacementFor() {
+  public List<FeedScopedId> replacementFor() {
     return replacementFor;
   }
 
-  public List<String> getPrivateCodes() {
+  public List<String> privateCodes() {
     return privateCodes;
   }
 
-  public List<TripAlteration> getAlterations() {
+  public List<TripAlteration> alterations() {
     return alterations;
   }
 
-  public List<LocalDate> getOperatingDays() {
+  public List<LocalDate> operatingDays() {
     return operatingDays;
   }
 }
