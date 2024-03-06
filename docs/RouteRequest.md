@@ -90,7 +90,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    pickupCost                                                                                                |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `120`            |  2.1  |
 |    pickupTime                                                                                                |       `duration`       | Add a time for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `"PT1M"`         |  2.1  |
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
-|    speed                                                                                                     |        `double`        | Max car speed along streets, in meters per second                                                                                              | *Optional* | `40.0`           |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
 |       cost                                                                                                   |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
 |       time                                                                                                   |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
@@ -1146,7 +1145,6 @@ include stairs as a last result.
       }
     },
     "car" : {
-      "speed" : 40,
       "reluctance" : 10,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
