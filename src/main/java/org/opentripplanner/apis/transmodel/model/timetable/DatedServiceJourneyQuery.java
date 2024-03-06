@@ -13,6 +13,7 @@ import java.util.List;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -101,7 +102,7 @@ public class DatedServiceJourneyQuery {
         var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
 
-        if (operatingDays == null || operatingDays.isEmpty()) {
+        if (CollectionUtils.isEmpty(operatingDays)) {
           throw new IllegalArgumentException("At least one operatingDay must be provided.");
         }
 
@@ -112,12 +113,12 @@ public class DatedServiceJourneyQuery {
           .withServiceJourneys(serviceJourneys)
           .withReplacementFor(replacementFor);
 
-        if (privateCodes != null && !privateCodes.isEmpty()) {
+        if (!CollectionUtils.isEmpty(privateCodes)) {
           tripOnServiceDateRequestBuilder =
             tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
         }
 
-        if (alterations != null && !alterations.isEmpty()) {
+        if (!CollectionUtils.isEmpty(alterations)) {
           tripOnServiceDateRequestBuilder =
             tripOnServiceDateRequestBuilder.withAlterations(alterations);
         }
