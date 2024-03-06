@@ -159,6 +159,20 @@ public final class TripPattern
     return stopPattern;
   }
 
+  /**
+   * Return the "original"/planned stop pattern as a builder. This is used when a realtime-update
+   * contains a full set of stops/pickup/dropoff for a pattern. This will wipe out any changes
+   * to the stop-pattern from previous updates.
+   * <p>
+   * Be aware, if the same update is applied twice, then the first instance will be reused to avoid
+   * unnecessary objects creation and gc.
+   */
+  public StopPattern.StopPatternBuilder copyPlannedStopPattern() {
+    return isModified()
+      ? originalTripPattern.stopPattern.mutate(stopPattern)
+      : stopPattern.mutate();
+  }
+
   public LineString getGeometry() {
     if (hopGeometries == null || hopGeometries.length == 0) {
       return null;
@@ -346,7 +360,7 @@ public final class TripPattern
    */
   public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {
     return (
-      originalTripPattern != null &&
+      isModified() &&
       originalTripPattern.equals(other) &&
       getStopPattern().stopsEqual(other.getStopPattern())
     );
@@ -392,6 +406,10 @@ public final class TripPattern
 
   public TripPattern getOriginalTripPattern() {
     return originalTripPattern;
+  }
+
+  public boolean isModified() {
+    return originalTripPattern != null;
   }
 
   /**
@@ -481,7 +499,7 @@ public final class TripPattern
    * is added through a realtime update. The pickup and dropoff values don't have to be the same.
    */
   private boolean containsSameStopsAsOriginalPattern() {
-    return originalTripPattern != null && getStops().equals(originalTripPattern.getStops());
+    return isModified() && getStops().equals(originalTripPattern.getStops());
   }
 
   /**

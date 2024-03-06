@@ -124,7 +124,7 @@ class ServiceLinkMapperTest {
         new NetexMainAndSubMode(TransitMode.BUS, "UNKNOWN"),
         Accessibility.NO_INFORMATION
       );
-      stopPatternBuilder.stops[i] = stop;
+      stopPatternBuilder.stops.with(i, stop);
       stopsById.add(stop);
     }
 

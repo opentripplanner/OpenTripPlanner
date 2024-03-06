@@ -67,7 +67,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
     TripPattern pattern,
     List<StopReplacement> replacements
   ) {
-    var updatedStopPattern = pattern.getStopPattern().mutate();
+    var updatedStopPattern = pattern.copyPlannedStopPattern();
     replacements.forEach(r -> updatedStopPattern.replaceStop(r.secondary(), r.primary()));
     return pattern.copy().withStopPattern(updatedStopPattern.build()).build();
   }

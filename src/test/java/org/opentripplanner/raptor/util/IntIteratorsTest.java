@@ -84,6 +84,11 @@ public class IntIteratorsTest {
     assertEquals("[3]", toString(singleValueIterator(3)));
   }
 
+  @Test
+  public void testEmptyIterator() {
+    assertEquals("[]", toString(IntIterators.empty()));
+  }
+
   private static String toString(IntIterator it) {
     StringBuilder buf = new StringBuilder();
     boolean empty = true;

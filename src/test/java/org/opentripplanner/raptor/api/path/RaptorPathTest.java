@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.api.path;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -112,10 +111,10 @@ class RaptorPathTest {
 
   @Test
   void compareDuration() {
-    assertFalse(RaptorPath.compareDuration(subject, subject));
-    assertFalse(RaptorPath.compareDuration(subject, same));
-    assertFalse(RaptorPath.compareDuration(subject, smallDuration));
-    assertTrue(RaptorPath.compareDuration(smallDuration, subject));
+    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, subject));
+    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, same));
+    assertFalse(RaptorPath.compareDurationInclusivePenalty(subject, smallDuration));
+    assertTrue(RaptorPath.compareDurationInclusivePenalty(smallDuration, subject));
   }
 
   @Test

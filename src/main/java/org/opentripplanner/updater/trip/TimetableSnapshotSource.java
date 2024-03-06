@@ -467,8 +467,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // If there are skipped stops, we need to change the pattern from the scheduled one
     if (skippedStopIndices.size() > 0) {
       StopPattern newStopPattern = pattern
-        .getStopPattern()
-        .mutate()
+        .copyPlannedStopPattern()
         .cancelStops(skippedStopIndices)
         .build();
 

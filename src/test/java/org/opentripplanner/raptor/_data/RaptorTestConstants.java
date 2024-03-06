@@ -27,12 +27,15 @@ public interface RaptorTestConstants {
   int D20m = durationInSeconds("20m");
   int D24h = durationInSeconds("24h");
 
+  /**
+   * There are 86400 seconds in a "normal" day(24 * 60 * 60).
+   */
+  int SECONDS_IN_A_DAY = (int) D24h;
+
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);
-  int T00_01 = hm2time(0, 1);
   int T00_02 = hm2time(0, 2);
   int T00_10 = hm2time(0, 10);
-  int T00_12 = hm2time(0, 12);
   int T00_30 = hm2time(0, 30);
   int T00_40 = hm2time(0, 40);
   int T01_00 = hm2time(1, 0);
@@ -42,7 +45,7 @@ public interface RaptorTestConstants {
   int TX_2 = 2;
 
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
-  // account for that in the test if you uses a stop index.
+  // account for that in the test if you use the stop index.
   int STOP_A = 1;
   int STOP_B = 2;
   int STOP_C = 3;

@@ -47,7 +47,17 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   }
 
   @Override
+  public int startTimeInclusivePenalty() {
+    return departureTime;
+  }
+
+  @Override
   public int endTime() {
+    return arrivalTime;
+  }
+
+  @Override
+  public int endTimeInclusivePenalty() {
     return arrivalTime;
   }
 

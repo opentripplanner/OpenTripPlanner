@@ -32,6 +32,8 @@ public class EgressPaths {
    * This method is static and package local to enable unit-testing.
    */
   public static EgressPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
+    paths = decorateWithTimePenaltyLogic(paths);
+
     if (MULTI_CRITERIA.is(profile)) {
       paths = removeNonOptimalPathsForMcRaptor(paths);
     } else {
@@ -70,6 +72,17 @@ public class EgressPaths {
    */
   public int[] egressesWitchStartByARide() {
     return filterPathsAndGetStops(RaptorAccessEgress::stopReachedOnBoard);
+  }
+
+  /**
+   * Decorate egress to implement time-penalty. This decoration will do the necessary
+   * adjustments to apply the penalty in the raptor algorithm. See the decorator class for more
+   * info. The original egress object is returned if it does not have a time-penalty set.
+   */
+  private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    return paths.stream().map(it -> it.hasTimePenalty() ? new EgressWithPenalty(it) : it).toList();
   }
 
   private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {

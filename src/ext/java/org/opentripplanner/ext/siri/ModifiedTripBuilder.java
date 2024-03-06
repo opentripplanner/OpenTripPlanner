@@ -98,7 +98,7 @@ public class ModifiedTripBuilder {
   public Result<TripUpdate, UpdateError> build() {
     RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
-    StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
+    var stopPattern = createStopPattern(pattern, calls, entityResolver);
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       LOG.debug("Trip is cancelled");
@@ -220,15 +220,12 @@ public class ModifiedTripBuilder {
     EntityResolver entityResolver
   ) {
     int numberOfStops = pattern.numberOfStops();
-    var builder = pattern.getStopPattern().mutate();
+    var builder = pattern.copyPlannedStopPattern();
 
     Set<CallWrapper> alreadyVisited = new HashSet<>();
     // modify updated stop-times
     for (int i = 0; i < numberOfStops; i++) {
-      StopLocation stop = pattern.getStop(i);
-      builder.stops[i] = stop;
-      builder.dropoffs[i] = pattern.getAlightType(i);
-      builder.pickups[i] = pattern.getBoardType(i);
+      StopLocation stop = builder.stops.original(i);
 
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
@@ -241,22 +238,25 @@ public class ModifiedTripBuilder {
           continue;
         }
 
-        int stopIndex = i;
-        builder.stops[stopIndex] = callStop;
+        // Used in lambda
+        final int stopIndex = i;
+        builder.stops.with(stopIndex, callStop);
 
         PickDropMapper
-          .mapPickUpType(call, builder.pickups[stopIndex])
-          .ifPresent(value -> builder.pickups[stopIndex] = value);
+          .mapPickUpType(call, builder.pickups.original(stopIndex))
+          .ifPresent(value -> builder.pickups.with(stopIndex, value));
 
         PickDropMapper
-          .mapDropOffType(call, builder.dropoffs[stopIndex])
-          .ifPresent(value -> builder.dropoffs[stopIndex] = value);
+          .mapDropOffType(call, builder.dropoffs.original(stopIndex))
+          .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
 
         alreadyVisited.add(call);
         break;
       }
     }
-
-    return builder.build();
+    var newStopPattern = builder.build();
+    return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
+      ? pattern.getStopPattern()
+      : newStopPattern;
   }
 }

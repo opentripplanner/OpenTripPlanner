@@ -3,13 +3,12 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -26,26 +25,26 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
   private final int stop;
   private final int durationInSeconds;
-  private final int cost;
+  private final int c1;
   private final int numberOfRides;
   private final boolean stopReachedOnBoard;
   private final boolean free;
   private final Integer opening;
   private final Integer closing;
   private final boolean closed;
-  private final TimeAndCost penalty;
+  private final int timePenalty;
 
   private TestAccessEgress(Builder builder) {
     this.stop = builder.stop;
     this.durationInSeconds = builder.durationInSeconds;
-    this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
     this.stopReachedOnBoard = builder.stopReachedOnBoard;
     this.free = builder.free;
     this.opening = builder.opening;
     this.closing = builder.closing;
     this.closed = builder.closed;
-    this.penalty = builder.penalty;
+    this.timePenalty = builder.timePenalty;
+    this.c1 = builder.c1;
 
     if (free) {
       assertEquals(0, durationInSeconds);
@@ -64,7 +63,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   /**
-   * @deprecated A stop can not be both free and have a cost - This is not a valid
+   * @deprecated A stop cannot be both free and have a cost - This is not a valid
    *             access/egress.
    */
   @Deprecated
@@ -122,14 +121,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return flexAndWalk(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
   }
 
-  public static TestAccessEgress car(int stop, int durationInSeconds, TimeAndCost penalty) {
-    return new Builder(stop, durationInSeconds)
-      .withFree()
-      .withCost(durationInSeconds)
-      .withPenalty(penalty)
-      .build();
-  }
-
   /** Create a flex access arriving at given stop by walking. */
   public static TestAccessEgress flexAndWalk(
     int stop,
@@ -162,7 +153,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
    * <p>
    * Opening and closing is specified as seconds since the start of "RAPTOR time" to limit the
    * time periods that the access is traversable, which is repeatead every 24 hours. This allows
-   * the access to only be traversable between for example 08:00 and 16:00 every day.
+   * access to only be traversable between given times like 08:00 and 16:00 every day.
    */
   public TestAccessEgress openingHours(int opening, int closing) {
     return copyOf().withOpeningHours(opening, closing).build();
@@ -177,6 +168,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
     return copyOf().withClosed().build();
   }
 
+  public TestAccessEgress withTimePenalty(int timePenalty) {
+    return this.copyOf().withTimePenalty(timePenalty).build();
+  }
+
   public Builder copyOf() {
     return new Builder(this);
   }
@@ -188,12 +183,17 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
   @Override
   public int c1() {
-    return cost;
+    return c1;
   }
 
   @Override
   public int durationInSeconds() {
     return durationInSeconds;
+  }
+
+  @Override
+  public int timePenalty() {
+    return timePenalty;
   }
 
   @Override
@@ -276,19 +276,20 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     int stop;
     int durationInSeconds;
-    int cost;
+    int c1;
     int numberOfRides = DEFAULT_NUMBER_OF_RIDES;
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
     private boolean free = false;
     private boolean closed = false;
-    private TimeAndCost penalty;
+    private int timePenalty;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
       this.durationInSeconds = durationInSeconds;
-      this.cost = walkCost(durationInSeconds);
+      this.c1 = walkCost(durationInSeconds);
+      this.timePenalty = RaptorConstants.TIME_NOT_SET;
     }
 
     Builder(TestAccessEgress original) {
@@ -296,12 +297,12 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.stop = original.stop;
       this.durationInSeconds = original.durationInSeconds;
       this.stopReachedOnBoard = original.stopReachedOnBoard;
-      this.cost = original.cost;
+      this.c1 = original.c1;
       this.numberOfRides = original.numberOfRides;
       this.opening = original.opening;
       this.closing = original.closing;
       this.closed = original.closed;
-      this.penalty = original.penalty;
+      this.timePenalty = original.timePenalty;
     }
 
     Builder withFree() {
@@ -311,7 +312,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     }
 
     Builder withCost(int cost) {
-      this.cost = cost;
+      this.c1 = cost;
       return this;
     }
 
@@ -325,8 +326,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return this;
     }
 
-    Builder withPenalty(TimeAndCost penalty) {
-      this.penalty = penalty;
+    Builder withTimePenalty(int timePenalty) {
+      this.timePenalty = timePenalty;
       return this;
     }
 

@@ -50,9 +50,4 @@ class AccessEgressesTest {
   void getEgresses() {
     assertEquals(EGRESSES, subject.getEgresses());
   }
-
-  @Test
-  void calculateMaxAccessTimePenalty() {
-    assertEquals(D7m, subject.calculateMaxAccessTimePenalty());
-  }
 }

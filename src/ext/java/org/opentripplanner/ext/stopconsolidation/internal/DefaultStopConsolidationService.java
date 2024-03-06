@@ -94,7 +94,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   @Override
-  public StopLocation primaryStop(FeedScopedId id) {
+  public Optional<StopLocation> primaryStop(FeedScopedId id) {
     var primaryId = repo
       .groups()
       .stream()
@@ -102,6 +102,6 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .map(ConsolidatedStopGroup::primary)
       .findAny()
       .orElse(id);
-    return transitModel.getStopModel().getRegularStop(primaryId);
+    return Optional.ofNullable(transitModel.getStopModel().getRegularStop(primaryId));
   }
 }
