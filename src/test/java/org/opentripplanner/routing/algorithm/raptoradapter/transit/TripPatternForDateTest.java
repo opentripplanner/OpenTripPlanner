@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -33,12 +33,14 @@ class TripPatternForDateTest {
     new Deduplicator()
   );
 
-  static Stream<Arguments> testCases = Stream
-    .of(List.of(new FrequencyEntry(new Frequency(), tripTimes)), List.of())
-    .map(Arguments::of);
+  static Stream<Arguments> testCases() {
+    return Stream
+      .of(List.of(new FrequencyEntry(new Frequency(), tripTimes)), List.of())
+      .map(Arguments::of);
+  }
 
   @ParameterizedTest(name = "trip with frequencies {0} should be correctly filtered")
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void shouldExcludeAndIncludeBasedOnFrequency(List<FrequencyEntry> freqs) {
     var stopTime = new StopTime();
     stopTime.setStop(STOP);

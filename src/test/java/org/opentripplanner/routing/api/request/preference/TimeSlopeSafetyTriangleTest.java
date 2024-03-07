@@ -7,26 +7,28 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class TimeSlopeSafetyTriangleTest {
 
   float DELTA = 0.001f;
 
   @SuppressWarnings("unused")
-  static Stream<Arguments> testCases = Stream.of(
-    // Input: time | slope | safety || Expected: time | slope | safety
-    Arguments.of(0.5, 0.3, 0.2, 0.5, 0.3, 0.2, "Exact"),
-    Arguments.of(1d, 1d, 1d, 0.33, 0.33, 0.34, "Greater than 1"),
-    Arguments.of(30d, 10d, 20d, 0.5, 0.17, 0.33, "Greater than 1 - big"),
-    Arguments.of(1d, 0d, 0d, 1d, 0d, 0d, "Two zeros"),
-    Arguments.of(0d, 0d, 0d, 0.33, 0.33, 0.34, "All zeros"),
-    Arguments.of(0.1, -1d, -1d, 1d, 0d, 0d, "Less than zero"),
-    Arguments.of(0d, 0.07, 0.93, 0d, 0.07, 0.93, "None precise round-off: " + (1.0 - 0.07))
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      // Input: time | slope | safety || Expected: time | slope | safety
+      Arguments.of(0.5, 0.3, 0.2, 0.5, 0.3, 0.2, "Exact"),
+      Arguments.of(1d, 1d, 1d, 0.33, 0.33, 0.34, "Greater than 1"),
+      Arguments.of(30d, 10d, 20d, 0.5, 0.17, 0.33, "Greater than 1 - big"),
+      Arguments.of(1d, 0d, 0d, 1d, 0d, 0d, "Two zeros"),
+      Arguments.of(0d, 0d, 0d, 0.33, 0.33, 0.34, "All zeros"),
+      Arguments.of(0.1, -1d, -1d, 1d, 0d, 0d, "Less than zero"),
+      Arguments.of(0d, 0.07, 0.93, 0d, 0.07, 0.93, "None precise round-off: " + (1.0 - 0.07))
+    );
+  }
 
   @ParameterizedTest(name = "Time/slope/safety: | {0} {1} {2} || {3} {4} {5} |  {6}")
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   public void test(
     double inTime,
     double inSlope,
