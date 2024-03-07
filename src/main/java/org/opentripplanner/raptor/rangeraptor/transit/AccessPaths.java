@@ -194,7 +194,7 @@ public class AccessPaths {
     if (list == null) {
       return List.of();
     }
-    if (iterationTimePenaltyLimit != RaptorConstants.TIME_NOT_SET) {
+    if (hasTimePenalty()) {
       return list.stream().filter(e -> e.timePenalty() > iterationTimePenaltyLimit).toList();
     }
     return list;

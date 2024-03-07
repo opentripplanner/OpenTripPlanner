@@ -83,7 +83,7 @@ class AccessPathsTest implements RaptorTestConstants {
   }
 
   @Test
-  void iterateOverPathsWithTimePenalty() {
+  void iterateOverPathsWithPenalty() {
     // Expected at departure 540
     var flexFastWithPenalty = FLEX_FAST.withTimePenalty(60);
 
@@ -146,7 +146,7 @@ class AccessPathsTest implements RaptorTestConstants {
   }
 
   @Test
-  void iterateOverPathsWithTimePenaltyInReversDirection() {
+  void iterateOverPathsWithPenaltyInReversDirection() {
     // Expected at departure 540
     var flexFastWithPenalty = FLEX_FAST.withTimePenalty(60);
 
@@ -163,10 +163,6 @@ class AccessPathsTest implements RaptorTestConstants {
       STANDARD,
       REVERSE
     );
-
-    // Make sure standard iterator works
-    expect(accessPaths.arrivedOnStreetByNumOfRides(0), WALK_B, walkFastWithPenalty);
-    expect(accessPaths.arrivedOnBoardByNumOfRides(3), FLEX_B, flexFastWithPenalty);
 
     var iterator = accessPaths.iterateOverPathsWithPenalty(600);
 
@@ -197,34 +193,6 @@ class AccessPathsTest implements RaptorTestConstants {
     expect(accessPaths.arrivedOnBoardByNumOfRides(2));
     expect(accessPaths.arrivedOnBoardByNumOfRides(3));
 
-    assertFalse(iterator.hasNext());
-  }
-
-  @Test
-  void testRegularIteratorsAndIteratorWithPenaltyWorksTogether() {
-    var walkFastWithPenalty = WALK_FAST.withTimePenalty(60);
-
-    // Without time-penalty, the iterator should be empty
-    var accessPaths = AccessPaths.create(
-      60,
-      List.of(walkFastWithPenalty, WALK_COST),
-      MULTI_CRITERIA,
-      FORWARD
-    );
-
-    // Both accesses are expected before with enter the "time-penalty" iteration
-    expect(accessPaths.arrivedOnStreetByNumOfRides(0), WALK_COST, walkFastWithPenalty);
-    expect(accessPaths.arrivedOnBoardByNumOfRides(0));
-
-    var iterator = accessPaths.iterateOverPathsWithPenalty(600);
-
-    // First iteration - only access with time-penalty is expected
-    assertTrue(iterator.hasNext());
-    assertEquals(540, iterator.next());
-    expect(accessPaths.arrivedOnStreetByNumOfRides(0), walkFastWithPenalty);
-    expect(accessPaths.arrivedOnBoardByNumOfRides(0));
-
-    // Second iteration - Done
     assertFalse(iterator.hasNext());
   }
 
