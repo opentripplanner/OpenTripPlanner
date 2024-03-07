@@ -127,7 +127,6 @@ public class TransitRouter {
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
-      accessEgresses.calculateMaxAccessTimePenalty(),
       serverContext.meterRegistry()
     );
 

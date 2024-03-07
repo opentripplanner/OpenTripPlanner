@@ -31,6 +31,7 @@ import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
@@ -74,7 +75,8 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
-    @Nullable StopConsolidationRepository stopConsolidationRepository
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
+    StreetLimitationParameters streetLimitationParameters
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -94,6 +96,7 @@ public class ConstructApplication {
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
+        .streetLimitationParameters(streetLimitationParameters)
         .build();
   }
 
@@ -126,6 +129,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
+      factory.streetLimitationParameters(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -303,5 +307,9 @@ public class ConstructApplication {
 
   public EmissionsDataModel emissionsDataModel() {
     return factory.emissionsDataModel();
+  }
+
+  public StreetLimitationParameters streetLimitationParameters() {
+    return factory.streetLimitationParameters();
   }
 }

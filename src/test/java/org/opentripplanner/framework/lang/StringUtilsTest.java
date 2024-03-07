@@ -12,20 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class StringUtilsTest {
 
-  static final Stream<Arguments> hasValueTestCases = Stream.of(
-    Arguments.of("Text", TRUE),
-    Arguments.of("T", TRUE),
-    Arguments.of(null, FALSE),
-    Arguments.of("", FALSE),
-    Arguments.of("\t\n", FALSE)
-  );
+  static Stream<Arguments> hasValueTestCases() {
+    return Stream.of(
+      Arguments.of("Text", TRUE),
+      Arguments.of("T", TRUE),
+      Arguments.of(null, FALSE),
+      Arguments.of("", FALSE),
+      Arguments.of("\t\n", FALSE)
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("hasValueTestCases")
+  @MethodSource("hasValueTestCases")
   void hasValue(String input, Boolean hasValue) {
     assertEquals(hasValue, StringUtils.hasValue(input));
     assertEquals(!hasValue, StringUtils.hasNoValue(input));

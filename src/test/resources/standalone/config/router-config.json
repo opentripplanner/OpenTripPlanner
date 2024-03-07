@@ -43,7 +43,6 @@
       }
     },
     "car": {
-      "speed": 40,
       "reluctance": 10,
       "decelerationSpeed": 2.9,
       "accelerationSpeed": 2.9,
@@ -209,6 +208,14 @@
         "name": "stops",
         "type": "Stop",
         "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "areaStops",
+        "type": "AreaStop",
+        "mapper": "OTPRR",
         "maxZoom": 20,
         "minZoom": 14,
         "cacheMaxSeconds": 600

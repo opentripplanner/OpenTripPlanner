@@ -23,12 +23,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -326,14 +326,16 @@ public class RealtimeVehicleMatcherTest {
     assertEquals(0, service.getRealtimeVehicles(pattern2).size());
   }
 
-  static Stream<Arguments> inferenceTestCases = Stream.of(
-    Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
-    Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
-    Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
-  );
+  static Stream<Arguments> inferenceTestCases() {
+    return Stream.of(
+      Arguments.of("2022-04-05T15:26:04+02:00", "2022-04-05"),
+      Arguments.of("2022-04-06T00:26:04+02:00", "2022-04-05"),
+      Arguments.of("2022-04-06T10:26:04+02:00", "2022-04-06")
+    );
+  }
 
   @ParameterizedTest(name = "{0} should resolve to {1}")
-  @VariableSource("inferenceTestCases")
+  @MethodSource("inferenceTestCases")
   void inferServiceDayOfTripAt6(String time, String expectedDate) {
     var trip = TransitModelForTest.trip(tripId).build();
 

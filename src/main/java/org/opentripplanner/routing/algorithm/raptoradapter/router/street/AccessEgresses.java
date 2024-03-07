@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
-import java.time.Duration;
 import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 
@@ -23,13 +22,5 @@ public class AccessEgresses {
 
   public Collection<DefaultAccessEgress> getEgresses() {
     return egresses;
-  }
-
-  public Duration calculateMaxAccessTimePenalty() {
-    return accesses
-      .stream()
-      .map(it -> it.penalty().time())
-      .max(Duration::compareTo)
-      .orElse(Duration.ZERO);
   }
 }

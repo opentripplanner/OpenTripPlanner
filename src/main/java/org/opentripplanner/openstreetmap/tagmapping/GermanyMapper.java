@@ -26,6 +26,7 @@ class GermanyMapper implements OsmTagMapper {
     // Automobile speeds in Germany. General speed limit is 50kph in settlements, 100kph outside settlements.
     // For motorways, there (currently still) is no limit. Nevertheless 120kph is assumed to reflect varying
     // traffic conditions.
+    props.maxPossibleCarSpeed = 33.34f;
     props.setCarSpeed("highway=motorway", 33.33f); // = 120kph. Varies between 80 - 120 kph depending on road and season.
     props.setCarSpeed("highway=motorway_link", 15); // = 54kph
     props.setCarSpeed("highway=trunk", 27.27f); // 100kph

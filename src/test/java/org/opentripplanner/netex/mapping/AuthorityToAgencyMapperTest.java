@@ -14,6 +14,7 @@ public class AuthorityToAgencyMapperTest {
 
   private static final String ID = "ID";
   private static final String NAME = "Olsen";
+  private static final String SHORT_NAME = "Short";
   private static final String URL = "http://olsen.no/help";
   private static final String PHONE = "+47 88882222";
   private static final String TIME_ZONE = "CET";
@@ -24,7 +25,7 @@ public class AuthorityToAgencyMapperTest {
   @Test
   public void mapAgency() {
     // Given
-    Authority authority = authority(ID, NAME, URL, PHONE);
+    Authority authority = authority(ID, NAME, SHORT_NAME, URL, PHONE);
 
     // When mapped
     Agency a = mapper.mapAuthorityToAgency(authority);
@@ -40,7 +41,7 @@ public class AuthorityToAgencyMapperTest {
   @Test
   public void mapAgencyWithoutOptionalElements() {
     // Given
-    Authority authority = authority(ID, NAME, null, null);
+    Authority authority = authority(ID, NAME, null, null, null);
 
     // When mapped
     Agency a = mapper.mapAuthorityToAgency(authority);
@@ -48,6 +49,18 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertNull(a.getUrl());
     assertNull(a.getPhone());
+  }
+
+  @Test
+  public void mapAgencyWithShortName() {
+    // Given
+    Authority authority = authority(ID, null, SHORT_NAME, null, null);
+
+    // When mapped
+    Agency a = mapper.mapAuthorityToAgency(authority);
+
+    // Then expect
+    assertEquals(SHORT_NAME, a.getName());
   }
 
   @Test
@@ -64,9 +77,16 @@ public class AuthorityToAgencyMapperTest {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private static Authority authority(String id, String name, String url, String phone) {
+  private static Authority authority(
+    String id,
+    String name,
+    String shortName,
+    String url,
+    String phone
+  ) {
     return new Authority()
       .withId(id)
+      .withShortName(new MultilingualString().withValue(shortName))
       .withName(new MultilingualString().withValue(name))
       .withContactDetails(new ContactStructure().withUrl(url).withPhone(phone));
   }
