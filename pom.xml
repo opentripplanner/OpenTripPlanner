@@ -63,7 +63,7 @@
         <jackson.version>2.16.1</jackson.version>
         <jersey.version>3.1.5</jersey.version>
         <junit.version>5.10.2</junit.version>
-        <micrometer.version>1.12.2</micrometer.version>
+        <micrometer.version>1.12.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.5.3</logback.version>
         <lucene.version>9.9.1</lucene.version>
