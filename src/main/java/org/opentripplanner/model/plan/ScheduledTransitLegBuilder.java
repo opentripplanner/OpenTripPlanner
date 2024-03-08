@@ -23,6 +23,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private ConstrainedTransfer transferToNextLeg;
   private int generalizedCost;
   private Float accessibilityScore;
+  private Integer headway;
 
   public ScheduledTransitLegBuilder() {}
 
@@ -40,6 +41,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     generalizedCost = original.getGeneralizedCost();
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
+    headway = original.getHeadway();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -165,5 +167,9 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   final B instance() {
     return (B) this;
+  }
+
+  public Integer headway() {
+    return headway;
   }
 }

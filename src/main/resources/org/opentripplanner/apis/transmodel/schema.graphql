@@ -325,6 +325,8 @@ type Leg {
   fromPlace: Place!
   "Generalized cost or weight of the leg. Used for debugging."
   generalizedCost: Int
+  "The leg's headway in seconds"
+  headway: Int
   "An identifier for the leg, which can be used to re-fetch the information."
   id: ID
   interchangeFrom: Interchange

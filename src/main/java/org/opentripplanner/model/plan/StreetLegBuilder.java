@@ -26,6 +26,8 @@ public class StreetLegBuilder {
   private Float accessibilityScore;
   private Set<StreetNote> streetNotes = new HashSet<>();
 
+  private Integer headway;
+
   protected StreetLegBuilder() {}
 
   public static StreetLegBuilder of(StreetLeg leg) {
@@ -44,7 +46,8 @@ public class StreetLegBuilder {
       .withRentedVehicle(leg.getRentedVehicle())
       .withVehicleRentalNetwork(leg.getVehicleRentalNetwork())
       .withAccessibilityScore(leg.accessibilityScore())
-      .withStreetNotes(leg.getStreetNotes());
+      .withStreetNotes(leg.getStreetNotes())
+      .withHeadway(leg.getHeadway());
   }
 
   public StreetLeg build() {
@@ -105,6 +108,10 @@ public class StreetLegBuilder {
 
   public Float getAccessibilityScore() {
     return accessibilityScore;
+  }
+
+  public Integer getHeadway() {
+    return headway;
   }
 
   public Set<StreetNote> getStreetNotes() {
@@ -183,6 +190,11 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
     streetNotes = Set.copyOf(notes);
+    return this;
+  }
+
+  public StreetLegBuilder withHeadway(Integer headway) {
+    this.headway = headway;
     return this;
   }
 }

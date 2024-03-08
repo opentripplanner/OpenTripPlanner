@@ -1766,6 +1766,13 @@ type Leg {
     interlineWithPreviousLeg: Boolean
 
     """
+    The best estimate of the time between two arriving vehicles. This is particularly important for
+    non-strict frequency trips, but could become important for real-time trips, strict frequency
+    trips, and scheduled trips with empirical headways.
+    """
+    headway: Int
+
+    """
     Special booking information for the drop off stop of this leg if, for example, it needs
     to be booked in advance. This could be due to a flexible or on-demand service.
     """

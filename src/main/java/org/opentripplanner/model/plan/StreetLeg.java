@@ -35,6 +35,7 @@ public class StreetLeg implements Leg {
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
   private final Float accessibilityScore;
+  private final Integer headway;
 
   public StreetLeg(StreetLegBuilder builder) {
     this.mode = Objects.requireNonNull(builder.getMode());
@@ -52,6 +53,7 @@ public class StreetLeg implements Leg {
     this.rentedVehicle = builder.getRentedVehicle();
     this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
     this.accessibilityScore = builder.getAccessibilityScore();
+    this.headway = builder.getHeadway();
   }
 
   public static StreetLegBuilder create() {
@@ -137,6 +139,12 @@ public class StreetLeg implements Leg {
   }
 
   @Override
+  @Nullable
+  public Integer getHeadway() {
+    return headway;
+  }
+
+  @Override
   public Boolean getRentedVehicle() {
     return rentedVehicle;
   }
@@ -200,6 +208,7 @@ public class StreetLeg implements Leg {
       .addBool("walkingBike", walkingBike)
       .addBool("rentedVehicle", rentedVehicle)
       .addStr("bikeRentalNetwork", vehicleRentalNetwork)
+      .addNum("headway", headway)
       .toString();
   }
 }

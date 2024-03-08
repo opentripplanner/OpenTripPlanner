@@ -254,6 +254,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment -> getSource(environment).getWalkingBike();
   }
 
+  @Override
+  public DataFetcher<Integer> headway() {
+    return environment -> getSource(environment).getHeadway();
+  }
+
   private Leg getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }

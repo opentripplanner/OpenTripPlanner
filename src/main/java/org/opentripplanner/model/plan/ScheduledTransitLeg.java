@@ -64,6 +64,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final double directDistanceMeters;
   private final Float accessibilityScore;
   private List<FareProductUse> fareProducts = List.of();
+  private final Integer headway;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     this.tripTimes = builder.tripTimes();
@@ -101,6 +102,7 @@ public class ScheduledTransitLeg implements TransitLeg {
           transitLegCoordinates.get(transitLegCoordinates.size() - 1)
         )
       );
+    this.headway = builder.headway();
   }
 
   public ZoneId getZoneId() {
@@ -415,6 +417,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addEnum("alightRule", getAlightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
+      .addNum("headway", headway)
       .toString();
   }
 
