@@ -271,17 +271,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           // starts for example at 40:00, yesterday would probably be a better guess.
           serviceDate = localDateNow.get();
         }
-
-        // Check whether trip id has been used for previously ADDED trip message and mark previously
-        // created trip as DELETED
-        var canceledPreviouslyAddedTrip = cancelPreviouslyAddedTrip(
-          tripId,
-          serviceDate,
-          CancelationType.DELETE
-        );
-        // Remove previous realtime updates for this trip. This is necessary to avoid previous
-        // stop pattern modifications from persisting
-        this.buffer.removePreviousRealtimeUpdate(tripId, serviceDate);
+        var canceledPreviouslyAddedTrip = false;
+        if (!fullDataset) {
+          // Check whether trip id has been used for previously ADDED trip message and mark previously
+          // created trip as DELETED
+          canceledPreviouslyAddedTrip =
+            cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
+          // Remove previous realtime updates for this trip. This is necessary to avoid previous
+          // stop pattern modifications from persisting
+          this.buffer.removePreviousRealtimeUpdate(tripId, serviceDate);
+        }
 
         uIndex += 1;
         LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
