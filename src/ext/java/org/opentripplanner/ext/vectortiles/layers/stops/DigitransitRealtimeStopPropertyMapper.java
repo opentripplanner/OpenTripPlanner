@@ -15,21 +15,21 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
+public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   private final TransitService transitService;
   private final I18NStringMapper i18NStringMapper;
 
-  DigitransitStopPropertyMapper(TransitService transitService, Locale locale) {
+  public DigitransitRealtimeStopPropertyMapper(TransitService transitService, Locale locale) {
     this.transitService = transitService;
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  protected static DigitransitStopPropertyMapper create(
+  protected static DigitransitRealtimeStopPropertyMapper create(
     TransitService transitService,
     Locale locale
   ) {
-    return new DigitransitStopPropertyMapper(transitService, locale);
+    return new DigitransitRealtimeStopPropertyMapper(transitService, locale);
   }
 
   @Override
@@ -58,6 +58,20 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         })
         .toList()
     );
+
+    String alerts = JSONArray.toJSONString(
+      transitService
+        .getTransitAlertService()
+        .getStopAlerts(stop.getId())
+        .stream()
+        .map(alert -> {
+          JSONObject alertObject = new JSONObject();
+          alertObject.put("alertEffect", alert.effect().toString());
+          return alertObject;
+        })
+        .toList()
+    );
+
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
       new KeyValue("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
@@ -69,7 +83,8 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
       new KeyValue("type", type),
-      new KeyValue("routes", routes)
+      new KeyValue("routes", routes),
+      new KeyValue("alerts", alerts)
     );
   }
 }

@@ -14,7 +14,7 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
+public class StopsLayerBuilder<T> extends LayerBuilder<T> {
 
   static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<RegularStop>>> mappers = Map.of(
     MapperType.Digitransit,
@@ -24,11 +24,11 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   public StopsLayerBuilder(
     TransitService transitService,
-    LayerParameters<VectorTilesResource.LayerType> layerParameters,
-    Locale locale
+    Map<MapperType, PropertyMapper<T>> mappers,
+    LayerParameters<VectorTilesResource.LayerType> layerParameters
   ) {
     super(
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale),
+      mappers.get(MapperType.valueOf(layerParameters.mapper())),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
@@ -51,5 +51,6 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
   enum MapperType {
     Digitransit,
+    DigitransitRealtime,
   }
 }
