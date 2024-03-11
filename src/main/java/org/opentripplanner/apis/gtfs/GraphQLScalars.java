@@ -346,7 +346,7 @@ public class GraphQLScalars {
         public Double serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
           var validationException = new CoercingSerializeException(
-            "Value is under 0 or greater than 1."
+            "Value is less than 0 or greater than 1."
           );
           if (dataFetcherResult instanceof Double doubleValue) {
             return validateRatio(doubleValue).orElseThrow(() -> validationException);
@@ -366,7 +366,7 @@ public class GraphQLScalars {
           if (input instanceof Double doubleValue) {
             return validateRatio(doubleValue)
               .orElseThrow(() ->
-                new CoercingParseValueException("Value is under 0 or greater than 1.")
+                new CoercingParseValueException("Value is less than 0 or greater than 1.")
               );
           }
           throw new CoercingParseValueException(
