@@ -221,15 +221,17 @@ public class RouteRequestMapper {
       var timetable = transitArgs.getGraphQLTimetable();
       if (timetable != null) {
         var excludeUpdates = timetable.getGraphQLExcludeRealTimeUpdates();
-        transitPreferences.setIgnoreRealtimeUpdates(Boolean.TRUE.equals(excludeUpdates));
+        if (excludeUpdates != null) {
+          transitPreferences.setIgnoreRealtimeUpdates(excludeUpdates);
+        }
         var includePlannedCancellations = timetable.getGraphQLIncludePlannedCancellations();
-        transitPreferences.setIncludePlannedCancellations(
-          Boolean.TRUE.equals(includePlannedCancellations)
-        );
+        if (includePlannedCancellations != null) {
+          transitPreferences.setIncludePlannedCancellations(includePlannedCancellations);
+        }
         var includeRealtimeCancellations = timetable.getGraphQLIncludeRealTimeCancellations();
-        transitPreferences.setIncludeRealtimeCancellations(
-          Boolean.TRUE.equals(includeRealtimeCancellations)
-        );
+        if (includeRealtimeCancellations != null) {
+          transitPreferences.setIncludeRealtimeCancellations(includeRealtimeCancellations);
+        }
       }
     }
   }
@@ -402,7 +404,9 @@ public class RouteRequestMapper {
       var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
       if (destinationPolicy != null) {
         var allowed = destinationPolicy.getGraphQLAllowKeeping();
-        preferences.withAllowArrivingInRentedVehicleAtDestination(Boolean.TRUE.equals(allowed));
+        if (allowed != null) {
+          preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
+        }
         var cost = destinationPolicy.getGraphQLKeepingCost();
         if (cost != null) {
           preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
@@ -531,7 +535,9 @@ public class RouteRequestMapper {
       var destinationPolicy = args.getGraphQLDestinationScooterPolicy();
       if (destinationPolicy != null) {
         var allowed = destinationPolicy.getGraphQLAllowKeeping();
-        preferences.withAllowArrivingInRentedVehicleAtDestination(Boolean.TRUE.equals(allowed));
+        if (allowed != null) {
+          preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
+        }
         var cost = destinationPolicy.getGraphQLKeepingCost();
         if (cost != null) {
           preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
