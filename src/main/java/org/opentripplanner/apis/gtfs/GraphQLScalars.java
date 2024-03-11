@@ -379,12 +379,12 @@ public class GraphQLScalars {
           var validationException = new CoercingParseLiteralException(
             "Value is under 0 or greater than 1."
           );
-          if (input instanceof FloatValue coordinate) {
-            return validateRatio(coordinate.getValue().doubleValue())
+          if (input instanceof FloatValue ratio) {
+            return validateRatio(ratio.getValue().doubleValue())
               .orElseThrow(() -> validationException);
           }
-          if (input instanceof IntValue coordinate) {
-            return validateRatio(coordinate.getValue().doubleValue())
+          if (input instanceof IntValue ratio) {
+            return validateRatio(ratio.getValue().doubleValue())
               .orElseThrow(() -> validationException);
           }
           throw new CoercingParseLiteralException(
