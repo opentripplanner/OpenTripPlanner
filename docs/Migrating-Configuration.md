@@ -16,10 +16,20 @@ to be a configuration error, perhaps because the schema was changed. In such a c
 consult the [feature](Configuration.md#otp-features), [router](RouterConfiguration.md) or 
 [build configuration documentation](BuildConfiguration.md) to find out what the new schema looks like.
 
+By default, OTP starts up even when unknown configuration parameters have been found. This is there
+to support the style deployment where old config parameters remain in the file for a certain migration 
+period.  
+
+This allows you to roll back the OTP version without the need to roll back the OTP configuration. 
+
+An example: you change the location of the graphs, a critical error occurs afterwards and you need to 
+roll back. Any member of the dev-ops team should then be confident that they can roll back without 
+risk - even if the environment changed.
+
 ### Aborting on invalid configuration
 
-If you want OTP to abort the startup when encountering invalid configuration, you can add the flag
-`--configCheck` to your regular OTP CLI commands.
+If you want OTP to abort the startup when encountering unknown configuration parameters, you can add 
+the flag `--configCheck` to your regular OTP CLI commands.
 
 This should of course be used wisely as it can also accidentally make your production instances refuse 
 to start up.
