@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.GenericLocation;
@@ -157,7 +158,7 @@ public class RouteRequestMapper {
   ) {
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
-    if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && transit.size() > 0) {
+    if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && !CollectionUtils.isEmpty(transit)) {
       var reluctanceForMode = transit
         .stream()
         .filter(mode -> mode.containsKey("cost"))
@@ -391,11 +392,11 @@ public class RouteRequestMapper {
   ) {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(allowedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(bannedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
       var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
@@ -485,11 +486,11 @@ public class RouteRequestMapper {
   ) {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(allowedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(bannedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
     }
@@ -520,11 +521,11 @@ public class RouteRequestMapper {
   ) {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (allowedNetworks != null && allowedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(allowedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (bannedNetworks != null && bannedNetworks.size() > 0) {
+      if (!CollectionUtils.isEmpty(bannedNetworks)) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
       var destinationPolicy = args.getGraphQLDestinationScooterPolicy();
@@ -616,7 +617,7 @@ public class RouteRequestMapper {
     var direct = modesInput.getGraphQLDirect();
     if (Boolean.TRUE.equals(modesInput.getGraphQLTransitOnly())) {
       journey.direct().setMode(StreetMode.NOT_SET);
-    } else if (direct != null && direct.size() > 0) {
+    } else if (!CollectionUtils.isEmpty(direct)) {
       journey.direct().setMode(DirectModeMapper.map(direct.getFirst()));
     }
 
@@ -625,23 +626,23 @@ public class RouteRequestMapper {
       journey.transit().disable();
     } else if (transit != null) {
       var access = transit.getGraphQLAccess();
-      if (access != null && access.size() > 0) {
+      if (!CollectionUtils.isEmpty(access)) {
         journey.access().setMode(AccessModeMapper.map(access.getFirst()));
       }
 
       var egress = transit.getGraphQLEgress();
-      if (egress != null && egress.size() > 0) {
+      if (!CollectionUtils.isEmpty(egress)) {
         journey.egress().setMode(EgressModeMapper.map(egress.getFirst()));
       }
 
       var transfer = transit.getGraphQLTransfer();
-      if (transfer != null && transfer.size() > 0) {
+      if (!CollectionUtils.isEmpty(transfer)) {
         journey.transfer().setMode(TransferModeMapper.map(transfer.getFirst()));
       }
       validateStreetModes(journey);
 
       var transitModes = getTransitModes(environment);
-      if (transitModes.size() > 0) {
+      if (!CollectionUtils.isEmpty(transitModes)) {
         var filterRequestBuilder = TransitFilterRequest.of();
         var mainAndSubModes = transitModes
           .stream()
