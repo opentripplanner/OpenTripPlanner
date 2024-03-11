@@ -4,6 +4,8 @@ public abstract class SiriAzureUpdaterParameters {
 
   private String configRef;
   private String type;
+  private AuthenticationType authenticationType;
+  private String fullyQualifiedNamespace;
   private String serviceBusUrl;
   private String topicName;
   private String dataInitializationUrl;
@@ -26,6 +28,22 @@ public abstract class SiriAzureUpdaterParameters {
 
   public String getType() {
     return type;
+  }
+
+  public AuthenticationType getAuthenticationType() {
+    return authenticationType;
+  }
+
+  public void setAuthenticationType(AuthenticationType authenticationType) {
+    this.authenticationType = authenticationType;
+  }
+
+  public String getFullyQualifiedNamespace() {
+    return fullyQualifiedNamespace;
+  }
+
+  public void setFullyQualifiedNamespace(String fullyQualifiedNamespace) {
+    this.fullyQualifiedNamespace = fullyQualifiedNamespace;
   }
 
   public String getServiceBusUrl() {

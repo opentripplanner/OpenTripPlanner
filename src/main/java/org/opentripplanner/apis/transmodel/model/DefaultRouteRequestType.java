@@ -44,9 +44,10 @@ public class DefaultRouteRequestType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("carSpeed")
+          .deprecate("This parameter is no longer configurable.")
           .description("Max car speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.car().speed())
+          .dataFetcher(env -> 0)
           .build()
       )
       .field(

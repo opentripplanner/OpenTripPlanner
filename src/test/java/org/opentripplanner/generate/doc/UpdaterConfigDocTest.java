@@ -31,6 +31,7 @@ public class UpdaterConfigDocTest {
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> SKIP_UPDATERS = Set.of(
     "siri-azure-sx-updater",
+    "siri-azure-et-updater",
     "vehicle-parking",
     "siri-et-updater",
     "siri-sx-updater"

@@ -24,6 +24,9 @@ class AtlantaMapper implements OsmTagMapper {
     props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.5));
     props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(2.5));
 
+    // Max speed limit in Georgia is 70 mph ~= 113kmh ~= 31.3m/s
+    props.maxPossibleCarSpeed = 31.4f;
+
     // Read the rest from the default set
     new DefaultMapper().populateProperties(props);
   }

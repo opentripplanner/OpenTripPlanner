@@ -1,0 +1,14 @@
+service_id,date,holiday_name,exception_type
+c_15353_b_26748_d_63,20220101,New Year's Day,2
+c_15353_b_26748_d_63,20211225,Christmas Day,2
+c_15353_b_26748_d_63,20211125,Thanksgiving Day,2
+c_15353_b_26748_d_63,20210101,New Year's Day,2
+c_15353_b_26748_d_63,20201225,Christmas Day,2
+c_15353_b_26748_d_31,20211125,Thanksgiving Day,2
+c_15353_b_26748_d_31,20210101,New Year's Day,2
+c_15353_b_26748_d_31,20201225,Christmas Day,2
+c_15353_b_26748_d_127,20220101,New Year's Day,2
+c_15353_b_26748_d_127,20211225,Christmas Day,2
+c_15353_b_26748_d_127,20211125,Thanksgiving Day,2
+c_15353_b_26748_d_127,20210101,New Year's Day,2
+c_15353_b_26748_d_127,20201225,Christmas Day,2

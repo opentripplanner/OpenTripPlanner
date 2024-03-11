@@ -10,8 +10,8 @@
 
 To enable this turn on `FlexRouting` as a feature in `otp-config.json`.
 
-The GTFS feeds should conform to
-the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master/spec/reference.md)
+The GTFS feeds should conform to the 
+[GTFS-Flex v2 draft PR](https://github.com/google/transit/pull/388)
 
 ## Configuration
 

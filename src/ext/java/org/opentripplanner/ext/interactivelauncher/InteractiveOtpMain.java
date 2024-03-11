@@ -31,6 +31,7 @@ public class InteractiveOtpMain {
   }
 
   private void startOtp() {
+    model.save();
     startDebugControllerAndSetupRequestInterceptor();
 
     System.out.println("Start OTP: " + model + "\n");

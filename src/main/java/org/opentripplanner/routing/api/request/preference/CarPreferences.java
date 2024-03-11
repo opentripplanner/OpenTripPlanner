@@ -22,7 +22,6 @@ public final class CarPreferences implements Serializable {
 
   public static final CarPreferences DEFAULT = new CarPreferences();
 
-  private final double speed;
   private final double reluctance;
   private final VehicleParkingPreferences parking;
   private final VehicleRentalPreferences rental;
@@ -33,7 +32,6 @@ public final class CarPreferences implements Serializable {
 
   /** Create a new instance with default values. */
   private CarPreferences() {
-    this.speed = 40.0;
     this.reluctance = 2.0;
     this.parking = VehicleParkingPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
@@ -44,7 +42,6 @@ public final class CarPreferences implements Serializable {
   }
 
   private CarPreferences(Builder builder) {
-    this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
     this.parking = builder.parking;
     this.rental = builder.rental;
@@ -60,15 +57,6 @@ public final class CarPreferences implements Serializable {
 
   public CarPreferences.Builder copyOf() {
     return new Builder(this);
-  }
-
-  /**
-   * Max car speed along streets, in meters per second.
-   * <p>
-   * Default: 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide.
-   */
-  public double speed() {
-    return speed;
   }
 
   public double reluctance() {
@@ -117,7 +105,6 @@ public final class CarPreferences implements Serializable {
     if (o == null || getClass() != o.getClass()) return false;
     CarPreferences that = (CarPreferences) o;
     return (
-      DoubleUtils.doubleEquals(that.speed, speed) &&
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
       parking.equals(that.parking) &&
       rental.equals(that.rental) &&
@@ -131,7 +118,6 @@ public final class CarPreferences implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(
-      speed,
       reluctance,
       parking,
       rental,
@@ -146,7 +132,6 @@ public final class CarPreferences implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(CarPreferences.class)
-      .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("parking", parking, DEFAULT.parking)
       .addObj("rental", rental, DEFAULT.rental)
@@ -161,7 +146,6 @@ public final class CarPreferences implements Serializable {
   public static class Builder {
 
     private final CarPreferences original;
-    private double speed;
     private double reluctance;
     private VehicleParkingPreferences parking;
     private VehicleRentalPreferences rental;
@@ -172,7 +156,6 @@ public final class CarPreferences implements Serializable {
 
     public Builder(CarPreferences original) {
       this.original = original;
-      this.speed = original.speed;
       this.reluctance = original.reluctance;
       this.parking = original.parking;
       this.rental = original.rental;
@@ -184,11 +167,6 @@ public final class CarPreferences implements Serializable {
 
     public CarPreferences original() {
       return original;
-    }
-
-    public Builder withSpeed(double speed) {
-      this.speed = speed;
-      return this;
     }
 
     public Builder withReluctance(double reluctance) {

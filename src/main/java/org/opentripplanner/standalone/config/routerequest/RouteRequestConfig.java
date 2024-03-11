@@ -28,6 +28,7 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
@@ -185,6 +186,7 @@ travel time `x` (in seconds).
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
+    preferences.withScooter(it -> mapScooterPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
@@ -595,13 +597,6 @@ your users receive a timely response. You can also limit the max duration. There
     var dft = builder.original();
     NodeAdapter c = root.of("car").since(V2_5).summary("Car preferences.").asObject();
     builder
-      .withSpeed(
-        c
-          .of("speed")
-          .since(V2_0)
-          .summary("Max car speed along streets, in meters per second")
-          .asDouble(dft.speed())
-      )
       .withReluctance(
         c
           .of("reluctance")
@@ -640,6 +635,41 @@ your users receive a timely response. You can also limit the max duration. There
           .asDouble(dft.decelerationSpeed())
       )
       .withParking(it -> mapParking(c, it))
+      .withRental(it -> mapRental(c, it));
+  }
+
+  private static void mapScooterPreferences(NodeAdapter root, ScooterPreferences.Builder builder) {
+    var dft = builder.original();
+    NodeAdapter c = root.of("scooter").since(V2_5).summary("Scooter preferences.").asObject();
+    builder
+      .withSpeed(
+        c
+          .of("speed")
+          .since(V2_0)
+          .summary("Max scooter speed along streets, in meters per second")
+          .asDouble(dft.speed())
+      )
+      .withReluctance(
+        c
+          .of("reluctance")
+          .since(V2_0)
+          .summary(
+            "A multiplier for how bad scooter travel is, compared to being in transit for equal lengths of time."
+          )
+          .asDouble(dft.reluctance())
+      )
+      .withOptimizeType(
+        c
+          .of("optimization")
+          .since(V2_0)
+          .summary("The set of characteristics that the user wants to optimize for.")
+          .description(
+            "If the triangle optimization is used, it's enough to just define the triangle parameters"
+          )
+          .asEnum(dft.optimizeType())
+      )
+      // triangle overrides the optimization type if defined
+      .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(c, it))
       .withRental(it -> mapRental(c, it));
   }
 

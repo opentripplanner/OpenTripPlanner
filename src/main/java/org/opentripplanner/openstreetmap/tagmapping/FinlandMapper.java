@@ -163,9 +163,11 @@ class FinlandMapper implements OsmTagMapper {
     props.setProperties("highway=service;tunnel=yes;access=destination", withModes(NONE));
     props.setProperties("highway=service;access=destination", withModes(ALL).bicycleSafety(1.1));
 
-    /*
-     * Automobile speeds in Finland. General speed limit is 80kph unless signs says otherwise.
-     */
+    // Automobile speeds in Finland.
+    // General speed limit is 80kph unless signs says otherwise.
+    props.defaultCarSpeed = 22.22f;
+    // 120kph is the max speed limit in Finland
+    props.maxPossibleCarSpeed = 33.34f;
     // = 100kph. Varies between 80 - 120 kph depending on road and season.
     props.setCarSpeed("highway=motorway", 27.77f);
     // = 54kph

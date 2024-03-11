@@ -49,6 +49,15 @@ The feature must be configured in `router-config.json` as follows
         "minZoom": 14,
         "cacheMaxSeconds": 600
       },
+      // flex zones
+      {
+        "name": "areaStops",
+        "type": "AreaStop",
+        "mapper": "OTPRR",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
       {
         "name": "stations",
         "type": "Station",
@@ -136,6 +145,7 @@ For each layer, the configuration includes:
 - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
 - `type` which tells the type of the layer. Currently supported:
     - `Stop`
+    - `AreaStop`: Flex zones
     - `Station`
     - `VehicleRental`: all rental places: stations and free-floating vehicles
     - `VehicleRentalVehicle`: free-floating rental vehicles
@@ -148,6 +158,7 @@ For each layer, the configuration includes:
 
 | Config Parameter                                               |    Type    | Summary                                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------|:----------:|--------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [attribution](#vectorTiles_attribution)                        |  `string`  | Custom attribution to be returned in `tilejson.json`                                       | *Optional* |               |  2.5  |
 | [basePath](#vectorTiles_basePath)                              |  `string`  | The path of the vector tile source URLs in `tilejson.json`.                                | *Optional* |               |  2.5  |
 | [layers](#vectorTiles_layers)                                  | `object[]` | Configuration of the individual layers for the Mapbox vector tiles.                        | *Optional* |               |  2.0  |
 |       type = "stop"                                            |   `enum`   | Type of the layer.                                                                         | *Required* |               |  2.0  |
@@ -160,6 +171,22 @@ For each layer, the configuration includes:
 
 
 #### Details
+
+<h4 id="vectorTiles_attribution">attribution</h4>
+
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Path:** /vectorTiles 
+
+Custom attribution to be returned in `tilejson.json`
+
+By default the, `attribution` property in `tilejson.json` is computed from the names and
+URLs of the feed publishers.
+If the OTP deployment contains many feeds, this can become very unwieldy.
+
+This configuration parameter allows you to set the `attribution` to any string you wish
+including HTML tags,
+for example `<a href='https://trimet.org/mod'>Regional Partners</a>`.
+
 
 <h4 id="vectorTiles_basePath">basePath</h4>
 
@@ -270,3 +297,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
   * Changed old vehicle parking mapper to be Stadtnavi
   * Added a new Digitransit vehicle parking mapper with no real-time information and less fields
 - 2024-01-22: Make `basePath` configurable [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
+- 2024-02-27: Add layer for flex zones [#5704](https://github.com/opentripplanner/OpenTripPlanner/pull/5704)

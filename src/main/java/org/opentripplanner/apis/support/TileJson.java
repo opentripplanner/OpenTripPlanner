@@ -36,15 +36,8 @@ public class TileJson implements Serializable {
   public final double[] bounds;
   public final double[] center;
 
-  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
-    attribution =
-      feedInfos
-        .stream()
-        .map(feedInfo ->
-          "<a href='" + feedInfo.getPublisherUrl() + "'>" + feedInfo.getPublisherName() + "</a>"
-        )
-        .collect(Collectors.joining(", "));
-
+  public TileJson(String tileUrl, WorldEnvelope envelope, String attribution) {
+    this.attribution = attribution;
     tiles = new String[] { tileUrl };
 
     bounds =
@@ -57,6 +50,10 @@ public class TileJson implements Serializable {
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };
+  }
+
+  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
+    this(tileUrl, envelope, attributionFromFeedInfo(feedInfos));
   }
 
   /**
@@ -95,5 +92,15 @@ public class TileJson implements Serializable {
         strippedPath,
         String.join(",", layers)
       );
+  }
+
+  private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {
+    return feedInfos
+      .stream()
+      .map(feedInfo ->
+        "<a href='%s'>%s</a>".formatted(feedInfo.getPublisherUrl(), feedInfo.getPublisherName())
+      )
+      .distinct()
+      .collect(Collectors.joining(", "));
   }
 }

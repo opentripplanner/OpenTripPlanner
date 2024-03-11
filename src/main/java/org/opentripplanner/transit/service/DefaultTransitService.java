@@ -41,6 +41,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -224,6 +225,12 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<RegularStop> listRegularStops() {
     OTPRequestTimeoutException.checkForTimeout();
     return transitModel.getStopModel().listRegularStops();
+  }
+
+  @Override
+  public Collection<GroupStop> listGroupStops() {
+    OTPRequestTimeoutException.checkForTimeout();
+    return transitModel.getStopModel().listGroupStops();
   }
 
   @Override

@@ -25,8 +25,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @GeneratesDocumentation
 public class SiriConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "SiriUpdater.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/SiriUpdater.md");
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "sandbox/siri/SiriUpdater.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/siri/SiriUpdater.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater", "siri-sx-updater");
