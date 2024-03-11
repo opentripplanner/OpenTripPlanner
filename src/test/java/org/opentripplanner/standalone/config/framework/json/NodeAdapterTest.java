@@ -569,7 +569,7 @@ public class NodeAdapterTest {
       // When: Access ONLY parameter 'a', but not 'b'
       subject.of("foo").asObject().of("a").asBoolean();
 
-      assertTrue(subject.hasInvalidProperties());
+      assertTrue(subject.hasUnknownProperties());
     }
 
     @Test
@@ -581,7 +581,7 @@ public class NodeAdapterTest {
       object.of("a").asBoolean();
       object.of("b").asBoolean();
 
-      assertFalse(subject.hasInvalidProperties());
+      assertFalse(subject.hasUnknownProperties());
     }
   }
 

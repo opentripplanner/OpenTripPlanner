@@ -109,11 +109,11 @@ public class ConfigModel {
   /**
    * Checks if any unknown or invalid properties were encountered while loading the configuration.
    */
-  public boolean hasInvalidProperties() {
+  public boolean hasIUnknownProperties() {
     return (
-      otpConfig.hasInvalidProperties() ||
-      buildConfig.hasInvalidProperties() ||
-      routerConfig.hasInvalidProperties()
+      otpConfig.hasUnknownProperties() ||
+      buildConfig.hasUnknownProperties() ||
+      routerConfig.hasUnknownProperties()
     );
   }
 }

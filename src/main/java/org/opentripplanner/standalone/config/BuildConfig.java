@@ -723,7 +723,7 @@ Netex data is also often supplied in a ZIP file.
   /**
    * Checks if any unknown or invalid properties were encountered while loading the configuration.
    */
-  public boolean hasInvalidProperties() {
-    return root.hasInvalidProperties();
+  public boolean hasUnknownProperties() {
+    return root.hasUnknownProperties();
   }
 }
