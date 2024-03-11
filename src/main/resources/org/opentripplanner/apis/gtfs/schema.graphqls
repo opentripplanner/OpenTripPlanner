@@ -4152,7 +4152,7 @@ type QueryType {
         used correctly to get meaningful itineraries).
         """
         startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
-    ): Plan @async @deprecated(reason: "Use planConnection instead")
+    ): Plan @async
 
     """
     Plan (itinerary) search that follows
@@ -4267,7 +4267,7 @@ type QueryType {
         and should be used together with the `before` parameter.
         """
         last: Int
-    ): PlanConnection @async
+    ): PlanConnection @async @deprecated(reason: "Experimental and can include breaking changes, use plan instead")
 }
 
 enum RealtimeState {
