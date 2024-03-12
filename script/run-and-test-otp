@@ -30,10 +30,10 @@ DATA_DIR=../data/fix-error-access
 
 if [ "$1" == "-h" ]  || [ "$1" == "--help" ]; then
   echo "This script: "
-  echo "  1. Compile OTP"
-  echo "  2. Run OTP - build a graph and start the server"
-  echo "  3. Send a request using curl"
-  echo "  4. Test the response, search for a unexpected token. If the token is"
+  echo "  1. Compiles OTP"
+  echo "  2. Runs OTP - build a graph and start the server"
+  echo "  3. Sends a request using curl"
+  echo "  4. Tests the response, search for a unexpected token. If the token is"
   echo "     NOT present the test is GOOD, if not it is BAD"
   echo ""
   echo "Before using this script you should copy it to a folder which is NOT"

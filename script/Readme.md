@@ -20,7 +20,7 @@ existing one. The reviewers are responsible for:
 # Owner: J. Brown, Fun & Fast Transit Inc
 
 if [ "$1" == "-h" ]  || [ "$1" == "--help" ]; then
-  echo "The purpouse of the script is .."
+  echo "The purpose of the script is .."
   echo "Usage: ..."
   echo "Parameters: "
   :
