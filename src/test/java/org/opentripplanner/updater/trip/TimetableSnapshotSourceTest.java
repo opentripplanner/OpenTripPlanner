@@ -849,6 +849,117 @@ public class TimetableSnapshotSourceTest {
         assertFalse(newTripTimes.isNoDataStop(2));
       }
     }
+
+    @Test
+    public void scheduledTripWithPreviouslySkipped() {
+      // Create update with a skipped stop at first
+      String scheduledTripId = "1.1";
+
+      var skippedBuilder = new TripUpdateBuilder(
+        scheduledTripId,
+        SERVICE_DATE,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addSkippedStop(2)
+        .addDelayedStopTime(3, 90);
+
+      var tripUpdate = skippedBuilder.build();
+
+      var updater = defaultUpdater();
+
+      // apply the update with a skipped stop
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        false,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // Force a snapshot commit. This is done to mimic normal behaviour where a new update arrives
+      // after the original snapshot has been committed
+      updater.getTimetableSnapshot(true);
+
+      // Create update to the same trip but now the skipped stop is no longer skipped
+      var scheduledBuilder = new TripUpdateBuilder(
+        scheduledTripId,
+        SERVICE_DATE,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addDelayedStopTime(2, 60, 80)
+        .addDelayedStopTime(3, 90, 90);
+
+      tripUpdate = scheduledBuilder.build();
+
+      // apply the update with the previously skipped stop now scheduled
+      updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        false,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // Check that the there is no longer a realtime added trip pattern for the trip and that the
+      // stoptime updates have gone through
+      var snapshot = updater.getTimetableSnapshot(true);
+      {
+        final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
+          new FeedScopedId(feedId, scheduledTripId),
+          SERVICE_DATE
+        );
+        assertNull(newTripPattern);
+
+        final FeedScopedId tripId = new FeedScopedId(feedId, scheduledTripId);
+        final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
+        final TripPattern originalTripPattern = transitModel
+          .getTransitModelIndex()
+          .getPatternForTrip()
+          .get(trip);
+
+        final Timetable originalTimetableForToday = snapshot.resolve(
+          originalTripPattern,
+          SERVICE_DATE
+        );
+        final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+
+        assertNotSame(originalTimetableForToday, originalTimetableScheduled);
+
+        final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(tripId);
+        assertTrue(
+          originalTripIndexScheduled > -1,
+          "Original trip should be found in scheduled time table"
+        );
+        final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
+          originalTripIndexScheduled
+        );
+        assertFalse(
+          originalTripTimesScheduled.isCanceledOrDeleted(),
+          "Original trip times should not be canceled in scheduled time table"
+        );
+        assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
+
+        final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(tripId);
+        assertTrue(
+          originalTripIndexForToday > -1,
+          "Original trip should be found in time table for service date"
+        );
+        final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
+          originalTripIndexForToday
+        );
+        assertEquals(RealTimeState.UPDATED, originalTripTimesForToday.getRealTimeState());
+        assertEquals(0, originalTripTimesForToday.getArrivalDelay(0));
+        assertEquals(0, originalTripTimesForToday.getDepartureDelay(0));
+        assertEquals(60, originalTripTimesForToday.getArrivalDelay(1));
+        assertEquals(80, originalTripTimesForToday.getDepartureDelay(1));
+        assertEquals(90, originalTripTimesForToday.getArrivalDelay(2));
+        assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
+      }
+    }
   }
 
   @Nested

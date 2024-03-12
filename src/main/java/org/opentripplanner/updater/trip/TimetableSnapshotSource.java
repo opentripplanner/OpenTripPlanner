@@ -370,6 +370,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return updateResult;
   }
 
+  /**
+   * This shouldn't be used outside of this class for other purposes than testing where the forced
+   * snapshot commit can guarantee consistent behaviour.
+   */
+  TimetableSnapshot getTimetableSnapshot(final boolean force) {
+    final long now = System.currentTimeMillis();
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
+      if (force || buffer.isDirty()) {
+        LOG.debug("Committing {}", buffer);
+        snapshot = buffer.commit(transitLayerUpdater, force);
+      } else {
+        LOG.debug("Buffer was unchanged, keeping old snapshot.");
+      }
+      lastSnapshotTime = System.currentTimeMillis();
+    } else {
+      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
+    }
+    return snapshot;
+  }
+
   private static void logUpdateResult(
     String feedId,
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
@@ -388,22 +408,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         var count = warnings.get(key).size();
         LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
       });
-  }
-
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer);
-        snapshot = buffer.commit(transitLayerUpdater, force);
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-      lastSnapshotTime = System.currentTimeMillis();
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-    return snapshot;
   }
 
   /**
