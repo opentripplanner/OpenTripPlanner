@@ -5,7 +5,7 @@ This folder is intended for various scripts used during the OTP development. The
 
 If you want to submit your own scripts, you need to include:
  - A header at the beginning of the script stating who the owner is.
- - The scrip should print some usage documentation if invoked with `--help` and `-h`.
+ - The script should print some usage documentation if invoked with `--help` and `-h`.
 
 The regular pull-request approval process is required for submitting new scripts and changing 
 existing one. The reviewers are responsible for:
