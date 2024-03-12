@@ -42,7 +42,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
       new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
       new KeyValue(
         "parentStation",
-        stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
+        stop.getParentStation() != null ? stop.getParentStation().getId() : null
       ),
       new KeyValue("type", getType(transitService, stop)),
       new KeyValue("routes", getRoutes(transitService, stop))

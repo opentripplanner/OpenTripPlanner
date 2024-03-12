@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
+import static java.util.Map.entry;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,11 +26,19 @@ public class StopsLayerBuilder<T> extends LayerBuilder<T> {
 
   public StopsLayerBuilder(
     TransitService transitService,
-    Map<MapperType, PropertyMapper<T>> mappers,
-    LayerParameters<VectorTilesResource.LayerType> layerParameters
+    LayerParameters<VectorTilesResource.LayerType> layerParameters,
+    Locale locale
   ) {
     super(
-      mappers.get(MapperType.valueOf(layerParameters.mapper())),
+      (PropertyMapper<T>) Map
+        .ofEntries(
+          entry(MapperType.Digitransit, new DigitransitStopPropertyMapper(transitService, locale)),
+          entry(
+            MapperType.DigitransitRealtime,
+            new DigitransitRealtimeStopPropertyMapper(transitService, locale)
+          )
+        )
+        .get(MapperType.valueOf(layerParameters.mapper())),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );

@@ -3,6 +3,8 @@ package org.opentripplanner.ext.vectortiles.layers.stops;
 import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getRoutes;
 import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getType;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -24,13 +26,6 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  protected static DigitransitRealtimeStopPropertyMapper create(
-    TransitService transitService,
-    Locale locale
-  ) {
-    return new DigitransitRealtimeStopPropertyMapper(transitService, locale);
-  }
-
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
     String alerts = JSONArray.toJSONString(
@@ -40,7 +35,19 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
         .stream()
         .map(alert -> {
           JSONObject alertObject = new JSONObject();
-          alertObject.put("alertEffect", alert.effect().toString());
+          Instant currentTime = ZonedDateTime.now(transitService.getTimeZone()).toInstant();
+          if (
+            (
+              alert.getEffectiveStartDate() != null &&
+              alert.getEffectiveStartDate().isBefore(currentTime)
+            ) &&
+            (
+              alert.getEffectiveEndDate() != null &&
+              alert.getEffectiveEndDate().isAfter(currentTime)
+            )
+          ) {
+            alertObject.put("alertEffect", alert.effect().toString());
+          }
           return alertObject;
         })
         .toList()

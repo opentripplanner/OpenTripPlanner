@@ -4,12 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.plan.Place;
@@ -34,7 +38,7 @@ public class StopsLayerTest {
   private RegularStop stop2;
 
   @BeforeEach
-  public final void setUp() {
+  public void setUp() {
     var nameTranslations = TranslatedString.getI18NString(
       new HashMap<>() {
         {
@@ -116,6 +120,7 @@ public class StopsLayerTest {
   public void digitransitRealtimeStopPropertyMapperTest() {
     var deduplicator = new Deduplicator();
     var transitModel = new TransitModel(new StopModel(), deduplicator);
+    transitModel.initTimeZone(ZoneIds.HELSINKI);
     transitModel.index();
     var alertService = new TransitAlertServiceImpl(transitModel);
     var transitService = new DefaultTransitService(transitModel) {
@@ -129,11 +134,12 @@ public class StopsLayerTest {
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();
-
+    var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
+    var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
     var alert = TransitAlert
       .of(stop.getId())
       .addEntity(new EntitySelector.Stop(stop.getId()))
-      .addTimePeriod(new TimePeriod(0, 0))
+      .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)
       .build();
     transitService.getTransitAlertService().setAlerts(List.of(alert));
@@ -141,7 +147,7 @@ public class StopsLayerTest {
     var itineraries = List.of(itinerary);
     RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
-    DigitransitRealtimeStopPropertyMapper mapper = DigitransitRealtimeStopPropertyMapper.create(
+    DigitransitRealtimeStopPropertyMapper mapper = new DigitransitRealtimeStopPropertyMapper(
       transitService,
       new Locale("en-US")
     );
