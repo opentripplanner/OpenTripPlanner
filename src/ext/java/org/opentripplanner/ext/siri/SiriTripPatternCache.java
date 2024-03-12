@@ -26,34 +26,39 @@ import org.slf4j.LoggerFactory;
  * the same sequence of stops, they will all end up on this same TripPattern.
  * <p>
  * Note that there are two versions of this class, this one for GTFS-RT and another for SIRI.
- * See additional comments in the Javadoc of the GTFS-RT version of this class.
+ * See additional comments in the Javadoc of the GTFS-RT version of this class, whose name is
+ * simply TripPatternCache.
+ * TODO RT_AB: To the extent that double SIRI/GTFS implementations are kept, prefix all names
+ *             with GTFS or SIRI or NETEX rather than having no prefix on the GTFS versions.
  */
 public class SiriTripPatternCache {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTripPatternCache.class);
 
-  // Seems to be the primary collection of added TripPatterns, with other collections serving as
-  // indexes. Similar to TripPatternCache.cache but with service date as part of the key.
+  // TODO RT_AB: Improve documentation. This seems to be the primary collection of added
+  //   TripPatterns, with other collections serving as indexes. Similar to TripPatternCache.cache
+  //   in the GTFS version of this class, but with service date as part of the key.
   private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
 
-  // Apparently a SIRI-specific index for use in GraphQL APIs (missing on GTFS-RT version).
+  // This appears to be a SIRI-specific index for use in GraphQL APIs.
+  // It is not present on the GTFS-RT version of this class.
   private final ListMultimap<StopLocation, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(
     ArrayListMultimap.create()
   );
 
-  // TODO clarify name and add documentation to this field
+  // TODO RT_AB: clarify name and add documentation to this field.
   private final Map<TripServiceDateKey, TripPattern> updatedTripPatternsForTripCache = new HashMap<>();
 
-  // TODO generalize this so we can generate IDs for SIRI or GTFS-RT sources
+  // TODO RT_AB: generalize this so we can generate IDs for SIRI or GTFS-RT sources.
   private final SiriTripPatternIdGenerator tripPatternIdGenerator;
 
-  // TODO clarify name and add documentation to this field, and why it's constructor injected
+  // TODO RT_AB: clarify name and add documentation to this field, and why it's constructor injected
   private final Function<Trip, TripPattern> getPatternForTrip;
 
   /**
    * Constructor.
-   * TODO: clarify why the ID generator and pattern fetching function are injected. Potentially
-   *     make the class usable for GTFS-RT cases by injecting different ID generator etc.
+   * TODO RT_AB: clarify why the ID generator and pattern fetching function are injected here.
+   *   Potentially make the class usable for GTFS-RT cases by injecting different ID generator etc.
    */
   public SiriTripPatternCache(
     SiriTripPatternIdGenerator tripPatternIdGenerator,
@@ -63,15 +68,16 @@ public class SiriTripPatternCache {
     this.getPatternForTrip = getPatternForTrip;
   }
 
-  // Below was clearly derived from a method from TripPatternCache, down to the obsolete Javadoc
-  // mentioning transit vertices and edges (which don't exist since raptor was adopted).
-  // Note that this is the only non-dead-code public method on this class, and mirrors the only
-  // public method on the GTFS-RT version of TripPatternCache.
-  // It also explains why this class is called a "cache". It allows reusing the same TripPattern
-  // instance when many different trips are created or updated with the same pattern.
+  //
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet.
+   *
+   * TODO RT_AB: Improve documentation and/or merge with GTFS version of this class.
+   *  This was clearly derived from a method from TripPatternCache. This is the only non-dead-code
+   *  public method on this class, and mirrors the only public method on the GTFS-RT version of
+   *  TripPatternCache. It also explains why this class is called a "cache". It allows reusing the
+   *  same TripPattern instance when many different trips are created or updated with the same pattern.
    *
    * @param stopPattern stop pattern to retrieve/create trip pattern
    * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
@@ -85,9 +91,9 @@ public class SiriTripPatternCache {
   ) {
     TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
-    // TODO: verify, this is different than GTFS-RT version
-    //   It can return a TripPattern from the scheduled data, but protective copies are handled
-    //   in TimetableSnapshot.update. Document better this aspect of the contract in this method's Javadoc.
+    // TODO RT_AB: Verify implementation, which is different than the GTFS-RT version.
+    //   It can return a TripPattern from the scheduled data, but protective copies are handled in
+    //   TimetableSnapshot.update. Better document this aspect of the contract in this method's Javadoc.
     if (originalTripPattern.getStopPattern().equals(stopPattern)) {
       return originalTripPattern;
     }
@@ -109,7 +115,7 @@ public class SiriTripPatternCache {
           .withCreatedByRealtimeUpdater(true)
           .withOriginalTripPattern(originalTripPattern)
           .build();
-      // TODO - SIRI: Add pattern to transitModel index?
+      // TODO: Add pattern to transitModel index?
 
       // Add pattern to cache
       cache.put(key, tripPattern);
@@ -147,8 +153,8 @@ public class SiriTripPatternCache {
      outdated) tripPattern for all affected stops. In example above, "StopPattern #rt1" should be
      removed from all stops.
 
-     TODO explore why this particular case is handled in an ad-hoc manner. It seems like all such
-       indexes should be constantly rebuilt and versioned along with the TimetableSnapshot.
+     TODO RT_AB: review why this particular case is handled in an ad-hoc manner. It seems like all
+       such indexes should be constantly rebuilt and versioned along with the TimetableSnapshot.
     */
     TripServiceDateKey tripServiceDateKey = new TripServiceDateKey(trip, serviceDate);
     if (updatedTripPatternsForTripCache.containsKey(tripServiceDateKey)) {
@@ -186,7 +192,7 @@ public class SiriTripPatternCache {
 
   /**
    * Returns any new TripPatterns added by real time information for a given stop.
-   * TODO: this appears to be currently unused. Perhaps remove it if the API has changed.
+   * TODO RT_AB: this appears to be currently unused. Perhaps remove it if the API has changed.
    *
    * @param stop the stop
    * @return list of TripPatterns created by real time sources for the stop.
@@ -196,15 +202,15 @@ public class SiriTripPatternCache {
   }
 }
 
-//// Below here are multiple additional private classes defined in the same top-level class file.
-//// TODO: move these private classes inside the above class as private static inner classes.
+// TODO RT_AB: move the below classes inside the above class as private static inner classes.
+//   Defining these additional classes in the same top-level class file is unconventional.
 
 /**
- * Serves as the key for the collection of realtime-added TripPatterns.
+ * Serves as the key for the collection of TripPatterns added by realtime messages.
  * Must define hashcode and equals to confer semantic identity.
- * It seems like there's a separate TripPattern instance for each StopPattern and service date,
- * rather a single TripPattern instance associated with a separate timetable for each date.
- * TODO: clarify why each date has a different TripPattern instead of a different Timetable.
+ * TODO RT_AB: clarify why each date has a different TripPattern instead of a different Timetable.
+ *   It seems like there's a separate TripPattern instance for each StopPattern and service date,
+ *   rather a single TripPattern instance associated with a separate timetable for each date.
  */
 class StopPatternServiceDateKey {
 
@@ -234,7 +240,7 @@ class StopPatternServiceDateKey {
 /**
  * An alternative key for looking up realtime-added TripPatterns by trip and service date instead
  * of stop pattern and service date. Must define hashcode and equals to confer semantic identity.
- * TODO verify whether one map is considered the definitive collection and the other an index.
+ * TODO RT_AB: verify whether one map is considered the definitive collection and the other an index.
  */
 class TripServiceDateKey {
 

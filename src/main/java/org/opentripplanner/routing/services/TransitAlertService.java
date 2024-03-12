@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
- * The TransitAlertService stores a set of alerts (passenger-facing textual information associated
+ * A TransitAlertService stores a set of alerts (passenger-facing textual information associated
  * with transit entities such as stops or routes) which are currently active and should be provided
  * to end users when their itineraries include the relevant stop, route, etc.
  *

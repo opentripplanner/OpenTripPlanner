@@ -50,7 +50,7 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO this interface seems to provide direct access to the TransitLayer but not the TransitModel.
+ * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TransitModel.
  *   Is this intentional, because TransitLayer is meant to be read-only and TransitModel is not?
  *   Should this be renamed TransitDataService since it seems to provide access to the data but
  *   not to transit routing functionality (which is provided by the RoutingService)?

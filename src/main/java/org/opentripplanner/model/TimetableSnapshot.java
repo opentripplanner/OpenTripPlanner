@@ -47,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * departure times of other trips that have not necessarily been boarded.
  * <p>
  * A TimetableSnapshot instance may only be modified by a single thread. This makes it easier to
- * reason about how the snapshot is built up and used. Write operation are applied one by one in
- * order with no concurrent access, then read operations are allowed concurrently by many threads
- * once writing is forbidden.
+ * reason about how the snapshot is built up and used. Write operations are applied one by one, in
+ * order, with no concurrent access. Read operations are then allowed concurrently by many threads
+ * after writing is forbidden.
  * <p>
  * The fact that TripPattern instances carry a reference only to their scheduled Timetable and not
  * to their realtime timetable is largely due to historical path-dependence in OTP development.
@@ -97,22 +97,22 @@ public class TimetableSnapshot {
    * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
    * trip ID and the service date. The type of this field is HashMap rather than the more general
    * Map interface because we need to efficiently clone it whenever we start building up a new
-   * snapshot. TODO: clarify if this is an index or the original source of truth.
+   * snapshot. TODO RT_AB: clarify if this is an index or the original source of truth.
    */
   private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
 
   /**
-   * This is an index of TripPatterns, not the primary collection.
-   * It tracks which TripPatterns that were updated or newly created by realtime messages contain
-   * which stops. This allows them to be readily found and included in API responses containing
-   * stop times at a specific stop. This is a SetMultimap, so that each pattern is only retained
-   * once per stop even if it's added more than once.
-   * TODO: Better, more general handling of all realtime indexes outside primary data structures.
+   * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
+   * that were updated or newly created by realtime messages contain which stops. This allows them
+   * to be readily found and included in API responses containing stop times at a specific stop.
+   * This is a SetMultimap, so that each pattern is only retained once per stop even if it's added
+   * more than once.
+   * TODO RT_AB: More general handling of all realtime indexes outside primary data structures.
    */
   private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
 
   /**
-   * This is an as-yet unused alternative to the current boolean fields readOnly and dirty, as well
+   * This is an AS YET UNUSED alternative to the current boolean fields readOnly and dirty, as well
    * as setting dirtyTimetables to null. A given instance of TimetableSnapshot should progress
    * through all these states in order, and cannot return to a previous state.
    */
@@ -129,7 +129,7 @@ public class TimetableSnapshot {
    * other hand, reading is expected to be highly concurrent and happens during core routing
    * processes. Therefore, any assertions about state should be concentrated in the writing methods.
    */
-  private TimetableSnapshotState state;
+  // private TimetableSnapshotState state;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it

@@ -20,8 +20,8 @@ import org.opentripplanner.updater.alert.TransitAlertProvider;
  * all alerts.
  *
  * Concretely: every realtime updater receiving GTFS Alerts or SIRI Situation Exchange (SX)
- * messages currently maintains its own private index of alerts seperate from all other updaters.
- * To make the set of all alerts from all updaters available in a single operaion and associate it
+ * messages currently maintains its own private index of alerts separately from all other updaters.
+ * To make the set of all alerts from all updaters available in a single operation and associate it
  * with the graph as a whole, the various indexes are merged in such a way as to have the same
  * index as each individual index.
  */

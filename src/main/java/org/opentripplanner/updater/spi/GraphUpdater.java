@@ -55,6 +55,7 @@ public interface GraphUpdater {
    * A GraphUpdater implementation uses this method to report its corresponding value of the "type"
    * field in the configuration file. This value should ONLY be used when providing human-friendly
    * messages while logging and debugging. Association of configuration to particular types is
+   * performed by the UpdatersConfig.Type constructor calling factory methods.
    */
   String getConfigRef();
 }

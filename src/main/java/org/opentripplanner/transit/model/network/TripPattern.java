@@ -80,7 +80,8 @@ public final class TripPattern
 
   // This TransitMode is a redundant replication/memoization of information on the Route.
   // It appears that in the TripPatternBuilder it is only ever set from a Trip which is itself set
-  // from a Route. TODO confirm whether there is any reason this doesn't just read through to Route.
+  // from a Route.
+  // TODO RT_AB: confirm whether there is any reason this doesn't just read through to Route.
   private final TransitMode mode;
 
   private final SubMode netexSubMode;
@@ -96,7 +97,7 @@ public final class TripPattern
    * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
    * SiriTripPatternCache.
    *
-   * FIXME this is only used rarely, make that obvious from comments.
+   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    */
   private final TripPattern originalTripPattern;
 

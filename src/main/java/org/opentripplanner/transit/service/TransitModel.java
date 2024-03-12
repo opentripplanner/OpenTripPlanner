@@ -72,8 +72,9 @@ import org.slf4j.LoggerFactory;
  * TransitLayer rather than the TransitModel it's derived from. Both are often accessed via the
  * TransitService rather than directly reading the fields of TransitModel or TransitLayer.
  *
- * TODO rename, as this is not really the model, but a top-level object grouping together instances
- *   of model classes with things that operate on and map those instances.
+ * TODO RT_AB: consider renaming. By some definitions this is not really the model, but a top-level
+ *   object grouping together instances of model classes with things that operate on and map those
+ *   instances.
  */
 public class TransitModel implements Serializable {
 

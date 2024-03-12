@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This service manages street edge notes. An edge note is a free-format alert (text) attached to an
- * edge, which is returned along with any itinerary where this edge is used, and which <b>does not have any
- * impact on routing</b>. Notes cannot affect routing because edges do not know which notes are
- * attached to them. This avoids storing references to notes on the edge, which would probably not
- * be worth the memory consumption as only few edges have notes.
+ * edge, which is returned along with any itinerary where this edge is used, and which <b>does not
+ * have any impact on routing</b>. Notes cannot affect routing because edges do not know which notes
+ * are attached to them. This avoids storing references to notes on the edge, which would probably
+ * not be worth the memory consumption as only a few edges have notes.
  * <p>
  * The service owns a list of StreetNotesSource, with a single static one used for graph building.
  * "Dynamic" notes can be returned by classes implementing StreetNoteSource, added to this service

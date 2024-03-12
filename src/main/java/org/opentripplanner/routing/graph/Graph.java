@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
  * of edges for each vertex, but those lists are now attached to the vertices themselves.
  * <p>
- * TODO rename to StreetGraph to emphasize what it represents?
+ * TODO RT_AB: rename to StreetGraph to emphasize what it represents?
  */
 public class Graph implements Serializable {
 

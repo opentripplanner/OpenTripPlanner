@@ -20,11 +20,11 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * the same sequence of stops, they will all end up on this same TripPattern.
  * <p>
  * Note that there are two versions of this class, this one for GTFS-RT and another for SIRI.
- * TODO: consolidate TripPatternCache and SiriTripPatternCache. They seem to only be separate
- *     because SIRI- or GTFS-specific indexes of the added TripPatterns seem to have been added to
- *     this primary collection.
- * FIXME: the name does not make it clear that this has anything to do with elements that are only
- *     added due to realtime updates, and it is only loosely a cache. RealtimeAddedTripPatterns?
+ * TODO RT_AB: consolidate TripPatternCache and SiriTripPatternCache. They seem to only be separate
+ *    because SIRI- or GTFS-specific indexes of the added TripPatterns seem to have been added to
+ *    this primary collection.
+ * FIXME RT_AB: the name does not make it clear that this has anything to do with elements that are
+ *    only added due to realtime updates, and it is only loosely a cache. RealtimeAddedTripPatterns?
  */
 public class TripPatternCache {
 
@@ -86,7 +86,7 @@ public class TripPatternCache {
    * implementation of TripPatternIdGenerator.
    * This method is not static because it references a monotonically increasing integer counter.
    * But like in SiriTripPatternIdGenerator, this could be encapsulated outside the cache object.
-   * TODO: create GtfsRtTripPatternIdGenerator as part of merging the two TripPatternCaches
+   * TODO RT_AB: create GtfsRtTripPatternIdGenerator as part of merging the two TripPatternCaches.
    */
   private FeedScopedId generateUniqueTripPatternCode(Trip trip) {
     FeedScopedId routeId = trip.getRoute().getId();

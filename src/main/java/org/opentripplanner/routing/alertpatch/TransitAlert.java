@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
  * of the transit system which will be displayed to users as text.
  * Although they have flags describing the effect of the problem described in the text, convention
  * is that these messages do not modify routing behavior on their own. They must be accompanied by
- * other messages such as
+ * messages of other types to actually impact routing.
  */
 public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAlertBuilder> {
 

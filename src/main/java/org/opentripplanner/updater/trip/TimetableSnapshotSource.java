@@ -89,10 +89,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock. By design, only one thread should
-   * ever be writing to this buffer. But we need to suspend writes while we're indexing and swapping
-   * out the buffer (Or do we? Can't we just make a new copy of the buffer first?)
-   * TODO: research why this lock is needed since only one thread should ever be writing to this buffer.
-   *   Instead we should throw an exception if a writing section is entered by more than one thread.
+   * ever be writing to this buffer.
+   * TODO RT_AB: research and document why this lock is needed since only one thread should ever be
+   *   writing to this buffer. One possible reason may be a need to suspend writes while indexing
+   *   and swapping out the buffer. But the original idea was to make a new copy of the buffer
+   *   before re-indexing it. While refactoring or rewriting parts of this system, we could throw
+   *   an exception if a writing section is entered by more than one thread.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
 
@@ -121,7 +123,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * Should expired real-time data be purged from the graph.
-   * TODO clarify exactly what this means? In what circumstances would you want to turn it off?
+   * TODO RT_AB: Clarify exactly what "purge" means and in what circumstances would one turn it off.
    */
   private final boolean purgeExpiredData;
 

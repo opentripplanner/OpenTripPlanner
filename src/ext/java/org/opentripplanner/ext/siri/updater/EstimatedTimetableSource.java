@@ -4,9 +4,9 @@ import java.util.Optional;
 import uk.org.siri.siri20.Siri;
 
 /**
- * Interface for a blocking, polling approach
- * TODO should the methods return as fast as possible?
- * Or do they intentionally wait for refreshed data?
+ * Interface for a blocking, polling approach to retrieving SIRI realtime timetable updates.
+ * TODO RT_AB: Clearly document whether the methods should return as fast as possible, or if they
+ *  should intentionally block and wait for refreshed data, and how this fits into the design.
  */
 public interface EstimatedTimetableSource {
   /**
