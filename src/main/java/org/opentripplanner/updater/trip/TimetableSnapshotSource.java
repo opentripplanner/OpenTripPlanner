@@ -271,12 +271,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           // starts for example at 40:00, yesterday would probably be a better guess.
           serviceDate = localDateNow.get();
         }
+        // Determine what kind of trip update this is
+        final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
+          tripDescriptor
+        );
         var canceledPreviouslyAddedTrip = false;
         if (!fullDataset) {
           // Check whether trip id has been used for previously ADDED trip message and mark previously
-          // created trip as DELETED
+          // created trip as DELETED unless schedule relationship is CANCELED, then as CANCEL
+          var cancelationType = tripScheduleRelationship ==
+            TripDescriptor.ScheduleRelationship.CANCELED
+            ? CancelationType.CANCEL
+            : CancelationType.DELETE;
           canceledPreviouslyAddedTrip =
-            cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
+            cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
           // Remove previous realtime updates for this trip. This is necessary to avoid previous
           // stop pattern modifications from persisting
           this.buffer.removePreviousRealtimeUpdate(tripId, serviceDate);
@@ -285,11 +293,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         uIndex += 1;
         LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
         LOG.trace("{}", tripUpdate);
-
-        // Determine what kind of trip update this is
-        final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
-          tripDescriptor
-        );
 
         Result<UpdateSuccess, UpdateError> result;
         try {
