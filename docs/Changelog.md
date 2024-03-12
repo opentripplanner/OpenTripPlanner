@@ -99,6 +99,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove configurable car speed and determine it in graph build [#5657](https://github.com/opentripplanner/OpenTripPlanner/pull/5657)
 - Avoid cumulative real-time updates [#5705](https://github.com/opentripplanner/OpenTripPlanner/pull/5705)
 - Fix time penalty [#5715](https://github.com/opentripplanner/OpenTripPlanner/pull/5715)
+- Fix world envelope builder when crossing Greenwich meridian [#5731](https://github.com/opentripplanner/OpenTripPlanner/pull/5731)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
