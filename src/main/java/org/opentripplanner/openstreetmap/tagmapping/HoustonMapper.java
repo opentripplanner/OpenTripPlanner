@@ -26,6 +26,10 @@ class HoustonMapper implements OsmTagMapper {
       new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
       withModes(NONE)
     );
+
+    // Max speed limit in Texas is 38 m/s ~= 85 mph ~= 137 kph
+    props.maxPossibleCarSpeed = 38f;
+
     // Read the rest from the default set
     new DefaultMapper().populateProperties(props);
   }

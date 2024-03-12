@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -24,7 +25,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.test.support.VariableSource;
 
 public class StreetEdgeRentalTraversalTest {
 
@@ -42,18 +42,20 @@ public class StreetEdgeRentalTraversalTest {
     );
   }
 
-  static Stream<Arguments> allowedToTraverse = Stream
-    .of(
-      StreetTraversalPermission.ALL,
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      StreetTraversalPermission.BICYCLE
-    )
-    .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+  static Stream<Arguments> allowedToTraverse() {
+    return Stream
+      .of(
+        StreetTraversalPermission.ALL,
+        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+        StreetTraversalPermission.BICYCLE
+      )
+      .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+  }
 
   @ParameterizedTest(
     name = "Form factor {0}, street mode {1} should be able to traverse edge with permission {2}"
   )
-  @VariableSource("allowedToTraverse")
+  @MethodSource("allowedToTraverse")
   void scooterBicycleTraversal(
     RentalFormFactor formFactor,
     StreetMode streetMode,
@@ -74,14 +76,16 @@ public class StreetEdgeRentalTraversalTest {
     assertEquals(formFactor.traverseMode, afterTraversal.currentMode());
   }
 
-  static Stream<Arguments> noTraversal = Stream
-    .of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE)
-    .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+  static Stream<Arguments> noTraversal() {
+    return Stream
+      .of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE)
+      .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+  }
 
   @ParameterizedTest(
     name = "Form factor {0}, street mode {1} should not be able to traverse edge with permission {2}"
   )
-  @VariableSource("noTraversal")
+  @MethodSource("noTraversal")
   void noTraversal(
     RentalFormFactor formFactor,
     StreetMode streetMode,

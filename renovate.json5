@@ -25,7 +25,8 @@
         "com.microsoft.azure:azure-servicebus",
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus"
+        "com.azure:azure-messaging-servicebus",
+        "com.azure:azure-identity"
       ],
       "enabled": false
     },
@@ -44,7 +45,8 @@
     // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
     {
       "matchPackageNames": [
-        "org.entur.gbfs:gbfs-java-model"
+        "org.entur.gbfs:gbfs-java-model",
+        "ch.qos.logback:logback-classic"
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",
@@ -104,7 +106,6 @@
         "org.apache.maven.plugins:maven-surefire-plugin",
         "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests
-        "ch.qos.logback:logback-classic",
         // maven plugins
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
@@ -121,6 +122,13 @@
       ],
       "automerge": true,
       "schedule": "after 11pm and before 5am every weekday"
+    },
+    {
+      "description": "give some projects time to publish a changelog before opening the PR",
+      "matchPackagePrefixes": [
+        "com.google.dagger:"
+      ],
+      "minimumReleaseAge": "1 week"
     }
   ],
   "timezone": "Europe/Berlin"

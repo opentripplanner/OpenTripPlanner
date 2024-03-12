@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.path;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareArrivalTime;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareC1;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareDepartureTime;
-import static org.opentripplanner.raptor.api.path.RaptorPath.compareDuration;
+import static org.opentripplanner.raptor.api.path.RaptorPath.compareDurationInclusivePenalty;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareIterationDepartureTime;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareNumberOfTransfers;
 
@@ -12,7 +12,6 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
-import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
@@ -37,7 +36,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  *     <li>Relax c1, if c2 is optimal</li>
  * </ul>
  * The {@code travelDuration} is added as a criteria to the pareto comparator in addition to the
- * parameters used for each stop arrivals. The {@code travelDuration} is only needed at the
+ * parameters used for each stop-arrival. The {@code travelDuration} is only needed at the
  * destination, because Range Raptor works in iterations backwards in time.
  */
 public class PathParetoSetComparators {
@@ -123,7 +122,7 @@ public class PathParetoSetComparators {
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r);
   }
 
@@ -136,7 +135,7 @@ public class PathParetoSetComparators {
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(relaxCost, l, r);
   }
 
@@ -146,7 +145,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r);
   }
 
@@ -156,7 +155,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r);
   }
 
@@ -168,7 +167,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(relaxCost, l, r);
   }
 
@@ -180,7 +179,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(relaxCost, l, r);
   }
 
@@ -193,7 +192,7 @@ public class PathParetoSetComparators {
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r) ||
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
@@ -208,7 +207,7 @@ public class PathParetoSetComparators {
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1RelaxedIfC2IsOptimal(l, r, relaxCost, c2Comp);
   }
 
@@ -218,7 +217,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r) ||
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
@@ -231,7 +230,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1(l, r) ||
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
@@ -245,7 +244,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1RelaxedIfC2IsOptimal(l, r, relaxCost, c2Comp);
   }
 
@@ -258,7 +257,7 @@ public class PathParetoSetComparators {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
-      compareDuration(l, r) ||
+      compareDurationInclusivePenalty(l, r) ||
       compareC1RelaxedIfC2IsOptimal(l, r, relaxCost, c2Comp);
   }
 

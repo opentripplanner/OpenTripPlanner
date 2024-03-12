@@ -56,21 +56,21 @@
 
 
     <properties>
-        <otp.serialization.version.id>146</otp.serialization.version.id>
+        <otp.serialization.version.id>148</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.2</geotools.version>
-        <google.dagger.version>2.50</google.dagger.version>
+        <google.dagger.version>2.51</google.dagger.version>
         <jackson.version>2.16.1</jackson.version>
         <jersey.version>3.1.5</jersey.version>
         <junit.version>5.10.2</junit.version>
-        <micrometer.version>1.12.2</micrometer.version>
+        <micrometer.version>1.12.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.5.0</logback.version>
+        <logback.version>1.5.3</logback.version>
         <lucene.version>9.9.1</lucene.version>
         <slf4j.version>2.0.12</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.26</siri-java-model.version>
-        <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -321,7 +321,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>7.0.0</version>
+                <version>8.0.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -444,7 +444,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -545,7 +545,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.31.0</version>
+                <version>26.34.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -713,7 +713,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.10.0</version>
+            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -907,17 +907,18 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.45.0</version>
+            <version>1.46.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.14.5</version>
+            <version>7.15.0</version>
         </dependency>
         <dependency>
-            <groupId>com.azure.resourcemanager</groupId>
-            <artifactId>azure-resourcemanager-servicebus</artifactId>
-            <version>2.32.0</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.11.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.poole</groupId>

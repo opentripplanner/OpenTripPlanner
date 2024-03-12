@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
@@ -48,7 +49,8 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRe
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -132,6 +134,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
           null,
+          new DefaultStreetLimitationParametersService(new StreetLimitationParameters()),
           null
         ),
         null,
@@ -276,13 +279,12 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req2.preferences().bike().optimizeTriangle());
   }
 
-  static Stream<Arguments> noTriangleCases = VehicleRoutingOptimizeType
-    .nonTriangleValues()
-    .stream()
-    .map(Arguments::of);
+  static Stream<Arguments> noTriangleCases() {
+    return VehicleRoutingOptimizeType.nonTriangleValues().stream().map(Arguments::of);
+  }
 
   @ParameterizedTest
-  @VariableSource("noTriangleCases")
+  @MethodSource("noTriangleCases")
   public void testBikeTriangleFactorsHasNoEffect(VehicleRoutingOptimizeType bot) {
     Map<String, Object> arguments = Map.of(
       "bicycleOptimisationMethod",

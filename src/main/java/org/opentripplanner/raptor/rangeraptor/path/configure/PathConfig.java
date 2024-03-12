@@ -26,7 +26,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /**
  * This class is responsible for creating a a result collector - the set of paths.
  * <p/>
- * This class have REQUEST scope, so a new instance should be created for each new request/travel
+ * This class has REQUEST scope, so a new instance should be created for each new request/travel
  * search.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -57,6 +57,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
       createPathParetoComparator(costConfig, c2Comp),
       ctx.calculator(),
       costConfig.includeC1() ? ctx.costCalculator() : null,
+      ctx.acceptC2AtDestination(),
       ctx.slackProvider(),
       createPathMapper(costConfig.includeC1()),
       ctx.debugFactory(),

@@ -29,6 +29,8 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.server.MetricsLogging;
+import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -53,6 +55,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     EmissionsServiceModule.class,
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
+    StreetLimitationParametersServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -82,6 +85,8 @@ public interface ConstructApplicationFactory {
   @Nullable
   StopConsolidationRepository stopConsolidationRepository();
 
+  StreetLimitationParameters streetLimitationParameters();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -109,6 +114,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
+
+    @BindsInstance
+    Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
 
     ConstructApplicationFactory build();
   }

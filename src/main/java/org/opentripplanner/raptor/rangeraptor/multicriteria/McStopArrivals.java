@@ -2,13 +2,10 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
-import gnu.trove.map.TIntObjectMap;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
@@ -54,7 +51,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initAccessArrivals(accessPaths.arrivedOnBoardByNumOfRides());
+    initAccessArrivals(accessPaths);
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
   }
 
@@ -142,9 +139,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     return arrivals[stop];
   }
 
-  private void initAccessArrivals(TIntObjectMap<List<RaptorAccessEgress>> accessOnBoardByRides) {
-    for (int round : accessOnBoardByRides.keys()) {
-      for (var access : accessOnBoardByRides.get(round)) {
+  private void initAccessArrivals(AccessPaths accessPaths) {
+    int maxNRides = accessPaths.calculateMaxNumberOfRides();
+    for (int nRides = 0; nRides <= maxNRides; ++nRides) {
+      for (var access : accessPaths.arrivedOnBoardByNumOfRides(nRides)) {
         int stop = access.stop();
         arrivals[stop] =
           StopArrivalParetoSet.createStopArrivalSet(
@@ -157,7 +155,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   /**
    * This method creates a ParetoSet for the given egress stop. When arrivals are added to the stop,
-   * the "glue" make sure new destination arrivals is added to the destination arrivals.
+   * the "glue" make sure new destination arrivals are added to the destination arrivals.
    */
   private void glueTogetherEgressStopWithDestinationArrivals(
     EgressPaths egressPaths,
