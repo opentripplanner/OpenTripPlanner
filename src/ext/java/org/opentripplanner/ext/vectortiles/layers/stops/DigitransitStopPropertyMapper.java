@@ -34,30 +34,6 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
-
-    String type = patternsForStop
-      .stream()
-      .map(TripPattern::getMode)
-      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-      .entrySet()
-      .stream()
-      .max(Map.Entry.comparingByValue())
-      .map(Map.Entry::getKey)
-      .map(Enum::name)
-      .orElse(null);
-
-    String routes = JSONArray.toJSONString(
-      transitService
-        .getRoutesForStop(stop)
-        .stream()
-        .map(route -> {
-          JSONObject routeObject = new JSONObject();
-          routeObject.put("gtfsType", route.getGtfsType());
-          return routeObject;
-        })
-        .toList()
-    );
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
       new KeyValue("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
@@ -68,8 +44,37 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
-      new KeyValue("type", type),
-      new KeyValue("routes", routes)
+      new KeyValue("type", getType(transitService, stop)),
+      new KeyValue("routes", getRoutes(transitService, stop))
     );
+  }
+
+  protected static String getRoutes(TransitService transitService, RegularStop stop) {
+    return JSONArray.toJSONString(
+      transitService
+        .getRoutesForStop(stop)
+        .stream()
+        .map(route -> {
+          JSONObject routeObject = new JSONObject();
+          routeObject.put("gtfsType", route.getGtfsType());
+          return routeObject;
+        })
+        .toList()
+    );
+  }
+
+  protected static String getType(TransitService transitService, RegularStop stop) {
+    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
+
+    return patternsForStop
+      .stream()
+      .map(TripPattern::getMode)
+      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+      .entrySet()
+      .stream()
+      .max(Map.Entry.comparingByValue())
+      .map(Map.Entry::getKey)
+      .map(Enum::name)
+      .orElse(null);
   }
 }
