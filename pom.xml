@@ -63,14 +63,14 @@
         <jackson.version>2.16.1</jackson.version>
         <jersey.version>3.1.5</jersey.version>
         <junit.version>5.10.2</junit.version>
-        <micrometer.version>1.12.2</micrometer.version>
+        <micrometer.version>1.12.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.5.3</logback.version>
         <lucene.version>9.9.1</lucene.version>
         <slf4j.version>2.0.12</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.26</siri-java-model.version>
-        <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -545,7 +545,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.31.0</version>
+                <version>26.34.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

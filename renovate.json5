@@ -25,7 +25,8 @@
         "com.microsoft.azure:azure-servicebus",
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus"
+        "com.azure:azure-messaging-servicebus",
+        "com.azure:azure-identity"
       ],
       "enabled": false
     },

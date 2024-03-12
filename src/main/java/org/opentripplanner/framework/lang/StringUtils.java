@@ -1,11 +1,24 @@
 package org.opentripplanner.framework.lang;
 
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 /**
  * OTP String utils extending the Java lang String...
  */
 public class StringUtils {
+
+  /**
+   * Regex to find unprintable characters like newlines and 'ZERO WIDTH SPACE' (U+200B).
+   * <p>
+   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in the
+   * middle of a word.
+   */
+  private static final String INVISIBLE_CHARS_REGEX = "\\p{C}";
+  /**
+   * Patterns are immutable and thread safe.
+   */
+  private static final Pattern INVISIBLE_CHARS_PATTERN = Pattern.compile(INVISIBLE_CHARS_REGEX);
 
   private StringUtils() {}
 
@@ -118,5 +131,15 @@ public class StringUtils {
    */
   public static String kebabCase(String input) {
     return input.toLowerCase().replace('_', '-');
+  }
+
+  /**
+   * Detects unprintable control characters like newlines, tabs and invisible whitespace
+   * like 'ZERO WIDTH SPACE' (U+200B) that don't have an immediate visual representation.
+   * <p>
+   * Note that "regular" whitespace characters like U+0020 and U+2000 are considered visible.
+   */
+  public static boolean containsInvisibleCharacters(String input) {
+    return INVISIBLE_CHARS_PATTERN.matcher(input).find();
   }
 }

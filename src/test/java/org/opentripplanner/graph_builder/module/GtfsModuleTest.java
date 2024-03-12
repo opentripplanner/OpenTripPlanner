@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import static graphql.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ import org.opentripplanner.transit.service.TransitModel;
 class GtfsModuleTest {
 
   @Test
-  public void addShapesForFrequencyTrips() {
+  void addShapesForFrequencyTrips() {
     var model = buildTestModel();
 
     var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS);
@@ -44,13 +45,27 @@ class GtfsModuleTest {
 
     assertEquals(1, frequencyTripPattern.size());
 
-    var tripPattern = frequencyTripPattern.get(0);
+    var tripPattern = frequencyTripPattern.getFirst();
     assertNotNull(tripPattern.getGeometry());
     assertNotNull(tripPattern.getHopGeometry(0));
 
     var pattern = model.transitModel.getTripPatternForId(tripPattern.getId());
     assertNotNull(pattern.getGeometry());
     assertNotNull(pattern.getHopGeometry(0));
+  }
+
+  @Test
+  void duplicateFeedId() {
+    var bundles = List.of(bundle("A"), bundle("A"));
+    var model = buildTestModel();
+
+    var module = new GtfsModule(
+      bundles,
+      model.transitModel,
+      model.graph,
+      ServiceDateInterval.unbounded()
+    );
+    assertThrows(IllegalArgumentException.class, module::buildGraph);
   }
 
   private static TestModels buildTestModel() {
@@ -63,14 +78,14 @@ class GtfsModuleTest {
 
   record TestModels(Graph graph, TransitModel transitModel) {}
 
+  static GtfsBundle bundle(String feedId) {
+    var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
+    b.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
+    return b;
+  }
+
   @Nested
   class Interlining {
-
-    static GtfsBundle bundle(String feedId) {
-      var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
-      b.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
-      return b;
-    }
 
     static List<Arguments> interliningCases() {
       return List.of(
@@ -86,7 +101,7 @@ class GtfsModuleTest {
      */
     @ParameterizedTest(name = "Bundles {0} should generate {1} stay-seated transfers")
     @MethodSource("interliningCases")
-    public void interline(List<GtfsBundle> bundles, int expectedTransfers) {
+    void interline(List<GtfsBundle> bundles, int expectedTransfers) {
       var model = buildTestModel();
 
       var feedIds = bundles.stream().map(GtfsBundle::getFeedId).collect(Collectors.toSet());
