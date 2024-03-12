@@ -138,6 +138,7 @@ public class OtpHttpClient implements AutoCloseable {
 
     HttpClientBuilder httpClientBuilder = HttpClients
       .custom()
+      .setUserAgent("OpenTripPlanner")
       .setConnectionManager(connectionManager)
       .setDefaultRequestConfig(requestConfig(timeout));
 
