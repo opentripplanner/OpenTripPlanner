@@ -1,17 +1,16 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
+import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getRoutes;
+import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getType;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -34,31 +33,6 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
-
-    String type = patternsForStop
-      .stream()
-      .map(TripPattern::getMode)
-      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-      .entrySet()
-      .stream()
-      .max(Map.Entry.comparingByValue())
-      .map(Map.Entry::getKey)
-      .map(Enum::name)
-      .orElse(null);
-
-    String routes = JSONArray.toJSONString(
-      transitService
-        .getRoutesForStop(stop)
-        .stream()
-        .map(route -> {
-          JSONObject routeObject = new JSONObject();
-          routeObject.put("gtfsType", route.getGtfsType());
-          return routeObject;
-        })
-        .toList()
-    );
-
     String alerts = JSONArray.toJSONString(
       transitService
         .getTransitAlertService()
@@ -82,8 +56,8 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
-      new KeyValue("type", type),
-      new KeyValue("routes", routes),
+      new KeyValue("type", getType(transitService, stop)),
+      new KeyValue("routes", getRoutes(transitService, stop)),
       new KeyValue("alerts", alerts)
     );
   }
