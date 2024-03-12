@@ -29,7 +29,7 @@ risk - even if the environment changed.
 ### Aborting on invalid configuration
 
 If you want OTP to abort the startup when encountering unknown configuration parameters, you can add 
-the flag `--configCheck` to your regular OTP CLI commands.
+the flag `--abortOnUnknownConfig` to your regular OTP CLI commands.
 
 This should of course be used wisely as it can also accidentally make your production instances refuse 
 to start up.

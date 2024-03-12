@@ -109,7 +109,7 @@ public class ConfigModel {
   /**
    * Checks if any unknown or invalid properties were encountered while loading the configuration.
    */
-  public boolean hasIUnknownProperties() {
+  public boolean hasUnknownProperties() {
     return (
       otpConfig.hasUnknownProperties() ||
       buildConfig.hasUnknownProperties() ||

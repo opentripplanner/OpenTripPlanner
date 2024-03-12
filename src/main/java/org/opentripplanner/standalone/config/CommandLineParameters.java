@@ -134,10 +134,10 @@ public class CommandLineParameters {
   public boolean visualize;
 
   @Parameter(
-    names = { "--configCheck" },
+    names = { "--abortOnUnknownConfig" },
     description = "Abort the startup if configuration files are found to be invalid."
   )
-  public boolean configCheck = false;
+  public boolean abortOnUnknownConfig = false;
 
   /**
    * The remaining single parameter after the switches is the directory with the configuration
