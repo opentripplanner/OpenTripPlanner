@@ -438,7 +438,7 @@ Used to group requests when monitoring OTP.
 ```JSON
 // router-config.json
 {
-  "configVersion" : "v2.4.0-EN000121",
+  "configVersion" : "v2.5.0-EN000121",
   "server" : {
     "apiProcessingTimeout" : "7s",
     "traceParameters" : [
