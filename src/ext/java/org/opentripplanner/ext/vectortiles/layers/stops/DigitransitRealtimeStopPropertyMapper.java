@@ -28,7 +28,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = ZonedDateTime.now(transitService.getTimeZone()).toInstant();
-    boolean noService = transitService
+    boolean noServiceAlert = transitService
       .getTransitAlertService()
       .getStopAlerts(stop.getId())
       .stream()
@@ -53,15 +53,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       ),
       new KeyValue("type", getType(transitService, stop)),
       new KeyValue("routes", getRoutes(transitService, stop)),
-      new KeyValue(
-        "state",
-        noService ? StopState.OUT_OF_SERVICE.toString() : StopState.OPERATIONAL.toString()
-      )
+      new KeyValue("noServiceAlert", noServiceAlert)
     );
-  }
-
-  enum StopState {
-    OPERATIONAL,
-    OUT_OF_SERVICE,
   }
 }
