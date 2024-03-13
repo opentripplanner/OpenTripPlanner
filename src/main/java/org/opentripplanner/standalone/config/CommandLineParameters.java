@@ -135,7 +135,7 @@ public class CommandLineParameters {
 
   @Parameter(
     names = { "--abortOnUnknownConfig" },
-    description = "Abort the startup if configuration files are found to be invalid."
+    description = "Abort the startup if configuration files are found to contain unknown parameters."
   )
   public boolean abortOnUnknownConfig = false;
 

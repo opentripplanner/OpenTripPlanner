@@ -180,9 +180,9 @@ public class OTPMain {
    * Optionally, check if the config is valid and if not abort the startup process.
    */
   private static void detectUnusedConfigParams(CommandLineParameters cli, ConfigModel config) {
-    if (cli.abortOnUnknownConfig && config.hasUnknownProperties()) {
+    if (cli.abortOnUnknownConfig && config.hasUnknownParameters()) {
       throw new OtpAppException(
-        "Configuration contains invalid properties (see above for details). " +
+        "Configuration contains unknown parameters (see above for details). " +
         "Please fix your configuration or remove --abortOnUnknownConfig from your OTP CLI parameters."
       );
     }

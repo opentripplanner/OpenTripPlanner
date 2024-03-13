@@ -73,9 +73,9 @@ public class OtpConfig {
   }
 
   /**
-   * Checks if any unknown or invalid properties were encountered while loading the configuration.
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
    */
-  public boolean hasUnknownProperties() {
-    return root.hasUnknownProperties();
+  public boolean hasUnknownParameters() {
+    return root.hasUnknownParameters();
   }
 }

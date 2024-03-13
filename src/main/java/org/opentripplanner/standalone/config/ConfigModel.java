@@ -107,13 +107,13 @@ public class ConfigModel {
   }
 
   /**
-   * Checks if any unknown or invalid properties were encountered while loading the configuration.
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
    */
-  public boolean hasUnknownProperties() {
+  public boolean hasUnknownParameters() {
     return (
-      otpConfig.hasUnknownProperties() ||
-      buildConfig.hasUnknownProperties() ||
-      routerConfig.hasUnknownProperties()
+      otpConfig.hasUnknownParameters() ||
+      buildConfig.hasUnknownParameters() ||
+      routerConfig.hasUnknownParameters()
     );
   }
 }
