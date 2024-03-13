@@ -83,7 +83,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git add pom.xml docs/Changelog.md`
     * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
     * `git push`
-* Email the OTP dev and users mailing lists
+* Send a message in Gitter and email the OTP users mailing lists
     * Mention the new version number.
     * Provide links to the new developer documentation.
     * Provide links to the artifacts directory on Maven Central.
