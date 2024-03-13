@@ -34,18 +34,34 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
+    return getKeyValues(
+      stop,
+      i18NStringMapper.mapNonnullToApi(stop.getName()),
+      i18NStringMapper.mapToApi(stop.getDescription()),
+      getType(transitService, stop),
+      getRoutes(transitService, stop)
+    );
+  }
+
+  protected static Collection<KeyValue> getKeyValues(
+    RegularStop stop,
+    String name,
+    String description,
+    String type,
+    String routes
+  ) {
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
-      new KeyValue("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
+      new KeyValue("name", name),
       new KeyValue("code", stop.getCode()),
       new KeyValue("platform", stop.getPlatformCode()),
-      new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
+      new KeyValue("desc", description),
       new KeyValue(
         "parentStation",
         stop.getParentStation() != null ? stop.getParentStation().getId() : null
       ),
-      new KeyValue("type", getType(transitService, stop)),
-      new KeyValue("routes", getRoutes(transitService, stop))
+      new KeyValue("type", type),
+      new KeyValue("routes", routes)
     );
   }
 

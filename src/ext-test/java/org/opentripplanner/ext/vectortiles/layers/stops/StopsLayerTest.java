@@ -158,6 +158,6 @@ public class StopsLayerTest {
     assertEquals("F:name", map.get("gtfsId"));
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
-    assertEquals(true, map.get("noServiceAlert"));
+    assertEquals(true, map.get("closedByServiceAlert"));
   }
 }
