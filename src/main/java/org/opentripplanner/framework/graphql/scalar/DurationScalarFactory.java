@@ -33,7 +33,7 @@ public class DurationScalarFactory {
     @Nonnull
     public String serialize(@Nonnull Object input) throws CoercingSerializeException {
       if (input instanceof Duration duration) {
-        return duration.toString();
+        return DurationUtils.formatDurationWithLeadingMinus(duration);
       }
 
       throw new CoercingSerializeException(input + " cannot be cast to 'Duration'");
