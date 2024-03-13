@@ -1622,7 +1622,7 @@ type Money {
     amount: Float!
 }
 
-""""
+"""
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 
 Negative durations are formatted like `-PT10M`.
