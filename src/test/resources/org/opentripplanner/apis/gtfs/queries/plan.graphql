@@ -17,25 +17,33 @@
             },
         ]) {
         itineraries {
-            startTime
-            endTime
+            start
+            end
             legs {
                 mode
-                startTime
-                endTime
                 from {
                     name
                     lat
                     lon
-                    departureTime
-                    arrivalTime
+                    departure {
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
+                    }
                 }
                 to {
                     name
                     lat
                     lon
-                    departureTime
-                    arrivalTime
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
+                    }
                 }
                 route {
                     gtfsId

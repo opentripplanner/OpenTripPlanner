@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
@@ -34,7 +35,6 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -91,25 +91,30 @@ class RouteRequestMapperTest implements PlanTestConstants {
     testParkingFilters(routeRequest.preferences().parking(TraverseMode.BICYCLE));
   }
 
-  static Stream<Arguments> banningCases = Stream.of(
-    of(Map.of(), "[TransitFilterRequest{}]"),
-    of(
-      Map.of("routes", "trimet:555"),
-      "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:555]}]}]"
-    ),
-    of(Map.of("agencies", ""), "[TransitFilterRequest{not: [SelectRequest{transportModes: []}]}]"),
-    of(
-      Map.of("agencies", "trimet:666"),
-      "[TransitFilterRequest{not: [SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
-    ),
-    of(
-      Map.of("agencies", "trimet:666", "routes", "trimet:444"),
-      "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:444]}, SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
-    )
-  );
+  static Stream<Arguments> banningCases() {
+    return Stream.of(
+      of(Map.of(), "[TransitFilterRequest{}]"),
+      of(
+        Map.of("routes", "trimet:555"),
+        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:555]}]}]"
+      ),
+      of(
+        Map.of("agencies", ""),
+        "[TransitFilterRequest{not: [SelectRequest{transportModes: []}]}]"
+      ),
+      of(
+        Map.of("agencies", "trimet:666"),
+        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
+      ),
+      of(
+        Map.of("agencies", "trimet:666", "routes", "trimet:444"),
+        "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:444]}, SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
+      )
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("banningCases")
+  @MethodSource("banningCases")
   void banning(Map<String, Object> banned, String expectedFilters) {
     Map<String, Object> arguments = Map.of("banned", banned);
 
@@ -119,21 +124,23 @@ class RouteRequestMapperTest implements PlanTestConstants {
     assertEquals(expectedFilters, routeRequest.journey().transit().filters().toString());
   }
 
-  static Stream<Arguments> transportModesCases = Stream.of(
-    of(List.of(), "[ExcludeAllTransitFilter{}]"),
-    of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
-    of(
-      List.of(mode("BUS")),
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
-    ),
-    of(
-      List.of(mode("BUS"), mode("MONORAIL")),
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH, MONORAIL]}]}]"
-    )
-  );
+  static Stream<Arguments> transportModesCases() {
+    return Stream.of(
+      of(List.of(), "[ExcludeAllTransitFilter{}]"),
+      of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
+      of(
+        List.of(mode("BUS")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
+      ),
+      of(
+        List.of(mode("BUS"), mode("MONORAIL")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH, MONORAIL]}]}]"
+      )
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("transportModesCases")
+  @MethodSource("transportModesCases")
   void modes(List<Map<String, Object>> modes, String expectedFilters) {
     Map<String, Object> arguments = Map.of("transportModes", modes);
 
@@ -172,13 +179,15 @@ class RouteRequestMapperTest implements PlanTestConstants {
     );
   }
 
-  static Stream<Arguments> noTriangleCases = Arrays
-    .stream(GraphQLTypes.GraphQLOptimizeType.values())
-    .filter(value -> value != GraphQLTypes.GraphQLOptimizeType.TRIANGLE)
-    .map(Arguments::of);
+  static Stream<Arguments> noTriangleCases() {
+    return Arrays
+      .stream(GraphQLTypes.GraphQLOptimizeType.values())
+      .filter(value -> value != GraphQLTypes.GraphQLOptimizeType.TRIANGLE)
+      .map(Arguments::of);
+  }
 
   @ParameterizedTest
-  @VariableSource("noTriangleCases")
+  @MethodSource("noTriangleCases")
   void noTriangle(GraphQLTypes.GraphQLOptimizeType bot) {
     Map<String, Object> arguments = Map.of(
       "optimize",

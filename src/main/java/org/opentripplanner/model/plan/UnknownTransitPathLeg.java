@@ -69,6 +69,16 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
+  public LegTime start() {
+    return LegTime.ofStatic(startTime);
+  }
+
+  @Override
+  public LegTime end() {
+    return LegTime.ofStatic(endTime);
+  }
+
+  @Override
   public double getDistanceMeters() {
     return UNKNOWN;
   }

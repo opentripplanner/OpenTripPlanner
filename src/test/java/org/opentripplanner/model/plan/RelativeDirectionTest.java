@@ -15,37 +15,39 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class RelativeDirectionTest {
 
   @SuppressWarnings("unused")
-  static Stream<Arguments> testCasesNormal = Stream.of(
-    // Turn Right
-    tc(0, CONTINUE),
-    tc(17, CONTINUE),
-    tc(18, SLIGHTLY_RIGHT),
-    tc(40, SLIGHTLY_RIGHT),
-    tc(41, RIGHT),
-    tc(114, RIGHT),
-    tc(115, HARD_RIGHT),
-    tc(179, HARD_RIGHT),
-    tc(180, HARD_LEFT),
-    // Turn Left
-    tc(0, CONTINUE),
-    tc(-17, CONTINUE),
-    tc(-18, SLIGHTLY_LEFT),
-    tc(-40, SLIGHTLY_LEFT),
-    tc(-41, LEFT),
-    tc(-114, LEFT),
-    tc(-115, HARD_LEFT),
-    tc(-179, HARD_LEFT),
-    tc(-180, HARD_LEFT),
-    tc(-181, HARD_RIGHT)
-  );
+  static Stream<Arguments> testCasesNormal() {
+    return Stream.of(
+      // Turn Right
+      tc(0, CONTINUE),
+      tc(17, CONTINUE),
+      tc(18, SLIGHTLY_RIGHT),
+      tc(40, SLIGHTLY_RIGHT),
+      tc(41, RIGHT),
+      tc(114, RIGHT),
+      tc(115, HARD_RIGHT),
+      tc(179, HARD_RIGHT),
+      tc(180, HARD_LEFT),
+      // Turn Left
+      tc(0, CONTINUE),
+      tc(-17, CONTINUE),
+      tc(-18, SLIGHTLY_LEFT),
+      tc(-40, SLIGHTLY_LEFT),
+      tc(-41, LEFT),
+      tc(-114, LEFT),
+      tc(-115, HARD_LEFT),
+      tc(-179, HARD_LEFT),
+      tc(-180, HARD_LEFT),
+      tc(-181, HARD_RIGHT)
+    );
+  }
 
   @ParameterizedTest(name = "Turning {0} degrees should give a relative direction of {1}")
-  @VariableSource("testCasesNormal")
+  @MethodSource("testCasesNormal")
   void testCalculateForNormalIntersections(int thisAngleDegrees, RelativeDirection expected) {
     assertEquals(expected, RelativeDirection.calculate(angle(thisAngleDegrees), false));
   }
