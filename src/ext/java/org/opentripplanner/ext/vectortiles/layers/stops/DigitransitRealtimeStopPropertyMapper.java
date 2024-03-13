@@ -8,11 +8,10 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -28,30 +27,19 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    String alerts = JSONArray.toJSONString(
-      transitService
-        .getTransitAlertService()
-        .getStopAlerts(stop.getId())
-        .stream()
-        .map(alert -> {
-          JSONObject alertObject = new JSONObject();
-          Instant currentTime = ZonedDateTime.now(transitService.getTimeZone()).toInstant();
-          if (
-            (
-              alert.getEffectiveStartDate() != null &&
-              alert.getEffectiveStartDate().isBefore(currentTime)
-            ) &&
-            (
-              alert.getEffectiveEndDate() != null &&
-              alert.getEffectiveEndDate().isAfter(currentTime)
-            )
-          ) {
-            alertObject.put("alertEffect", alert.effect().toString());
-          }
-          return alertObject;
-        })
-        .toList()
-    );
+    Instant currentTime = ZonedDateTime.now(transitService.getTimeZone()).toInstant();
+    boolean noService = transitService
+      .getTransitAlertService()
+      .getStopAlerts(stop.getId())
+      .stream()
+      .anyMatch(alert ->
+        alert.effect().equals(AlertEffect.NO_SERVICE) &&
+        (
+          alert.getEffectiveStartDate() != null &&
+          alert.getEffectiveStartDate().isBefore(currentTime)
+        ) &&
+        (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().isAfter(currentTime))
+      );
 
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
@@ -65,7 +53,15 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       ),
       new KeyValue("type", getType(transitService, stop)),
       new KeyValue("routes", getRoutes(transitService, stop)),
-      new KeyValue("alerts", alerts)
+      new KeyValue(
+        "state",
+        noService ? StopState.OUT_OF_SERVICE.toString() : StopState.OPERATIONAL.toString()
+      )
     );
+  }
+
+  enum StopState {
+    OPERATIONAL,
+    OUT_OF_SERVICE,
   }
 }
