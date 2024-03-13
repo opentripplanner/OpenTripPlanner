@@ -69,12 +69,6 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Apply the changes recorded
       in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
     * While still on the tag commit, run `mvn deploy -Prelease`.
-* Set up next development iteration
-    * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
-    * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
-    * `git add pom.xml docs/Changelog.md`
-    * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
-    * `git push`
 * Check that Maven artifact appears on Maven Central
     * [Directory listing of OTP releases on Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/)
     * It may take a while (half an hour) for releases to show up in the central repo after Travis
@@ -82,6 +76,12 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
 * Merge master back into dev (to sync up the Maven artifact version from the POM)
     * `git checkout dev-2.x`
     * `git merge master`
+    * `git push`
+* Set up next development iteration
+    * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
+    * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
+    * `git add pom.xml docs/Changelog.md`
+    * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
     * `git push`
 * Email the OTP dev and users mailing lists
     * Mention the new version number.
