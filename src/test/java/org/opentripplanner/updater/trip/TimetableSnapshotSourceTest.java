@@ -1202,12 +1202,7 @@ public class TimetableSnapshotSourceTest {
       // THEN
       assertAddedTrip(SERVICE_DATE, this.addedTripId, updater, true);
 
-      builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
+      builder = new TripUpdateBuilder(addedTripId, SERVICE_DATE, ADDED, transitModel.getTimeZone());
 
       var tripDescriptorBuilder = TripDescriptor.newBuilder();
       tripDescriptorBuilder.setTripId(addedTripId);
@@ -1280,12 +1275,7 @@ public class TimetableSnapshotSourceTest {
       // THEN
       assertAddedTrip(SERVICE_DATE, this.addedTripId, updater, true);
 
-      builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
+      builder = new TripUpdateBuilder(addedTripId, SERVICE_DATE, ADDED, transitModel.getTimeZone());
 
       var tripDescriptorBuilder = TripDescriptor.newBuilder();
       tripDescriptorBuilder.setTripId(addedTripId);
