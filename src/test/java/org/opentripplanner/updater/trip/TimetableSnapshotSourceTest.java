@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.trip;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.DELETED;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -1173,83 +1176,21 @@ public class TimetableSnapshotSourceTest {
       assertNotNull(transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
     }
 
-    @Test
-    public void cancelingAddedTrip() {
-      // TODO we might want to change the behaviour so that only the trip without pattern is
-      // persisted if the added trip is cancelled
-      var builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
+    static List<Arguments> addedRemovalTestCase() {
+      return List.of(
+        // TODO we might want to change the behaviour so that only the trip without pattern is
+        // persisted if the added trip is cancelled
+        Arguments.of(CANCELED, RealTimeState.CANCELED),
+        Arguments.of(DELETED, RealTimeState.DELETED)
       );
-
-      builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
-
-      var tripUpdate = builder.build();
-
-      var updater = defaultUpdater();
-
-      // WHEN
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        fullDataset,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      // THEN
-      assertAddedTrip(SERVICE_DATE, this.addedTripId, updater, true);
-
-      builder = new TripUpdateBuilder(addedTripId, SERVICE_DATE, ADDED, transitModel.getTimeZone());
-
-      var tripDescriptorBuilder = TripDescriptor.newBuilder();
-      tripDescriptorBuilder.setTripId(addedTripId);
-      tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
-
-      tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
-      tripUpdate = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
-
-      // WHEN
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        fullDataset,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      // THEN
-      // Get trip pattern of last (most recently added) outgoing edge
-      var snapshot = updater.getTimetableSnapshot(true);
-      var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-      var patternsAtA = snapshot.getPatternsForStop(stopA);
-
-      assertNotNull(patternsAtA, "Added trip pattern should be found");
-      var tripPattern = patternsAtA.stream().findFirst().get();
-
-      final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
-      final Timetable schedule = snapshot.resolve(tripPattern, null);
-
-      assertNotSame(forToday, schedule);
-
-      final int forTodayAddedTripIndex = forToday.getTripIndex(addedTripId);
-      assertTrue(
-        forTodayAddedTripIndex > -1,
-        "Added trip should not be found in time table for service date"
-      );
-      assertEquals(
-        RealTimeState.CANCELED,
-        forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-      );
-
-      final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
-      assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
     }
 
-    @Test
-    public void deletingAddedTrip() {
+    @ParameterizedTest
+    @MethodSource("addedRemovalTestCase")
+    public void cancelingAddedTrip(
+      ScheduleRelationship scheduleRelationship,
+      RealTimeState expectedState
+    ) {
       var builder = new TripUpdateBuilder(
         addedTripId,
         SERVICE_DATE,
@@ -1279,7 +1220,7 @@ public class TimetableSnapshotSourceTest {
 
       var tripDescriptorBuilder = TripDescriptor.newBuilder();
       tripDescriptorBuilder.setTripId(addedTripId);
-      tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.DELETED);
+      tripDescriptorBuilder.setScheduleRelationship(scheduleRelationship);
 
       tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
       tripUpdate = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
@@ -1312,10 +1253,7 @@ public class TimetableSnapshotSourceTest {
         forTodayAddedTripIndex > -1,
         "Added trip should not be found in time table for service date"
       );
-      assertEquals(
-        RealTimeState.DELETED,
-        forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-      );
+      assertEquals(expectedState, forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState());
 
       final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
       assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
