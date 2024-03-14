@@ -120,6 +120,7 @@ public class SpeedTest {
         config.flexConfig,
         List.of(),
         null,
+        TestServerContext.createStreetLimitationParametersService(),
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

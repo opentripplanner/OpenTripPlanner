@@ -61,6 +61,8 @@ class UKMapper implements OsmTagMapper {
      * my (marcusyoung) personal experience in obtaining realistic routes.
      *
      */
+    // Max speed limit is 70 mph ~113kmh ~31.3m/s
+    props.maxPossibleCarSpeed = 31.4f;
     props.setCarSpeed("highway=motorway", 30.4f); // ~=68mph
     props.setCarSpeed("highway=motorway_link", 22.4f); // ~= 50mph
     props.setCarSpeed("highway=trunk", 22.4f); // ~=50mph

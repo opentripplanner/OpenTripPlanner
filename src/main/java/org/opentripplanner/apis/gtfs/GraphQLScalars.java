@@ -12,6 +12,7 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.text.ParseException;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -83,27 +84,33 @@ public class GraphQLScalars {
         @Override
         public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof CharSequence cs) {
-            return OffsetDateTimeParser.parseLeniently(cs).orElseThrow(() -> valueException(input));
+            try {
+              return OffsetDateTimeParser.parseLeniently(cs);
+            } catch (ParseException e) {
+              int errorOffset = e.getErrorOffset();
+              throw new CoercingParseValueException(
+                "Cannot parse %s into an OffsetDateTime. Error at character index %s".formatted(
+                    input,
+                    errorOffset
+                  )
+              );
+            }
           }
-          throw valueException(input);
+          throw new CoercingParseValueException(
+            "Cannot parse %s into an OffsetDateTime. Must be a string."
+          );
         }
 
         @Override
         public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof StringValue sv) {
-            return OffsetDateTimeParser
-              .parseLeniently(sv.getValue())
-              .orElseThrow(() -> literalException(input));
+            try {
+              return OffsetDateTimeParser.parseLeniently(sv.getValue());
+            } catch (ParseException e) {
+              throw new CoercingSerializeException();
+            }
           }
-          throw literalException(input);
-        }
-
-        private static CoercingParseValueException valueException(Object input) {
-          return new CoercingParseValueException("Cannot parse %s".formatted(input));
-        }
-
-        private static CoercingParseLiteralException literalException(Object input) {
-          return new CoercingParseLiteralException("Cannot parse %s".formatted(input));
+          throw new CoercingParseLiteralException();
         }
       }
     )
@@ -234,7 +241,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
+  public static final GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()
     .name("GeoJson")
     .description("Geographic data structures in JSON format. See: https://geojson.org/")
@@ -262,7 +269,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType GRAPHQL_ID_SCALAR = GraphQLScalarType
+  public static final GraphQLScalarType GRAPHQL_ID_SCALAR = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(
@@ -302,7 +309,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType
+  public static final GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Grams")
     .coercing(

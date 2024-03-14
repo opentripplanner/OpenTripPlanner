@@ -3,29 +3,12 @@ package org.opentripplanner.apis.gtfs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import graphql.schema.CoercingSerializeException;
-import java.time.Duration;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 
-class GraphQLScalarsTest {
-
-  @Test
-  void duration() {
-    var string = GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(Duration.ofMinutes(30));
-    assertEquals("PT30M", string);
-  }
-
-  @Test
-  void nonDuration() {
-    Assertions.assertThrows(
-      CoercingSerializeException.class,
-      () -> GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(new Object())
-    );
-  }
+class GeoJsonScalarTest {
 
   @Test
   void geoJson() throws JsonProcessingException {

@@ -19,7 +19,6 @@ public class SearchParams {
   private final int earliestDepartureTime;
   private final int latestArrivalTime;
   private final int searchWindowInSeconds;
-  private final int searchWindowAccessSlackInSeconds;
   private final boolean preferLateArrival;
   private final int numberOfAdditionalTransfers;
   private final int maxNumberOfTransfers;
@@ -30,13 +29,12 @@ public class SearchParams {
   private final boolean allowEmptyAccessEgressPaths;
 
   /**
-   * Default values is defined in the default constructor.
+   * Default values are defined in the default constructor.
    */
   private SearchParams() {
     earliestDepartureTime = RaptorConstants.TIME_NOT_SET;
     latestArrivalTime = RaptorConstants.TIME_NOT_SET;
     searchWindowInSeconds = RaptorConstants.NOT_SET;
-    searchWindowAccessSlackInSeconds = 0;
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
     maxNumberOfTransfers = RaptorConstants.NOT_SET;
@@ -51,7 +49,6 @@ public class SearchParams {
     this.earliestDepartureTime = builder.earliestDepartureTime();
     this.latestArrivalTime = builder.latestArrivalTime();
     this.searchWindowInSeconds = builder.searchWindowInSeconds();
-    this.searchWindowAccessSlackInSeconds = builder.searchWindowAccessSlackInSeconds();
     this.preferLateArrival = builder.preferLateArrival();
     this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
@@ -71,13 +68,6 @@ public class SearchParams {
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
-  }
-
-  /**
-   * The {@link #earliestDepartureTime()} including search-window-access-slack.
-   */
-  public int routerEarliestDepartureTime() {
-    return earliestDepartureTime - searchWindowAccessSlackInSeconds;
   }
 
   public boolean isEarliestDepartureTimeSet() {
@@ -102,10 +92,10 @@ public class SearchParams {
   /**
    * The time window used to search. The unit is seconds.
    * <p>
-   * For a *depart by search*, this is added to the 'earliestDepartureTime' to find the
+   * For a *depart-by-search*, this is added to the 'earliestDepartureTime' to find the
    * 'latestDepartureTime'.
    * <p>
-   * For a *arrive by search* this is used to calculate the 'earliestArrivalTime'. The algorithm
+   * For an *arrive-by-search* this is used to calculate the 'earliestArrivalTime'. The algorithm
    * will find all optimal travels within the given time window.
    * <p>
    * Set the search window to 0 (zero) to run 1 iteration.
@@ -114,26 +104,6 @@ public class SearchParams {
    */
   public int searchWindowInSeconds() {
     return searchWindowInSeconds;
-  }
-
-  /**
-   * The {@link #searchWindowInSeconds()} plus search-window-access-slack.
-   */
-  public int routerSearchWindowInSeconds() {
-    return searchWindowInSeconds == 0
-      ? 0
-      : searchWindowInSeconds() + searchWindowAccessSlackInSeconds;
-  }
-
-  /**
-   * A slack to force Raptor to start the iterations before the earliest-departure-time.
-   * This will enable paths starting before the earliest-departure-time to be included in the
-   * result. This is useful if these paths are used to prune other paths(filtering) or if a
-   * path only can be time-shifted AFTER the search - this enables us to add a time-penalty
-   * to access.
-   */
-  public int searchWindowAccessSlackInSeconds() {
-    return searchWindowAccessSlackInSeconds;
   }
 
   public boolean isSearchWindowSet() {

@@ -547,7 +547,9 @@ class DefaultMapper implements OsmTagMapper {
     props.setCarSpeed("highway=road", 11.2f); // ~= 25 mph
 
     // default ~= 25 mph
-    props.defaultSpeed = 11.2f;
+    props.defaultCarSpeed = 11.2f;
+    // 38 m/s ~= 85 mph ~= 137 kph
+    props.maxPossibleCarSpeed = 38f;
 
     /* special situations */
 

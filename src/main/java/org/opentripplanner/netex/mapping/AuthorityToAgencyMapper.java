@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;
 
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.AgencyBuilder;
@@ -33,9 +34,13 @@ class AuthorityToAgencyMapper {
    * Map authority and time zone to OTP agency.
    */
   Agency mapAuthorityToAgency(Authority source) {
+    String name = MultilingualStringMapper.nullableValueOf(source.getName());
+    String shortName = MultilingualStringMapper.nullableValueOf(source.getShortName());
+    String agencyName = StringUtils.hasValue(name) ? name : shortName;
+
     AgencyBuilder target = Agency
       .of(idFactory.createId(source.getId()))
-      .withName(source.getName().getValue())
+      .withName(agencyName)
       .withTimezone(timeZone);
 
     withOptional(

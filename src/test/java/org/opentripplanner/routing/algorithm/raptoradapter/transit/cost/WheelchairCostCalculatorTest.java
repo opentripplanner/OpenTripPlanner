@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 public class WheelchairCostCalculatorTest {
@@ -34,14 +34,16 @@ public class WheelchairCostCalculatorTest {
   );
   private final TestTripSchedule.Builder scheduleBuilder = TestTripSchedule.schedule("12:00 12:01");
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(Accessibility.POSSIBLE, 0),
-    Arguments.of(Accessibility.NO_INFORMATION, UNKNOWN_ACCESSIBILITY_COST),
-    Arguments.of(Accessibility.NOT_POSSIBLE, INACCESSIBLE_TRIP_COST)
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      Arguments.of(Accessibility.POSSIBLE, 0),
+      Arguments.of(Accessibility.NO_INFORMATION, UNKNOWN_ACCESSIBILITY_COST),
+      Arguments.of(Accessibility.NOT_POSSIBLE, INACCESSIBLE_TRIP_COST)
+    );
+  }
 
   @ParameterizedTest(name = "accessibility of {0} should add an extra cost of {1}")
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   public void calculateExtraBoardingCost(Accessibility wcb, int expectedExtraCost) {
     var schedule = scheduleBuilder.wheelchairBoarding(wcb).build();
 

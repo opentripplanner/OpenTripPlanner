@@ -181,10 +181,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     int fromTime = accessPathLeg.fromTime();
 
-    if (accessPath.hasPenalty()) {
-      fromTime = accessPath.timeShiftDepartureTimeToActualTime(fromTime);
-    }
-
     return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).getLegs();
   }
 

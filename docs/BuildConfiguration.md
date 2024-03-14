@@ -40,7 +40,7 @@ Sections follow that describe particular settings in more depth.
 | [readCachedElevations](#readCachedElevations)                            |  `boolean`  | Whether to read cached elevation data.                                                                                                                         | *Optional* | `true`                            |  2.0  |
 | staticBikeParkAndRide                                                    |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
 | staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
-| stopConsolidationFile                                                    |   `string`  | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
+| stopConsolidationFile                                                    |    `uri`    | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
 | [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
 | [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
 | [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
@@ -945,7 +945,7 @@ the local filesystem.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osm/[0]   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
@@ -953,7 +953,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osmDefaults   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
 

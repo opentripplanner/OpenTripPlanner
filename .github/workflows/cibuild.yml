@@ -75,7 +75,7 @@ jobs:
       # on windows there are frequent failures caused by page files being too small
       # https://github.com/actions/virtual-environments/issues/785
       - name: Configure Windows Pagefile
-        uses: al-cheb/configure-pagefile-action@v1.3
+        uses: al-cheb/configure-pagefile-action@v1.4
       - name: Run tests
         run: mvn --batch-mode test -P prettierSkip
 
@@ -87,7 +87,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: 2.4.0
+      MASTER_BRANCH_VERSION: 2.5.0
 
     steps:
 

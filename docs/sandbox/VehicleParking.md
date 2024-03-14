@@ -196,7 +196,7 @@ Tags to add to the parking lots.
 | [feedId](#u__4__feedId)         |     `string`    | The name of the data source.                                               | *Required* |               |  2.2  |
 | frequency                       |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.3  |
 | [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
-| url                             |     `string`    | URL of the locations endpoint.                                             | *Optional* |               |  2.3  |
+| url                             |      `uri`      | URL of the locations endpoint.                                             | *Optional* |               |  2.3  |
 | [headers](#u__4__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 

@@ -482,7 +482,6 @@ Used to group requests when monitoring OTP.
       }
     },
     "car" : {
-      "speed" : 40,
       "reluctance" : 10,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
@@ -646,6 +645,14 @@ Used to group requests when monitoring OTP.
         "name" : "stops",
         "type" : "Stop",
         "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "areaStops",
+        "type" : "AreaStop",
+        "mapper" : "OTPRR",
         "maxZoom" : 20,
         "minZoom" : 14,
         "cacheMaxSeconds" : 600

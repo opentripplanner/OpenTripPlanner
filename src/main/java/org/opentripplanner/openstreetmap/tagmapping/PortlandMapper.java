@@ -40,6 +40,10 @@ class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties(exact("sidewalk=no;maxspeed=40 mph"), ofWalkSafety(3));
     props.setMixinProperties(exact("sidewalk=no;maxspeed=35 mph"), ofWalkSafety(2));
     props.setMixinProperties(exact("sidewalk=no;maxspeed=30 mph"), ofWalkSafety(1.5));
+
+    // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
+    props.maxPossibleCarSpeed = 31.4f;
+
     // Read the rest from the default set
     new DefaultMapper().populateProperties(props);
   }

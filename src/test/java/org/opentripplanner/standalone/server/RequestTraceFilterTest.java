@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class RequestTraceFilterTest {
 
@@ -19,22 +19,24 @@ class RequestTraceFilterTest {
   private static final String A_TOO_LONG_STRING = A_VERY_LONG_STRING + "1";
 
   @SuppressWarnings("unused")
-  private static final Stream<Arguments> headerCheckTestCases = Stream.of(
-    Arguments.of(true, "ok"),
-    Arguments.of(true, "special characters: -_,;.:!#$%&/(){}[]=?+"),
-    Arguments.of(true, "quote: \"quoted\" 'single' `back` ´forward´"),
-    Arguments.of(true, "international characters: æøå öâò≈∰🧐"),
-    Arguments.of(true, A_VERY_LONG_STRING),
-    Arguments.of(false, A_TOO_LONG_STRING),
-    Arguments.of(false, "Vertical space new-line: -\n-"),
-    Arguments.of(false, "Vertical space return: -\r-"),
-    Arguments.of(false, "Vertical space form-feed: -\f-"),
-    Arguments.of(false, "Control character 0x01: -\u0001-"),
-    Arguments.of(false, "Control character 0x19: -\u0019-")
-  );
+  private static final Stream<Arguments> headerCheckTestCases() {
+    return Stream.of(
+      Arguments.of(true, "ok"),
+      Arguments.of(true, "special characters: -_,;.:!#$%&/(){}[]=?+"),
+      Arguments.of(true, "quote: \"quoted\" 'single' `back` ´forward´"),
+      Arguments.of(true, "international characters: æøå öâò≈∰🧐"),
+      Arguments.of(true, A_VERY_LONG_STRING),
+      Arguments.of(false, A_TOO_LONG_STRING),
+      Arguments.of(false, "Vertical space new-line: -\n-"),
+      Arguments.of(false, "Vertical space return: -\r-"),
+      Arguments.of(false, "Vertical space form-feed: -\f-"),
+      Arguments.of(false, "Control character 0x01: -\u0001-"),
+      Arguments.of(false, "Control character 0x19: -\u0019-")
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("headerCheckTestCases")
+  @MethodSource("headerCheckTestCases")
   void headerCheck(boolean expectedMatch, String input) {
     assertEquals(
       expectedMatch,
