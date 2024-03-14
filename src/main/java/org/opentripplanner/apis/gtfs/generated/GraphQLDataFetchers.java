@@ -817,7 +817,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> viewer();
   }
 
-  public interface GraphQLRealtimeEstimate {
+  /** Real-time estimates for a vehicle at a certain place. */
+  public interface GraphQLRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
 
     public DataFetcher<java.time.OffsetDateTime> time();

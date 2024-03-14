@@ -26,7 +26,6 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Grams
-    OffsetDateTime: java.time.OffsetDateTime
     Duration: java.time.Duration
     Cost: org.opentripplanner.framework.model.Cost
     CoordinateValue: Double
