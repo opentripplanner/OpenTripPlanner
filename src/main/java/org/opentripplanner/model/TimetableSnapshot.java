@@ -112,26 +112,6 @@ public class TimetableSnapshot {
   private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
 
   /**
-   * This is an AS YET UNUSED alternative to the current boolean fields readOnly and dirty, as well
-   * as setting dirtyTimetables to null. A given instance of TimetableSnapshot should progress
-   * through all these states in order, and cannot return to a previous state.
-   */
-  private enum TimetableSnapshotState {
-    WRITABLE_CLEAN,
-    WRITBLE_DIRTY,
-    INDEXING,
-    READ_ONLY,
-  }
-
-  /**
-   * Which stage of existence this TimetableSnapshot is in, which determines whether it's read-only.
-   * Writing to TimetableSnapshots is not concurrent and does not happen in hot methods. On the
-   * other hand, reading is expected to be highly concurrent and happens during core routing
-   * processes. Therefore, any assertions about state should be concentrated in the writing methods.
-   */
-  // private TimetableSnapshotState state;
-
-  /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
    * shouldn't be possible to change it to false anymore.
    */
