@@ -4247,7 +4247,7 @@ type QueryType {
         search for next or previous pages with `after` or `before` cursors, this field is ignored and
         `first` or `last` should be used instead.
         """
-        numberOfItineraries: Int = 50
+        numberOfItineraries: Int
 
         """
         The origin where the search starts. Usually coordinates but can also be a stop location.
@@ -5145,7 +5145,7 @@ input TimetablePreferencesInput {
     realistic as the transfers could be invalid due to delays,
     trips can be cancelled or stops can be skipped.
     """
-    excludeRealTimeUpdates: Boolean = false
+    excludeRealTimeUpdates: Boolean
 
     """
     When true, departures that have been cancelled ahead of time will be
@@ -5154,7 +5154,7 @@ input TimetablePreferencesInput {
     could be filtered out as the alternative containing a cancellation would normally
     be better.
     """
-    includePlannedCancellations: Boolean = false
+    includePlannedCancellations: Boolean
 
     """
     When true, departures that have been cancelled through a real-time feed will be
@@ -5163,7 +5163,7 @@ input TimetablePreferencesInput {
     could be filtered out as the alternative containing a cancellation would normally
     be better. This option can't be set to true while `includeRealTimeUpdates` is false.
     """
-    includeRealTimeCancellations: Boolean = false
+    includeRealTimeCancellations: Boolean
 }
 
 """
