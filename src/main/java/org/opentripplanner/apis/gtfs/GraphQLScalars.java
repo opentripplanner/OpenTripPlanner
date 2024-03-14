@@ -121,6 +121,8 @@ public class GraphQLScalars {
     .name("CoordinateValue")
     .coercing(
       new Coercing<Double, Double>() {
+        private static final String VALIDATION_ERROR_MESSAGE = "Not a valid WGS84 coordinate value";
+
         @Override
         public Double serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
@@ -141,9 +143,7 @@ public class GraphQLScalars {
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
             return validateCoordinate(doubleValue)
-              .orElseThrow(() ->
-                new CoercingParseValueException("Not a valid WGS84 coordinate value")
-              );
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -152,16 +152,13 @@ public class GraphQLScalars {
 
         @Override
         public Double parseLiteral(Object input) throws CoercingParseLiteralException {
-          var validationException = new CoercingParseLiteralException(
-            "Not a valid WGS84 coordinate value"
-          );
           if (input instanceof FloatValue coordinate) {
             return validateCoordinate(coordinate.getValue().doubleValue())
-              .orElseThrow(() -> validationException);
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           if (input instanceof IntValue coordinate) {
             return validateCoordinate(coordinate.getValue().doubleValue())
-              .orElseThrow(() -> validationException);
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
@@ -184,6 +181,8 @@ public class GraphQLScalars {
     .coercing(
       new Coercing<Cost, Integer>() {
         private static final int MAX_COST = 1000000;
+        private static final String VALIDATION_ERROR_MESSAGE =
+          "Cost cannot be negative or greater than %d".formatted(MAX_COST);
 
         @Override
         public Integer serialize(@Nonnull Object dataFetcherResult)
@@ -204,15 +203,8 @@ public class GraphQLScalars {
         @Override
         public Cost parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Integer intValue) {
-            if (intValue < 0) {
-              throw new CoercingParseValueException("Cost cannot be negative");
-            }
-            if (intValue > MAX_COST) {
-              throw new CoercingParseValueException(
-                "Cost cannot be greater than %d".formatted(MAX_COST)
-              );
-            }
-            return Cost.costOfSeconds(intValue);
+            return validateCost(intValue)
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(
             "Expected an integer, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -223,19 +215,19 @@ public class GraphQLScalars {
         public Cost parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof IntValue intValue) {
             var value = intValue.getValue().intValue();
-            if (value < 0) {
-              throw new CoercingParseLiteralException("Cost cannot be negative");
-            }
-            if (value > MAX_COST) {
-              throw new CoercingParseLiteralException(
-                "Cost cannot be greater than %d".formatted(MAX_COST)
-              );
-            }
-            return Cost.costOfSeconds(value);
+            return validateCost(value)
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseLiteralException(
             "Expected an integer, got: " + input.getClass().getSimpleName()
           );
+        }
+
+        private static Optional<Cost> validateCost(int cost) {
+          if (cost >= 0 && cost <= MAX_COST) {
+            return Optional.of(Cost.costOfSeconds(cost));
+          }
+          return Optional.empty();
         }
       }
     )
@@ -349,12 +341,13 @@ public class GraphQLScalars {
     .name("Ratio")
     .coercing(
       new Coercing<Double, Double>() {
+        private static final String VALIDATION_ERROR_MESSAGE =
+          "Value is under 0 or greater than 1.";
+
         @Override
         public Double serialize(@Nonnull Object dataFetcherResult)
           throws CoercingSerializeException {
-          var validationException = new CoercingSerializeException(
-            "Value is less than 0 or greater than 1."
-          );
+          var validationException = new CoercingSerializeException(VALIDATION_ERROR_MESSAGE);
           if (dataFetcherResult instanceof Double doubleValue) {
             return validateRatio(doubleValue).orElseThrow(() -> validationException);
           } else if (dataFetcherResult instanceof Float floatValue) {
@@ -372,9 +365,7 @@ public class GraphQLScalars {
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
             return validateRatio(doubleValue)
-              .orElseThrow(() ->
-                new CoercingParseValueException("Value is less than 0 or greater than 1.")
-              );
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -383,16 +374,13 @@ public class GraphQLScalars {
 
         @Override
         public Double parseLiteral(Object input) throws CoercingParseLiteralException {
-          var validationException = new CoercingParseLiteralException(
-            "Value is under 0 or greater than 1."
-          );
           if (input instanceof FloatValue ratio) {
             return validateRatio(ratio.getValue().doubleValue())
-              .orElseThrow(() -> validationException);
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           if (input instanceof IntValue ratio) {
             return validateRatio(ratio.getValue().doubleValue())
-              .orElseThrow(() -> validationException);
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
@@ -414,7 +402,10 @@ public class GraphQLScalars {
     .name("Reluctance")
     .coercing(
       new Coercing<Double, Double>() {
+        private static final double MIN_Reluctance = 0.1;
         private static final double MAX_Reluctance = 100000;
+        private static final String VALIDATION_ERROR_MESSAGE =
+          "Reluctance needs to be between %s and %s".formatted(MIN_Reluctance, MAX_Reluctance);
 
         @Override
         public Double serialize(@Nonnull Object dataFetcherResult)
@@ -435,15 +426,8 @@ public class GraphQLScalars {
         @Override
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
-            if (Double.doubleToRawLongBits(doubleValue) < 0) {
-              throw new CoercingParseValueException("Reluctance cannot be negative");
-            }
-            if (doubleValue > MAX_Reluctance + 0.001) {
-              throw new CoercingParseValueException(
-                "Reluctance cannot be greater than %s".formatted(MAX_Reluctance)
-              );
-            }
-            return doubleValue;
+            return validateReluctance(doubleValue)
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -453,26 +437,23 @@ public class GraphQLScalars {
         @Override
         public Double parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof FloatValue reluctance) {
-            return validateLiteral(reluctance.getValue().doubleValue());
+            return validateReluctance(reluctance.getValue().doubleValue())
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           if (input instanceof IntValue reluctance) {
-            return validateLiteral(reluctance.getValue().doubleValue());
+            return validateReluctance(reluctance.getValue().doubleValue())
+              .orElseThrow(() -> new CoercingParseLiteralException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()
           );
         }
 
-        private static double validateLiteral(double reluctance) {
-          if (Double.doubleToRawLongBits(reluctance) < 0) {
-            throw new CoercingParseLiteralException("Reluctance cannot be negative");
+        private static Optional<Double> validateReluctance(double reluctance) {
+          if (reluctance >= MIN_Reluctance - 0.001 && reluctance <= MAX_Reluctance + 0.001) {
+            return Optional.of(reluctance);
           }
-          if (reluctance > MAX_Reluctance + 0.001) {
-            throw new CoercingParseLiteralException(
-              "Reluctance cannot be greater than %s".formatted(MAX_Reluctance)
-            );
-          }
-          return reluctance;
+          return Optional.empty();
         }
       }
     )

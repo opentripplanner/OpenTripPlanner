@@ -16,8 +16,9 @@ import org.junit.jupiter.api.Test;
 class ReluctanceScalarTest {
 
   private static final Double HALF = 0.5;
+  private static final int ONE = 1;
   private static final double TOO_HIGH = 100001;
-  private static final double TOO_LOW = -0.1;
+  private static final double TOO_LOW = 0;
   private static final String TEXT = "foo";
   private static final double DELTA = 0.0001;
 
@@ -60,8 +61,8 @@ class ReluctanceScalarTest {
     assertEquals(HALF, reluctanceDouble, DELTA);
     var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR
       .getCoercing()
-      .parseLiteral(new IntValue(BigInteger.valueOf(HALF.intValue())));
-    assertEquals(HALF.intValue(), reluctanceInt, DELTA);
+      .parseLiteral(new IntValue(BigInteger.valueOf(ONE)));
+    assertEquals(ONE, reluctanceInt, DELTA);
     assertThrows(
       CoercingParseLiteralException.class,
       () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
