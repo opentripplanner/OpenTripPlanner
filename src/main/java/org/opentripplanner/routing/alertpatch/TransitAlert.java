@@ -196,7 +196,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
    * @param instant
    * @return
    */
-  public boolean noServiceOn(Instant instant) {
+  public boolean noServiceAt(Instant instant) {
     return (
       effect.equals(AlertEffect.NO_SERVICE) &&
       (getEffectiveStartDate() != null && getEffectiveStartDate().isBefore(instant)) &&

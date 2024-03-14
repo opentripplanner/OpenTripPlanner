@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getKeyValues;
-import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getRoutes;
-import static org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper.getType;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -32,15 +30,9 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       .getTransitAlertService()
       .getStopAlerts(stop.getId())
       .stream()
-      .anyMatch(alert -> alert.noServiceOn(currentTime));
+      .anyMatch(alert -> alert.noServiceAt(currentTime));
 
-    Collection<KeyValue> sharedKeyValues = getKeyValues(
-      stop,
-      i18NStringMapper.mapNonnullToApi(stop.getName()),
-      i18NStringMapper.mapToApi(stop.getDescription()),
-      getType(transitService, stop),
-      getRoutes(transitService, stop)
-    );
+    Collection<KeyValue> sharedKeyValues = getKeyValues(stop, i18NStringMapper, transitService);
     Collection<KeyValue> keyValues = ListUtils.combine(
       sharedKeyValues,
       List.of(new KeyValue("closedByServiceAlert", noServiceAlert))
