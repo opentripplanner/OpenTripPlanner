@@ -10,6 +10,7 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import java.io.InputStreamReader;
@@ -46,6 +47,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
   private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
   private final String topicName;
+  private final Duration autoDeleteOnIdle;
+  private final int prefetchCount;
 
   protected WriteToGraphCallback saveResultOnGraph;
   private ServiceBusProcessorClient eventProcessor;
@@ -73,6 +76,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.feedId();
+    this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
+    this.prefetchCount = config.getPrefetchCount();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
@@ -122,10 +127,11 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
           .buildAsyncClient();
     }
 
-    // If Idle more then one day, then delete subscription so we don't have old obsolete subscriptions on Azure Service Bus
+    // Set options
     var options = new CreateSubscriptionOptions();
     options.setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS));
-    options.setAutoDeleteOnIdle(Duration.ofDays(1));
+    // Set subscription to be deleted if idle for a certain time, so that orphaned instances doesn't linger.
+    options.setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
     if (
@@ -150,15 +156,18 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         .processor()
         .topicName(topicName)
         .subscriptionName(subscriptionName)
+        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+        .prefetchCount(prefetchCount)
         .processError(errorConsumer)
         .processMessage(messageConsumer)
         .buildProcessorClient();
 
     eventProcessor.start();
     LOG.info(
-      "Service Bus processor started for topic {} and subscription {}",
+      "Service Bus processor started for topic '{}' and subscription '{}', prefetching {} messages.",
       topicName,
-      subscriptionName
+      subscriptionName,
+      prefetchCount
     );
 
     ApplicationShutdownSupport.addShutdownHook(
