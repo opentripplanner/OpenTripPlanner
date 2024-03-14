@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -191,18 +192,11 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   @Override
   public String toString() {
-    return (
-      "MqttGtfsRealtimeUpdater{" +
-      "url='" +
-      url +
-      '\'' +
-      ", topic='" +
-      topic +
-      '\'' +
-      ", feedId='" +
-      feedId +
-      '\'' +
-      '}'
-    );
+    return ToStringBuilder
+      .of(MqttGtfsRealtimeUpdater.class)
+      .addStr("url", url)
+      .addStr("topic", topic)
+      .addStr("feedId", feedId)
+      .toString();
   }
 }
