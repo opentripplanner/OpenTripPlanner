@@ -35,9 +35,9 @@ public class FlexTripsMapper {
     for (Trip trip : stopTimesByTrip.keys()) {
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
-      var factors = builder.getFlexDurationFactors().getOrDefault(trip, FlexDurationFactors.ZERO);
 
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
+        var factors = builder.getFlexDurationFactors().getOrDefault(trip, FlexDurationFactors.ZERO);
         result.add(
           UnscheduledTrip
             .of(trip.getId())
