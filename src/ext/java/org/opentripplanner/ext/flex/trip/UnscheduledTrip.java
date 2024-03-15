@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -120,7 +121,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
     }
 
-    var updatedCalculator = new DurationFactorCalculator(calculator);
+    var updatedCalculator = new DurationFactorCalculator(calculator, 1.5f, Duration.ofMinutes(20));
 
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices
