@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
-import java.util.OptionalDouble;
 import org.opentripplanner.framework.lang.IntRange;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -19,8 +18,6 @@ class StopTimeWindow implements Serializable {
   private final PickDrop pickupType;
   private final PickDrop dropOffType;
 
-  private final double meanDurationFactor;
-
   StopTimeWindow(StopTime st) {
     stop = st.getStop();
 
@@ -35,12 +32,6 @@ class StopTimeWindow implements Serializable {
     // Do not allow for pickup/dropoff if times are not available
     pickupType = start == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
     dropOffType = end == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
-
-    if (st.meanDurationFactor().isPresent()) {
-      meanDurationFactor = st.meanDurationFactor().getAsDouble();
-    } else {
-      meanDurationFactor = 1;
-    }
   }
 
   public StopLocation stop() {
@@ -65,10 +56,6 @@ class StopTimeWindow implements Serializable {
 
   public IntRange timeWindow() {
     return IntRange.ofInclusive(start, end);
-  }
-
-  public double meanDurationFactor() {
-    return meanDurationFactor;
   }
 
   private static int getAvailableTime(int... times) {

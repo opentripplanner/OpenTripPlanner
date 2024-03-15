@@ -1,9 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.OptionalDouble;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -51,14 +49,6 @@ public final class StopTime implements Comparable<StopTime> {
   private int flexWindowStart = MISSING_VALUE;
 
   private int flexWindowEnd = MISSING_VALUE;
-
-  private double meanDurationFactor = MISSING_VALUE;
-
-  private Duration meanDurationOffset = Duration.ZERO;
-
-  private double safeDurationFactor = MISSING_VALUE;
-
-  private Duration safeDurationOffset = Duration.ZERO;
 
   // Disabled by default
   private PickDrop flexContinuousPickup = PickDrop.NONE;
@@ -296,29 +286,6 @@ public final class StopTime implements Comparable<StopTime> {
       TimeUtils.timeToStrLong(getDepartureTime()) +
       ")"
     );
-  }
-
-  public void setMeanDurationFactor(double meanDurationFactor) {
-    this.meanDurationFactor = meanDurationFactor;
-  }
-
-  public void setMeanDurationOffset(Duration meanDurationOffset) {
-    this.meanDurationOffset = meanDurationOffset;
-  }
-
-  public void setSafeDurationOffset(Duration safeDurationOffset) {
-    this.safeDurationOffset = safeDurationOffset;
-  }
-
-  public void setSafeDurationFactor(double safeDurationFactor) {
-    this.safeDurationFactor = safeDurationFactor;
-  }
-
-  public OptionalDouble meanDurationFactor() {
-    if (meanDurationFactor == MISSING_VALUE) {
-      return OptionalDouble.empty();
-    }
-    return OptionalDouble.of(meanDurationFactor);
   }
 
   private static int getAvailableTime(int... times) {
