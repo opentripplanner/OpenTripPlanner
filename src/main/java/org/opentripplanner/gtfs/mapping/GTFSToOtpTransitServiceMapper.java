@@ -171,6 +171,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
+    builder.getFlexDurationFactors().putAll(tripMapper.flexDurationFactors());
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));

@@ -3,9 +3,9 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -52,6 +52,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
+  private final FlexDurationFactors duractionFactors;
+
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -69,6 +71,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
     }
+    this.duractionFactors = Objects.requireNonNull(builder.durationFactors());
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {
@@ -121,7 +124,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
     }
 
-    var updatedCalculator = new DurationFactorCalculator(calculator, 1.5f, Duration.ofMinutes(20));
+    final var updatedCalculator = flexPathCalculator(calculator);
 
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices
@@ -144,6 +147,14 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
           config
         )
       );
+  }
+
+  private FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
+    if (duractionFactors.nonZero()) {
+      return new DurationFactorCalculator(calculator, duractionFactors);
+    } else {
+      return calculator;
+    }
   }
 
   @Override

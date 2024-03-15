@@ -1,8 +1,11 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.opentripplanner.ext.flex.trip.FlexDurationFactors;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -12,9 +15,10 @@ class TripMapper {
 
   private final RouteMapper routeMapper;
   private final DirectionMapper directionMapper;
-  private TranslationHelper translationHelper;
+  private final TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Trip, Trip> mappedTrips = new HashMap<>();
+  private final Map<Trip, FlexDurationFactors> flexDurationFactors = new HashMap<>();
 
   TripMapper(
     RouteMapper routeMapper,
@@ -36,6 +40,13 @@ class TripMapper {
 
   Collection<Trip> getMappedTrips() {
     return mappedTrips.values();
+  }
+
+  /**
+   * The map of flex duration factors per flex trip.
+   */
+  Map<Trip, FlexDurationFactors> flexDurationFactors() {
+    return flexDurationFactors;
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
@@ -62,6 +73,17 @@ class TripMapper {
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
     lhs.withGtfsFareId(rhs.getFareId());
 
-    return lhs.build();
+    var trip = lhs.build();
+    mapFlexDurationFactots(rhs).ifPresent(f -> flexDurationFactors.put(trip, f));
+    return trip;
+  }
+
+  private Optional<FlexDurationFactors> mapFlexDurationFactots(org.onebusaway.gtfs.model.Trip rhs) {
+    if (rhs.getMeanDurationFactor() == null && rhs.getMeanDurationOffset() == null) {
+      return Optional.empty();
+    } else {
+      var offset = Duration.ofSeconds(rhs.getMeanDurationOffset().longValue());
+      return Optional.of(new FlexDurationFactors(offset, rhs.getMeanDurationFactor().floatValue()));
+    }
   }
 }
