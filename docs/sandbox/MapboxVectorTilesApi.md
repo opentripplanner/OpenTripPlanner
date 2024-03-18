@@ -103,15 +103,6 @@ The feature must be configured in `router-config.json` as follows
         "minZoom": 14,
         "cacheMaxSeconds": 60
       },
-      // Contains just stops and real-time information for them
-      {
-        "name": "realtimeStops",
-        "type": "Stop",
-        "mapper": "DigitransitRealtime",
-        "maxZoom": 20,
-        "minZoom": 14,
-        "cacheMaxSeconds": 600
-      },
       // This exists for backwards compatibility. At some point, we might want
       // to add a new real-time parking mapper with better translation support
       // and less unnecessary fields.
