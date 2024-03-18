@@ -1497,15 +1497,11 @@ type DefaultFareProduct implements FareProduct {
 }
 
 type Itinerary {
-    """
-    Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
-    """
-    startTime: Long
+    "Time when the user leaves from the origin."
+    start: OffsetDateTime
 
-    """
-    Time when the user arrives to the destination.. Format: Unix timestamp in milliseconds.
-    """
-    endTime: Long
+    "Time when the user leaves arrives at the destination."
+    end: OffsetDateTime
 
     """Duration of the trip on this itinerary, in seconds."""
     duration: Long
@@ -1584,6 +1580,16 @@ type Itinerary {
     and always returns an empty list. Use the leg's `fareProducts` instead.
     """
     fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
+
+    """
+    Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
+    """
+    startTime: Long @deprecated(reason: "Use `start` instead which includes timezone information.")
+
+    """
+    Time when the user arrives to the destination. Format: Unix timestamp in milliseconds.
+    """
+    endTime: Long @deprecated(reason: "Use `end` instead which includes timezone information.")
 }
 
 "A currency"
@@ -1616,10 +1622,12 @@ type Money {
     amount: Float!
 }
 
-""""
-An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
-scalar Duration
+An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+
+Negative durations are formatted like `-PT10M`.
+"""
+scalar Duration @specifiedBy(url:"https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)")
 
 type RideHailingProvider {
     "The ID of the ride hailing provider."
@@ -1640,30 +1648,46 @@ type RideHailingEstimate {
     productName: String
 }
 
+"""
+An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
+
+ISO-8601 allows many different formats but OTP will only return the profile specified in RFC3339.
+"""
+scalar OffsetDateTime @specifiedBy(url: "https://www.rfcreader.com/#rfc3339")
+
+"Real-time estimates for a vehicle at a certain place."
+type RealTimeEstimate {
+    time: OffsetDateTime!
+    """
+    The delay or "earliness" of the vehicle at a certain place.
+
+    If the vehicle is early then this is a negative duration.
+    """
+    delay: Duration!
+}
+
+"""
+Time information about a passenger at a certain place. May contain real-time information if
+available.
+"""
+type LegTime {
+    "The scheduled time of the event."
+    scheduledTime: OffsetDateTime!
+    "The estimated time of the event. If no real-time information is available, this is null,"
+    estimated: RealTimeEstimate
+}
+
 type Leg {
-    """
-    The date and time when this leg begins. Format: Unix timestamp in milliseconds.
-    """
-    startTime: Long
 
     """
-    The date and time when this leg ends. Format: Unix timestamp in milliseconds.
+    The time when the leg starts including real-time information, if available.
     """
-    endTime: Long
+    start: LegTime!
 
     """
-    For transit leg, the offset from the scheduled departure time of the boarding
-    stop in this leg, i.e. scheduled time of departure at boarding stop =
-    `startTime - departureDelay`
+    The time when the leg ends including real-time information, if available.
     """
-    departureDelay: Int
-
-    """
-    For transit leg, the offset from the scheduled arrival time of the alighting
-    stop in this leg, i.e. scheduled time of arrival at alighting stop = `endTime
-    - arrivalDelay`
-    """
-    arrivalDelay: Int
+    end: LegTime!
 
     """The mode (e.g. `WALK`) used when traversing this leg."""
     mode: Mode
@@ -1825,6 +1849,31 @@ type Leg {
     that applies to multiple legs can appear several times.
     """
     fareProducts: [FareProductUse]
+
+    """
+    The date and time when this leg begins. Format: Unix timestamp in milliseconds.
+    """
+    startTime: Long @deprecated(reason: "Use `start.estimated.time` instead which contains timezone information.")
+
+    """
+    The date and time when this leg ends. Format: Unix timestamp in milliseconds.
+    """
+    endTime: Long @deprecated(reason: "Use `end.estimated.time` instead which contains timezone information.")
+
+    """
+    For transit leg, the offset from the scheduled departure time of the boarding
+    stop in this leg, i.e. scheduled time of departure at boarding stop =
+    `startTime - departureDelay`
+    """
+    departureDelay: Int @deprecated(reason: "Use `end.estimated.delay` instead.")
+
+    """
+    For transit leg, the offset from the scheduled arrival time of the alighting
+    stop in this leg, i.e. scheduled time of arrival at alighting stop = `endTime
+    - arrivalDelay`
+    """
+    arrivalDelay: Int @deprecated(reason: "Use `start.estimated.delay` instead.")
+
 }
 
 """A span of time."""
@@ -2260,14 +2309,16 @@ type Place {
     lon: Float!
 
     """
-    The time the rider will arrive at the place. Format: Unix timestamp in milliseconds.
+    The time the rider will arrive at the place. This also includes real-time information
+    if available.
     """
-    arrivalTime: Long!
+    arrival: LegTime
 
     """
-    The time the rider will depart the place. Format: Unix timestamp in milliseconds.
+    The time the rider will depart the place. This also includes real-time information
+    if available.
     """
-    departureTime: Long!
+    departure: LegTime
 
     """The stop related to the place."""
     stop: Stop
@@ -2305,6 +2356,16 @@ type Place {
 
     """The car parking related to the place"""
     carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """
+    The time the rider will arrive at the place. Format: Unix timestamp in milliseconds.
+    """
+    arrivalTime: Long! @deprecated(reason: "Use `arrival` which includes timezone information.")
+
+    """
+    The time the rider will depart the place. Format: Unix timestamp in milliseconds.
+    """
+    departureTime: Long! @deprecated(reason: "Use `departure` which includes timezone information.")
 }
 
 type placeAtDistance implements Node {

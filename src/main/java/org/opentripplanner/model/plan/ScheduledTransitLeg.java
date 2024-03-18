@@ -163,6 +163,24 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  public LegTime start() {
+    if (getRealTime()) {
+      return LegTime.of(startTime, getDepartureDelay());
+    } else {
+      return LegTime.ofStatic(startTime);
+    }
+  }
+
+  @Override
+  public LegTime end() {
+    if (getRealTime()) {
+      return LegTime.of(endTime, getArrivalDelay());
+    } else {
+      return LegTime.ofStatic(endTime);
+    }
+  }
+
+  @Override
   @Nonnull
   public TransitMode getMode() {
     return getTrip().getMode();
@@ -257,17 +275,11 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public List<StopArrival> getIntermediateStops() {
     List<StopArrival> visits = new ArrayList<>();
+    var mapper = new StopArrivalMapper(zoneId, serviceDate, tripTimes);
 
     for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
       StopLocation stop = tripPattern.getStop(i);
-
-      StopArrival visit = new StopArrival(
-        Place.forStop(stop),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getArrivalTime(i)),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getDepartureTime(i)),
-        i,
-        tripTimes.gtfsSequenceOfStopIndex(i)
-      );
+      final StopArrival visit = mapper.map(i, stop, getRealTime());
       visits.add(visit);
     }
     return visits;

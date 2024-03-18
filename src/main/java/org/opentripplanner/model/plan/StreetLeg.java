@@ -157,6 +157,16 @@ public class StreetLeg implements Leg {
   }
 
   @Override
+  public LegTime start() {
+    return LegTime.ofStatic(startTime);
+  }
+
+  @Override
+  public LegTime end() {
+    return LegTime.ofStatic(endTime);
+  }
+
+  @Override
   public Leg withTimeShift(Duration duration) {
     return StreetLegBuilder
       .of(this)
