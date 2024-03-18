@@ -33,10 +33,9 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       .anyMatch(alert -> alert.noServiceAt(currentTime));
 
     Collection<KeyValue> sharedKeyValues = getKeyValues(stop, i18NStringMapper, transitService);
-    Collection<KeyValue> keyValues = ListUtils.combine(
+    return ListUtils.combine(
       sharedKeyValues,
       List.of(new KeyValue("closedByServiceAlert", noServiceAlert))
     );
-    return keyValues;
   }
 }
