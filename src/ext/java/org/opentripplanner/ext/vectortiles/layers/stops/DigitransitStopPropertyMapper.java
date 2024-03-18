@@ -34,10 +34,10 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    return getKeyValues(stop, i18NStringMapper, transitService);
+    return getBaseKeyValues(stop, i18NStringMapper, transitService);
   }
 
-  protected static Collection<KeyValue> getKeyValues(
+  protected static Collection<KeyValue> getBaseKeyValues(
     RegularStop stop,
     I18NStringMapper i18NStringMapper,
     TransitService transitService
