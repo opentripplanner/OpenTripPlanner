@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.support;
 
 import graphql.execution.AsyncExecutionStrategy;
+import graphql.execution.ExecutionStrategyParameters;
 import graphql.schema.DataFetchingEnvironment;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
@@ -27,13 +28,14 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy impl
   @Override
   protected <T> CompletableFuture<T> handleFetchingException(
     DataFetchingEnvironment environment,
+    ExecutionStrategyParameters params,
     Throwable e
   ) {
     if (e instanceof OTPRequestTimeoutException te) {
       logTimeoutProgress();
       throw te;
     }
-    return super.handleFetchingException(environment, e);
+    return super.handleFetchingException(environment, params, e);
   }
 
   @SuppressWarnings("Convert2MethodRef")
