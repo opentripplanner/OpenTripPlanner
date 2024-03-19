@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.wayproperty;
 
+import java.util.Objects;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 
 /**
@@ -13,13 +14,8 @@ public class CreativeNamerPicker {
   public OsmSpecifier specifier;
   public CreativeNamer namer;
 
-  public CreativeNamerPicker() {
-    specifier = null;
-    namer = null;
-  }
-
   public CreativeNamerPicker(OsmSpecifier specifier, CreativeNamer namer) {
-    this.specifier = specifier;
-    this.namer = namer;
+    this.specifier = Objects.requireNonNull(specifier);
+    this.namer = Objects.requireNonNull(namer);
   }
 }

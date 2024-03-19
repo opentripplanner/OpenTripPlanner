@@ -42,6 +42,8 @@ public class WayPropertySet {
 
   private final List<WayPropertyPicker> wayProperties;
 
+  private final Set<I18NString> creativeNameCache = new HashSet<>();
+
   /** Assign names to ways that do not have them based on OSM tags. */
   private final List<CreativeNamerPicker> creativeNamers;
 
@@ -202,7 +204,12 @@ public class WayPropertySet {
     if (bestNamer == null) {
       return null;
     }
-    return bestNamer.generateCreativeName(way);
+    var name = bestNamer.generateCreativeName(way);
+    if(name !=null && creativeNameCache.contains(name)) {
+      return creativeNameCache.stream().filter(n -> n.equals(name)).findAny().orElseThrow();
+    }
+    creativeNameCache.add(name);
+    return name;
   }
 
   /**
