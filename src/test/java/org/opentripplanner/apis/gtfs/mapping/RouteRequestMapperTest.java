@@ -102,8 +102,8 @@ class RouteRequestMapperTest {
     assertTrue(routeRequest.journey().transit().filters().size() == 1);
     assertTrue(routeRequest.journey().transit().enabled());
     assertEquals(
-      defaultRequest.journey().transit().filters().getFirst(),
-      routeRequest.journey().transit().filters().getFirst()
+      defaultRequest.journey().transit().filters().toString(),
+      routeRequest.journey().transit().filters().toString()
     );
     assertTrue(
       Duration
@@ -303,8 +303,10 @@ class RouteRequestMapperTest {
     var reluctanceForMode = routeRequest.preferences().transit().reluctanceForMode();
     assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
     assertNull(reluctanceForMode.get(TransitMode.FERRY));
-    assertEquals(1, routeRequest.journey().transit().filters().size());
-    // TODO somehow test which modes are enabled
+    assertEquals(
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}]}]",
+      routeRequest.journey().transit().filters().toString()
+    );
   }
 
   @Test
