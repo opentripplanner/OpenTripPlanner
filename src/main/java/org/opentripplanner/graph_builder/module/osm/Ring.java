@@ -19,7 +19,7 @@ import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
-public class Ring {
+class Ring {
 
   private final LinearRing shell;
   private final List<Ring> holes = new ArrayList<>();

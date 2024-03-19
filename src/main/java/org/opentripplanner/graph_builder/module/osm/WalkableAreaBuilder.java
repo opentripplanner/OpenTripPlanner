@@ -68,7 +68,7 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
  * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  */
-public class WalkableAreaBuilder {
+class WalkableAreaBuilder {
 
   private final DataImportIssueStore issueStore;
 
