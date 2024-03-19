@@ -1,0 +1,105 @@
+#!/bin/bash
+
+## Owner: Thomas Gran, Entur AS
+
+# [ EDIT HERE ] ----------------------------------------------------------
+
+# Match or NOT Match. The script return success 0 - Good if a match is found(-l) or not found(-L)
+#   -l : Match
+#   -L : Not match
+MATCH="-L"
+
+
+# The HTTP URL query to call using curl"
+QUERY="http://localhost:8080/otp/routers/default/plan?"
+QUERY+="fromPlace=63.30959874454729%2C9.858169555664064&"
+QUERY+="toPlace=63.26723697045908%2C9.811992645263674&"
+QUERY+="time=14%3A50&date=03-07-2024&"
+QUERY+="mode=FLEX_ACCESS%2CFLEX_EGRESS%2CTRANSIT&"
+QUERY+="searchWindow=780"
+
+ACCEPT_HEADER="accept: application/json, */*"
+
+# The string token to search for"
+SEARCH_FOR="No trip found"
+
+# File catalog where the the OTP config files is (build-config.json & router-config.json)
+DATA_DIR=../data/fix-error-access
+
+# ----------------------------------------------------------- [ EDIT END ]
+
+if [ "$1" == "-h" ]  || [ "$1" == "--help" ]; then
+  echo "This script: "
+  echo "  1. Compiles OTP"
+  echo "  2. Runs OTP - build a graph and start the server"
+  echo "  3. Sends a request using curl"
+  echo "  4. Tests the response, search for a unexpected token. If the token is"
+  echo "     NOT present the test is GOOD, if not it is BAD"
+  echo ""
+  echo "Before using this script you should copy it to a folder which is NOT"
+  echo "under version control and then edit it. You must provide a query, a test and the"
+  echo "path to the otp data root directory with the OTP configuration files. You need to"
+  echo "edit the following variables in the beginning of the script:"
+  echo "  - QUERY - the HTTP URL query to call using curl"
+  echo "  - SEARCH_FOR - The string token to search for - if it is present the test FAILS!"
+  echo "  - DATA_DIR - File catalog where the OTP config files is (build-config.json & router-config.json)"
+  echo ""
+  echo "This script is intended used together with 'git bisect' (binary search for good and bad"
+  echo "commits), but it works well with manual changes in the code as well. When you have found"
+  echo "the bad commit, you may manually undo it line by line to find the problem."
+  echo ""
+  echo "ARGUMENTS"
+  echo "  --help | -h        : Help"
+  echo "  --skipCompile | -c : Skip Maven compile"
+  exit 0
+fi
+
+# Files used to store intermediate results - check the files if the script
+# is not working as expected.
+OTP_LOG=target/otp.log
+RESPONSE_FILE=target/response.json
+
+
+if [ "$1" != "--skipCompile" ] && [ "$1" != "-c" ]; then
+  echo "Build project with maven"
+  mvn clean package -Dps -DskipTests
+fi
+
+echo "Start OTP, output: $OTP_LOG"
+mv target/otp-*-shaded.jar target/otp-shaded.jar
+java -Xmx16G -jar target/otp-shaded.jar ${DATA_DIR}  --build --save --serve > ${OTP_LOG} &
+OTP_PID=$!
+
+tail -F ${OTP_LOG} &
+TAIL_PID=$!
+
+while ! grep "Grizzly server running" ${OTP_LOG};do echo "#";sleep 1;done
+
+echo "OTP Server up and running"
+
+echo "Query: $QUERY"
+curl -s -o ${RESPONSE_FILE} "$QUERY" -H "$ACCEPT_HEADER"
+
+echo "Test results does NOT match (-L) or match (-l)"
+grep ${MATCH} "${SEARCH_FOR}" ${RESPONSE_FILE}
+OK=$?
+
+echo "Shutdown..."
+echo "Kill Otp Server PID: ${OTP_PID}"
+kill $OTP_PID
+
+# Allow OTP to shutdown before we kill the tail and return, this is not critical it is just
+# a bit confusing if the script is done, while OTP is still writing to the console.
+sleep 3
+echo "Kill Tail PID: ${TAIL_PID}"
+kill $TAIL_PID
+
+echo ""
+
+if [ "$OK" == 0 ]; then
+  echo "Test is OK - GOOD"
+  exit 0
+else
+  echo "Test failed - BAD"
+  exit 1
+fi
