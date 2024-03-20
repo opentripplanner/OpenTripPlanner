@@ -26,11 +26,11 @@ class I18nStringDeduplicatorTest {
 
   @ParameterizedTest
   @MethodSource("testCases")
-  void deduplicate() {
+  void deduplicate(Supplier<I18NString> makeString) {
     var cache = new I18nStringDeduplicator();
 
-    var s1 = nonLocalizedString();
-    var s2 = nonLocalizedString();
+    var s1 = makeString.get();
+    var s2 = makeString.get();
     assertEquals(s1, s2);
     assertNotSame(s1, s2);
 
