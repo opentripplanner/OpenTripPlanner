@@ -84,7 +84,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       .addParameter("fromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
       .build();
 
-    LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
+    LOG.info("Fetching initial Siri ET data from {}, timeout is {} ms.", uri, timeout);
     var siri = fetchInitialSiriData(uri);
 
     if (siri.isEmpty()) {
@@ -122,7 +122,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       long t1 = System.currentTimeMillis();
       var f = processMessage(updates);
       f.get();
-      LOG.info("Azure ET updater initialized after {} ms", (System.currentTimeMillis() - t1));
+      LOG.info("Azure ET updater initialized in {} ms.", (System.currentTimeMillis() - t1));
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }

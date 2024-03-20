@@ -92,7 +92,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
       .build();
 
-    LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
+    LOG.info("Fetching initial Siri SX data from {}, timeout is {} ms.", uri, timeout);
     var siri = fetchInitialSiriData(uri);
 
     if (siri.isEmpty()) {
@@ -138,7 +138,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       var t1 = System.currentTimeMillis();
       var f = processMessage(siri);
       f.get();
-      LOG.info("Azure SX updater initialized. Took {} ms", (System.currentTimeMillis() - t1));
+      LOG.info("Azure SX updater initialized in {} ms.", (System.currentTimeMillis() - t1));
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying SX history", e);
     }

@@ -224,14 +224,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       final long t2 = System.currentTimeMillis();
 
       LOG.info(
-        "Fetching initial data - finished after {} ms, got {} bytes",
+        "Fetching initial data, received {} bytes in {} ms.",
         (t2 - t1),
         initialData.length()
       );
     } catch (OtpHttpClientStatusCodeException e) {
-      // 204 No Response status is ok.
+      // 204 No Content status is ok.
       if (e.getStatusCode() == 204) {
-        LOG.info("Got status 204 No Response");
+        LOG.info("Got status 204 'No Content', handling gracefully.");
         return Optional.empty();
       }
       throw e;
