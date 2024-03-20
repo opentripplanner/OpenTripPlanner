@@ -2,10 +2,12 @@ package org.opentripplanner.openstreetmap.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -50,6 +52,12 @@ class I18nStringDeduplicatorTest {
     var d3 = cache.deduplicate(s3);
     assertEquals(d3, s3);
     assertSame(d3, s3);
+  }
+
+  @Test
+  void nullString() {
+    var cache = new I18nStringDeduplicator();
+    assertNull(cache.deduplicate(null));
   }
 
   static I18NString nonLocalizedString() {
