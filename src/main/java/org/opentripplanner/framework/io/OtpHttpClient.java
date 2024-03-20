@@ -320,9 +320,7 @@ public class OtpHttpClient implements AutoCloseable {
       headers,
       response -> {
         if (isFailedRequest(response)) {
-          throw new OtpHttpClientException(
-            "HTTP request failed with status code " + response.getCode()
-          );
+          throw new OtpHttpClientStatusCodeException(response.getCode());
         }
         if (response.getEntity() == null || response.getEntity().getContent() == null) {
           throw new OtpHttpClientException("HTTP request failed: empty response");

@@ -29,6 +29,7 @@ import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientStatusCodeException;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -227,6 +228,13 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         (t2 - t1),
         initialData.length()
       );
+    } catch (OtpHttpClientStatusCodeException e) {
+      // 204 No Response status is ok.
+      if (e.getStatusCode() == 204) {
+        LOG.info("Got status 204 No Response");
+        return Optional.empty();
+      }
+      throw e;
     }
 
     try {
