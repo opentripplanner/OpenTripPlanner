@@ -325,7 +325,6 @@ class WayPropertySetTest {
     }
   }
 
-
   @Nested
   class CreativeNames {
 
@@ -351,5 +350,4 @@ class WayPropertySetTest {
       return wps;
     }
   }
-
 }
