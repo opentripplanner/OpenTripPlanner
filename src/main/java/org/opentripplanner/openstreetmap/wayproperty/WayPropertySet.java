@@ -42,7 +42,6 @@ public class WayPropertySet {
 
   private final List<WayPropertyPicker> wayProperties;
 
-  private final Set<I18NString> creativeNameCache = new HashSet<>();
 
   /** Assign names to ways that do not have them based on OSM tags. */
   private final List<CreativeNamerPicker> creativeNamers;
@@ -72,6 +71,8 @@ public class WayPropertySet {
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
   private final DataImportIssueStore issueStore;
+
+  private final I18nStringDeduplicator nameDeduplicator = new I18nStringDeduplicator();
 
   public List<MixinProperties> getMixins() {
     return mixins;
@@ -205,11 +206,7 @@ public class WayPropertySet {
       return null;
     }
     var name = bestNamer.generateCreativeName(way);
-    if(name !=null && creativeNameCache.contains(name)) {
-      return creativeNameCache.stream().filter(n -> n.equals(name)).findAny().orElseThrow();
-    }
-    creativeNameCache.add(name);
-    return name;
+    return nameDeduplicator.deduplicate(name);
   }
 
   /**
