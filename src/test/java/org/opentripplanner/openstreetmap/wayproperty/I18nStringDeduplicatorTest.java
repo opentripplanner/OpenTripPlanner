@@ -24,27 +24,28 @@ class I18nStringDeduplicatorTest {
 
   @ParameterizedTest
   @MethodSource("testCases")
-  void deduplicate(){
+  void deduplicate() {
     var cache = new I18nStringDeduplicator();
 
     var s1 = nonLocalizedString();
     var s2 = nonLocalizedString();
-    assertEquals(s1,s2);
-    assertNotSame(s1,s2);
+    assertEquals(s1, s2);
+    assertNotSame(s1, s2);
 
-    var d1= cache.deduplicate(s1);
+    var d1 = cache.deduplicate(s1);
     assertSame(s1, d1);
 
-    var d2= cache.deduplicate(s2);
+    var d2 = cache.deduplicate(s2);
     assertEquals(s1, d2);
+
     assertSame(s1, d2);
     assertEquals(d1, d2);
     assertSame(d1, d2);
 
     var s3 = I18NString.of("Rue de Helmut Kohl");
 
-    assertNotSame(s1,s3);
-    assertNotSame(s2,s3);
+    assertNotSame(s1, s3);
+    assertNotSame(s2, s3);
 
     var d3 = cache.deduplicate(s3);
     assertEquals(d3, s3);
@@ -58,7 +59,14 @@ class I18nStringDeduplicatorTest {
   static I18NString localizedString() {
     return new LocalizedString("name.sidewalk");
   }
+
   static I18NString translatedString() {
-    return TranslatedString.getI18NString("Helmut-Kohl-Straße", "de", "Helmut-Kohl-Straße", "se", "Gattan Helmuth Kohl");
+    return TranslatedString.getI18NString(
+      "Helmut-Kohl-Straße",
+      "de",
+      "Helmut-Kohl-Straße",
+      "se",
+      "Helmuth Kohl Gattan "
+    );
   }
 }

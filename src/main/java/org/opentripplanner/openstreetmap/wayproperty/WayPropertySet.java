@@ -42,7 +42,6 @@ public class WayPropertySet {
 
   private final List<WayPropertyPicker> wayProperties;
 
-
   /** Assign names to ways that do not have them based on OSM tags. */
   private final List<CreativeNamerPicker> creativeNamers;
 
