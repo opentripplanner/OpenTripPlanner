@@ -13,15 +13,18 @@ import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOp
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
+import jakarta.xml.bind.JAXBException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import javax.xml.stream.XMLStreamException;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
@@ -32,8 +35,10 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.ServiceDelivery;
 
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
@@ -157,6 +162,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         .topicName(topicName)
         .subscriptionName(subscriptionName)
         .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+        .disableAutoComplete() // Receive and delete does not need autocomplete
         .prefetchCount(prefetchCount)
         .processError(errorConsumer)
         .processMessage(messageConsumer)
@@ -169,6 +175,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       subscriptionName,
       prefetchCount
     );
+
+    setPrimed();
 
     ApplicationShutdownSupport.addShutdownHook(
       "azure-siri-updater-shutdown",
@@ -186,8 +194,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return this.isPrimed;
   }
 
-  public void setPrimed(boolean primed) {
-    isPrimed = primed;
+  private void setPrimed() {
+    isPrimed = true;
   }
 
   @Override
@@ -195,11 +203,16 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return this.configRef;
   }
 
-  protected String fetchInitialData(URI uri) {
+  /**
+   * Returns None for empty result
+   */
+  protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
     // Maybe put this in the config?
     HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
     String initialData;
+
     try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      var t1 = System.currentTimeMillis();
       initialData =
         otpHttpClient.getAndMap(
           uri,
@@ -207,8 +220,21 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
           rh.asMap(),
           is -> CharStreams.toString(new InputStreamReader(is))
         );
+      final long t2 = System.currentTimeMillis();
+
+      LOG.info(
+        "Fetching initial data - finished after {} ms, got {} bytes",
+        (t2 - t1),
+        initialData.length()
+      );
     }
-    return initialData;
+
+    try {
+      var serviceDelivery = SiriXml.parseXml(initialData).getServiceDelivery();
+      return Optional.ofNullable(serviceDelivery);
+    } catch (JAXBException | XMLStreamException e) {
+      throw new SiriAzureInitializationException("Could not parse history message", e);
+    }
   }
 
   SiriFuzzyTripMatcher fuzzyTripMatcher() {
@@ -232,7 +258,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         initializeData(dataInitializationUrl, messageConsumer);
         break;
       } catch (Exception e) {
-        sleepPeriod = sleepPeriod * 2;
+        sleepPeriod = Math.min(sleepPeriod * 2, 60 * 1000);
 
         LOG.warn(
           "Caught exception while initializing data will retry after {} ms - attempt {}. ({})",
