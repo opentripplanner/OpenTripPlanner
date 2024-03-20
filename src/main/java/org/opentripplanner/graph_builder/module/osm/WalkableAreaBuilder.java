@@ -532,11 +532,9 @@ class WalkableAreaBuilder {
         .withBack(false)
         .withArea(edgeList)
         .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.needsFallbackName());
-
-      streetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
-
-      streetEdgeBuilder.withLink(areaEntity.isLink());
+        .withBogusName(areaEntity.needsFallbackName())
+        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
+        .withLink(areaEntity.isLink());
 
       label =
         "way (area) " +
@@ -557,11 +555,9 @@ class WalkableAreaBuilder {
         .withBack(true)
         .withArea(edgeList)
         .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.needsFallbackName());
-
-      backStreetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
-
-      backStreetEdgeBuilder.withLink(areaEntity.isLink());
+        .withBogusName(areaEntity.needsFallbackName())
+        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
+        .withLink(areaEntity.isLink());
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
