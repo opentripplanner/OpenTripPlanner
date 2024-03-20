@@ -107,7 +107,8 @@ public class DatedServiceJourneyQuery {
         }
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
-          .of(operatingDays)
+          .of()
+          .withOperatingDays(operatingDays)
           .withAuthorities(authorities)
           .withLines(lines)
           .withServiceJourneys(serviceJourneys)

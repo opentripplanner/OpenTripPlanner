@@ -8,13 +8,13 @@ import java.util.function.Function;
  * <p>
  * The collection is provided by a function that takes the entity being matched as an argument.
  */
-public class ContainsMatcher<T, V> implements Matcher<T> {
+public class ContainsMatcher<T, S> implements Matcher<T> {
 
   private final String typeName;
-  private final V value;
-  private final Function<T, Collection<V>> valueProvider;
+  private final S value;
+  private final Function<T, Collection<S>> valueProvider;
 
-  public ContainsMatcher(String typeName, V value, Function<T, Collection<V>> valueProvider) {
+  public ContainsMatcher(String typeName, S value, Function<T, Collection<S>> valueProvider) {
     this.typeName = typeName;
     this.value = value;
     this.valueProvider = valueProvider;
@@ -22,7 +22,7 @@ public class ContainsMatcher<T, V> implements Matcher<T> {
 
   @Override
   public boolean match(T entity) {
-    Collection<V> values = valueProvider.apply(entity);
+    Collection<S> values = valueProvider.apply(entity);
     if (values == null) {
       return false;
     }

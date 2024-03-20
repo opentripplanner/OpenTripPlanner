@@ -1,6 +1,8 @@
 package org.opentripplanner.framework.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.type.Month;
 import java.time.Duration;
@@ -14,6 +16,13 @@ import org.junit.jupiter.api.Test;
 class CollectionUtilsTest {
 
   public static final String NULL_STRING = "<null>";
+
+  @Test
+  void testIsEmpty() {
+    assertTrue(CollectionUtils.isEmpty(null));
+    assertTrue(CollectionUtils.isEmpty(List.of()));
+    assertFalse(CollectionUtils.isEmpty(List.of(1)));
+  }
 
   @Test
   void testToString() {

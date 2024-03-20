@@ -3,9 +3,9 @@ package org.opentripplanner.transit.model.filter.expr;
 import java.util.function.Function;
 
 /**
- * A matcher that checks if a value is equal to another value.
+ * A matcher that checks if a value is equal to another value derived from the matched entities.
  * <p>
- * The value is provided by a function that takes the entity being matched as an argument.
+ * The derived entity value is provided by a function that takes the entity being matched as an argument.
  */
 public class EqualityMatcher<T, V> implements Matcher<T> {
 

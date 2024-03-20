@@ -13,13 +13,13 @@ public class TripOnServiceDateRequestBuilder {
   private List<FeedScopedId> replacementFor = List.of();
   private List<String> privateCodes = List.of();
   private List<TripAlteration> alterations = List.of();
-  private final List<LocalDate> operatingDays;
+  private List<LocalDate> operatingDays;
 
-  protected TripOnServiceDateRequestBuilder(List<LocalDate> operatingDays) {
-    if (operatingDays == null || operatingDays.isEmpty()) {
-      throw new IllegalArgumentException("operatingDays must have at least one date");
-    }
+  protected TripOnServiceDateRequestBuilder() {}
+
+  public TripOnServiceDateRequestBuilder withOperatingDays(List<LocalDate> operatingDays) {
     this.operatingDays = operatingDays;
+    return this;
   }
 
   public TripOnServiceDateRequestBuilder withAuthorities(List<FeedScopedId> authorities) {
@@ -54,12 +54,12 @@ public class TripOnServiceDateRequestBuilder {
 
   public TripOnServiceDateRequest build() {
     return new TripOnServiceDateRequest(
+      operatingDays,
       authorities,
       lines,
       serviceJourneys,
       replacementFor,
       privateCodes,
-      operatingDays,
       alterations
     );
   }
