@@ -17,4 +17,8 @@ public interface TransitFilter {
   default boolean isSubModePredicate() {
     return false;
   }
+
+  default boolean isTripPredicate() {
+    return false;
+  }
 }

@@ -22,6 +22,7 @@ public class SelectRequest implements Serializable {
   private final List<FeedScopedId> agencies;
   private final List<FeedScopedId> groupOfRoutes;
   private final List<FeedScopedId> routes;
+  private final List<FeedScopedId> trips;
 
   public SelectRequest(Builder builder) {
     if (builder.transportModes.isEmpty()) {
@@ -35,7 +36,17 @@ public class SelectRequest implements Serializable {
 
     this.agencies = List.copyOf(builder.agencies);
     this.groupOfRoutes = List.copyOf(builder.groupOfRoutes);
-    this.routes = builder.routes;
+    this.routes = List.copyOf(builder.routes);
+    this.trips = List.copyOf(builder.trips);
+  }
+
+  public boolean isTripsOnly() {
+    return (
+      this.transportModeFilter == null &&
+      this.agencies.isEmpty() &&
+      this.groupOfRoutes.isEmpty() &&
+      this.routes.isEmpty()
+    );
   }
 
   public boolean matches(TripPattern tripPattern) {
@@ -77,10 +88,15 @@ public class SelectRequest implements Serializable {
   public boolean matchesSelect(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
 
-    return (
+    var tripFilter = this.getTrips();
+
+    var matchesTrip =
+      (tripFilter == null || tripFilter.isEmpty()) || tripFilter.contains(trip.getId());
+    var matchesTransportMode =
       this.transportModeFilter == null ||
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
-    );
+      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode());
+
+    return matchesTrip && matchesTransportMode;
   }
 
   /**
@@ -88,10 +104,16 @@ public class SelectRequest implements Serializable {
    */
   public boolean matchesNot(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
-    return (
+
+    var tripFilter = this.getTrips();
+
+    var matchesTrip =
+      (tripFilter != null && !tripFilter.isEmpty()) && tripFilter.contains(trip.getId());
+    var matchesTransportMode =
       this.transportModeFilter != null &&
-      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
-    );
+      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode());
+
+    return matchesTrip || matchesTransportMode;
   }
 
   @Override
@@ -120,6 +142,10 @@ public class SelectRequest implements Serializable {
     return routes;
   }
 
+  public List<FeedScopedId> getTrips() {
+    return trips;
+  }
+
   private String transportModesToString() {
     if (transportModes == null) {
       return null;
@@ -146,6 +172,7 @@ public class SelectRequest implements Serializable {
     private List<FeedScopedId> agencies = new ArrayList<>();
     private List<FeedScopedId> groupOfRoutes = new ArrayList<>();
     private List<FeedScopedId> routes = new ArrayList<>();
+    private List<FeedScopedId> trips = new ArrayList<>();
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
       this.transportModes = transportModes;
@@ -183,6 +210,11 @@ public class SelectRequest implements Serializable {
 
     public Builder withGroupOfRoutes(List<FeedScopedId> groupOfRoutes) {
       this.groupOfRoutes = groupOfRoutes;
+      return this;
+    }
+
+    public Builder withTrips(List<FeedScopedId> trips) {
+      this.trips = trips;
       return this;
     }
 

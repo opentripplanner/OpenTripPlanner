@@ -32,6 +32,11 @@ class SelectRequestMapper {
       selectRequestBuilder.withGroupOfRoutes(mapIDsToDomainNullSafe(groupOfLines));
     }
 
+    if (input.containsKey("serviceJourneys")) {
+      var serviceJourneys = (List<String>) input.get("serviceJourneys");
+      selectRequestBuilder.withTrips(mapIDsToDomainNullSafe(serviceJourneys));
+    }
+
     if (input.containsKey("transportModes")) {
       var tModes = new ArrayList<MainAndSubMode>();
 
