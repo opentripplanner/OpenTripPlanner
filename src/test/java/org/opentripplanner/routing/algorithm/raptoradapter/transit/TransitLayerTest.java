@@ -72,12 +72,12 @@ class TransitLayerTest {
     assertEquals(1, runningOnDate.size());
     assertEquals(tripPatterns, runningOnDate);
     assertFalse(tripPatterns == runningOnDate);
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.plusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsRunningOnDateCopy(date.minusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsRunningOnDateCopy(date.plusDays(1)).size());
   }
 
   @Test
-  void testGetTripPatternsForDate() {
+  void testGetTripPatternsForRunningDate() {
     var date = LocalDate.of(2024, 1, 1);
 
     var tripPatternForDate = new TripPatternForDate(
@@ -98,16 +98,16 @@ class TransitLayerTest {
       null,
       null
     );
-    var runningOnDate = transitLayer.getTripPatternsForDate(date);
+    var runningOnDate = transitLayer.getTripPatternsForRunningDate(date);
     assertEquals(1, runningOnDate.size());
     assertEquals(tripPatterns, runningOnDate);
     assertTrue(tripPatterns == runningOnDate);
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.plusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsForRunningDate(date.minusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsForRunningDate(date.plusDays(1)).size());
   }
 
   @Test
-  void testGetTripPatternsStartingOnDateCopyWithSameRunningAndServiceDate() {
+  void testGetTripPatternsOnServiceDateCopyWithSameRunningAndServiceDate() {
     var date = LocalDate.of(2024, 1, 1);
 
     var tripPatternForDate = new TripPatternForDate(
@@ -127,15 +127,15 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsStartingOnDateCopy(date);
+    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(date);
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(date.plusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(date.minusDays(1)).size());
+    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(date.plusDays(1)).size());
   }
 
   @Test
-  void testGetTripPatternsStartingOnDateCopyWithServiceRunningAfterMidnight() {
+  void testGetTripPatternsOnServiceDateCopyWithServiceRunningAfterMidnight() {
     var runningDate = LocalDate.of(2024, 1, 1);
     var serviceDate = runningDate.minusDays(1);
 
@@ -156,16 +156,16 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsStartingOnDateCopy(serviceDate);
+    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(serviceDate);
     // starting date should be determined by service date, not running date which refers to the
     // normal calendar date that the trip pattern is running on
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(runningDate).size());
+    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(runningDate).size());
   }
 
   @Test
-  void testGetTripPatternsStartingOnDateCopyWithServiceRunningBeforeAndAfterMidnight() {
+  void testGetTripPatternsOnServiceDateCopyWithServiceRunningBeforeAndAfterMidnight() {
     // This is same as the service date
     var firstRunningDate = LocalDate.of(2024, 1, 1);
     var secondRunningDate = firstRunningDate.plusDays(1);
@@ -190,12 +190,12 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsStartingOnDateCopy(firstRunningDate);
+    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(firstRunningDate);
     // Transit layer indexes trip patterns by running date and to get trip patterns for certain
     // service date, we need to look up the trip patterns for the next running date as well, but
     // we don't want to return duplicates
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsStartingOnDateCopy(secondRunningDate).size());
+    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(secondRunningDate).size());
   }
 }
