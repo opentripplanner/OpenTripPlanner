@@ -541,11 +541,8 @@ public class OsmModule implements GraphBuilderModule {
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isSteps())
-      .withWheelchairAccessible(way.isWheelchairAccessible());
-
-    if (!way.hasTag("name") && !way.hasTag("ref")) {
-      seb.withBogusName(true);
-    }
+      .withWheelchairAccessible(way.isWheelchairAccessible())
+      .withBogusName(way.needsFallbackName());
 
     StreetEdge street = seb.buildAndConnect();
     params.edgeNamer().recordEdge(way, street);

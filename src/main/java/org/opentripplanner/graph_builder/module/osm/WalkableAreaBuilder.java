@@ -400,7 +400,7 @@ class WalkableAreaBuilder {
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
-    if (edges.size() == 0) return;
+    if (edges.isEmpty()) return;
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
@@ -496,7 +496,7 @@ class WalkableAreaBuilder {
     }
     // do we need to recurse?
     if (intersects.size() == 1) {
-      Area area = intersects.get(0);
+      Area area = intersects.getFirst();
       OSMWithTags areaEntity = area.parent;
 
       StreetTraversalPermission areaPermissions = areaEntity.overridePermissions(
@@ -531,11 +531,8 @@ class WalkableAreaBuilder {
         .withPermission(areaPermissions)
         .withBack(false)
         .withArea(edgeList)
-        .withCarSpeed(carSpeed);
-
-      if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        streetEdgeBuilder.withBogusName(true);
-      }
+        .withCarSpeed(carSpeed)
+        .withBogusName(areaEntity.needsFallbackName());
 
       streetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
@@ -559,11 +556,8 @@ class WalkableAreaBuilder {
         .withPermission(areaPermissions)
         .withBack(true)
         .withArea(edgeList)
-        .withCarSpeed(carSpeed);
-
-      if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        backStreetEdgeBuilder.withBogusName(true);
-      }
+        .withCarSpeed(carSpeed)
+        .withBogusName(areaEntity.needsFallbackName());
 
       backStreetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
