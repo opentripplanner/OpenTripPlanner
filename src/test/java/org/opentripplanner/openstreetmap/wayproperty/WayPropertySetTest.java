@@ -2,6 +2,7 @@ package org.opentripplanner.openstreetmap.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
@@ -25,14 +26,14 @@ class WayPropertySetTest {
   class ConditionSpecificity {
 
     @Test
-    public void carTunnel() {
+    void carTunnel() {
       OSMWithTags tunnel = WayTestData.carTunnel();
       WayPropertySet wps = wps();
       assertEquals(CAR, wps.getDataForWay(tunnel).getPermission());
     }
 
     @Test
-    public void carMaxSpeed() {
+    void carMaxSpeed() {
       var delta = 0.001f;
       var motorWaySpeed = 35f;
       WayPropertySet wps = wps();
@@ -323,4 +324,32 @@ class WayPropertySetTest {
       return way.splitPermissions(def);
     }
   }
+
+
+  @Nested
+  class CreativeNames {
+
+    @Test
+    void deduplicateCreativeName() {
+      WayPropertySet wps = wps();
+      var n1 = wps.getCreativeNameForWay(WayTestData.sidewalk());
+      assertEquals("sidewalk", n1.toString());
+      var n2 = wps.getCreativeNameForWay(WayTestData.sidewalk());
+      assertEquals(n1, n2);
+      assertSame(n1, n2);
+    }
+
+    private static WayPropertySet wps() {
+      var wps = new WayPropertySet();
+      var source = new OsmTagMapper() {
+        @Override
+        public void populateProperties(WayPropertySet props) {
+          props.createNames("highway=footway;footway=sidewalk", "name.sidewalk");
+        }
+      };
+      source.populateProperties(wps);
+      return wps;
+    }
+  }
+
 }

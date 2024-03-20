@@ -6,9 +6,9 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 
 /**
- * De-duplicates instances of {@link I18NString}. This is useful for lowering the memory
- * for simple names like "sidewalk" or "service road" are appear several thousand/million times
- * in a typical graph.
+ * De-duplicates instances of {@link I18NString}. This is useful for lowering the memory consumption
+ * for simple names like "sidewalk" or "service road" that appear several thousand or even million
+ * times in a typical graph.
  */
 class I18nStringDeduplicator {
 

@@ -121,8 +121,9 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags footwaySidewalk() {
+  public static OSMWithTags sidewalk() {
     var way = new OSMWithTags();
+    way.addTag("highway", "footway");
     way.addTag("footway", "sidewalk");
     return way;
   }
