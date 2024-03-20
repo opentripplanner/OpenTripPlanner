@@ -13,34 +13,37 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
  */
 public class TripOnServiceDateRequest {
 
+  private final List<LocalDate> operatingDays;
   private final List<FeedScopedId> authorities;
   private final List<FeedScopedId> lines;
   private final List<FeedScopedId> serviceJourneys;
   private final List<FeedScopedId> replacementFor;
   private final List<String> privateCodes;
   private final List<TripAlteration> alterations;
-  private final List<LocalDate> operatingDays;
 
   protected TripOnServiceDateRequest(
+    List<LocalDate> operatingDays,
     List<FeedScopedId> authorities,
     List<FeedScopedId> lines,
     List<FeedScopedId> serviceJourneys,
     List<FeedScopedId> replacementFor,
     List<String> privateCodes,
-    List<LocalDate> operatingDays,
     List<TripAlteration> alterations
   ) {
+    if (operatingDays == null || operatingDays.isEmpty()) {
+      throw new IllegalArgumentException("operatingDays must have at least one date");
+    }
+    this.operatingDays = List.copyOf(operatingDays);
     this.authorities = List.copyOf(authorities);
     this.lines = List.copyOf(lines);
     this.serviceJourneys = List.copyOf(serviceJourneys);
     this.replacementFor = List.copyOf(replacementFor);
     this.privateCodes = List.copyOf(privateCodes);
     this.alterations = List.copyOf(alterations);
-    this.operatingDays = List.copyOf(operatingDays);
   }
 
-  public static TripOnServiceDateRequestBuilder of(List<LocalDate> operatingDays) {
-    return new TripOnServiceDateRequestBuilder(operatingDays);
+  public static TripOnServiceDateRequestBuilder of() {
+    return new TripOnServiceDateRequestBuilder();
   }
 
   public List<FeedScopedId> authorities() {

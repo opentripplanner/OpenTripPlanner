@@ -102,7 +102,8 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchOperatingDays() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(List.of(LocalDate.of(2024, 2, 22)))
+      .of()
+      .withOperatingDays(List.of(LocalDate.of(2024, 2, 22)))
       .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
@@ -115,7 +116,8 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchMultiple() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(List.of(LocalDate.of(2024, 2, 22)))
+      .of()
+      .withOperatingDays(List.of(LocalDate.of(2024, 2, 22)))
       .withAuthorities(List.of(new FeedScopedId("RUT", "3")))
       .withLines(List.of(new FeedScopedId("RUT:route", "2")))
       .withServiceJourneys(List.of(new FeedScopedId("RUT:route:trip", "1")))
@@ -131,7 +133,8 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchMultipleServiceJourneyMatchers() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(List.of(LocalDate.of(2024, 2, 22)))
+      .of()
+      .withOperatingDays(List.of(LocalDate.of(2024, 2, 22)))
       .withAuthorities(List.of(new FeedScopedId("RUT", "3")))
       .withLines(List.of(new FeedScopedId("RUT:route", "2")))
       .withServiceJourneys(
