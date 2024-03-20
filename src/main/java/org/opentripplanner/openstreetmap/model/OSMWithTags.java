@@ -577,6 +577,13 @@ public class OSMWithTags {
   }
 
   /**
+   * Does this entity has a name of its own or if it needs to have a fallback one assigned?
+   */
+  public boolean needsFallbackName() {
+    return !hasTag("name") && !hasTag("ref");
+  }
+
+  /**
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isTagDeniedAccess(String tagName) {
