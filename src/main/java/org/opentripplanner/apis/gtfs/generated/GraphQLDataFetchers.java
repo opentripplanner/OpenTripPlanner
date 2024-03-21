@@ -2,8 +2,6 @@
 package org.opentripplanner.apis.gtfs.generated;
 
 import graphql.relay.Connection;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
@@ -23,12 +21,8 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirec
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
-import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
-import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
-import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
-import org.opentripplanner.apis.gtfs.model.UnknownModel;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -50,8 +44,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -61,7 +53,6 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
@@ -1244,10 +1235,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> elevation();
   }
 
-  /**
-   * This type is only here for backwards-compatibility and this API will never return it anymore.
-   * Please use the leg's `fareProducts` instead.
-   */
   public interface GraphQLFare {
     public DataFetcher<Integer> cents();
 
@@ -1258,10 +1245,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> type();
   }
 
-  /**
-   * This type is only here for backwards-compatibility and this API will never return it anymore.
-   * Please use the leg's `fareProducts` instead.
-   */
+  /** Component of the fare (i.e. ticket) for a part of the itinerary */
   public interface GraphQLFareComponent {
     public DataFetcher<Integer> cents();
 
