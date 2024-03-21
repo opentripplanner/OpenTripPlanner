@@ -33,7 +33,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor()))
     );
     if (se.hasBogusName()) {
-      props.addFirst(kv("generated name", "%s".formatted(se.getName().toString())));
+      props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
     } else {
       props.addFirst(kv("name", se.getName().toString()));
     }
