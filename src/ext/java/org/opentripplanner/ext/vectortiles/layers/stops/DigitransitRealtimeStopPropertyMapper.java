@@ -35,7 +35,13 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
     Collection<KeyValue> sharedKeyValues = getBaseKeyValues(stop, i18NStringMapper, transitService);
     return ListUtils.combine(
       sharedKeyValues,
-      List.of(new KeyValue("closedByServiceAlert", noServiceAlert))
+      List.of(
+        new KeyValue("closedByServiceAlert", noServiceAlert),
+        new KeyValue(
+          "parentStation",
+          stop.getParentStation() != null ? stop.getParentStation().getId() : null
+        )
+      )
     );
   }
 }

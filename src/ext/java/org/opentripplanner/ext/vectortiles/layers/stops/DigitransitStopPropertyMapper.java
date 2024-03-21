@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -34,7 +35,16 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    return getBaseKeyValues(stop, i18NStringMapper, transitService);
+    Collection<KeyValue> sharedKeyValues = getBaseKeyValues(stop, i18NStringMapper, transitService);
+    return ListUtils.combine(
+      sharedKeyValues,
+      List.of(
+        new KeyValue(
+          "parentStation",
+          stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
+        )
+      )
+    );
   }
 
   protected static Collection<KeyValue> getBaseKeyValues(
@@ -48,10 +58,6 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
       new KeyValue("code", stop.getCode()),
       new KeyValue("platform", stop.getPlatformCode()),
       new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
-      new KeyValue(
-        "parentStation",
-        stop.getParentStation() != null ? stop.getParentStation().getId() : null
-      ),
       new KeyValue("type", getType(transitService, stop)),
       new KeyValue("routes", getRoutes(transitService, stop))
     );
