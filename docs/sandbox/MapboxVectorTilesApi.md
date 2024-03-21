@@ -110,7 +110,7 @@ The feature must be configured in `router-config.json` as follows
         "mapper": "DigitransitRealtime",
         "maxZoom": 20,
         "minZoom": 14,
-        "cacheMaxSeconds": 600
+        "cacheMaxSeconds": 60
       },
       // This exists for backwards compatibility. At some point, we might want
       // to add a new real-time parking mapper with better translation support
