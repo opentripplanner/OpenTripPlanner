@@ -5,6 +5,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
+import org.opentripplanner.graph_builder.module.osm.naming.SidewalkNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
@@ -50,7 +51,7 @@ public interface EdgeNamer {
       var osmNaming = root
         .of(parameterName)
         .summary("A custom OSM namer to use.")
-        .since(OtpVersion.V2_0)
+        .since(OtpVersion.V1_5)
         .asString(null);
       return fromConfig(osmNaming);
     }
@@ -65,6 +66,7 @@ public interface EdgeNamer {
 
       return switch (type) {
         case "portland" -> new PortlandCustomNamer();
+        case "sidewalks" -> new SidewalkNamer();
         default -> throw new IllegalArgumentException(
           String.format("Unknown osmNaming type: '%s'", type)
         );
