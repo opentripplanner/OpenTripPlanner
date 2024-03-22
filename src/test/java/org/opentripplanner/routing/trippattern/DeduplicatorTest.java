@@ -2,6 +2,7 @@ package org.opentripplanner.routing.trippattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,8 +11,14 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 @SuppressWarnings("StringOperationCanBeSimplified")
@@ -225,6 +232,68 @@ public class DeduplicatorTest {
       "List<LocalDate>: 1(1)" +
       "}",
       subject.toString()
+    );
+  }
+
+  static List<Supplier<I18NString>> testCases() {
+    return List.of(
+      DeduplicatorTest::nonLocalizedString,
+      DeduplicatorTest::localizedString,
+      DeduplicatorTest::translatedString
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("testCases")
+  void deduplicateI18nString(Supplier<I18NString> makeString) {
+    var cache = new Deduplicator();
+
+    var s1 = makeString.get();
+    var s2 = makeString.get();
+    assertEquals(s1, s2);
+    assertNotSame(s1, s2);
+
+    var d1 = cache.deduplicateObject(I18NString.class, s1);
+    assertSame(s1, d1);
+
+    var d2 = cache.deduplicateObject(I18NString.class, s2);
+    assertEquals(s1, d2);
+
+    assertSame(s1, d2);
+    assertEquals(d1, d2);
+    assertSame(d1, d2);
+
+    var s3 = I18NString.of("Rue de Helmut Kohl");
+
+    assertNotSame(s1, s3);
+    assertNotSame(s2, s3);
+
+    var d3 = cache.deduplicateObject(I18NString.class, s3);
+    assertEquals(d3, s3);
+    assertSame(d3, s3);
+  }
+
+  @Test
+  void nullString() {
+    var cache = new Deduplicator();
+    assertNull(cache.deduplicateObject(I18NString.class, null));
+  }
+
+  static I18NString nonLocalizedString() {
+    return I18NString.of("test123");
+  }
+
+  static I18NString localizedString() {
+    return new LocalizedString("name.sidewalk");
+  }
+
+  static I18NString translatedString() {
+    return TranslatedString.getI18NString(
+      "Helmut-Kohl-Straße",
+      "de",
+      "Helmut-Kohl-Straße",
+      "se",
+      "Helmuth Kohl Gattan "
     );
   }
 }
