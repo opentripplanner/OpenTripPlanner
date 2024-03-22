@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper.parseNotFilters;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper.parseSelectFilters;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.parseNotFilters;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.parseSelectFilters;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
