@@ -20,19 +20,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
-import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -86,7 +83,7 @@ class RouteRequestMapperTest {
 
   @Test
   void testMinimalArgs() {
-    var env = executionContext(args);
+    var env = executionContext(args, LOCALE, context);
     var defaultRequest = new RouteRequest();
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(ORIGIN.x, routeRequest.from().lat);
@@ -118,10 +115,10 @@ class RouteRequestMapperTest {
 
   @Test
   void testEarliestDeparture() {
-    var dateTimeArgs = createArgsCopy();
+    var dateTimeArgs = createArgsCopy(args);
     var dateTime = OffsetDateTime.of(LocalDate.of(2020, 3, 15), LocalTime.MIDNIGHT, ZoneOffset.UTC);
     dateTimeArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", dateTime)));
-    var env = executionContext(dateTimeArgs);
+    var env = executionContext(dateTimeArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertFalse(routeRequest.arriveBy());
@@ -130,10 +127,10 @@ class RouteRequestMapperTest {
 
   @Test
   void testLatestArrival() {
-    var dateTimeArgs = createArgsCopy();
+    var dateTimeArgs = createArgsCopy(args);
     var dateTime = OffsetDateTime.of(LocalDate.of(2020, 3, 15), LocalTime.MIDNIGHT, ZoneOffset.UTC);
     dateTimeArgs.put("dateTime", Map.ofEntries(entry("latestArrival", dateTime)));
-    var env = executionContext(dateTimeArgs);
+    var env = executionContext(dateTimeArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertTrue(routeRequest.arriveBy());
@@ -161,7 +158,7 @@ class RouteRequestMapperTest {
         entry("label", destinationLabel)
       )
     );
-    var env = executionContext(stopLocationArgs);
+    var env = executionContext(stopLocationArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(FeedScopedId.parse(stopA), routeRequest.from().stopId);
     assertEquals(originLabel, routeRequest.from().label);
@@ -172,9 +169,9 @@ class RouteRequestMapperTest {
   @Test
   void testLocale() {
     var englishLocale = Locale.ENGLISH;
-    var localeArgs = createArgsCopy();
+    var localeArgs = createArgsCopy(args);
     localeArgs.put("locale", englishLocale);
-    var env = executionContext(localeArgs);
+    var env = executionContext(localeArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(englishLocale, routeRequest.locale());
   }
@@ -182,9 +179,9 @@ class RouteRequestMapperTest {
   @Test
   void testSearchWindow() {
     var searchWindow = Duration.ofHours(5);
-    var searchWindowArgs = createArgsCopy();
+    var searchWindowArgs = createArgsCopy(args);
     searchWindowArgs.put("searchWindow", searchWindow);
-    var env = executionContext(searchWindowArgs);
+    var env = executionContext(searchWindowArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(searchWindow, routeRequest.searchWindow());
   }
@@ -195,12 +192,12 @@ class RouteRequestMapperTest {
       "MXxQUkVWSU9VU19QQUdFfDIwMjQtMDMtMTVUMTM6MzU6MzlafHw0MG18U1RSRUVUX0FORF9BUlJJVkFMX1RJTUV8ZmFsc2V8MjAyNC0wMy0xNVQxNDoyODoxNFp8MjAyNC0wMy0xNVQxNToxNDoyMlp8MXw0MjUzfA=="
     );
     var last = 8;
-    var beforeArgs = createArgsCopy();
+    var beforeArgs = createArgsCopy(args);
     beforeArgs.put("before", before.encode());
     beforeArgs.put("first", 3);
     beforeArgs.put("last", last);
     beforeArgs.put("numberOfItineraries", 3);
-    var env = executionContext(beforeArgs);
+    var env = executionContext(beforeArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(before, routeRequest.pageCursor());
     assertEquals(last, routeRequest.numItineraries());
@@ -212,12 +209,12 @@ class RouteRequestMapperTest {
       "MXxORVhUX1BBR0V8MjAyNC0wMy0xNVQxNDo0MzoxNFp8fDQwbXxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXxmYWxzZXwyMDI0LTAzLTE1VDE0OjI4OjE0WnwyMDI0LTAzLTE1VDE1OjE0OjIyWnwxfDQyNTN8"
     );
     var first = 8;
-    var afterArgs = createArgsCopy();
+    var afterArgs = createArgsCopy(args);
     afterArgs.put("after", after.encode());
     afterArgs.put("first", first);
     afterArgs.put("last", 3);
     afterArgs.put("numberOfItineraries", 3);
-    var env = executionContext(afterArgs);
+    var env = executionContext(afterArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(after, routeRequest.pageCursor());
     assertEquals(first, routeRequest.numItineraries());
@@ -226,34 +223,34 @@ class RouteRequestMapperTest {
   @Test
   void testNumberOfItineraries() {
     var itineraries = 8;
-    var itinArgs = createArgsCopy();
+    var itinArgs = createArgsCopy(args);
     itinArgs.put("numberOfItineraries", itineraries);
-    var env = executionContext(itinArgs);
+    var env = executionContext(itinArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(itineraries, routeRequest.numItineraries());
   }
 
   @Test
   void testDirectOnly() {
-    var modesArgs = createArgsCopy();
+    var modesArgs = createArgsCopy(args);
     modesArgs.put("modes", Map.ofEntries(entry("directOnly", true)));
-    var env = executionContext(modesArgs);
+    var env = executionContext(modesArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertFalse(routeRequest.journey().transit().enabled());
   }
 
   @Test
   void testTransitOnly() {
-    var modesArgs = createArgsCopy();
+    var modesArgs = createArgsCopy(args);
     modesArgs.put("modes", Map.ofEntries(entry("transitOnly", true)));
-    var env = executionContext(modesArgs);
+    var env = executionContext(modesArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(StreetMode.NOT_SET, routeRequest.journey().direct().mode());
   }
 
   @Test
   void testStreetModes() {
-    var modesArgs = createArgsCopy();
+    var modesArgs = createArgsCopy(args);
     var bicycle = List.of("BICYCLE");
     modesArgs.put(
       "modes",
@@ -269,7 +266,7 @@ class RouteRequestMapperTest {
         )
       )
     );
-    var env = executionContext(modesArgs);
+    var env = executionContext(modesArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     assertEquals(StreetMode.CAR, routeRequest.journey().direct().mode());
     assertEquals(StreetMode.BIKE, routeRequest.journey().access().mode());
@@ -279,7 +276,7 @@ class RouteRequestMapperTest {
 
   @Test
   void testTransitModes() {
-    var modesArgs = createArgsCopy();
+    var modesArgs = createArgsCopy(args);
     var tramCost = 1.5;
     modesArgs.put(
       "modes",
@@ -301,7 +298,7 @@ class RouteRequestMapperTest {
         )
       )
     );
-    var env = executionContext(modesArgs);
+    var env = executionContext(modesArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     var reluctanceForMode = routeRequest.preferences().transit().reluctanceForMode();
     assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
@@ -314,7 +311,7 @@ class RouteRequestMapperTest {
 
   @Test
   void testItineraryFilters() {
-    var filterArgs = createArgsCopy();
+    var filterArgs = createArgsCopy(args);
     var profile = ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES;
     var keepOne = 0.4;
     var keepThree = 0.6;
@@ -328,7 +325,7 @@ class RouteRequestMapperTest {
         entry("groupedOtherThanSameLegsMaxCostMultiplier", multiplier)
       )
     );
-    var env = executionContext(filterArgs);
+    var env = executionContext(filterArgs, LOCALE, context);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
     var itinFilter = routeRequest.preferences().itineraryFilter();
     assertEquals(profile, itinFilter.debug());
@@ -337,279 +334,33 @@ class RouteRequestMapperTest {
     assertEquals(multiplier, itinFilter.groupedOtherThanSameLegsMaxCostMultiplier());
   }
 
-  @Test
-  void testBasicBikePreferences() {
-    var bicycleArgs = createArgsCopy();
-    var reluctance = 7.5;
-    var speed = 15d;
-    var boardCost = Cost.costOfSeconds(50);
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(
-                entry("reluctance", reluctance),
-                entry("speed", speed),
-                entry("boardCost", boardCost)
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikePreferences = routeRequest.preferences().bike();
-    assertEquals(reluctance, bikePreferences.reluctance());
-    assertEquals(speed, bikePreferences.speed());
-    assertEquals(boardCost.toSeconds(), bikePreferences.boardCost());
-  }
-
-  @Test
-  void testBikeWalkPreferences() {
-    var bicycleArgs = createArgsCopy();
-    var walkSpeed = 7d;
-    var mountDismountTime = Duration.ofSeconds(23);
-    var mountDismountCost = Cost.costOfSeconds(35);
-    var walkReluctance = 6.3;
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(
-                entry(
-                  "walk",
-                  Map.ofEntries(
-                    entry("speed", walkSpeed),
-                    entry("mountDismountTime", mountDismountTime),
-                    entry(
-                      "cost",
-                      Map.ofEntries(
-                        entry("mountDismountCost", mountDismountCost),
-                        entry("reluctance", walkReluctance)
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikeWalkingPreferences = routeRequest.preferences().bike().walking();
-    assertEquals(walkSpeed, bikeWalkingPreferences.speed());
-    assertEquals(mountDismountTime, bikeWalkingPreferences.mountDismountTime());
-    assertEquals(mountDismountCost, bikeWalkingPreferences.mountDismountCost());
-    assertEquals(walkReluctance, bikeWalkingPreferences.reluctance());
-  }
-
-  @Test
-  void testBikeTrianglePreferences() {
-    var bicycleArgs = createArgsCopy();
-    var bikeSafety = 0.3;
-    var bikeFlatness = 0.5;
-    var bikeTime = 0.2;
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(
-                entry(
-                  "optimization",
-                  Map.ofEntries(
-                    entry(
-                      "triangle",
-                      Map.ofEntries(
-                        entry("safety", bikeSafety),
-                        entry("flatness", bikeFlatness),
-                        entry("time", bikeTime)
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikePreferences = routeRequest.preferences().bike();
-    assertEquals(VehicleRoutingOptimizeType.TRIANGLE, bikePreferences.optimizeType());
-    var bikeTrianglePreferences = bikePreferences.optimizeTriangle();
-    assertEquals(bikeSafety, bikeTrianglePreferences.safety());
-    assertEquals(bikeFlatness, bikeTrianglePreferences.slope());
-    assertEquals(bikeTime, bikeTrianglePreferences.time());
-  }
-
-  @Test
-  void testBikeOptimizationPreferences() {
-    var bicycleArgs = createArgsCopy();
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(entry("optimization", Map.ofEntries(entry("type", "SAFEST_STREETS"))))
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikePreferences = routeRequest.preferences().bike();
-    assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, bikePreferences.optimizeType());
-  }
-
-  @Test
-  void testBikeRentalPreferences() {
-    var bicycleArgs = createArgsCopy();
-    var allowed = Set.of("foo", "bar");
-    var banned = Set.of("not");
-    var allowKeeping = true;
-    var keepingCost = Cost.costOfSeconds(150);
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(
-                entry(
-                  "rental",
-                  Map.ofEntries(
-                    entry("allowedNetworks", allowed.stream().toList()),
-                    entry("bannedNetworks", banned.stream().toList()),
-                    entry(
-                      "destinationBicyclePolicy",
-                      Map.ofEntries(
-                        entry("allowKeeping", allowKeeping),
-                        entry("keepingCost", keepingCost)
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikeRentalPreferences = routeRequest.preferences().bike().rental();
-    assertEquals(allowed, bikeRentalPreferences.allowedNetworks());
-    assertEquals(banned, bikeRentalPreferences.bannedNetworks());
-    assertEquals(allowKeeping, bikeRentalPreferences.allowArrivingInRentedVehicleAtDestination());
-    assertEquals(keepingCost, bikeRentalPreferences.arrivingInRentalVehicleAtDestinationCost());
-  }
-
-  @Test
-  void testBikeParkingPreferences() {
-    var bicycleArgs = createArgsCopy();
-    var unpreferredCost = Cost.costOfSeconds(150);
-    var notFilter = List.of("wheelbender");
-    var selectFilter = List.of("locker", "roof");
-    var unpreferred = List.of("bad");
-    var preferred = List.of("a", "b");
-    bicycleArgs.put(
-      "preferences",
-      Map.ofEntries(
-        entry(
-          "street",
-          Map.ofEntries(
-            entry(
-              "bicycle",
-              Map.ofEntries(
-                entry(
-                  "parking",
-                  Map.ofEntries(
-                    entry("unpreferredCost", unpreferredCost),
-                    entry(
-                      "filters",
-                      List.of(
-                        Map.ofEntries(
-                          entry("not", List.of(Map.of("tags", notFilter))),
-                          entry("select", List.of(Map.of("tags", selectFilter)))
-                        )
-                      )
-                    ),
-                    entry(
-                      "preferred",
-                      List.of(
-                        Map.ofEntries(
-                          entry("not", List.of(Map.of("tags", unpreferred))),
-                          entry("select", List.of(Map.of("tags", preferred)))
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(bicycleArgs);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-    var bikeParkingPreferences = routeRequest.preferences().bike().parking();
-    assertEquals(unpreferredCost, bikeParkingPreferences.unpreferredVehicleParkingTagCost());
-    assertEquals(
-      "VehicleParkingFilter{not: [tags=%s], select: [tags=%s]}".formatted(notFilter, selectFilter),
-      bikeParkingPreferences.filter().toString()
-    );
-    assertEquals(
-      "VehicleParkingFilter{not: [tags=%s], select: [tags=%s]}".formatted(unpreferred, preferred),
-      bikeParkingPreferences.preferred().toString()
-    );
-  }
-
-  private Map<String, Object> createArgsCopy() {
+  static Map<String, Object> createArgsCopy(Map<String, Object> arguments) {
     Map<String, Object> newArgs = new HashMap<>();
-    newArgs.putAll(args);
+    newArgs.putAll(arguments);
     return newArgs;
   }
 
-  private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
+  static DataFetchingEnvironment executionContext(
+    Map<String, Object> arguments,
+    Locale locale,
+    GraphQLRequestContext requestContext
+  ) {
     ExecutionInput executionInput = ExecutionInput
       .newExecutionInput()
       .query("")
       .operationName("planConnection")
-      .context(context)
-      .locale(LOCALE)
+      .context(requestContext)
+      .locale(locale)
       .build();
 
     var executionContext = newExecutionContextBuilder()
       .executionInput(executionInput)
-      .executionId(ExecutionId.from(this.getClass().getName()))
+      .executionId(ExecutionId.from("planConnectionTest"))
       .build();
     return DataFetchingEnvironmentImpl
       .newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
-      .localContext(Map.of("locale", LOCALE))
+      .localContext(Map.of("locale", locale))
       .build();
   }
 }
