@@ -12,9 +12,6 @@ import com.azure.messaging.servicebus.administration.ServiceBusAdministrationCli
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
-import com.google.common.io.CharStreams;
-import jakarta.xml.bind.JAXBException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -24,12 +21,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import javax.xml.stream.XMLStreamException;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClient;
-import org.opentripplanner.framework.io.OtpHttpClientStatusCodeException;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -208,40 +204,26 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    * Returns None for empty result
    */
   protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
-    // Maybe put this in the config?
-    HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
-    String initialData;
+    var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
 
     try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
       var t1 = System.currentTimeMillis();
-      initialData =
-        otpHttpClient.getAndMap(
-          uri,
-          Duration.ofMillis(timeout),
-          rh.asMap(),
-          is -> CharStreams.toString(new InputStreamReader(is))
-        );
-      final long t2 = System.currentTimeMillis();
-
-      LOG.info(
-        "Fetching initial data, received {} bytes in {} ms.",
-        (t2 - t1),
-        initialData.length()
+      var siriOptional = otpHttpClient.executeAndMapOptional(
+        new HttpGet(uri),
+        Duration.ofMillis(timeout),
+        headers,
+        SiriXml::parseXml
       );
-    } catch (OtpHttpClientStatusCodeException e) {
-      // 204 No Content status is ok.
-      if (e.getStatusCode() == 204) {
+      var t2 = System.currentTimeMillis();
+      LOG.info("Fetched initial data in {} ms", (t2 - t1));
+
+      if (siriOptional.isEmpty()) {
         LOG.info("Got status 204 'No Content', handling gracefully.");
         return Optional.empty();
       }
-      throw e;
-    }
 
-    try {
-      var serviceDelivery = SiriXml.parseXml(initialData).getServiceDelivery();
+      var serviceDelivery = siriOptional.get().getServiceDelivery();
       return Optional.ofNullable(serviceDelivery);
-    } catch (JAXBException | XMLStreamException e) {
-      throw new SiriAzureInitializationException("Could not parse history message", e);
     }
   }
 
