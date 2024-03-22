@@ -17,6 +17,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,8 @@ public class OsmProvider {
       OsmTagMapperSource.DEFAULT,
       null,
       cacheDataInMem,
-      DataImportIssueStore.NOOP
+      DataImportIssueStore.NOOP,
+      new Deduplicator()
     );
   }
 
@@ -56,12 +58,13 @@ public class OsmProvider {
     OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
     boolean cacheDataInMem,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    Deduplicator deduplicator
   ) {
     this.source = dataSource;
     this.zoneId = zoneId;
     this.osmTagMapper = tagMapperSource.getInstance();
-    this.wayPropertySet = new WayPropertySet(issueStore);
+    this.wayPropertySet = new WayPropertySet(issueStore, deduplicator);
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
   }
