@@ -9,8 +9,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "CARPOOL",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "CARPOOL"
       },
       {
         "longName" : "Long name for SUBWAY",
@@ -20,8 +19,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "SUBWAY",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "SUBWAY"
       },
       {
         "longName" : "Long name for BUS",
@@ -31,8 +29,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "BUS",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "BUS"
       },
       {
         "longName" : "Long name for FERRY",
@@ -42,8 +39,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "FERRY",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "FERRY"
       },
       {
         "longName" : "Long name for COACH",
@@ -53,8 +49,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "COACH",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "COACH"
       },
       {
         "longName" : "Long name for TRAM",
@@ -64,8 +59,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "TRAM",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "TRAM"
       },
       {
         "longName" : "Long name for CABLE_CAR",
@@ -75,8 +69,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "CABLE_CAR",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "CABLE_CAR"
       },
       {
         "longName" : "Long name for FUNICULAR",
@@ -86,8 +79,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "FUNICULAR",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "FUNICULAR"
       },
       {
         "longName" : "Long name for RAIL",
@@ -97,8 +89,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "RAIL",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "RAIL"
       },
       {
         "longName" : "Long name for MONORAIL",
@@ -108,8 +99,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "MONORAIL",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "MONORAIL"
       },
       {
         "longName" : "Long name for GONDOLA",
@@ -119,8 +109,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "GONDOLA",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "GONDOLA"
       },
       {
         "longName" : "Long name for TROLLEYBUS",
@@ -130,8 +119,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "TROLLEYBUS",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "TROLLEYBUS"
       },
       {
         "longName" : "Long name for AIRPLANE",
@@ -141,8 +129,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "AIRPLANE",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "AIRPLANE"
       },
       {
         "longName" : "Long name for TAXI",
@@ -152,8 +139,7 @@
           "gtfsId" : "F:A1",
           "name" : "Agency Test"
         },
-        "mode" : "TAXI",
-        "bikesAllowed" : "NO_INFORMATION"
+        "mode" : "TAXI"
       }
     ]
   }

@@ -10,7 +10,8 @@
           "name" : "Agency Test"
         },
         "mode" : "CARPOOL",
-        "sortOrder" : 12
+        "sortOrder" : 12,
+        "bikesAllowed" : "ALLOWED"
       },
       {
         "longName" : "Long name for SUBWAY",
@@ -21,7 +22,8 @@
           "name" : "Agency Test"
         },
         "mode" : "SUBWAY",
-        "sortOrder" : 2
+        "sortOrder" : 2,
+        "bikesAllowed" : "NO_INFORMATION"
       },
       {
         "longName" : "Long name for BUS",
@@ -32,7 +34,8 @@
           "name" : "Agency Test"
         },
         "mode" : "BUS",
-        "sortOrder" : 3
+        "sortOrder" : 3,
+        "bikesAllowed" : "ALLOWED"
       },
       {
         "longName" : "Long name for FERRY",
@@ -43,7 +46,8 @@
           "name" : "Agency Test"
         },
         "mode" : "FERRY",
-        "sortOrder" : 5
+        "sortOrder" : 5,
+        "bikesAllowed" : "NO_INFORMATION"
       },
       {
         "longName" : "Long name for COACH",
@@ -54,7 +58,8 @@
           "name" : "Agency Test"
         },
         "mode" : "COACH",
-        "sortOrder" : 1
+        "sortOrder" : 1,
+        "bikesAllowed" : "NOT_ALLOWED"
       },
       {
         "longName" : "Long name for TRAM",
@@ -65,7 +70,8 @@
           "name" : "Agency Test"
         },
         "mode" : "TRAM",
-        "sortOrder" : 4
+        "sortOrder" : 4,
+        "bikesAllowed" : "NOT_ALLOWED"
       },
       {
         "longName" : "Long name for CABLE_CAR",
@@ -76,7 +82,8 @@
           "name" : "Agency Test"
         },
         "mode" : "CABLE_CAR",
-        "sortOrder" : 7
+        "sortOrder" : 7,
+        "bikesAllowed" : "NOT_ALLOWED"
       },
       {
         "longName" : "Long name for FUNICULAR",
@@ -87,7 +94,8 @@
           "name" : "Agency Test"
         },
         "mode" : "FUNICULAR",
-        "sortOrder" : 9
+        "sortOrder" : 9,
+        "bikesAllowed" : "ALLOWED"
       },
       {
         "longName" : "Long name for RAIL",
@@ -98,7 +106,8 @@
           "name" : "Agency Test"
         },
         "mode" : "RAIL",
-        "sortOrder" : null
+        "sortOrder" : null,
+        "bikesAllowed" : "ALLOWED"
       },
       {
         "longName" : "Long name for MONORAIL",
@@ -109,7 +118,8 @@
           "name" : "Agency Test"
         },
         "mode" : "MONORAIL",
-        "sortOrder" : 11
+        "sortOrder" : 11,
+        "bikesAllowed" : "NO_INFORMATION"
       },
       {
         "longName" : "Long name for GONDOLA",
@@ -120,7 +130,8 @@
           "name" : "Agency Test"
         },
         "mode" : "GONDOLA",
-        "sortOrder" : 8
+        "sortOrder" : 8,
+        "bikesAllowed" : "NO_INFORMATION"
       },
       {
         "longName" : "Long name for TROLLEYBUS",
@@ -131,7 +142,8 @@
           "name" : "Agency Test"
         },
         "mode" : "TROLLEYBUS",
-        "sortOrder" : 10
+        "sortOrder" : 10,
+        "bikesAllowed" : "NOT_ALLOWED"
       },
       {
         "longName" : "Long name for AIRPLANE",
@@ -142,7 +154,8 @@
           "name" : "Agency Test"
         },
         "mode" : "AIRPLANE",
-        "sortOrder" : 6
+        "sortOrder" : 6,
+        "bikesAllowed" : "ALLOWED"
       },
       {
         "longName" : "Long name for TAXI",
@@ -153,7 +166,8 @@
           "name" : "Agency Test"
         },
         "mode" : "TAXI",
-        "sortOrder" : 13
+        "sortOrder" : 13,
+        "bikesAllowed" : "NOT_ALLOWED"
       }
     ]
   }
