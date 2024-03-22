@@ -159,6 +159,7 @@ class GraphQLIntegrationTest {
           .route(m.name())
           .withMode(m)
           .withLongName(I18NString.of("Long name for %s".formatted(m)))
+          .withGtfsSortOrder(sortOrder(m))
           .build()
       )
       .toList();
@@ -281,6 +282,17 @@ class GraphQLIntegrationTest {
         finder,
         new RouteRequest()
       );
+  }
+
+  /**
+   * We want to provide a variety of numbers and null.
+   */
+  private static Integer sortOrder(TransitMode m) {
+    if (m.ordinal() == 0) {
+      return null;
+    } else {
+      return m.ordinal();
+    }
   }
 
   private static void add10MinuteDelay(Itinerary i1) {

@@ -3426,6 +3426,12 @@ type Route implements Node {
         """
         types: [RouteAlertType]
     ): [Alert]
+
+    """
+    Orders the routes in a way which is ideal for presentation to passengers.
+    Routes with smaller values should be displayed first.
+    """
+    sortOrder: Int
 }
 
 """Entities that are relevant for routes that can contain alerts"""
