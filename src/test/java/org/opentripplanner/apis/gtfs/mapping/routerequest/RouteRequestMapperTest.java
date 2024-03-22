@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static graphql.Assert.assertTrue;
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;

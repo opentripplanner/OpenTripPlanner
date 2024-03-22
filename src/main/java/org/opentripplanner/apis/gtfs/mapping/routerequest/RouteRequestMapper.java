@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.DurationUtils;

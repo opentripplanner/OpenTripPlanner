@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;

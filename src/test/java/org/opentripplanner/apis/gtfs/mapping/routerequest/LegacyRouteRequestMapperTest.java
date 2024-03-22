@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
