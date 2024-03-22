@@ -3428,7 +3428,7 @@ type Route implements Node {
     ): [Alert]
 
     """
-    Orders the routes in a way which is ideal for presentation to passengers.
+    Orders the routes in a way which is useful for presentation to passengers.
     Routes with smaller values should be displayed first.
     """
     sortOrder: Int
