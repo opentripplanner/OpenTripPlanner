@@ -218,12 +218,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       LOG.info("Fetched initial data in {} ms", (t2 - t1));
 
       if (siriOptional.isEmpty()) {
-        LOG.info("Got status 204 'No Content', handling gracefully.");
-        return Optional.empty();
+        LOG.info("Got status 204 'No Content'.");
       }
 
-      var serviceDelivery = siriOptional.get().getServiceDelivery();
-      return Optional.ofNullable(serviceDelivery);
+      return siriOptional.flatMap(siri -> Optional.ofNullable(siri.getServiceDelivery()));
     }
   }
 
