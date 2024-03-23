@@ -34,7 +34,7 @@ public class ScooterPreferencesMapper {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
       if (!CollectionUtils.isEmpty(allowedNetworks)) {
-        preferences.withBannedNetworks(Set.copyOf(allowedNetworks));
+        preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
       if (!CollectionUtils.isEmpty(bannedNetworks)) {
