@@ -18,7 +18,7 @@ public class WalkPreferencesMapper {
       if (reluctance != null) {
         preferences.withReluctance(reluctance);
       }
-      var walkSafetyFactor = args.getGraphQLWalkSafetyFactor();
+      var walkSafetyFactor = args.getGraphQLSafetyFactor();
       if (walkSafetyFactor != null) {
         preferences.withSafetyFactor(walkSafetyFactor);
       }

@@ -111,7 +111,7 @@
         walk: {
           speed: 2.4
           reluctance: 1.5
-          walkSafetyFactor: 0.5
+          safetyFactor: 0.5
           boardCost: 200
         }
       }

@@ -5536,7 +5536,7 @@ input WalkPreferencesInput {
     Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
     If the value is set to be 0, safety is ignored.
     """
-    walkSafetyFactor: Ratio
+    safetyFactor: Ratio
 
     """
     The cost of boarding a vehicle while walking.

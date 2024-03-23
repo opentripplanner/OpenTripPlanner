@@ -4985,15 +4985,15 @@ public class GraphQLTypes {
 
     private org.opentripplanner.framework.model.Cost boardCost;
     private Double reluctance;
+    private Double safetyFactor;
     private Double speed;
-    private Double walkSafetyFactor;
 
     public GraphQLWalkPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         this.boardCost = (org.opentripplanner.framework.model.Cost) args.get("boardCost");
         this.reluctance = (Double) args.get("reluctance");
+        this.safetyFactor = (Double) args.get("safetyFactor");
         this.speed = (Double) args.get("speed");
-        this.walkSafetyFactor = (Double) args.get("walkSafetyFactor");
       }
     }
 
@@ -5005,12 +5005,12 @@ public class GraphQLTypes {
       return this.reluctance;
     }
 
-    public Double getGraphQLSpeed() {
-      return this.speed;
+    public Double getGraphQLSafetyFactor() {
+      return this.safetyFactor;
     }
 
-    public Double getGraphQLWalkSafetyFactor() {
-      return this.walkSafetyFactor;
+    public Double getGraphQLSpeed() {
+      return this.speed;
     }
 
     public void setGraphQLBoardCost(org.opentripplanner.framework.model.Cost boardCost) {
@@ -5021,12 +5021,12 @@ public class GraphQLTypes {
       this.reluctance = reluctance;
     }
 
-    public void setGraphQLSpeed(Double speed) {
-      this.speed = speed;
+    public void setGraphQLSafetyFactor(Double safetyFactor) {
+      this.safetyFactor = safetyFactor;
     }
 
-    public void setGraphQLWalkSafetyFactor(Double walkSafetyFactor) {
-      this.walkSafetyFactor = walkSafetyFactor;
+    public void setGraphQLSpeed(Double speed) {
+      this.speed = speed;
     }
   }
 
