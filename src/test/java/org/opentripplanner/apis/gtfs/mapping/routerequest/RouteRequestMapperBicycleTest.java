@@ -6,65 +6,19 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMap
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
-import org.opentripplanner.apis.gtfs.TestRoutingService;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 
 class RouteRequestMapperBicycleTest {
 
-  private static final GraphQLRequestContext context;
-  private static final Map<String, Object> args = new HashMap<>();
-
-  static {
-    args.put(
-      "origin",
-      Map.ofEntries(
-        entry("location", Map.of("coordinate", Map.of("latitude", 1.0, "longitude", 2.0)))
-      )
-    );
-    args.put(
-      "destination",
-      Map.ofEntries(
-        entry("location", Map.of("coordinate", Map.of("latitude", 2.0, "longitude", 1.0)))
-      )
-    );
-
-    Graph graph = new Graph();
-    var transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(transitModel);
-    context =
-      new GraphQLRequestContext(
-        new TestRoutingService(List.of()),
-        transitService,
-        new DefaultFareService(),
-        graph.getVehicleParkingService(),
-        new DefaultVehicleRentalService(),
-        new DefaultRealtimeVehicleService(transitService),
-        GraphFinder.getInstance(graph, transitService::findRegularStops),
-        new RouteRequest()
-      );
-  }
-
   @Test
   void testBasicBikePreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var reluctance = 7.5;
     var speed = 15d;
     var boardCost = Cost.costOfSeconds(50);
@@ -86,8 +40,8 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikePreferences = routeRequest.preferences().bike();
     assertEquals(reluctance, bikePreferences.reluctance());
     assertEquals(speed, bikePreferences.speed());
@@ -96,7 +50,7 @@ class RouteRequestMapperBicycleTest {
 
   @Test
   void testBikeWalkPreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var walkSpeed = 7d;
     var mountDismountTime = Duration.ofSeconds(23);
     var mountDismountCost = Cost.costOfSeconds(35);
@@ -130,8 +84,8 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikeWalkingPreferences = routeRequest.preferences().bike().walking();
     assertEquals(walkSpeed, bikeWalkingPreferences.speed());
     assertEquals(mountDismountTime, bikeWalkingPreferences.mountDismountTime());
@@ -141,7 +95,7 @@ class RouteRequestMapperBicycleTest {
 
   @Test
   void testBikeTrianglePreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var bikeSafety = 0.3;
     var bikeFlatness = 0.5;
     var bikeTime = 0.2;
@@ -173,8 +127,8 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikePreferences = routeRequest.preferences().bike();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, bikePreferences.optimizeType());
     var bikeTrianglePreferences = bikePreferences.optimizeTriangle();
@@ -185,7 +139,7 @@ class RouteRequestMapperBicycleTest {
 
   @Test
   void testBikeOptimizationPreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     bicycleArgs.put(
       "preferences",
       Map.ofEntries(
@@ -200,15 +154,15 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikePreferences = routeRequest.preferences().bike();
     assertEquals(VehicleRoutingOptimizeType.SAFEST_STREETS, bikePreferences.optimizeType());
   }
 
   @Test
   void testBikeRentalPreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var allowed = Set.of("foo", "bar");
     var banned = Set.of("not");
     var allowKeeping = true;
@@ -242,8 +196,8 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikeRentalPreferences = routeRequest.preferences().bike().rental();
     assertEquals(allowed, bikeRentalPreferences.allowedNetworks());
     assertEquals(banned, bikeRentalPreferences.bannedNetworks());
@@ -253,7 +207,7 @@ class RouteRequestMapperBicycleTest {
 
   @Test
   void testBikeParkingPreferences() {
-    var bicycleArgs = createArgsCopy(args);
+    var bicycleArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var unpreferredCost = Cost.costOfSeconds(150);
     var notFilter = List.of("wheelbender");
     var selectFilter = List.of("locker", "roof");
@@ -298,8 +252,8 @@ class RouteRequestMapperBicycleTest {
         )
       )
     );
-    var env = executionContext(bicycleArgs, Locale.ENGLISH, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(bicycleArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var bikeParkingPreferences = routeRequest.preferences().bike().parking();
     assertEquals(unpreferredCost, bikeParkingPreferences.unpreferredVehicleParkingTagCost());
     assertEquals(

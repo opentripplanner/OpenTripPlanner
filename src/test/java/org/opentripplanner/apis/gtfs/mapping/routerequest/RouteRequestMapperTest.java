@@ -44,17 +44,15 @@ class RouteRequestMapperTest {
   private static final Coordinate ORIGIN = new Coordinate(1.0, 2.0);
   private static final Coordinate DESTINATION = new Coordinate(2.0, 1.0);
   private static final Locale LOCALE = Locale.GERMAN;
-  private static final GraphQLRequestContext context;
-  private static final Map<String, Object> args = new HashMap<>();
-
-  static {
-    args.put(
+  static final GraphQLRequestContext CONTEXT;
+  static final Map<String, Object> ARGS = Map.ofEntries(
+    entry(
       "origin",
       Map.ofEntries(
         entry("location", Map.of("coordinate", Map.of("latitude", ORIGIN.x, "longitude", ORIGIN.y)))
       )
-    );
-    args.put(
+    ),
+    entry(
       "destination",
       Map.ofEntries(
         entry(
@@ -62,13 +60,15 @@ class RouteRequestMapperTest {
           Map.of("coordinate", Map.of("latitude", DESTINATION.x, "longitude", DESTINATION.y))
         )
       )
-    );
+    )
+  );
 
+  static {
     Graph graph = new Graph();
     var transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(transitModel);
-    context =
+    CONTEXT =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),
         transitService,
@@ -83,9 +83,9 @@ class RouteRequestMapperTest {
 
   @Test
   void testMinimalArgs() {
-    var env = executionContext(args, LOCALE, context);
+    var env = executionContext(ARGS, LOCALE, CONTEXT);
     var defaultRequest = new RouteRequest();
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(ORIGIN.x, routeRequest.from().lat);
     assertEquals(ORIGIN.y, routeRequest.from().lng);
     assertEquals(DESTINATION.x, routeRequest.to().lat);
@@ -115,11 +115,11 @@ class RouteRequestMapperTest {
 
   @Test
   void testEarliestDeparture() {
-    var dateTimeArgs = createArgsCopy(args);
+    var dateTimeArgs = createArgsCopy(ARGS);
     var dateTime = OffsetDateTime.of(LocalDate.of(2020, 3, 15), LocalTime.MIDNIGHT, ZoneOffset.UTC);
     dateTimeArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", dateTime)));
-    var env = executionContext(dateTimeArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(dateTimeArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertFalse(routeRequest.arriveBy());
     assertFalse(routeRequest.isTripPlannedForNow());
@@ -127,11 +127,11 @@ class RouteRequestMapperTest {
 
   @Test
   void testLatestArrival() {
-    var dateTimeArgs = createArgsCopy(args);
+    var dateTimeArgs = createArgsCopy(ARGS);
     var dateTime = OffsetDateTime.of(LocalDate.of(2020, 3, 15), LocalTime.MIDNIGHT, ZoneOffset.UTC);
     dateTimeArgs.put("dateTime", Map.ofEntries(entry("latestArrival", dateTime)));
-    var env = executionContext(dateTimeArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(dateTimeArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertTrue(routeRequest.arriveBy());
     assertFalse(routeRequest.isTripPlannedForNow());
@@ -158,8 +158,8 @@ class RouteRequestMapperTest {
         entry("label", destinationLabel)
       )
     );
-    var env = executionContext(stopLocationArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(stopLocationArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(FeedScopedId.parse(stopA), routeRequest.from().stopId);
     assertEquals(originLabel, routeRequest.from().label);
     assertEquals(FeedScopedId.parse(stopB), routeRequest.to().stopId);
@@ -169,20 +169,20 @@ class RouteRequestMapperTest {
   @Test
   void testLocale() {
     var englishLocale = Locale.ENGLISH;
-    var localeArgs = createArgsCopy(args);
+    var localeArgs = createArgsCopy(ARGS);
     localeArgs.put("locale", englishLocale);
-    var env = executionContext(localeArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(localeArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(englishLocale, routeRequest.locale());
   }
 
   @Test
   void testSearchWindow() {
     var searchWindow = Duration.ofHours(5);
-    var searchWindowArgs = createArgsCopy(args);
+    var searchWindowArgs = createArgsCopy(ARGS);
     searchWindowArgs.put("searchWindow", searchWindow);
-    var env = executionContext(searchWindowArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(searchWindowArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(searchWindow, routeRequest.searchWindow());
   }
 
@@ -192,13 +192,13 @@ class RouteRequestMapperTest {
       "MXxQUkVWSU9VU19QQUdFfDIwMjQtMDMtMTVUMTM6MzU6MzlafHw0MG18U1RSRUVUX0FORF9BUlJJVkFMX1RJTUV8ZmFsc2V8MjAyNC0wMy0xNVQxNDoyODoxNFp8MjAyNC0wMy0xNVQxNToxNDoyMlp8MXw0MjUzfA=="
     );
     var last = 8;
-    var beforeArgs = createArgsCopy(args);
+    var beforeArgs = createArgsCopy(ARGS);
     beforeArgs.put("before", before.encode());
     beforeArgs.put("first", 3);
     beforeArgs.put("last", last);
     beforeArgs.put("numberOfItineraries", 3);
-    var env = executionContext(beforeArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(beforeArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(before, routeRequest.pageCursor());
     assertEquals(last, routeRequest.numItineraries());
   }
@@ -209,13 +209,13 @@ class RouteRequestMapperTest {
       "MXxORVhUX1BBR0V8MjAyNC0wMy0xNVQxNDo0MzoxNFp8fDQwbXxTVFJFRVRfQU5EX0FSUklWQUxfVElNRXxmYWxzZXwyMDI0LTAzLTE1VDE0OjI4OjE0WnwyMDI0LTAzLTE1VDE1OjE0OjIyWnwxfDQyNTN8"
     );
     var first = 8;
-    var afterArgs = createArgsCopy(args);
+    var afterArgs = createArgsCopy(ARGS);
     afterArgs.put("after", after.encode());
     afterArgs.put("first", first);
     afterArgs.put("last", 3);
     afterArgs.put("numberOfItineraries", 3);
-    var env = executionContext(afterArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(afterArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(after, routeRequest.pageCursor());
     assertEquals(first, routeRequest.numItineraries());
   }
@@ -223,34 +223,34 @@ class RouteRequestMapperTest {
   @Test
   void testNumberOfItineraries() {
     var itineraries = 8;
-    var itinArgs = createArgsCopy(args);
+    var itinArgs = createArgsCopy(ARGS);
     itinArgs.put("numberOfItineraries", itineraries);
-    var env = executionContext(itinArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(itinArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(itineraries, routeRequest.numItineraries());
   }
 
   @Test
   void testDirectOnly() {
-    var modesArgs = createArgsCopy(args);
+    var modesArgs = createArgsCopy(ARGS);
     modesArgs.put("modes", Map.ofEntries(entry("directOnly", true)));
-    var env = executionContext(modesArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(modesArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertFalse(routeRequest.journey().transit().enabled());
   }
 
   @Test
   void testTransitOnly() {
-    var modesArgs = createArgsCopy(args);
+    var modesArgs = createArgsCopy(ARGS);
     modesArgs.put("modes", Map.ofEntries(entry("transitOnly", true)));
-    var env = executionContext(modesArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(modesArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(StreetMode.NOT_SET, routeRequest.journey().direct().mode());
   }
 
   @Test
   void testStreetModes() {
-    var modesArgs = createArgsCopy(args);
+    var modesArgs = createArgsCopy(ARGS);
     var bicycle = List.of("BICYCLE");
     modesArgs.put(
       "modes",
@@ -266,8 +266,8 @@ class RouteRequestMapperTest {
         )
       )
     );
-    var env = executionContext(modesArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(modesArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(StreetMode.CAR, routeRequest.journey().direct().mode());
     assertEquals(StreetMode.BIKE, routeRequest.journey().access().mode());
     assertEquals(StreetMode.BIKE, routeRequest.journey().egress().mode());
@@ -276,7 +276,7 @@ class RouteRequestMapperTest {
 
   @Test
   void testTransitModes() {
-    var modesArgs = createArgsCopy(args);
+    var modesArgs = createArgsCopy(ARGS);
     var tramCost = 1.5;
     modesArgs.put(
       "modes",
@@ -298,8 +298,8 @@ class RouteRequestMapperTest {
         )
       )
     );
-    var env = executionContext(modesArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(modesArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     var reluctanceForMode = routeRequest.preferences().transit().reluctanceForMode();
     assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
     assertNull(reluctanceForMode.get(TransitMode.FERRY));
@@ -311,7 +311,7 @@ class RouteRequestMapperTest {
 
   @Test
   void testItineraryFilters() {
-    var filterArgs = createArgsCopy(args);
+    var filterArgs = createArgsCopy(ARGS);
     var profile = ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES;
     var keepOne = 0.4;
     var keepThree = 0.6;
@@ -325,8 +325,8 @@ class RouteRequestMapperTest {
         entry("groupedOtherThanSameLegsMaxCostMultiplier", multiplier)
       )
     );
-    var env = executionContext(filterArgs, LOCALE, context);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var env = executionContext(filterArgs, LOCALE, CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     var itinFilter = routeRequest.preferences().itineraryFilter();
     assertEquals(profile, itinFilter.debug());
     assertEquals(keepOne, itinFilter.groupSimilarityKeepOne());
