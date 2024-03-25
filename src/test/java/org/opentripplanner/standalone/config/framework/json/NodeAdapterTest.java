@@ -558,7 +558,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  void unknownProperties() {
+  void unknownParameters() {
     // Given: two parameters a and b
     NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
@@ -569,7 +569,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  void allPropertiesAreKnown() {
+  void allParametersAreKnown() {
     // Given: two parameters a and b
     NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
