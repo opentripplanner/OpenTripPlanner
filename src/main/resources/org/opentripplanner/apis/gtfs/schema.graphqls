@@ -1673,7 +1673,7 @@ available.
 type LegTime {
     "The scheduled time of the event."
     scheduledTime: OffsetDateTime!
-    "The estimated time of the event. If no real-time information is available, this is null,"
+    "The estimated time of the event. If no real-time information is available, this is null."
     estimated: RealTimeEstimate
 }
 
