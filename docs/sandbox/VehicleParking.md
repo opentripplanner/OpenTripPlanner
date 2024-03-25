@@ -60,7 +60,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[2]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
 
 The source of the vehicle updates.
 
@@ -110,7 +110,7 @@ Used for converting abstract opening hours into concrete points in time.
 | frequency                       |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.2  |
 | [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
 | [timeZone](#u__3__timeZone)     |   `time-zone`   | The time zone of the feed.                                                 | *Optional* |               |  2.2  |
-| url                             |     `string`    | URL of the resource.                                                       | *Optional* |               |  2.2  |
+| url                             |     `string`    | URL of the resource.                                                       | *Required* |               |  2.2  |
 | [headers](#u__3__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.2  |
 | [tags](#u__3__tags)             |    `string[]`   | Tags to add to the parking lots.                                           | *Optional* |               |  2.2  |
 
@@ -130,7 +130,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[3]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
 
 The source of the vehicle updates.
 
@@ -196,7 +196,7 @@ Tags to add to the parking lots.
 | [feedId](#u__4__feedId)         |     `string`    | The name of the data source.                                               | *Required* |               |  2.2  |
 | frequency                       |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.3  |
 | [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
-| url                             |      `uri`      | URL of the locations endpoint.                                             | *Optional* |               |  2.3  |
+| url                             |      `uri`      | URL of the locations endpoint.                                             | *Required* |               |  2.3  |
 | [headers](#u__4__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
@@ -215,7 +215,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[4]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
 
 The source of the vehicle updates.
 
