@@ -42,7 +42,7 @@ public class StyleBuilder {
     Line,
     Raster,
     Fill,
-    Symbol
+    Symbol,
   }
 
   private StyleBuilder(String id) {
@@ -106,12 +106,18 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder lineText(String name){
+  public StyleBuilder lineText(String name) {
     layout.put("symbol-placement", "line");
+    layout.put("symbol-spacing", 500);
     layout.put("text-field", "{%s}".formatted(name));
     layout.put("text-font", List.of("KlokanTech Noto Sans Regular"));
-    layout.put("text-size", new ZoomDependentNumber(14, List.of(new ZoomStop(14, 12), new ZoomStop(20, 14))).toJson());
-    layout.put("text-offset", List.of(0, 0.9));
+    layout.put(
+      "text-size",
+      new ZoomDependentNumber(14, List.of(new ZoomStop(14, 12), new ZoomStop(20, 14))).toJson()
+    );
+    layout.put("text-max-width", 5);
+    layout.put("text-keep-upright", true);
+    layout.put("text-rotation-alignment", "map");
     paint.put("text-color", "#000");
     paint.put("text-halo-color", "#fff");
     paint.put("text-halo-blur", 4);
