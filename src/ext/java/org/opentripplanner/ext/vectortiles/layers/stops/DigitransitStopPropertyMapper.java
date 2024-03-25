@@ -35,16 +35,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   @Override
   protected Collection<KeyValue> map(RegularStop stop) {
-    Collection<KeyValue> sharedKeyValues = getBaseKeyValues(stop, i18NStringMapper, transitService);
-    return ListUtils.combine(
-      sharedKeyValues,
-      List.of(
-        new KeyValue(
-          "parentStation",
-          stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
-        )
-      )
-    );
+    return getBaseKeyValues(stop, i18NStringMapper, transitService);
   }
 
   protected static Collection<KeyValue> getBaseKeyValues(
@@ -59,7 +50,11 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
       new KeyValue("platform", stop.getPlatformCode()),
       new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
       new KeyValue("type", getType(transitService, stop)),
-      new KeyValue("routes", getRoutes(transitService, stop))
+      new KeyValue("routes", getRoutes(transitService, stop)),
+      new KeyValue(
+        "parentStation",
+        stop.getParentStation() != null ? stop.getParentStation().getId() : null
+      )
     );
   }
 
