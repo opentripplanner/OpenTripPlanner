@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -558,31 +557,27 @@ public class NodeAdapterTest {
     assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
   }
 
-  @Nested
-  class Validation {
+  @Test
+  void unknownProperties() {
+    // Given: two parameters a and b
+    NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
-    @Test
-    void invalidProperties() {
-      // Given: two parameters a and b
-      NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+    // When: Access ONLY parameter 'a', but not 'b'
+    subject.of("foo").asObject().of("a").asBoolean();
 
-      // When: Access ONLY parameter 'a', but not 'b'
-      subject.of("foo").asObject().of("a").asBoolean();
+    assertTrue(subject.hasUnknownParameters());
+  }
 
-      assertTrue(subject.hasUnknownParameters());
-    }
+  @Test
+  void allPropertiesAreKnown() {
+    // Given: two parameters a and b
+    NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
-    @Test
-    void valid() {
-      // Given: two parameters a and b
-      NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+    var object = subject.of("foo").asObject();
+    object.of("a").asBoolean();
+    object.of("b").asBoolean();
 
-      var object = subject.of("foo").asObject();
-      object.of("a").asBoolean();
-      object.of("b").asBoolean();
-
-      assertFalse(subject.hasUnknownParameters());
-    }
+    assertFalse(subject.hasUnknownParameters());
   }
 
   private static String unusedParams(NodeAdapter subject) {
