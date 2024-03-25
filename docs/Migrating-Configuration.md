@@ -16,8 +16,11 @@ to be a configuration error, perhaps because the schema was changed. In such a c
 consult the [feature](Configuration.md#otp-features), [router](RouterConfiguration.md) or 
 [build configuration documentation](BuildConfiguration.md) to find out what the new schema looks like.
 
-By default, OTP starts up even if unknown configuration parameters exists. This supports forward and backwards
-migration of config parameters independent if the OTP version. This allow the configuration to follow the lifecycle of the environment and still be able to roll back OTP. Combined with the config parameter substitution it also allows using the same configuration in different environments. Tip! Rolling out the configuration before rolling out a new
+By default, OTP starts up even if unknown configuration parameters exist. This supports forward and backwards
+migration of config parameters independent if the OTP version. This allows the configuration to follow 
+the lifecycle of the environment and still be able to roll back OTP. 
+Combined with the config parameter substitution it also allows using the same configuration in 
+different environments. Tip! Rolling out the configuration before rolling out a new
 version of OTP, ensure you that you are safe and can roll back later. 
 
 An example: you change the location of the graphs, a critical error occurs afterwards and you need to 
