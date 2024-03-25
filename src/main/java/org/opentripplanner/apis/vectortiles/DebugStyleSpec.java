@@ -50,13 +50,15 @@ public class DebugStyleSpec {
     1,
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
-  private static final Class<Edge>[] ALL_EDGES = new Class[]{StreetEdge.class,
+  private static final Class<Edge>[] ALL_EDGES = new Class[] {
+    StreetEdge.class,
     AreaEdge.class,
     EscalatorEdge.class,
     PathwayEdge.class,
     ElevatorHopEdge.class,
     TemporaryPartialStreetEdge.class,
-    TemporaryFreeEdge.class};
+    TemporaryFreeEdge.class,
+  };
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -81,9 +83,7 @@ public class DebugStyleSpec {
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(MAGENTA)
-          .edgeFilter(
-            ALL_EDGES
-          )
+          .edgeFilter(ALL_EDGES)
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
           .maxZoom(MAX_ZOOM)
@@ -93,10 +93,8 @@ public class DebugStyleSpec {
           .typeSymbol()
           .lineText("name")
           .vectorSourceLayer(edges)
-          .edgeFilter(
-            ALL_EDGES
-          )
-          .minZoom(15)
+          .edgeFilter(ALL_EDGES)
+          .minZoom(17)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder

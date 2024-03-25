@@ -168,6 +168,13 @@ public class OSMWithTags {
     return isTag("footway", "sidewalk") && isTag("highway", "footway");
   }
 
+  /**
+   * Whether this entity explicity doesn't have a name.
+   */
+  public boolean isExplicitlyUnnamed() {
+    return isTagTrue("noname");
+  }
+
   protected boolean doesTagAllowAccess(String tag) {
     if (tags == null) {
       return false;
