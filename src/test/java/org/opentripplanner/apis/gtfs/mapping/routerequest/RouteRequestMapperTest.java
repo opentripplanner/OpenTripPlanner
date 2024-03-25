@@ -5,7 +5,6 @@ import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuild
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -28,13 +27,11 @@ import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -228,85 +225,6 @@ class RouteRequestMapperTest {
     var env = executionContext(itinArgs, LOCALE, CONTEXT);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(itineraries, routeRequest.numItineraries());
-  }
-
-  @Test
-  void testDirectOnly() {
-    var modesArgs = createArgsCopy(ARGS);
-    modesArgs.put("modes", Map.ofEntries(entry("directOnly", true)));
-    var env = executionContext(modesArgs, LOCALE, CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
-    assertFalse(routeRequest.journey().transit().enabled());
-  }
-
-  @Test
-  void testTransitOnly() {
-    var modesArgs = createArgsCopy(ARGS);
-    modesArgs.put("modes", Map.ofEntries(entry("transitOnly", true)));
-    var env = executionContext(modesArgs, LOCALE, CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
-    assertEquals(StreetMode.NOT_SET, routeRequest.journey().direct().mode());
-  }
-
-  @Test
-  void testStreetModes() {
-    var modesArgs = createArgsCopy(ARGS);
-    var bicycle = List.of("BICYCLE");
-    modesArgs.put(
-      "modes",
-      Map.ofEntries(
-        entry("direct", List.of("CAR")),
-        entry(
-          "transit",
-          Map.ofEntries(
-            entry("access", bicycle),
-            entry("egress", bicycle),
-            entry("transfer", bicycle)
-          )
-        )
-      )
-    );
-    var env = executionContext(modesArgs, LOCALE, CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
-    assertEquals(StreetMode.CAR, routeRequest.journey().direct().mode());
-    assertEquals(StreetMode.BIKE, routeRequest.journey().access().mode());
-    assertEquals(StreetMode.BIKE, routeRequest.journey().egress().mode());
-    assertEquals(StreetMode.BIKE, routeRequest.journey().transfer().mode());
-  }
-
-  @Test
-  void testTransitModes() {
-    var modesArgs = createArgsCopy(ARGS);
-    var tramCost = 1.5;
-    modesArgs.put(
-      "modes",
-      Map.ofEntries(
-        entry(
-          "transit",
-          Map.ofEntries(
-            entry(
-              "transit",
-              List.of(
-                Map.ofEntries(
-                  entry("mode", "TRAM"),
-                  entry("cost", Map.ofEntries(entry("reluctance", tramCost)))
-                ),
-                Map.ofEntries(entry("mode", "FERRY"))
-              )
-            )
-          )
-        )
-      )
-    );
-    var env = executionContext(modesArgs, LOCALE, CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
-    var reluctanceForMode = routeRequest.preferences().transit().reluctanceForMode();
-    assertEquals(tramCost, reluctanceForMode.get(TransitMode.TRAM));
-    assertNull(reluctanceForMode.get(TransitMode.FERRY));
-    assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}]}]",
-      routeRequest.journey().transit().filters().toString()
-    );
   }
 
   @Test
