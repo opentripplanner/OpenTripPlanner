@@ -28,9 +28,9 @@
       transitOnly: false
       direct: [WALK]
       transit: {
-        access: [BICYCLE_RENTAL]
+        access: [BICYCLE_RENTAL, WALK]
         transfer: [WALK]
-        egress: [BICYCLE_RENTAL]
+        egress: [BICYCLE_RENTAL, WALK]
         transit: [
           {
             mode: TRAM
