@@ -191,6 +191,19 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       .orElse(null);
   }
 
+  /**
+   * Checks if the alert has a NO_SERVICE alert active at the requested time.
+   * @param instant
+   * @return
+   */
+  public boolean noServiceAt(Instant instant) {
+    return (
+      effect.equals(AlertEffect.NO_SERVICE) &&
+      (getEffectiveStartDate() != null && getEffectiveStartDate().isBefore(instant)) &&
+      (getEffectiveEndDate() == null || getEffectiveEndDate().isAfter(instant))
+    );
+  }
+
   @Override
   public boolean sameAs(@Nonnull TransitAlert other) {
     return (

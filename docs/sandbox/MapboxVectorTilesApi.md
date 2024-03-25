@@ -103,6 +103,15 @@ The feature must be configured in `router-config.json` as follows
         "minZoom": 14,
         "cacheMaxSeconds": 60
       },
+      // Contains just stops and real-time information for them
+      {
+        "name": "realtimeStops",
+        "type": "Stop",
+        "mapper": "DigitransitRealtime",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60
+      },
       // This exists for backwards compatibility. At some point, we might want
       // to add a new real-time parking mapper with better translation support
       // and less unnecessary fields.
@@ -298,3 +307,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
   * Added a new Digitransit vehicle parking mapper with no real-time information and less fields
 - 2024-01-22: Make `basePath` configurable [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
 - 2024-02-27: Add layer for flex zones [#5704](https://github.com/opentripplanner/OpenTripPlanner/pull/5704)
+- 2024-03-25: Add layer for realtime stops [#5743](https://github.com/opentripplanner/OpenTripPlanner/pull/5743)
