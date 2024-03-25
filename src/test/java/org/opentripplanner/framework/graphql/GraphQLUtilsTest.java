@@ -73,9 +73,11 @@ class GraphQLUtilsTest {
 
     var frenchLocale = Locale.FRENCH;
 
-    var locale = GraphQLUtils.getLocale(env, frenchLocale.toString());
+    var localeWithString = GraphQLUtils.getLocale(env, frenchLocale.toString());
+    assertEquals(frenchLocale, localeWithString);
 
-    assertEquals(frenchLocale, locale);
+    var localeWithLocale = GraphQLUtils.getLocale(env, frenchLocale);
+    assertEquals(frenchLocale, localeWithLocale);
   }
 
   @Test

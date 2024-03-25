@@ -191,7 +191,7 @@ public class DurationUtils {
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */
-  public static Duration requireNonNegativeLarge(Duration value, String subject) {
+  public static Duration requireNonNegativeLong(Duration value, String subject) {
     Objects.requireNonNull(value);
     if (value.isNegative()) {
       throw new IllegalArgumentException(
