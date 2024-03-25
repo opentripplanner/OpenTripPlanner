@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * Takes a list of matchers and provides a single interface. At least one of the matchers in the
  * list must match for the composite matcher to return a match.
+ * <p/>
+ * @param <T> The entity type the OrMatcher matches.
  */
 public final class OrMatcher<T> implements Matcher<T> {
 

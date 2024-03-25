@@ -7,6 +7,8 @@ import java.util.List;
 /**
  * Takes a list of matchers and provides a single interface. All matchers in the list must match for
  * the composite matcher to return a match.
+ *
+ * @param <T> The entity type the AndMatcher matches.
  */
 public final class AndMatcher<T> implements Matcher<T> {
 
