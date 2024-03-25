@@ -176,7 +176,7 @@ public class NodeAdapter {
    * Checks if any unknown or invalid properties were encountered while loading the configuration.
    */
   public boolean hasUnknownParameters() {
-    return !unusedParams().isEmpty() || !allWarnings().toList().isEmpty();
+    return !unusedParams().isEmpty();
   }
 
   /**
