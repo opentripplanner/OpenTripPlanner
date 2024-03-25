@@ -46,9 +46,9 @@ public class TripOnServiceDateMatcherFactory {
 
   static Matcher<TripOnServiceDate> replacementFor(FeedScopedId id) {
     return new ContainsMatcher<>(
-      "replacementFor",
-      id,
-      t -> t.getReplacementFor().stream().map(AbstractTransitEntity::getId).toList()
+      "replacementForContains",
+      t -> t.getReplacementFor().stream().map(AbstractTransitEntity::getId).toList(),
+      new EqualityMatcher<>("replacementForIdEquals", id, (idToMatch -> idToMatch))
     );
   }
 

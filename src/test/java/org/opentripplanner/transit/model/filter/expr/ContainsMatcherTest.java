@@ -19,7 +19,11 @@ class ContainsMatcherTest {
 
   @Test
   void testMatch() {
-    var matcher = new ContainsMatcher<>("integer:string", "foo", i -> integerListMap.get(i));
+    var matcher = new ContainsMatcher<>(
+      "contains",
+      integerListMap::get,
+      new EqualityMatcher<>("string", "foo", s -> s)
+    );
 
     assertTrue(matcher.match(1));
     assertFalse(matcher.match(2));
