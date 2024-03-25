@@ -196,4 +196,22 @@ public class DurationUtils {
   private static String msToSecondsStr(String formatSeconds, double timeMs) {
     return String.format(ROOT, formatSeconds, timeMs / 1000.0) + " seconds";
   }
+
+  /**
+   * Formats a duration and if it's a negative amount, it places the minus before the "P" rather
+   * than in the middle of the value.
+   * <p>
+   * Background: There are multiple ways to express -1.5 hours: "PT-1H-30M" and "-PT1H30M".
+   * <p>
+   * The first version is what you get when calling toString() but it's quite confusing. Therefore,
+   * this method makes sure that you get the second form "-PT1H30M".
+   */
+  public static String formatDurationWithLeadingMinus(Duration duration) {
+    if (duration.isNegative()) {
+      var positive = duration.abs().toString();
+      return "-" + positive;
+    } else {
+      return duration.toString();
+    }
+  }
 }

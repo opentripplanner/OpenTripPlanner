@@ -6,18 +6,20 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.test.support.VariableSource;
 
 class StateDataTest {
 
-  static Stream<Arguments> cases = Arrays
-    .stream(StreetMode.values())
-    .flatMap(mode -> Stream.of(Arguments.of(true, mode), Arguments.of(false, mode)));
+  static Stream<Arguments> cases() {
+    return Arrays
+      .stream(StreetMode.values())
+      .flatMap(mode -> Stream.of(Arguments.of(true, mode), Arguments.of(false, mode)));
+  }
 
   @ParameterizedTest(name = "arriveBy={0}, streetMode={1}")
-  @VariableSource("cases")
+  @MethodSource("cases")
   void baseCases(boolean arriveBy, StreetMode streetMode) {
     var req = StreetSearchRequest.of().withArriveBy(arriveBy).withMode(streetMode).build();
     var data = StateData.getBaseCaseStateData(req);

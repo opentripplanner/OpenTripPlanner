@@ -8,8 +8,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.test.support.VariableSource;
 
 class BestMatchSpecifierTest extends SpecifierTest {
 
@@ -48,17 +48,19 @@ class BestMatchSpecifierTest extends SpecifierTest {
     assertEquals(100, result.forward());
   }
 
-  static Stream<Arguments> leftRightTestCases = Stream.of(
-    Arguments.of(cyclewayLeft(), bikeLane, 210, 100),
-    Arguments.of(cyclewayLaneTrack(), cyclewayTrack, 100, 210),
-    Arguments.of(cyclewayLaneTrack(), highwayFootwayCyclewayLane, 210, 100),
-    Arguments.of(cyclewayLaneTrack(), cyclewayLane, 110, 0)
-  );
+  static Stream<Arguments> leftRightTestCases() {
+    return Stream.of(
+      Arguments.of(cyclewayLeft(), bikeLane, 210, 100),
+      Arguments.of(cyclewayLaneTrack(), cyclewayTrack, 100, 210),
+      Arguments.of(cyclewayLaneTrack(), highwayFootwayCyclewayLane, 210, 100),
+      Arguments.of(cyclewayLaneTrack(), cyclewayLane, 110, 0)
+    );
+  }
 
   @ParameterizedTest(
     name = "way {0} with specifier {1} should have a backward score {2} and forward score {3}"
   )
-  @VariableSource("leftRightTestCases")
+  @MethodSource("leftRightTestCases")
   void leftRight(OSMWithTags way, OsmSpecifier spec, int expectedBackward, int expectedForward) {
     var result = spec.matchScores(way);
     assertEquals(expectedBackward, result.backward());

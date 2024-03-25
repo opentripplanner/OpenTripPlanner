@@ -143,7 +143,12 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
     return switch (this) {
       case NOT_SET -> "";
       case WALK -> "Walking some or all of the way of the route.";
-      case BIKE -> "Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.";
+      case BIKE -> """
+        Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+
+        Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
+        is called `bikesAllowed`.
+        """;
       case BIKE_TO_PARK -> """
         Leaving the bicycle at the departure station and walking from the arrival station to the destination.
         This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.

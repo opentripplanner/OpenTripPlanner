@@ -25,21 +25,21 @@
   "transitFeeds": [
     {
       "type": "netex",
-      "source": "https://ressapublic.blob.core.windows.net/ressapub/ST_netex.zip",
+      "source": "https://jpsapubdev.blob.core.windows.net/resesok-pub/ST_netex.zip",
       "feedId": "ST"
     },
     {
       "type": "gtfs",
-      "source": "https://ressapublic.blob.core.windows.net/ressapub/GTFS-filtered.zip",
+      "source": "https://jpsapubdev.blob.core.windows.net/resesok-pub/GTFS-filtered.zip",
       "feedId": "DK"
     }
   ],
   "osm": [
     {
-      "source": "https://ressapublic.blob.core.windows.net/ressapub/denmark-oresund.osm.pbf"
+      "source": "https://jpsapubdev.blob.core.windows.net/resesok-pub/denmark-oresund.osm.pbf"
     },
     {
-      "source": "https://ressapublic.blob.core.windows.net/ressapub/sweden-filtered.osm.pbf"
+      "source": "https://jpsapubdev.blob.core.windows.net/resesok-pub/sweden-filtered.osm.pbf"
     }
   ]
 }

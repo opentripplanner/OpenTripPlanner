@@ -35,7 +35,8 @@ To learn how to deactivate it, read the
       appTitle: 'OTP GTFS GraphQL API',
       queryGenerationFactories: {
         'Polyline': '<>',
-        'GeoJson': '<>'
+        'GeoJson': '<>',
+        'OffsetDateTime': '2024-02-05T18:04:23+01:00'
       },
     }
   },

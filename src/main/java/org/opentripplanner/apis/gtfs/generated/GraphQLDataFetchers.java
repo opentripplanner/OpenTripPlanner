@@ -36,6 +36,7 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -400,6 +401,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Emissions> emissionsPerPerson();
 
+    public DataFetcher<java.time.OffsetDateTime> end();
+
     public DataFetcher<Long> endTime();
 
     public DataFetcher<Iterable<Object>> fares();
@@ -409,6 +412,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<Leg>> legs();
 
     public DataFetcher<Integer> numberOfTransfers();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -439,6 +444,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> dropoffType();
 
     public DataFetcher<Double> duration();
+
+    public DataFetcher<LegTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -480,6 +487,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
+    public DataFetcher<LegTime> start();
+
     public DataFetcher<Long> startTime();
 
     public DataFetcher<Iterable<WalkStep>> steps();
@@ -491,6 +500,16 @@ public class GraphQLDataFetchers {
     public DataFetcher<Trip> trip();
 
     public DataFetcher<Boolean> walkingBike();
+  }
+
+  /**
+   * Time information about a passenger at a certain place. May contain real-time information if
+   * available.
+   */
+  public interface GraphQLLegTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
   /** A span of time. */
@@ -576,6 +595,8 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
+    public DataFetcher<LegTime> arrival();
+
     public DataFetcher<Long> arrivalTime();
 
     public DataFetcher<VehicleParking> bikePark();
@@ -583,6 +604,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
     public DataFetcher<VehicleParking> carPark();
+
+    public DataFetcher<LegTime> departure();
 
     public DataFetcher<Long> departureTime();
 
@@ -738,6 +761,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
     public DataFetcher<Object> viewer();
+  }
+
+  public interface GraphQLRealtimeEstimate {
+    public DataFetcher<java.time.Duration> delay();
+
+    public DataFetcher<java.time.OffsetDateTime> time();
   }
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
@@ -1235,6 +1264,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> elevation();
   }
 
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFare {
     public DataFetcher<Integer> cents();
 
@@ -1245,7 +1278,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> type();
   }
 
-  /** Component of the fare (i.e. ticket) for a part of the itinerary */
+  /**
+   * This type is only here for backwards-compatibility and this API will never return it anymore.
+   * Please use the leg's `fareProducts` instead.
+   */
   public interface GraphQLFareComponent {
     public DataFetcher<Integer> cents();
 

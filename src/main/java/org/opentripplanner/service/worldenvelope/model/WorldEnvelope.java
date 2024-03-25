@@ -6,8 +6,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
- * This class calculates borders of envelopes that can be also on 180th meridian The same way as it
- * was previously calculated in GraphMetadata constructor
+ * This class calculates borders of envelopes that can be also on 180th meridian.
  */
 public class WorldEnvelope implements Serializable {
 
@@ -54,6 +53,16 @@ public class WorldEnvelope implements Serializable {
   }
 
   /**
+   * If transit data exist, then this is the median center of the transit stops. The median
+   * is computed independently for the longitude and latitude.
+   * <p>
+   * If not transit data exist this return `empty`.
+   */
+  public WgsCoordinate center() {
+    return medianCenter().orElse(meanCenter);
+  }
+
+  /**
    * This is the center of the Envelope including both street vertexes and transit stops
    * if they exist.
    */
@@ -62,19 +71,9 @@ public class WorldEnvelope implements Serializable {
   }
 
   /**
-   * If transit data exist, then this is the median center of the transit stops. The median
-   * is computed independently for the longitude and latitude.
-   * <p>
-   * If not transit data exist this return `empty`.
-   */
-  public WgsCoordinate center() {
-    return transitMedianCenter().orElse(meanCenter);
-  }
-
-  /**
    * Return the transit median center [if it exist] or the mean center.
    */
-  public Optional<WgsCoordinate> transitMedianCenter() {
+  public Optional<WgsCoordinate> medianCenter() {
     return Optional.ofNullable(transitMedianCenter);
   }
 

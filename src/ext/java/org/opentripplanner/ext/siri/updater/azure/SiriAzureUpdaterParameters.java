@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
+import java.time.Duration;
+
 public abstract class SiriAzureUpdaterParameters {
 
   private String configRef;
@@ -13,6 +15,8 @@ public abstract class SiriAzureUpdaterParameters {
   private int timeout;
 
   private boolean fuzzyTripMatching;
+  private Duration autoDeleteOnIdle;
+  private int prefetchCount;
 
   public SiriAzureUpdaterParameters(String type) {
     this.type = type;
@@ -92,5 +96,21 @@ public abstract class SiriAzureUpdaterParameters {
 
   public void setFuzzyTripMatching(boolean fuzzyTripMatching) {
     this.fuzzyTripMatching = fuzzyTripMatching;
+  }
+
+  public Duration getAutoDeleteOnIdle() {
+    return autoDeleteOnIdle;
+  }
+
+  public void setAutoDeleteOnIdle(Duration autoDeleteOnIdle) {
+    this.autoDeleteOnIdle = autoDeleteOnIdle;
+  }
+
+  public int getPrefetchCount() {
+    return prefetchCount;
+  }
+
+  public void setPrefetchCount(int prefetchCount) {
+    this.prefetchCount = prefetchCount;
   }
 }

@@ -5,9 +5,9 @@ import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
@@ -59,7 +59,17 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * Parses a string consisting of concatenated FeedScopedIds to a List
    */
   public static List<FeedScopedId> parseList(String s) {
-    return Arrays.stream(s.split(",")).map(FeedScopedId::parse).collect(Collectors.toList());
+    if (StringUtils.containsInvisibleCharacters(s)) {
+      throw new IllegalArgumentException(
+        "The input string '%s' contains invisible characters which is not allowed.".formatted(s)
+      );
+    }
+    return Arrays
+      .stream(s.split(","))
+      .map(String::strip)
+      .filter(i -> !i.isBlank())
+      .map(FeedScopedId::parse)
+      .toList();
   }
 
   public static boolean isValidString(String value) throws IllegalArgumentException {

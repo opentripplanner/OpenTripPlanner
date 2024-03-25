@@ -51,11 +51,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     this.otpHttpClient = new OtpHttpClient();
-    LOG.info(
-      "Creating real-time alert updater running every {} seconds : {}",
-      pollingPeriod(),
-      url
-    );
+    LOG.info("Creating real-time alert updater running every {}: {}", pollingPeriod(), url);
   }
 
   @Override

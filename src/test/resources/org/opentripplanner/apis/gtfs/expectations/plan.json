@@ -3,47 +3,57 @@
     "plan" : {
       "itineraries" : [
         {
-          "startTime" : 1580641200000,
-          "endTime" : 1580644800000,
+          "start" : "2020-02-02T11:00:00Z",
+          "end" : "2020-02-02T12:00:00Z",
           "legs" : [
             {
               "mode" : "WALK",
-              "startTime" : 1580641200000,
-              "endTime" : 1580641220000,
               "from" : {
                 "name" : "A",
                 "lat" : 5.0,
                 "lon" : 8.0,
-                "departureTime" : 1580641200000,
-                "arrivalTime" : 1580641200000
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:00:00Z",
+                  "estimated" : null
+                }
               },
               "to" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departureTime" : 1580641220000,
-                "arrivalTime" : 1580641220000
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:00:20Z",
+                  "estimated" : null
+                }
               },
               "route" : null,
               "legGeometry" : null
             },
             {
               "mode" : "BUS",
-              "startTime" : 1580641260000,
-              "endTime" : 1580642100000,
               "from" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departureTime" : 1580641260000,
-                "arrivalTime" : 1580641260000
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T10:51:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:01:00Z",
+                    "delay" : "PT10M"
+                  }
+                }
               },
               "to" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departureTime" : 1580642100000,
-                "arrivalTime" : 1580642100000
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:05:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:15:00Z",
+                    "delay" : "PT10M"
+                  }
+                }
               },
               "route" : {
                 "gtfsId" : "F:BUS",
@@ -56,21 +66,29 @@
             },
             {
               "mode" : "RAIL",
-              "startTime" : 1580643000000,
-              "endTime" : 1580644200000,
               "from" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departureTime" : 1580643000000,
-                "arrivalTime" : 1580643000000
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:20:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:30:00Z",
+                    "delay" : "PT10M"
+                  }
+                }
               },
               "to" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:40:00Z",
+                  "estimated" : {
+                    "time" : "2020-02-02T11:50:00Z",
+                    "delay" : "PT10M"
+                  }
+                }
               },
               "route" : {
                 "gtfsId" : "F:2",
@@ -83,21 +101,23 @@
             },
             {
               "mode" : "CAR",
-              "startTime" : 1580644200000,
-              "endTime" : 1580644800000,
               "from" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:50:00Z",
+                  "estimated" : null
+                }
               },
               "to" : {
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
-                "departureTime" : 1580644800000,
-                "arrivalTime" : 1580644800000
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T12:00:00Z",
+                  "estimated" : null
+                }
               },
               "route" : null,
               "legGeometry" : null

@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -40,7 +41,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -1090,16 +1090,18 @@ public class TimetableSnapshotSourceTest {
     }
   }
 
-  static Stream<Arguments> purgeExpiredDataTestCases = Stream.of(
-    // purgeExpiredData   maxSnapshotFrequency || snapshots PatternSnapshotA  PatternSnapshotB
-    Arguments.of(Boolean.TRUE, -1, NotSame, NotSame),
-    Arguments.of(Boolean.FALSE, -1, NotSame, Same),
-    Arguments.of(Boolean.TRUE, 1000, NotSame, NotSame),
-    Arguments.of(Boolean.FALSE, 1000, Same, Same)
-  );
+  static Stream<Arguments> purgeExpiredDataTestCases() {
+    return Stream.of(
+      // purgeExpiredData   maxSnapshotFrequency || snapshots PatternSnapshotA  PatternSnapshotB
+      Arguments.of(Boolean.TRUE, -1, NotSame, NotSame),
+      Arguments.of(Boolean.FALSE, -1, NotSame, Same),
+      Arguments.of(Boolean.TRUE, 1000, NotSame, NotSame),
+      Arguments.of(Boolean.FALSE, 1000, Same, Same)
+    );
+  }
 
   @ParameterizedTest(name = "purgeExpired: {0}, maxFrequency: {1}  ||  {2}  {3}")
-  @VariableSource("purgeExpiredDataTestCases")
+  @MethodSource("purgeExpiredDataTestCases")
   public void testPurgeExpiredData(
     boolean purgeExpiredData,
     int maxSnapshotFrequency,

@@ -10,18 +10,24 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.text.ParseException;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 
   private static final ObjectMapper geoJsonMapper = new ObjectMapper()
     .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
-  public static GraphQLScalarType durationScalar = DurationScalarFactory.createDurationScalar();
+  public static GraphQLScalarType DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
 
-  public static GraphQLScalarType polylineScalar = GraphQLScalarType
+  public static final GraphQLScalarType POLYLINE_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Polyline")
     .description(
@@ -50,7 +56,63 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType geoJsonScalar = GraphQLScalarType
+  public static final GraphQLScalarType OFFSET_DATETIME_SCALAR = GraphQLScalarType
+    .newScalar()
+    .name("OffsetDateTime")
+    .coercing(
+      new Coercing<OffsetDateTime, String>() {
+        @Override
+        public String serialize(@Nonnull Object dataFetcherResult)
+          throws CoercingSerializeException {
+          if (dataFetcherResult instanceof ZonedDateTime zdt) {
+            return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+          } else if (dataFetcherResult instanceof OffsetDateTime odt) {
+            return odt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+          } else {
+            throw new CoercingSerializeException(
+              "Cannot serialize object of class %s".formatted(
+                  dataFetcherResult.getClass().getSimpleName()
+                )
+            );
+          }
+        }
+
+        @Override
+        public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof CharSequence cs) {
+            try {
+              return OffsetDateTimeParser.parseLeniently(cs);
+            } catch (ParseException e) {
+              int errorOffset = e.getErrorOffset();
+              throw new CoercingParseValueException(
+                "Cannot parse %s into an OffsetDateTime. Error at character index %s".formatted(
+                    input,
+                    errorOffset
+                  )
+              );
+            }
+          }
+          throw new CoercingParseValueException(
+            "Cannot parse %s into an OffsetDateTime. Must be a string."
+          );
+        }
+
+        @Override
+        public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof StringValue sv) {
+            try {
+              return OffsetDateTimeParser.parseLeniently(sv.getValue());
+            } catch (ParseException e) {
+              throw new CoercingSerializeException();
+            }
+          }
+          throw new CoercingParseLiteralException();
+        }
+      }
+    )
+    .build();
+
+  public static final GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()
     .name("GeoJson")
     .description("Geographic data structures in JSON format. See: https://geojson.org/")
@@ -78,7 +140,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+  public static final GraphQLScalarType GRAPHQL_ID_SCALAR = GraphQLScalarType
     .newScalar()
     .name("ID")
     .coercing(
@@ -118,7 +180,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType gramsScalar = GraphQLScalarType
+  public static final GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType
     .newScalar()
     .name("Grams")
     .coercing(

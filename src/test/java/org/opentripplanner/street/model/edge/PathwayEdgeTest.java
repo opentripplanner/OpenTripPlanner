@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -19,7 +20,6 @@ import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
@@ -141,20 +141,22 @@ class PathwayEdgeTest {
     assertEquals(300.0, state.getWeight());
   }
 
-  static Stream<Arguments> slopeCases = Stream.of(
-    // no extra cost
-    Arguments.of(0.07, 120),
-    // no extra cost
-    Arguments.of(0.08, 120),
-    // 1 % above max
-    Arguments.of(0.09, 239),
-    // 1.1 % above the max slope, tiny extra cost
-    Arguments.of(0.091, 251),
-    // 1.15 % above the max slope, will incur larger cost
-    Arguments.of(0.0915, 257),
-    // 3 % above max slope, will incur very large cost
-    Arguments.of(0.11, 480)
-  );
+  static Stream<Arguments> slopeCases() {
+    return Stream.of(
+      // no extra cost
+      Arguments.of(0.07, 120),
+      // no extra cost
+      Arguments.of(0.08, 120),
+      // 1 % above max
+      Arguments.of(0.09, 239),
+      // 1.1 % above the max slope, tiny extra cost
+      Arguments.of(0.091, 251),
+      // 1.15 % above the max slope, will incur larger cost
+      Arguments.of(0.0915, 257),
+      // 3 % above max slope, will incur very large cost
+      Arguments.of(0.11, 480)
+    );
+  }
 
   /**
    * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
@@ -164,7 +166,7 @@ class PathwayEdgeTest {
    * dramatically to the point where it's only used as a last resort.
    */
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
-  @VariableSource("slopeCases")
+  @MethodSource("slopeCases")
   void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
     var edge = PathwayEdge.createPathwayEdge(
       from,

@@ -201,6 +201,16 @@ public interface Leg {
   }
 
   /**
+   * The time (including realtime information) when the leg starts.
+   */
+  LegTime start();
+
+  /**
+   * The time (including realtime information) when the leg ends.
+   */
+  LegTime end();
+
+  /**
    * The date and time this leg begins.
    */
   ZonedDateTime getStartTime();

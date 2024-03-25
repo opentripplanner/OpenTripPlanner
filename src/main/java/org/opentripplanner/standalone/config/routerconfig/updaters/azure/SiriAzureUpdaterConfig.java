@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -40,6 +41,20 @@ public abstract class SiriAzureUpdaterConfig {
         .since(V2_2)
         .summary("The ID of the feed to apply the updates to.")
         .asString(null)
+    );
+    parameters.setAutoDeleteOnIdle(
+      c
+        .of("autoDeleteOnIdle")
+        .since(V2_5)
+        .summary("The time after which an inactive subscription is removed.")
+        .asDuration(Duration.ofHours(1))
+    );
+    parameters.setPrefetchCount(
+      c
+        .of("prefetchCount")
+        .since(V2_5)
+        .summary("The number of messages to fetch from the subscription at a time.")
+        .asInt(10)
     );
     parameters.setFuzzyTripMatching(
       c

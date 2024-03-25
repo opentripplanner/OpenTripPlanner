@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class DateTimeScalarFactoryTest {
 
@@ -32,17 +32,19 @@ class DateTimeScalarFactoryTest {
     assertEquals(DATE_TIME, result);
   }
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(DATE_TIME),
-    Arguments.of("2023-01-27T12:59:00.000+01:00"),
-    Arguments.of("2023-01-27T12:59:00+0100"),
-    Arguments.of("2023-01-27T12:59:00+01"),
-    Arguments.of("2023-01-27T12:59:00"),
-    Arguments.of("2023-01-27T11:59:00Z")
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      Arguments.of(DATE_TIME),
+      Arguments.of("2023-01-27T12:59:00.000+01:00"),
+      Arguments.of("2023-01-27T12:59:00+0100"),
+      Arguments.of("2023-01-27T12:59:00+01"),
+      Arguments.of("2023-01-27T12:59:00"),
+      Arguments.of("2023-01-27T11:59:00Z")
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void parse(String input) {
     var result = subject.getCoercing().parseValue(input);
     assertEquals(EPOCH_MILLIS, result);

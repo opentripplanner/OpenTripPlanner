@@ -1,16 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -62,8 +55,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
         i,
         tripTimes.gtfsSequenceOfStopIndex(i)
       );

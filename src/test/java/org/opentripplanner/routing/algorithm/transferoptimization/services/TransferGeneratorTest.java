@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -28,7 +29,6 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.test.support.VariableSource;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
 
@@ -497,24 +497,26 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
   // TODO: here we check that minimum transfer time and slack are NOT added up, but perhaps that is
   // asserting the wrong behaviour
-  static Stream<Arguments> minTransferTimeSlackCases = Stream.of(
-    // transfer takes 1 min plus 0 slack, passenger will make it
-    Arguments.of(ofMinutes(1), ofMinutes(0), true),
-    // slack is 30 minutes, passenger won't make the connection
-    Arguments.of(ofMinutes(1), ofMinutes(30), false),
-    // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes required
-    Arguments.of(ofMinutes(1), ofMinutes(8), true),
-    // transfer slack is ignored since minimumTransferTime is short
-    Arguments.of(ofMinutes(1), ofMinutes(9), true),
-    Arguments.of(ofMinutes(11), ofMinutes(0), false),
-    Arguments.of(ofMinutes(9), ofMinutes(1), true),
-    Arguments.of(ofMinutes(0), ofMinutes(11), false)
-  );
+  static Stream<Arguments> minTransferTimeSlackCases() {
+    return Stream.of(
+      // transfer takes 1 min plus 0 slack, passenger will make it
+      Arguments.of(ofMinutes(1), ofMinutes(0), true),
+      // slack is 30 minutes, passenger won't make the connection
+      Arguments.of(ofMinutes(1), ofMinutes(30), false),
+      // tight since 8 minutes slack + 1 min transfer time but still less than the 10 minutes required
+      Arguments.of(ofMinutes(1), ofMinutes(8), true),
+      // transfer slack is ignored since minimumTransferTime is short
+      Arguments.of(ofMinutes(1), ofMinutes(9), true),
+      Arguments.of(ofMinutes(11), ofMinutes(0), false),
+      Arguments.of(ofMinutes(9), ofMinutes(1), true),
+      Arguments.of(ofMinutes(0), ofMinutes(11), false)
+    );
+  }
 
   @ParameterizedTest(
     name = "minimum transfer time of {0}, transfer slack of {1} should expectTransfer={2} on 10 min transfer window"
   )
-  @VariableSource("minTransferTimeSlackCases")
+  @MethodSource("minTransferTimeSlackCases")
   void includeTransferSlackInMinimumTransferTime(
     Duration minTransferTime,
     Duration transferSlack,

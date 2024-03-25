@@ -8,23 +8,25 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.test.support.VariableSource;
 
 class StreetEdgeCostTest {
 
-  static Stream<Arguments> walkReluctanceCases = Stream.of(
-    Arguments.of(0.5, 37),
-    Arguments.of(1, 75),
-    Arguments.of(2, 150),
-    Arguments.of(3, 225)
-  );
+  static Stream<Arguments> walkReluctanceCases() {
+    return Stream.of(
+      Arguments.of(0.5, 37),
+      Arguments.of(1, 75),
+      Arguments.of(2, 150),
+      Arguments.of(3, 225)
+    );
+  }
 
   @ParameterizedTest(name = "walkRelucance of {0} should lead to traversal costs of {1}")
-  @VariableSource("walkReluctanceCases")
+  @MethodSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 100;
     var edge = new StreetEdgeBuilder<>()
@@ -45,15 +47,17 @@ class StreetEdgeCostTest {
     assertEquals(76, result.getElapsedTimeSeconds());
   }
 
-  static Stream<Arguments> bikeReluctanceCases = Stream.of(
-    Arguments.of(0.5, 10),
-    Arguments.of(1, 20),
-    Arguments.of(2, 40),
-    Arguments.of(3, 60)
-  );
+  static Stream<Arguments> bikeReluctanceCases() {
+    return Stream.of(
+      Arguments.of(0.5, 10),
+      Arguments.of(1, 20),
+      Arguments.of(2, 40),
+      Arguments.of(3, 60)
+    );
+  }
 
   @ParameterizedTest(name = "bikeReluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("bikeReluctanceCases")
+  @MethodSource("bikeReluctanceCases")
   public void bikeReluctance(double bikeReluctance, long expectedCost) {
     double length = 100;
     var edge = new StreetEdgeBuilder<>()
@@ -75,15 +79,17 @@ class StreetEdgeCostTest {
     assertEquals(20, result.getElapsedTimeSeconds());
   }
 
-  static Stream<Arguments> carReluctanceCases = Stream.of(
-    Arguments.of(0.5, 4),
-    Arguments.of(1, 8),
-    Arguments.of(2, 17),
-    Arguments.of(3, 26)
-  );
+  static Stream<Arguments> carReluctanceCases() {
+    return Stream.of(
+      Arguments.of(0.5, 4),
+      Arguments.of(1, 8),
+      Arguments.of(2, 17),
+      Arguments.of(3, 26)
+    );
+  }
 
   @ParameterizedTest(name = "carReluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("carReluctanceCases")
+  @MethodSource("carReluctanceCases")
   public void carReluctance(double carReluctance, long expectedCost) {
     double length = 100;
     var edge = new StreetEdgeBuilder<>()
@@ -105,14 +111,12 @@ class StreetEdgeCostTest {
     assertEquals(9, result.getElapsedTimeSeconds());
   }
 
-  static Stream<Arguments> stairsCases = Stream.of(
-    Arguments.of(1, 22),
-    Arguments.of(1.5, 33),
-    Arguments.of(3, 67)
-  );
+  static Stream<Arguments> stairsCases() {
+    return Stream.of(Arguments.of(1, 22), Arguments.of(1.5, 33), Arguments.of(3, 67));
+  }
 
   @ParameterizedTest(name = "stairs reluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("stairsCases")
+  @MethodSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
     var stairsEdge = new StreetEdgeBuilder<>()
@@ -138,14 +142,12 @@ class StreetEdgeCostTest {
     assertEquals(15, (long) notStairsResult.weight);
   }
 
-  static Stream<Arguments> bikeStairsCases = Stream.of(
-    Arguments.of(1, 45),
-    Arguments.of(1.5, 67),
-    Arguments.of(3, 135)
-  );
+  static Stream<Arguments> bikeStairsCases() {
+    return Stream.of(Arguments.of(1, 45), Arguments.of(1.5, 67), Arguments.of(3, 135));
+  }
 
   @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("bikeStairsCases")
+  @MethodSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
     var stairsEdge = new StreetEdgeBuilder<>()
@@ -173,14 +175,12 @@ class StreetEdgeCostTest {
     assertEquals(37, (long) notStairsResult.weight);
   }
 
-  static Stream<Arguments> walkSafetyCases = Stream.of(
-    Arguments.of(0, 15),
-    Arguments.of(0.5, 22),
-    Arguments.of(1, 30)
-  );
+  static Stream<Arguments> walkSafetyCases() {
+    return Stream.of(Arguments.of(0, 15), Arguments.of(0.5, 22), Arguments.of(1, 30));
+  }
 
   @ParameterizedTest(name = "walk safety factor of {0} should lead to traversal costs of {1}")
-  @VariableSource("walkSafetyCases")
+  @MethodSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;
     var safeEdge = new StreetEdgeBuilder<>()

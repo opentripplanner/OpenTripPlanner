@@ -9,13 +9,13 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -65,17 +65,19 @@ public class PlaceTest {
     assertFalse(otherPlace.sameLocation(aPlace), "other place(symmetric)");
   }
 
-  static Stream<Arguments> flexStopCases = Stream.of(
-    Arguments.of(null, "an intersection name"),
-    Arguments.of(new NonLocalizedString("1:stop_id"), "an intersection name (part of 1:stop_id)"),
-    Arguments.of(
-      new NonLocalizedString("Flex Zone 123"),
-      "an intersection name (part of Flex Zone 123)"
-    )
-  );
+  static Stream<Arguments> flexStopCases() {
+    return Stream.of(
+      Arguments.of(null, "an intersection name"),
+      Arguments.of(new NonLocalizedString("1:stop_id"), "an intersection name (part of 1:stop_id)"),
+      Arguments.of(
+        new NonLocalizedString("Flex Zone 123"),
+        "an intersection name (part of Flex Zone 123)"
+      )
+    );
+  }
 
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
-  @VariableSource("flexStopCases")
+  @MethodSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
     var stop = StopModel
       .of()

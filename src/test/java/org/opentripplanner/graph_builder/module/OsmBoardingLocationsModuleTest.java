@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -23,7 +24,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -49,21 +49,23 @@ class OsmBoardingLocationsModuleTest {
   RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
   RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(
-      false,
-      Stream
-        .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
-        .map(VertexLabel::osm)
-        .collect(Collectors.toSet())
-    ),
-    Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      Arguments.of(
+        false,
+        Stream
+          .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
+          .map(VertexLabel::osm)
+          .collect(Collectors.toSet())
+      ),
+      Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
+    );
+  }
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
   )
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);

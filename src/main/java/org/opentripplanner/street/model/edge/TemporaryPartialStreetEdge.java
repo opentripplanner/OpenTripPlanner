@@ -40,17 +40,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     return (e == this || e == parentEdge);
   }
 
-  @Override
-  public boolean isReverseOf(Edge e) {
-    Edge other = e;
-    if (e instanceof TemporaryPartialStreetEdge) {
-      other = ((TemporaryPartialStreetEdge) e).parentEdge;
-    }
-
-    // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
-    return parentEdge.isReverseOf(other);
-  }
-
   /**
    * Returns true if this edge is trivial - beginning and ending at the same point.
    */

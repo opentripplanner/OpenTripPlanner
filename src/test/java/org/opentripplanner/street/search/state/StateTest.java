@@ -31,11 +31,11 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.test.support.VariableSource;
 
 class StateTest {
 
@@ -48,30 +48,32 @@ class StateTest {
     NULL_RENTAL_STATES.add(null);
   }
 
-  static Stream<Arguments> testCases = Stream.of(
-    of(SCOOTER_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-    //FIXME: it's strange that the arriveBy rental searches all start on a bicycle
-    of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
-    of(BIKE_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-    of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
-    of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-    of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
-    of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(CAR)),
-    of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
-    of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),
-    of(BIKE_TO_PARK, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
-    of(CAR_TO_PARK, false, NULL_RENTAL_STATES, Set.of(CAR)),
-    of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK)),
-    of(CAR_PICKUP, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
-    of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
-    of(CAR_HAILING, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
-    of(CAR_HAILING, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      of(SCOOTER_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
+      //FIXME: it's strange that the arriveBy rental searches all start on a bicycle
+      of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(BIKE_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
+      of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
+      of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(CAR)),
+      of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
+      of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),
+      of(BIKE_TO_PARK, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
+      of(CAR_TO_PARK, false, NULL_RENTAL_STATES, Set.of(CAR)),
+      of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK)),
+      of(CAR_PICKUP, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+      of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+      of(CAR_HAILING, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+      of(CAR_HAILING, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
+    );
+  }
 
   @ParameterizedTest(
     name = "street mode {0}, arriveBy={1} should lead to initial states with rentalStates={2}, currentModes={3}"
   )
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void initialStates(
     StreetMode streetMode,
     boolean arriveBy,

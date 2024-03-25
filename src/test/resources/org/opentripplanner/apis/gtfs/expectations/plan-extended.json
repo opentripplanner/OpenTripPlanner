@@ -3,6 +3,8 @@
     "plan" : {
       "itineraries" : [
         {
+          "start" : "2020-02-02T11:00:00Z",
+          "end" : "2020-02-02T12:00:00Z",
           "startTime" : 1580641200000,
           "endTime" : 1580644800000,
           "generalizedCost" : 4072,
@@ -16,10 +18,26 @@
           "legs" : [
             {
               "mode" : "WALK",
+              "start" : {
+                "scheduledTime" : "2020-02-02T11:00:00Z",
+                "estimated" : null
+              },
+              "end" : {
+                "scheduledTime" : "2020-02-02T11:00:20Z",
+                "estimated" : null
+              },
               "from" : {
                 "name" : "A",
                 "lat" : 5.0,
                 "lon" : 8.0,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:00:00Z",
+                  "estimated" : null
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:00:00Z",
+                  "estimated" : null
+                },
                 "departureTime" : 1580641200000,
                 "arrivalTime" : 1580641200000
               },
@@ -27,6 +45,14 @@
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:00:20Z",
+                  "estimated" : null
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:00:20Z",
+                  "estimated" : null
+                },
                 "departureTime" : 1580641220000,
                 "arrivalTime" : 1580641220000
               },
@@ -35,16 +61,45 @@
               "generalizedCost" : 40,
               "headsign" : null,
               "trip" : null,
+              "intermediatePlaces" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
             },
             {
               "mode" : "BUS",
+              "start" : {
+                "scheduledTime" : "2020-02-02T10:51:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:01:00Z",
+                  "delay" : "PT10M"
+                }
+              },
+              "end" : {
+                "scheduledTime" : "2020-02-02T11:05:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:15:00Z",
+                  "delay" : "PT10M"
+                }
+              },
               "from" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T10:51:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:01:00Z"
+                  }
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T10:51:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:01:00Z"
+                  }
+                },
                 "departureTime" : 1580641260000,
                 "arrivalTime" : 1580641260000
               },
@@ -52,6 +107,20 @@
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:05:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:15:00Z"
+                  }
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:05:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:15:00Z"
+                  }
+                },
                 "departureTime" : 1580642100000,
                 "arrivalTime" : 1580642100000
               },
@@ -62,16 +131,65 @@
               "trip" : {
                 "tripHeadsign" : "Trip headsign 122"
               },
+              "intermediatePlaces" : [
+                {
+                  "arrival" : {
+                    "scheduledTime" : "2020-02-02T11:01:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:11:00Z",
+                      "delay" : "PT10M"
+                    }
+                  },
+                  "departure" : {
+                    "scheduledTime" : "2020-02-02T11:01:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:11:00Z",
+                      "delay" : "PT10M"
+                    }
+                  },
+                  "stop" : {
+                    "name" : "B"
+                  }
+                }
+              ],
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
             },
             {
               "mode" : "RAIL",
+              "start" : {
+                "scheduledTime" : "2020-02-02T11:20:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:30:00Z",
+                  "delay" : "PT10M"
+                }
+              },
+              "end" : {
+                "scheduledTime" : "2020-02-02T11:40:00Z",
+                "estimated" : {
+                  "time" : "2020-02-02T11:50:00Z",
+                  "delay" : "PT10M"
+                }
+              },
               "from" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:20:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:30:00Z"
+                  }
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:20:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:30:00Z"
+                  }
+                },
                 "departureTime" : 1580643000000,
                 "arrivalTime" : 1580643000000
               },
@@ -79,6 +197,20 @@
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:40:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:50:00Z"
+                  }
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:40:00Z",
+                  "estimated" : {
+                    "delay" : "PT10M",
+                    "time" : "2020-02-02T11:50:00Z"
+                  }
+                },
                 "departureTime" : 1580644200000,
                 "arrivalTime" : 1580644200000
               },
@@ -89,6 +221,27 @@
               "trip" : {
                 "tripHeadsign" : "Trip headsign 439"
               },
+              "intermediatePlaces" : [
+                {
+                  "arrival" : {
+                    "scheduledTime" : "2020-02-02T11:30:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:40:00Z",
+                      "delay" : "PT10M"
+                    }
+                  },
+                  "departure" : {
+                    "scheduledTime" : "2020-02-02T11:30:00Z",
+                    "estimated" : {
+                      "time" : "2020-02-02T11:40:00Z",
+                      "delay" : "PT10M"
+                    }
+                  },
+                  "stop" : {
+                    "name" : "C"
+                  }
+                }
+              ],
               "alerts" : [
                 {
                   "id" : "QWxlcnQ6Rjphbi1hbGVydA",
@@ -115,10 +268,26 @@
             },
             {
               "mode" : "CAR",
+              "start" : {
+                "scheduledTime" : "2020-02-02T11:50:00Z",
+                "estimated" : null
+              },
+              "end" : {
+                "scheduledTime" : "2020-02-02T12:00:00Z",
+                "estimated" : null
+              },
               "from" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T11:50:00Z",
+                  "estimated" : null
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T11:50:00Z",
+                  "estimated" : null
+                },
                 "departureTime" : 1580644200000,
                 "arrivalTime" : 1580644200000
               },
@@ -126,6 +295,14 @@
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
+                "arrival" : {
+                  "scheduledTime" : "2020-02-02T12:00:00Z",
+                  "estimated" : null
+                },
+                "departure" : {
+                  "scheduledTime" : "2020-02-02T12:00:00Z",
+                  "estimated" : null
+                },
                 "departureTime" : 1580644800000,
                 "arrivalTime" : 1580644800000
               },
@@ -134,6 +311,7 @@
               "generalizedCost" : 1000,
               "headsign" : null,
               "trip" : null,
+              "intermediatePlaces" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : {
                 "provider" : {
