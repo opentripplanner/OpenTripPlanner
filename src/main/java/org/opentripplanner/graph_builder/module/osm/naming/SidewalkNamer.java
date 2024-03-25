@@ -63,10 +63,11 @@ public class SidewalkNamer implements EdgeNamer {
           .map(c -> {
             var hausdorff = DiscreteHausdorffDistance.distance(
               sidewalk.getGeometry(),
-              c.getGeometry(),0.5
+              c.getGeometry(),
+              0.5
             );
 
-            var points = DistanceOp.nearestPoints( c.getGeometry(),sidewalk.getGeometry());
+            var points = DistanceOp.nearestPoints(c.getGeometry(), sidewalk.getGeometry());
             double fastDistance = SphericalDistanceLibrary.fastDistance(points[0], points[1]);
 
             return new EdgeWithDistance(hausdorff, fastDistance, candidates.size(), c, sidewalk);
@@ -114,7 +115,9 @@ public class SidewalkNamer implements EdgeNamer {
       LOG.info("Distance:      {}m", distance);
       LOG.info("OSM:           {}", osmUrl());
       LOG.info("Debug client:  {}", debugClientUrl());
-      LOG.info("<-------------------------------------------------------------------------------->");
+      LOG.info(
+        "<-------------------------------------------------------------------------------->"
+      );
     }
 
     String debugClientUrl() {
