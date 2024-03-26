@@ -68,9 +68,9 @@ public class SidewalkNamer implements EdgeNamer {
             );
 
             var points = DistanceOp.nearestPoints(c.getGeometry(), sidewalk.getGeometry());
-            double fastDistance = SphericalDistanceLibrary.fastDistance(points[0], points[1]);
+            double distance = SphericalDistanceLibrary.fastDistance(points[0], points[1]);
 
-            return new EdgeWithDistance(hausdorff, fastDistance, candidates.size(), c, sidewalk);
+            return new EdgeWithDistance(hausdorff, distance, candidates.size(), c, sidewalk);
           })
           .filter(e -> e.distance < MAX_DISTANCE_TO_SIDEWALK)
           .min(Comparator.comparingDouble(EdgeWithDistance::hausdorff))
@@ -84,11 +84,12 @@ public class SidewalkNamer implements EdgeNamer {
         progress.step(m -> LOG.info(m));
       });
 
-    edges
+    var worst = edges
       .stream()
       .sorted(Comparator.comparingDouble(EdgeWithDistance::hausdorff).reversed())
       .limit(100)
-      .forEach(EdgeWithDistance::logDebugString);
+      .toList();
+    worst.forEach(EdgeWithDistance::logDebugString);
     LOG.info(progress.completeMessage());
 
     // set the indices to null so they can be garbage-collected
@@ -109,6 +110,10 @@ public class SidewalkNamer implements EdgeNamer {
     StreetEdge namedEdge,
     StreetEdge sidewalk
   ) {
+    EdgeWithDistance {
+      Objects.requireNonNull(namedEdge);
+      Objects.requireNonNull(sidewalk);
+    }
     void logDebugString() {
       LOG.info("Name '{}' applied with low Hausdorff distance ", namedEdge.getName());
       LOG.info("Hausdorff:     {}", hausdorff);
