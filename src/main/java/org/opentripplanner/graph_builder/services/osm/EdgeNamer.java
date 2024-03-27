@@ -52,7 +52,7 @@ public interface EdgeNamer {
         .of(parameterName)
         .summary("A custom OSM namer to use.")
         .since(OtpVersion.V1_5)
-        .asEnum(EdgeNamerType.NONE);
+        .asEnum(EdgeNamerType.DEFAULT);
       return fromConfig(osmNaming);
     }
 
@@ -60,19 +60,19 @@ public interface EdgeNamer {
      * Create a custom namer if needed, return null if not found / by default.
      */
     public static EdgeNamer fromConfig(EdgeNamerType type) {
-      if(type == null{
+      if (type == null) {
         return new DefaultNamer();
       }
       return switch (type) {
         case PORTLAND -> new PortlandCustomNamer();
         case SIDEWALKS -> new SidewalkNamer();
-        case NONE ->  new DefaultNamer();
+        case DEFAULT -> new DefaultNamer();
       };
     }
   }
 
   enum EdgeNamerType {
-    NONE,
+    DEFAULT,
     PORTLAND,
     SIDEWALKS,
   }

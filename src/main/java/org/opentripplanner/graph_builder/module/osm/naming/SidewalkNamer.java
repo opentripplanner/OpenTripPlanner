@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.geotools.api.referencing.FactoryException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.MathTransform;
@@ -53,6 +54,8 @@ public class SidewalkNamer implements EdgeNamer {
       unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels()));
     }
     if (way.isNamed() && !way.isLink()) {
+      // we generate two edges for each osm way: one there and one back. since we don't do any routing
+      // in this class we don't need the two directions and keep only one of them.
       var containsReverse = streetEdges
         .query(edge.getGeometry().getEnvelopeInternal())
         .stream()
@@ -78,49 +81,7 @@ public class SidewalkNamer implements EdgeNamer {
     unnamedSidewalks
       .parallelStream()
       .forEach(sidewalkOnLevel -> {
-        var sidewalk = sidewalkOnLevel.edge;
-        var envelope = sidewalk.getGeometry().getEnvelopeInternal();
-        envelope.expandBy(0.000002);
-        var candidates = streetEdges.query(envelope);
-
-        var groups = candidates
-          .stream()
-          .collect(Collectors.groupingBy(e -> e.edge.getName()))
-          .entrySet()
-          .stream()
-          .map(entry -> {
-            var levels = entry
-              .getValue()
-              .stream()
-              .flatMap(e -> e.levels.stream())
-              .collect(Collectors.toSet());
-            return new CandidateGroup(
-              entry.getKey(),
-              entry.getValue().stream().map(e -> e.edge).toList(),
-              levels
-            );
-          });
-
-        var buffer = preciseBuffer(sidewalk.getGeometry(), 25);
-        var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
-
-        groups
-          .filter(g -> g.nearestDistanceTo(sidewalk.getGeometry()) < MAX_DISTANCE_TO_SIDEWALK)
-          .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
-          .map(g -> {
-            var lengthInsideBuffer = g.intersectionLength(buffer);
-            double percentInBuffer = lengthInsideBuffer / sidewalkLength;
-            return new NamedEdgeGroup(percentInBuffer, candidates.size(), g.name, sidewalk);
-          })
-          // remove those groups where less than a certain percentage is inside the buffer around
-          // the sidewalk. this safety mechanism for sidewalks that snake around the
-          // like https://www.openstreetmap.org/way/1059101564
-          .filter(group -> group.percentInBuffer > MIN_PERCENT_IN_BUFFER)
-          .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
-          .ifPresent(group -> {
-            namesApplied.incrementAndGet();
-            sidewalk.setName(Objects.requireNonNull(group.name));
-          });
+        assignNameToSidewalk(sidewalkOnLevel, namesApplied);
 
         //Keep lambda! A method-ref would cause incorrect class and line number to be logged
         //noinspection Convert2MethodRef
@@ -128,7 +89,7 @@ public class SidewalkNamer implements EdgeNamer {
       });
 
     LOG.info(
-      "Assigned names to {} of {} of sidewalks ({})",
+      "Assigned names to {} of {} of sidewalks ({}%)",
       namesApplied.get(),
       unnamedSidewalks.size(),
       DoubleUtils.roundTo2Decimals((double) namesApplied.get() / unnamedSidewalks.size() * 100)
@@ -139,6 +100,60 @@ public class SidewalkNamer implements EdgeNamer {
     // set the indices to null so they can be garbage-collected
     streetEdges = null;
     unnamedSidewalks = null;
+  }
+
+  private void assignNameToSidewalk(EdgeOnLevel sidewalkOnLevel, AtomicInteger namesApplied) {
+    var sidewalk = sidewalkOnLevel.edge;
+    var buffer = preciseBuffer(sidewalk.getGeometry(), 25);
+    var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
+
+    var envelope = sidewalk.getGeometry().getEnvelopeInternal();
+    envelope.expandBy(0.000002);
+    var candidates = streetEdges.query(envelope);
+
+    groupEdgesByName(candidates)
+      .filter(g -> g.nearestDistanceTo(sidewalk.getGeometry()) < MAX_DISTANCE_TO_SIDEWALK)
+      .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
+      .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
+      // remove those groups where less than a certain percentage is inside the buffer around
+      // the sidewalk. this safety mechanism for sidewalks that snake around the corner
+      // like https://www.openstreetmap.org/way/1059101564
+      .filter(group -> group.percentInBuffer > MIN_PERCENT_IN_BUFFER)
+      .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
+      .ifPresent(group -> {
+        namesApplied.incrementAndGet();
+        sidewalk.setName(Objects.requireNonNull(group.name));
+      });
+  }
+
+  private static NamedEdgeGroup computePercentInsideBuffer(
+    CandidateGroup g,
+    Geometry buffer,
+    double sidewalkLength
+  ) {
+    var lengthInsideBuffer = g.intersectionLength(buffer);
+    double percentInBuffer = lengthInsideBuffer / sidewalkLength;
+    return new NamedEdgeGroup(percentInBuffer, g.name);
+  }
+
+  private static Stream<CandidateGroup> groupEdgesByName(List<EdgeOnLevel> candidates) {
+    return candidates
+      .stream()
+      .collect(Collectors.groupingBy(e -> e.edge.getName()))
+      .entrySet()
+      .stream()
+      .map(entry -> {
+        var levels = entry
+          .getValue()
+          .stream()
+          .flatMap(e -> e.levels.stream())
+          .collect(Collectors.toSet());
+        return new CandidateGroup(
+          entry.getKey(),
+          entry.getValue().stream().map(e -> e.edge).toList(),
+          levels
+        );
+      });
   }
 
   /**
@@ -162,19 +177,17 @@ public class SidewalkNamer implements EdgeNamer {
     }
   }
 
-  record NamedEdgeGroup(
-    double percentInBuffer,
-    int numberOfCandidates,
-    I18NString name,
-    StreetEdge sidewalk
-  ) {
+  private record NamedEdgeGroup(double percentInBuffer, I18NString name) {
     NamedEdgeGroup {
       Objects.requireNonNull(name);
-      Objects.requireNonNull(sidewalk);
     }
   }
 
-  record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
+  /**
+   * A group of edges that are near a sidewalk that have the same name. These groups are used
+   * to figure out if the name of the group can be applied to a nearby sidewalk.
+   */
+  private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
     double intersectionLength(Geometry polygon) {
       return edges
         .stream()
@@ -200,6 +213,9 @@ public class SidewalkNamer implements EdgeNamer {
       };
     }
 
+    /**
+     * Get the closest distance in meters between any of the edges in the group and the given geometry.
+     */
     double nearestDistanceTo(Geometry g) {
       return edges
         .stream()
@@ -212,5 +228,5 @@ public class SidewalkNamer implements EdgeNamer {
     }
   }
 
-  record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}
+  private record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}
 }
