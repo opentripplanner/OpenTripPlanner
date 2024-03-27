@@ -533,7 +533,7 @@ public class OSMWithTags {
       .flatMap(v -> Arrays.stream(v.split(";")))
       .map(String::strip)
       .filter(v -> !v.isBlank())
-      .collect(Collectors.toUnmodifiableSet());
+      .collect(Collectors.toSet());
   }
 
   public OsmProvider getOsmProvider() {
@@ -570,6 +570,9 @@ public class OSMWithTags {
     return false;
   }
 
+  /**
+   * Is this a link to another road, like a highway ramp.
+   */
   public boolean isLink() {
     String highway = getTag("highway");
     return highway != null && highway.endsWith(("_link"));
