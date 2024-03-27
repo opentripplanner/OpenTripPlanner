@@ -46,7 +46,7 @@ public class StreetEdgeTest {
   public void before() {
     v0 = intersectionVertex("maple_0th", 0.0, 0.0); // label, X, Y
     v1 = intersectionVertex("maple_1st", 2.0, 2.0);
-    v2 = intersectionVertex("maple_2nd", 1.0, 2.0);
+    v2 = intersectionVertex("maple_2nd", 2.0, 1.0);
 
     this.proto =
       StreetSearchRequest
@@ -73,7 +73,7 @@ public class StreetEdgeTest {
     assertEquals(90, e1.getOutAngle());
 
     // 2 new ones
-    StreetVertex u = intersectionVertex("test1", 2.0, 1.0);
+    StreetVertex u = intersectionVertex("test1", 1.0, 2.0);
     StreetVertex v = intersectionVertex("test2", 2.0, 2.0);
 
     // Second edge, heading straight North

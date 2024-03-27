@@ -12,11 +12,11 @@ public class Polygons {
     .getGeometryFactory()
     .createPolygon(
       new Coordinate[] {
-        new Coordinate(52.616841, 13.224692810),
-        new Coordinate(52.6168419, 13.224692810),
-        new Coordinate(52.3915238, 13.646107734),
-        new Coordinate(52.616841, 13.646107734),
-        new Coordinate(52.616841, 13.224692810),
+        Coordinates.of(52.616841, 13.224692810),
+        Coordinates.of(52.616841, 13.646107734),
+        Coordinates.of(52.3915238, 13.646107734),
+        Coordinates.of(52.396421, 13.2268067),
+        Coordinates.of(52.616841, 13.224692810),
       }
     );
 
@@ -25,7 +25,7 @@ public class Polygons {
 
     var coordinates = Arrays
       .stream(polygon.getCoordinates())
-      .map(c -> new LngLatAlt(c.y, c.x))
+      .map(c -> new LngLatAlt(c.x, c.y))
       .toList();
     ret.add(coordinates);
 
