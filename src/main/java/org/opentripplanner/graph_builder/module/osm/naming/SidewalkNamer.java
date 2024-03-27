@@ -119,13 +119,7 @@ public class SidewalkNamer implements EdgeNamer {
           .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
           .ifPresent(group -> {
             namesApplied.incrementAndGet();
-            var name = group.name.toString();
-
-            sidewalk.setName(
-              Objects.requireNonNull(
-                I18NString.of("%s, Percent in buffer: %s".formatted(name, group.percentInBuffer))
-              )
-            );
+            sidewalk.setName(Objects.requireNonNull(group.name));
           });
 
         //Keep lambda! A method-ref would cause incorrect class and line number to be logged
