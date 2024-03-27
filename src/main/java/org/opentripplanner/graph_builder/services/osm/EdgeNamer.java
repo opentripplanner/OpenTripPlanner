@@ -52,25 +52,28 @@ public interface EdgeNamer {
         .of(parameterName)
         .summary("A custom OSM namer to use.")
         .since(OtpVersion.V1_5)
-        .asString(null);
+        .asEnum(EdgeNamerType.NONE);
       return fromConfig(osmNaming);
     }
 
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static EdgeNamer fromConfig(String type) {
-      if (type == null) {
+    public static EdgeNamer fromConfig(EdgeNamerType type) {
+      if(type == null{
         return new DefaultNamer();
       }
-
       return switch (type) {
-        case "portland" -> new PortlandCustomNamer();
-        case "sidewalks" -> new SidewalkNamer();
-        default -> throw new IllegalArgumentException(
-          String.format("Unknown osmNaming type: '%s'", type)
-        );
+        case PORTLAND -> new PortlandCustomNamer();
+        case SIDEWALKS -> new SidewalkNamer();
+        case NONE ->  new DefaultNamer();
       };
     }
+  }
+
+  enum EdgeNamerType {
+    NONE,
+    PORTLAND,
+    SIDEWALKS,
   }
 }
