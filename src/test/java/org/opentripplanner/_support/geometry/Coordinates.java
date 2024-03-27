@@ -11,7 +11,7 @@ public class Coordinates {
   public static final Coordinate BOSTON = of(42.36541, -71.06129);
 
   /**
-   * Because it is a frequent mistake to mistake x/y and longitude/latitude when
+   * Because it is a frequent mistake to swap x/y and longitude/latitude when
    * constructing JTS Coordinates, this static factory method makes is clear
    * which is which.
    */

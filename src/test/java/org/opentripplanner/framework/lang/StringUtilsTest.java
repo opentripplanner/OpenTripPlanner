@@ -78,7 +78,6 @@ class StringUtilsTest {
 
   @Test
   void padRight() {
-    System.out.println(Polygons.BERLIN);
     assertEquals("ABC???", StringUtils.padRight("ABC", '?', 6));
     assertEquals("??????", StringUtils.padRight(null, '?', 6));
     assertEquals("ABC", StringUtils.padRight("ABC", '?', 3));
