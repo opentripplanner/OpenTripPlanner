@@ -64,6 +64,56 @@
       }
     },
     {
+      "id" : "edge-name",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line",
+        "symbol-spacing" : 500,
+        "text-field" : "{name}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : {
+          "base" : 14.0,
+          "stops" : [
+            [
+              14,
+              12.0
+            ],
+            [
+              20,
+              14.0
+            ]
+          ]
+        },
+        "text-max-width" : 5,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "visibility" : "none"
+      }
+    },
+    {
       "id" : "link",
       "type" : "line",
       "source" : "vectorSource",
@@ -194,5 +244,6 @@
       }
     }
   ],
-  "version" : 8
+  "version" : 8,
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
 }
