@@ -21,6 +21,7 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.note.StreetNoteMatcher;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,7 @@ public class WayPropertySet {
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
   private final DataImportIssueStore issueStore;
+  private final Deduplicator deduplicator;
 
   public List<MixinProperties> getMixins() {
     return mixins;
@@ -78,10 +80,10 @@ public class WayPropertySet {
   private final List<MixinProperties> mixins = new ArrayList<>();
 
   public WayPropertySet() {
-    this(DataImportIssueStore.NOOP);
+    this(DataImportIssueStore.NOOP, new Deduplicator());
   }
 
-  public WayPropertySet(DataImportIssueStore issueStore) {
+  public WayPropertySet(DataImportIssueStore issueStore, Deduplicator deduplicator) {
     /* sensible defaults */
     // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
     defaultCarSpeed = 11.2f;
@@ -99,6 +101,7 @@ public class WayPropertySet {
     defaultWalkSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
     defaultBicycleSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
     this.issueStore = issueStore;
+    this.deduplicator = deduplicator;
   }
 
   /**
@@ -202,7 +205,8 @@ public class WayPropertySet {
     if (bestNamer == null) {
       return null;
     }
-    return bestNamer.generateCreativeName(way);
+    var name = bestNamer.generateCreativeName(way);
+    return deduplicator.deduplicateObject(I18NString.class, name);
   }
 
   /**

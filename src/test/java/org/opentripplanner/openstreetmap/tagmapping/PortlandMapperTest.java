@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.carTunnel;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.cobblestones;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.fiveLanes;
-import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.footwaySidewalk;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.highwayTertiary;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.highwayTertiaryWithSidewalk;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.highwayTrunk;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.noSidewalk;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.noSidewalkHighSpeed;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.pedestrianTunnel;
+import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.sidewalk;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.sidewalkBoth;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.southeastLaBonitaWay;
 import static org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData.southwestMayoStreet;
@@ -38,7 +38,7 @@ public class PortlandMapperTest {
       Arguments.of(cobblestones(), 1.2),
       Arguments.of(noSidewalk(), 1.2),
       Arguments.of(carTunnel(), 1.2),
-      Arguments.of(footwaySidewalk(), 1.32),
+      Arguments.of(sidewalk(), 1.32),
       Arguments.of(highwayTertiary(), 1.32),
       Arguments.of(highwayTrunk(), 1.44),
       Arguments.of(fiveLanes(), 1.584),
