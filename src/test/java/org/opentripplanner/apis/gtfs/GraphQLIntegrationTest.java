@@ -295,7 +295,7 @@ class GraphQLIntegrationTest {
   }
 
   /**
-   * We want to provide a variety of numbers and null.
+   * We want to provide a variety of numbers and null, so we cover all cases in the test output.
    */
   private static Integer sortOrder(TransitMode m) {
     if (m.ordinal() == 0) {
