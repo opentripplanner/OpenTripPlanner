@@ -533,7 +533,7 @@ public class OSMWithTags {
       .flatMap(v -> Arrays.stream(v.split(";")))
       .map(String::strip)
       .filter(v -> !v.isBlank())
-      .collect(Collectors.toSet());
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   public OsmProvider getOsmProvider() {
