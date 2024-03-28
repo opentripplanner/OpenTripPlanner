@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -109,38 +108,6 @@ public class TimetableSnapshot {
     }
 
     return pattern.getScheduledTimetable();
-  }
-
-  public void removeRealtimeUpdatedTripTimes(
-    TripPattern tripPattern,
-    FeedScopedId tripId,
-    LocalDate serviceDate
-  ) {
-    SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
-    if (sortedTimetables != null) {
-      TripTimes tripTimesToRemove = null;
-      for (Timetable timetable : sortedTimetables) {
-        if (timetable.isValidFor(serviceDate)) {
-          final TripTimes tripTimes = timetable.getTripTimes(tripId);
-          if (tripTimes == null) {
-            LOG.debug("No triptimes to remove for trip {}", tripId);
-          } else if (tripTimesToRemove != null) {
-            LOG.debug("Found two triptimes to remove for trip {}", tripId);
-          } else {
-            tripTimesToRemove = tripTimes;
-          }
-        }
-      }
-
-      if (tripTimesToRemove != null) {
-        for (Timetable sortedTimetable : sortedTimetables) {
-          boolean isDirty = sortedTimetable.getTripTimes().remove(tripTimesToRemove);
-          if (isDirty) {
-            dirtyTimetables.add(sortedTimetable);
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -295,11 +262,24 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Removes the latest added trip pattern from the cache. This should be done when removing the
-   * trip times from the timetable the trip has been added to.
+   * Removes previous trip-update from buffer if there is an update with given trip on service date
+   *
+   * @param serviceDate service date
+   * @return true if a previously added trip was removed
    */
-  public void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, LocalDate serviceDate) {
-    realtimeAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
+  public boolean removePreviousRealtimeUpdate(FeedScopedId tripId, LocalDate serviceDate) {
+    boolean success = false;
+
+    final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);
+    if (pattern != null) {
+      // Remove the previous real-time-added TripPattern from buffer.
+      // Only one version of the real-time-update should exist
+      removeLastAddedTripPattern(tripId, serviceDate);
+      removeRealtimeUpdatedTripTimes(pattern, tripId, serviceDate);
+      success = true;
+    }
+
+    return success;
   }
 
   /**
@@ -389,6 +369,46 @@ public class TimetableSnapshot {
       .removeIf(realtimeAddedTripPattern ->
         feedId.equals(realtimeAddedTripPattern.tripId().getFeedId())
       );
+  }
+
+  private void removeRealtimeUpdatedTripTimes(
+    TripPattern tripPattern,
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
+    SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
+    if (sortedTimetables != null) {
+      TripTimes tripTimesToRemove = null;
+      for (Timetable timetable : sortedTimetables) {
+        if (timetable.isValidFor(serviceDate)) {
+          final TripTimes tripTimes = timetable.getTripTimes(tripId);
+          if (tripTimes == null) {
+            LOG.debug("No triptimes to remove for trip {}", tripId);
+          } else if (tripTimesToRemove != null) {
+            LOG.debug("Found two triptimes to remove for trip {}", tripId);
+          } else {
+            tripTimesToRemove = tripTimes;
+          }
+        }
+      }
+
+      if (tripTimesToRemove != null) {
+        for (Timetable sortedTimetable : sortedTimetables) {
+          boolean isDirty = sortedTimetable.getTripTimes().remove(tripTimesToRemove);
+          if (isDirty) {
+            dirtyTimetables.add(sortedTimetable);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Removes the latest added trip pattern from the cache. This should be done when removing the
+   * trip times from the timetable the trip has been added to.
+   */
+  private void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, LocalDate serviceDate) {
+    realtimeAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
   }
 
   /**
