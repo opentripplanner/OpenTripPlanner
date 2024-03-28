@@ -34,11 +34,30 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A namer that assigns names of nearby streets to sidewalks if they meet certain
+ * geometric similarity criteria.
+ * <p>
+ * The algorithm works as follows:
+ *  - for each sidewalk we look up (named) street edges nearby
+ *  - group those edges into groups where each edge has the same name
+ *  - draw a flat-capped buffer around the sidewalk, like this: https://tinyurl.com/4fpe882h
+ *  - check how much of a named edge group is inside the buffer
+ *  - remove those groups which are below MIN_PERCENT_IN_BUFFER
+ *  - take the group that has the highest percentage (as a proportion of the sidewalk length) inside
+ *    the buffer and apply its name to the sidewalk.
+ * <p>
+ * This works very well for OSM data where the sidewalk runs a parallel to the street and at each
+ * intersection the sidewalk is also split. It doesn't work well for sidewalks that go around
+ * the corner, like https://www.openstreetmap.org/way/1059101564. These cases are, however, detected
+ * by the above algorithm and the sidewalk name remains the same.
+ */
 public class SidewalkNamer implements EdgeNamer {
 
   private static final Logger LOG = LoggerFactory.getLogger(SidewalkNamer.class);
   private static final int MAX_DISTANCE_TO_SIDEWALK = 50;
   private static final double MIN_PERCENT_IN_BUFFER = .85;
+  private static final int BUFFER_METERS = 25;
 
   private HashGridSpatialIndex<EdgeOnLevel> streetEdges = new HashGridSpatialIndex<>();
   private Collection<EdgeOnLevel> unnamedSidewalks = new ArrayList<>();
@@ -102,9 +121,12 @@ public class SidewalkNamer implements EdgeNamer {
     unnamedSidewalks = null;
   }
 
+  /**
+   * The actual worker method that runs the business logic on an individual sidewalk edge.
+   */
   private void assignNameToSidewalk(EdgeOnLevel sidewalkOnLevel, AtomicInteger namesApplied) {
     var sidewalk = sidewalkOnLevel.edge;
-    var buffer = preciseBuffer(sidewalk.getGeometry(), 25);
+    var buffer = preciseBuffer(sidewalk.getGeometry(), BUFFER_METERS);
     var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
 
     var envelope = sidewalk.getGeometry().getEnvelopeInternal();
@@ -112,7 +134,9 @@ public class SidewalkNamer implements EdgeNamer {
     var candidates = streetEdges.query(envelope);
 
     groupEdgesByName(candidates)
+      // remove edges that are far away
       .filter(g -> g.nearestDistanceTo(sidewalk.getGeometry()) < MAX_DISTANCE_TO_SIDEWALK)
+      // make sure we only compare sidewalks and streets that are on the same level
       .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
       .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
       // remove those groups where less than a certain percentage is inside the buffer around
@@ -126,6 +150,10 @@ public class SidewalkNamer implements EdgeNamer {
       });
   }
 
+  /**
+   * Compute the length of the group that is inside the buffer and return it as a percentage
+   * of the lenght of the sidewalk.
+   */
   private static NamedEdgeGroup computePercentInsideBuffer(
     CandidateGroup g,
     Geometry buffer,
@@ -136,6 +164,11 @@ public class SidewalkNamer implements EdgeNamer {
     return new NamedEdgeGroup(percentInBuffer, g.name);
   }
 
+  /**
+   * If a single street is split into several eges each individual part of the street would potentially
+   * have a low similarity with the (longer) sidewalk. For that reason we combined them into a group
+   * and have a better basis for comparison.
+   */
   private static Stream<CandidateGroup> groupEdgesByName(List<EdgeOnLevel> candidates) {
     return candidates
       .stream()
@@ -157,6 +190,13 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   /**
+   * Add a buffer around a geometry that uses both meters as the input and makes sure
+   * that the buffer is the same distance (in meters) anywhere on earth.
+   * <p>
+   * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
+   * coordinate reference system, the buffer will be accurate at the equator but will become more
+   * and more elongated the furter north/south you go.
+   * <p>
    * Taken from https://stackoverflow.com/questions/36455020
    */
   private Geometry preciseBuffer(Geometry geometry, double distanceInMeters) {
@@ -188,6 +228,9 @@ public class SidewalkNamer implements EdgeNamer {
    * to figure out if the name of the group can be applied to a nearby sidewalk.
    */
   private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
+    /**
+     * How much of this group intersects with the give geometry, in meters.
+     */
     double intersectionLength(Geometry polygon) {
       return edges
         .stream()
