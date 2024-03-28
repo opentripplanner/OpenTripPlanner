@@ -32,4 +32,20 @@ public class CollectionUtils {
     }
     return stream.collect(Collectors.joining(", ", "[", "]"));
   }
+
+  /**
+   * A null-safe version of isEmpty() for a collection.
+   * <p>
+   * The main strategy handling collections in OTP is to avoid nullable collection fields and use empty
+   * collections instead. So, before using this method check if the variable/field is indeed `@Nullable`.
+   * <p>
+   * If the collection is {@code null} then {@code true} is returned.
+   * <p>
+   * If the collection is empty then {@code true} is returned.
+   * <p>
+   * Otherwise {@code false} is returned.
+   */
+  public static boolean isEmpty(@Nullable Collection<?> c) {
+    return c == null || c.isEmpty();
+  }
 }
