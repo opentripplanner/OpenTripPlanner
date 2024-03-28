@@ -17,6 +17,16 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
+/**
+ * This is a replica of public transportation data already present in TransitModel, but rearranged
+ * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
+ * by days, retaining only the services actually running on any particular day.
+ *
+ * TODO RT_AB: this name is apparently modeled after R5, where the TransportNetwork is split into
+ *  two layers (one for the streets and one for the public transit data). Here the situation is
+ *  different: this seems to be an indexed and rearranged copy of the main transit data (a
+ *  TransitModel instance).
+ */
 public class TransitLayer {
 
   /**

@@ -94,6 +94,7 @@ public final class StopPattern implements Serializable {
     return new StopPatternBuilder(this, null);
   }
 
+  // TODO RT_AB: documentation or naming - this does not mutate the object in place, it makes a copy
   StopPatternBuilder mutate(StopPattern realTime) {
     return new StopPatternBuilder(this, realTime);
   }

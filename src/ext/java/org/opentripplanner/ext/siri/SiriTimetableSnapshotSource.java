@@ -133,10 +133,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
+   * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
+   *              same internal model.
    *
    * @param fullDataset  true iff the list with updates represent all updates that are active right
    *                     now, i.e. all previous updates should be disregarded
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
+   *                     FIXME RT_AB: aren't these ET deliveries, not VM?
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
@@ -373,11 +376,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate
     );
 
-    // Add new trip times to the buffer and return success
+    // Add new trip times to the buffer and return result with success or error. The update method
+    // will perform protective copies as needed, whether pattern is created by realtime data or not.
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
-
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
-
     return result;
   }
 

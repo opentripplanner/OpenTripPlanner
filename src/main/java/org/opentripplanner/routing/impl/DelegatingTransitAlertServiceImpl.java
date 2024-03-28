@@ -18,11 +18,23 @@ import org.opentripplanner.updater.alert.TransitAlertProvider;
  * This class is used to combine alerts from multiple {@link TransitAlertService}s. Each
  * {@link TransitAlertProvider} has its own service, and all need to be queried in order to fetch
  * all alerts.
+ *
+ * Concretely: every realtime updater receiving GTFS Alerts or SIRI Situation Exchange (SX)
+ * messages currently maintains its own private index of alerts separately from all other updaters.
+ * To make the set of all alerts from all updaters available in a single operation and associate it
+ * with the graph as a whole, the various indexes are merged in such a way as to have the same
+ * index as each individual index.
  */
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
+  /**
+   * Constructor which scans over all existing GraphUpdaters associated with a TransitModel
+   * instance and retains references to all their TransitAlertService instances.
+   * This implies that these instances are expected to remain in use indefinitely (not be replaced
+   * with new instances or taken out of service over time).
+   */
   public DelegatingTransitAlertServiceImpl(TransitModel transitModel) {
     if (transitModel.getUpdaterManager() != null) {
       transitModel
@@ -38,7 +50,9 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public void setAlerts(Collection<TransitAlert> alerts) {
-    throw new UnsupportedOperationException("Not supported");
+    throw new UnsupportedOperationException(
+      "This delegating TransitAlertService is not intended to hold any TransitAlerts of its own."
+    );
   }
 
   @Override

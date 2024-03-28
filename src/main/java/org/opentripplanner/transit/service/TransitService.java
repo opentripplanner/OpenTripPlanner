@@ -44,7 +44,20 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
- * Entry point for read-only requests towards the transit API.
+ * TransitService is a read-only interface for retrieving public transport data. It provides a
+ * frozen view of all these elements at a point in time, which is not affected by incoming realtime
+ * data, allowing results to remain stable over the course of a request. This can be used for
+ * fetching tables of specific information like the routes passing through a particular stop, or for
+ * gaining access to the entirety of the data to perform routing.
+ * <p>
+ * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TransitModel.
+ *   Is this intentional, because TransitLayer is meant to be read-only and TransitModel is not?
+ *   Should this be renamed TransitDataService since it seems to provide access to the data but
+ *   not to transit routing functionality (which is provided by the RoutingService)?
+ *   The DefaultTransitService implementation has a TransitModel instance and many of its methods
+ *   read through to that TransitModel instance. But that field itself is not exposed, while the
+ *   TransitLayer is here. It seems like exposing the raw TransitLayer is still a risk since it's
+ *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
  */
 public interface TransitService {
   Collection<String> getFeedIds();

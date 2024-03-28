@@ -31,6 +31,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private final String url;
   private final String originalRequestorRef;
   private final TransitAlertService transitAlertService;
+
+  // TODO RT_AB: Document why SiriAlertsUpdateHandler is a separate instance that persists across
+  //  many graph update operations.
   private final SiriAlertsUpdateHandler updateHandler;
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
@@ -85,6 +88,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    // TODO RT_AB: Consider renaming this callback. Its name is currently like an imperative verb.
     this.saveResultOnGraph = saveResultOnGraph;
   }
 
@@ -101,6 +105,10 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     retry.execute(this::updateSiri);
   }
 
+  /**
+   * This part of the update process has been factored out to allow repeated retries of the HTTP
+   * fetching operation in case the connection fails or some other disruption happens.
+   */
   private void updateSiri() {
     boolean moreData = false;
     do {
@@ -112,6 +120,36 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
         if (serviceDelivery.getSituationExchangeDeliveries() != null) {
+          // FIXME RT_AB: This is submitting a reference to a method on a long-lived instance as a
+          //   GraphWriterRunnable. These runnables were originally intended to be small,
+          //   self-contained, throw-away update tasks.
+          //   See org/opentripplanner/updater/trip/PollingTripUpdater.java:90
+          //   Clarify why the long-lived instance is capturing and holding so many references.
+          //   The runnable should only contain the minimum needed to operate on the graph.
+          //   Such runnables should be illustrated in documentation as e.g. a little box labeled
+          //   "change trip ABC123 by making stop 53 late by 2 minutes."
+          //   Also clarify how this runnable works without even using the supplied
+          //   (graph, transitModel) parameters. There are multiple TransitAlertServices and they
+          //   are not versioned along with the Graph, they are attached to updaters.
+          //
+          // This is submitting a runnable to an executor, but that runnable only writes back to
+          // objects referenced by updateHandler itself, rather than the graph or transitModel
+          // supplied for writing, and apparently with no versioning. This seems like a
+          // misinterpretation of the realtime design.
+          // If this is an intentional choice to live-patch a single server-wide instance of an
+          // alerts service/index while it's already in use by routing, we should be clear about
+          // this and document why it differs from the graph-writer design. Currently the code
+          // seems to follow some surface conventions of the threadsafe copy-on-write pattern
+          // without actually providing threadsafe behavior.
+          // It's a reasonable choice to defer processing the list of alerts to another thread than
+          // this fetching thread, but we probably don't want to defer any such processing to the
+          // graph writer thread, as that's explicitly restricted to be one single shared thread for
+          // the entire application. There seems to be a misunderstanding that the tasks are
+          // submitted to get them off the updater thread, but the real reason is to ensure
+          // consistent transactions in graph writing and reading.
+          // All that said, out of all the update types, Alerts (and SIRI SX) are probably the ones
+          // that would be most tolerant of non-versioned application-wide storage since they don't
+          // participate in routing and are tacked on to already-completed routing responses.
           saveResultOnGraph.execute((graph, transitModel) -> {
             updateHandler.update(serviceDelivery);
             if (markPrimed) {

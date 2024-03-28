@@ -32,15 +32,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the TransitLayer object from the OTP Graph object. The ServiceDay hierarchy is reversed,
+ * Maps the TransitLayer object from the TransitModel object. The ServiceDay hierarchy is reversed,
  * with service days at the top level, which contains TripPatternForDate objects that contain only
  * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
  * when doing Range Raptor searches.
  * <p>
- * CONCURRENCY: This mapper run part of the mapping in parallel using parallel streams. This improve
- * startup time on the Norwegian graph by 20 seconds; reducing the this mapper from 36 seconds to 15
- * seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020, MacBook Pro, 3.1
- * GHz i7)
+ * CONCURRENCY: This mapper runs part of the mapping in parallel using parallel streams. This
+ * improves startup time on the Norwegian network by 20 seconds, by reducing this mapper from 36
+ * seconds to 15 seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020,
+ * MacBook Pro, 3.1 GHz i7)
  */
 public class TransitLayerMapper {
 
@@ -59,8 +59,8 @@ public class TransitLayerMapper {
     return new TransitLayerMapper(transitModel).map(tuningParameters);
   }
 
-  // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
-  //      optimized for sorting nearly sorted list
+  // TODO We could save time by either pre-sorting these, or by using a sorting algorithm that is
+  //      optimized for sorting nearly-sorted lists.
   static List<TripTimes> getSortedTripTimes(Timetable timetable) {
     return timetable
       .getTripTimes()
@@ -75,7 +75,7 @@ public class TransitLayerMapper {
     ConstrainedTransfersForPatterns constrainedTransfers = null;
     StopModel stopModel = transitModel.getStopModel();
 
-    LOG.info("Mapping transitLayer from Graph...");
+    LOG.info("Mapping transitLayer from TransitModel...");
 
     Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
 
