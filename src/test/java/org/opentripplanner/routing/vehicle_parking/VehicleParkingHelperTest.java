@@ -10,6 +10,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -41,8 +42,8 @@ class VehicleParkingHelperTest {
   @Test
   void linkSkippingEdgesTest() {
     Graph graph = new Graph();
-    var vehicleParking = VehicleParking
-      .builder()
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .entrances(
         IntStream
           .rangeClosed(1, 3)
@@ -67,8 +68,8 @@ class VehicleParkingHelperTest {
   }
 
   private VehicleParking createParingWithEntrances(int entranceNumber) {
-    return VehicleParking
-      .builder()
+    return StreetModelForTest
+      .vehicleParking()
       .bicyclePlaces(true)
       .entrances(
         IntStream

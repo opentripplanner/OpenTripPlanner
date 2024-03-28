@@ -5,4 +5,5 @@ public enum VehicleParkingSourceType {
   BICYCLE_PARK_API,
   HSL_PARK,
   BIKELY,
+  NOI_OPEN_DATA_HUB,
 }

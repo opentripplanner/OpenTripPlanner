@@ -9,6 +9,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -110,5 +111,9 @@ public class StreetModelForTest {
       rentalVehicleBuilder.withVehicleCar();
     }
     return new VehicleRentalPlaceVertex(rentalVehicleBuilder.build());
+  }
+
+  public static VehicleParking.VehicleParkingBuilder vehicleParking() {
+    return VehicleParking.builder().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
   }
 }

@@ -16,6 +16,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -142,7 +143,10 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void addNotOperatingVehicleParkingTest() {
-    var vehicleParking = VehicleParking.builder().state(VehicleParkingState.CLOSED).build();
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
+      .state(VehicleParkingState.CLOSED)
+      .build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
@@ -155,8 +159,8 @@ class VehicleParkingUpdaterTest {
   void updateNotOperatingVehicleParkingTest() {
     var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
 
-    var vehicleParking = VehicleParking
-      .builder()
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .availability(vehiclePlaces)
       .state(VehicleParkingState.CLOSED)
       .build();
@@ -175,8 +179,8 @@ class VehicleParkingUpdaterTest {
     vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
 
     vehicleParking =
-      VehicleParking
-        .builder()
+      StreetModelForTest
+        .vehicleParking()
         .availability(vehiclePlaces)
         .state(VehicleParkingState.CLOSED)
         .build();
@@ -194,7 +198,10 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void deleteNotOperatingVehicleParkingTest() {
-    var vehicleParking = VehicleParking.builder().state(VehicleParkingState.CLOSED).build();
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
+      .state(VehicleParkingState.CLOSED)
+      .build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();

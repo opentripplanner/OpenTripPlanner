@@ -765,6 +765,12 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "vehicle-parking",
+      "feedId" : "noi",
+      "sourceType" : "noi-open-data-hub",
+      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
+    },
+    {
       "type" : "stop-time-updater",
       "frequency" : "1m",
       "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
