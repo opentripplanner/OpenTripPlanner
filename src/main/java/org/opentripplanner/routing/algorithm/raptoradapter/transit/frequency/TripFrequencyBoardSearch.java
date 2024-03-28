@@ -54,7 +54,7 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
             departureTime - headway,
             headway,
             offset,
-            pattern.getLocalDate()
+            pattern.getServiceDate()
           );
         }
       }

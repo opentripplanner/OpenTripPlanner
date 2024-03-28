@@ -96,7 +96,7 @@ public class TransitLayerUpdater {
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
-          .getTripPatternsStartingOnDateCopy(date)
+          .getTripPatternsOnServiceDateCopy(date)
           .stream()
           .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t));
         tripPatternsStartingOnDateMapCache.put(date, map);
@@ -146,7 +146,7 @@ public class TransitLayerUpdater {
           } else {
             LOG.debug(
               "NEW TripPatternForDate: {} - {}",
-              newTripPatternForDate.getLocalDate(),
+              newTripPatternForDate.getServiceDate(),
               newTripPatternForDate.getTripPattern().debugInfo()
             );
           }
@@ -179,7 +179,7 @@ public class TransitLayerUpdater {
       }
 
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
-        if (tripPatternForDate.getLocalDate().equals(date)) {
+        if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
           if (!pattern.isCreatedByRealtimeUpdater()) {
             continue;

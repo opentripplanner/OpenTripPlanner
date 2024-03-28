@@ -15,7 +15,7 @@ public class AssertSpeedTestSetup {
   ) {
     int numberOfPatternForTestDate = transitModel
       .getTransitLayer()
-      .getTripPatternsForDate(config.testDate)
+      .getTripPatternsForRunningDate(config.testDate)
       .size();
 
     if (numberOfPatternForTestDate < 10) {
