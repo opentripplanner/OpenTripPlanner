@@ -8,7 +8,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +49,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -257,6 +261,59 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Trip getTripForId(FeedScopedId id) {
     return this.transitModelIndex.getTripForId().get(id);
+  }
+
+  @Override
+  public Collection<DatedTrip> getCancelledTrips(List<String> feeds) {
+    OTPRequestTimeoutException.checkForTimeout();
+    List<DatedTrip> cancelledTrips = new ArrayList<>();
+    Map<Trip, Integer> departures = new HashMap<>();
+
+    var timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return cancelledTrips;
+    }
+    var calendarService = getCalendarService();
+    var patternMap = transitModelIndex.getPatternForTrip();
+    var trips = transitModelIndex.getTripForId();
+
+    for (Map.Entry<FeedScopedId, Trip> entry : trips.entrySet()) {
+      var trip = entry.getValue();
+      if (feeds != null && !feeds.contains(trip.getId().getFeedId())) {
+        continue;
+      }
+      Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
+        trip.getServiceId()
+      );
+      var pattern = patternMap.get(trip);
+      for (LocalDate date : serviceDates) {
+        var timetable = timetableSnapshot.resolve(pattern, date);
+        var tripTimes = timetable.getTripTimes(trip);
+        if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) { // use UPDATED for faked testing
+          cancelledTrips.add(new DatedTrip(trip, date));
+          // store departure time from first stop
+          departures.put(trip, tripTimes.sortIndex());
+        }
+      }
+    }
+    cancelledTrips.sort((t1, t2) -> {
+      if (t1.serviceDate().isBefore(t2.serviceDate())) {
+        return -1;
+      } else if (t2.serviceDate().isBefore(t1.serviceDate())) {
+        return 1;
+      }
+      var departure1 = departures.get(t1.trip());
+      var departure2 = departures.get(t2.trip());
+      if (departure1 < departure2) {
+        return -1;
+      } else if (departure1 > departure2) {
+        return 1;
+      } else {
+        // identical departure day and time, so sort by unique feedscope id
+        return t1.trip().getId().compareTo(t2.trip().getId());
+      }
+    });
+    return cancelledTrips;
   }
 
   @Override
