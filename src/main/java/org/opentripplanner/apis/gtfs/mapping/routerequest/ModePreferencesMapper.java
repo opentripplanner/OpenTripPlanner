@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
-import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -28,7 +27,10 @@ public class ModePreferencesMapper {
     var direct = modesInput.getGraphQLDirect();
     if (Boolean.TRUE.equals(modesInput.getGraphQLTransitOnly())) {
       journey.direct().setMode(StreetMode.NOT_SET);
-    } else if (!CollectionUtils.isEmpty(direct)) {
+    } else if (direct != null) {
+      if (direct.isEmpty()) {
+        throw new IllegalArgumentException("Direct modes must not be empty.");
+      }
       var streetModes = direct.stream().map(DirectModeMapper::map).toList();
       journey.direct().setMode(getStreetMode(streetModes));
     }
@@ -38,26 +40,38 @@ public class ModePreferencesMapper {
       journey.transit().disable();
     } else if (transit != null) {
       var access = transit.getGraphQLAccess();
-      if (!CollectionUtils.isEmpty(access)) {
+      if (access != null) {
+        if (access.isEmpty()) {
+          throw new IllegalArgumentException("Access modes must not be empty.");
+        }
         var streetModes = access.stream().map(AccessModeMapper::map).toList();
         journey.access().setMode(getStreetMode(streetModes));
       }
 
       var egress = transit.getGraphQLEgress();
-      if (!CollectionUtils.isEmpty(egress)) {
+      if (egress != null) {
+        if (egress.isEmpty()) {
+          throw new IllegalArgumentException("Egress modes must not be empty.");
+        }
         var streetModes = egress.stream().map(EgressModeMapper::map).toList();
         journey.egress().setMode(getStreetMode(streetModes));
       }
 
       var transfer = transit.getGraphQLTransfer();
-      if (!CollectionUtils.isEmpty(transfer)) {
+      if (transfer != null) {
+        if (transfer.isEmpty()) {
+          throw new IllegalArgumentException("Transfer modes must not be empty.");
+        }
         var streetModes = transfer.stream().map(TransferModeMapper::map).toList();
         journey.transfer().setMode(getStreetMode(streetModes));
       }
       validateStreetModes(journey);
 
       var transitModes = getTransitModes(environment);
-      if (!CollectionUtils.isEmpty(transitModes)) {
+      if (transitModes != null) {
+        if (transitModes.isEmpty()) {
+          throw new IllegalArgumentException("Transit modes must not be empty.");
+        }
         var filterRequestBuilder = TransitFilterRequest.of();
         var mainAndSubModes = transitModes
           .stream()

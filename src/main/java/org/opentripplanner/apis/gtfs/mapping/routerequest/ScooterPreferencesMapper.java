@@ -2,7 +2,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 
@@ -33,11 +32,14 @@ public class ScooterPreferencesMapper {
   ) {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (!CollectionUtils.isEmpty(allowedNetworks)) {
+      if (allowedNetworks != null) {
+        if (allowedNetworks.isEmpty()) {
+          throw new IllegalArgumentException("Allowed scooter rental networks must not be empty.");
+        }
         preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (!CollectionUtils.isEmpty(bannedNetworks)) {
+      if (bannedNetworks != null) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
       var destinationPolicy = args.getGraphQLDestinationScooterPolicy();

@@ -8,7 +8,6 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.p
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
@@ -99,11 +98,14 @@ public class BicyclePreferencesMapper {
   ) {
     if (args != null) {
       var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (!CollectionUtils.isEmpty(allowedNetworks)) {
+      if (allowedNetworks != null) {
+        if (allowedNetworks.isEmpty()) {
+          throw new IllegalArgumentException("Allowed bicycle rental networks must not be empty.");
+        }
         preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
       }
       var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (!CollectionUtils.isEmpty(bannedNetworks)) {
+      if (bannedNetworks != null) {
         preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
       }
       var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();

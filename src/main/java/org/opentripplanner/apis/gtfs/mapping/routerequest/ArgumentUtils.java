@@ -20,6 +20,7 @@ public class ArgumentUtils {
    * <p>
    * TODO this ugliness can be removed when the bug gets fixed
    */
+  @Nullable
   static List<Map<String, Object>> getTransitModes(DataFetchingEnvironment environment) {
     if (environment.containsArgument("modes")) {
       Map<String, Object> modesArgs = environment.getArgument("modes");
@@ -30,7 +31,7 @@ public class ArgumentUtils {
         }
       }
     }
-    return List.of();
+    return null;
   }
 
   /**
