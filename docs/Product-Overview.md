@@ -3,8 +3,9 @@
 ## OpenTripPlanner project
 
 OpenTripPlanner is a group of open source software applications that help individuals and organizations 
-calculate and deliver multimodal trip plans based on OpenStreetMap (OSM) and other standardized data 
-sources (e.g. GTFS, GBFS, NeTEx).
+calculate and deliver multimodal trip plans based on a combination of open-standard data sources.
+These include public transit services and schedules (GTFS and NeTEx) and OpenStreetMap (OSM), as 
+well as sources describing bicycle sharing or rental, ride hailing, and other services (e.g. GBFS).
 
 A community of dozens of individuals and organizations work on OpenTripPlanner collaboratively to 
 improve multimodal trip planning best practices and to make it easier for public transit agencies and 
@@ -12,7 +13,7 @@ public transit riders to publish and access information about transit services.
 
 OpenTripPlanner deployments are locally managed in many different ways by many different types of organizations. 
 OpenTripPlanner consistently and dependably delivers multimodal trip plans to millions of riders 
-everyday in dozens of countries around the globe. The project is actively maintained by the community, 
+every day in dozens of countries around the globe. The project is actively maintained by the community, 
 with more than 50 commits most weeks during 2022, and 20 different developers having made 50 or more 
 commits during the life of the project.
 
