@@ -150,4 +150,11 @@ public class RouterConfig implements Serializable {
     // Print ONLY the values set, not default values
     return root.toPrettyString();
   }
+
+  /**
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
+   */
+  public boolean hasUnknownParameters() {
+    return root.hasUnknownParameters();
+  }
 }

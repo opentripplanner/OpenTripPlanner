@@ -120,10 +120,6 @@ public class ParameterBuilder {
     return ofOptional(BOOLEAN, defaultValue, JsonNode::asBoolean);
   }
 
-  public Map<String, Boolean> asBooleanMap() {
-    return ofOptionalMap(BOOLEAN, JsonNode::asBoolean);
-  }
-
   /** @throws OtpAppException if parameter is missing. */
   public double asDouble() {
     return ofRequired(DOUBLE).asDouble();
