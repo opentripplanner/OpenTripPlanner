@@ -29,16 +29,16 @@ public class StreetModelForTest {
   public static StreetVertex V4 = intersectionVertex("V4", 3, 3);
 
   public static IntersectionVertex intersectionVertex(Coordinate c) {
-    return intersectionVertex(c.x, c.y);
+    return intersectionVertex(c.y, c.x);
   }
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new LabelledIntersectionVertex(label, lat, lon, false, false);
+    return new LabelledIntersectionVertex(label, lon, lat, false, false);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new LabelledIntersectionVertex(label, lat, lon, false, false);
+    return new LabelledIntersectionVertex(label, lon, lat, false, false);
   }
 
   @Nonnull

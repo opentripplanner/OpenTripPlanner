@@ -102,12 +102,12 @@ class StreetLinkerModuleTest {
 
     public TestModel() {
       var from = StreetModelForTest.intersectionVertex(
-        KONGSBERG_PLATFORM_1.x - DELTA,
-        KONGSBERG_PLATFORM_1.y - DELTA
+        KONGSBERG_PLATFORM_1.y - DELTA,
+        KONGSBERG_PLATFORM_1.x - DELTA
       );
       var to = StreetModelForTest.intersectionVertex(
-        KONGSBERG_PLATFORM_1.x + DELTA,
-        KONGSBERG_PLATFORM_1.y + DELTA
+        KONGSBERG_PLATFORM_1.y + DELTA,
+        KONGSBERG_PLATFORM_1.x + DELTA
       );
 
       Graph graph = new Graph();
