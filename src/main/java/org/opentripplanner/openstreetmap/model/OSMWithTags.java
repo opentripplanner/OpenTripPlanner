@@ -30,7 +30,7 @@ public class OSMWithTags {
   /**
    * highway=* values that we don't want to even consider when building the graph.
    */
-  public static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
+  private static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
     "proposed",
     "planned",
     "construction",
@@ -46,7 +46,8 @@ public class OSMWithTags {
     "escape"
   );
 
-  static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
+  private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
+  private static final Set<String> DEFAULT_LEVEL = Set.of("0");
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -161,6 +162,17 @@ public class OSMWithTags {
    */
   public boolean isBicycleDismountForced() {
     return isTag("bicycle", "dismount");
+  }
+
+  public boolean isSidewalk() {
+    return isTag("footway", "sidewalk") && isTag("highway", "footway");
+  }
+
+  /**
+   * Whether this entity explicity doesn't have a name.
+   */
+  public boolean isExplicitlyUnnamed() {
+    return isTagTrue("noname");
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -558,6 +570,9 @@ public class OSMWithTags {
     return false;
   }
 
+  /**
+   * Is this a link to another road, like a highway ramp.
+   */
   public boolean isLink() {
     String highway = getTag("highway");
     return highway != null && highway.endsWith(("_link"));
@@ -577,6 +592,20 @@ public class OSMWithTags {
   }
 
   /**
+   * Does this entity has a name of its own or if it needs to have a fallback one assigned?
+   */
+  public boolean needsFallbackName() {
+    return !isNamed();
+  }
+
+  /**
+   * Does this entity have tags that allow extracting a name?
+   */
+  public boolean isNamed() {
+    return hasTag("name") || hasTag("ref");
+  }
+
+  /**
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isTagDeniedAccess(String tagName) {
@@ -593,7 +622,7 @@ public class OSMWithTags {
     var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {
       // default
-      return Set.of("0");
+      return DEFAULT_LEVEL;
     }
     return levels;
   }

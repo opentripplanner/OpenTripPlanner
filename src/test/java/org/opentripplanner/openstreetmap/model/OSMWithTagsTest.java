@@ -262,4 +262,13 @@ public class OSMWithTagsTest {
       osmTags.generateI18NForPattern("Note: {note}, {wheelchair:description}, {foobar:description}")
     );
   }
+
+  @Test
+  void fallbackName() {
+    var nameless = WayTestData.cycleway();
+    assertTrue(nameless.needsFallbackName());
+
+    var namedTunnel = WayTestData.carTunnel();
+    assertFalse(namedTunnel.needsFallbackName());
+  }
 }

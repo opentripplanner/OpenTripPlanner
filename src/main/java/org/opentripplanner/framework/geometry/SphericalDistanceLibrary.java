@@ -30,10 +30,16 @@ public abstract class SphericalDistanceLibrary {
     return distance(from.y, from.x, to.y, to.x);
   }
 
+  /**
+   * @see SphericalDistanceLibrary#fastDistance(double, double, double, double)
+   */
   public static double fastDistance(Coordinate from, Coordinate to) {
     return fastDistance(from.y, from.x, to.y, to.x);
   }
 
+  /**
+   * @see SphericalDistanceLibrary#fastDistance(double, double, double, double)
+   */
   public static double fastDistance(Coordinate from, Coordinate to, double cosLat) {
     double dLat = toRadians(from.y - to.y);
     double dLon = toRadians(from.x - to.x) * cosLat;
@@ -105,8 +111,8 @@ public abstract class SphericalDistanceLibrary {
   }
 
   /**
-   * Compute an (approximated) distance between two points, with a known cos(lat). Be careful, this
-   * is approximated and never check for the validity of input cos(lat).
+   * Compute an (approximated) distance in meters between two points, with a known cos(lat).
+   * Be careful, this is approximated and never checks for the validity of input cos(lat).
    */
   public static double fastDistance(double lat1, double lon1, double lat2, double lon2) {
     return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
@@ -131,8 +137,8 @@ public abstract class SphericalDistanceLibrary {
   }
 
   /**
-   * Approximated, fast and under-estimated equirectangular distance between two points. Works only
-   * for small delta lat/lon, fall-back on exact distance if not the case. See:
+   * Approximated, fast and under-estimated equirectangular distance in meters between two points.
+   * Works only for small delta lat/lon, fall-back on exact distance if not the case. See:
    * http://www.movable-type.co.uk/scripts/latlong.html
    */
   public static double fastDistance(
