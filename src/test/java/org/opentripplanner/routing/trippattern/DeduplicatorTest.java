@@ -293,7 +293,7 @@ public class DeduplicatorTest {
       "de",
       "Helmut-Kohl-Straße",
       "se",
-      "Helmuth Kohl Gattan "
+      "Helmuth Kohl Gatan"
     );
   }
 }
