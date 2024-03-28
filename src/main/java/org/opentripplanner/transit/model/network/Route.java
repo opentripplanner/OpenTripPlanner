@@ -10,6 +10,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -55,7 +56,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     this.branding = builder.getBranding();
     this.groupsOfRoutes = listOfNullSafe(builder.getGroupsOfRoutes());
     this.gtfsType = builder.getGtfsType();
-    this.gtfsSortOrder = builder.getGtfsSortOrder();
+    this.gtfsSortOrder = IntUtils.requireNullOrNotNegative(builder.getGtfsSortOrder(), "sortOrder");
     this.netexSubmode = SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode());
     this.flexibleLineType = builder.getFlexibleLineType();
     this.description = builder.getDescription();
@@ -148,6 +149,12 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return gtfsType;
   }
 
+  /**
+   * The visual sort priority of this route when displayed in a graphical interface.
+   * A lower number means that the route has a higher priority.
+   * <p>
+   * Pass-through information from GTFS. This information is not used by OTP.
+   */
   @Nullable
   public Integer getGtfsSortOrder() {
     return gtfsSortOrder;

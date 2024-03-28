@@ -82,6 +82,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -159,6 +160,8 @@ class GraphQLIntegrationTest {
           .route(m.name())
           .withMode(m)
           .withLongName(I18NString.of("Long name for %s".formatted(m)))
+          .withGtfsSortOrder(sortOrder(m))
+          .withBikesAllowed(bikesAllowed(m))
           .build()
       )
       .toList();
@@ -281,6 +284,25 @@ class GraphQLIntegrationTest {
         finder,
         new RouteRequest()
       );
+  }
+
+  private static BikeAccess bikesAllowed(TransitMode m) {
+    return switch (m.ordinal() % 3) {
+      case 0 -> BikeAccess.ALLOWED;
+      case 1 -> BikeAccess.NOT_ALLOWED;
+      default -> BikeAccess.UNKNOWN;
+    };
+  }
+
+  /**
+   * We want to provide a variety of numbers and null, so we cover all cases in the test output.
+   */
+  private static Integer sortOrder(TransitMode m) {
+    if (m.ordinal() == 0) {
+      return null;
+    } else {
+      return m.ordinal();
+    }
   }
 
   private static void add10MinuteDelay(Itinerary i1) {
