@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -24,6 +25,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
@@ -318,20 +320,29 @@ public class OtpHttpClient implements AutoCloseable {
       httpRequest,
       timeout,
       headers,
+      response -> mapResponse(response, contentMapper)
+    );
+  }
+
+  /**
+   * Executes an HTTP request and returns the body mapped according to the provided content mapper.
+   * Returns empty result on http status 204 "No Content"
+   */
+  public <T> Optional<T> executeAndMapOptional(
+    HttpUriRequestBase httpRequest,
+    Duration timeout,
+    Map<String, String> headers,
+    ResponseMapper<T> contentMapper
+  ) {
+    return executeAndMapWithResponseHandler(
+      httpRequest,
+      timeout,
+      headers,
       response -> {
-        if (isFailedRequest(response)) {
-          throw new OtpHttpClientException(
-            "HTTP request failed with status code " + response.getCode()
-          );
+        if (response.getCode() == 204) {
+          return Optional.empty();
         }
-        if (response.getEntity() == null || response.getEntity().getContent() == null) {
-          throw new OtpHttpClientException("HTTP request failed: empty response");
-        }
-        try (InputStream is = response.getEntity().getContent()) {
-          return contentMapper.apply(is);
-        } catch (Exception e) {
-          throw new OtpHttpClientException(e);
-        }
+        return Optional.of(mapResponse(response, contentMapper));
       }
     );
   }
@@ -403,6 +414,25 @@ public class OtpHttpClient implements AutoCloseable {
     }
   }
 
+  private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> contentMapper) {
+    if (isFailedRequest(response)) {
+      throw new OtpHttpClientException(
+        "HTTP request failed with status code " + response.getCode()
+      );
+    }
+    if (response.getEntity() == null) {
+      throw new OtpHttpClientException("HTTP request failed: empty response");
+    }
+    try (InputStream is = response.getEntity().getContent()) {
+      if (is == null) {
+        throw new OtpHttpClientException("HTTP request failed: empty response");
+      }
+      return contentMapper.apply(is);
+    } catch (Exception e) {
+      throw new OtpHttpClientException(e);
+    }
+  }
+
   private <T> T sendAndMap(
     HttpUriRequestBase request,
     URI uri,
@@ -445,7 +475,7 @@ public class OtpHttpClient implements AutoCloseable {
    * Returns true if the HTTP status code is not 200.
    */
   private static boolean isFailedRequest(HttpResponse response) {
-    return response.getCode() != 200;
+    return response.getCode() < 200 || response.getCode() >= 300;
   }
 
   /**
