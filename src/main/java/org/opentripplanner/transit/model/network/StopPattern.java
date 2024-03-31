@@ -94,7 +94,8 @@ public final class StopPattern implements Serializable {
     return new StopPatternBuilder(this, null);
   }
 
-  // TODO RT_AB: documentation or naming - this does not mutate the object in place, it makes a copy
+  // TODO RT_AB: Rename and add documentation. This method does not mutate the object in place, it
+  //  makes a copy. Confirmed in discussion that this should have a different name like "copy".
   StopPatternBuilder mutate(StopPattern realTime) {
     return new StopPatternBuilder(this, realTime);
   }

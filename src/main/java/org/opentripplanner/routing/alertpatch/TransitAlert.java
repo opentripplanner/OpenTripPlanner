@@ -19,9 +19,10 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
  * Internal representation of a GTFS-RT Service Alert or SIRI Situation Exchange (SX) message.
  * These are text descriptions of problems affecting specific stops, routes, or other components
  * of the transit system which will be displayed to users as text.
- * Although they have flags describing the effect of the problem described in the text, convention
- * is that these messages do not modify routing behavior on their own. They must be accompanied by
- * messages of other types to actually impact routing.
+ * Although they have flags describing the effect of the problem described in the text, these
+ * messages do not currently modify routing behavior on their own. They must be accompanied by
+ * messages of other types to actually impact routing. However, there is ongoing discussion about
+ * allowing Alerts to affect routing, especially for cases such as stop closure messages.
  */
 public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAlertBuilder> {
 

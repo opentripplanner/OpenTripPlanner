@@ -58,7 +58,9 @@ import org.slf4j.LoggerFactory;
  * The TransitModel groups together all instances making up OTP's primary internal representation
  * of the public transportation network. Although the names of many entities are derived from
  * GTFS concepts, these are actually independent of the data source from which they are loaded.
- * Both GTFS and NeTEx entities are mapped to these same internal OTP entities.
+ * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
+ * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
+ * only in NeTEx, the NeTEx name is used in the internal model.
  *
  * A TransitModel instance also includes references to some transient indexes of its contents, to
  * the TransitLayer derived from it, and to some other services and utilities that operate upon

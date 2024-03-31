@@ -52,13 +52,16 @@ public class SiriTripPatternCache {
   // TODO RT_AB: generalize this so we can generate IDs for SIRI or GTFS-RT sources.
   private final SiriTripPatternIdGenerator tripPatternIdGenerator;
 
-  // TODO RT_AB: clarify name and add documentation to this field, and why it's constructor injected
+  /**
+   * SiriTripPatternCache needs only this one feature of TransitService, so we retain only this
+   * function reference to effectively narrow the interface. This should also facilitate testing.
+   */
   private final Function<Trip, TripPattern> getPatternForTrip;
 
   /**
    * Constructor.
-   * TODO RT_AB: clarify why the ID generator and pattern fetching function are injected here.
-   *   Potentially make the class usable for GTFS-RT cases by injecting different ID generator etc.
+   * TODO RT_AB: This class could potentially be reused for both SIRI and GTFS-RT, which may
+   *   involve injecting a different ID generator and pattern fetching method.
    */
   public SiriTripPatternCache(
     SiriTripPatternIdGenerator tripPatternIdGenerator,
