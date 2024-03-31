@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * Other data structures related to street routing, such as elevation data and vehicle parking
  * information, are also collected here as fields of the Graph. For historical reasons the Graph
  * sometimes serves as a catch-all, as it used to be the root of the object tree representing the
- * whole transportation network.
+ * whole transportation network. This use of the Graph object is being phased out and discouraged.
  * <p>
  * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
  * of edges for each vertex, but those lists are now attached to the vertices themselves.
