@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
@@ -150,5 +151,54 @@ class RouteRequestMapperScooterTest {
       scooterRentalPreferences.allowArrivingInRentedVehicleAtDestination()
     );
     assertEquals(keepingCost, scooterRentalPreferences.arrivingInRentalVehicleAtDestinationCost());
+  }
+
+  @Test
+  void testEmptyScooterRentalPreferences() {
+    var scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var empty = Set.of();
+    scooterArgs.put(
+      "preferences",
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "scooter",
+              Map.ofEntries(
+                entry("rental", Map.ofEntries(entry("allowedNetworks", empty.stream().toList())))
+              )
+            )
+          )
+        )
+      )
+    );
+    var allowedEnv = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    scooterArgs.put(
+      "preferences",
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "scooter",
+              Map.ofEntries(
+                entry("rental", Map.ofEntries(entry("bannedNetworks", empty.stream().toList())))
+              )
+            )
+          )
+        )
+      )
+    );
+    var bannedEnv = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(bannedEnv, RouteRequestMapperTest.CONTEXT);
+    var scooterRentalPreferences = routeRequest.preferences().scooter().rental();
+    assertEquals(empty, scooterRentalPreferences.bannedNetworks());
   }
 }

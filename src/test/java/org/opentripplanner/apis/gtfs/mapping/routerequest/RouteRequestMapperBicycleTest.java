@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
@@ -203,6 +204,55 @@ class RouteRequestMapperBicycleTest {
     assertEquals(banned, bikeRentalPreferences.bannedNetworks());
     assertEquals(allowKeeping, bikeRentalPreferences.allowArrivingInRentedVehicleAtDestination());
     assertEquals(keepingCost, bikeRentalPreferences.arrivingInRentalVehicleAtDestinationCost());
+  }
+
+  @Test
+  void testEmptyBikeRentalPreferences() {
+    var bikeArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var empty = Set.of();
+    bikeArgs.put(
+      "preferences",
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "bicycle",
+              Map.ofEntries(
+                entry("rental", Map.ofEntries(entry("allowedNetworks", empty.stream().toList())))
+              )
+            )
+          )
+        )
+      )
+    );
+    var allowedEnv = executionContext(bikeArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    bikeArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    bikeArgs.put(
+      "preferences",
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "bicycle",
+              Map.ofEntries(
+                entry("rental", Map.ofEntries(entry("bannedNetworks", empty.stream().toList())))
+              )
+            )
+          )
+        )
+      )
+    );
+    var bannedEnv = executionContext(bikeArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    var routeRequest = RouteRequestMapper.toRouteRequest(bannedEnv, RouteRequestMapperTest.CONTEXT);
+    var bikeRentalPreferences = routeRequest.preferences().bike().rental();
+    assertEquals(empty, bikeRentalPreferences.bannedNetworks());
   }
 
   @Test

@@ -183,4 +183,51 @@ class RouteRequestMapperModesTest {
       routeRequest.journey().transit().filters().toString()
     );
   }
+
+  @Test
+  void testStreetModesWithEmptyModes() {
+    var modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var empty = List.of();
+    modesArgs.put("modes", Map.ofEntries(entry("direct", empty)));
+    var directEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(directEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("access", empty)))));
+    var accessEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(accessEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("egress", empty)))));
+    var egressEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(egressEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs.put(
+      "modes",
+      Map.ofEntries(entry("transit", Map.ofEntries(entry("transfer", empty))))
+    );
+    var transferEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(transferEnv, RouteRequestMapperTest.CONTEXT)
+    );
+
+    modesArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
+    modesArgs.put("modes", Map.ofEntries(entry("transit", Map.ofEntries(entry("transit", empty)))));
+    var transitEnv = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> RouteRequestMapper.toRouteRequest(transitEnv, RouteRequestMapperTest.CONTEXT)
+    );
+  }
 }
