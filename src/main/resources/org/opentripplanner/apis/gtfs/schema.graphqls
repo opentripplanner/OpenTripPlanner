@@ -1673,7 +1673,7 @@ available.
 type LegTime {
     "The scheduled time of the event."
     scheduledTime: OffsetDateTime!
-    "The estimated time of the event. If no real-time information is available, this is null,"
+    "The estimated time of the event. If no real-time information is available, this is null."
     estimated: RealTimeEstimate
 }
 
@@ -3426,6 +3426,21 @@ type Route implements Node {
         """
         types: [RouteAlertType]
     ): [Alert]
+
+    """
+    Orders the routes in a way which is useful for presentation to passengers.
+    Routes with smaller values should be displayed first.
+
+    The value can be any non-negative integer. A null value means that no information was supplied.
+
+    This value is passed through from the source data without modification. If multiple feeds
+    define sort orders for their routes, they may not be comparable to each other as no agreed scale
+    exists.
+
+    Two routes may also have the same sort order and clients must decide based on other criteria
+    what the actual order is.
+    """
+    sortOrder: Int
 }
 
 """Entities that are relevant for routes that can contain alerts"""

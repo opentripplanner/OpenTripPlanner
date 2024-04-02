@@ -5,19 +5,17 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -26,6 +24,7 @@ import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri20.ServiceDelivery;
 
 public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
@@ -35,8 +34,6 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
   private final LocalDate fromDateTime;
   private final SiriTimetableSnapshotSource snapshotSource;
-
-  private Instant startTime;
 
   private final Consumer<UpdateResult> recordMetrics;
 
@@ -60,7 +57,14 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       LOG.debug("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
     }
 
-    processMessage(message.getBody().toString(), message.getMessageId());
+    try {
+      var updates = parseSiriEt(message.getBody().toString(), message.getMessageId());
+      if (!updates.isEmpty()) {
+        processMessage(updates);
+      }
+    } catch (JAXBException | XMLStreamException e) {
+      LOG.error(e.getLocalizedMessage(), e);
+    }
   }
 
   @Override
@@ -80,89 +84,53 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       .addParameter("fromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
       .build();
 
-    while (!isPrimed()) {
-      startTime = Instant.now();
-      LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
-      final long t1 = System.currentTimeMillis();
-      String string = fetchInitialData(uri);
-      final long t2 = System.currentTimeMillis();
+    LOG.info("Fetching initial Siri ET data from {}, timeout is {} ms.", uri, timeout);
+    var siri = fetchInitialSiriData(uri);
 
-      LOG.info(
-        "Fetching initial data - finished after {} ms, got {} bytes",
-        (t2 - t1),
-        string.length()
+    if (siri.isEmpty()) {
+      LOG.info("Got empty ET response from history endpoint");
+      return;
+    }
+
+    // This is fine since runnables are scheduled after each other
+    processHistory(siri.get());
+  }
+
+  private Future<?> processMessage(List<EstimatedTimetableDeliveryStructure> updates) {
+    return super.saveResultOnGraph.execute((graph, transitModel) -> {
+      var result = snapshotSource.applyEstimatedTimetable(
+        fuzzyTripMatcher(),
+        entityResolver(),
+        feedId,
+        false,
+        updates
       );
-
-      // This is fine since runnables are scheduled after each other
-      processHistory(string, "ET-INITIAL-1");
-    }
+      ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
+      recordMetrics.accept(result);
+    });
   }
 
-  private void processMessage(String message, String id) {
-    try {
-      List<EstimatedTimetableDeliveryStructure> updates = getUpdates(message, id);
+  private void processHistory(ServiceDelivery siri) {
+    var updates = siri.getEstimatedTimetableDeliveries();
 
-      if (updates.isEmpty()) {
-        return;
-      }
-
-      super.saveResultOnGraph.execute((graph, transitModel) -> {
-        var result = snapshotSource.applyEstimatedTimetable(
-          fuzzyTripMatcher(),
-          entityResolver(),
-          feedId,
-          false,
-          updates
-        );
-        ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
-        recordMetrics.accept(result);
-      });
-    } catch (JAXBException | XMLStreamException e) {
-      LOG.error(e.getLocalizedMessage(), e);
+    if (updates == null || updates.isEmpty()) {
+      LOG.info("Did not receive any ET messages from history endpoint");
+      return;
     }
-  }
 
-  private void processHistory(String message, String id) {
     try {
-      List<EstimatedTimetableDeliveryStructure> updates = getUpdates(message, id);
-
-      if (updates.isEmpty()) {
-        LOG.info("Did not receive any ET messages from history endpoint");
-        return;
-      }
-
-      var f = super.saveResultOnGraph.execute((graph, transitModel) -> {
-        try {
-          long t1 = System.currentTimeMillis();
-          var result = snapshotSource.applyEstimatedTimetable(
-            fuzzyTripMatcher(),
-            entityResolver(),
-            feedId,
-            false,
-            updates
-          );
-          ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
-          recordMetrics.accept(result);
-
-          setPrimed(true);
-          LOG.info(
-            "Azure ET updater initialized after {} ms: [time since startup: {}]",
-            (System.currentTimeMillis() - t1),
-            DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-          );
-        } catch (Exception e) {
-          LOG.error("Could not process ET history", e);
-        }
-      });
+      long t1 = System.currentTimeMillis();
+      var f = processMessage(updates);
       f.get();
-    } catch (JAXBException | XMLStreamException | ExecutionException | InterruptedException e) {
-      LOG.error(e.getLocalizedMessage(), e);
+      LOG.info("Azure ET updater initialized in {} ms.", (System.currentTimeMillis() - t1));
+    } catch (ExecutionException | InterruptedException e) {
+      throw new SiriAzureInitializationException("Error applying history", e);
     }
   }
 
-  private List<EstimatedTimetableDeliveryStructure> getUpdates(String message, String id)
+  private List<EstimatedTimetableDeliveryStructure> parseSiriEt(String siriXmlMessage, String id)
     throws JAXBException, XMLStreamException {
-    var siri = SiriXml.parseXml(message);
+    var siri = SiriXml.parseXml(siriXmlMessage);
     if (
       siri.getServiceDelivery() == null ||
       siri.getServiceDelivery().getEstimatedTimetableDeliveries() == null ||
@@ -171,7 +139,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       if (siri.getHeartbeatNotification() != null) {
         LOG.debug("Received SIRI heartbeat message");
       } else {
-        LOG.warn("Empty Siri message {}: {}", id, message);
+        LOG.info("Empty Siri message {}: {}", id, siriXmlMessage);
       }
       return new ArrayList<>();
     }

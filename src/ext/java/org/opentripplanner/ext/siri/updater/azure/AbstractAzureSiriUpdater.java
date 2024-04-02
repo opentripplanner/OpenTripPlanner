@@ -10,17 +10,18 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
-import com.google.common.io.CharStreams;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
@@ -31,8 +32,10 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.ServiceDelivery;
 
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
@@ -46,6 +49,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
   private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
   private final String topicName;
+  private final Duration autoDeleteOnIdle;
+  private final int prefetchCount;
 
   protected WriteToGraphCallback saveResultOnGraph;
   private ServiceBusProcessorClient eventProcessor;
@@ -73,6 +78,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.feedId();
+    this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
+    this.prefetchCount = config.getPrefetchCount();
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
@@ -122,10 +129,11 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
           .buildAsyncClient();
     }
 
-    // If Idle more then one day, then delete subscription so we don't have old obsolete subscriptions on Azure Service Bus
+    // Set options
     var options = new CreateSubscriptionOptions();
     options.setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS));
-    options.setAutoDeleteOnIdle(Duration.ofDays(1));
+    // Set subscription to be deleted if idle for a certain time, so that orphaned instances doesn't linger.
+    options.setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
     if (
@@ -150,16 +158,22 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         .processor()
         .topicName(topicName)
         .subscriptionName(subscriptionName)
+        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+        .disableAutoComplete() // Receive and delete does not need autocomplete
+        .prefetchCount(prefetchCount)
         .processError(errorConsumer)
         .processMessage(messageConsumer)
         .buildProcessorClient();
 
     eventProcessor.start();
     LOG.info(
-      "Service Bus processor started for topic {} and subscription {}",
+      "Service Bus processor started for topic '{}' and subscription '{}', prefetching {} messages.",
       topicName,
-      subscriptionName
+      subscriptionName,
+      prefetchCount
     );
+
+    setPrimed();
 
     ApplicationShutdownSupport.addShutdownHook(
       "azure-siri-updater-shutdown",
@@ -177,8 +191,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return this.isPrimed;
   }
 
-  public void setPrimed(boolean primed) {
-    isPrimed = primed;
+  private void setPrimed() {
+    isPrimed = true;
   }
 
   @Override
@@ -186,20 +200,29 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return this.configRef;
   }
 
-  protected String fetchInitialData(URI uri) {
-    // Maybe put this in the config?
-    HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
-    String initialData;
+  /**
+   * Returns None for empty result
+   */
+  protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
+    var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
+
     try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
-      initialData =
-        otpHttpClient.getAndMap(
-          uri,
-          Duration.ofMillis(timeout),
-          rh.asMap(),
-          is -> CharStreams.toString(new InputStreamReader(is))
-        );
+      var t1 = System.currentTimeMillis();
+      var siriOptional = otpHttpClient.executeAndMapOptional(
+        new HttpGet(uri),
+        Duration.ofMillis(timeout),
+        headers,
+        SiriXml::parseXml
+      );
+      var t2 = System.currentTimeMillis();
+      LOG.info("Fetched initial data in {} ms", (t2 - t1));
+
+      if (siriOptional.isEmpty()) {
+        LOG.info("Got status 204 'No Content'.");
+      }
+
+      return siriOptional.map(siri -> siri.getServiceDelivery());
     }
-    return initialData;
   }
 
   SiriFuzzyTripMatcher fuzzyTripMatcher() {
@@ -223,7 +246,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         initializeData(dataInitializationUrl, messageConsumer);
         break;
       } catch (Exception e) {
-        sleepPeriod = sleepPeriod * 2;
+        sleepPeriod = Math.min(sleepPeriod * 2, 60 * 1000);
 
         LOG.warn(
           "Caught exception while initializing data will retry after {} ms - attempt {}. ({})",

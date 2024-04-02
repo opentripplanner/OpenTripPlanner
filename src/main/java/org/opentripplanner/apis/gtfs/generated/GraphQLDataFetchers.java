@@ -763,7 +763,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> viewer();
   }
 
-  public interface GraphQLRealtimeEstimate {
+  /** Real-time estimates for a vehicle at a certain place. */
+  public interface GraphQLRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
 
     public DataFetcher<java.time.OffsetDateTime> time();
@@ -863,6 +864,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripPattern>> patterns();
 
     public DataFetcher<String> shortName();
+
+    public DataFetcher<Integer> sortOrder();
 
     public DataFetcher<Iterable<Object>> stops();
 

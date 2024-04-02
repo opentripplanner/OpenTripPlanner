@@ -71,5 +71,5 @@ found in the main documentation.
 
 ## OTP Ecosystem
 
-- [awesome-transit](https://github.com/CUTR-at-USF/awesome-transit) Community list of transit APIs,
+- [awesome-transit](https://github.com/MobilityData/awesome-transit) Community list of transit APIs,
   apps, datasets, research, and software.

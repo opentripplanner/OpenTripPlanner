@@ -32,11 +32,10 @@ jobs:
             jfr-delay: "35s"
             profile: core
 
-          # disabled due to https://github.com/opentripplanner/OpenTripPlanner/issues/5702
-          #- location: skanetrafiken
-          #  iterations: 1
-          #  jfr-delay: "50s"
-          #  profile: core
+          - location: skanetrafiken
+            iterations: 1
+            jfr-delay: "50s"
+            profile: core
 
           # extended locations that are run only after merging to dev-2.x
 

@@ -35,18 +35,20 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
       "schedule": ["on the first day of the week"],
-      "assignees": ["testower"]
+      "reviewers": ["testower"]
     },
     {
       "matchFiles": ["client-next/package.json"],
       "matchUpdateTypes": ["major"],
-      "assignees": ["testower"]
+      "reviewers": ["testower"]
     },
-    // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
+    // some dependencies that we auto-merge release very often and even the auto-merges create a lot of
+    // noise, so we slow it down a bit
     {
       "matchPackageNames": [
         "org.entur.gbfs:gbfs-java-model",
-        "ch.qos.logback:logback-classic"
+        "ch.qos.logback:logback-classic",
+        "io.github.git-commit-id:git-commit-id-maven-plugin"
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",
@@ -110,7 +112,6 @@
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
-        "io.github.git-commit-id:git-commit-id-maven-plugin",
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
         "org.apache.maven.plugins:maven-shade-plugin",

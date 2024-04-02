@@ -6,6 +6,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 ## 2.6.0-SNAPSHOT (under development)
 
 - ISO-8601 date time for GTFS API itinerary responses [#5660](https://github.com/opentripplanner/OpenTripPlanner/pull/5660)
+- Fix street routing on roundabout [#5732](https://github.com/opentripplanner/OpenTripPlanner/pull/5732)
+- Expose route sort order in GTFS API [#5764](https://github.com/opentripplanner/OpenTripPlanner/pull/5764)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
