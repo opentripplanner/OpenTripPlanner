@@ -257,7 +257,7 @@ public class PruneIslands implements GraphBuilderModule {
           TransitStopVertex v = (TransitStopVertex) vIter.next();
           Set<TransitMode> modes = v.getModes();
           // test if stop has other transit modes than FERRY
-          if (!modes.isEmpty() && !modes.contains(TransitMode.FERRY)) {
+          if (modes.isEmpty() || !modes.contains(TransitMode.FERRY)) {
             onlyFerry = false;
             break;
           }
