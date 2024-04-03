@@ -124,7 +124,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
       if (index < numSchedules) {
         this.tripTimes = tripPatternForDate.getTripTimes(index);
-        this.serviceDate = tripPatternForDate.getLocalDate();
+        this.serviceDate = tripPatternForDate.getServiceDate();
         this.secondsOffset = pattern.tripPatternForDateOffsets(i);
         return;
       }
