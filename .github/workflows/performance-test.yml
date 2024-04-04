@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - habrahamsson/fix-egress-transfer-cost-bug
 
 jobs:
   perf-test:
