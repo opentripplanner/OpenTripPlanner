@@ -63,7 +63,7 @@ public class ElevationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
   /** A shared copy of the WGS84 CRS with longitude-first axis order. */
-  public static final CoordinateReferenceSystem WGS84_XY;
+  private static final CoordinateReferenceSystem WGS84_XY;
 
   static {
     try {
