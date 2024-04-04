@@ -1,16 +1,16 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -18,6 +18,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
+  private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private final TransitService transitService;
   private final I18NStringMapper i18NStringMapper;
 
@@ -59,17 +60,20 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   }
 
   protected static String getRoutes(TransitService transitService, RegularStop stop) {
-    return JSONArray.toJSONString(
-      transitService
+    try {
+      var objects = transitService
         .getRoutesForStop(stop)
         .stream()
         .map(route -> {
-          JSONObject routeObject = new JSONObject();
+          var routeObject = OBJECT_MAPPER.createObjectNode();
           routeObject.put("gtfsType", route.getGtfsType());
           return routeObject;
         })
-        .toList()
-    );
+        .toList();
+      return OBJECT_MAPPER.writeValueAsString(objects);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected static String getType(TransitService transitService, RegularStop stop) {
