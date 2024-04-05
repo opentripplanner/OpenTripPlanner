@@ -68,8 +68,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     for (int i = 0; i < size; i++) {
       this.stopTimes[i] = new StopTimeWindow(stopTimes.get(i));
-      this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
-      this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
+      this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
+      this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
     this.duractionFactors = Objects.requireNonNull(builder.durationFactors());
   }
