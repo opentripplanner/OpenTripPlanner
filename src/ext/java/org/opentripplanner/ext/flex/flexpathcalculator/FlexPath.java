@@ -2,7 +2,7 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import java.util.function.Supplier;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.flex.trip.FlexDurationFactors;
+import org.opentripplanner.ext.flex.trip.FlexDurationModifier;
 
 /**
  * This class contains the results from a FlexPathCalculator.
@@ -34,7 +34,7 @@ public class FlexPath {
     return geometry;
   }
 
-  public FlexPath withDurationFactors(FlexDurationFactors factors) {
+  public FlexPath withDurationFactors(FlexDurationModifier factors) {
     int updatedDuration = (int) ((durationSeconds * factors.factor()) + factors.offsetInSeconds());
     return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
   }

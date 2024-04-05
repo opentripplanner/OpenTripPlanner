@@ -1,15 +1,15 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.flex.trip.FlexDurationFactors;
+import org.opentripplanner.ext.flex.trip.FlexDurationModifier;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 public class DurationFactorCalculator implements FlexPathCalculator {
 
   private final FlexPathCalculator delegate;
-  private final FlexDurationFactors factors;
+  private final FlexDurationModifier factors;
 
-  public DurationFactorCalculator(FlexPathCalculator delegate, FlexDurationFactors factors) {
+  public DurationFactorCalculator(FlexPathCalculator delegate, FlexDurationModifier factors) {
     this.delegate = delegate;
     this.factors = factors;
   }

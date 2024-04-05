@@ -7,9 +7,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.ext.flex.trip.FlexDurationFactors;
+import org.opentripplanner.ext.flex.trip.FlexDurationModifier;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
@@ -95,7 +94,7 @@ public class OtpTransitServiceBuilder {
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
-  private final Map<Trip, FlexDurationFactors> flexDurationFactors = new HashMap<>();
+  private final Map<Trip, FlexDurationModifier> flexDurationFactors = new HashMap<>();
 
   private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
@@ -214,7 +213,7 @@ public class OtpTransitServiceBuilder {
     return stopTimesByTrip;
   }
 
-  public Map<Trip, FlexDurationFactors> getFlexDurationFactors() {
+  public Map<Trip, FlexDurationModifier> getFlexDurationFactors() {
     return flexDurationFactors;
   }
 

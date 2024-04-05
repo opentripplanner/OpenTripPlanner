@@ -52,7 +52,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  private final FlexDurationFactors duractionFactors;
+  private final FlexDurationModifier durationModifier;
 
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
@@ -71,7 +71,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
-    this.duractionFactors = Objects.requireNonNull(builder.durationFactors());
+    this.durationModifier = Objects.requireNonNull(builder.durationModifier());
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {
@@ -150,8 +150,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   private FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
-    if (duractionFactors.nonZero()) {
-      return new DurationFactorCalculator(calculator, duractionFactors);
+    if (durationModifier.modifies()) {
+      return new DurationFactorCalculator(calculator, durationModifier);
     } else {
       return calculator;
     }

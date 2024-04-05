@@ -8,7 +8,7 @@ public class UnscheduledTripBuilder
   extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder> {
 
   private List<StopTime> stopTimes;
-  private FlexDurationFactors durationFactors = FlexDurationFactors.ZERO;
+  private FlexDurationModifier durationModifier = FlexDurationModifier.NONE;
 
   UnscheduledTripBuilder(FeedScopedId id) {
     super(id);
@@ -30,13 +30,13 @@ public class UnscheduledTripBuilder
     return stopTimes;
   }
 
-  public UnscheduledTripBuilder withDurationFactors(FlexDurationFactors factors) {
-    this.durationFactors = factors;
+  public UnscheduledTripBuilder withDurationModifier(FlexDurationModifier factors) {
+    this.durationModifier = factors;
     return this;
   }
 
-  public FlexDurationFactors durationFactors() {
-    return durationFactors;
+  public FlexDurationModifier durationModifier() {
+    return durationModifier;
   }
 
   @Override

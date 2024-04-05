@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.flex.trip;
 
+import static org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip.TimeType.FIXED_TIME;
+import static org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip.TimeType.FLEXIBLE_TIME;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
+import org.opentripplanner.ext.flex.flexpathcalculator.DurationFactorCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -42,6 +45,8 @@ public class ScheduledDeviatedTrip
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
+  private final FlexDurationModifier durationModifier;
+
   ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -59,6 +64,7 @@ public class ScheduledDeviatedTrip
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
+    this.durationModifier = builder.durationModifier();
   }
 
   public static ScheduledDeviatedTripBuilder of(FeedScopedId id) {
@@ -104,7 +110,7 @@ public class ScheduledDeviatedTrip
             toIndex,
             stop,
             date,
-            scheduledCalculator,
+            getCalculator(fromIndex, toIndex, scheduledCalculator),
             config
           )
         );
@@ -112,6 +118,25 @@ public class ScheduledDeviatedTrip
     }
 
     return res.stream();
+  }
+
+  /**
+   * If any of the stops involved in the path computation, then apply the duration factors.
+   * If both from and to have a fixed time, then don't apply the factors.
+   */
+  private FlexPathCalculator getCalculator(
+    int fromIndex,
+    int toIndex,
+    FlexPathCalculator scheduledCalculator
+  ) {
+    final boolean usesFlexWindow =
+      stopTimes[fromIndex].timeType == FLEXIBLE_TIME ||
+      stopTimes[toIndex].timeType == FLEXIBLE_TIME;
+    if (usesFlexWindow && durationModifier.modifies()) {
+      return new DurationFactorCalculator(scheduledCalculator, FlexDurationModifier.NONE);
+    } else {
+      return scheduledCalculator;
+    }
   }
 
   @Override
@@ -144,7 +169,7 @@ public class ScheduledDeviatedTrip
             toIndex,
             stop,
             date,
-            scheduledCalculator,
+            getCalculator(fromIndex, toIndex, scheduledCalculator),
             config
           )
         );
@@ -176,7 +201,7 @@ public class ScheduledDeviatedTrip
   @Override
   public int latestArrivalTime(
     int arrivalTime,
-    int fromStopIndex,
+    int ignored,
     int toStopIndex,
     int flexTripDurationSeconds
   ) {
@@ -297,9 +322,12 @@ public class ScheduledDeviatedTrip
     private final int arrivalTime;
     private final PickDrop pickupType;
     private final PickDrop dropOffType;
+    private final TimeType timeType;
 
     private ScheduledDeviatedStopTime(StopTime st) {
       this.stop = st.getStop();
+
+      this.timeType = st.hasFlexWindow() ? FLEXIBLE_TIME : FIXED_TIME;
 
       // Store the time the user is guaranteed to arrive at latest
       this.arrivalTime = st.getLatestPossibleArrivalTime();
@@ -314,5 +342,10 @@ public class ScheduledDeviatedTrip
       this.pickupType = departureTime == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
       this.dropOffType = arrivalTime == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
     }
+  }
+
+  enum TimeType {
+    FIXED_TIME,
+    FLEXIBLE_TIME,
   }
 }

@@ -4,7 +4,7 @@ import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.flex.trip.FlexDurationFactors;
+import org.opentripplanner.ext.flex.trip.FlexDurationModifier;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
@@ -35,20 +35,24 @@ public class FlexTripsMapper {
     for (Trip trip : stopTimesByTrip.keys()) {
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
-
+      var modifier = builder.getFlexDurationFactors().getOrDefault(trip, FlexDurationModifier.NONE);
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        var factors = builder.getFlexDurationFactors().getOrDefault(trip, FlexDurationFactors.ZERO);
         result.add(
           UnscheduledTrip
             .of(trip.getId())
             .withTrip(trip)
             .withStopTimes(stopTimes)
-            .withDurationFactors(factors)
+            .withDurationModifier(modifier)
             .build()
         );
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         result.add(
-          ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
+          ScheduledDeviatedTrip
+            .of(trip.getId())
+            .withTrip(trip)
+            .withStopTimes(stopTimes)
+            .withDurationModifier(modifier)
+            .build()
         );
       } else if (hasContinuousStops(stopTimes) && FlexTrip.containsFlexStops(stopTimes)) {
         store.add(
