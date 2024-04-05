@@ -16,11 +16,15 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
  */
 class GbfsVehicleRentalDataSourceTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSourceTest.class);
 
   @Test
   void makeStationFromV22() {
@@ -34,7 +38,7 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         false
       ),
-      new OtpHttpClient()
+      new OtpHttpClient(LOG)
     );
 
     dataSource.setup();
@@ -125,7 +129,7 @@ class GbfsVehicleRentalDataSourceTest {
         true,
         false
       ),
-      new OtpHttpClient()
+      new OtpHttpClient(LOG)
     );
 
     dataSource.setup();
@@ -167,7 +171,7 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         true
       ),
-      new OtpHttpClient()
+      new OtpHttpClient(LOG)
     );
 
     dataSource.setup();

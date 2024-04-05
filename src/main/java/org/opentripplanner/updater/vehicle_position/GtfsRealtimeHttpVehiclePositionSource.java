@@ -33,7 +33,7 @@ public class GtfsRealtimeHttpVehiclePositionSource {
   public GtfsRealtimeHttpVehiclePositionSource(URI url, HttpHeaders headers) {
     this.url = url;
     this.headers = HttpHeaders.of().acceptProtobuf().add(headers).build();
-    this.otpHttpClient = new OtpHttpClient();
+    this.otpHttpClient = new OtpHttpClient(LOG);
   }
 
   /**

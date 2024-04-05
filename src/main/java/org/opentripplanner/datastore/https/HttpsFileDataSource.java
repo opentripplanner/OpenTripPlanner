@@ -13,6 +13,8 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a wrapper around an HTTPS resource.
@@ -21,6 +23,8 @@ import org.opentripplanner.framework.io.OtpHttpClient;
  * .gz).
  */
 final class HttpsFileDataSource implements DataSource {
+
+  private static final Logger LOG = LoggerFactory.getLogger(HttpsFileDataSource.class);
 
   private static final Duration HTTP_GET_REQUEST_TIMEOUT = Duration.ofSeconds(20);
   private final URI uri;
@@ -35,7 +39,7 @@ final class HttpsFileDataSource implements DataSource {
     this.uri = uri;
     this.type = type;
     this.httpsDataSourceMetadata = httpsDataSourceMetadata;
-    otpHttpClient = new OtpHttpClient();
+    otpHttpClient = new OtpHttpClient(LOG);
   }
 
   /**

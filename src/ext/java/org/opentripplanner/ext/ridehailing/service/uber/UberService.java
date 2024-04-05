@@ -79,7 +79,7 @@ public class UberService extends CachingRideHailingService {
     this.timeEstimateUri = timeEstimateUri;
     this.bannedTypes = bannedTypes;
     this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
-    this.otpHttpClient = new OtpHttpClient();
+    this.otpHttpClient = new OtpHttpClient(LOG);
   }
 
   @Override

@@ -44,7 +44,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
     .put("lonMax", 0)
     .put("latMin", 0)
     .put("latMax", 0);
-  private final OtpHttpClient httpClient = new OtpHttpClient();
+  private final OtpHttpClient httpClient = new OtpHttpClient(LOG);
   private final BikelyUpdaterParameters parameters;
   private List<VehicleParking> lots;
 

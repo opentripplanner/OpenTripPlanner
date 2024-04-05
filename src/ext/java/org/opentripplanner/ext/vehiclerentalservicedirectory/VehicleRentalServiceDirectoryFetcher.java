@@ -61,7 +61,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     }
 
     int maxHttpConnections = sources.size();
-    var otpHttpClient = new OtpHttpClient(maxHttpConnections);
+    var otpHttpClient = new OtpHttpClient(maxHttpConnections, LOG);
 
     var serviceDirectory = new VehicleRentalServiceDirectoryFetcher(
       vertexLinker,
@@ -154,7 +154,7 @@ public class VehicleRentalServiceDirectoryFetcher {
   private static JsonNode listSources(VehicleRentalServiceDirectoryFetcherParameters parameters) {
     JsonNode node;
     URI url = parameters.getUrl();
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient(LOG)) {
       node = otpHttpClient.getAndMapAsJsonNode(url, Map.of(), new ObjectMapper());
     } catch (OtpHttpClientException e) {
       LOG.warn("Error fetching list of vehicle rental endpoints from {}", url, e);

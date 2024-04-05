@@ -28,6 +28,8 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sets up and starts all the graph updaters.
@@ -37,6 +39,8 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
  * GraphUpdaterManager.
  */
 public class UpdaterConfigurator {
+
+  private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfigurator.class);
 
   private final Graph graph;
   private final TransitModel transitModel;
@@ -137,7 +141,7 @@ public class UpdaterConfigurator {
 
     if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
       int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
-      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections);
+      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections, LOG);
       for (var configItem : updatersParameters.getVehicleRentalParameters()) {
         var source = VehicleRentalDataSourceFactory.create(
           configItem.sourceParameters(),

@@ -35,7 +35,7 @@ public class SiriHttpLoader implements SiriLoader {
     this.timeout = timeout;
     this.requestHeaders = requestHeaders;
     this.previewInterval = previewInterval;
-    this.otpHttpClient = new OtpHttpClient(timeout, timeout);
+    this.otpHttpClient = new OtpHttpClient(timeout, timeout, LOG);
   }
 
   /**

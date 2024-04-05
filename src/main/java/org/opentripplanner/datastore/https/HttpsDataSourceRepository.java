@@ -12,11 +12,15 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This data store accesses files in read-only mode over HTTPS.
  */
 public class HttpsDataSourceRepository implements DataSourceRepository {
+
+  private static final Logger LOG = LoggerFactory.getLogger(HttpsFileDataSource.class);
 
   private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
 
@@ -75,7 +79,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   protected List<Header> getHttpHeaders(URI uri) {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient(LOG)) {
       return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
     }
   }

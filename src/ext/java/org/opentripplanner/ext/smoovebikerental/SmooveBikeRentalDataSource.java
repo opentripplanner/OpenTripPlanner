@@ -23,7 +23,7 @@ public class SmooveBikeRentalDataSource
   extends GenericJsonDataSource<VehicleRentalPlace>
   implements VehicleRentalDatasource {
 
-  private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
   public static final String DEFAULT_NETWORK_NAME = "smoove";
 
@@ -33,7 +33,7 @@ public class SmooveBikeRentalDataSource
   private final RentalVehicleType vehicleType;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    this(config, new OtpHttpClient());
+    this(config, new OtpHttpClient(LOG));
   }
 
   public SmooveBikeRentalDataSource(
@@ -76,7 +76,7 @@ public class SmooveBikeRentalDataSource
       station.longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      log.warn("Error parsing bike rental station {}", station.id, e);
+      LOG.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
     if (!node.path("style").asText().equals("Station on")) {

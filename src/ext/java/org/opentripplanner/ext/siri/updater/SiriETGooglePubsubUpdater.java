@@ -312,7 +312,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   private ByteString fetchInitialData() {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient(LOG)) {
       return otpHttpClient.getAndMap(
         dataInitializationUrl,
         initialGetDataTimeout,

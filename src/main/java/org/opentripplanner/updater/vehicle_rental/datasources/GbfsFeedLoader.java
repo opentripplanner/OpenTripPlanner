@@ -98,7 +98,7 @@ public class GbfsFeedLoader {
   }
 
   GbfsFeedLoader(String url, HttpHeaders httpHeaders, String languageCode) {
-    this(url, httpHeaders, languageCode, new OtpHttpClient());
+    this(url, httpHeaders, languageCode, new OtpHttpClient(LOG));
   }
 
   /**

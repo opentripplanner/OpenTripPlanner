@@ -206,7 +206,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
     var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
 
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient(LOG)) {
       var t1 = System.currentTimeMillis();
       var siriOptional = otpHttpClient.executeAndMapOptional(
         new HttpGet(uri),

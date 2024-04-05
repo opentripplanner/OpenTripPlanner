@@ -33,7 +33,7 @@ public class GtfsRealtimeTripUpdateSource {
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
-    otpHttpClient = new OtpHttpClient();
+    otpHttpClient = new OtpHttpClient(LOG);
   }
 
   public List<TripUpdate> getUpdates() {

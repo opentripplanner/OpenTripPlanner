@@ -39,7 +39,6 @@ import org.apache.hc.core5.pool.PoolReusePolicy;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * HTTP client providing convenience methods to send HTTP requests and map HTTP responses to Java
@@ -79,7 +78,6 @@ import org.slf4j.LoggerFactory;
  */
 public class OtpHttpClient implements AutoCloseable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClient.class);
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 
   private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
@@ -91,34 +89,41 @@ public class OtpHttpClient implements AutoCloseable {
 
   private final CloseableHttpClient httpClient;
 
+  private final Logger log;
+
   /**
    * Creates an HTTP client with default timeout, default connection time-to-live and default max
    * number of connections.
    */
-  public OtpHttpClient() {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL);
+  public OtpHttpClient(Logger logger) {
+    this(DEFAULT_TIMEOUT, DEFAULT_TTL, logger);
   }
 
   /**
    * Creates an HTTP client with default timeout, default connection time-to-live and the given max
    * number of connections.
    */
-  public OtpHttpClient(int maxConnections) {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL, maxConnections);
+  public OtpHttpClient(int maxConnections, Logger logger) {
+    this(DEFAULT_TIMEOUT, DEFAULT_TTL, maxConnections, logger);
   }
 
   /**
    * Creates an HTTP client the given timeout and connection time-to-live and the default max
    * number of connections.
    */
-  public OtpHttpClient(Duration timeout, Duration connectionTtl) {
-    this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS);
+  public OtpHttpClient(Duration timeout, Duration connectionTtl, Logger logger) {
+    this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS, logger);
   }
 
   /**
    * Creates an HTTP client with custom configuration.
    */
-  private OtpHttpClient(Duration timeout, Duration connectionTtl, int maxConnections) {
+  private OtpHttpClient(
+    Duration timeout,
+    Duration connectionTtl,
+    int maxConnections,
+    Logger logger
+  ) {
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(connectionTtl);
 
@@ -145,6 +150,7 @@ public class OtpHttpClient implements AutoCloseable {
       .setDefaultRequestConfig(requestConfig(timeout));
 
     httpClient = httpClientBuilder.build();
+    log = logger;
   }
 
   /**
@@ -162,7 +168,7 @@ public class OtpHttpClient implements AutoCloseable {
       requestHeaderValues,
       response -> {
         if (isFailedRequest(response)) {
-          LOG.warn(
+          log.warn(
             "Headers of resource {} unavailable. HTTP error code {}",
             sanitizeUri(uri),
             response.getCode()

@@ -15,7 +15,7 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   protected List<T> updates = List.of();
 
   protected GenericJsonDataSource(String url, String jsonParsePath, HttpHeaders headers) {
-    this(url, jsonParsePath, headers, new OtpHttpClient());
+    this(url, jsonParsePath, headers, new OtpHttpClient(LOG));
   }
 
   protected GenericJsonDataSource(
