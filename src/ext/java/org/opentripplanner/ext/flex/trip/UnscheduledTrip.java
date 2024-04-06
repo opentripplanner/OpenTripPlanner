@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.DurationFactorCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.DurationModifierCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
@@ -52,7 +52,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  private final FlexDurationModifier durationModifier;
+  private final DurationModifier durationModifier;
 
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
@@ -151,7 +151,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   private FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
     if (durationModifier.modifies()) {
-      return new DurationFactorCalculator(calculator, durationModifier);
+      return new DurationModifierCalculator(calculator, durationModifier);
     } else {
       return calculator;
     }

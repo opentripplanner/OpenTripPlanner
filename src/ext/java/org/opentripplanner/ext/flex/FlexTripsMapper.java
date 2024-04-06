@@ -4,7 +4,7 @@ import static org.opentripplanner.model.PickDrop.NONE;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.flex.trip.FlexDurationModifier;
+import org.opentripplanner.ext.flex.trip.DurationModifier;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
@@ -35,7 +35,7 @@ public class FlexTripsMapper {
     for (Trip trip : stopTimesByTrip.keys()) {
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
-      var modifier = builder.getFlexDurationFactors().getOrDefault(trip, FlexDurationModifier.NONE);
+      var modifier = builder.getFlexDurationFactors().getOrDefault(trip, DurationModifier.NONE);
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
         result.add(
           UnscheduledTrip

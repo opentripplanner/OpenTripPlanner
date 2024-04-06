@@ -5,13 +5,13 @@ import java.time.Duration;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
-public class FlexDurationModifier implements Serializable {
+public class DurationModifier implements Serializable {
 
-  public static FlexDurationModifier NONE = new FlexDurationModifier(Duration.ZERO, 1);
+  public static DurationModifier NONE = new DurationModifier(Duration.ZERO, 1);
   private final int offset;
   private final float factor;
 
-  public FlexDurationModifier(Duration offset, float factor) {
+  public DurationModifier(Duration offset, float factor) {
     if (factor < 0.1) {
       throw new IllegalArgumentException("Flex duration factor must not be less than 0.1");
     }
@@ -38,7 +38,7 @@ public class FlexDurationModifier implements Serializable {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(FlexDurationModifier.class)
+      .of(DurationModifier.class)
       .addNum("factor", factor)
       .addDurationSec("offset", offset)
       .toString();

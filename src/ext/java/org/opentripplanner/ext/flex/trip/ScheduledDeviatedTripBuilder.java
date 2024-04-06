@@ -8,7 +8,7 @@ public class ScheduledDeviatedTripBuilder
   extends FlexTripBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> {
 
   private List<StopTime> stopTimes;
-  private FlexDurationModifier durationModifier = FlexDurationModifier.NONE;
+  private DurationModifier durationModifier = DurationModifier.NONE;
 
   ScheduledDeviatedTripBuilder(FeedScopedId id) {
     super(id);
@@ -30,11 +30,11 @@ public class ScheduledDeviatedTripBuilder
     return stopTimes;
   }
 
-  public FlexDurationModifier durationModifier() {
+  public DurationModifier durationModifier() {
     return durationModifier;
   }
 
-  public ScheduledDeviatedTripBuilder withDurationModifier(FlexDurationModifier modifier) {
+  public ScheduledDeviatedTripBuilder withDurationModifier(DurationModifier modifier) {
     this.durationModifier = modifier;
     return this;
   }
