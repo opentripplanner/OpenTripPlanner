@@ -7,18 +7,16 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.locationtech.jts.geom.LineString;
+import org.opentripplanner._support.geometry.LineStrings;
 import org.opentripplanner.ext.flex.trip.DurationModifier;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 
 class FlexPathTest {
 
   private static final int THIRTY_MINS_IN_SECONDS = (int) Duration.ofMinutes(30).toSeconds();
-  private static final LineString LINE_STRING = GeometryUtils.makeLineString(1, 1, 2, 2);
   private static final FlexPath PATH = new FlexPath(
     10_000,
     THIRTY_MINS_IN_SECONDS,
-    () -> LINE_STRING
+    () -> LineStrings.SIMPLE
   );
 
   static List<Arguments> cases() {
