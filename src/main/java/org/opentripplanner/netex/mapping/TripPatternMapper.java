@@ -392,9 +392,12 @@ class TripPatternMapper {
     JourneyPattern_VersionStructure journeyPattern,
     ServiceJourney serviceJourney
   ) {
-    return tripMapper.mapServiceJourney(
-      serviceJourney,
-      () -> findTripHeadsign(journeyPattern, serviceJourney)
+    return deduplicator.deduplicateObject(
+      Trip.class,
+      tripMapper.mapServiceJourney(
+        serviceJourney,
+        () -> findTripHeadsign(journeyPattern, serviceJourney)
+      )
     );
   }
 
