@@ -2,8 +2,10 @@ package org.opentripplanner.framework.io;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -168,6 +171,7 @@ public class OtpHttpClient implements AutoCloseable {
       requestHeaderValues,
       response -> {
         if (isFailedRequest(response)) {
+          logResponse(response);
           log.warn(
             "Headers of resource {} unavailable. HTTP error code {}",
             sanitizeUri(uri),
@@ -422,6 +426,7 @@ public class OtpHttpClient implements AutoCloseable {
 
   private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> contentMapper) {
     if (isFailedRequest(response)) {
+      logResponse(response);
       throw new OtpHttpClientException(
         "HTTP request failed with status code " + response.getCode()
       );
@@ -489,6 +494,24 @@ public class OtpHttpClient implements AutoCloseable {
    */
   private static String sanitizeUri(URI uri) {
     return uri.toString().replace('?' + uri.getQuery(), "");
+  }
+
+  private void logResponse(ClassicHttpResponse response) {
+    try {
+      if (
+        log.isTraceEnabled() &&
+        response.getEntity() != null &&
+        response.getEntity().getContent() != null
+      ) {
+        var entity = response.getEntity();
+        String content = new BufferedReader(new InputStreamReader(entity.getContent()))
+          .lines()
+          .collect(Collectors.joining("\n"));
+        log.trace("HTTP request failed with status code {}: \n{}", response.getCode(), content);
+      }
+    } catch (Exception e) {
+      log.debug(e.getMessage());
+    }
   }
 
   @FunctionalInterface
