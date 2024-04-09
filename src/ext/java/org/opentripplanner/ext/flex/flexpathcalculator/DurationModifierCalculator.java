@@ -4,6 +4,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.DurationModifier;
 import org.opentripplanner.street.model.vertex.Vertex;
 
+/**
+ * A calculator to delegates the main computation to another instance and applies a duration
+ * modifier afterward.
+ */
 public class DurationModifierCalculator implements FlexPathCalculator {
 
   private final FlexPathCalculator delegate;

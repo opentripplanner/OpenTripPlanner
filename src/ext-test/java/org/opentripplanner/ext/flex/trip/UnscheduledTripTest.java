@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularArrival;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularDeparture;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
@@ -23,7 +25,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
@@ -197,7 +198,7 @@ class UnscheduledTripTest {
 
   static Stream<TestCase> testRegularStopToAreaEarliestDepartureTimeTestCases() {
     // REGULAR-STOP to AREA - (10:00-14:00) => (14:00)
-    var tc = tc(FlexStopTimesForTest.regularDeparture("10:00"), area("10:00", "14:00"));
+    var tc = tc(regularDeparture("10:00"), area("10:00", "14:00"));
     return Stream.of(
       tc
         .expected("Requested departure time is before flex service departure time", "10:00")
@@ -246,7 +247,7 @@ class UnscheduledTripTest {
 
   static Stream<TestCase> testAreaToRegularStopEarliestDepartureTestCases() {
     // AREA TO REGULAR-STOP - (10:00-14:00) => (14:00)
-    var tc = tc(area("10:00", "14:00"), FlexStopTimesForTest.regularArrival("14:00"));
+    var tc = tc(area("10:00", "14:00"), regularArrival("14:00"));
     return Stream.of(
       tc
         .expected(
@@ -367,7 +368,7 @@ class UnscheduledTripTest {
 
   static Stream<TestCase> testRegularStopToAreaLatestArrivalTimeTestCases() {
     // REGULAR-STOP to AREA - (10:00-14:00) => (14:00)
-    var tc = tc(FlexStopTimesForTest.regularDeparture("10:00"), area("10:00", "14:00"));
+    var tc = tc(regularDeparture("10:00"), area("10:00", "14:00"));
     return Stream.of(
       tc
         .expectedNotFound("Requested arrival time is before flex service arrival window start")
@@ -422,7 +423,7 @@ class UnscheduledTripTest {
 
   static Stream<TestCase> testAreaToRegularStopLatestArrivalTimeTestCases() {
     // AREA TO REGULAR-STOP - (10:00-14:00) => (14:00)
-    var tc = tc(area("10:00", "14:00"), FlexStopTimesForTest.regularArrival("14:00"));
+    var tc = tc(area("10:00", "14:00"), regularArrival("14:00"));
     return Stream.of(
       tc
         .expectedNotFound("Requested arrival time is before flex service arrival window start")

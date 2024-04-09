@@ -33,11 +33,15 @@ public class TripMapperTest {
 
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
-  private final TripMapper subject = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
-    new DirectionMapper(ISSUE_STORE),
-    new TranslationHelper()
-  );
+  private final TripMapper subject = defaultTripMapper();
+
+  private static TripMapper defaultTripMapper() {
+    return new TripMapper(
+      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
+      new DirectionMapper(ISSUE_STORE),
+      new TranslationHelper()
+    );
+  }
 
   static {
     GtfsTestData data = new GtfsTestData();
@@ -56,14 +60,14 @@ public class TripMapperTest {
   }
 
   @Test
-  public void testMapCollection() throws Exception {
+  void testMapCollection() throws Exception {
     assertNull(subject.map((Collection<Trip>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(TRIP)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
+  void testMap() throws Exception {
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(TRIP);
 
     assertEquals("A:1", result.getId().toString());
@@ -80,7 +84,7 @@ public class TripMapperTest {
   }
 
   @Test
-  public void testMapWithNulls() throws Exception {
+  void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
     input.setRoute(new GtfsTestData().route);
@@ -101,12 +105,33 @@ public class TripMapperTest {
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
   }
 
-  /** Mapping the same object twice, should return the the same instance. */
+  /** Mapping the same object twice, should return the same instance. */
   @Test
-  public void testMapCache() throws Exception {
+  void testMapCache() throws Exception {
     org.opentripplanner.transit.model.timetable.Trip result1 = subject.map(TRIP);
     org.opentripplanner.transit.model.timetable.Trip result2 = subject.map(TRIP);
 
     assertSame(result1, result2);
+  }
+
+  @Test
+  void noFlexDurationModifier() {
+    var mapper = defaultTripMapper();
+    mapper.map(TRIP);
+    assertTrue(mapper.flexSafeDurationModifiers().isEmpty());
+  }
+
+  @Test
+  void flexDurationModifier() {
+    var flexTrip = new Trip();
+    flexTrip.setId(new AgencyAndId("1", "1"));
+    flexTrip.setSafeDurationFactor(1.5);
+    flexTrip.setSafeDurationOffset(600d);
+    flexTrip.setRoute(new GtfsTestData().route);
+    var mapper = defaultTripMapper();
+    var mapped = mapper.map(flexTrip);
+    var mod = mapper.flexSafeDurationModifiers().get(mapped);
+    assertEquals(1.5f, mod.factor());
+    assertEquals(600, mod.offsetInSeconds());
   }
 }

@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.flex.trip;
 
-import static org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip.TimeType.FIXED_TIME;
-import static org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip.TimeType.FLEXIBLE_TIME;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
@@ -299,12 +297,9 @@ public class ScheduledDeviatedTrip
     private final int arrivalTime;
     private final PickDrop pickupType;
     private final PickDrop dropOffType;
-    private final TimeType timeType;
 
     private ScheduledDeviatedStopTime(StopTime st) {
       this.stop = st.getStop();
-
-      this.timeType = st.hasFlexWindow() ? FLEXIBLE_TIME : FIXED_TIME;
 
       // Store the time the user is guaranteed to arrive at latest
       this.arrivalTime = st.getLatestPossibleArrivalTime();
@@ -319,10 +314,5 @@ public class ScheduledDeviatedTrip
       this.pickupType = departureTime == MISSING_VALUE ? PickDrop.NONE : st.getPickupType();
       this.dropOffType = arrivalTime == MISSING_VALUE ? PickDrop.NONE : st.getDropOffType();
     }
-  }
-
-  enum TimeType {
-    FIXED_TIME,
-    FLEXIBLE_TIME,
   }
 }

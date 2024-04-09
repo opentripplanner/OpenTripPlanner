@@ -149,7 +149,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       );
   }
 
-  private FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
+  /**
+   * Get the correct {@link FlexPathCalculator} depending on the {@code durationModified}.
+   * If the modifier doesn't actually modify, we don't
+   */
+  protected FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
     if (durationModifier.modifies()) {
       return new DurationModifierCalculator(calculator, durationModifier);
     } else {

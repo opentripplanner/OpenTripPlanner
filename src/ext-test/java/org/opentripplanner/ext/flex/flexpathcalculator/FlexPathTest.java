@@ -33,5 +33,6 @@ class FlexPathTest {
   void calculate(DurationModifier mod, int expectedSeconds) {
     var modified = PATH.withDurationModifier(mod);
     assertEquals(expectedSeconds, modified.durationSeconds);
+    assertEquals(LineStrings.SIMPLE, modified.getGeometry());
   }
 }

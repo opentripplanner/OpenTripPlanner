@@ -47,11 +47,7 @@ public class FlexTripsMapper {
         );
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         result.add(
-          ScheduledDeviatedTrip
-            .of(trip.getId())
-            .withTrip(trip)
-            .withStopTimes(stopTimes)
-            .build()
+          ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
         );
       } else if (hasContinuousStops(stopTimes) && FlexTrip.containsFlexStops(stopTimes)) {
         store.add(
