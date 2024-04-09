@@ -63,9 +63,9 @@ public class ElevationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
   /**
-   * The WGS84 CRS with longitude-first axis order. The first time a CRS lookup is 
+   * The WGS84 CRS with longitude-first axis order. The first time a CRS lookup is
    * performed is surprisingly expensive (around 500ms), apparently due to  initializing
-   * an HSQLDB JDBC connection. For this reason, the constant is defined in this 
+   * an HSQLDB JDBC connection. For this reason, the constant is defined in this
    * narrower scope rather than a shared utility class, where it was seen to incur the
    * initialization cost in a broader range of tests than is necessary.
    */
