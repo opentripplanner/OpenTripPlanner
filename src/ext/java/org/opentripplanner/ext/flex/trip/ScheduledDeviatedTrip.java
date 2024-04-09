@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.DurationModifierCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -45,8 +44,6 @@ public class ScheduledDeviatedTrip
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  private final DurationModifier durationModifier;
-
   ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -64,7 +61,6 @@ public class ScheduledDeviatedTrip
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
-    this.durationModifier = builder.durationModifier();
   }
 
   public static ScheduledDeviatedTripBuilder of(FeedScopedId id) {
@@ -110,7 +106,7 @@ public class ScheduledDeviatedTrip
             toIndex,
             stop,
             date,
-            getCalculator(fromIndex, toIndex, scheduledCalculator),
+            scheduledCalculator,
             config
           )
         );
@@ -118,25 +114,6 @@ public class ScheduledDeviatedTrip
     }
 
     return res.stream();
-  }
-
-  /**
-   * If any of the stops involved in the path computation, then apply the duration factors.
-   * If both from and to have a fixed time, then don't apply the factors.
-   */
-  private FlexPathCalculator getCalculator(
-    int fromIndex,
-    int toIndex,
-    FlexPathCalculator scheduledCalculator
-  ) {
-    final boolean usesFlexWindow =
-      stopTimes[fromIndex].timeType == FLEXIBLE_TIME ||
-      stopTimes[toIndex].timeType == FLEXIBLE_TIME;
-    if (usesFlexWindow && durationModifier.modifies()) {
-      return new DurationModifierCalculator(scheduledCalculator, durationModifier);
-    } else {
-      return scheduledCalculator;
-    }
   }
 
   @Override
@@ -169,7 +146,7 @@ public class ScheduledDeviatedTrip
             toIndex,
             stop,
             date,
-            getCalculator(fromIndex, toIndex, scheduledCalculator),
+            scheduledCalculator,
             config
           )
         );
