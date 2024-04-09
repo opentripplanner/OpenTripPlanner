@@ -168,7 +168,7 @@ public class FinlandMapperTest {
     assertEquals(8, wps.getDataForWay(wayWithBicycleSidePath).walkSafety().forward(), epsilon);
     OSMWithTags wayWithFootSidePath = new OSMWithTags();
     wayWithFootSidePath.addTag("foot", "use_sidepath");
-    assertEquals(12.8, wps.getDataForWay(wayWithFootSidePath).walkSafety().forward(), epsilon);
+    assertEquals(8, wps.getDataForWay(wayWithFootSidePath).walkSafety().forward(), epsilon);
   }
 
   @Test

@@ -168,8 +168,6 @@ class FinlandMapper implements OsmTagMapper {
     // We don't need to set bicycle safety as cycling is not currently allowed on these ways.
     props.setMixinProperties("bicycle=use_sidepath", ofWalkSafety(5));
 
-    props.setMixinProperties("foot=use_sidepath", ofWalkSafety(8));
-
     // Automobile speeds in Finland.
     // General speed limit is 80kph unless signs says otherwise.
     props.defaultCarSpeed = 22.22f;
