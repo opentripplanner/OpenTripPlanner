@@ -5,12 +5,19 @@ import java.time.Duration;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
+/**
+ * A modifier to influence the A*-calculated driving time of flex trips.
+ */
 public class DurationModifier implements Serializable {
 
   public static DurationModifier NONE = new DurationModifier(Duration.ZERO, 1);
   private final int offset;
   private final float factor;
 
+  /**
+   * @param offset A fixed offset to add to the driving time.
+   * @param factor A factor to multiply the driving time with.
+   */
   public DurationModifier(Duration offset, float factor) {
     if (factor < 0.1) {
       throw new IllegalArgumentException("Flex duration factor must not be less than 0.1");
