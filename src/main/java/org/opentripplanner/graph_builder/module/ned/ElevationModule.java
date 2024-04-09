@@ -62,10 +62,17 @@ import org.slf4j.LoggerFactory;
 public class ElevationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
-  /** A shared copy of the WGS84 CRS with longitude-first axis order. */
+  /**
+   * A shared copy of the WGS84 CRS with longitude-first axis order. This constant used
+   * to be defined in a shared utility class but since it's slow to initialize, it was move here.
+   * See https://github.com/opentripplanner/OpenTripPlanner/pull/5786
+   * */
   private static final CoordinateReferenceSystem WGS84_XY;
 
   static {
+    // looking up the CRS is surprisingly expensive (~500ms) and should therefore not done
+    // in shared utility class
+    // https://github.com/opentripplanner/OpenTripPlanner/pull/5786
     try {
       WGS84_XY = CRS.getAuthorityFactory(true).createCoordinateReferenceSystem("EPSG:4326");
     } catch (Exception ex) {
