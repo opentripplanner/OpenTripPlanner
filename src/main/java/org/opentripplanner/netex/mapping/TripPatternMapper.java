@@ -67,7 +67,7 @@ class TripPatternMapper {
 
   private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
-  private final Multimap<String, ServiceJourney> serviceJourniesByPatternId = ArrayListMultimap.create();
+  private final Multimap<String, ServiceJourney> serviceJourneysByPatternId = ArrayListMultimap.create();
 
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
 
@@ -152,12 +152,12 @@ class TripPatternMapper {
     this.serviceJourneyById = serviceJourneyById;
     // Index service journey by pattern id
     for (ServiceJourney sj : serviceJourneyById.localValues()) {
-      this.serviceJourniesByPatternId.put(sj.getJourneyPatternRef().getValue().getRef(), sj);
+      this.serviceJourneysByPatternId.put(sj.getJourneyPatternRef().getValue().getRef(), sj);
     }
   }
 
   Optional<TripPatternMapperResult> mapTripPattern(JourneyPattern_VersionStructure journeyPattern) {
-    Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(
+    Collection<ServiceJourney> serviceJourneys = serviceJourneysByPatternId.get(
       journeyPattern.getId()
     );
 
