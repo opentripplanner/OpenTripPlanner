@@ -17,11 +17,12 @@ import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 class Subgraph {
 
   private final Set<Vertex> streetVertexSet;
-  private final Set<Vertex> stopsVertexSet;
+  private final Set<TransitStopVertex> stopsVertexSet;
 
   Subgraph() {
     streetVertexSet = new HashSet<>();
@@ -30,7 +31,7 @@ class Subgraph {
 
   void addVertex(Vertex vertex) {
     if (vertex instanceof TransitStopVertex) {
-      stopsVertexSet.add(vertex);
+      stopsVertexSet.add((TransitStopVertex) vertex);
     } else {
       streetVertexSet.add(vertex);
     }
@@ -64,7 +65,7 @@ class Subgraph {
     return streetVertexSet.iterator();
   }
 
-  Iterator<Vertex> stopIterator() {
+  Iterator<TransitStopVertex> stopIterator() {
     return stopsVertexSet.iterator();
   }
 
@@ -98,7 +99,7 @@ class Subgraph {
       Vertex vx = vIter.next();
       envelope.expandToInclude(vx.getCoordinate());
     }
-    for (Iterator<Vertex> vIter = stopIterator(); vIter.hasNext();) {
+    for (Iterator<TransitStopVertex> vIter = stopIterator(); vIter.hasNext();) {
       Vertex vx = vIter.next();
       envelope.expandToInclude(vx.getCoordinate());
     }
@@ -126,5 +127,23 @@ class Subgraph {
     stopIterator().forEachRemaining(vertexAdder);
 
     return new MultiPoint(points.toArray(new Point[0]), geometryFactory);
+  }
+
+  /**
+   * Checks whether the subgraph has only transit-stops for ferries
+   *
+   * @return true if only ferries stop at the subgraph and false if other or no other modes are
+   * stopping at the subgraph
+   */
+  boolean hasOnlyFerryStops() {
+    for (Iterator<TransitStopVertex> vIter = this.stopIterator(); vIter.hasNext();) {
+      TransitStopVertex v = vIter.next();
+      Set<TransitMode> modes = v.getModes();
+      // test if stop has other transit modes than FERRY
+      if (!modes.contains(TransitMode.FERRY)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
