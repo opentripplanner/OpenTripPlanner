@@ -75,7 +75,7 @@ jobs:
 
       - name: Set up Maven
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: stCarolas/setup-maven@v.4.5
+        uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.8.2
 
@@ -102,7 +102,7 @@ jobs:
 
       - name: Archive travel results file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
           path: test/performance/${{ matrix.location }}/travelSearch-results.csv
