@@ -46,12 +46,18 @@
     // noise, so we slow it down a bit
     {
       "matchPackageNames": [
-        "org.entur.gbfs:gbfs-java-model",
-        "ch.qos.logback:logback-classic",
-        "io.github.git-commit-id:git-commit-id-maven-plugin"
+        "org.entur.gbfs:gbfs-java-model"
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",
+      "automerge": true
+    },
+    {
+      "matchPackageNames": [
+        "ch.qos.logback:logback-classic",
+        "io.github.git-commit-id:git-commit-id-maven-plugin"
+      ],
+      "schedule": "on the 19th day of the month",
       "automerge": true
     },
     {
