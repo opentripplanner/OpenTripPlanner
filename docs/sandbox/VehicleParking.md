@@ -61,7 +61,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[2]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
 
 The source of the vehicle updates.
 
@@ -131,7 +131,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[3]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
 
 The source of the vehicle updates.
 
@@ -216,7 +216,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[4]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
 
 The source of the vehicle updates.
 
@@ -281,7 +281,7 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[5]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
 
 The source of the vehicle updates.
 
