@@ -66,7 +66,7 @@ public class LegReferenceSerializer {
       var type = readEnum(in, LegReferenceType.class);
       return type.getDeserializer().read(in);
     } catch (IOException e) {
-      LOG.info(
+      LOG.warn(
         "Unable to decode leg reference (incompatible serialization format): '{}'",
         legReference,
         e
