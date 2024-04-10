@@ -3,7 +3,7 @@
 ## Contact Info
 
 - For HSL Park and Ride updater: Digitransit team, HSL, Helsinki, Finland
-- For Bikely and NOI updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
+- For Bikely, NOI and Bikeep updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
 
 ## Documentation
@@ -312,6 +312,66 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- noi-open-data-hub END -->
 
+## Bikeep
+
+<!-- bikeep BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                 |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|----------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-parking"         |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| [feedId](#u__13__feedId)         |     `string`    | The name of the data source.                                               | *Required* |               |  2.2  |
+| frequency                        |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.6  |
+| [sourceType](#u__13__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
+| url                              |      `uri`      | URL of the locations endpoint.                                             | *Required* |               |  2.6  |
+| [headers](#u__13__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.6  |
+
+
+#### Details
+
+<h4 id="u__13__feedId">feedId</h4>
+
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[13] 
+
+The name of the data source.
+
+This will end up in the API responses as the feed id of of the parking lot.
+
+<h4 id="u__13__sourceType">sourceType</h4>
+
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[13]   
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
+
+The source of the vehicle updates.
+
+<h4 id="u__13__headers">headers</h4>
+
+**Since version:** `2.6` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[13] 
+
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
+{
+  "updaters" : [
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikeep",
+      "sourceType" : "bikeep",
+      "url" : "https://services.bikeep.com/location/v1/public-areas/no-baia-mobility/locations"
+    }
+  ]
+}
+```
+
+<!-- bikeep END -->
 
 ## Changelog
 

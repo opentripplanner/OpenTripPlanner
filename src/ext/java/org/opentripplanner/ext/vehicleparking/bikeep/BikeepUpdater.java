@@ -1,8 +1,12 @@
 package org.opentripplanner.ext.vehicleparking.bikeep;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectReader;
+import java.io.IOException;
+import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -16,6 +20,9 @@ import org.opentripplanner.updater.spi.GenericJsonDataSource;
 public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
   private static final String JSON_PARSE_PATH = "features";
+  private static final ObjectReader STRING_LIST_READER = ObjectMappers
+    .ignoringExtraFields()
+    .readerForListOf(String.class);
   private final BikeepUpdaterParameters params;
 
   public BikeepUpdater(BikeepUpdaterParameters parameters) {
@@ -25,41 +32,48 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
   @Override
   protected VehicleParking parseElement(JsonNode jsonNode) {
-    var coords = jsonNode.path("geometry").path("coordinates");
-    var coordinate = new WgsCoordinate(coords.get(1).asDouble(), coords.get(0).asDouble());
+    try {
+      var coords = jsonNode.path("geometry").path("coordinates");
+      var coordinate = new WgsCoordinate(coords.get(1).asDouble(), coords.get(0).asDouble());
 
-    var props = jsonNode.path("properties");
-    var vehicleParkId = new FeedScopedId(params.feedId(), props.path("code").asText());
-    var name = new NonLocalizedString(props.path("label").asText());
-    var parking = props.path("parking");
+      var props = jsonNode.path("properties");
+      var vehicleParkId = new FeedScopedId(params.feedId(), props.path("code").asText());
+      var name = new NonLocalizedString(props.path("label").asText());
+      var parking = props.path("parking");
 
-    var availability = VehicleParkingSpaces
-      .builder()
-      .bicycleSpaces(parking.get("available").asInt())
-      .build();
-    var capacity = VehicleParkingSpaces
-      .builder()
-      .bicycleSpaces(parking.get("total").asInt())
-      .build();
+      List<String> tags = STRING_LIST_READER.readValue(props.path("tags"));
 
-    VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-      builder
-        .entranceId(new FeedScopedId(params.feedId(), vehicleParkId.getId() + "/entrance"))
+      var availability = VehicleParkingSpaces
+        .builder()
+        .bicycleSpaces(parking.get("available").asInt())
+        .build();
+      var capacity = VehicleParkingSpaces
+        .builder()
+        .bicycleSpaces(parking.get("total").asInt())
+        .build();
+
+      VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
+        builder
+          .entranceId(new FeedScopedId(params.feedId(), vehicleParkId.getId() + "/entrance"))
+          .coordinate(coordinate)
+          .walkAccessible(true)
+          .carAccessible(true);
+
+      return VehicleParking
+        .builder()
+        .id(vehicleParkId)
+        .name(name)
+        .state(VehicleParkingState.OPERATIONAL)
         .coordinate(coordinate)
-        .walkAccessible(true)
-        .carAccessible(true);
-
-    return VehicleParking
-      .builder()
-      .id(vehicleParkId)
-      .name(name)
-      .state(VehicleParkingState.OPERATIONAL)
-      .coordinate(coordinate)
-      .bicyclePlaces(true)
-      .availability(availability)
-      .capacity(capacity)
-      .entrance(entrance)
-      .build();
+        .bicyclePlaces(true)
+        .availability(availability)
+        .tags(tags)
+        .capacity(capacity)
+        .entrance(entrance)
+        .build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

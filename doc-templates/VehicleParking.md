@@ -3,7 +3,7 @@
 ## Contact Info
 
 - For HSL Park and Ride updater: Digitransit team, HSL, Helsinki, Finland
-- For Bikely and NOI updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
+- For Bikely, NOI and Bikeep updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
 
 ## Documentation
@@ -44,6 +44,9 @@ All updaters have the following parameters in common:
 
 <!-- INSERT: noi-open-data-hub -->
 
+## Bikeep
+
+<!-- INSERT: bikeep -->
 
 ## Changelog
 

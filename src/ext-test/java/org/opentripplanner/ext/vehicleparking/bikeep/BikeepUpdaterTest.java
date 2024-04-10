@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.Duration;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -34,6 +35,7 @@ class BikeepUpdaterTest {
     assertEquals("Ågotnes Terminal", first.getName().toString());
     assertEquals(10, first.getAvailability().getBicycleSpaces());
     assertEquals(10, first.getCapacity().getBicycleSpaces());
+    assertEquals(Set.of("FREE", "PRIVATE", "BIKE", "BOOKABLE"), first.getTags());
 
     var last = lots.getLast();
     assertEquals("bikeep:224111", last.getId().toString());
