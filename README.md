@@ -1,6 +1,7 @@
 ## Overview
 
 [![Join the chat at https://gitter.im/opentripplanner/OpenTripPLanner](https://badges.gitter.im/opentripplanner/OpenTripPlanner.svg)](https://gitter.im/opentripplanner/OpenTripPlanner)
+[![Matrix](https://img.shields.io/matrix/opentripplanner%3Amatrix.org?label=Matrix%20chat)](https://matrix.to/#/#opentripplanner_OpenTripPlanner:gitter.im)
 [![codecov](https://codecov.io/gh/opentripplanner/OpenTripPlanner/branch/dev-2.x/graph/badge.svg?token=ak4PbIKgZ1)](https://codecov.io/gh/opentripplanner/OpenTripPlanner)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/opentripplanner/OpenTripPlanner)](https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors)
 [![Docker Pulls](https://img.shields.io/docker/pulls/opentripplanner/opentripplanner)](https://hub.docker.com/r/opentripplanner/opentripplanner)
