@@ -102,8 +102,8 @@ public class SidewalkNamer implements EdgeNamer {
       .forEach(sidewalkOnLevel -> {
         assignNameToSidewalk(sidewalkOnLevel, namesApplied);
 
-        //Keep lambda! A method-ref would cause incorrect class and line number to be logged
-        //noinspection Convert2MethodRef
+        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
+        // noinspection Convert2MethodRef
         progress.step(m -> LOG.info(m));
       });
 
@@ -139,9 +139,9 @@ public class SidewalkNamer implements EdgeNamer {
       // make sure we only compare sidewalks and streets that are on the same level
       .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
       .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
-      // remove those groups where less than a certain percentage is inside the buffer around
-      // the sidewalk. this safety mechanism for sidewalks that snake around the corner
-      // like https://www.openstreetmap.org/way/1059101564
+      // Remove those groups where less than a certain percentage is inside the buffer around
+      // the sidewalk. This is a safety mechanism for sidewalks that snake around the corner,
+      // like https://www.openstreetmap.org/way/1059101564 .
       .filter(group -> group.percentInBuffer > MIN_PERCENT_IN_BUFFER)
       .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
       .ifPresent(group -> {
@@ -152,7 +152,7 @@ public class SidewalkNamer implements EdgeNamer {
 
   /**
    * Compute the length of the group that is inside the buffer and return it as a percentage
-   * of the lenght of the sidewalk.
+   * of the length of the sidewalk.
    */
   private static NamedEdgeGroup computePercentInsideBuffer(
     CandidateGroup g,
@@ -165,8 +165,8 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   /**
-   * If a single street is split into several eges each individual part of the street would potentially
-   * have a low similarity with the (longer) sidewalk. For that reason we combined them into a group
+   * If a single street is split into several edges, each individual part of the street would potentially
+   * have a low similarity with the (longer) sidewalk. For that reason we combine them into a group
    * and have a better basis for comparison.
    */
   private static Stream<CandidateGroup> groupEdgesByName(List<EdgeOnLevel> candidates) {
@@ -190,12 +190,12 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   /**
-   * Add a buffer around a geometry that uses both meters as the input and makes sure
-   * that the buffer is the same distance (in meters) anywhere on earth.
+   * Add a buffer around a geometry that makes sure that the buffer is the same distance (in meters)
+   * anywhere on earth.
    * <p>
    * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
    * coordinate reference system, the buffer will be accurate at the equator but will become more
-   * and more elongated the furter north/south you go.
+   * and more elongated the further north/south you go.
    * <p>
    * Taken from https://stackoverflow.com/questions/36455020
    */
@@ -229,7 +229,7 @@ public class SidewalkNamer implements EdgeNamer {
    */
   private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<String> levels) {
     /**
-     * How much of this group intersects with the give geometry, in meters.
+     * How much of this group intersects with the given geometry, in meters.
      */
     double intersectionLength(Geometry polygon) {
       return edges
