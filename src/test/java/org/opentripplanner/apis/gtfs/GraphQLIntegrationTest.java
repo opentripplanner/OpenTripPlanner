@@ -131,6 +131,7 @@ class GraphQLIntegrationTest {
           VehicleParking
             .builder()
             .id(id("parking-1"))
+            .coordinate(WgsCoordinate.GREENWICH)
             .name(NonLocalizedString.ofNullable("parking"))
             .build()
         ),

@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
 import java.time.Duration;
 import java.time.ZoneId;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
@@ -50,7 +52,7 @@ public class VehicleParkingUpdaterConfig {
       );
       case PARK_API, BICYCLE_PARK_API -> new ParkAPIUpdaterParameters(
         updaterRef,
-        c.of("url").since(V2_2).summary("URL of the resource.").asString(null),
+        c.of("url").since(V2_2).summary("URL of the resource.").asString(),
         feedId,
         c
           .of("frequency")
@@ -66,7 +68,7 @@ public class VehicleParkingUpdaterConfig {
       );
       case BIKELY -> new BikelyUpdaterParameters(
         updaterRef,
-        c.of("url").since(V2_3).summary("URL of the locations endpoint.").asUri(null),
+        c.of("url").since(V2_3).summary("URL of the locations endpoint.").asUri(),
         feedId,
         c
           .of("frequency")
@@ -74,6 +76,17 @@ public class VehicleParkingUpdaterConfig {
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
         HttpHeadersConfig.headers(c, V2_3)
+      );
+      case NOI_OPEN_DATA_HUB -> new NoiUpdaterParameters(
+        updaterRef,
+        c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
+        feedId,
+        c
+          .of("frequency")
+          .since(V2_6)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
+        HttpHeadersConfig.headers(c, V2_6)
       );
     };
   }
