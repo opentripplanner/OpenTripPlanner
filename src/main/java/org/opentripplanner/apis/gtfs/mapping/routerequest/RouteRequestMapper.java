@@ -81,7 +81,7 @@ public class RouteRequestMapper {
     prefs.withTransit(transit -> {
       prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
     });
-    setStreetPreferences(prefs, preferenceArgs.getGraphQLStreet(), environment);
+    setStreetPreferences(prefs, request, preferenceArgs.getGraphQLStreet(), environment);
     setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
   }
 
@@ -109,9 +109,11 @@ public class RouteRequestMapper {
 
   private static void setStreetPreferences(
     RoutingPreferences.Builder preferences,
+    RouteRequest request,
     GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
     DataFetchingEnvironment environment
   ) {
+    setRentalAvailabilityPreferences(preferences, request);
     if (args != null) {
       preferences.withBike(bicycle ->
         setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
@@ -120,6 +122,24 @@ public class RouteRequestMapper {
       preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
       preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
     }
+  }
+
+  private static void setRentalAvailabilityPreferences(
+    RoutingPreferences.Builder preferences,
+    RouteRequest request
+  ) {
+    preferences.withBike(bike ->
+      bike.withRental(rental -> rental.withUseAvailabilityInformation(request.isTripPlannedForNow())
+      )
+    );
+    preferences.withCar(car ->
+      car.withRental(rental -> rental.withUseAvailabilityInformation(request.isTripPlannedForNow()))
+    );
+    preferences.withScooter(scooter ->
+      scooter.withRental(rental ->
+        rental.withUseAvailabilityInformation(request.isTripPlannedForNow())
+      )
+    );
   }
 
   private static void setAccessibilityPreferences(

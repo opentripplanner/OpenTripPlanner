@@ -88,7 +88,6 @@ class RouteRequestMapperTest {
     assertEquals(DESTINATION.x, routeRequest.to().lat);
     assertEquals(DESTINATION.y, routeRequest.to().lng);
     assertEquals(LOCALE, routeRequest.locale());
-    assertEquals(defaultRequest.preferences(), routeRequest.preferences());
     assertEquals(defaultRequest.wheelchair(), routeRequest.wheelchair());
     assertEquals(defaultRequest.arriveBy(), routeRequest.arriveBy());
     assertEquals(defaultRequest.isTripPlannedForNow(), routeRequest.isTripPlannedForNow());
@@ -108,6 +107,19 @@ class RouteRequestMapperTest {
         .compareTo(Duration.ofSeconds(10)) <
       0
     );
+
+    // Using current time as datetime changes rental availability use preferences, therefore to
+    // check that the preferences are equal, we need to use a future time.
+    var futureArgs = createArgsCopy(ARGS);
+    var futureTime = OffsetDateTime.of(
+      LocalDate.of(3000, 3, 15),
+      LocalTime.MIDNIGHT,
+      ZoneOffset.UTC
+    );
+    futureArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", futureTime)));
+    var futureEnv = executionContext(futureArgs, LOCALE, CONTEXT);
+    var futureRequest = RouteRequestMapper.toRouteRequest(futureEnv, CONTEXT);
+    assertEquals(defaultRequest.preferences(), futureRequest.preferences());
   }
 
   @Test
@@ -132,6 +144,29 @@ class RouteRequestMapperTest {
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertTrue(routeRequest.arriveBy());
     assertFalse(routeRequest.isTripPlannedForNow());
+  }
+
+  @Test
+  void testRentalAvailability() {
+    var nowArgs = createArgsCopy(ARGS);
+    var nowEnv = executionContext(nowArgs, LOCALE, CONTEXT);
+    var nowRequest = RouteRequestMapper.toRouteRequest(nowEnv, CONTEXT);
+    assertTrue(nowRequest.preferences().bike().rental().useAvailabilityInformation());
+    assertTrue(nowRequest.preferences().car().rental().useAvailabilityInformation());
+    assertTrue(nowRequest.preferences().scooter().rental().useAvailabilityInformation());
+
+    var futureArgs = createArgsCopy(ARGS);
+    var futureTime = OffsetDateTime.of(
+      LocalDate.of(3000, 3, 15),
+      LocalTime.MIDNIGHT,
+      ZoneOffset.UTC
+    );
+    futureArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", futureTime)));
+    var futureEnv = executionContext(futureArgs, LOCALE, CONTEXT);
+    var futureRequest = RouteRequestMapper.toRouteRequest(futureEnv, CONTEXT);
+    assertFalse(futureRequest.preferences().bike().rental().useAvailabilityInformation());
+    assertFalse(futureRequest.preferences().car().rental().useAvailabilityInformation());
+    assertFalse(futureRequest.preferences().scooter().rental().useAvailabilityInformation());
   }
 
   @Test
