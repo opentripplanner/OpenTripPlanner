@@ -30,8 +30,8 @@ class Subgraph {
   }
 
   void addVertex(Vertex vertex) {
-    if (vertex instanceof TransitStopVertex) {
-      stopsVertexSet.add((TransitStopVertex) vertex);
+    if (vertex instanceof TransitStopVertex transitStopVertex) {
+      stopsVertexSet.add(transitStopVertex);
     } else {
       streetVertexSet.add(vertex);
     }
