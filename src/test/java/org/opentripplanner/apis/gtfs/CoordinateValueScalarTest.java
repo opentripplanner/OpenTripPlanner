@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 class CoordinateValueScalarTest {
 
   private static final Double COORDINATE = 10.0;
+  private static final Integer COORDINATE_INT = 10;
   private static final double COORDINATE_MAX = 180.0;
   private static final double COORDINATE_MIN = 180.0;
   private static final double TOO_HIGH = 190;
@@ -52,6 +53,9 @@ class CoordinateValueScalarTest {
     coordinate =
       (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(COORDINATE_MAX);
     assertEquals(COORDINATE_MAX, coordinate, DELTA);
+    coordinate =
+      (Double) GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(COORDINATE_INT);
+    assertEquals(COORDINATE_INT, coordinate, DELTA);
     assertThrows(
       CoercingParseValueException.class,
       () -> GraphQLScalars.COORDINATE_VALUE_SCALAR.getCoercing().parseValue(TEXT)

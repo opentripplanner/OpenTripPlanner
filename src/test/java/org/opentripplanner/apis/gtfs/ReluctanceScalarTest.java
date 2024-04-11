@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 class ReluctanceScalarTest {
 
   private static final Double HALF = 0.5;
-  private static final int ONE = 1;
+  private static final Integer ONE = 1;
   private static final double TOO_HIGH = 100001;
   private static final double TOO_LOW = 0;
   private static final String TEXT = "foo";
@@ -37,8 +37,10 @@ class ReluctanceScalarTest {
 
   @Test
   void testParseValue() {
-    var reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(HALF);
-    assertEquals(HALF, reluctance, DELTA);
+    var reluctanceDouble = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(HALF);
+    assertEquals(HALF, reluctanceDouble, DELTA);
+    var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(ONE);
+    assertEquals(ONE, reluctanceInt, DELTA);
     assertThrows(
       CoercingParseValueException.class,
       () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TEXT)

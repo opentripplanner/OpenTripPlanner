@@ -145,6 +145,10 @@ public class GraphQLScalars {
             return validateCoordinate(doubleValue)
               .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
+          if (input instanceof Integer intValue) {
+            return validateCoordinate(intValue)
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
+          }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
           );
@@ -317,20 +321,28 @@ public class GraphQLScalars {
 
         @Override
         public Grams parseValue(Object input) throws CoercingParseValueException {
-          if (input instanceof Double) {
-            var grams = (Double) input;
-            return new Grams(grams);
+          if (input instanceof Double doubleValue) {
+            return new Grams(doubleValue);
           }
-          return null;
+          if (input instanceof Integer intValue) {
+            return new Grams(intValue);
+          }
+          throw new CoercingParseValueException(
+            "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
+          );
         }
 
         @Override
         public Grams parseLiteral(Object input) throws CoercingParseLiteralException {
-          if (input instanceof Double) {
-            var grams = (Double) input;
-            return new Grams(grams);
+          if (input instanceof FloatValue coordinate) {
+            return new Grams(coordinate.getValue().doubleValue());
           }
-          return null;
+          if (input instanceof IntValue coordinate) {
+            return new Grams(coordinate.getValue().doubleValue());
+          }
+          throw new CoercingParseLiteralException(
+            "Expected a number, got: " + input.getClass().getSimpleName()
+          );
         }
       }
     )
@@ -365,6 +377,10 @@ public class GraphQLScalars {
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
             return validateRatio(doubleValue)
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
+          }
+          if (input instanceof Integer intValue) {
+            return validateRatio(intValue)
               .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(
@@ -427,6 +443,10 @@ public class GraphQLScalars {
         public Double parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
             return validateReluctance(doubleValue)
+              .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
+          }
+          if (input instanceof Integer intValue) {
+            return validateReluctance(intValue)
               .orElseThrow(() -> new CoercingParseValueException(VALIDATION_ERROR_MESSAGE));
           }
           throw new CoercingParseValueException(

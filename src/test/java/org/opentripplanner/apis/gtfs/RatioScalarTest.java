@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 class RatioScalarTest {
 
   private static final Double HALF = 0.5;
-  private static final double ZERO = 0;
-  private static final double ONE = 1;
+  private static final Integer ZERO = 0;
+  private static final Integer ONE = 1;
   private static final double TOO_HIGH = 1.1;
   private static final double TOO_LOW = -1.1;
   private static final String TEXT = "foo";
