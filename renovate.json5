@@ -55,7 +55,8 @@
     {
       "matchPackageNames": [
         "ch.qos.logback:logback-classic",
-        "io.github.git-commit-id:git-commit-id-maven-plugin"
+        "io.github.git-commit-id:git-commit-id-maven-plugin",
+        "org.apache.maven.plugins:maven-gpg-plugin"
       ],
       "schedule": "on the 19th day of the month",
       "automerge": true
@@ -116,7 +117,6 @@
         "org.apache.commons:commons-compress", // only used by tests
         // maven plugins
         "org.codehaus.mojo:build-helper-maven-plugin",
-        "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
