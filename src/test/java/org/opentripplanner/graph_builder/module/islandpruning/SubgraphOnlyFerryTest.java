@@ -1,34 +1,21 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class SubgraphOnlyFerryTest {
 
-  private static RegularStop regularStop1;
-  private static RegularStop regularStop2;
-
-  @BeforeAll
-  static void setUp() {
-    regularStop1 =
-      RegularStop
-        .of(new FeedScopedId("HH-GTFS", "TEST1"), () -> 0)
-        .withCoordinate(53.54948, 9.98455)
-        .build();
-    regularStop2 =
-      RegularStop
-        .of(new FeedScopedId("HH-GTFS", "TEST2"), () -> 0)
-        .withCoordinate(53.55272, 9.99480)
-        .build();
-  }
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final RegularStop regularStop1 = TEST_MODEL.stop("TEST-1").build();
+  private static final RegularStop regularStop2 = TEST_MODEL.stop("TEST-2").build();
 
   @Test
   void subgraphHasOnlyFerry() {

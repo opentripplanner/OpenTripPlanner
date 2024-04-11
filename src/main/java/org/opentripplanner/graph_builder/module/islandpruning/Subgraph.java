@@ -99,8 +99,7 @@ class Subgraph {
       Vertex vx = vIter.next();
       envelope.expandToInclude(vx.getCoordinate());
     }
-    for (Iterator<TransitStopVertex> vIter = stopIterator(); vIter.hasNext();) {
-      Vertex vx = vIter.next();
+    for (TransitStopVertex vx : stopsVertexSet) {
       envelope.expandToInclude(vx.getCoordinate());
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
@@ -132,12 +131,11 @@ class Subgraph {
   /**
    * Checks whether the subgraph has only transit-stops for ferries
    *
-   * @return true if only ferries stop at the subgraph and false if other or no other modes are
+   * @return true if only ferries stop at the subgraph and false if other or no modes are
    * stopping at the subgraph
    */
   boolean hasOnlyFerryStops() {
-    for (Iterator<TransitStopVertex> vIter = this.stopIterator(); vIter.hasNext();) {
-      TransitStopVertex v = vIter.next();
+    for (TransitStopVertex v : stopsVertexSet) {
       Set<TransitMode> modes = v.getModes();
       // test if stop has other transit modes than FERRY
       if (!modes.contains(TransitMode.FERRY)) {
