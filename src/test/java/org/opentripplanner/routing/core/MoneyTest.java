@@ -102,4 +102,9 @@ class MoneyTest {
   void serializable() {
     assertInstanceOf(Serializable.class, oneDollar);
   }
+
+  @Test
+  void equalHashCode() {
+    assertEquals(Money.usDollars(5).hashCode(), Money.usDollars(5).hashCode());
+  }
 }

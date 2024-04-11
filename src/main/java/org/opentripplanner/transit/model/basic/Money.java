@@ -206,4 +206,9 @@ public class Money implements Comparable<Money>, Serializable {
       return false;
     }
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(currency, amount);
+  }
 }
