@@ -141,7 +141,7 @@ public class SidewalkNamer implements EdgeNamer {
       .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
       // Remove those groups where less than a certain percentage is inside the buffer around
       // the sidewalk. This is a safety mechanism for sidewalks that snake around the corner,
-      // like https://www.openstreetmap.org/way/1059101564 .
+      // like https://www.openstreetmap.org/way/1059101564.
       .filter(group -> group.percentInBuffer > MIN_PERCENT_IN_BUFFER)
       .max(Comparator.comparingDouble(NamedEdgeGroup::percentInBuffer))
       .ifPresent(group -> {
@@ -195,7 +195,7 @@ public class SidewalkNamer implements EdgeNamer {
    * <p>
    * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
    * coordinate reference system, the buffer will be accurate at the equator but will become more
-   * and more elongated the further north/south you go.
+   * and more elongated the farther north/south you go.
    * <p>
    * Taken from https://stackoverflow.com/questions/36455020
    */
