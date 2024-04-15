@@ -121,7 +121,8 @@
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
         "org.apache.maven.plugins:maven-shade-plugin",
-        "org.apache.maven.plugins:maven-compiler-plugin"
+        "org.apache.maven.plugins:maven-compiler-plugin",
+        "org.apache.maven.plugins:maven-jar-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",
