@@ -129,9 +129,7 @@ public class SidewalkNamer implements EdgeNamer {
     var buffer = preciseBuffer(sidewalk.getGeometry(), BUFFER_METERS);
     var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
 
-    var envelope = sidewalk.getGeometry().getEnvelopeInternal();
-    envelope.expandBy(0.000002);
-    var candidates = streetEdges.query(envelope);
+    var candidates = streetEdges.query(buffer.getEnvelopeInternal());
 
     groupEdgesByName(candidates)
       // remove edges that are far away
