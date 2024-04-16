@@ -89,7 +89,7 @@ class RouteRequestMapperTransitTest {
     assertEquals(cost.toSeconds(), transferPreferences.cost());
     assertEquals(slack.toSeconds(), transferPreferences.slack());
     assertEquals(maximumAdditionalTransfers, transferPreferences.maxAdditionalTransfers());
-    assertEquals(maximumTransfers, transferPreferences.maxTransfers());
+    assertEquals(maximumTransfers + 1, transferPreferences.maxTransfers());
   }
 
   @Test

@@ -75,10 +75,18 @@ public class TransitPreferencesMapper {
         }
         var maxTransfers = transfer.getGraphQLMaximumTransfers();
         if (maxTransfers != null) {
-          transferPreferences.withMaxTransfers(maxTransfers);
+          if (maxTransfers < 0) {
+            throw new IllegalArgumentException("Maximum transfers must be non-negative.");
+          }
+          transferPreferences.withMaxTransfers(maxTransfers + 1);
         }
         var additionalTransfers = transfer.getGraphQLMaximumAdditionalTransfers();
         if (additionalTransfers != null) {
+          if (additionalTransfers < 0) {
+            throw new IllegalArgumentException(
+              "Maximum additional transfers must be non-negative."
+            );
+          }
           transferPreferences.withMaxAdditionalTransfers(additionalTransfers);
         }
       }
