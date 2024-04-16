@@ -16,6 +16,8 @@ import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
@@ -61,6 +63,7 @@ public class SidewalkNamer implements EdgeNamer {
 
   private HashGridSpatialIndex<EdgeOnLevel> streetEdges = new HashGridSpatialIndex<>();
   private Collection<EdgeOnLevel> unnamedSidewalks = new ArrayList<>();
+  private PreciseBuffer preciseBuffer;
 
   @Override
   public I18NString name(OSMWithTags way) {
@@ -96,6 +99,8 @@ public class SidewalkNamer implements EdgeNamer {
       unnamedSidewalks.size()
     );
 
+    this.preciseBuffer = new PreciseBuffer(computeCentroid(), BUFFER_METERS);
+
     final AtomicInteger namesApplied = new AtomicInteger(0);
     unnamedSidewalks
       .parallelStream()
@@ -122,11 +127,22 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   /**
+   * Compute the centroid of all sidewalk edges.
+   */
+  private Coordinate computeCentroid() {
+    var envelope = new Envelope();
+    unnamedSidewalks.forEach(e ->
+      envelope.expandToInclude(e.edge.getGeometry().getEnvelopeInternal())
+    );
+    return envelope.centre();
+  }
+
+  /**
    * The actual worker method that runs the business logic on an individual sidewalk edge.
    */
   private void assignNameToSidewalk(EdgeOnLevel sidewalkOnLevel, AtomicInteger namesApplied) {
     var sidewalk = sidewalkOnLevel.edge;
-    var buffer = preciseBuffer(sidewalk.getGeometry(), BUFFER_METERS);
+    var buffer = preciseBuffer.preciseBuffer(sidewalk.getGeometry());
     var sidewalkLength = SphericalDistanceLibrary.length(sidewalk.getGeometry());
 
     var candidates = streetEdges.query(buffer.getEnvelopeInternal());
@@ -187,34 +203,6 @@ public class SidewalkNamer implements EdgeNamer {
       });
   }
 
-  /**
-   * Add a buffer around a geometry that makes sure that the buffer is the same distance (in meters)
-   * anywhere on earth.
-   * <p>
-   * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
-   * coordinate reference system, the buffer will be accurate at the equator but will become more
-   * and more elongated the farther north/south you go.
-   * <p>
-   * Taken from https://stackoverflow.com/questions/36455020
-   */
-  private Geometry preciseBuffer(Geometry geometry, double distanceInMeters) {
-    try {
-      var coordinate = geometry.getCentroid().getCoordinate();
-      String code = "AUTO:42001,%s,%s".formatted(coordinate.x, coordinate.y);
-      CoordinateReferenceSystem auto = CRS.decode(code);
-
-      MathTransform toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
-      MathTransform fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
-
-      Geometry pGeom = JTS.transform(geometry, toTransform);
-
-      Geometry pBufferedGeom = pGeom.buffer(distanceInMeters, 4, BufferParameters.CAP_FLAT);
-      return JTS.transform(pBufferedGeom, fromTransform);
-    } catch (TransformException | FactoryException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private record NamedEdgeGroup(double percentInBuffer, I18NString name) {
     NamedEdgeGroup {
       Objects.requireNonNull(name);
@@ -270,4 +258,49 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   private record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}
+
+  /**
+   * A class to cache the expensive construction of a Universal Traverse Mercator coordinate
+   * reference system.
+   * Re-using the same CRS for all edges might introduce tiny imprecisions for OTPs use cases
+   * but speeds up the processing enormously and is a price well worth paying.
+   */
+  private static final class PreciseBuffer {
+
+    private final double distanceInMeters;
+    private final MathTransform toTransform;
+    private final MathTransform fromTransform;
+
+    private PreciseBuffer(Coordinate coordinate, double distanceInMeters) {
+      this.distanceInMeters = distanceInMeters;
+      String code = "AUTO:42001,%s,%s".formatted(coordinate.x, coordinate.y);
+      try {
+        CoordinateReferenceSystem auto = CRS.decode(code);
+        this.toTransform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, auto);
+        this.fromTransform = CRS.findMathTransform(auto, DefaultGeographicCRS.WGS84);
+      } catch (FactoryException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    /**
+     * Add a buffer around a geometry that makes sure that the buffer is the same distance (in
+     * meters) anywhere on earth.
+     * <p>
+     * Background: If you call the regular buffer() method on a JTS geometry that uses WGS84 as the
+     * coordinate reference system, the buffer will be accurate at the equator but will become more
+     * and more elongated the farther north/south you go.
+     * <p>
+     * Taken from https://stackoverflow.com/questions/36455020
+     */
+    private Geometry preciseBuffer(Geometry geometry) {
+      try {
+        Geometry pGeom = JTS.transform(geometry, toTransform);
+        Geometry pBufferedGeom = pGeom.buffer(distanceInMeters, 4, BufferParameters.CAP_FLAT);
+        return JTS.transform(pBufferedGeom, fromTransform);
+      } catch (TransformException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 }
