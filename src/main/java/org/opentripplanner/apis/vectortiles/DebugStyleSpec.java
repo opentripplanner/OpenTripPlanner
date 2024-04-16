@@ -50,7 +50,7 @@ public class DebugStyleSpec {
     1,
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
-  private static final Class<Edge>[] ALL_EDGES = new Class[] {
+  private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
     StreetEdge.class,
     AreaEdge.class,
     EscalatorEdge.class,
@@ -83,7 +83,7 @@ public class DebugStyleSpec {
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(MAGENTA)
-          .edgeFilter(ALL_EDGES)
+          .edgeFilter(EDGES_TO_DISPLAY)
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
           .maxZoom(MAX_ZOOM)
@@ -93,7 +93,7 @@ public class DebugStyleSpec {
           .typeSymbol()
           .lineText("name")
           .vectorSourceLayer(edges)
-          .edgeFilter(ALL_EDGES)
+          .edgeFilter(EDGES_TO_DISPLAY)
           .minZoom(17)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
