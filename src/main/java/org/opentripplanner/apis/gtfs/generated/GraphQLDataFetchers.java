@@ -919,6 +919,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> shortName();
 
+    public DataFetcher<Integer> sortOrder();
+
     public DataFetcher<Iterable<Object>> stops();
 
     public DataFetcher<String> textColor();

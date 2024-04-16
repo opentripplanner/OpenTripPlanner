@@ -624,6 +624,9 @@ class DefaultMapper implements OsmTagMapper {
     props.setMixinProperties("foot=discouraged", ofWalkSafety(3));
     props.setMixinProperties("bicycle=discouraged", ofBicycleSafety(3));
 
+    props.setMixinProperties("foot=use_sidepath", ofWalkSafety(5));
+    props.setMixinProperties("bicycle=use_sidepath", ofBicycleSafety(5));
+
     populateNotesAndNames(props);
 
     // slope overrides

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -46,8 +45,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithVertexLinkingTest() {
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
       )
@@ -65,8 +64,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithoutVertexLinkingTest() {
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -99,8 +98,8 @@ public class VehicleParkingLinkingTest {
 
     StreetModelForTest.streetEdge(A, C, StreetTraversalPermission.NONE);
 
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -123,9 +122,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeEntranceWithNonExistingVertexTest() {
-    var vehicleParking = VehicleParking
-      .builder()
-      .id(id("VP"))
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder
@@ -159,9 +157,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
-    var vehicleParking = VehicleParking
-      .builder()
-      .id(id("VP"))
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder

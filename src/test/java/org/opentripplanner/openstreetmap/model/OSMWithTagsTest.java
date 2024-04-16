@@ -136,7 +136,7 @@ public class OSMWithTagsTest {
       assertFalse(tags.isBicycleExplicitlyDenied(), "bicycle=" + allowedValue);
     }
 
-    for (var deniedValue : List.of("no", "dismount", "license", "use_sidepath")) {
+    for (var deniedValue : List.of("no", "dismount", "license")) {
       tags.addTag("bicycle", deniedValue);
       assertTrue(tags.isBicycleExplicitlyDenied(), "bicycle=" + deniedValue);
     }

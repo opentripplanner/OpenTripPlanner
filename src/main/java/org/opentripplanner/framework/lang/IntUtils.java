@@ -104,6 +104,19 @@ public final class IntUtils {
     return requireInRange(value, minInclusive, maxInclusive, null);
   }
 
+  /**
+   * Check if the given {@code value} is null or a non-negative integer.
+   *
+   * @throws IllegalArgumentException
+   */
+  public static Integer requireNullOrNotNegative(Integer value, String field) {
+    if (value == null) {
+      return null;
+    } else {
+      return requireNotNegative(value, field);
+    }
+  }
+
   public static int requireNotNegative(int value, String field) {
     if (value < 0) {
       throw new IllegalArgumentException(

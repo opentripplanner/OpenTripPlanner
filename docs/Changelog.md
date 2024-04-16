@@ -6,6 +6,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 ## 2.6.0-SNAPSHOT (under development)
 
 - ISO-8601 date time for GTFS API itinerary responses [#5660](https://github.com/opentripplanner/OpenTripPlanner/pull/5660)
+- Fix street routing on roundabout [#5732](https://github.com/opentripplanner/OpenTripPlanner/pull/5732)
+- Expose route sort order in GTFS API [#5764](https://github.com/opentripplanner/OpenTripPlanner/pull/5764)
+- Fix issue with cancellations on trip patterns that run after midnight [#5719](https://github.com/opentripplanner/OpenTripPlanner/pull/5719)
+- Fix handling of null transport mode filter [#5789](https://github.com/opentripplanner/OpenTripPlanner/pull/5789)
+- Discourage instead of ban cycling on use_sidepath ways and do the same for walking on foot=use_sidepath [#5790](https://github.com/opentripplanner/OpenTripPlanner/pull/5790)
+- Prune islands with mode-less stop vertices [#5782](https://github.com/opentripplanner/OpenTripPlanner/pull/5782)
+- Overwrite default WALK directMode when it is not set in the request, but modes is set [#5779](https://github.com/opentripplanner/OpenTripPlanner/pull/5779)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

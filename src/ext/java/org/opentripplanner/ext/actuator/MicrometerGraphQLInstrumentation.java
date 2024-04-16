@@ -13,7 +13,6 @@ import graphql.execution.instrumentation.parameters.InstrumentationExecuteOperat
 import graphql.execution.instrumentation.parameters.InstrumentationExecutionParameters;
 import graphql.execution.instrumentation.parameters.InstrumentationExecutionStrategyParameters;
 import graphql.execution.instrumentation.parameters.InstrumentationFieldFetchParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationFieldParameters;
 import graphql.execution.instrumentation.parameters.InstrumentationValidationParameters;
 import graphql.language.Document;
 import graphql.schema.GraphQLTypeUtil;
@@ -22,7 +21,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Using this instrumentation we can precisely measure how queries and data fetchers are executed
@@ -107,19 +105,11 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
   ) {
     return new ExecutionStrategyInstrumentationContext() {
       @Override
-      public void onDispatched(CompletableFuture<ExecutionResult> result) {}
+      public void onDispatched() {}
 
       @Override
       public void onCompleted(ExecutionResult result, Throwable t) {}
     };
-  }
-
-  @Override
-  public InstrumentationContext<ExecutionResult> beginField(
-    InstrumentationFieldParameters parameters,
-    InstrumentationState state
-  ) {
-    return noOp();
   }
 
   @Override

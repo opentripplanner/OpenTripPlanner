@@ -13,9 +13,11 @@ class RequestModesMapperTest {
   void testMapRequestModesEmptyMapReturnsDefaults() {
     Map<String, StreetMode> inputModes = Map.of();
 
+    RequestModes wantModes = RequestModes.of().withDirectMode(null).build();
+
     RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
 
-    assertEquals(RequestModes.of().build(), mappedModes);
+    assertEquals(wantModes, mappedModes);
   }
 
   @Test
@@ -26,6 +28,7 @@ class RequestModesMapperTest {
       .of()
       .withAccessMode(StreetMode.BIKE)
       .withTransferMode(StreetMode.BIKE)
+      .withDirectMode(null)
       .build();
 
     RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
@@ -37,7 +40,11 @@ class RequestModesMapperTest {
   void testMapRequestModesEgressSetReturnsDefaultsForOthers() {
     Map<String, StreetMode> inputModes = Map.of("egressMode", StreetMode.CAR);
 
-    RequestModes wantModes = RequestModes.of().withEgressMode(StreetMode.CAR).build();
+    RequestModes wantModes = RequestModes
+      .of()
+      .withEgressMode(StreetMode.CAR)
+      .withDirectMode(null)
+      .build();
 
     RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
 
