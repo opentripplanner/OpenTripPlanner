@@ -59,15 +59,15 @@
         <otp.serialization.version.id>149</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>31.0</geotools.version>
-        <google.dagger.version>2.51</google.dagger.version>
+        <google.dagger.version>2.51.1</google.dagger.version>
         <jackson.version>2.17.0</jackson.version>
-        <jersey.version>3.1.5</jersey.version>
+        <jersey.version>3.1.6</jersey.version>
         <junit.version>5.10.2</junit.version>
         <micrometer.version>1.12.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.5.3</logback.version>
-        <lucene.version>9.9.1</lucene.version>
-        <slf4j.version>2.0.12</slf4j.version>
+        <lucene.version>9.10.0</lucene.version>
+        <slf4j.version>2.0.13</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.26</siri-java-model.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -185,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -312,7 +312,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.12</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -444,7 +444,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -586,20 +586,6 @@
             <version>${google.dagger.version}</version>
         </dependency>
 
-        <!-- JSON AST, not used much and is a good candidate for removal -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-            <exclusions>
-                <!-- This includes a dependency on an ancient version of Junit which we want to exclude -->
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
 
@@ -688,7 +674,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.26</version>
+            <version>3.1.1</version>
         </dependency>
 
         <!-- TESTING -->
@@ -707,7 +693,7 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.2.1</version>
+            <version>1.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

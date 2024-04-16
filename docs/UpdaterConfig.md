@@ -92,20 +92,20 @@ The information is downloaded in a single HTTP request and polled regularly.
 | Config Parameter                                                      |       Type      | Summary                                                                    |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------------|:-----:|
 | type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
+| [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Required* |                      |  1.5  |
 | frequency                                                             |    `duration`   | How often the data should be downloaded.                                   | *Optional* | `"PT1M"`             |  1.5  |
 | fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                                    | *Optional* | `false`              |  1.5  |
-| [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
-| [headers](#u__5__headers)                                             | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |                      |  2.3  |
+| [url](#u__6__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
+| [headers](#u__6__headers)                                             | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |                      |  2.3  |
 
 
 ##### Parameter details
 
-<h4 id="u__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__6__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
-**Path:** /updaters/[5]   
+**Path:** /updaters/[6]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -124,19 +124,19 @@ How backwards propagation should be handled.
   The updated times are exposed through APIs.
 
 
-<h4 id="u__5__url">url</h4>
+<h4 id="u__6__url">url</h4>
 
 **Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[5] 
+**Path:** /updaters/[6] 
 
 The URL of the GTFS-RT resource.
 
 `file:` URLs are also supported if you want to read a file from the local disk.
 
-<h4 id="u__5__headers">headers</h4>
+<h4 id="u__6__headers">headers</h4>
 
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[5] 
+**Path:** /updaters/[6] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
@@ -178,7 +178,7 @@ This system powers the realtime updates in Helsinki and more information can be 
 | Config Parameter                                                      |    Type   | Summary                                      |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|----------------------------------------------|:----------:|----------------------|:-----:|
 | type = "mqtt-gtfs-rt-updater"                                         |   `enum`  | The type of the updater.                     | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled. | *Optional* | `"required-no-data"` |  2.2  |
+| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled. | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                |  `string` | The feed id to apply the updates to.         | *Required* |                      |  2.0  |
 | fuzzyTripMatching                                                     | `boolean` | Whether to match trips fuzzily.              | *Optional* | `false`              |  2.0  |
 | qos                                                                   | `integer` | QOS level.                                   | *Optional* | `0`                  |  2.0  |
@@ -188,10 +188,10 @@ This system powers the realtime updates in Helsinki and more information can be 
 
 ##### Parameter details
 
-<h4 id="u__6__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
+<h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
-**Path:** /updaters/[6]   
+**Path:** /updaters/[7]   
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -247,24 +247,24 @@ The information is downloaded in a single HTTP request and polled regularly.
 | frequency                   |    `duration`   | How often the positions should be updated.                                 | *Optional* | `"PT1M"`      |  2.2  |
 | fuzzyTripMatching           |    `boolean`    | Whether to match trips fuzzily.                                            | *Optional* | `false`       |  2.5  |
 | url                         |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
-| [features](#u__7__features) |    `enum set`   | Which features of GTFS RT vehicle positions should be loaded into OTP.     | *Optional* |               |  2.5  |
-| [headers](#u__7__headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
+| [features](#u__8__features) |    `enum set`   | Which features of GTFS RT vehicle positions should be loaded into OTP.     | *Optional* |               |  2.5  |
+| [headers](#u__8__headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
 
-<h4 id="u__7__features">features</h4>
+<h4 id="u__8__features">features</h4>
 
 **Since version:** `2.5` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[7]   
+**Path:** /updaters/[8]   
 **Enum values:** `position` | `stop-position` | `occupancy`
 
 Which features of GTFS RT vehicle positions should be loaded into OTP.
 
-<h4 id="u__7__headers">headers</h4>
+<h4 id="u__8__headers">headers</h4>
 
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[7] 
+**Path:** /updaters/[8] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 

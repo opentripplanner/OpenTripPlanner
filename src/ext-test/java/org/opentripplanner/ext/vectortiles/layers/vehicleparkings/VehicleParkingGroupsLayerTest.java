@@ -144,7 +144,7 @@ public class VehicleParkingGroupsLayerTest {
     assertEquals("groupName", map.get("name").toString());
 
     assertEquals(
-      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"name\",\"id\":\"F:id\"}]",
+      "[{\"carPlaces\":true,\"bicyclePlaces\":false,\"id\":\"F:id\",\"name\":\"name\"}]",
       map.get("vehicleParking")
     );
   }
@@ -162,7 +162,7 @@ public class VehicleParkingGroupsLayerTest {
     assertEquals("groupDE", map.get("name").toString());
 
     assertEquals(
-      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"DE\",\"id\":\"F:id\"}]",
+      "[{\"carPlaces\":true,\"bicyclePlaces\":false,\"id\":\"F:id\",\"name\":\"DE\"}]",
       map.get("vehicleParking")
     );
   }
