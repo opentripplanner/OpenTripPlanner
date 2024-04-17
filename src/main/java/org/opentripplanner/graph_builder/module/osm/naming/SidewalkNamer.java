@@ -30,6 +30,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -71,23 +72,20 @@ public class SidewalkNamer implements EdgeNamer {
   }
 
   @Override
-  public void recordEdge(OSMWithTags way, StreetEdge edge) {
+  public void recordEdges(OSMWithTags way, StreetEdgePair pair) {
     if (way.isSidewalk() && way.needsFallbackName() && !way.isExplicitlyUnnamed()) {
-      unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels()));
+      pair
+        .asIterable()
+        .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels())));
     }
     if (way.isNamed() && !way.isLink()) {
       // we generate two edges for each osm way: one there and one back. since we don't do any routing
       // in this class we don't need the two directions and keep only one of them.
-      var containsReverse = streetEdges
-        .query(edge.getGeometry().getEnvelopeInternal())
-        .stream()
-        .anyMatch(candidate -> candidate.edge.isReverseOf(edge));
-      if (!containsReverse) {
-        streetEdges.insert(
-          edge.getGeometry().getEnvelopeInternal(),
-          new EdgeOnLevel(edge, way.getLevels())
-        );
-      }
+      var edge = pair.pickAny();
+      streetEdges.insert(
+        edge.getGeometry().getEnvelopeInternal(),
+        new EdgeOnLevel(edge, way.getLevels())
+      );
     }
   }
 

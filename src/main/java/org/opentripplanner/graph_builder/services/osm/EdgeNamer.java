@@ -3,13 +3,13 @@ package org.opentripplanner.graph_builder.services.osm;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.SidewalkNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
-import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
  * Interface responsible for naming edges of the street graph. It allows you to write your own
@@ -25,11 +25,11 @@ public interface EdgeNamer {
    * Callback function for each way/edge combination so that more complicated names can be built
    * in the post-processing step.
    */
-  void recordEdge(OSMWithTags way, StreetEdge edge);
+  void recordEdges(OSMWithTags way, StreetEdgePair edge);
 
   /**
    * Called after each edge has been named to build a more complex name out of the relationships
-   * tracked in {@link EdgeNamer#recordEdge(OSMWithTags, StreetEdge)}.
+   * tracked in {@link EdgeNamer#recordEdges(OSMWithTags, StreetEdgePair)}.
    */
   void postprocess();
 

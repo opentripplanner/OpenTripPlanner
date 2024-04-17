@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
@@ -92,7 +93,7 @@ class SidewalkNamerTest {
     }
 
     void postProcess(EdgeNamer namer) {
-      pairs.forEach(p -> namer.recordEdge(p.way, p.edge));
+      pairs.forEach(p -> namer.recordEdges(p.way, new StreetEdgePair(p.edge, null)));
       namer.postprocess();
     }
 
