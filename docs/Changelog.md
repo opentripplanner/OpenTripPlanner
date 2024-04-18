@@ -14,6 +14,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Prune islands with mode-less stop vertices [#5782](https://github.com/opentripplanner/OpenTripPlanner/pull/5782)
 - Overwrite default WALK directMode when it is not set in the request, but modes is set [#5779](https://github.com/opentripplanner/OpenTripPlanner/pull/5779)
 - Fix trip duplication in Graph Builder DSJ mapping [#5794](https://github.com/opentripplanner/OpenTripPlanner/pull/5794)
+- Optionally abort startup when unknown configuration parameters were detected [#5676](https://github.com/opentripplanner/OpenTripPlanner/pull/5676)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
