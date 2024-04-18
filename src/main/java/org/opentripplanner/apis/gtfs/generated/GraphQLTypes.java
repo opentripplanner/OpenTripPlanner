@@ -3114,6 +3114,12 @@ public class GraphQLTypes {
     TRIPS,
   }
 
+  public enum GraphQLStopPositionType {
+    FIRST,
+    LAST,
+    MIDDLE,
+  }
+
   public static class GraphQLStoptimeHeadsignArgs {
 
     private String language;
@@ -3300,12 +3306,6 @@ public class GraphQLTypes {
     ROUTE_TYPE,
     STOPS_ON_TRIP,
     TRIP,
-  }
-
-  public enum GraphQLTripPosition {
-    FIRST,
-    LAST,
-    MIDDLE,
   }
 
   public static class GraphQLVehicleParkingNameArgs {

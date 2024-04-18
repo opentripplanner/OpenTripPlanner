@@ -3929,8 +3929,13 @@ type StopOnTrip {
     trip: Trip!
 }
 
-enum TripPosition {
-    FIRST, MIDDLE, LAST
+enum StopPositionType {
+    "The stop time is the first stop on the trip."
+    FIRST,
+    "The stop time is neither the first nor the last stop on the trip."
+    MIDDLE,
+    "The stop time is the last stop on the trip."
+    LAST
 }
 
 """
@@ -3953,6 +3958,9 @@ type Stoptime {
     even generated.
     """
     stopPosition: Int
+
+    "If the stop time is the first or last in the trip, or neither of those."
+    stopPositionType: StopPositionType
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date
@@ -4027,8 +4035,6 @@ type Stoptime {
     feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
     """
     language: String): String
-
-    tripPosition: TripPosition
 }
 
 """Stoptimes grouped by pattern"""

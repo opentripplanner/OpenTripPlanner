@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-public enum PositionInTrip {
+public enum StopPositionType {
   FIRST,
   MIDDLE,
   LAST,

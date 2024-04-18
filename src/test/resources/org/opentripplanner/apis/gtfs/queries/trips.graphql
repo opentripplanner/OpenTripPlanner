@@ -3,9 +3,9 @@ query {
         gtfsId
         stoptimes {
             stopPosition
+            stopPositionType
             scheduledArrival
             scheduledDeparture
-            tripPosition
         }
     }
 }

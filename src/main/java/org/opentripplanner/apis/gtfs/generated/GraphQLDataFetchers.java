@@ -19,8 +19,8 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopPositionType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTripPosition;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
@@ -1022,11 +1022,11 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> stopPosition();
 
+    public DataFetcher<GraphQLStopPositionType> stopPositionType();
+
     public DataFetcher<Boolean> timepoint();
 
     public DataFetcher<Trip> trip();
-
-    public DataFetcher<GraphQLTripPosition> tripPosition();
   }
 
   /** Stoptimes grouped by pattern */

@@ -25,9 +25,9 @@ class TripTimeOnDateTest implements PlanTestConstants {
 
   @Test
   void tripPosition() {
-    assertEquals(PositionInTrip.FIRST, buildTripTimeOnDate(0).positionInTrip());
-    assertEquals(PositionInTrip.MIDDLE, buildTripTimeOnDate(1).positionInTrip());
-    assertEquals(PositionInTrip.LAST, buildTripTimeOnDate(2).positionInTrip());
+    assertEquals(StopPositionType.FIRST, buildTripTimeOnDate(0).stopPositionType());
+    assertEquals(StopPositionType.MIDDLE, buildTripTimeOnDate(1).stopPositionType());
+    assertEquals(StopPositionType.LAST, buildTripTimeOnDate(2).stopPositionType());
   }
 
   private static TripTimeOnDate buildTripTimeOnDate(int stopIndex) {

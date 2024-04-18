@@ -1,15 +1,15 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTripPosition;
-import org.opentripplanner.model.PositionInTrip;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopPositionType;
+import org.opentripplanner.model.StopPositionType;
 
 public class TripPositionMapper {
 
-  public static GraphQLTripPosition map(PositionInTrip tripPosition) {
+  public static GraphQLStopPositionType map(StopPositionType tripPosition) {
     return switch (tripPosition) {
-      case FIRST -> GraphQLTripPosition.FIRST;
-      case MIDDLE -> GraphQLTripPosition.MIDDLE;
-      case LAST -> GraphQLTripPosition.LAST;
+      case FIRST -> GraphQLStopPositionType.FIRST;
+      case MIDDLE -> GraphQLStopPositionType.MIDDLE;
+      case LAST -> GraphQLStopPositionType.LAST;
     };
   }
 }

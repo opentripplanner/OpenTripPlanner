@@ -269,13 +269,16 @@ public class TripTimeOnDate {
     return tripTimes.getDropOffBookingInfo(stopIndex);
   }
 
-  public PositionInTrip positionInTrip() {
+  /**
+   * If this stop time is the first or last of the trip, or any stop in between.
+   */
+  public StopPositionType stopPositionType() {
     if (stopIndex == 0) {
-      return PositionInTrip.FIRST;
+      return StopPositionType.FIRST;
     } else if (stopIndex == tripPattern.numberOfStops() - 1) {
-      return PositionInTrip.LAST;
+      return StopPositionType.LAST;
     } else {
-      return PositionInTrip.MIDDLE;
+      return StopPositionType.MIDDLE;
     }
   }
 }

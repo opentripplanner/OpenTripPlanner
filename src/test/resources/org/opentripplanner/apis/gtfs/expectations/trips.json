@@ -6,21 +6,21 @@
         "stoptimes" : [
           {
             "stopPosition" : 10,
+            "stopPositionType" : "FIRST",
             "scheduledArrival" : 39600,
-            "scheduledDeparture" : 39600,
-            "tripPosition" : "FIRST"
+            "scheduledDeparture" : 39600
           },
           {
             "stopPosition" : 20,
+            "stopPositionType" : "MIDDLE",
             "scheduledArrival" : 39900,
-            "scheduledDeparture" : 39900,
-            "tripPosition" : "MIDDLE"
+            "scheduledDeparture" : 39900
           },
           {
             "stopPosition" : 30,
+            "stopPositionType" : "LAST",
             "scheduledArrival" : 40200,
-            "scheduledDeparture" : 40200,
-            "tripPosition" : "LAST"
+            "scheduledDeparture" : 40200
           }
         ]
       }
