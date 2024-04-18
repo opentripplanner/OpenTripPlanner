@@ -1,0 +1,29 @@
+{
+  "data" : {
+    "trips" : [
+      {
+        "gtfsId" : "F:123",
+        "stoptimes" : [
+          {
+            "stopPosition" : 10,
+            "scheduledArrival" : 39600,
+            "scheduledDeparture" : 39600,
+            "tripPosition" : "FIRST"
+          },
+          {
+            "stopPosition" : 20,
+            "scheduledArrival" : 39900,
+            "scheduledDeparture" : 39900,
+            "tripPosition" : "MIDDLE"
+          },
+          {
+            "stopPosition" : 30,
+            "scheduledArrival" : 40200,
+            "scheduledDeparture" : 40200,
+            "tripPosition" : "LAST"
+          }
+        ]
+      }
+    ]
+  }
+}

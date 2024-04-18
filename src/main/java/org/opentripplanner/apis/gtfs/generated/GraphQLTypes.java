@@ -3302,6 +3302,12 @@ public class GraphQLTypes {
     TRIP,
   }
 
+  public enum GraphQLTripPosition {
+    FIRST,
+    LAST,
+    MIDDLE,
+  }
+
   public static class GraphQLVehicleParkingNameArgs {
 
     private String language;

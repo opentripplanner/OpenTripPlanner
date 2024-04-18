@@ -3929,6 +3929,10 @@ type StopOnTrip {
     trip: Trip!
 }
 
+enum TripPosition {
+    FIRST, MIDDLE, LAST
+}
+
 """
 Stoptime represents the time when a specific trip arrives to or departs from a specific stop.
 """
@@ -4023,6 +4027,8 @@ type Stoptime {
     feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
     """
     language: String): String
+
+    tripPosition: TripPosition
 }
 
 """Stoptimes grouped by pattern"""

@@ -268,4 +268,14 @@ public class TripTimeOnDate {
   public BookingInfo getDropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(stopIndex);
   }
+
+  public PositionInTrip positionInTrip() {
+    if (stopIndex == 0) {
+      return PositionInTrip.FIRST;
+    } else if (stopIndex == tripPattern.numberOfStops() - 1) {
+      return PositionInTrip.LAST;
+    } else {
+      return PositionInTrip.MIDDLE;
+    }
+  }
 }

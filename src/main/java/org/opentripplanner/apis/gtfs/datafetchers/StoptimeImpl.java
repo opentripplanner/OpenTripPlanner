@@ -3,6 +3,8 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTripPosition;
+import org.opentripplanner.apis.gtfs.mapping.TripPositionMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -107,6 +109,11 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).getTrip();
+  }
+
+  @Override
+  public DataFetcher<GraphQLTripPosition> tripPosition() {
+    return environment -> TripPositionMapper.map(getSource(environment).positionInTrip());
   }
 
   private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
