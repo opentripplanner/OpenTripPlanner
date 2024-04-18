@@ -560,7 +560,7 @@ public class NodeAdapterTest {
   @Test
   void unknownParameters() {
     // Given: two parameters a and b
-    NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+    var subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
     // When: Access ONLY parameter 'a', but not 'b'
     subject.of("foo").asObject().of("a").asBoolean();
@@ -571,7 +571,7 @@ public class NodeAdapterTest {
   @Test
   void allParametersAreKnown() {
     // Given: two parameters a and b
-    NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+    var subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
 
     var object = subject.of("foo").asObject();
     object.of("a").asBoolean();
