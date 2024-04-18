@@ -76,6 +76,7 @@ nav:
     - Router: 'RouterConfiguration.md'
     - "Route Request": 'RouteRequest.md'
     - "Realtime Updaters": 'UpdaterConfig.md'
+    - "Migrating between versions/builds": 'Migrating-Configuration.md'
 - Features explained:
     - "Routing modes": 'RoutingModes.md'
     - "In-station navigation": 'In-Station-Navigation.md'
