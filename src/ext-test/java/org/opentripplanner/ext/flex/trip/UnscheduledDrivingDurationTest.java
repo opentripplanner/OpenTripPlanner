@@ -13,6 +13,7 @@ import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 class UnscheduledDrivingDurationTest {
 
@@ -34,7 +35,7 @@ class UnscheduledDrivingDurationTest {
     var trip = UnscheduledTrip
       .of(id("1"))
       .withStopTimes(List.of(STOP_TIME))
-      .withDurationModifier(new DurationModifier(Duration.ofMinutes(2), 1.5f))
+      .withDurationModifier(TimePenalty.of(Duration.ofMinutes(2), 1.5f))
       .build();
 
     var calculator = trip.flexPathCalculator(STATIC_CALCULATOR);

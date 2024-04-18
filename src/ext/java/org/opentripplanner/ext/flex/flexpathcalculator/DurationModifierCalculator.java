@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.flex.trip.DurationModifier;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
@@ -11,11 +11,11 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class DurationModifierCalculator implements FlexPathCalculator {
 
   private final FlexPathCalculator delegate;
-  private final DurationModifier factors;
+  private final TimePenalty factors;
 
-  public DurationModifierCalculator(FlexPathCalculator delegate, DurationModifier factors) {
+  public DurationModifierCalculator(FlexPathCalculator delegate, TimePenalty penalty) {
     this.delegate = delegate;
-    this.factors = factors;
+    this.factors = penalty;
   }
 
   @Nullable

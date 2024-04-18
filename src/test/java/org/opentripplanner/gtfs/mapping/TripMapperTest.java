@@ -131,7 +131,7 @@ public class TripMapperTest {
     var mapper = defaultTripMapper();
     var mapped = mapper.map(flexTrip);
     var mod = mapper.flexSafeDurationModifiers().get(mapped);
-    assertEquals(1.5f, mod.factor());
-    assertEquals(600, mod.offsetInSeconds());
+    assertEquals(1.5f, mod.coefficient());
+    assertEquals(600, mod.constant().toSeconds());
   }
 }

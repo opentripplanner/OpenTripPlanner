@@ -2,13 +2,14 @@ package org.opentripplanner.ext.flex.trip;
 
 import java.util.List;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class UnscheduledTripBuilder
   extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder> {
 
   private List<StopTime> stopTimes;
-  private DurationModifier durationModifier = DurationModifier.NONE;
+  private TimePenalty durationModifier = TimePenalty.ZERO;
 
   UnscheduledTripBuilder(FeedScopedId id) {
     super(id);
@@ -30,12 +31,12 @@ public class UnscheduledTripBuilder
     return stopTimes;
   }
 
-  public UnscheduledTripBuilder withDurationModifier(DurationModifier factors) {
+  public UnscheduledTripBuilder withDurationModifier(TimePenalty factors) {
     this.durationModifier = factors;
     return this;
   }
 
-  public DurationModifier durationModifier() {
+  public TimePenalty durationModifier() {
     return durationModifier;
   }
 

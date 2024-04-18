@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 import javax.annotation.concurrent.Immutable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.flex.trip.DurationModifier;
+import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 /**
  * This class contains the results from a FlexPathCalculator.
@@ -25,7 +27,7 @@ public class FlexPath {
    */
   public FlexPath(int distanceMeters, int durationSeconds, Supplier<LineString> geometrySupplier) {
     this.distanceMeters = distanceMeters;
-    this.durationSeconds = durationSeconds;
+    this.durationSeconds = IntUtils.requireNotNegative(durationSeconds);
     this.geometrySupplier = geometrySupplier;
   }
 
@@ -39,8 +41,12 @@ public class FlexPath {
   /**
    * Returns an (immutable) copy of this path with the duration modified.
    */
-  public FlexPath withDurationModifier(DurationModifier mod) {
-    int updatedDuration = (int) ((durationSeconds * mod.factor()) + mod.offsetInSeconds());
-    return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
+  public FlexPath withDurationModifier(TimePenalty mod) {
+    if (mod.isZero()) {
+      return this;
+    } else {
+      int updatedDuration = (int) mod.calculate(Duration.ofSeconds(durationSeconds)).toSeconds();
+      return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
+    }
   }
 }

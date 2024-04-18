@@ -23,6 +23,7 @@ import org.opentripplanner.framework.lang.IntRange;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -52,7 +53,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  private final DurationModifier durationModifier;
+  private final TimePenalty durationModifier;
 
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
@@ -154,7 +155,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    * If the modifier doesn't actually modify, we don't
    */
   protected FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
-    if (durationModifier.modifies()) {
+    if (!durationModifier.isZero()) {
       return new DurationModifierCalculator(calculator, durationModifier);
     } else {
       return calculator;
