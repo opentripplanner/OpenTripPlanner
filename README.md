@@ -1,7 +1,9 @@
 ## Overview
 
 [![Join the chat at https://gitter.im/opentripplanner/OpenTripPLanner](https://badges.gitter.im/opentripplanner/OpenTripPlanner.svg)](https://gitter.im/opentripplanner/OpenTripPlanner)
+[![Matrix](https://img.shields.io/matrix/opentripplanner%3Amatrix.org?label=Matrix%20chat)](https://matrix.to/#/#opentripplanner_OpenTripPlanner:gitter.im)
 [![codecov](https://codecov.io/gh/opentripplanner/OpenTripPlanner/branch/dev-2.x/graph/badge.svg?token=ak4PbIKgZ1)](https://codecov.io/gh/opentripplanner/OpenTripPlanner)
+[![Commit activity](https://img.shields.io/github/commit-activity/y/opentripplanner/OpenTripPlanner)](https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors)
 [![Docker Pulls](https://img.shields.io/docker/pulls/opentripplanner/opentripplanner)](https://hub.docker.com/r/opentripplanner/opentripplanner)
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled
@@ -14,7 +16,7 @@ GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate 
 clients, finding itineraries that account for disruptions and service changes.
 
 Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has
-been under development since 2018. The latest version of OTP is v2.4.0, released in September 2023.
+been under development since 2018. The latest version of OTP is v2.5.0, released in March 2024.
 
 If you do not want to use this version, please switch to the final 1.x release
 tag `v1.5.0` or the `dev-1.x` branch.
@@ -71,5 +73,5 @@ found in the main documentation.
 
 ## OTP Ecosystem
 
-- [awesome-transit](https://github.com/CUTR-at-USF/awesome-transit) Community list of transit APIs,
+- [awesome-transit](https://github.com/MobilityData/awesome-transit) Community list of transit APIs,
   apps, datasets, research, and software.

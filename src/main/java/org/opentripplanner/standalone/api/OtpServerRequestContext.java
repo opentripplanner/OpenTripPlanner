@@ -26,6 +26,7 @@ import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -98,6 +99,8 @@ public interface OtpServerRequestContext {
   @Nullable
   StopConsolidationService stopConsolidationService();
 
+  StreetLimitationParametersService streetLimitationParametersService();
+
   MeterRegistry meterRegistry();
 
   @Nullable
@@ -114,7 +117,7 @@ public interface OtpServerRequestContext {
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
+    return GraphFinder.getInstance(graph(), transitService()::findRegularStops);
   }
 
   FlexConfig flexConfig();

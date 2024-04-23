@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -68,7 +69,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  protected void runPolling() throws Exception {
+  protected void runPolling() {
     LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
@@ -238,5 +239,10 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         .forEach(graph::removeEdge);
       graph.remove(entranceVertex);
     }
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("source", source).toString();
   }
 }

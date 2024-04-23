@@ -39,8 +39,8 @@ public class TemporaryVerticesContainerTest {
   private final Graph g = new Graph(new Deduplicator());
 
   private final StreetVertex a = StreetModelForTest.intersectionVertex("A", 1.0, 1.0);
-  private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 0.0, 1.0);
-  private final StreetVertex c = StreetModelForTest.intersectionVertex("C", 1.0, 0.0);
+  private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 1.0, 0.0);
+  private final StreetVertex c = StreetModelForTest.intersectionVertex("C", 0.0, 1.0);
   private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
   // - And travel *origin* is 0,4 degrees on the road from B to A
   private final GenericLocation from = new GenericLocation(1.0, 0.4);

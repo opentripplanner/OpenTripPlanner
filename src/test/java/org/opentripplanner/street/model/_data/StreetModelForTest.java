@@ -9,6 +9,10 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -26,16 +30,16 @@ public class StreetModelForTest {
   public static StreetVertex V4 = intersectionVertex("V4", 3, 3);
 
   public static IntersectionVertex intersectionVertex(Coordinate c) {
-    return intersectionVertex(c.x, c.y);
+    return intersectionVertex(c.y, c.x);
   }
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new LabelledIntersectionVertex(label, lat, lon, false, false);
+    return new LabelledIntersectionVertex(label, lon, lat, false, false);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new LabelledIntersectionVertex(label, lat, lon, false, false);
+    return new LabelledIntersectionVertex(label, lon, lat, false, false);
   }
 
   @Nonnull
@@ -92,5 +96,24 @@ public class StreetModelForTest {
     StreetTraversalPermission permissions
   ) {
     return streetEdge(from, to, 1, permissions);
+  }
+
+  public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
+    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder
+      .of()
+      .withLatitude(-122.575133)
+      .withLongitude(45.456773);
+    if (formFactor == RentalFormFactor.SCOOTER) {
+      rentalVehicleBuilder.withVehicleScooter();
+    } else if (formFactor == RentalFormFactor.BICYCLE) {
+      rentalVehicleBuilder.withVehicleBicycle();
+    } else if (formFactor == RentalFormFactor.CAR) {
+      rentalVehicleBuilder.withVehicleCar();
+    }
+    return new VehicleRentalPlaceVertex(rentalVehicleBuilder.build());
+  }
+
+  public static VehicleParking.VehicleParkingBuilder vehicleParking() {
+    return VehicleParking.builder().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
   }
 }

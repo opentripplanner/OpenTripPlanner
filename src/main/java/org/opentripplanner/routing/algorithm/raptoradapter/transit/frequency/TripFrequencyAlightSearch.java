@@ -55,7 +55,7 @@ public final class TripFrequencyAlightSearch<T extends DefaultTripSchedule>
             arrivalTime + headway,
             headway,
             offset,
-            pattern.getLocalDate()
+            pattern.getServiceDate()
           );
         }
       }

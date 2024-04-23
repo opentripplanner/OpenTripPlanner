@@ -18,7 +18,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -46,7 +46,7 @@ public class StreetEdgeTest {
   public void before() {
     v0 = intersectionVertex("maple_0th", 0.0, 0.0); // label, X, Y
     v1 = intersectionVertex("maple_1st", 2.0, 2.0);
-    v2 = intersectionVertex("maple_2nd", 1.0, 2.0);
+    v2 = intersectionVertex("maple_2nd", 2.0, 1.0);
 
     this.proto =
       StreetSearchRequest
@@ -58,7 +58,7 @@ public class StreetEdgeTest {
             .withBike(it ->
               it.withSpeed(5.0f).withReluctance(1.0).withWalking(w -> w.withSpeed(0.8))
             )
-            .withCar(c -> c.withSpeed(15.0f).withReluctance(1.0))
+            .withCar(c -> c.withReluctance(1.0))
         )
         .build();
   }
@@ -73,7 +73,7 @@ public class StreetEdgeTest {
     assertEquals(90, e1.getOutAngle());
 
     // 2 new ones
-    StreetVertex u = intersectionVertex("test1", 2.0, 1.0);
+    StreetVertex u = intersectionVertex("test1", 1.0, 2.0);
     StreetVertex v = intersectionVertex("test2", 2.0, 2.0);
 
     // Second edge, heading straight North
@@ -221,7 +221,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
     noPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(0).withHopCost(0)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(0).withMountDismountCost(0)))
     );
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
@@ -231,7 +231,7 @@ public class StreetEdgeTest {
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
     withPenalty.withPreferences(p ->
-      p.withBike(it -> it.withWalking(w -> w.withHopTime(42).withHopCost(23)))
+      p.withBike(it -> it.withWalking(w -> w.withMountDismountTime(42).withMountDismountCost(23)))
     );
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
@@ -357,7 +357,7 @@ public class StreetEdgeTest {
         .withBike(bike ->
           bike
             .withSpeed(SPEED)
-            .withOptimizeType(BicycleOptimizeType.TRIANGLE)
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
             .withReluctance(1)
         )

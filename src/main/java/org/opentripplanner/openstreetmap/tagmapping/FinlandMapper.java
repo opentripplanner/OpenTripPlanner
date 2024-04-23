@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
@@ -163,9 +164,15 @@ class FinlandMapper implements OsmTagMapper {
     props.setProperties("highway=service;tunnel=yes;access=destination", withModes(NONE));
     props.setProperties("highway=service;access=destination", withModes(ALL).bicycleSafety(1.1));
 
-    /*
-     * Automobile speeds in Finland. General speed limit is 80kph unless signs says otherwise.
-     */
+    // Typically if this tag is used on a way, there is also a better option for walking.
+    // We don't need to set bicycle safety as cycling is not currently allowed on these ways.
+    props.setMixinProperties("bicycle=use_sidepath", ofWalkSafety(5));
+
+    // Automobile speeds in Finland.
+    // General speed limit is 80kph unless signs says otherwise.
+    props.defaultCarSpeed = 22.22f;
+    // 120kph is the max speed limit in Finland
+    props.maxPossibleCarSpeed = 33.34f;
     // = 100kph. Varies between 80 - 120 kph depending on road and season.
     props.setCarSpeed("highway=motorway", 27.77f);
     // = 54kph

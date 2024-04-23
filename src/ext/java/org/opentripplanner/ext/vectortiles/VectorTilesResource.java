@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
+import org.opentripplanner.ext.vectortiles.layers.areastops.AreaStopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -28,6 +29,7 @@ import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVeh
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
@@ -67,7 +69,7 @@ public class VectorTilesResource {
       locale,
       Arrays.asList(requestedLayers.split(",")),
       serverContext.vectorTileConfig().layers(),
-      VectorTilesResource::crateLayerBuilder,
+      VectorTilesResource::createLayerBuilder,
       serverContext
     );
   }
@@ -81,13 +83,6 @@ public class VectorTilesResource {
     @PathParam("layers") String requestedLayers
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
-    var feedInfos = serverContext
-      .transitService()
-      .getFeedIds()
-      .stream()
-      .map(serverContext.transitService()::getFeedInfo)
-      .filter(Predicate.not(Objects::isNull))
-      .toList();
 
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
@@ -101,10 +96,27 @@ public class VectorTilesResource {
         TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
-    return new TileJson(url, envelope, feedInfos);
+    return serverContext
+      .vectorTileConfig()
+      .attribution()
+      .map(attr -> new TileJson(url, envelope, attr))
+      .orElseGet(() -> {
+        var feedInfos = getFeedInfos();
+        return new TileJson(url, envelope, feedInfos);
+      });
   }
 
-  private static LayerBuilder<?> crateLayerBuilder(
+  private List<FeedInfo> getFeedInfos() {
+    return serverContext
+      .transitService()
+      .getFeedIds()
+      .stream()
+      .map(serverContext.transitService()::getFeedInfo)
+      .filter(Predicate.not(Objects::isNull))
+      .toList();
+  }
+
+  private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
     OtpServerRequestContext context
@@ -112,6 +124,7 @@ public class VectorTilesResource {
     return switch (layerParameters.type()) {
       case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
+      case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
         context.vehicleRentalService(),
         layerParameters,
@@ -142,6 +155,7 @@ public class VectorTilesResource {
   public enum LayerType {
     Stop,
     Station,
+    AreaStop,
     VehicleRental,
     VehicleRentalVehicle,
     VehicleRentalStation,

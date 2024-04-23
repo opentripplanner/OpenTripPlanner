@@ -95,11 +95,11 @@ public class TripPatternTest {
     List<LineString> geometry
   ) {
     var builder = StopPattern.create(2);
-    builder.stops[0] = origin;
-    builder.stops[1] = destination;
+    builder.stops.with(0, origin);
+    builder.stops.with(1, destination);
     for (int i = 0; i < 2; i++) {
-      builder.pickups[i] = PickDrop.SCHEDULED;
-      builder.dropoffs[i] = PickDrop.SCHEDULED;
+      builder.pickups.with(i, PickDrop.SCHEDULED);
+      builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
 
     var stopPattern = builder.build();

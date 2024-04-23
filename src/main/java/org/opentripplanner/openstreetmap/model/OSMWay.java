@@ -106,20 +106,6 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
-   * Returns true if bikes must use sidepath in forward direction
-   */
-  public boolean isForwardDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:forward"));
-  }
-
-  /**
-   * Returns true if bikes must use sidepath in reverse direction
-   */
-  public boolean isReverseDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:backward"));
-  }
-
-  /**
    * Some cycleways allow contraflow biking.
    */
   public boolean isOpposableCycleway() {
@@ -182,18 +168,6 @@ public class OSMWay extends OSMWithTags {
         permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
         permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
       }
-    }
-
-    //This needs to be after adding permissions for oneway:bicycle=no
-    //removes bicycle permission when bicycles need to use sidepath
-    //TAG: bicycle:forward=use_sidepath
-    if (isForwardDirectionSidepath()) {
-      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
-    }
-
-    //TAG bicycle:backward=use_sidepath
-    if (isReverseDirectionSidepath()) {
-      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
     }
 
     if (isOpposableCycleway()) {

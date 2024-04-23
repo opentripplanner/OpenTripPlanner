@@ -26,10 +26,18 @@
       }
     },
     "car": {
-      "speed": 40,
       "reluctance": 4.0,
       "decelerationSpeed": 2.9,
       "accelerationSpeed": 2.9,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      }
+    },
+    "scooter": {
+      "speed": 5,
+      "reluctance": 5.0,
       "rental": {
         "pickupCost": 120,
         "dropOffTime": "30s",

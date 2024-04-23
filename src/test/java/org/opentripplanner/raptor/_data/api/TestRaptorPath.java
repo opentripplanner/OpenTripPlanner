@@ -3,6 +3,7 @@ package org.opentripplanner.raptor._data.api;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
@@ -18,9 +19,9 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
  */
 public record TestRaptorPath(
   int rangeRaptorIterationDepartureTime,
-  int startTime,
-  int endTime,
-  int durationInSeconds,
+  int startTimeInclusivePenalty,
+  int endTimeInclusivePenalty,
+  int durationInclusivePenaltyInSeconds,
   int numberOfTransfers,
   int c1,
   int c2
@@ -28,6 +29,18 @@ public record TestRaptorPath(
   implements RaptorPath<RaptorTripSchedule> {
   private static final String NOT_IMPLEMENTED_MESSAGE =
     "Use the real Path implementation if you need legs...";
+
+  @Override
+  public int startTime() {
+    // This should not be used in the pareto comparison.
+    return RaptorConstants.TIME_NOT_SET;
+  }
+
+  @Override
+  public int endTime() {
+    // This should not be used in the pareto comparison.
+    return RaptorConstants.TIME_NOT_SET;
+  }
 
   @Override
   public int numberOfTransfersExAccessEgress() {

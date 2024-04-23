@@ -10,8 +10,8 @@
   },
   "license": "LGPL-3.0",
   "dependencies": {
-    "@graphql-codegen/add": "5.0.0",
-    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/add": "5.0.2",
+    "@graphql-codegen/cli": "5.0.2",
     "@graphql-codegen/java": "4.0.0",
     "@graphql-codegen/java-resolvers": "3.0.0",
     "graphql": "16.8.1"

@@ -28,6 +28,15 @@ export function GeometryPropertyPopup({
           ))}
         </tbody>
       </Table>
+      <div className="geometry-popup-osm-link">
+        <a
+          href={`https://www.openstreetmap.org/?mlat=${coordinates.lat}&mlon=${coordinates.lng}#map=18/${coordinates.lat}/${coordinates.lng}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          ↗️ osm.org
+        </a>
+      </div>
     </Popup>
   );
 }

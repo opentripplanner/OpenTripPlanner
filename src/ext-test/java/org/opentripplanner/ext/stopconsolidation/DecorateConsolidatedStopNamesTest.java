@@ -37,8 +37,8 @@ class DecorateConsolidatedStopNamesTest {
 
     filter.decorate(itinerary);
 
-    var updatedLeg = itinerary.getLegs().get(0);
-    assertEquals(STOP_D.getName(), updatedLeg.getFrom().name);
+    var updatedLeg = itinerary.getLegs().getFirst();
+    assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
   }
 }

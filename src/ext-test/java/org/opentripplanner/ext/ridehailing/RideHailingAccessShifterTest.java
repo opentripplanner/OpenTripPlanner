@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
@@ -24,7 +25,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.test.support.VariableSource;
 
 class RideHailingAccessShifterTest {
 
@@ -42,21 +42,23 @@ class RideHailingAccessShifterTest {
     List.of()
   );
 
-  static Stream<Arguments> testCases = Stream.of(
-    // leave now, so shift by 10 minutes
-    Arguments.of(TIME, DEFAULT_ARRIVAL_DURATION),
-    // only shift by 9 minutes because we are wanting to leave in 1 minute
-    Arguments.of(TIME.plus(ofMinutes(1)), ofMinutes(9)),
-    // only shift by 7 minutes because we are wanting to leave in 3 minutes
-    Arguments.of(TIME.plus(ofMinutes(3)), ofMinutes(7)),
-    // no shifting because it's far in the future
-    Arguments.of(TIME.plus(ofMinutes(15)), ZERO),
-    Arguments.of(TIME.plus(ofMinutes(30)), ZERO),
-    Arguments.of(TIME.plus(ofMinutes(40)), ZERO)
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      // leave now, so shift by 10 minutes
+      Arguments.of(TIME, DEFAULT_ARRIVAL_DURATION),
+      // only shift by 9 minutes because we are wanting to leave in 1 minute
+      Arguments.of(TIME.plus(ofMinutes(1)), ofMinutes(9)),
+      // only shift by 7 minutes because we are wanting to leave in 3 minutes
+      Arguments.of(TIME.plus(ofMinutes(3)), ofMinutes(7)),
+      // no shifting because it's far in the future
+      Arguments.of(TIME.plus(ofMinutes(15)), ZERO),
+      Arguments.of(TIME.plus(ofMinutes(30)), ZERO),
+      Arguments.of(TIME.plus(ofMinutes(40)), ZERO)
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void testArrivalDelay(Instant searchTime, Duration expectedArrival) {
     var req = new RouteRequest();
     req.setTo(FROM);
@@ -73,14 +75,16 @@ class RideHailingAccessShifterTest {
     assertEquals(expectedArrival, actualArrival);
   }
 
-  static Stream<Arguments> accessShiftCases = Stream.of(
-    // leave now, so shift by 10 minutes
-    Arguments.of(TIME, TIME.plus(DEFAULT_ARRIVAL_DURATION)),
-    Arguments.of(TIME.plus(Duration.ofHours(4)), TIME)
-  );
+  static Stream<Arguments> accessShiftCases() {
+    return Stream.of(
+      // leave now, so shift by 10 minutes
+      Arguments.of(TIME, TIME.plus(DEFAULT_ARRIVAL_DURATION)),
+      Arguments.of(TIME.plus(Duration.ofHours(4)), TIME)
+    );
+  }
 
   @ParameterizedTest
-  @VariableSource("accessShiftCases")
+  @MethodSource("accessShiftCases")
   void shiftAccesses(Instant startTime, Instant expectedStartTime) {
     var drivingState = TestStateBuilder.ofDriving().streetEdge().streetEdge().build();
     var access = new DefaultAccessEgress(0, drivingState);

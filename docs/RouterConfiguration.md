@@ -482,7 +482,6 @@ Used to group requests when monitoring OTP.
       }
     },
     "car" : {
-      "speed" : 40,
       "reluctance" : 10,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
@@ -494,6 +493,20 @@ Used to group requests when monitoring OTP.
       "parking" : {
         "time" : "5m",
         "cost" : 600
+      }
+    },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
       }
     },
     "walk" : {
@@ -637,6 +650,14 @@ Used to group requests when monitoring OTP.
         "cacheMaxSeconds" : 600
       },
       {
+        "name" : "areaStops",
+        "type" : "AreaStop",
+        "mapper" : "OTPRR",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
         "name" : "stations",
         "type" : "Station",
         "mapper" : "Digitransit",
@@ -744,6 +765,12 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "vehicle-parking",
+      "feedId" : "noi",
+      "sourceType" : "noi-open-data-hub",
+      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
+    },
+    {
       "type" : "stop-time-updater",
       "frequency" : "1m",
       "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
@@ -801,6 +828,20 @@ Used to group requests when monitoring OTP.
         "url" : "endpoint_url",
         "fromDateTime" : "-P1D",
         "toDateTime" : "P1D",
+        "timeout" : 300000
+      }
+    },
+    {
+      "type" : "siri-azure-et-updater",
+      "topic" : "some_topic",
+      "authenticationType" : "SharedAccessKey",
+      "fullyQualifiedNamespace" : "fully_qualified_namespace",
+      "servicebus-url" : "service_bus_url",
+      "feedId" : "feed_id",
+      "customMidnight" : 4,
+      "history" : {
+        "url" : "endpoint_url",
+        "fromDateTime" : "-P1D",
         "timeout" : 300000
       }
     }

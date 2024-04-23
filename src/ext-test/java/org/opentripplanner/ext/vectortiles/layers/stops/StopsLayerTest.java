@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -56,7 +57,7 @@ public class StopsLayerTest {
     var deduplicator = new Deduplicator();
     var transitModel = new TransitModel(new StopModel(), deduplicator);
     transitModel.index();
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new TestTransitService(transitModel);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,
@@ -69,6 +70,7 @@ public class StopsLayerTest {
     assertEquals("F:name", map.get("gtfsId"));
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
+    assertEquals("[{\"gtfsType\":100}]", map.get("routes"));
   }
 
   @Test

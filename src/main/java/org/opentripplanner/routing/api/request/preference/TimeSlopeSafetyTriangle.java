@@ -4,13 +4,14 @@ import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 
 /**
- * Sets the (bicycle) triangle routing parameters -- the relative importance of safety, flatness,
- * and speed. These three fields should have values between 0 and 1, and should add up to 1.
+ * Sets the (bicycle or scooter) triangle routing parameters -- the relative importance of safety,
+ * flatness, and speed. These three fields should have values between 0 and 1, and should add up to
+ * 1.
  * <p>
  * The constructor accepts any three numbers and will normalize them to add up to 1. {@code time}
  * and {@code slope} are rounded to the closest two decimal number, then
- * {@code safety := 1.0 - (time + slope)}. This is done to make the rounding predictable and
- * to allways add up to one. This allows this class to be used in an index of a cache. For example:
+ * {@code safety := 1.0 - (time + slope)}. This is done to make the rounding predictable and to
+ * allways add up to one. This allows this class to be used in an index of a cache. For example:
  * <pre>
  *   ( 1.0, 1.0, 1.0 ) => ( time: 0.33, slope: 0.33, safety: 0.34 )
  * </pre>
@@ -25,10 +26,10 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
   public static final TimeSlopeSafetyTriangle DEFAULT = new TimeSlopeSafetyTriangle(1, 1, 1);
 
   /**
-   * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
-   * and speed. These three fields of the RouteRequest should have values between 0 and 1, and
-   * should add up to 1. This setter function accepts any three numbers and will normalize them to
-   * add up to 1.
+   * Sets the bicycle or scooter triangle routing parameters -- the relative importance of safety,
+   * flatness, and speed. These three fields of the RouteRequest should have values between 0 and 1,
+   * and should add up to 1. This setter function accepts any three numbers and will normalize them
+   * to add up to 1.
    */
   public TimeSlopeSafetyTriangle(double time, double slope, double safety) {
     safety = positiveValueOrZero(safety);

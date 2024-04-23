@@ -61,7 +61,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -83,9 +82,11 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -115,6 +116,7 @@ class GraphQLIntegrationTest {
     .parse("2023-02-15T12:03:28+01:00")
     .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
+  private static final int TEN_MINUTES = 10 * 60;
 
   private static GraphQLRequestContext context;
 
@@ -129,6 +131,7 @@ class GraphQLIntegrationTest {
           VehicleParking
             .builder()
             .id(id("parking-1"))
+            .coordinate(WgsCoordinate.GREENWICH)
             .name(NonLocalizedString.ofNullable("parking"))
             .build()
         ),
@@ -158,6 +161,8 @@ class GraphQLIntegrationTest {
           .route(m.name())
           .withMode(m)
           .withLongName(I18NString.of("Long name for %s".formatted(m)))
+          .withGtfsSortOrder(sortOrder(m))
+          .withBikesAllowed(bikesAllowed(m))
           .build()
       )
       .toList();
@@ -178,6 +183,8 @@ class GraphQLIntegrationTest {
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
       .build();
+
+    add10MinuteDelay(i1);
 
     var busLeg = i1.getTransitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
@@ -278,6 +285,39 @@ class GraphQLIntegrationTest {
         finder,
         new RouteRequest()
       );
+  }
+
+  private static BikeAccess bikesAllowed(TransitMode m) {
+    return switch (m.ordinal() % 3) {
+      case 0 -> BikeAccess.ALLOWED;
+      case 1 -> BikeAccess.NOT_ALLOWED;
+      default -> BikeAccess.UNKNOWN;
+    };
+  }
+
+  /**
+   * We want to provide a variety of numbers and null, so we cover all cases in the test output.
+   */
+  private static Integer sortOrder(TransitMode m) {
+    if (m.ordinal() == 0) {
+      return null;
+    } else {
+      return m.ordinal();
+    }
+  }
+
+  private static void add10MinuteDelay(Itinerary i1) {
+    i1.transformTransitLegs(tl -> {
+      if (tl instanceof ScheduledTransitLeg stl) {
+        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+
+        for (var i = 0; i < rtt.getNumStops(); i++) {
+          rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
+          rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+        }
+      }
+      return tl;
+    });
   }
 
   @FilePatternSource(pattern = "src/test/resources/org/opentripplanner/apis/gtfs/queries/*.graphql")

@@ -43,9 +43,9 @@ public class VehicleWalkingConfig {
           )
           .asDouble(dft.reluctance())
       )
-      .withHopTime(
+      .withMountDismountTime(
         c
-          .of("hopTime")
+          .of("mountDismountTime")
           .since(V2_0)
           .summary("The time it takes the user to hop on or off a vehicle.")
           .description(
@@ -54,11 +54,11 @@ public class VehicleWalkingConfig {
             for controlling the duration of those events.
             """
           )
-          .asDuration(dft.hopTime())
+          .asDuration(dft.mountDismountTime())
       )
-      .withHopCost(
+      .withMountDismountCost(
         c
-          .of("hopCost")
+          .of("mountDismountCost")
           .since(V2_0)
           .summary("The cost of hopping on or off a vehicle.")
           .description(
@@ -67,7 +67,7 @@ public class VehicleWalkingConfig {
             not meant for controlling the cost of those events.
             """
           )
-          .asInt(dft.hopCost().toSeconds())
+          .asInt(dft.mountDismountCost().toSeconds())
       )
       .withStairsReluctance(
         c

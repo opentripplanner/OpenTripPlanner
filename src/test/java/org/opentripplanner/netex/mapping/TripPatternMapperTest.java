@@ -1,9 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ArrayListMultimap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -19,17 +22,19 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.rutebanken.netex.model.DatedServiceJourney;
+import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 /**
  * @author Thomas Gran (Capra) - tgr@capraconsulting.no (29.11.2017)
  */
-public class TripPatternMapperTest {
+class TripPatternMapperTest {
 
   private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S01");
 
   @Test
-  public void testMapTripPattern() {
+  void testMapTripPattern() {
     NetexTestDataSample sample = new NetexTestDataSample();
 
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
@@ -88,9 +93,85 @@ public class TripPatternMapperTest {
   }
 
   @Test
-  public void testMapTripPattern_datedServiceJourney() {
+  void testMapTripPattern_datedServiceJourney() {
     NetexTestDataSample sample = new NetexTestDataSample();
+    Optional<TripPatternMapperResult> res = mapTripPattern(sample);
 
+    assertTrue(res.isPresent());
+
+    var r = res.get();
+
+    assertEquals(2, r.tripOnServiceDates().size());
+
+    Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
+
+    for (TripOnServiceDate tripOnServiceDate : r.tripOnServiceDates()) {
+      assertEquals(trip, tripOnServiceDate.getTrip());
+      assertEquals(TripAlteration.PLANNED, tripOnServiceDate.getTripAlteration());
+      assertEquals(
+        1,
+        sample
+          .getOperatingDaysById()
+          .localValues()
+          .stream()
+          .map(OperatingDay::getId)
+          .filter(id -> id.equals(tripOnServiceDate.getServiceDate().toString()))
+          .count()
+      );
+    }
+  }
+
+  @Test
+  void testDatedServiceJourneyReplacement() {
+    NetexTestDataSample sample = new NetexTestDataSample();
+    DatedServiceJourney dsjReplaced = sample.getDatedServiceJourneyById(
+      NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1
+    );
+    dsjReplaced.setServiceAlteration(ServiceAlterationEnumeration.REPLACED);
+    DatedServiceJourney dsjReplacing = sample.getDatedServiceJourneyById(
+      NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2
+    );
+    dsjReplacing.withJourneyRef(
+      List.of(
+        MappingSupport.createWrappedRef(dsjReplaced.getId(), DatedServiceJourneyRefStructure.class)
+      )
+    );
+    Optional<TripPatternMapperResult> res = mapTripPattern(sample);
+
+    assertTrue(res.isPresent());
+    var r = res.get();
+    Optional<TripOnServiceDate> replacedTripOnServiceDate = r
+      .tripOnServiceDates()
+      .stream()
+      .filter(tripOnServiceDate ->
+        NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1.equals(tripOnServiceDate.getId().getId())
+      )
+      .findFirst();
+
+    assertTrue(replacedTripOnServiceDate.isPresent());
+    assertEquals(TripAlteration.REPLACED, replacedTripOnServiceDate.get().getTripAlteration());
+
+    Optional<TripOnServiceDate> replacingTripOnServiceDate = r
+      .tripOnServiceDates()
+      .stream()
+      .filter(tripOnServiceDate ->
+        NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2.equals(tripOnServiceDate.getId().getId())
+      )
+      .findFirst();
+
+    assertTrue(replacingTripOnServiceDate.isPresent());
+    assertEquals(TripAlteration.PLANNED, replacingTripOnServiceDate.get().getTripAlteration());
+    assertFalse(replacingTripOnServiceDate.get().getReplacementFor().isEmpty());
+
+    // the replaced trip should refer to the same object (object identity) whether it is accessed
+    // directly from the replaced DSJ or indirectly through the replacing DSJ.
+    assertSame(
+      replacingTripOnServiceDate.get().getReplacementFor().getFirst().getTrip(),
+      replacedTripOnServiceDate.get().getTrip()
+    );
+  }
+
+  private static Optional<TripPatternMapperResult> mapTripPattern(NetexTestDataSample sample) {
     HierarchicalMapById<DatedServiceJourney> datedServiceJourneys = new HierarchicalMapById<>();
     datedServiceJourneys.addAll(sample.getDatedServiceJourneyBySjId().values());
 
@@ -121,28 +202,6 @@ public class TripPatternMapperTest {
     Optional<TripPatternMapperResult> res = tripPatternMapper.mapTripPattern(
       sample.getJourneyPattern()
     );
-
-    assertTrue(res.isPresent());
-
-    var r = res.get();
-
-    assertEquals(2, r.tripOnServiceDates().size());
-
-    Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
-
-    for (TripOnServiceDate tripOnServiceDate : r.tripOnServiceDates()) {
-      assertEquals(trip, tripOnServiceDate.getTrip());
-      assertEquals(TripAlteration.PLANNED, tripOnServiceDate.getTripAlteration());
-      assertEquals(
-        1,
-        sample
-          .getOperatingDaysById()
-          .localValues()
-          .stream()
-          .map(OperatingDay::getId)
-          .filter(id -> id.equals(tripOnServiceDate.getServiceDate().toString()))
-          .count()
-      );
-    }
+    return res;
   }
 }
