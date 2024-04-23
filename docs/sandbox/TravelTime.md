@@ -11,7 +11,11 @@
 ## Documentation
 
 The API produces a snapshot of travel time form a single place to places around it. The results can
-be fetched either as a set of isochrones or a raster map.
+be fetched either as a set of isochrones or a raster map. Please note that as a sandbox feature this
+functionality is UNSUPPORTED and neither maintained nor well-understood by most current OTP 
+developers, and may not be accurate or reliable. Travel time analytics work that began within OTP
+has moved years ago to other projects, where it actively continues. See the 
+[Analysis](../Analysis.md) page for further details.
 
 ### Configuration
 
