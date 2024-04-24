@@ -15,7 +15,6 @@ class RequestModesMapper {
    * Maps GraphQL Modes input type to RequestModes.
    * <p>
    * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
-   * Default modes are WALK for access, egress & transfer.
    */
   static RequestModes mapRequestModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();
@@ -24,11 +23,11 @@ class RequestModesMapper {
       StreetMode accessMode = (StreetMode) modesInput.get(accessModeKey);
       mBuilder.withAccessMode(accessMode);
       mBuilder.withTransferMode(accessMode == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK);
+    } else {
+      mBuilder.withAccessMode(StreetMode.NOT_SET);
     }
-    if (modesInput.containsKey(egressModeKey)) {
-      mBuilder.withEgressMode((StreetMode) modesInput.get(egressModeKey));
-    }
-    // An unset directMode should overwrite the walk default, so we don't check for existence first.
+    // Non-existing values and null are later translated into NOT_SET.
+    mBuilder.withEgressMode((StreetMode) modesInput.get(egressModeKey));
     mBuilder.withDirectMode((StreetMode) modesInput.get(directModeKey));
 
     return mBuilder.build();
