@@ -30,7 +30,7 @@ public class JsonDataListDownloader<T> {
     @Nonnull Function<JsonNode, T> elementParser,
     @Nonnull Map<String, String> headers
   ) {
-    this(url, jsonParsePath, elementParser, headers, new OtpHttpClient(LOG));
+    this(url, jsonParsePath, elementParser, headers, new OtpHttpClientFactory().create(LOG));
   }
 
   public JsonDataListDownloader(

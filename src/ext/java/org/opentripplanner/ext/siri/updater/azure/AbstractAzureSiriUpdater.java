@@ -25,7 +25,7 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -206,7 +206,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
     var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
 
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient(LOG)) {
+    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
+      var otpHttpClient = otpHttpClientFactory.create(LOG);
       var t1 = System.currentTimeMillis();
       var siriOptional = otpHttpClient.executeAndMapOptional(
         new HttpGet(uri),

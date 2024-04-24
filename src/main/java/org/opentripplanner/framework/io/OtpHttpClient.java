@@ -20,14 +20,9 @@ import java.util.stream.Collectors;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
@@ -35,11 +30,7 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
-import org.apache.hc.core5.pool.PoolReusePolicy;
-import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 
@@ -52,107 +43,26 @@ import org.slf4j.Logger;
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}
- * <h3>Timeout configuration</h3>
- * The same timeout value is applied to the following parameters:
- * <ul>
- *  <li>Connection request timeout: the maximum waiting time for leasing a connection in the
- *  connection pool.
- *  <li>Connect timeout: the maximum waiting time for the first packet received from the server.
- *  <li>Socket timeout: the maximum waiting time between two packets received from the server.
- * </ul>
- * The default timeout is set to 5 seconds.
- * <h3>Connection time-to-live</h3>
- * Maximum time an HTTP connection can stay in the connection pool before being closed.
- * Note that HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to
- * close idle connections at any time.
- * The default connection time-to-live is set to 1 minute.
  * <h3>Resource management</h3>
- * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods
- * in this class since they
- * ensure that the underlying network resources are properly released.
- * The method {@link #getAsInputStream} gives access to an input stream on the body response but
- * requires the caller to close this stream. For most use cases, this method is not recommended .
- * <h3>Connection Pooling</h3>
- * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections
- * per host.
+ * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods in
+ * this class since they ensure that the underlying network resources are properly released. The
+ * method {@link #getAsInputStream} gives access to an input stream on the body response but
+ * requires the caller to close this stream. For most use cases, this method is not recommended.
  *
  * <h3>Thread-safety</h3>
  * Instances of this class are thread-safe.
  */
-public class OtpHttpClient implements AutoCloseable {
-
-  private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
-
-  private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
-
-  /**
-   * see {@link PoolingHttpClientConnectionManager#DEFAULT_MAX_TOTAL_CONNECTIONS}
-   */
-  public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 25;
+public class OtpHttpClient {
 
   private final CloseableHttpClient httpClient;
 
   private final Logger log;
 
   /**
-   * Creates an HTTP client with default timeout, default connection time-to-live and default max
-   * number of connections.
-   */
-  public OtpHttpClient(Logger logger) {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL, logger);
-  }
-
-  /**
-   * Creates an HTTP client with default timeout, default connection time-to-live and the given max
-   * number of connections.
-   */
-  public OtpHttpClient(int maxConnections, Logger logger) {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL, maxConnections, logger);
-  }
-
-  /**
-   * Creates an HTTP client the given timeout and connection time-to-live and the default max
-   * number of connections.
-   */
-  public OtpHttpClient(Duration timeout, Duration connectionTtl, Logger logger) {
-    this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS, logger);
-  }
-
-  /**
    * Creates an HTTP client with custom configuration.
    */
-  private OtpHttpClient(
-    Duration timeout,
-    Duration connectionTtl,
-    int maxConnections,
-    Logger logger
-  ) {
-    Objects.requireNonNull(timeout);
-    Objects.requireNonNull(connectionTtl);
-
-    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder
-      .create()
-      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
-      .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
-      .setConnPoolPolicy(PoolReusePolicy.LIFO)
-      .setMaxConnTotal(maxConnections)
-      .setDefaultConnectionConfig(
-        ConnectionConfig
-          .custom()
-          .setSocketTimeout(Timeout.of(timeout))
-          .setConnectTimeout(Timeout.of(timeout))
-          .setTimeToLive(TimeValue.of(connectionTtl))
-          .build()
-      )
-      .build();
-
-    HttpClientBuilder httpClientBuilder = HttpClients
-      .custom()
-      .setUserAgent("OpenTripPlanner")
-      .setConnectionManager(connectionManager)
-      .setDefaultRequestConfig(requestConfig(timeout));
-
-    httpClient = httpClientBuilder.build();
+  OtpHttpClient(CloseableHttpClient httpClient, Logger logger) {
+    this.httpClient = httpClient;
     log = logger;
   }
 
@@ -355,15 +265,6 @@ public class OtpHttpClient implements AutoCloseable {
         return Optional.of(mapResponse(response, contentMapper));
       }
     );
-  }
-
-  @Override
-  public void close() {
-    try {
-      httpClient.close();
-    } catch (IOException e) {
-      throw new OtpHttpClientException(e);
-    }
   }
 
   /**

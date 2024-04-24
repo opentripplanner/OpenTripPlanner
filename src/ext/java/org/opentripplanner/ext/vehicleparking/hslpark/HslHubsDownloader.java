@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -29,12 +30,13 @@ public class HslHubsDownloader {
   public HslHubsDownloader(
     String url,
     String jsonParsePath,
-    Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser
+    Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser,
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.hubsParser = hubsParser;
-    otpHttpClient = new OtpHttpClient(LOG);
+    otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   public Map<FeedScopedId, VehicleParkingGroup> downloadHubs() {

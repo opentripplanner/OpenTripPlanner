@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -31,12 +32,13 @@ public class HslFacilitiesDownloader {
   public HslFacilitiesDownloader(
     String url,
     String jsonParsePath,
-    BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser
+    BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser,
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.facilitiesParser = facilitiesParser;
-    this.otpHttpClient = new OtpHttpClient(LOG);
+    this.otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   public List<VehicleParking> downloadFacilities(

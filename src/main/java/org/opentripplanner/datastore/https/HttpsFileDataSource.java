@@ -13,6 +13,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ final class HttpsFileDataSource implements DataSource {
     this.uri = uri;
     this.type = type;
     this.httpsDataSourceMetadata = httpsDataSourceMetadata;
-    otpHttpClient = new OtpHttpClient(LOG);
+    otpHttpClient = new OtpHttpClientFactory().create(LOG);
   }
 
   /**
