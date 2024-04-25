@@ -52,12 +52,12 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
 
   /**
    * Used for estimating the remaining value for a criteria at a given stop arrival. The calculated
-   * value should be a an optimistic estimate for the heuristics to work properly. So, to calculate
-   * the generalized cost for given the {@code minTravelTime} and {@code minNumTransfers} retuning
+   * value should be an optimistic estimate for the heuristics to work properly. So, to calculate
+   * the generalized cost for given the {@code minTravelTime} and {@code minNumTransfers} returning
    * the greatest value, which is guaranteed to be less than the
-   * <em>real value</em> would be correct and a good choose.
+   * <em>real value</em> would be correct and a good choice.
    */
-  int calculateMinCost(int minTravelTime, int minNumTransfers);
+  int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop);
 
   /**
    * This method allows the cost calculator to add cost in addition to the generalized-cost of the
