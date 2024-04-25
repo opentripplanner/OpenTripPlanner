@@ -9,23 +9,25 @@ public class WalkPreferencesMapper {
     WalkPreferences.Builder preferences,
     GraphQLTypes.GraphQLWalkPreferencesInput args
   ) {
-    if (args != null) {
-      var speed = args.getGraphQLSpeed();
-      if (speed != null) {
-        preferences.withSpeed(speed);
-      }
-      var reluctance = args.getGraphQLReluctance();
-      if (reluctance != null) {
-        preferences.withReluctance(reluctance);
-      }
-      var walkSafetyFactor = args.getGraphQLSafetyFactor();
-      if (walkSafetyFactor != null) {
-        preferences.withSafetyFactor(walkSafetyFactor);
-      }
-      var boardCost = args.getGraphQLBoardCost();
-      if (boardCost != null) {
-        preferences.withBoardCost(boardCost.toSeconds());
-      }
+    if (args == null) {
+      return;
+    }
+
+    var speed = args.getGraphQLSpeed();
+    if (speed != null) {
+      preferences.withSpeed(speed);
+    }
+    var reluctance = args.getGraphQLReluctance();
+    if (reluctance != null) {
+      preferences.withReluctance(reluctance);
+    }
+    var walkSafetyFactor = args.getGraphQLSafetyFactor();
+    if (walkSafetyFactor != null) {
+      preferences.withSafetyFactor(walkSafetyFactor);
+    }
+    var boardCost = args.getGraphQLBoardCost();
+    if (boardCost != null) {
+      preferences.withBoardCost(boardCost.toSeconds());
     }
   }
 }

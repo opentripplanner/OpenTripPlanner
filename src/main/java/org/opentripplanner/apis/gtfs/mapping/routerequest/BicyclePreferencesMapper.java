@@ -21,54 +21,57 @@ public class BicyclePreferencesMapper {
     GraphQLTypes.GraphQLBicyclePreferencesInput args,
     DataFetchingEnvironment environment
   ) {
-    if (args != null) {
-      var speed = args.getGraphQLSpeed();
-      if (speed != null) {
-        preferences.withSpeed(speed);
-      }
-      var reluctance = args.getGraphQLReluctance();
-      if (reluctance != null) {
-        preferences.withReluctance(reluctance);
-      }
-      var boardCost = args.getGraphQLBoardCost();
-      if (boardCost != null) {
-        preferences.withBoardCost(boardCost.toSeconds());
-      }
-      preferences.withWalking(walk -> setBicycleWalkPreferences(walk, args.getGraphQLWalk()));
-      preferences.withParking(parking ->
-        setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
-      );
-      preferences.withRental(rental -> setBicycleRentalPreferences(rental, args.getGraphQLRental())
-      );
-      setBicycleOptimization(preferences, args.getGraphQLOptimization());
+    if (args == null) {
+      return;
     }
+
+    var speed = args.getGraphQLSpeed();
+    if (speed != null) {
+      preferences.withSpeed(speed);
+    }
+    var reluctance = args.getGraphQLReluctance();
+    if (reluctance != null) {
+      preferences.withReluctance(reluctance);
+    }
+    var boardCost = args.getGraphQLBoardCost();
+    if (boardCost != null) {
+      preferences.withBoardCost(boardCost.toSeconds());
+    }
+    preferences.withWalking(walk -> setBicycleWalkPreferences(walk, args.getGraphQLWalk()));
+    preferences.withParking(parking ->
+      setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
+    );
+    preferences.withRental(rental -> setBicycleRentalPreferences(rental, args.getGraphQLRental()));
+    setBicycleOptimization(preferences, args.getGraphQLOptimization());
   }
 
   private static void setBicycleWalkPreferences(
     VehicleWalkingPreferences.Builder preferences,
     GraphQLTypes.GraphQLBicycleWalkPreferencesInput args
   ) {
-    if (args != null) {
-      var speed = args.getGraphQLSpeed();
-      if (speed != null) {
-        preferences.withSpeed(speed);
+    if (args == null) {
+      return;
+    }
+
+    var speed = args.getGraphQLSpeed();
+    if (speed != null) {
+      preferences.withSpeed(speed);
+    }
+    var mountTime = args.getGraphQLMountDismountTime();
+    if (mountTime != null) {
+      preferences.withMountDismountTime(
+        DurationUtils.requireNonNegativeShort(mountTime, "bicycle mount dismount time")
+      );
+    }
+    var cost = args.getGraphQLCost();
+    if (cost != null) {
+      var reluctance = cost.getGraphQLReluctance();
+      if (reluctance != null) {
+        preferences.withReluctance(reluctance);
       }
-      var mountTime = args.getGraphQLMountDismountTime();
-      if (mountTime != null) {
-        preferences.withMountDismountTime(
-          DurationUtils.requireNonNegativeShort(mountTime, "bicycle mount dismount time")
-        );
-      }
-      var cost = args.getGraphQLCost();
-      if (cost != null) {
-        var reluctance = cost.getGraphQLReluctance();
-        if (reluctance != null) {
-          preferences.withReluctance(reluctance);
-        }
-        var mountCost = cost.getGraphQLMountDismountCost();
-        if (mountCost != null) {
-          preferences.withMountDismountCost(mountCost.toSeconds());
-        }
+      var mountCost = cost.getGraphQLMountDismountCost();
+      if (mountCost != null) {
+        preferences.withMountDismountCost(mountCost.toSeconds());
       }
     }
   }
@@ -78,46 +81,50 @@ public class BicyclePreferencesMapper {
     GraphQLTypes.GraphQLBicycleParkingPreferencesInput args,
     DataFetchingEnvironment environment
   ) {
-    if (args != null) {
-      var unpreferredCost = args.getGraphQLUnpreferredCost();
-      if (unpreferredCost != null) {
-        preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
-      }
-      var filters = getParkingFilters(environment, "bicycle");
-      preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
-      preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
-      var preferred = getParkingPreferred(environment, "bicycle");
-      preferences.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
-      preferences.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+    if (args == null) {
+      return;
     }
+
+    var unpreferredCost = args.getGraphQLUnpreferredCost();
+    if (unpreferredCost != null) {
+      preferences.withUnpreferredVehicleParkingTagCost(unpreferredCost.toSeconds());
+    }
+    var filters = getParkingFilters(environment, "bicycle");
+    preferences.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+    preferences.withBannedVehicleParkingTags(parseNotFilters(filters));
+    var preferred = getParkingPreferred(environment, "bicycle");
+    preferences.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+    preferences.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
   }
 
   private static void setBicycleRentalPreferences(
     VehicleRentalPreferences.Builder preferences,
     GraphQLTypes.GraphQLBicycleRentalPreferencesInput args
   ) {
-    if (args != null) {
-      var allowedNetworks = args.getGraphQLAllowedNetworks();
-      if (allowedNetworks != null) {
-        if (allowedNetworks.isEmpty()) {
-          throw new IllegalArgumentException("Allowed bicycle rental networks must not be empty.");
-        }
-        preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
+    if (args == null) {
+      return;
+    }
+
+    var allowedNetworks = args.getGraphQLAllowedNetworks();
+    if (allowedNetworks != null) {
+      if (allowedNetworks.isEmpty()) {
+        throw new IllegalArgumentException("Allowed bicycle rental networks must not be empty.");
       }
-      var bannedNetworks = args.getGraphQLBannedNetworks();
-      if (bannedNetworks != null) {
-        preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
+      preferences.withAllowedNetworks(Set.copyOf(allowedNetworks));
+    }
+    var bannedNetworks = args.getGraphQLBannedNetworks();
+    if (bannedNetworks != null) {
+      preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
+    }
+    var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
+    if (destinationPolicy != null) {
+      var allowed = destinationPolicy.getGraphQLAllowKeeping();
+      if (allowed != null) {
+        preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
       }
-      var destinationPolicy = args.getGraphQLDestinationBicyclePolicy();
-      if (destinationPolicy != null) {
-        var allowed = destinationPolicy.getGraphQLAllowKeeping();
-        if (allowed != null) {
-          preferences.withAllowArrivingInRentedVehicleAtDestination(allowed);
-        }
-        var cost = destinationPolicy.getGraphQLKeepingCost();
-        if (cost != null) {
-          preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
-        }
+      var cost = destinationPolicy.getGraphQLKeepingCost();
+      if (cost != null) {
+        preferences.withArrivingInRentalVehicleAtDestinationCost(cost.toSeconds());
       }
     }
   }
@@ -126,21 +133,23 @@ public class BicyclePreferencesMapper {
     BikePreferences.Builder preferences,
     GraphQLTypes.GraphQLCyclingOptimizationInput args
   ) {
-    if (args != null) {
-      var type = args.getGraphQLType();
-      var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
-      if (mappedType != null) {
-        preferences.withOptimizeType(mappedType);
-      }
-      var triangleArgs = args.getGraphQLTriangle();
-      if (isBicycleTriangleSet(triangleArgs)) {
-        preferences.withForcedOptimizeTriangle(triangle -> {
-          triangle
-            .withSlope(triangleArgs.getGraphQLFlatness())
-            .withSafety(triangleArgs.getGraphQLSafety())
-            .withTime(triangleArgs.getGraphQLTime());
-        });
-      }
+    if (args == null) {
+      return;
+    }
+
+    var type = args.getGraphQLType();
+    var mappedType = type != null ? VehicleOptimizationTypeMapper.map(type) : null;
+    if (mappedType != null) {
+      preferences.withOptimizeType(mappedType);
+    }
+    var triangleArgs = args.getGraphQLTriangle();
+    if (isBicycleTriangleSet(triangleArgs)) {
+      preferences.withForcedOptimizeTriangle(triangle -> {
+        triangle
+          .withSlope(triangleArgs.getGraphQLFlatness())
+          .withSafety(triangleArgs.getGraphQLSafety())
+          .withTime(triangleArgs.getGraphQLTime());
+      });
     }
   }
 

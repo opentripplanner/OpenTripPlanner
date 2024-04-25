@@ -114,14 +114,17 @@ public class RouteRequestMapper {
     DataFetchingEnvironment environment
   ) {
     setRentalAvailabilityPreferences(preferences, request);
-    if (args != null) {
-      preferences.withBike(bicycle ->
-        setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
-      );
-      preferences.withCar(car -> setCarPreferences(car, args.getGraphQLCar(), environment));
-      preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
-      preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
+
+    if (args == null) {
+      return;
     }
+
+    preferences.withBike(bicycle ->
+      setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
+    );
+    preferences.withCar(car -> setCarPreferences(car, args.getGraphQLCar(), environment));
+    preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
+    preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
   }
 
   private static void setRentalAvailabilityPreferences(
