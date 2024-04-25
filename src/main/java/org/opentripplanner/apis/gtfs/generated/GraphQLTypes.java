@@ -3248,7 +3248,6 @@ public class GraphQLTypes {
     private Integer last;
     private java.util.Locale locale;
     private GraphQLPlanModesInput modes;
-    private Integer numberOfItineraries;
     private GraphQLPlanLabeledLocationInput origin;
     private GraphQLPlanPreferencesInput preferences;
     private java.time.Duration searchWindow;
@@ -3266,7 +3265,6 @@ public class GraphQLTypes {
         this.last = (Integer) args.get("last");
         this.locale = (java.util.Locale) args.get("locale");
         this.modes = new GraphQLPlanModesInput((Map<String, Object>) args.get("modes"));
-        this.numberOfItineraries = (Integer) args.get("numberOfItineraries");
         this.origin = new GraphQLPlanLabeledLocationInput((Map<String, Object>) args.get("origin"));
         this.preferences =
           new GraphQLPlanPreferencesInput((Map<String, Object>) args.get("preferences"));
@@ -3308,10 +3306,6 @@ public class GraphQLTypes {
 
     public GraphQLPlanModesInput getGraphQLModes() {
       return this.modes;
-    }
-
-    public Integer getGraphQLNumberOfItineraries() {
-      return this.numberOfItineraries;
     }
 
     public GraphQLPlanLabeledLocationInput getGraphQLOrigin() {
@@ -3360,10 +3354,6 @@ public class GraphQLTypes {
 
     public void setGraphQLModes(GraphQLPlanModesInput modes) {
       this.modes = modes;
-    }
-
-    public void setGraphQLNumberOfItineraries(Integer numberOfItineraries) {
-      this.numberOfItineraries = numberOfItineraries;
     }
 
     public void setGraphQLOrigin(GraphQLPlanLabeledLocationInput origin) {

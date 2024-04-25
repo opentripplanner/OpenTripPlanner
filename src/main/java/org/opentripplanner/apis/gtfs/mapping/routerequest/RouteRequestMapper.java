@@ -57,8 +57,8 @@ public class RouteRequestMapper {
       if (args.getGraphQLFirst() != null) {
         request.setNumItineraries(args.getGraphQLFirst());
       }
-    } else if (args.getGraphQLNumberOfItineraries() != null) {
-      request.setNumItineraries(args.getGraphQLNumberOfItineraries());
+    } else if (args.getGraphQLFirst() != null) {
+      request.setNumItineraries(args.getGraphQLFirst());
     }
 
     request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));

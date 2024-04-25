@@ -4238,18 +4238,6 @@ type QueryType {
         searchWindow: Duration
 
         """
-        Maximum number of itineraries that will be returned. It's possible that no itineraries are
-        found, paging for earlier or later itineraries can yield to results in that case. The returned
-        itineraries are either closest to the defined earliest departure time or to the latest arrival
-        time. It can make sense to search for more itineraries that what is immediately needed if there
-        is a possibility that more itineraries are used later on (limiting the number of returned itineraries
-        does not affect the performance by a lot but can affect the network bandwidth usage). During the
-        search for next or previous pages with `after` or `before` cursors, this field is ignored and
-        `first` or `last` should be used instead.
-        """
-        numberOfItineraries: Int
-
-        """
         The origin where the search starts. Usually coordinates but can also be a stop location.
         """
         origin: PlanLabeledLocationInput!
@@ -4298,11 +4286,11 @@ type QueryType {
         after: String
 
         """
-        How many new itineraries should at maximum be returned in forward pagination. It's recommended to
-        use the same value as was used for the `numberOfItineraries` in the original search for optimal
-        performance. This parameter is part of the
+        How many new itineraries should at maximum be returned in either the first search or with
+        forward pagination. This parameter is part of the
         [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
-        and should be used together with the `after` parameter.
+        and should be used together with the `after` parameter (although `after` shouldn't be defined
+        in the first search).
         """
         first: Int
 
@@ -4317,7 +4305,7 @@ type QueryType {
 
         """
         How many new itineraries should at maximum be returned in backwards pagination. It's recommended to
-        use the same value as was used for the `numberOfItineraries` in the original search for optimal
+        use the same value as was used for the `first` parameter in the original search for optimal
         performance. This parameter is part of the
         [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
         and should be used together with the `before` parameter.

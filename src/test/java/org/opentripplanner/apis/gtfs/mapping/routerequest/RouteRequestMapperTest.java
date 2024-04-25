@@ -253,10 +253,11 @@ class RouteRequestMapperTest {
   }
 
   @Test
-  void testNumberOfItineraries() {
+  void testNumberOfItinerariesForSearchWithoutPaging() {
     var itineraries = 8;
     var itinArgs = createArgsCopy(ARGS);
-    itinArgs.put("numberOfItineraries", itineraries);
+    itinArgs.put("first", itineraries);
+    itinArgs.put("last", 3);
     var env = executionContext(itinArgs, LOCALE, CONTEXT);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, CONTEXT);
     assertEquals(itineraries, routeRequest.numItineraries());

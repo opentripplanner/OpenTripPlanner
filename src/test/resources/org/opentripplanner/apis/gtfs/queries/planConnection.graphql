@@ -4,7 +4,7 @@
       earliestDeparture: "2023-06-13T14:30+03:00"
     }
     searchWindow: "PT2H30M"
-    numberOfItineraries: 5
+    first: 5
     origin: {
       location: {
         coordinate: {
