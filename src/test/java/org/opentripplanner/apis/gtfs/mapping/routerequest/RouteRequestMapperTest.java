@@ -94,8 +94,8 @@ class RouteRequestMapperTest {
     assertEquals(defaultRequest.numItineraries(), routeRequest.numItineraries());
     assertEquals(defaultRequest.searchWindow(), routeRequest.searchWindow());
     assertEquals(defaultRequest.journey().modes(), routeRequest.journey().modes());
-    assertTrue(defaultRequest.journey().transit().filters().size() == 1);
-    assertTrue(routeRequest.journey().transit().filters().size() == 1);
+    assertEquals(1, defaultRequest.journey().transit().filters().size());
+    assertEquals(1, routeRequest.journey().transit().filters().size());
     assertTrue(routeRequest.journey().transit().enabled());
     assertEquals(
       defaultRequest.journey().transit().filters().toString(),
