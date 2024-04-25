@@ -2,10 +2,12 @@ package org.opentripplanner.framework.time;
 
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
@@ -245,5 +247,9 @@ public class TimeUtils {
       value |= rnd.nextLong();
     }
     return value;
+  }
+
+  public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
+    return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
   }
 }
