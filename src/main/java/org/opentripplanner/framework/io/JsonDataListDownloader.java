@@ -60,11 +60,11 @@ public class JsonDataListDownloader<T> {
           try {
             return parseJSON(is);
           } catch (IllegalArgumentException e) {
-            LOG.warn("Error parsing bike rental feed from {}", url, e);
+            LOG.warn("Error parsing feed from {}", url, e);
           } catch (JsonProcessingException e) {
-            LOG.warn("Error parsing bike rental feed from {} (bad JSON of some sort)", url, e);
+            LOG.warn("Error parsing feed from {} (bad JSON of some sort)", url, e);
           } catch (IOException e) {
-            LOG.warn("Error reading bike rental feed from {}", url, e);
+            LOG.warn("Error reading feed from {}", url, e);
           }
           return null;
         }
