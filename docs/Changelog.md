@@ -16,6 +16,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix trip duplication in Graph Builder DSJ mapping [#5794](https://github.com/opentripplanner/OpenTripPlanner/pull/5794)
 - Optionally abort startup when unknown configuration parameters were detected [#5676](https://github.com/opentripplanner/OpenTripPlanner/pull/5676)
 - Fix bug in heuristics cost calculation for egress legs [#5783](https://github.com/opentripplanner/OpenTripPlanner/pull/5783)
+- De-emphasize mailing list in landing page [#5820](https://github.com/opentripplanner/OpenTripPlanner/pull/5820)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
