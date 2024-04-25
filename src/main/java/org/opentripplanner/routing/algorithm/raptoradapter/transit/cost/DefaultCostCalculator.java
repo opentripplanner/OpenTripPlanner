@@ -130,11 +130,11 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
         transitFactors.minFactor() *
         minTravelTime
       );
-    } else if (stopTransferCost != null) {
-      // Remove cost that was added during alighting similar as we do in the costEgress() method
-      return (transitFactors.minFactor() * minTravelTime - stopTransferCost[fromStop]);
     } else {
-      return transitFactors.minFactor() * minTravelTime;
+      // Remove cost that was added during alighting similar as we do in the costEgress() method
+      int fixedCost = transitFactors.minFactor() * minTravelTime;
+
+      return stopTransferCost == null ? fixedCost : fixedCost - stopTransferCost[fromStop];
     }
   }
 

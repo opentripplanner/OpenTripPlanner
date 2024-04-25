@@ -6,11 +6,11 @@ public class CostCalculatorFactory {
 
   public static <T extends DefaultTripSchedule> RaptorCostCalculator<T> createCostCalculator(
     GeneralizedCostParameters generalizedCostParameters,
-    int[] stopTransferCosts
+    int[] stopBoardAlightCosts
   ) {
     RaptorCostCalculator<T> calculator = new DefaultCostCalculator<>(
       generalizedCostParameters,
-      stopTransferCosts
+      stopBoardAlightCosts
     );
 
     if (generalizedCostParameters.wheelchairEnabled()) {
