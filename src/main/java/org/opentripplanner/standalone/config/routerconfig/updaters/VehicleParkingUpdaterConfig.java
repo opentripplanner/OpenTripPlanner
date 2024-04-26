@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Set;
+import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
@@ -27,7 +28,7 @@ public class VehicleParkingUpdaterConfig {
     var feedId = c
       .of("feedId")
       .since(V2_2)
-      .summary("The name of the data source.")
+      .summary("The id of the data source, which will be the prefix of the parking lot's id.")
       .description("This will end up in the API responses as the feed id of of the parking lot.")
       .asString();
     return switch (sourceType) {
@@ -78,6 +79,17 @@ public class VehicleParkingUpdaterConfig {
         HttpHeadersConfig.headers(c, V2_3)
       );
       case NOI_OPEN_DATA_HUB -> new NoiUpdaterParameters(
+        updaterRef,
+        c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
+        feedId,
+        c
+          .of("frequency")
+          .since(V2_6)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
+        HttpHeadersConfig.headers(c, V2_6)
+      );
+      case BIKEEP -> new BikeepUpdaterParameters(
         updaterRef,
         c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
         feedId,
