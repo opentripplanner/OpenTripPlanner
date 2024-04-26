@@ -31,7 +31,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   private final List<RouteRequest> transferCacheRequests;
   private final List<Duration> pagingSearchWindowAdjustments;
 
-  private final Map<StopTransferPriority, Integer> stopTransferCost;
+  private final Map<StopTransferPriority, Integer> stopBoardAlightDuringTransferCost;
   private final Duration maxSearchWindow;
   private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
@@ -114,18 +114,24 @@ no extra threads are started and the search is done in one thread.
         )
         .asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
-    this.stopTransferCost =
+    this.stopBoardAlightDuringTransferCost =
       c
-        .of("stopTransferCost")
+        .of("stopBoardAlightDuringTransferCost")
         .since(V2_0)
-        .summary("Use this to set a stop transfer cost for the given transfer priority")
+        .summary(
+          "Costs for boarding and alighting during transfers at stops with a given transfer priority."
+        )
         .description(
           """
-The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority
-set, the default is `allowed`. The `stopTransferCost` parameter is optional, but if listed all 
-values must be set.
+This cost is applied **both to boarding and alighting** at stops during transfers. All stops have a
+transfer cost priority set, the default is `allowed`. The `stopBoardAlightDuringTransferCost`
+parameter is optional, but if listed all values must be set.
+
+When a transfer occurs at the same stop, the cost will be applied twice since the cost is both for
+boarding and alighting,
           
-If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+If not set the `stopBoardAlightDuringTransferCost` is ignored. This is only available for NeTEx
+imported Stops.
           
 The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
           
@@ -137,7 +143,7 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 | `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
           
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the 
-`stopTransferCost` is listed.**
+`stopBoardAlightDuringTransferCost` is listed.**
 """
         )
         .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
@@ -250,12 +256,12 @@ for more info."
 
   @Override
   public boolean enableStopTransferPriority() {
-    return stopTransferCost != null;
+    return stopBoardAlightDuringTransferCost != null;
   }
 
   @Override
-  public Integer stopTransferCost(StopTransferPriority key) {
-    return stopTransferCost.get(key);
+  public Integer stopBoardAlightDuringTransferCost(StopTransferPriority key) {
+    return stopBoardAlightDuringTransferCost.get(key);
   }
 
   @Override

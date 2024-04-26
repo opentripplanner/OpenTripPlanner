@@ -7,7 +7,7 @@
     "dynamicSearchWindow": {
       "maxWindow": "24h"
     },
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 3000,
       "ALLOWED": 150,
       "RECOMMENDED": 60,

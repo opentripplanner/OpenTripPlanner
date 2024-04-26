@@ -744,7 +744,7 @@ but we want to calculate the transfers always from OSM data.
 Should there be some preference or aversion for transfers at stops that are part of a station.
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
-with the `stopTransferCost` parameter in the router configuration.
+with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
@@ -993,7 +993,7 @@ but we want to calculate the transfers always from OSM data.
 Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
-with the `stopTransferCost` parameter in the router configuration.
+with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>

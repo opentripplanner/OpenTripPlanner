@@ -48,7 +48,11 @@ public class TransitLayer {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  private final int[] stopBoardAlightCosts;
+  /**
+   * @see #getStopBoardAlightTransferCosts()
+   */
+  @Nullable
+  private final int[] stopBoardAlightTransferCosts;
 
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
@@ -65,7 +69,7 @@ public class TransitLayer {
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
-      transitLayer.stopBoardAlightCosts
+      transitLayer.stopBoardAlightTransferCosts
     );
   }
 
@@ -78,7 +82,7 @@ public class TransitLayer {
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
-    int[] stopBoardAlightCosts
+    @Nullable int[] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -88,7 +92,7 @@ public class TransitLayer {
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
-    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
 
   @Nullable
@@ -166,8 +170,13 @@ public class TransitLayer {
     return transferIndexGenerator;
   }
 
-  public int[] getStopBoardAlightCosts() {
-    return stopBoardAlightCosts;
+  /**
+   * Costs for both boarding and alighting at a given stop during transfer. Note that this is in
+   * raptor centi-second units.
+   */
+  @Nullable
+  public int[] getStopBoardAlightTransferCosts() {
+    return stopBoardAlightTransferCosts;
   }
 
   /**

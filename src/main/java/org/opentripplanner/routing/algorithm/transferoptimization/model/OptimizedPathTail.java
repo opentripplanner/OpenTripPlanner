@@ -33,6 +33,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
 
+  @Nullable
   private final StopPriorityCostCalculator stopPriorityCostCalculator;
 
   private int transferPriorityCost = TransferConstraint.ZERO_COST;
@@ -44,15 +45,18 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     RaptorCostCalculator<T> costCalculator,
     int iterationDepartureTime,
     TransferWaitTimeCostCalculator waitTimeCostCalculator,
-    int[] stopBoardAlightCosts,
+    @Nullable int[] stopBoardAlightTransferCosts,
     double extraStopBoardAlightCostsFactor,
     RaptorStopNameResolver stopNameResolver
   ) {
     super(slackProvider, iterationDepartureTime, costCalculator, stopNameResolver, null);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopPriorityCostCalculator =
-      (stopBoardAlightCosts != null && extraStopBoardAlightCostsFactor > 0.01)
-        ? new StopPriorityCostCalculator(extraStopBoardAlightCostsFactor, stopBoardAlightCosts)
+      (stopBoardAlightTransferCosts != null && extraStopBoardAlightCostsFactor > 0.01)
+        ? new StopPriorityCostCalculator(
+          extraStopBoardAlightCostsFactor,
+          stopBoardAlightTransferCosts
+        )
         : null;
   }
 

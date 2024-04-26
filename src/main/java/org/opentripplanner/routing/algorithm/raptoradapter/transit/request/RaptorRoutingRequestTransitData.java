@@ -104,7 +104,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(
         mcCostParams,
-        transitLayer.getStopBoardAlightCosts()
+        transitLayer.getStopBoardAlightTransferCosts()
       );
 
     this.slackProvider =

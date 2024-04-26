@@ -61,6 +61,7 @@ public class Timetable implements Serializable {
 
   private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
+  @Nullable
   private final LocalDate serviceDate;
 
   /** Construct an empty Timetable. */
