@@ -791,12 +791,12 @@ type QueryType {
     boardSlackDefault: Int = 0,
     "List of boardSlack for a given set of modes. Defaults: []"
     boardSlackList: [TransportModeSlack],
+    "Date and time for the time the user can book the journey. Normally this is when the search is performed, plus a small grace period to complete the booking. Services witch must be booked before this time is excluded. Currently only flex services used as access and egress is supported, not direct flex or other services."
+    bookingTime: DateTime,
     "Date and time for the earliest time the user is willing to start the journey (if arriveBy=false/not set) or the latest acceptable time of arriving (arriveBy=true). Defaults to now"
     dateTime: DateTime,
     "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
     debugItineraryFilter: Boolean = false @deprecated(reason : "Use `itineraryFilter.debug` instead."),
-    "Date and time for the earliest time the user can book the journey"
-    earliestBookingTime: DateTime,
     "A list of filters for which trips should be included. A trip will be included if it matches with at least one filter. An empty list of filters means that all trips should be included. If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
     filters: [TripFilterInput!],
     "The start location"

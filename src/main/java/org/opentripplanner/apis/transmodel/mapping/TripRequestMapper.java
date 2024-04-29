@@ -54,9 +54,8 @@ public class TripRequestMapper {
     );
 
     callWith.argument(
-      "earliestBookingTime",
-      millisSinceEpoch ->
-        request.setEarliestBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      "bookingTime",
+      millisSinceEpoch -> request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
     callWith.argument(

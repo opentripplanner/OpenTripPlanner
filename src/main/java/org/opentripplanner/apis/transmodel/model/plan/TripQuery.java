@@ -61,8 +61,13 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("earliestBookingTime")
-          .description("Date and time for the earliest time the user can book the journey")
+          .name("bookingTime")
+          .description(
+            "Date and time for the time the user can book the journey. Normally this is when the " +
+            "search is performed, plus a small grace period to complete the booking. Services witch " +
+            "must be booked before this time is excluded. Currently only flex services used as " +
+            "access and egress is supported, not direct flex or other services."
+          )
           .type(gqlUtil.dateTimeScalar)
           .build()
       )

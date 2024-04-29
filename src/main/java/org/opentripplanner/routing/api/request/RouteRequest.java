@@ -81,7 +81,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private boolean wheelchair = false;
 
-  private Instant earliestBookingTime;
+  private Instant bookingTime;
 
   /* CONSTRUCTORS */
 
@@ -114,12 +114,17 @@ public class RouteRequest implements Cloneable, Serializable {
     this.preferences = preferences.copyOf().apply(body).build();
   }
 
-  public Instant earliestBookingTime() {
-    return earliestBookingTime;
+  /**
+   * The booking time is used exclude services witch is not bookable at the
+   * requested booking time. If a service is bookable at this time or later, the service
+   * is included. Currently, OTP only supports this for FLEX access and egress.
+   */
+  public Instant bookingTime() {
+    return bookingTime;
   }
 
-  public RouteRequest setEarliestBookingTime(Instant earliestBookingTime) {
-    this.earliestBookingTime = earliestBookingTime;
+  public RouteRequest setBookingTime(Instant bookingTime) {
+    this.bookingTime = bookingTime;
     return this;
   }
 

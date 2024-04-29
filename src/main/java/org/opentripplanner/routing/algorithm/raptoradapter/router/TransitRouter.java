@@ -276,7 +276,7 @@ public class TransitRouter {
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type.isEgress()));
     }
 
-    if (request.earliestBookingTime() != null) {
+    if (request.bookingTime() != null) {
       return results
         .stream()
         .map(routingAccessEgress -> {
@@ -284,7 +284,7 @@ public class TransitRouter {
             return new BookingTimeAccessEgress(
               routingAccessEgress.routingBookingInfo().get(),
               request.dateTime(),
-              request.earliestBookingTime(),
+              request.bookingTime(),
               serverContext.transitService().getTimeZone(),
               routingAccessEgress
             );
