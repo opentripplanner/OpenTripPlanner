@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
@@ -19,35 +20,42 @@ public class BookingInfo implements Serializable, RoutingBookingInfo {
   /**
    * Cannot be set at the same time as minimumBookingNotice or maximumBookingNotice
    */
+  @Nullable
   private final BookingTime earliestBookingTime;
 
   /**
    * Cannot be set at the same time as minimumBookingNotice or maximumBookingNotice
    */
+  @Nullable
   private final BookingTime latestBookingTime;
 
   /**
    * Cannot be set at the same time as earliestBookingTime or latestBookingTime
    */
+  @Nullable
   private final Duration minimumBookingNotice;
 
   /**
    * Cannot be set at the same time as earliestBookingTime or latestBookingTime
    */
+  @Nullable
   private final Duration maximumBookingNotice;
 
+  @Nullable
   private final String message;
 
+  @Nullable
   private final String pickupMessage;
 
+  @Nullable
   private final String dropOffMessage;
 
   BookingInfo(
     ContactInfo contactInfo,
     EnumSet<BookingMethod> bookingMethods,
     BookingTime earliestBookingTime,
-    BookingTime latestBookingTime,
-    Duration minimumBookingNotice,
+    @Nullable BookingTime latestBookingTime,
+    @Nullable Duration minimumBookingNotice,
     Duration maximumBookingNotice,
     String message,
     String pickupMessage,
@@ -87,30 +95,37 @@ public class BookingInfo implements Serializable, RoutingBookingInfo {
     return bookingMethods;
   }
 
+  @Nullable
   public BookingTime getEarliestBookingTime() {
     return earliestBookingTime;
   }
 
+  @Nullable
   public BookingTime getLatestBookingTime() {
     return latestBookingTime;
   }
 
+  @Nullable
   public Duration getMinimumBookingNotice() {
     return minimumBookingNotice;
   }
 
+  @Nullable
   public Duration getMaximumBookingNotice() {
     return maximumBookingNotice;
   }
 
+  @Nullable
   public String getMessage() {
     return message;
   }
 
+  @Nullable
   public String getPickupMessage() {
     return pickupMessage;
   }
 
+  @Nullable
   public String getDropOffMessage() {
     return dropOffMessage;
   }

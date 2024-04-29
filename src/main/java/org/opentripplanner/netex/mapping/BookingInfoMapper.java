@@ -240,24 +240,18 @@ public class BookingInfoMapper {
       Duration minimumBookingPeriod,
       MultilingualString bookingNote
     ) {
-      if (bookingContact != null) {
-        this.bookingContact = bookingContact;
-      }
       if (bookingMethods != null && !bookingMethods.isEmpty()) {
         this.bookingMethods = bookingMethods;
       }
-      if (latestBookingTime != null) {
-        this.latestBookingTime = latestBookingTime;
-      }
-      if (bookWhen != null) {
-        this.bookWhen = bookWhen;
-      }
-      if (minimumBookingPeriod != null) {
-        this.minimumBookingPeriod = minimumBookingPeriod;
-      }
-      if (bookingNote != null) {
-        this.bookingNote = bookingNote;
-      }
+      this.bookingContact = getOrDefault(bookingContact, this.bookingContact);
+      this.minimumBookingPeriod = getOrDefault(minimumBookingPeriod, this.minimumBookingPeriod);
+      this.latestBookingTime = getOrDefault(latestBookingTime, this.latestBookingTime);
+      this.bookWhen = getOrDefault(bookWhen, this.bookWhen);
+      this.bookingNote = getOrDefault(bookingNote, this.bookingNote);
     }
+  }
+
+  private static <T> T getOrDefault(T value, T defaultValue) {
+    return value == null ? defaultValue : value;
   }
 }

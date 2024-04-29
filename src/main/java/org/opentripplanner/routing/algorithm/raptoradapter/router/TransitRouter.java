@@ -172,8 +172,8 @@ public class TransitRouter {
   }
 
   private AccessEgresses fetchAccessEgresses() {
-    final var asyncAccessList = new ArrayList<RoutingAccessEgress>();
-    final var asyncEgressList = new ArrayList<RoutingAccessEgress>();
+    final var accessList = new ArrayList<RoutingAccessEgress>();
+    final var egressList = new ArrayList<RoutingAccessEgress>();
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
@@ -181,19 +181,19 @@ public class TransitRouter {
         //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture
           .allOf(
-            CompletableFuture.runAsync(() -> asyncAccessList.addAll(fetchAccess())),
-            CompletableFuture.runAsync(() -> asyncEgressList.addAll(fetchEgress()))
+            CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
+            CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
           )
           .join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
-      asyncAccessList.addAll(fetchAccess());
-      asyncEgressList.addAll(fetchEgress());
+      accessList.addAll(fetchAccess());
+      egressList.addAll(fetchEgress());
     }
 
-    verifyAccessEgress(asyncAccessList, asyncEgressList);
+    verifyAccessEgress(accessList, egressList);
 
     // Decorate access/egress with a penalty to make it less favourable than transit
     var penaltyDecorator = new AccessEgressPenaltyDecorator(
@@ -202,10 +202,10 @@ public class TransitRouter {
       request.preferences().street().accessEgress().penalty()
     );
 
-    var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
-    var egressList = penaltyDecorator.decorateEgress(asyncEgressList);
+    var accessListWithPenalty = penaltyDecorator.decorateAccess(accessList);
+    var egressListWithPenalty = penaltyDecorator.decorateEgress(egressList);
 
-    return new AccessEgresses(accessList, egressList);
+    return new AccessEgresses(accessListWithPenalty, egressListWithPenalty);
   }
 
   private Collection<? extends RoutingAccessEgress> fetchAccess() {
