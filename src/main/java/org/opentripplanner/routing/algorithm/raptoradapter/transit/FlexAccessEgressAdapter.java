@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.booking.RoutingBookingInfo;
@@ -68,11 +67,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   @Override
   public Optional<RoutingBookingInfo> routingBookingInfo() {
-    return Optional.ofNullable(flexAccessEgress.routingBookingInfo());
-  }
-
-  FlexTrip getFlexTrip() {
-    return flexAccessEgress.trip();
+    return flexAccessEgress.routingBookingInfo();
   }
 
   private static int mapToRaptorTime(int flexTime) {

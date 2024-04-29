@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import java.time.Instant;
-import java.time.ZoneId;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.booking.RoutingBookingInfo;
@@ -11,24 +11,32 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   private final DefaultAccessEgress delegate;
 
-  private final OpeningHoursAdjuster openingHoursAdjuster;
+  /**
+   * The requested time the passenger will book the trip. Normally, this is when the search is
+   * performed plus a small grace period to allow the user to complete the booking.
+   */
+  private final int requestedBookingTime;
+
+  private final RoutingBookingInfo bookingInfo;
 
   public BookingTimeAccessEgress(
+    DefaultAccessEgress delegate,
     RoutingBookingInfo bookingInfo,
-    Instant requestDateTime,
-    Instant earliestBookingTime,
-    ZoneId timeZone,
-    DefaultAccessEgress delegate
+    int requestedBookingTime
   ) {
     this.delegate = delegate;
-    openingHoursAdjuster =
-      new OpeningHoursAdjuster(
-        bookingInfo,
-        delegate,
-        earliestBookingTime,
-        requestDateTime,
-        timeZone
-      );
+    this.requestedBookingTime = requestedBookingTime;
+    this.bookingInfo = bookingInfo;
+  }
+
+  public static RoutingAccessEgress decorateBookingAccessEgress(
+    DefaultAccessEgress accessEgress,
+    int requestedBookingTime
+  ) {
+    var bookingInfo = accessEgress.routingBookingInfo();
+    return bookingInfo.isPresent()
+      ? new BookingTimeAccessEgress(accessEgress, bookingInfo.get(), requestedBookingTime)
+      : accessEgress;
   }
 
   @Override
@@ -48,12 +56,20 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    return openingHoursAdjuster.earliestDepartureTime(requestedDepartureTime);
+    int edt = delegate.earliestDepartureTime(requestedDepartureTime);
+    if (edt == TIME_NOT_SET) {
+      return TIME_NOT_SET;
+    }
+    return bookingInfo.isThereEnoughTimeToBook(edt, requestedBookingTime) ? edt : TIME_NOT_SET;
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    return delegate.latestArrivalTime(requestedArrivalTime);
+    int lat = delegate.latestArrivalTime(requestedArrivalTime);
+    int departureTime = lat - delegate.durationInSeconds();
+    return bookingInfo.isThereEnoughTimeToBook(departureTime, requestedBookingTime)
+      ? lat
+      : TIME_NOT_SET;
   }
 
   @Override
@@ -104,7 +120,11 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
-    return delegate.withPenalty(penalty);
+    return new BookingTimeAccessEgress(
+      delegate.withPenalty(penalty),
+      bookingInfo,
+      requestedBookingTime
+    );
   }
 
   @Override

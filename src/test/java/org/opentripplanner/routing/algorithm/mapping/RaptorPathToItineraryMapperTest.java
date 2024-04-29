@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -142,8 +143,14 @@ public class RaptorPathToItineraryMapperTest {
   void createItineraryWithOnBoardFlexAccess() {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
+    var flexTrip = TEST_MODEL.unscheduledTrip(
+      id("flex"),
+      TEST_MODEL.stop("A:Stop:1").build(),
+      TEST_MODEL.stop("A:Stop:2").build()
+    );
+
     State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
-    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(S1, null, 0, 1, null, state, true);
+    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(S1, null, 0, 1, flexTrip, state, true);
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
     Transfer transfer = new Transfer(S2.getIndex(), 0);
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);

@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
+import static org.opentripplanner.framework.time.TimeUtils.toTransitTimeSeconds;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.ACCESS;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress.decorateBookingAccessEgress;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,7 +25,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -278,21 +279,10 @@ public class TransitRouter {
     }
 
     if (request.bookingTime() != null) {
+      int requestedBookingTime = toTransitTimeSeconds(transitSearchTimeZero, request.bookingTime());
       return results
         .stream()
-        .map(routingAccessEgress -> {
-          if (routingAccessEgress.routingBookingInfo().isPresent()) {
-            return new BookingTimeAccessEgress(
-              routingAccessEgress.routingBookingInfo().get(),
-              request.dateTime(),
-              request.bookingTime(),
-              serverContext.transitService().getTimeZone(),
-              routingAccessEgress
-            );
-          } else {
-            return routingAccessEgress;
-          }
-        })
+        .map(accessEgress -> decorateBookingAccessEgress(accessEgress, requestedBookingTime))
         .toList();
     }
 
