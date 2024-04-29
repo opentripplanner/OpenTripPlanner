@@ -1137,7 +1137,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private Result<UpdateSuccess, UpdateError> handleCanceledTrip(
     FeedScopedId tripId,
     final LocalDate serviceDate,
-    CancelationType markAsDeleted,
+    CancelationType cancelationType,
     boolean canceledPreviouslyAddedTrip
   ) {
     // if previously a added trip was removed, there can't be a scheduled trip to remove
@@ -1145,7 +1145,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return Result.success(UpdateSuccess.noWarnings());
     }
     // Try to cancel scheduled trip
-    final boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate, markAsDeleted);
+    final boolean cancelScheduledSuccess = cancelScheduledTrip(
+      tripId,
+      serviceDate,
+      cancelationType
+    );
 
     if (!cancelScheduledSuccess) {
       debug(tripId, "No pattern found for tripId. Skipping cancellation.");
