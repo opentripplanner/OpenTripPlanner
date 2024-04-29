@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.framework.Result;
@@ -34,9 +33,9 @@ public class RideHailingAccessShifter {
    * so that they only start at the time when the ride hailing vehicle can actually be there
    * to pick up passengers.
    */
-  public static List<RoutingAccessEgress> shiftAccesses(
+  public static List<DefaultAccessEgress> shiftAccesses(
     boolean isAccess,
-    List<RoutingAccessEgress> results,
+    List<DefaultAccessEgress> results,
     List<RideHailingService> services,
     RouteRequest request,
     Instant now

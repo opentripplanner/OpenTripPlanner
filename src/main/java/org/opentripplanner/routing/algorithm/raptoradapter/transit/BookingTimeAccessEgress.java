@@ -9,7 +9,7 @@ import org.opentripplanner.street.search.state.State;
 
 public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
-  private final RoutingAccessEgress delegate;
+  private final DefaultAccessEgress delegate;
 
   private final OpeningHoursAdjuster openingHoursAdjuster;
 
@@ -18,7 +18,7 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
     Instant requestDateTime,
     Instant earliestBookingTime,
     ZoneId timeZone,
-    RoutingAccessEgress delegate
+    DefaultAccessEgress delegate
   ) {
     this.delegate = delegate;
     openingHoursAdjuster =

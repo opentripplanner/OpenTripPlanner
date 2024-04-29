@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -256,7 +257,7 @@ public class TransitRouter {
       stopCountLimit
     );
 
-    List<RoutingAccessEgress> results = new ArrayList<>(
+    List<DefaultAccessEgress> results = new ArrayList<>(
       AccessEgressMapper.mapNearbyStops(nearbyStops, type.isEgress())
     );
     results = timeshiftRideHailing(streetRequest, type, results);
@@ -308,10 +309,10 @@ public class TransitRouter {
    * This method is a good candidate to be moved to the access/egress filter chain when that has
    * been added.
    */
-  private List<RoutingAccessEgress> timeshiftRideHailing(
+  private List<DefaultAccessEgress> timeshiftRideHailing(
     StreetRequest streetRequest,
     AccessEgressType type,
-    List<RoutingAccessEgress> accessEgressList
+    List<DefaultAccessEgress> accessEgressList
   ) {
     if (streetRequest.mode() != StreetMode.CAR_HAILING) {
       return accessEgressList;
