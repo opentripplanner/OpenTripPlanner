@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.restapi.mapping;
 
 import org.opentripplanner.ext.restapi.model.ApiBookingInfo;
-import org.opentripplanner.model.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 public class BookingInfoMapper {
 

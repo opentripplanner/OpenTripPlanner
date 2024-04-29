@@ -4,10 +4,10 @@ package org.opentripplanner.model;
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.model.booking.BookingInfo;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model, it is not

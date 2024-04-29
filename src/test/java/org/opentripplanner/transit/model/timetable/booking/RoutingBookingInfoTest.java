@@ -1,8 +1,8 @@
-package org.opentripplanner.model.booking;
+package org.opentripplanner.transit.model.timetable.booking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.booking.RoutingBookingInfoTest.Expected.LATEST_BOOKING_TIME;
-import static org.opentripplanner.model.booking.RoutingBookingInfoTest.Expected.MIN_BOOKING_NOTICE;
+import static org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfoTest.Expected.LATEST_BOOKING_TIME;
+import static org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfoTest.Expected.MIN_BOOKING_NOTICE;
 
 import java.time.LocalTime;
 import java.util.List;

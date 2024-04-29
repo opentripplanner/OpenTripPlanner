@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
-import org.opentripplanner.model.booking.BookingInfo;
-import org.opentripplanner.model.booking.BookingMethod;
-import org.opentripplanner.model.booking.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 /** Responsible for mapping GTFS BookingRule into the OTP model. */
 class BookingRuleMapper {

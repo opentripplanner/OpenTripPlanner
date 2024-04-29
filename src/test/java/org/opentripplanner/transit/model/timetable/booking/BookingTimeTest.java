@@ -1,4 +1,4 @@
-package org.opentripplanner.model.booking;
+package org.opentripplanner.transit.model.timetable.booking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

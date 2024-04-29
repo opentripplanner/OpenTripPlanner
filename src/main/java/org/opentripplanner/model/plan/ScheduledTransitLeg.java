@@ -21,7 +21,6 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.booking.BookingInfo;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -38,6 +37,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

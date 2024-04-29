@@ -4,8 +4,8 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public class BookingTimeAccessEgress implements RoutingAccessEgress {
 

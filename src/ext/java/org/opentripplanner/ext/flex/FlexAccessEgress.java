@@ -7,9 +7,9 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public final class FlexAccessEgress {
 

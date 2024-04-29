@@ -4,8 +4,8 @@ import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.

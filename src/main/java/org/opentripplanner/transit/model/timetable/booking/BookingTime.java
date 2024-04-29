@@ -1,4 +1,4 @@
-package org.opentripplanner.model.booking;
+package org.opentripplanner.transit.model.timetable.booking;
 
 import java.io.Serializable;
 import java.time.LocalTime;

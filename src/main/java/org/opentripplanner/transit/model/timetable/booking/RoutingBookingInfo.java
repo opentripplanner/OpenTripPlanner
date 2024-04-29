@@ -1,4 +1,4 @@
-package org.opentripplanner.model.booking;
+package org.opentripplanner.transit.model.timetable.booking;
 
 import java.util.Objects;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
