@@ -36,7 +36,7 @@ public final class RoutingBookingInfo {
 
   /**
    * Check if requested board-time can be booked according to the booking info rules. See
-   * {@link org.opentripplanner.model.BookingInfo}.
+   * {@link BookingInfo}.
    * <p>
    * If not the case, the RaptorConstants.TIME_NOT_SET is returned.
    */

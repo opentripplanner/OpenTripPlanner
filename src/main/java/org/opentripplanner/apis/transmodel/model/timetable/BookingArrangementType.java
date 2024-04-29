@@ -8,8 +8,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.booking.BookingInfo;
+import org.opentripplanner.model.booking.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class BookingArrangementType {

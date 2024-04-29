@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.booking.BookingInfo;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 public class ScheduledTripTimesBuilder {

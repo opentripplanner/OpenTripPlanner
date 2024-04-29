@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.booking.BookingInfo;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;

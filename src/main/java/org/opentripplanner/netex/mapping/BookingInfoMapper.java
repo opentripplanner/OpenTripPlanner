@@ -9,10 +9,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingInfoBuilder;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.booking.BookingInfo;
+import org.opentripplanner.model.booking.BookingMethod;
+import org.opentripplanner.model.booking.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
 import org.rutebanken.netex.model.BookingMethodEnumeration;
@@ -221,7 +220,8 @@ public class BookingInfoMapper {
       }
 
       String bookingInfoMessage = bookingNote != null ? bookingNote.getValue() : null;
-      return new BookingInfoBuilder()
+      return BookingInfo
+        .of()
         .withContactInfo(contactInfo)
         .withBookingMethods(filteredBookingMethods)
         .withEarliestBookingTime(otpEarliestBookingTime)

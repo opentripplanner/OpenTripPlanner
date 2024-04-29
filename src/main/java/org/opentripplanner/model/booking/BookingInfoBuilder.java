@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.model.booking;
 
 import java.time.Duration;
 import java.util.EnumSet;
@@ -6,15 +6,17 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class BookingInfoBuilder {
 
-  private ContactInfo contactInfo;
-  private EnumSet<BookingMethod> bookingMethods;
-  private BookingTime earliestBookingTime;
-  private BookingTime latestBookingTime;
-  private Duration minimumBookingNotice;
-  private Duration maximumBookingNotice;
-  private String message;
-  private String pickupMessage;
-  private String dropOffMessage;
+  ContactInfo contactInfo;
+  EnumSet<BookingMethod> bookingMethods;
+  BookingTime earliestBookingTime;
+  BookingTime latestBookingTime;
+  Duration minimumBookingNotice;
+  Duration maximumBookingNotice;
+  String message;
+  String pickupMessage;
+  String dropOffMessage;
+
+  BookingInfoBuilder() {}
 
   public BookingInfoBuilder withContactInfo(ContactInfo contactInfo) {
     this.contactInfo = contactInfo;
@@ -62,16 +64,6 @@ public class BookingInfoBuilder {
   }
 
   public BookingInfo build() {
-    return new BookingInfo(
-      contactInfo,
-      bookingMethods,
-      earliestBookingTime,
-      latestBookingTime,
-      minimumBookingNotice,
-      maximumBookingNotice,
-      message,
-      pickupMessage,
-      dropOffMessage
-    );
+    return new BookingInfo(this);
   }
 }

@@ -28,6 +28,8 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.booking.BookingInfo;
+import org.opentripplanner.model.booking.BookingTime;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -210,9 +212,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> dropOffMessage();
 
-    public DataFetcher<org.opentripplanner.model.BookingTime> earliestBookingTime();
+    public DataFetcher<BookingTime> earliestBookingTime();
 
-    public DataFetcher<org.opentripplanner.model.BookingTime> latestBookingTime();
+    public DataFetcher<BookingTime> latestBookingTime();
 
     public DataFetcher<Long> maximumBookingNoticeSeconds();
 
@@ -439,7 +441,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> distance();
 
-    public DataFetcher<org.opentripplanner.model.BookingInfo> dropOffBookingInfo();
+    public DataFetcher<BookingInfo> dropOffBookingInfo();
 
     public DataFetcher<String> dropoffType();
 
@@ -471,7 +473,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Leg>> nextLegs();
 
-    public DataFetcher<org.opentripplanner.model.BookingInfo> pickupBookingInfo();
+    public DataFetcher<BookingInfo> pickupBookingInfo();
 
     public DataFetcher<String> pickupType();
 

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.restapi.mapping;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.booking.BookingMethod;
 
 public class BookingMethodMapper {
 

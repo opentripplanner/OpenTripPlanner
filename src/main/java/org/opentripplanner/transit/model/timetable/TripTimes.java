@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.booking.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**

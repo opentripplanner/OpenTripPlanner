@@ -1,10 +1,9 @@
-package org.opentripplanner.model;
+package org.opentripplanner.model.booking;
 
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.Objects;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * Represents either an earliest or latest time a trip can be booked relative to the departure day
@@ -56,10 +55,6 @@ public class BookingTime implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(BookingTime.class)
-      .addObj("time", time)
-      .addNum("daysPrior", daysPrior, 0)
-      .toString();
+    return daysPrior == 0 ? time.toString() : time.toString() + "-" + daysPrior + "d";
   }
 }

@@ -6,7 +6,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.framework.doc.DocumentedEnum;
-import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.booking.BookingMethod;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;

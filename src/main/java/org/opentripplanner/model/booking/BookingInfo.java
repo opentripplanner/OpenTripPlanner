@@ -1,11 +1,11 @@
-package org.opentripplanner.model;
+package org.opentripplanner.model.booking;
 
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.booking.RoutingBookingInfo;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
@@ -51,41 +51,35 @@ public class BookingInfo implements Serializable {
   @Nullable
   private final String dropOffMessage;
 
-  BookingInfo(
-    ContactInfo contactInfo,
-    EnumSet<BookingMethod> bookingMethods,
-    BookingTime earliestBookingTime,
-    @Nullable BookingTime latestBookingTime,
-    @Nullable Duration minimumBookingNotice,
-    Duration maximumBookingNotice,
-    String message,
-    String pickupMessage,
-    String dropOffMessage
-  ) {
-    this.contactInfo = contactInfo;
-    this.bookingMethods = bookingMethods;
-    this.message = message;
-    this.pickupMessage = pickupMessage;
-    this.dropOffMessage = dropOffMessage;
+  BookingInfo(BookingInfoBuilder builder) {
+    this.contactInfo = builder.contactInfo;
+    this.bookingMethods = builder.bookingMethods;
+    this.message = builder.message;
+    this.pickupMessage = builder.pickupMessage;
+    this.dropOffMessage = builder.dropOffMessage;
 
     // Ensure that earliestBookingTime/latestBookingTime is not set at the same time as
     // minimumBookingNotice/maximumBookingNotice
-    if (earliestBookingTime != null || latestBookingTime != null) {
-      this.earliestBookingTime = earliestBookingTime;
-      this.latestBookingTime = latestBookingTime;
+    if (builder.earliestBookingTime != null || builder.latestBookingTime != null) {
+      this.earliestBookingTime = builder.earliestBookingTime;
+      this.latestBookingTime = builder.latestBookingTime;
       this.minimumBookingNotice = null;
       this.maximumBookingNotice = null;
-    } else if (minimumBookingNotice != null || maximumBookingNotice != null) {
+    } else if (builder.minimumBookingNotice != null || builder.maximumBookingNotice != null) {
       this.earliestBookingTime = null;
       this.latestBookingTime = null;
-      this.minimumBookingNotice = minimumBookingNotice;
-      this.maximumBookingNotice = maximumBookingNotice;
+      this.minimumBookingNotice = builder.minimumBookingNotice;
+      this.maximumBookingNotice = builder.maximumBookingNotice;
     } else {
       this.earliestBookingTime = null;
       this.latestBookingTime = null;
       this.minimumBookingNotice = null;
       this.maximumBookingNotice = null;
     }
+  }
+
+  public static BookingInfoBuilder of() {
+    return new BookingInfoBuilder();
   }
 
   public ContactInfo getContactInfo() {
@@ -162,5 +156,21 @@ public class BookingInfo implements Serializable {
       builder.withMinimumBookingNotice((int) minimumBookingNotice.toSeconds() - flexTripAccessTime);
     }
     return Optional.of(builder.build());
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(BookingInfo.class)
+      .addObj("cntactInfo", contactInfo)
+      .addObj("bookingMethods", bookingMethods)
+      .addObj("earliestBookingTime", earliestBookingTime)
+      .addObj("latestBookingTime", latestBookingTime)
+      .addDuration("minimumBookingNotice", minimumBookingNotice)
+      .addDuration("maximumBookingNotice", maximumBookingNotice)
+      .addStr("message", message)
+      .addStr("pickupMessage", pickupMessage)
+      .addStr("dropOffMessage", dropOffMessage)
+      .toString();
   }
 }
