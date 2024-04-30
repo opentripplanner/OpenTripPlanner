@@ -46,11 +46,6 @@ class BookingInfoTest {
       "BookingInfo{cntactInfo: ContactInfo{contactPerson: 'Jo Contact', bookingUrl: 'http://booking.otp.org'}, bookingMethods: [CALL_DRIVER], latestBookingTime: 12:00, message: 'message', pickupMessage: 'pickup', dropOffMessage: 'dropoff'}",
       subject.toString()
     );
-
-    assertEquals(
-      "Optional[RoutingBookingInfo{latestBookingTime: 12:00}]",
-      subject.createRoutingBookingInfo(45).toString()
-    );
   }
 
   @Test
@@ -68,11 +63,6 @@ class BookingInfoTest {
     assertEquals(
       "BookingInfo{bookingMethods: [CALL_DRIVER], minimumBookingNotice: 45m}",
       subject.toString()
-    );
-
-    assertEquals(
-      "Optional[RoutingBookingInfo{minimumBookingNotice: 44m15s}]",
-      subject.createRoutingBookingInfo(45).toString()
     );
   }
 }

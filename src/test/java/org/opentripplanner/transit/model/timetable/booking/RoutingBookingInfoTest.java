@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfoTest.Expected.LATEST_BOOKING_TIME;
 import static org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfoTest.Expected.MIN_BOOKING_NOTICE;
 
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 class RoutingBookingInfoTest {
 
@@ -19,24 +21,6 @@ class RoutingBookingInfoTest {
   private static final LocalTime T13_00 = LocalTime.of(13, 0);
   private static final LocalTime T14_00 = LocalTime.of(14, 0);
   private static final LocalTime LATEST_BOOKING_TIME_13_00 = T13_00;
-
-  // NeTEx does not support booking notice and latest booking time, but there is no conflict
-  // between these parameters. To make sure we support all combinations, we create all 3:
-  private final RoutingBookingInfo subjectBoth = RoutingBookingInfo
-    .of()
-    .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
-    .withLatestBookingTime(LATEST_BOOKING_TIME_13_00.toSecondOfDay())
-    .build();
-
-  private final RoutingBookingInfo subjectMinBookingNotice = RoutingBookingInfo
-    .of()
-    .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
-    .build();
-
-  private final RoutingBookingInfo subjectLatestBookingTime = RoutingBookingInfo
-    .of()
-    .withLatestBookingTime(LATEST_BOOKING_TIME_13_00.toSecondOfDay())
-    .build();
 
   static List<Arguments> testCase() {
     //   BOARD-TIME   |   REQUESTED-BOOKING-TIME   |   EXPECTED
@@ -57,7 +41,7 @@ class RoutingBookingInfoTest {
 
   @ParameterizedTest
   @MethodSource("testCase")
-  void isThereEnoughTimeToBookWithMinBookingTime(
+  void isThereEnoughTimeToBookWithMinBookingTimeBeforeDeparture(
     LocalTime searchTime,
     LocalTime requestedBookingTime,
     Expected expected
@@ -65,9 +49,56 @@ class RoutingBookingInfoTest {
     int searchTimeSec = searchTime.toSecondOfDay();
     int reqBookingTime = requestedBookingTime.toSecondOfDay();
 
+    var subject = RoutingBookingInfo
+      .of()
+      .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
+      .build()
+      .orElseThrow();
+
+    // Since we have not set a duration or offset, departure and arrival is the same
     assertEquals(
       expected.minBookingNotice,
-      subjectMinBookingNotice.isThereEnoughTimeToBook(searchTimeSec, reqBookingTime)
+      subject.isThereEnoughTimeToBookForDeparture(searchTimeSec, reqBookingTime)
+    );
+    assertEquals(
+      expected.minBookingNotice,
+      subject.isThereEnoughTimeToBookForArrival(searchTimeSec, reqBookingTime)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("testCase")
+  void isThereEnoughTimeToBookWithMinBookingTimeBeforeArrival(
+    LocalTime searchTime,
+    LocalTime requestedBookingTime,
+    Expected expected
+  ) {
+    int duration = 110;
+    int offset = 10;
+    int departureTimeSec = searchTime.toSecondOfDay() - offset;
+    int arrivalTimeSec = departureTimeSec + duration;
+    int reqBookingTime = requestedBookingTime.toSecondOfDay();
+
+    var subject = RoutingBookingInfo
+      .of()
+      .withBookingInfo(
+        BookingInfo
+          .of()
+          .withMinimumBookingNotice(Duration.ofSeconds(MINIMUM_BOOKING_NOTICE_20m))
+          .build()
+      )
+      .withLegDurationInSeconds(duration)
+      .withTimeOffsetInSeconds(offset)
+      .build()
+      .orElseThrow();
+
+    assertEquals(
+      expected.minBookingNotice,
+      subject.isThereEnoughTimeToBookForDeparture(departureTimeSec, reqBookingTime)
+    );
+    assertEquals(
+      expected.minBookingNotice,
+      subject.isThereEnoughTimeToBookForArrival(arrivalTimeSec, reqBookingTime)
     );
   }
 
@@ -78,12 +109,32 @@ class RoutingBookingInfoTest {
     LocalTime requestedBookingTime,
     Expected expected
   ) {
-    int searchTimeSec = searchTime.toSecondOfDay();
+    int duration = 300;
+    int offset = 50;
+    int departureTimeSec = searchTime.toSecondOfDay() - offset;
+    int arrivalTimeSec = departureTimeSec + duration;
     int reqBookingTime = requestedBookingTime.toSecondOfDay();
+
+    var subject = RoutingBookingInfo
+      .of()
+      .withBookingInfo(
+        BookingInfo
+          .of()
+          .withLatestBookingTime(new BookingTime(LATEST_BOOKING_TIME_13_00, 0))
+          .build()
+      )
+      .withLegDurationInSeconds(duration)
+      .withTimeOffsetInSeconds(offset)
+      .build()
+      .orElseThrow();
 
     assertEquals(
       expected.latestBookingTime,
-      subjectLatestBookingTime.isThereEnoughTimeToBook(searchTimeSec, reqBookingTime)
+      subject.isThereEnoughTimeToBookForDeparture(departureTimeSec, reqBookingTime)
+    );
+    assertEquals(
+      expected.latestBookingTime,
+      subject.isThereEnoughTimeToBookForArrival(arrivalTimeSec, reqBookingTime)
     );
   }
 
@@ -94,28 +145,52 @@ class RoutingBookingInfoTest {
     LocalTime requestedBookingTime,
     Expected expected
   ) {
-    int searchTimeSec = searchTime.toSecondOfDay();
+    int duration = 0;
+    int offset = 0;
+    int departureTimeSec = searchTime.toSecondOfDay() - offset;
+    int arrivalTimeSec = departureTimeSec + duration;
     int reqBookingTime = requestedBookingTime.toSecondOfDay();
+
+    // NeTEx does not support booking notice and latest booking time, but there is no conflict
+    // between these parameters. To make sure we support all combinations, we create all 3:
+    var subject = RoutingBookingInfo
+      .of()
+      .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
+      .withLatestBookingTime(LATEST_BOOKING_TIME_13_00.toSecondOfDay())
+      .withLegDurationInSeconds(duration)
+      .withTimeOffsetInSeconds(offset)
+      .build()
+      .orElseThrow();
 
     assertEquals(
       expected == Expected.BOTH,
-      subjectBoth.isThereEnoughTimeToBook(searchTimeSec, reqBookingTime)
+      subject.isThereEnoughTimeToBookForDeparture(departureTimeSec, reqBookingTime),
+      expected +
+      " " +
+      subject +
+      " " +
+      TimeUtils.timeToStrLong(departureTimeSec) +
+      " " +
+      TimeUtils.timeToStrLong(reqBookingTime)
+    );
+    assertEquals(
+      expected == Expected.BOTH,
+      subject.isThereEnoughTimeToBookForArrival(arrivalTimeSec, reqBookingTime)
     );
   }
 
   @Test
   void testToString() {
-    assertEquals(
-      "RoutingBookingInfo{minimumBookingNotice: 20m}",
-      subjectMinBookingNotice.toString()
-    );
-    assertEquals(
-      "RoutingBookingInfo{latestBookingTime: 13:00}",
-      subjectLatestBookingTime.toString()
-    );
+    var subject = RoutingBookingInfo
+      .of()
+      .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
+      .withLatestBookingTime(LATEST_BOOKING_TIME_13_00.toSecondOfDay())
+      .build()
+      .orElseThrow();
+
     assertEquals(
       "RoutingBookingInfo{latestBookingTime: 13:00, minimumBookingNotice: 20m}",
-      subjectBoth.toString()
+      subject.toString()
     );
   }
 
@@ -125,8 +200,8 @@ class RoutingBookingInfoTest {
     LATEST_BOOKING_TIME(false, true),
     BOTH(true, true);
 
-    boolean minBookingNotice;
-    boolean latestBookingTime;
+    final boolean minBookingNotice;
+    final boolean latestBookingTime;
 
     Expected(boolean minBookingNotice, boolean latestBookingTime) {
       this.minBookingNotice = minBookingNotice;

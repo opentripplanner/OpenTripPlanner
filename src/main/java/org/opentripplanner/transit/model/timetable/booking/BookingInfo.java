@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.timetable.booking;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -123,39 +122,6 @@ public class BookingInfo implements Serializable {
   @Nullable
   public String getDropOffMessage() {
     return dropOffMessage;
-  }
-
-  /**
-   * Create new booking-info for routing based on the parameters used by the trip planner
-   * routing. The {@code latestBookingTime} and {@code minimumBookingNotice} is checked
-   * to make sure the service is bookable using the request parameter {@code bookingTime}.
-   * <p>
-   * This method returns empty if this object does not contain parameters used by the
-   * routing algorithm.
-   *<p>
-   * @param flexTripAccessTime The time used for access before boarding the Flex trip - it could
-   *                           include slack or walk time.
-   */
-  @Nullable
-  public Optional<RoutingBookingInfo> createRoutingBookingInfo(int flexTripAccessTime) {
-    if (minimumBookingNotice == null && latestBookingTime == null) {
-      return Optional.empty();
-    }
-    var builder = RoutingBookingInfo.of();
-
-    if (latestBookingTime != null) {
-      // TODO TGR BOOKING_TIME - This do not look right. Why would we remove the time it takes to
-      //     walk to a flex area here. This is about the time we want to book. I could see how this
-      //     should apply to the `minimumBookingNotice` because it is relative to the board-time
-      //     but not the `latestBookingTime`.
-      // builder.withLatestBookingTime(latestBookingTime.relativeTime() - flexTripAccessTime);
-      builder.withLatestBookingTime(latestBookingTime.relativeTimeSeconds());
-    }
-    if (minimumBookingNotice != null) {
-      // builder.withMinimumBookingNotice((int) minimumBookingNotice.toSeconds());
-      builder.withMinimumBookingNotice((int) minimumBookingNotice.toSeconds() - flexTripAccessTime);
-    }
-    return Optional.of(builder.build());
   }
 
   @Override

@@ -110,6 +110,11 @@ public final class FlexAccessEgress {
     if (bookingInfo == null) {
       return Optional.empty();
     }
-    return bookingInfo.createRoutingBookingInfo(pathDurations.access());
+    return RoutingBookingInfo
+      .of()
+      .withBookingInfo(bookingInfo)
+      .withLegDurationInSeconds(pathDurations.total())
+      .withTimeOffsetInSeconds(pathDurations.access())
+      .build();
   }
 }

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router;
 import static org.opentripplanner.framework.time.TimeUtils.toTransitTimeSeconds;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.ACCESS;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress.decorateBookingAccessEgress;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingRestrictionAccessEgress.decorateAccessEgressBookingRestriction;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -282,7 +282,9 @@ public class TransitRouter {
       int requestedBookingTime = toTransitTimeSeconds(transitSearchTimeZero, request.bookingTime());
       return results
         .stream()
-        .map(accessEgress -> decorateBookingAccessEgress(accessEgress, requestedBookingTime))
+        .map(accessEgress ->
+          decorateAccessEgressBookingRestriction(accessEgress, requestedBookingTime)
+        )
         .toList();
     }
 

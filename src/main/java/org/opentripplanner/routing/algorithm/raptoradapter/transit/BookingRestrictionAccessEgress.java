@@ -7,7 +7,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
-public class BookingTimeAccessEgress implements RoutingAccessEgress {
+public class BookingRestrictionAccessEgress implements RoutingAccessEgress {
 
   private final DefaultAccessEgress delegate;
 
@@ -19,7 +19,7 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   private final RoutingBookingInfo bookingInfo;
 
-  public BookingTimeAccessEgress(
+  public BookingRestrictionAccessEgress(
     DefaultAccessEgress delegate,
     RoutingBookingInfo bookingInfo,
     int requestedBookingTime
@@ -29,13 +29,13 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
     this.bookingInfo = bookingInfo;
   }
 
-  public static RoutingAccessEgress decorateBookingAccessEgress(
+  public static RoutingAccessEgress decorateAccessEgressBookingRestriction(
     DefaultAccessEgress accessEgress,
     int requestedBookingTime
   ) {
     var bookingInfo = accessEgress.routingBookingInfo();
     return bookingInfo.isPresent()
-      ? new BookingTimeAccessEgress(accessEgress, bookingInfo.get(), requestedBookingTime)
+      ? new BookingRestrictionAccessEgress(accessEgress, bookingInfo.get(), requestedBookingTime)
       : accessEgress;
   }
 
@@ -60,16 +60,22 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
     if (edt == TIME_NOT_SET) {
       return TIME_NOT_SET;
     }
-    return bookingInfo.isThereEnoughTimeToBook(edt, requestedBookingTime) ? edt : TIME_NOT_SET;
+    if (bookingInfo.isThereEnoughTimeToBookForDeparture(edt, requestedBookingTime)) {
+      return edt;
+    }
+    return TIME_NOT_SET;
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    int lat = delegate.latestArrivalTime(requestedArrivalTime);
-    int departureTime = lat - delegate.durationInSeconds();
-    return bookingInfo.isThereEnoughTimeToBook(departureTime, requestedBookingTime)
-      ? lat
-      : TIME_NOT_SET;
+    var lat = delegate.latestArrivalTime(requestedArrivalTime);
+    if (lat == TIME_NOT_SET) {
+      return TIME_NOT_SET;
+    }
+    if (bookingInfo.isThereEnoughTimeToBookForArrival(lat, requestedBookingTime)) {
+      return lat;
+    }
+    return TIME_NOT_SET;
   }
 
   @Override
@@ -120,7 +126,7 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
-    return new BookingTimeAccessEgress(
+    return new BookingRestrictionAccessEgress(
       delegate.withPenalty(penalty),
       bookingInfo,
       requestedBookingTime

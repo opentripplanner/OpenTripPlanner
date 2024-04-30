@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.opentripplanner.framework.time.TimeUtils;
 
 /**
- * Represents either an earliest or latest time a trip can be booked relative to the departure day
+ * Represents either the earliest or latest time a trip can be booked relative to the departure day
  * of the trip.
  */
 public class BookingTime implements Serializable {

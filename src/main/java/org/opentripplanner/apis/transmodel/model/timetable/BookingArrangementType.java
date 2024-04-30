@@ -127,7 +127,8 @@ public class BookingArrangementType {
                 return "other";
               }
             } else if (
-              earliestBookingTime.getDaysPrior() == 0 && (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
+              earliestBookingTime.getDaysPrior() == 0 &&
+              (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
             ) {
               return "dayOfTravelOnly";
             } else {
