@@ -52,6 +52,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   // we should DEFINITELY rename this variable and the associated methods.
   public double walkDistance;
 
+  // how far a vehicle powered by battery has driven
+  public double batteryDistance;
+
   /* CONSTRUCTORS */
 
   /**
@@ -82,6 +85,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         vertex.rentalRestrictions().noDropOffNetworks();
     }
     this.walkDistance = 0;
+    this.batteryDistance = 0;
     this.time = startTime.getEpochSecond();
   }
 
@@ -360,6 +364,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
       editor.incrementWeight(orig.getWeightDelta());
       editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+      editor.incrementBatteryDistance(orig.getBatteryDistanceDelta());
 
       // propagate the modes through to the reversed edge
       editor.setBackMode(orig.getBackMode());
@@ -498,6 +503,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   private double getWalkDistanceDelta() {
     if (backState != null) {
       return Math.abs(this.walkDistance - backState.walkDistance);
+    } else {
+      return 0.0;
+    }
+  }
+
+  private double getBatteryDistanceDelta() {
+    if (backState != null) {
+      return Math.abs(this.batteryDistance - backState.batteryDistance);
     } else {
       return 0.0;
     }

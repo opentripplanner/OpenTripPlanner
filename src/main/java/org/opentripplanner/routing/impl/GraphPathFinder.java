@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.astar.strategy.BatteryDistanceSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -87,11 +89,9 @@ public class GraphPathFinder {
     StreetSearchBuilder aStar = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-      .setSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy(
-          preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
-        )
-      )
+      .setSkipEdgeStrategy(new ComposingSkipEdgeStrategy<>(new DurationSkipEdgeStrategy(
+        preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+      ), new BatteryDistanceSkipEdgeStrategy()))
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
