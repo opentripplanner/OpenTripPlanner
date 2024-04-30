@@ -22,7 +22,7 @@ class DefaultAccessEgressTest {
   public static final TimeAndCost PENALTY = new TimeAndCost(TIME_PENALTY, COST_PENALTY);
 
   private final DefaultAccessEgress subject = new DefaultAccessEgress(STOP, LAST_STATE);
-  private final DefaultAccessEgress subjectWithPenalty = subject.withPenalty(PENALTY);
+  private final RoutingAccessEgress subjectWithPenalty = subject.withPenalty(PENALTY);
 
   @Test
   void canNotAddPenaltyTwice() {

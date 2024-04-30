@@ -50,7 +50,7 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
   }
 
   @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
     return new RideHailingAccessAdapter(this, penalty);
   }
 

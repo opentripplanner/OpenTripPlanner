@@ -34,7 +34,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.api.response.StopArrivals;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
@@ -178,7 +178,7 @@ public class TravelTimeResource {
     }
   }
 
-  private Collection<DefaultAccessEgress> getAccess(TemporaryVerticesContainer temporaryVertices) {
+  private Collection<RoutingAccessEgress> getAccess(TemporaryVerticesContainer temporaryVertices) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
       routingRequest,
       temporaryVertices,

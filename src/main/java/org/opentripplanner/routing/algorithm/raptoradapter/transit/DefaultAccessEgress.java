@@ -99,7 +99,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
    * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
    */
   @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
     return new DefaultAccessEgress(this, penalty);
   }
 

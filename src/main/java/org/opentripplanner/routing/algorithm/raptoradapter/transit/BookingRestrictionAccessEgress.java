@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public class BookingRestrictionAccessEgress implements RoutingAccessEgress {
 
-  private final DefaultAccessEgress delegate;
+  private final RoutingAccessEgress delegate;
 
   /**
    * The requested time the passenger will book the trip. Normally, this is when the search is
@@ -20,7 +20,7 @@ public class BookingRestrictionAccessEgress implements RoutingAccessEgress {
   private final RoutingBookingInfo bookingInfo;
 
   public BookingRestrictionAccessEgress(
-    DefaultAccessEgress delegate,
+    RoutingAccessEgress delegate,
     RoutingBookingInfo bookingInfo,
     int requestedBookingTime
   ) {
@@ -30,7 +30,7 @@ public class BookingRestrictionAccessEgress implements RoutingAccessEgress {
   }
 
   public static RoutingAccessEgress decorateAccessEgressBookingRestriction(
-    DefaultAccessEgress accessEgress,
+    RoutingAccessEgress accessEgress,
     int requestedBookingTime
   ) {
     var bookingInfo = accessEgress.routingBookingInfo();
