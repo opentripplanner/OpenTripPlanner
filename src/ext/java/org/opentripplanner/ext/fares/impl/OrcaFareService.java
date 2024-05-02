@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class OrcaFareService extends DefaultFareService {
 
@@ -50,6 +52,12 @@ public class OrcaFareService extends DefaultFareService {
     "cash"
   );
 
+  protected enum TransferType {
+    ORCA_INTERAGENCY_TRANSFER,
+    SAME_AGENCY_TRANSFER,
+    NO_TRANSFER,
+  }
+
   protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
     COMM_TRANS_COMMUTER_EXPRESS,
@@ -75,12 +83,25 @@ public class OrcaFareService extends DefaultFareService {
     SKAGIT_CROSS_COUNTY,
     UNKNOWN;
 
+    public TransferType getTransferType(FareType fareType) {
+      if (usesOrca(fareType) && this.permitsFreeTransfers()) {
+        return TransferType.ORCA_INTERAGENCY_TRANSFER;
+      } else if (this == KC_METRO || this == KITSAP_TRANSIT) {
+        return TransferType.SAME_AGENCY_TRANSFER;
+      }
+      return TransferType.NO_TRANSFER;
+    }
+
     /**
      * All transit agencies permit free transfers, apart from these.
      */
     public boolean permitsFreeTransfers() {
       return switch (this) {
-        case WASHINGTON_STATE_FERRIES, SKAGIT_TRANSIT -> false;
+        case WASHINGTON_STATE_FERRIES,
+          SKAGIT_TRANSIT,
+          WHATCOM_LOCAL,
+          WHATCOM_CROSS_COUNTY,
+          SKAGIT_CROSS_COUNTY -> false;
         default -> true;
       };
     }
@@ -90,6 +111,46 @@ public class OrcaFareService extends DefaultFareService {
         case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL -> false;
         default -> true;
       };
+    }
+  }
+
+  static class TransferData {
+
+    Money transferDiscount;
+    ZonedDateTime transferStartTime;
+
+    FareType fareType;
+
+    public TransferData(FareType fareType) {
+      this.fareType = fareType;
+    }
+
+    public Money getDiscountedLegPrice(Leg leg, Money legPrice) {
+      if (transferStartTime != null) {
+        var inFreeTransferWindow = inFreeTransferWindow(transferStartTime, leg.getStartTime());
+        if (inFreeTransferWindow) {
+          if (legPrice.greaterThan(transferDiscount)) {
+            this.transferStartTime = leg.getStartTime();
+            var discountedLegFare = legPrice.minus(this.transferDiscount);
+            this.transferDiscount = legPrice;
+            return discountedLegFare;
+          }
+          return Money.ZERO_USD;
+        }
+      }
+      // Start a new transfer
+      this.transferDiscount = legPrice;
+      this.transferStartTime = leg.getStartTime();
+      return legPrice;
+    }
+
+    public void update(Money transferDiscount, ZonedDateTime transferStartTime) {
+      this.transferDiscount = transferDiscount;
+      this.transferStartTime = transferStartTime;
+    }
+
+    public void update(Money transferDiscount) {
+      this.transferDiscount = transferDiscount;
     }
   }
 
@@ -403,17 +464,14 @@ public class OrcaFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     var fare = ItineraryFares.empty();
-    ZonedDateTime freeTransferStartTime = null;
     Money cost = Money.ZERO_USD;
-    Money orcaFareDiscount = Money.ZERO_USD;
+    var orcaFareDiscount = new TransferData(fareType);
+    HashMap<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
+
     for (Leg leg : legs) {
       RideType rideType = getRideType(leg);
       assert rideType != null;
       boolean ridePermitsFreeTransfers = rideType.permitsFreeTransfers();
-      if (freeTransferStartTime == null && ridePermitsFreeTransfers) {
-        // The start of a free transfer must be with a transit agency that permits it!
-        freeTransferStartTime = leg.getStartTime();
-      }
       Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
       Optional<Money> optionalLegFare = singleLegPrice.flatMap(slp ->
         getLegFare(fareType, rideType, slp, leg)
@@ -424,61 +482,30 @@ public class OrcaFareService extends DefaultFareService {
       }
       Money legFare = optionalLegFare.get();
 
-      boolean inFreeTransferWindow = inFreeTransferWindow(
-        freeTransferStartTime,
-        leg.getStartTime()
-      );
-      if (hasFreeTransfers(fareType, rideType) && inFreeTransferWindow) {
-        // If using Orca (free transfers), the total fare should be equivalent to the
-        // most expensive leg of the journey.
-        // If the new fare is more than the current ORCA amount, the transfer is extended.
-        if (legFare.greaterThan(orcaFareDiscount)) {
-          freeTransferStartTime = leg.getStartTime();
-          // Note: on first leg, discount will be 0 meaning no transfer was applied.
-          addLegFareProduct(leg, fare, fareType, legFare.minus(orcaFareDiscount), orcaFareDiscount);
-          orcaFareDiscount = legFare;
+      var transferType = rideType.getTransferType(fareType);
+      if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
+        var discountedFare = orcaFareDiscount.getDiscountedLegPrice(leg, legFare);
+        var transferDiscount = legFare.minus(discountedFare);
+        addLegFareProduct(leg, fare, fareType, discountedFare, transferDiscount);
+        cost = cost.plus(discountedFare);
+      } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
+        TransferData transferData;
+        if (perAgencyTransferDiscount.containsKey(leg.getAgency().getName())) {
+          transferData = perAgencyTransferDiscount.get(leg.getAgency().getName());
         } else {
-          // Ride is free, counts as a transfer if legFare is NOT free
-          addLegFareProduct(
-            leg,
-            fare,
-            fareType,
-            Money.ZERO_USD,
-            legFare.isPositive() ? orcaFareDiscount : Money.ZERO_USD
-          );
+          transferData = new TransferData(fareType);
+          perAgencyTransferDiscount.put(leg.getAgency().getName(), transferData);
         }
-      } else if (usesOrca(fareType) && !inFreeTransferWindow) {
-        // If using Orca and outside of the free transfer window, add the cumulative Orca fare (the maximum leg
-        // fare encountered within the free transfer window).
-        cost = cost.plus(orcaFareDiscount);
-
-        // Reset the free transfer start time and next Orca fare as needed.
-        if (ridePermitsFreeTransfers) {
-          // The leg is using a ride type that permits free transfers.
-          // The next free transfer window begins at the start time of this leg.
-          freeTransferStartTime = leg.getStartTime();
-          // Reset the Orca fare to be the fare of this leg.
-          orcaFareDiscount = legFare;
-        } else {
-          // The leg is not using a ride type that permits free transfers.
-          // Since there are no free transfers for this leg, increase the total cost by the fare for this leg.
-          cost = cost.plus(legFare);
-          // The current free transfer window has expired and won't start again until another leg is
-          // encountered that does have free transfers.
-          freeTransferStartTime = null;
-          // The previous Orca fare has been applied to the total cost. Also, the non-free transfer cost has
-          // also been applied to the total cost. Therefore, the next Orca cost for the next free-transfer
-          // window needs to be reset to 0 so that it is not applied after looping through all rides.
-          orcaFareDiscount = Money.ZERO_USD;
-        }
-        addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
+        var discountedFare = transferData.getDiscountedLegPrice(leg, legFare);
+        var transferDiscount = legFare.minus(discountedFare);
+        addLegFareProduct(leg, fare, fareType, discountedFare, transferDiscount);
+        cost = cost.plus(discountedFare);
       } else {
         // If not using Orca, add the agency's default price for this leg.
         addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
         cost = cost.plus(legFare);
       }
     }
-    cost = cost.plus(orcaFareDiscount);
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
       var fp = FareProduct
         .of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost)
@@ -552,7 +579,7 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Check if trip falls within the transfer time window.
    */
-  private boolean inFreeTransferWindow(
+  private static boolean inFreeTransferWindow(
     ZonedDateTime freeTransferStartTime,
     ZonedDateTime currentLegStartTime
   ) {
@@ -560,17 +587,6 @@ public class OrcaFareService extends DefaultFareService {
     if (freeTransferStartTime == null) return false;
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
-  }
-
-  /**
-   * A free transfer can be applied if using Orca and the transit agency permits free transfers.
-   */
-  private boolean hasFreeTransfers(FareType fareType, RideType rideType) {
-    // King County Metro allows transfers on cash fare
-    return (
-      (rideType.permitsFreeTransfers() && usesOrca(fareType)) ||
-      (rideType == RideType.KC_METRO && !usesOrca(fareType))
-    );
   }
 
   /**
