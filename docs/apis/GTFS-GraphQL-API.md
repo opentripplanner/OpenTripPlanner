@@ -11,7 +11,7 @@ makes it easy to use this API in a Java application.
 ## URLs 
  - GraphQL endpoint: [`http://localhost:8080/otp/gtfs/v1`](http://localhost:8080/otp/gtfs/v1)
  - HTML schema documentation: [https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
- - Built-in visual GraphQL client: [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
+ - Built-in visual GraphQL client: [http://localhost:8080/graphiql](http://localhost:8080/graphiql) (note the additional `i`!)
 
 ## Built-in API client
 
