@@ -16,9 +16,11 @@ import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -357,6 +359,21 @@ public class TripRequestMapperTest implements PlanTestConstants {
   @Test
   public void testEmptyModes() {
     Map<String, Object> arguments = Map.of("modes", Map.of());
+    var req = TripRequestMapper.createRequest(executionContext(arguments));
+
+    assertEquals(StreetMode.NOT_SET, req.journey().access().mode());
+    assertEquals(StreetMode.NOT_SET, req.journey().egress().mode());
+    assertEquals(StreetMode.NOT_SET, req.journey().direct().mode());
+    assertEquals(StreetMode.WALK, req.journey().transfer().mode());
+  }
+
+  @Test
+  public void testNullModes() {
+    HashMap<Object, Object> modes = new HashMap<>();
+    modes.put("accessMode", null);
+    modes.put("egressMode", null);
+    modes.put("directMode", null);
+    Map<String, Object> arguments = Map.of("modes", modes);
     var req = TripRequestMapper.createRequest(executionContext(arguments));
 
     assertEquals(StreetMode.NOT_SET, req.journey().access().mode());
