@@ -42,6 +42,11 @@ import org.slf4j.LoggerFactory;
  * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
  * later trip.
  * <p>
+ * The Route and StopPattern together form the natural key of the TripPattern. They are the shared
+ * set of characteristics that group many trips together into one TripPattern. This grouping saves
+ * memory by not replicating any details shared across all trips in the TripPattern, but it is
+ * also essential to some optimizations in routing algorithms like Raptor.
+ * <p>
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
  * JOURNEY a "trip", thus TripPattern.
  * <p>
@@ -58,11 +63,6 @@ public final class TripPattern
   private final Route route;
 
   /**
-   * The Route and StopPattern together form the natural key of the TripPattern. They are the shared
-   * set of characteristics that group many trips together into one TripPattern. This grouping saves
-   * memory by not replicating any details shared across all trips in the TripPattern, but it is
-   * also essential to some optimizations in routing algorithms like Raptor.
-   * <p>
    * This field should not be accessed outside this class. All access to the StopPattern is
    * performed through method  delegation, like the {@link #numberOfStops()} and
    * {@link #canBoard(int)} methods.
@@ -73,15 +73,18 @@ public final class TripPattern
    * TripPatterns hold a reference to a Timetable (i.e. TripTimes for all Trips in the pattern) for
    * only scheduled trips from the GTFS or NeTEx data. If any trips were later updated in real time,
    * there will be another Timetable holding those updates and reading through to the scheduled one.
-   * This realtime Timetable is retrieved from a TimetableSnapshot.
-   * Also see end of Javadoc on TimetableSnapshot for more details.
+   * That other realtime Timetable is retrieved from a TimetableSnapshot (see end of Javadoc on
+   * TimetableSnapshot for more details).
+   * TODO RT_AB: The above system should be changed to integrate realtime and scheduled data more
+   *   closely. The Timetable may become obsolete or change significantly when they are integrated.
    */
   private final Timetable scheduledTimetable;
 
-  // This TransitMode is a redundant replication/memoization of information on the Route.
+  // This TransitMode is arguably a redundant replication/memoization of information on the Route.
   // It appears that in the TripPatternBuilder it is only ever set from a Trip which is itself set
-  // from a Route.
-  // TODO RT_AB: confirm whether there is any reason this doesn't just read through to Route.
+  // from a Route. This does not just read through to Route because in Netex trips may override
+  // the mode of their route. But we need to establish with more clarity whether our internal model
+  // TripPatterns allow trips of mixed modes, or rather if a single mode is part of their unique key.
   private final TransitMode mode;
 
   private final SubMode netexSubMode;
