@@ -30,16 +30,14 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * The purpose of this class is to allow APIs (HTTP Resources) to access the OTP Server Context.
- * FIXME RT_AB: Expand and clarify descriptions, which are circular (OtpServerRequestContext
- *   provides access to OTP Server Context). What exactly does "Server Context" mean here?
- *   What does "access" mean? Does this mean it "allows individual requests to call a limited
- *   number of methods on the components of the server without direct access to their internals?"
+ * The purpose of this class is to give APIs (HTTP Resources) read-only access to the OTP internal
+ * transit model. It allows individual API requests to use a limited number of methods and data
+ * structures without direct access to the internals of the server components.
+ *
  * By using an interface, and not injecting each service class we avoid giving the resources access
- * to the server implementation. The context is injected by Jersey. An alternative to injecting this
- * interface is to inject each individual component in the context - hence reducing the dependencies
- * further.
- * TODO RT_AB: clarify how injecting more individual components would "reduce dependencies further".
+ * to the server implementation. The context is injected by Jersey. Instead of injecting this
+ * context interface, it is conceivable to inject each of the individual items within this context.
+ *
  * But there is not a "real" need for this. For example, we do not have unit tests on the
  * Resources. If we in the future would decide to write unit tests for the APIs, then we could
  * eliminate this interface and just inject the components. See the bind method in OTPServer.

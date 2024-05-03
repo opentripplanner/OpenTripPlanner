@@ -92,8 +92,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   protected abstract void errorConsumer(ServiceBusErrorContext errorContext);
 
   @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   @Override

@@ -8,6 +8,9 @@ import org.opentripplanner.routing.services.TransitAlertService;
  * Alerts or Siri SX messages. This interface appears to exist only to allow merging multiple such
  * services together, which appears to be a workaround for not maintaining snapshots of a single
  * instance-wide index.
+ *
+ * Ideally this will become unnecessary and be removed when updaters are all feeding into a central
+ * index. If kept, this should be renamed from TransitAlertProvider to TransitAlertServiceProvider.
  */
 public interface TransitAlertProvider {
   TransitAlertService getTransitAlertService();

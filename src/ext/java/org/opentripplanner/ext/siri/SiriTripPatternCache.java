@@ -46,8 +46,9 @@ public class SiriTripPatternCache {
   //   in the GTFS version of this class, but with service date as part of the key.
   private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
 
-  // This appears to be a SIRI-specific index for use in GraphQL APIs.
-  // It is not present on the GTFS-RT version of this class.
+  // TODO RT_AB: Improve documentation. This field appears to be an index that exists only in the
+  //   SIRI version of this class (i.e. this version and not the older TripPatternCache that
+  //   handles GTFS-RT). This index appears to be tailored for use by the Transmodel GraphQL APIs.
   private final ListMultimap<StopLocation, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(
     ArrayListMultimap.create()
   );

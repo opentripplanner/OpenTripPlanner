@@ -90,13 +90,11 @@ public final class StopPattern implements Serializable {
    * This has package local access since a StopPattern is a part of a TripPattern. To change it
    * use the {@link TripPattern#copyPlannedStopPattern()} method.
    */
-  StopPatternBuilder mutate() {
+  StopPatternBuilder copyOf() {
     return new StopPatternBuilder(this, null);
   }
 
-  // TODO RT_AB: Rename and add documentation. This method does not mutate the object in place, it
-  //  makes a copy. Confirmed in discussion that this should have a different name like "copy".
-  StopPatternBuilder mutate(StopPattern realTime) {
+  StopPatternBuilder copyOf(StopPattern realTime) {
     return new StopPatternBuilder(this, realTime);
   }
 

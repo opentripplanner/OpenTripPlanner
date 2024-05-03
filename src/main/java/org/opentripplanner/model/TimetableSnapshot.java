@@ -196,11 +196,10 @@ public class TimetableSnapshot {
   /**
    * Update the TripTimes of one Trip in a Timetable of a TripPattern. If the Trip of the TripTimes
    * does not exist yet in the Timetable, add it. This method will make a protective copy
-   * of the Timetable if such a copy has not already been made while building up this snapshot.
+   * of the Timetable if such a copy has not already been made while building up this snapshot,
+   * handling both cases where patterns were pre-existing in static data or created by realtime data.
    *
-   * @param pattern          trip pattern
-   * @param updatedTripTimes updated trip times
-   * @param serviceDate      service day for which this update is valid
+   * @param serviceDate service day for which this update is valid
    * @return whether the update was actually applied
    */
   public Result<UpdateSuccess, UpdateError> update(

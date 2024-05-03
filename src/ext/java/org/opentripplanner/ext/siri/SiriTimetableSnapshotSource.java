@@ -138,8 +138,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param fullDataset  true iff the list with updates represent all updates that are active right
    *                     now, i.e. all previous updates should be disregarded
-   * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
-   *                     FIXME RT_AB: aren't these ET deliveries, not VM?
+   * @param updates      SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
@@ -375,9 +374,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       trip,
       serviceDate
     );
-
-    // Add new trip times to the buffer and return result with success or error. The update method
-    // will perform protective copies as needed, whether pattern is created by realtime data or not.
+    // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;

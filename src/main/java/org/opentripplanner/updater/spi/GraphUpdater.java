@@ -26,7 +26,7 @@ public interface GraphUpdater {
    * immediately supply a callback via this method. The GraphUpdater will employ that callback
    * every time it wants to queue up a write modification to the Graph or related data structures.
    */
-  void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph);
+  void setup(WriteToGraphCallback writeToGraphCallback);
 
   /**
    * The GraphUpdaterManager will run this method in its own long-running thread. This method then

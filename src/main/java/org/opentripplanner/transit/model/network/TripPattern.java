@@ -200,8 +200,8 @@ public final class TripPattern
    */
   public StopPattern.StopPatternBuilder copyPlannedStopPattern() {
     return isModified()
-      ? originalTripPattern.stopPattern.mutate(stopPattern)
-      : stopPattern.mutate();
+      ? originalTripPattern.stopPattern.copyOf(stopPattern)
+      : stopPattern.copyOf();
   }
 
   public LineString getGeometry() {
