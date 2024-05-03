@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.Lists;
@@ -116,13 +117,14 @@ public class OrcaFareService extends DefaultFareService {
 
   static class TransferData {
 
-    Money transferDiscount;
-    ZonedDateTime transferStartTime;
+    private Money transferDiscount;
+    private ZonedDateTime transferStartTime;
 
-    FareType fareType;
-
-    public TransferData(FareType fareType) {
-      this.fareType = fareType;
+    public Money getTransferDiscount() {
+      if (this.transferDiscount == null) {
+        return ZERO_USD;
+      }
+      return this.transferDiscount;
     }
 
     public Money getDiscountedLegPrice(Leg leg, Money legPrice) {
@@ -142,15 +144,6 @@ public class OrcaFareService extends DefaultFareService {
       this.transferDiscount = legPrice;
       this.transferStartTime = leg.getStartTime();
       return legPrice;
-    }
-
-    public void update(Money transferDiscount, ZonedDateTime transferStartTime) {
-      this.transferDiscount = transferDiscount;
-      this.transferStartTime = transferStartTime;
-    }
-
-    public void update(Money transferDiscount) {
-      this.transferDiscount = transferDiscount;
     }
   }
 
@@ -465,13 +458,12 @@ public class OrcaFareService extends DefaultFareService {
   ) {
     var fare = ItineraryFares.empty();
     Money cost = Money.ZERO_USD;
-    var orcaFareDiscount = new TransferData(fareType);
+    var orcaFareDiscount = new TransferData();
     HashMap<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
 
     for (Leg leg : legs) {
       RideType rideType = getRideType(leg);
       assert rideType != null;
-      boolean ridePermitsFreeTransfers = rideType.permitsFreeTransfers();
       Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
       Optional<Money> optionalLegFare = singleLegPrice.flatMap(slp ->
         getLegFare(fareType, rideType, slp, leg)
@@ -484,21 +476,34 @@ public class OrcaFareService extends DefaultFareService {
 
       var transferType = rideType.getTransferType(fareType);
       if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
+        // Important to get transfer discount before calculating next leg price
+        var transferDiscount = orcaFareDiscount.getTransferDiscount();
         var discountedFare = orcaFareDiscount.getDiscountedLegPrice(leg, legFare);
-        var transferDiscount = legFare.minus(discountedFare);
-        addLegFareProduct(leg, fare, fareType, discountedFare, transferDiscount);
+        addLegFareProduct(
+          leg,
+          fare,
+          fareType,
+          discountedFare,
+          legFare.greaterThan(ZERO_USD) ? transferDiscount : ZERO_USD
+        );
         cost = cost.plus(discountedFare);
       } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
         TransferData transferData;
         if (perAgencyTransferDiscount.containsKey(leg.getAgency().getName())) {
           transferData = perAgencyTransferDiscount.get(leg.getAgency().getName());
         } else {
-          transferData = new TransferData(fareType);
+          transferData = new TransferData();
           perAgencyTransferDiscount.put(leg.getAgency().getName(), transferData);
         }
+        var transferDiscount = transferData.transferDiscount;
         var discountedFare = transferData.getDiscountedLegPrice(leg, legFare);
-        var transferDiscount = legFare.minus(discountedFare);
-        addLegFareProduct(leg, fare, fareType, discountedFare, transferDiscount);
+        addLegFareProduct(
+          leg,
+          fare,
+          fareType,
+          discountedFare,
+          legFare.greaterThan(ZERO_USD) ? transferDiscount : ZERO_USD
+        );
         cost = cost.plus(discountedFare);
       } else {
         // If not using Orca, add the agency's default price for this leg.
