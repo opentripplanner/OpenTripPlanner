@@ -3,13 +3,16 @@ package org.opentripplanner.updater.spi;
 /**
  * Interface for classes that fetch or receive information while the OTP instance is running and
  * make changes to the Graph and associated transit data to reflect the current situation. This is
- * typically information about disruptions to service, bicycle or parking availability, etc. <p>
+ * typically information about disruptions to service, bicycle or parking availability, etc.
+ * <p>
  * Each GraphUpdater implementation will be run in a separate thread, allowing it to make blocking
  * calls to fetch data or even sleep between periodic polling operations without affecting the rest
- * of the OTP instance. <p>
+ * of the OTP instance.
+ * <p>
  * GraphUpdater implementations are instantiated by UpdaterConfigurator. Each updater configuration
  * item in the router-config for a ThingUpdater is mapped to a corresponding configuration class
- * ThingUpdaterParameters, which is passed to the ThingUpdater constructor. <p>
+ * ThingUpdaterParameters, which is passed to the ThingUpdater constructor.
+ * <p>
  * GraphUpdater implementations are only allowed to make changes to the Graph and related structures
  * by submitting instances implementing GraphWriterRunnable (often anonymous functions) to the
  * Graph writing callback function supplied to them by the GraphUpdaterManager after they're

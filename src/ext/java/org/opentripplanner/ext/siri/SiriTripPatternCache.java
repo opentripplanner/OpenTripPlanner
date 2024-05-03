@@ -30,6 +30,12 @@ import org.slf4j.LoggerFactory;
  * simply TripPatternCache.
  * TODO RT_AB: To the extent that double SIRI/GTFS implementations are kept, prefix all names
  *             with GTFS or SIRI or NETEX rather than having no prefix on the GTFS versions.
+ *  TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and the flow
+ *             between them. The NeTEx and a GTFS version of this should be merged. Having NeTex and GTFS 
+ *             specific indexes inside is ok. With the increased usage of DatedServiceJourneys, this should probably 
+ *             be part of the main model - not a separate cashe. It is possible that this class works when it comes to
+ *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
+ *             analysed, designed and documented. 
  */
 public class SiriTripPatternCache {
 
@@ -70,8 +76,6 @@ public class SiriTripPatternCache {
     this.tripPatternIdGenerator = tripPatternIdGenerator;
     this.getPatternForTrip = getPatternForTrip;
   }
-
-  //
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet.

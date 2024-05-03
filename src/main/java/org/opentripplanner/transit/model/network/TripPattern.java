@@ -58,7 +58,7 @@ public final class TripPattern
   private final Route route;
 
   /**
-   * The Route and StopPattern together form the primary key of the TripPattern. They are the shared
+   * The Route and StopPattern together form the natural key of the TripPattern. They are the shared
    * set of characteristics that group many trips together into one TripPattern. This grouping saves
    * memory by not replicating any details shared across all trips in the TripPattern, but it is
    * also essential to some optimizations in routing algorithms like Raptor.
@@ -88,7 +88,11 @@ public final class TripPattern
   private final boolean containsMultipleModes;
   private String name;
 
-  /** Geometries of each inter-stop segment of the tripPattern. */
+  /** 
+     * Geometries of each inter-stop segment of the tripPattern. 
+     * Not used in routing, only for API listing. 
+     * TODO: Encapsulate the byte arrays in a class.
+     */
   private final byte[][] hopGeometries;
 
   /**
