@@ -91,11 +91,11 @@ public final class TripPattern
   private final boolean containsMultipleModes;
   private String name;
 
-  /** 
-     * Geometries of each inter-stop segment of the tripPattern. 
-     * Not used in routing, only for API listing. 
-     * TODO: Encapsulate the byte arrays in a class.
-     */
+  /**
+   * Geometries of each inter-stop segment of the tripPattern.
+   * Not used in routing, only for API listing.
+   * TODO: Encapsulate the byte arrays in a class.
+   */
   private final byte[][] hopGeometries;
 
   /**
