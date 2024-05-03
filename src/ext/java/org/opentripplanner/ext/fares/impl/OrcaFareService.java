@@ -495,7 +495,7 @@ public class OrcaFareService extends DefaultFareService {
           transferData = new TransferData();
           perAgencyTransferDiscount.put(leg.getAgency().getName(), transferData);
         }
-        var transferDiscount = transferData.transferDiscount;
+        var transferDiscount = transferData.getTransferDiscount();
         var discountedFare = transferData.getDiscountedLegPrice(leg, legFare);
         addLegFareProduct(
           leg,
