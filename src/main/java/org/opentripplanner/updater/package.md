@@ -36,7 +36,14 @@ As mentioned above, these GraphWriterRunnable instances must write to the transi
 
 This writable buffer of transit data is periodically made immutable and swapped into the role of a live snapshot, which is ready to be handed off to any incoming routing requests. Each time an immutable snapshot is created, a new writable buffer is created by making a shallow copy of the root instance in the transit data aggreagate. This functions like a double-buffering system, except that any number of snapshots can exist at once, and large subsets of the data can be shared across snapshots. As older snapshots (and their component parts) fall out of use, they are dereferenced and become eligible for garbage collection. Although the buffer swap could in principle occur after every write operation, it can incur significant copying and indexing overhead. When incremental message-oriented updaters are present this overhead would be incurred more often than necesary. Snapshots can be throttled to occur at most every few seconds, thereby reducing the total overhead at no perceptible cost to realtime visibility latency.
 
-This is essentially a multi-version snapshot concurrency control system, inspired by widely used database engines (and in fact informed by books on transactional database design). The end result is a system where 1) writing operations are simple to reason about and cannot conflict because only one write happens at a time; 2) multiple read operations (including routing requests) can occur concurrently; 3) read operations do not need to pause while writes are happening; 4) read operations see only fully completed write operations, never partial writes; and 5) each read operation sees a consistent, unchanging view of the transit data.
+This is essentially a multi-version snapshot concurrency control system, inspired by widely used database engines (and in fact informed by books on transactional database design). The end result is a system where:
+<ol>
+  <li>writing operations are simple to reason about and cannot conflict because only one write happens at a time.</li>
+  <li> multiple read operations (including routing requests) can occur concurrently.</li>
+  <li> read operations do not need to pause while writes are happening.</li>
+  <li> read operations see only fully completed write operations, never partial writes.</li>
+  <li> each read operation sees a consistent, unchanging view of the transit data.</li>
+<ol>  
 
 An important characteristic of this approach is that _no locking is necessary_. However, some form of synchronization is used during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.
 
