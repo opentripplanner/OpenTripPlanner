@@ -4,7 +4,7 @@
 
 Published transit data is broadly divided into two categories, which represent different time scales. On one hand we have scheduled data (also called planned or static data), and on the other hand realtime data. Scheduled data is supplied in GTFS or NeTEx format, with the corresponding realtime data supplied in the [GTFS-RT](https://gtfs.org/realtime/reference/) and [SIRI](https://www.siri-cen.eu/) formats, respectively. This package contains code that retrieves and decodes realtime data, then layers it on top of the static transit data in a live OTP instance while it continues to handle routing requests.
 
-Different data producers might update their scheduled data every month, week, or day. Realtime data then covers any changes to service at a timescale shorter than that of a given producer's scheduled data. Broadly speaking, realtime data represents short-term unexpected or unplanned changes that modify the planned schedules, and could require changes to journeys that the riders would not expect from the schedule. OpenTripPlanner uses three main categories of realtime data which are summarized in the table below. The SIRI specification includes more types, but OTP handles only these three that correspond to the three GTFS-RT types.
+Different data producers might update their scheduled data every month, week, or day; some even update it multiple times per day. Realtime data then covers any changes to service at a timescale shorter than that of a given producer's scheduled data. Broadly speaking, realtime data represents short-term unexpected or unplanned changes that modify the planned schedules, and could require changes to journeys that the riders would not expect from the schedule. OpenTripPlanner uses three main categories of realtime data which are summarized in the table below. The SIRI specification includes more types, but OTP handles only these three that correspond to the three GTFS-RT types.
 
 | GTFS-RT Name                                                                     | SIRI Name                | Description                                                           |
 |----------------------------------------------------------------------------------|--------------------------|-----------------------------------------------------------------------|
@@ -12,7 +12,7 @@ Different data producers might update their scheduled data every month, week, or
 | [Trip Update](https://gtfs.org/realtime/reference/#message-tripupdate)           | Estimated Timetable (ET) | Observed or expected arrival and departure times for near-term trips  |
 | [Vehicle Position](https://gtfs.org/realtime/reference/#message-vehicleposition) | Vehicle Monitoring (VM)  | Physical location of vehicles currently providing service             |
 
-GTFS-RT takes the form of binary protocol buffer messages that are typically fetched over HTTP. On the other hand, the SIRI specification originally described SOAP remote procedure calls retrieving an XML representation of the messages. Various projects instead adopted simple HTTP GET requests passing parameters in the URL and returning a JSON representation. The latter approach was eventually officially recognized as "SIRI Lite".
+GTFS-RT takes the form of binary protocol buffer messages that are typically fetched over HTTP. On the other hand, the SIRI specification originally described SOAP remote procedure calls retrieving an XML representation of the messages. Various projects instead adopted simple HTTP GET requests passing parameters in the URL and optionally returning a JSON representation instead of XML. This latter approach was officially recognized as "SIRI Lite", has become quite common, and is the approach supported by OTP. 
 
 Because OTP handles both GTFS-RT and SIRI data sources, there will often be two equivalent classes for retrieving and interpreting a particular kind of realtime data. For example, there is a SiriAlertsUpdateHandler and an AlertsUpdateHandler. The SIRI variants are typically prefixed with `Siri` while the GTFS-RT ones have no prefix for historical reasons (the GTFS-RT versions were originally the only ones). These should perhaps be renamed with a `GtfsRt` prefix for symmetry. Once the incoming messages have been decoded, they will ideally be mapped into a single internal class that was originally derived from GTFS-RT but has been extended to cover all information afforded by both GTFS and SIRI. For example, both classes mentioned above produce TransitAlert instances. These uniform internal representations can then be applied to the internal transit model using a single mechanism, independent of the message source type.
 
@@ -23,6 +23,8 @@ In practice, OTP does not yet use a single uniform internal representation for e
 The following approach to realtime concurrency was devised around 2013 when OTP first started consuming realtime data that affected routing results rather than just displaying messages. At first, the whole realtime system followed this approach. Some aspects of this system were maintained in subsequent work over the years, but because the details and rationale were not fully documented, misinterpretations and subtle inconsistencies were introduced.
 
 On 11 January 2024 a team of OTP developers reviewed this realtime concurrency approach together. The conclusion was that this approach remains sound, and that any consistency problems were not due to the approach itself, but rather due to its partial or erroneous implementation in realtime updater classes. Therefore, we decided to continue applying this approach in any new work on the realtime subsystem, at least until we encounter some situation that does not fit within this model. All existing realtime code that is not consistent with this approach should progressively be brought in line with it. 
+
+In OTP's internal transit model, realtime data is currently stored separately from the scheduled data. This is only because realtime was originally introduced as an optional extra feature. Now that realtime is very commonly used, we intend to create a single unified transit model that will nonetheless continue to apply the same concurrency approach. 
 
 The following is a sequence diagram showing how threads are intended to communicate. Unlike some common forms of sequence diagrams, time is on the horizontal axis here. Each horizontal line represents either a thread of execution (handling incoming realtime messages or routing requests) or a queue or buffer data structure. Dotted lines represent object references being handed off, and solid lines represent data being copied.
 
@@ -37,13 +39,14 @@ As mentioned above, these GraphWriterRunnable instances must write to the transi
 This writable buffer of transit data is periodically made immutable and swapped into the role of a live snapshot, which is ready to be handed off to any incoming routing requests. Each time an immutable snapshot is created, a new writable buffer is created by making a shallow copy of the root instance in the transit data aggreagate. This functions like a double-buffering system, except that any number of snapshots can exist at once, and large subsets of the data can be shared across snapshots. As older snapshots (and their component parts) fall out of use, they are dereferenced and become eligible for garbage collection. Although the buffer swap could in principle occur after every write operation, it can incur significant copying and indexing overhead. When incremental message-oriented updaters are present this overhead would be incurred more often than necesary. Snapshots can be throttled to occur at most every few seconds, thereby reducing the total overhead at no perceptible cost to realtime visibility latency.
 
 This is essentially a multi-version snapshot concurrency control system, inspired by widely used database engines (and in fact informed by books on transactional database design). The end result is a system where:
-<ol>
-  <li>writing operations are simple to reason about and cannot conflict because only one write happens at a time.</li>
-  <li> multiple read operations (including routing requests) can occur concurrently.</li>
-  <li> read operations do not need to pause while writes are happening.</li>
-  <li> read operations see only fully completed write operations, never partial writes.</li>
-  <li> each read operation sees a consistent, unchanging view of the transit data.</li>
-<ol>  
+
+1. Writing operations are simple to reason about and cannot conflict because only one write happens at a time.
+1. Multiple read operations (including routing requests) can occur concurrently.
+1. Read operations do not need to pause while writes are happening.
+1. Read operations see only fully completed write operations, never partial writes.
+1. Each read operation sees a consistent, unchanging view of the transit data.
+1. Each external API request sees a consistent data set, meaning all services that the
+   query directly or indirectly uses are operating on the same version of the data.
 
 An important characteristic of this approach is that _no locking is necessary_. However, some form of synchronization is used during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.
 
