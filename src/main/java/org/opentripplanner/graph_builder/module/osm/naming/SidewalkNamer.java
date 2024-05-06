@@ -23,7 +23,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.operation.buffer.BufferParameters;
-import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -146,8 +145,6 @@ public class SidewalkNamer implements EdgeNamer {
     var candidates = streetEdges.query(buffer.getEnvelopeInternal());
 
     groupEdgesByName(candidates)
-      // remove edges that are far away
-      .filter(g -> g.nearestDistanceTo(sidewalk.getGeometry()) < MAX_DISTANCE_TO_SIDEWALK)
       // make sure we only compare sidewalks and streets that are on the same level
       .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
       .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
@@ -240,19 +237,6 @@ public class SidewalkNamer implements EdgeNamer {
       };
     }
 
-    /**
-     * Get the closest distance in meters between any of the edges in the group and the given geometry.
-     */
-    double nearestDistanceTo(Geometry g) {
-      return edges
-        .stream()
-        .mapToDouble(e -> {
-          var points = DistanceOp.nearestPoints(e.getGeometry(), g);
-          return SphericalDistanceLibrary.fastDistance(points[0], points[1]);
-        })
-        .min()
-        .orElse(Double.MAX_VALUE);
-    }
   }
 
   private record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}
