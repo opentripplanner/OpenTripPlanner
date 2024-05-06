@@ -32,7 +32,7 @@ While the "classic" (i.e. old) debug frontend is enabled by default as of this w
 // otp-config.json
 {
   "otpFeatures": {
-    "DebugClient": true,
+    "DebugUi": true,
     "SandboxAPIGeocoder": true
   }
 }

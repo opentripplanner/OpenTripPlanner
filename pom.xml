@@ -65,7 +65,7 @@
         <junit.version>5.10.2</junit.version>
         <micrometer.version>1.12.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.5.3</logback.version>
+        <logback.version>1.5.6</logback.version>
         <lucene.version>9.10.0</lucene.version>
         <slf4j.version>2.0.13</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -363,7 +363,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -993,7 +993,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.2</version>
+                        <version>3.2.4</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

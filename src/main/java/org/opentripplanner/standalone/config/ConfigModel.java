@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,5 +105,25 @@ public class ConfigModel {
   public static void initializeOtpFeatures(OtpConfig otpConfig) {
     OTPFeature.enableFeatures(otpConfig.otpFeatures);
     OTPFeature.logFeatureSetup();
+  }
+
+  /**
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
+   * <p>
+   * If so it throws an exception.
+   */
+  public void abortOnUnknownParameters() {
+    if (
+      (
+        otpConfig.hasUnknownParameters() ||
+        buildConfig.hasUnknownParameters() ||
+        routerConfig.hasUnknownParameters()
+      )
+    ) {
+      throw new OtpAppException(
+        "Configuration contains unknown parameters (see above for details). " +
+        "Please fix your configuration or remove --abortOnUnknownConfig from your OTP CLI parameters."
+      );
+    }
   }
 }

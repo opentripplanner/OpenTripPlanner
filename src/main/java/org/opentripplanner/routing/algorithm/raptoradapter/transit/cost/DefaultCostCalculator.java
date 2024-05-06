@@ -121,14 +121,21 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-    return (
-      boardCostOnly +
-      boardAndTransferCost *
-      minNumTransfers +
-      transitFactors.minFactor() *
-      minTravelTime
-    );
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
+    if (minNumTransfers > -1) {
+      return (
+        boardCostOnly +
+        boardAndTransferCost *
+        minNumTransfers +
+        transitFactors.minFactor() *
+        minTravelTime
+      );
+    } else {
+      // Remove cost that was added during alighting similar as we do in the costEgress() method
+      int fixedCost = transitFactors.minFactor() * minTravelTime;
+
+      return stopTransferCost == null ? fixedCost : fixedCost - stopTransferCost[fromStop];
+    }
   }
 
   @Override
