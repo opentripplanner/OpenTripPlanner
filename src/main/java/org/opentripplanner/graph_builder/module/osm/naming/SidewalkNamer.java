@@ -236,7 +236,6 @@ public class SidewalkNamer implements EdgeNamer {
         );
       };
     }
-
   }
 
   private record EdgeOnLevel(StreetEdge edge, Set<String> levels) {}

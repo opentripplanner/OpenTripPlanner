@@ -71,24 +71,21 @@ public class PortlandCustomNamer implements EdgeNamer {
 
   @Override
   public void recordEdges(OSMWithTags way, StreetEdgePair edgePair) {
+    final boolean isHighwayLink = way.isHighwayLink();
+    final boolean isLowerLink = way.isLowerLink();
     edgePair
       .asIterable()
       .forEach(edge -> {
         if (!edge.hasBogusName()) {
           return; // this edge already has a real name so there is nothing to do
         }
-        String highway = way.getTag("highway");
-        if ("motorway_link".equals(highway) || "trunk_link".equals(highway)) {
+        if (isHighwayLink) {
           if (edge.isBack()) {
             nameByDestination.add(edge);
           } else {
             nameByOrigin.add(edge);
           }
-        } else if (
-          "secondary_link".equals(highway) ||
-          "primary_link".equals(highway) ||
-          "tertiary_link".equals(highway)
-        ) {
+        } else if (isLowerLink) {
           if (edge.isBack()) {
             nameByOrigin.add(edge);
           } else {
