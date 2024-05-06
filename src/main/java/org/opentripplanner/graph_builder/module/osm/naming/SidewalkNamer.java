@@ -96,7 +96,7 @@ public class SidewalkNamer implements EdgeNamer {
       unnamedSidewalks.size()
     );
 
-    this.preciseBuffer = new PreciseBuffer(computeCentroid(), BUFFER_METERS);
+    this.preciseBuffer = new PreciseBuffer(computeEnvelopeCenter(), BUFFER_METERS);
 
     final AtomicInteger namesApplied = new AtomicInteger(0);
     unnamedSidewalks
@@ -126,11 +126,12 @@ public class SidewalkNamer implements EdgeNamer {
   /**
    * Compute the centroid of all sidewalk edges.
    */
-  private Coordinate computeCentroid() {
+  private Coordinate computeEnvelopeCenter() {
     var envelope = new Envelope();
-    unnamedSidewalks.forEach(e ->
-      envelope.expandToInclude(e.edge.getGeometry().getEnvelopeInternal())
-    );
+    unnamedSidewalks.forEach(e -> {
+      envelope.expandToInclude(e.edge.getFromVertex().getCoordinate());
+      envelope.expandToInclude(e.edge.getToVertex().getCoordinate());
+    });
     return envelope.centre();
   }
 
