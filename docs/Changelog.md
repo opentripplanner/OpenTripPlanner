@@ -17,6 +17,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Optionally abort startup when unknown configuration parameters were detected [#5676](https://github.com/opentripplanner/OpenTripPlanner/pull/5676)
 - Fix bug in heuristics cost calculation for egress legs [#5783](https://github.com/opentripplanner/OpenTripPlanner/pull/5783)
 - De-emphasize mailing list in landing page [#5820](https://github.com/opentripplanner/OpenTripPlanner/pull/5820)
+- ORCA Fares: Add free cash transfers for Kitsap transit [#5826](https://github.com/opentripplanner/OpenTripPlanner/pull/5826)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
