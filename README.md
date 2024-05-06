@@ -60,16 +60,7 @@ the world.
 
 ## Getting in touch
 
-The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner)
-where most of the core developers are. You can also send questions and comments to the 
-[mailing list](http://groups.google.com/group/opentripplanner-users).
-
-Changes and extensions to OTP are debated in issues on [GitHub](https://github.com/opentripplanner/OpenTripPlanner/issues)
-and in the  [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner). More general 
-questions and announcements of interest to non-developer OTP users should be directed to
-the [opentripplanner-users](https://groups.google.com/forum/#!forum/opentripplanner-users) list.
-Other details of [project governance](http://docs.opentripplanner.org/en/dev-2.x/Governance/) can be
-found in the main documentation.
+The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) where most of the core developers are. Bug reports may be filed via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). The OpenTripPlanner [mailing list](http://groups.google.com/group/opentripplanner-users) is used almost exclusively for project announcements. The mailing list and issue tracker are not intended for support questions or discussions. Please use the chat for this purpose. Other details of [project governance](http://docs.opentripplanner.org/en/dev-2.x/Governance/) can be found in the main documentation.
 
 ## OTP Ecosystem
 
