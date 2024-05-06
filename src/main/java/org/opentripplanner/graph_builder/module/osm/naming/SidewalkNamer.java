@@ -57,7 +57,6 @@ import org.slf4j.LoggerFactory;
 public class SidewalkNamer implements EdgeNamer {
 
   private static final Logger LOG = LoggerFactory.getLogger(SidewalkNamer.class);
-  private static final int MAX_DISTANCE_TO_SIDEWALK = 50;
   private static final double MIN_PERCENT_IN_BUFFER = .85;
   private static final int BUFFER_METERS = 25;
 
@@ -72,14 +71,16 @@ public class SidewalkNamer implements EdgeNamer {
 
   @Override
   public void recordEdges(OSMWithTags way, StreetEdgePair pair) {
+    // this way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (way.isSidewalk() && way.needsFallbackName() && !way.isExplicitlyUnnamed()) {
       pair
         .asIterable()
         .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels())));
     }
-    if (way.isNamed() && !way.isLink()) {
+    // the way is _not_ a sidewalk and does have a name
+    else if (way.isNamed() && !way.isLink()) {
       // we generate two edges for each osm way: one there and one back. since we don't do any routing
-      // in this class we don't need the two directions and keep only one of them.
+      // in this class we don't need the two directions and index only one of them.
       var edge = pair.pickAny();
       streetEdges.insert(
         edge.getGeometry().getEnvelopeInternal(),
