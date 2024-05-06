@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdater;
+import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdater;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
@@ -39,6 +41,7 @@ public class VehicleParkingDataSourceFactory {
       );
       case BIKELY -> new BikelyUpdater((BikelyUpdaterParameters) parameters);
       case NOI_OPEN_DATA_HUB -> new NoiUpdater((NoiUpdaterParameters) parameters);
+      case BIKEEP -> new BikeepUpdater((BikeepUpdaterParameters) parameters);
     };
   }
 }

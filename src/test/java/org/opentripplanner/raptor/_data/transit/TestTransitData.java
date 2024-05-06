@@ -66,6 +66,8 @@ public class TestTransitData
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
   private final GeneralizedCostParametersBuilder costParamsBuilder = GeneralizedCostParameters.of();
 
+  private final int[] stopBoardAlightCosts = new int[NUM_STOPS];
+
   private RaptorSlackProvider slackProvider = SLACK_PROVIDER;
 
   @Override
@@ -300,6 +302,11 @@ public class TestTransitData
     return this;
   }
 
+  public TestTransitData withStopBoardAlightCost(int stop, int boardAlightCost) {
+    stopBoardAlightCosts[stop] = boardAlightCost;
+    return this;
+  }
+
   public GeneralizedCostParametersBuilder mcCostParamsBuilder() {
     return costParamsBuilder;
   }
@@ -352,7 +359,7 @@ public class TestTransitData
 
   private int[] stopBoardAlightCost() {
     // Not implemented, no test for this yet.
-    return null;
+    return stopBoardAlightCosts;
   }
 
   private void expandNumOfStops(int stopIndex) {

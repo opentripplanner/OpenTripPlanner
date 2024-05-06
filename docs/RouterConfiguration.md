@@ -844,6 +844,12 @@ Used to group requests when monitoring OTP.
         "fromDateTime" : "-P1D",
         "timeout" : 300000
       }
+    },
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikeep",
+      "sourceType" : "bikeep",
+      "url" : "https://services.bikeep.com/location/v1/public-areas/no-baia-mobility/locations"
     }
   ],
   "rideHailingServices" : [
