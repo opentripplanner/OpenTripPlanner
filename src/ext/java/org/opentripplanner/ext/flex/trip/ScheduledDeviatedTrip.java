@@ -176,7 +176,7 @@ public class ScheduledDeviatedTrip
   @Override
   public int latestArrivalTime(
     int arrivalTime,
-    int ignored,
+    int fromStopIndex,
     int toStopIndex,
     int flexTripDurationSeconds
   ) {
