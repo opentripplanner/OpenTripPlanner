@@ -79,8 +79,9 @@ public class SidewalkNamer implements EdgeNamer {
     }
     // the way is _not_ a sidewalk and does have a name
     else if (way.isNamed() && !way.isLink()) {
-      // we generate two edges for each osm way: one there and one back. since we don't do any routing
-      // in this class we don't need the two directions and index only one of them.
+      // We generate two edges for each osm way: one there and one back. This spatial index only
+      // needs to contain one item for each road segment with a unique geometry and name, so we
+      // add only one of the two edges.
       var edge = pair.pickAny();
       streetEdges.insert(
         edge.getGeometry().getEnvelopeInternal(),
