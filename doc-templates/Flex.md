@@ -13,6 +13,17 @@ To enable this turn on `FlexRouting` as a feature in `otp-config.json`.
 The GTFS feeds must conform to the final, approved version of the draft which has been 
 merged into the [mainline specification](https://gtfs.org/schedule/reference/) in March 2024.
 
+### Experimental features
+
+This sandbox feature also has experimental support for the following fields:
+
+- `safe_duration_factor`
+- `safe_duration_offset`
+
+These features are currently [undergoing specification](https://github.com/MobilityData/gtfs-flex/pull/79) 
+and their definition might change. OTP's implementation will be also be changed so be careful
+when relying on this feature.
+
 ## Configuration
 
 This feature allows a limited number of config options. To change the configuration, add the 
