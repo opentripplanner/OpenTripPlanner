@@ -48,9 +48,6 @@ public class TransitLayer {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  /**
-   * @see #getStopBoardAlightTransferCosts()
-   */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;
 
