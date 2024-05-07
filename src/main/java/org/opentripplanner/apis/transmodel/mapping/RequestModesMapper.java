@@ -39,6 +39,6 @@ class RequestModesMapper {
    * @param consumer
    */
   private static void ensureValueAndSet(StreetMode streetMode, Consumer<StreetMode> consumer) {
-    Optional.ofNullable(streetMode).or(() -> Optional.of(StreetMode.NOT_SET)).ifPresent(consumer);
+    consumer.accept(streetMode == null ? StreetMode.NOT_SET : streetMode);
   }
 }
