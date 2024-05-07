@@ -358,7 +358,7 @@ public class StopPlaceType {
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
             int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
-            Duration timeRage = Duration.ofSeconds(timeRangeInput);
+            Duration timeRange = Duration.ofSeconds(timeRangeInput);
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
@@ -375,7 +375,7 @@ public class StopPlaceType {
                 getTripTimesForStop(
                   singleStop,
                   startTime,
-                  timeRage,
+                  timeRange,
                   arrivalDeparture,
                   includeCancelledTrips,
                   numberOfDepartures,
@@ -420,7 +420,7 @@ public class StopPlaceType {
   public static Stream<TripTimeOnDate> getTripTimesForStop(
     StopLocation stop,
     Instant startTimeSeconds,
-    Duration timeRage,
+    Duration timeRange,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     int numberOfDepartures,
@@ -435,7 +435,7 @@ public class StopPlaceType {
     List<StopTimesInPattern> stopTimesInPatterns = transitService.stopTimesForStop(
       stop,
       startTimeSeconds,
-      timeRage,
+      timeRange,
       numberOfDepartures,
       arrivalDeparture,
       includeCancelledTrips
