@@ -84,6 +84,7 @@ nav:
     - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Accessibility: 'Accessibility.md'
+    - "Travel Time Analysis": 'Analysis.md'
     - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
