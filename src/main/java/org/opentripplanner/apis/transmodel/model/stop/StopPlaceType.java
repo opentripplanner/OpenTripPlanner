@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.stop;
 
 import static java.lang.Boolean.TRUE;
+import static org.opentripplanner.apis.transmodel.support.GqlUtil.getPositiveNonNullIntegerArgument;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -356,8 +357,8 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            Integer timeRangeInput = environment.getArgument("timeRange");
-            Duration timeRage = Duration.ofSeconds(timeRangeInput.longValue());
+            int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
+            Duration timeRage = Duration.ofSeconds(timeRangeInput);
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);

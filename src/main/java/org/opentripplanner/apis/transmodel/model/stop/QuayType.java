@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.stop;
 
+import static org.opentripplanner.apis.transmodel.support.GqlUtil.getPositiveNonNullIntegerArgument;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -299,8 +301,8 @@ public class QuayType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            Integer timeRangeInput = environment.getArgument("timeRange");
-            Duration timeRange = Duration.ofSeconds(timeRangeInput.longValue());
+            int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
+            Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
