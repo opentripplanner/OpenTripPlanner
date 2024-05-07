@@ -366,13 +366,15 @@ for more info."
 
 Costs for boarding and alighting during transfers at stops with a given transfer priority.
 
-This cost is applied **both to boarding and alighting** at stops during transfers. All stops have a transfer cost priority
-set, the default is `allowed`. The `stopBoardAlightDuringTransferCost` parameter is optional, but if listed all
-values must be set.
+This cost is applied **both to boarding and alighting** at stops during transfers. All stops have a
+transfer cost priority set, the default is `allowed`. The `stopBoardAlightDuringTransferCost`
+parameter is optional, but if listed all values must be set.
 
-When a transfer occurs at the same stop, the cost will be applied twice since the cost is both for boarding and alighting,
+When a transfer occurs at the same stop, the cost will be applied twice since the cost is both for
+boarding and alighting,
 
-If not set the `stopBoardAlightDuringTransferCost` is ignored. This is only available for NeTEx imported Stops.
+If not set the `stopBoardAlightDuringTransferCost` is ignored. This is only available for NeTEx
+imported Stops.
 
 The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
 
