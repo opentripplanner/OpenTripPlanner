@@ -290,6 +290,9 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("timeRange")
+              .description(
+                "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
+              )
               .type(Scalars.GraphQLInt)
               .defaultValue(24 * 60 * 60)
               .build()
