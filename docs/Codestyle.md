@@ -38,7 +38,7 @@ To skip the prettier formating use profile `prettierSkip`:
 The check for formatting errors use profile `prettierCheck`:
 
 ```
-% mvn test -P prettierSkip
+% mvn test -P prettierCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.
