@@ -817,7 +817,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.15</version>
+            <version>1.4.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
