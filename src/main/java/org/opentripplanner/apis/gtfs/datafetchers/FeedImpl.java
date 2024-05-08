@@ -64,6 +64,22 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
     return this::getSource;
   }
 
+  @Override
+  public DataFetcher<String> publisherName() {
+    return environment -> {
+      String id = getSource(environment);
+      return getTransitService(environment).getFeedInfo(id).getPublisherName();
+    };
+  }
+
+  @Override
+  public DataFetcher<String> publisherUrl() {
+    return environment -> {
+      String id = getSource(environment);
+      return getTransitService(environment).getFeedInfo(id).getPublisherUrl();
+    };
+  }
+
   private List<Agency> getAgencies(DataFetchingEnvironment environment) {
     String id = getSource(environment);
     return getTransitService(environment)
