@@ -43,7 +43,6 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
   private static final Set<Integer> N_STOPS = Set.of(1, 2);
-  private static final int INDEX_NOT_FOUND = -1;
 
   private final StopTimeWindow[] stopTimes;
 
@@ -104,13 +103,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     FlexConfig config
   ) {
     // Find boarding index, also check if it's boardable
-    final int fromIndex = getFromIndex(access.stop);
+    final int fromIndex = findBoardIndex(access.stop);
 
     // templates will be generated from the boardingIndex to the end of the trip
     final int lastIndexInTrip = stopTimes.length - 1;
 
     // Check if trip is possible
-    if (fromIndex == INDEX_NOT_FOUND || fromIndex > lastIndexInTrip) {
+    if (fromIndex == STOP_INDEX_NOT_FOUND) {
       return Stream.empty();
     }
 
@@ -154,10 +153,10 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int firstIndexInTrip = 0;
 
     // Find alighting index, also check if alighting is allowed
-    int toIndex = getToIndex(egress.stop);
+    int toIndex = findAlightIndex(egress.stop);
 
     // Check if trip is possible
-    if (toIndex == INDEX_NOT_FOUND || firstIndexInTrip > toIndex) {
+    if (toIndex == STOP_INDEX_NOT_FOUND) {
       return Stream.empty();
     }
 
@@ -273,12 +272,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public boolean isBoardingPossible(StopLocation stop) {
-    return getFromIndex(stop) != INDEX_NOT_FOUND;
+    return findBoardIndex(stop) != STOP_INDEX_NOT_FOUND;
   }
 
   @Override
   public boolean isAlightingPossible(StopLocation stop) {
-    return getToIndex(stop) != INDEX_NOT_FOUND;
+    return findAlightIndex(stop) != STOP_INDEX_NOT_FOUND;
   }
 
   @Override
@@ -297,14 +296,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return new UnscheduledTripBuilder(this);
   }
 
-  private Stream<IndexedStopLocation> expandStops(int index) {
-    var stop = stopTimes[index].stop();
-    return stop instanceof GroupStop groupStop
-      ? groupStop.getChildLocations().stream().map(s -> new IndexedStopLocation(index, s))
-      : Stream.of(new IndexedStopLocation(index, stop));
-  }
-
-  private int getFromIndex(StopLocation fromStop) {
+  @Override
+  public int findBoardIndex(StopLocation fromStop) {
     for (int i = 0; i < stopTimes.length; i++) {
       if (getBoardRule(i).isNotRoutable()) {
         continue;
@@ -320,10 +313,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         }
       }
     }
-    return INDEX_NOT_FOUND;
+    return FlexTrip.STOP_INDEX_NOT_FOUND;
   }
 
-  private int getToIndex(StopLocation toStop) {
+  @Override
+  public int findAlightIndex(StopLocation toStop) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
       if (getAlightRule(i).isNotRoutable()) {
         continue;
@@ -339,7 +333,14 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         }
       }
     }
-    return INDEX_NOT_FOUND;
+    return FlexTrip.STOP_INDEX_NOT_FOUND;
+  }
+
+  private Stream<IndexedStopLocation> expandStops(int index) {
+    var stop = stopTimes[index].stop();
+    return stop instanceof GroupStop groupStop
+      ? groupStop.getChildLocations().stream().map(s -> new IndexedStopLocation(index, s))
+      : Stream.of(new IndexedStopLocation(index, stop));
   }
 
   private Optional<IntRange> departureTimeWindow(

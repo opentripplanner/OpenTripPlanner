@@ -83,7 +83,7 @@ public class ScheduledDeviatedTrip
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
-    int fromIndex = getFromIndex(access.stop);
+    int fromIndex = findBoardIndex(access.stop);
 
     if (fromIndex == -1) {
       return Stream.empty();
@@ -123,9 +123,9 @@ public class ScheduledDeviatedTrip
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
-    int toIndex = getToIndex(egress.stop);
+    var toIndex = findAlightIndex(egress.stop);
 
-    if (toIndex == -1) {
+    if (toIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
       return Stream.empty();
     }
 
@@ -221,13 +221,13 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public boolean isBoardingPossible(StopLocation stop) {
-    return getFromIndex(stop) != -1;
+  public boolean isBoardingPossible(StopLocation fromStop) {
+    return findBoardIndex(fromStop) != STOP_INDEX_NOT_FOUND;
   }
 
   @Override
-  public boolean isAlightingPossible(StopLocation stop) {
-    return getToIndex(stop) != -1;
+  public boolean isAlightingPossible(StopLocation toStop) {
+    return findAlightIndex(toStop) != STOP_INDEX_NOT_FOUND;
   }
 
   @Override
@@ -252,7 +252,8 @@ public class ScheduledDeviatedTrip
       : Collections.singleton(stop);
   }
 
-  private int getFromIndex(StopLocation fromStop) {
+  @Override
+  public int findBoardIndex(StopLocation fromStop) {
     for (int i = 0; i < stopTimes.length; i++) {
       if (getBoardRule(i).isNotRoutable()) {
         continue;
@@ -268,10 +269,11 @@ public class ScheduledDeviatedTrip
         }
       }
     }
-    return -1;
+    return STOP_INDEX_NOT_FOUND;
   }
 
-  private int getToIndex(StopLocation toStop) {
+  @Override
+  public int findAlightIndex(StopLocation toStop) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
       if (getAlightRule(i).isNotRoutable()) {
         continue;
@@ -287,7 +289,7 @@ public class ScheduledDeviatedTrip
         }
       }
     }
-    return -1;
+    return STOP_INDEX_NOT_FOUND;
   }
 
   private static class ScheduledDeviatedStopTime implements Serializable {

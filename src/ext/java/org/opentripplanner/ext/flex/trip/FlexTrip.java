@@ -28,6 +28,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuilder<T, B>>
   extends AbstractTransitEntity<T, B> {
 
+  public static int STOP_INDEX_NOT_FOUND = -1;
+
   private final Trip trip;
 
   FlexTrip(FlexTripBuilder<T, B> builder) {
@@ -122,6 +124,18 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract boolean isBoardingPossible(StopLocation stop);
 
   public abstract boolean isAlightingPossible(StopLocation stop);
+
+  /**
+   * Find the first board-stop-position matching the given {@code fromStop}.
+   * Retuns {@link #STOP_INDEX_NOT_FOUND} if not found.
+   */
+  public abstract int findBoardIndex(StopLocation fromStop);
+
+  /**
+   * Find the first alight-stop-position matching the given {@code toStop}.
+   * Retuns {@link #STOP_INDEX_NOT_FOUND} if not found.
+   */
+  public abstract int findAlightIndex(StopLocation toStop);
 
   @Override
   public boolean sameAs(@Nonnull T other) {
