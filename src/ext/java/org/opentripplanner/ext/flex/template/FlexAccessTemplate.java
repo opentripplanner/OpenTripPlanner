@@ -24,7 +24,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FlexAccessTemplate extends FlexAccessEgressTemplate {
+public class FlexAccessTemplate extends AbstractFlexTemplate {
 
   public FlexAccessTemplate(
     NearbyStop accessEgress,

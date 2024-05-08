@@ -4,7 +4,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
-import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
+import org.opentripplanner.ext.flex.template.AbstractFlexTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -19,7 +19,7 @@ public class FlexTripEdge extends Edge {
   private final FlexTrip trip;
   public final StopLocation s1;
   public final StopLocation s2;
-  public final FlexAccessEgressTemplate flexTemplate;
+  public final AbstractFlexTemplate flexTemplate;
   public final FlexPath flexPath;
 
   private FlexTripEdge(
@@ -28,7 +28,7 @@ public class FlexTripEdge extends Edge {
     StopLocation s1,
     StopLocation s2,
     FlexTrip trip,
-    FlexAccessEgressTemplate flexTemplate,
+    AbstractFlexTemplate flexTemplate,
     FlexPath flexPath
   ) {
     super(v1, v2);
@@ -49,7 +49,7 @@ public class FlexTripEdge extends Edge {
     StopLocation s1,
     StopLocation s2,
     FlexTrip trip,
-    FlexAccessEgressTemplate flexTemplate,
+    AbstractFlexTemplate flexTemplate,
     FlexPath flexPath
   ) {
     return new FlexTripEdge(v1, v2, s1, s2, trip, flexTemplate, flexPath);

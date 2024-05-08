@@ -33,7 +33,7 @@ import org.opentripplanner.transit.service.TransitService;
  * <p>
  * Please also see Flex.svg for an illustration of how the flex concepts relate to each other.
  */
-public abstract class FlexAccessEgressTemplate {
+public abstract class AbstractFlexTemplate {
 
   /**
    * We do not want extremely short flex trips, they will normally be dominated in the
@@ -59,7 +59,7 @@ public abstract class FlexAccessEgressTemplate {
    * @param date          The service date of this FlexTrip
    * @param calculator    Calculates the path and duration of the FlexTrip
    */
-  FlexAccessEgressTemplate(
+  AbstractFlexTemplate(
     NearbyStop accessEgress,
     FlexTrip trip,
     int fromStopIndex,
@@ -125,7 +125,7 @@ public abstract class FlexAccessEgressTemplate {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(FlexAccessEgressTemplate.class)
+      .of(AbstractFlexTemplate.class)
       .addObj("accessEgress", accessEgress)
       .addObj("trip", trip)
       .addNum("fromStopIndex", fromStopIndex)
