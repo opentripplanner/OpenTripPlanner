@@ -7,21 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.framework.lang.IntRange;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -96,100 +88,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-    NearbyStop access,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  ) {
-    // Find boarding index, also check if it's boardable
-    final int fromIndex = findBoardIndex(access.stop);
-
-    // templates will be generated from the boardingIndex to the end of the trip
-    final int lastIndexInTrip = stopTimes.length - 1;
-
-    // Check if trip is possible
-    if (fromIndex == STOP_INDEX_NOT_FOUND) {
-      return Stream.empty();
-    }
-
-    IntStream indices;
-    if (stopTimes.length == 1) {
-      indices = IntStream.of(fromIndex);
-    } else {
-      indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
-    }
-    // check for every stop after fromIndex if you can alight, if so return a template
-    return indices
-      // if you cannot alight at an index, the trip is not possible
-      .filter(alightIndex -> getAlightRule(alightIndex).isRoutable())
-      // expand GroupStops and build IndexedStopLocations
-      .mapToObj(this::expandStops)
-      // flatten stream of streams
-      .flatMap(Function.identity())
-      // create template
-      .map(alightStop ->
-        new FlexAccessTemplate(
-          access,
-          this,
-          fromIndex,
-          alightStop.index,
-          alightStop.stop,
-          date,
-          calculator,
-          config
-        )
-      );
-  }
-
-  @Override
-  public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-    NearbyStop egress,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  ) {
-    // templates will be generated from the first index to the toIndex
-    int firstIndexInTrip = 0;
-
-    // Find alighting index, also check if alighting is allowed
-    int toIndex = findAlightIndex(egress.stop);
-
-    // Check if trip is possible
-    if (toIndex == STOP_INDEX_NOT_FOUND) {
-      return Stream.empty();
-    }
-
-    IntStream indices;
-    if (stopTimes.length == 1) {
-      indices = IntStream.of(toIndex);
-    } else {
-      indices = IntStream.range(firstIndexInTrip, toIndex + 1);
-    }
-    // check for every stop after fromIndex if you can alight, if so return a template
-    return indices
-      // if you cannot board at this index, the trip is not possible
-      .filter(boardIndex -> getBoardRule(boardIndex).isRoutable())
-      // expand GroupStops and build IndexedStopLocations
-      .mapToObj(this::expandStops)
-      // flatten stream of streams
-      .flatMap(Function.identity())
-      // create template
-      .map(boardStop ->
-        new FlexEgressTemplate(
-          egress,
-          this,
-          boardStop.index,
-          toIndex,
-          boardStop.stop,
-          date,
-          calculator,
-          config
-        )
-      );
-  }
-
-  @Override
   public int earliestDepartureTime(
     int requestedDepartureTime,
     int fromStopIndex,
@@ -246,28 +144,38 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
+  public int numberOfStops() {
+    return stopTimes.length;
+  }
+
+  @Override
   public Set<StopLocation> getStops() {
     return Arrays.stream(stopTimes).map(StopTimeWindow::stop).collect(Collectors.toSet());
   }
 
   @Override
-  public BookingInfo getDropOffBookingInfo(int i) {
-    return dropOffBookingInfos[i];
+  public StopLocation getStop(int stopIndex) {
+    return stopTimes[stopIndex].stop();
   }
 
   @Override
-  public BookingInfo getPickupBookingInfo(int i) {
-    return pickupBookingInfos[i];
+  public BookingInfo getDropOffBookingInfo(int stopIndex) {
+    return dropOffBookingInfos[stopIndex];
   }
 
   @Override
-  public PickDrop getBoardRule(int i) {
-    return stopTimes[i].pickupType();
+  public BookingInfo getPickupBookingInfo(int stopIndex) {
+    return pickupBookingInfos[stopIndex];
   }
 
   @Override
-  public PickDrop getAlightRule(int i) {
-    return stopTimes[i].dropOffType();
+  public PickDrop getBoardRule(int stopIndex) {
+    return stopTimes[stopIndex].pickupType();
+  }
+
+  @Override
+  public PickDrop getAlightRule(int stopIndex) {
+    return stopTimes[stopIndex].dropOffType();
   }
 
   @Override

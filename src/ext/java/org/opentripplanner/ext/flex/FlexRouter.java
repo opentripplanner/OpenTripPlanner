@@ -19,6 +19,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -170,6 +171,8 @@ public class FlexRouter {
       return;
     }
 
+    var templateFactory = new FlexTemplateFactory(accessFlexPathCalculator, config);
+
     // Fetch the closest flexTrips reachable from the access stops
     this.flexAccessTemplates =
       getClosestFlexTrips(streetAccesses, true)
@@ -181,9 +184,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              it
-                .flexTrip()
-                .getFlexAccessTemplates(it.accessEgress(), date, accessFlexPathCalculator, config)
+              templateFactory.createAccessTemplates(it.flexTrip(), it.accessEgress(), date).stream()
             )
         )
         .toList();
@@ -193,6 +194,8 @@ public class FlexRouter {
     if (this.flexEgressTemplates != null) {
       return;
     }
+
+    var templateFactory = new FlexTemplateFactory(egressFlexPathCalculator, config);
 
     // Fetch the closest flexTrips reachable from the egress stops
     this.flexEgressTemplates =
@@ -205,9 +208,7 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, alighting at the nearbyStop
             .flatMap(date ->
-              it
-                .flexTrip()
-                .getFlexEgressTemplates(it.accessEgress(), date, egressFlexPathCalculator, config)
+              templateFactory.createEgressTemplates(it.flexTrip(), it.accessEgress(), date).stream()
             )
         )
         .toList();

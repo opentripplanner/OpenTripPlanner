@@ -3,16 +3,9 @@ package org.opentripplanner.ext.flex.trip;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -44,20 +37,6 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public static boolean isFlexStop(StopLocation stop) {
     return stop instanceof GroupStop || stop instanceof AreaStop;
   }
-
-  public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-    NearbyStop access,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  );
-
-  public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-    NearbyStop egress,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  );
 
   /**
    * Earliest departure time from fromStopIndex to toStopIndex, which departs after departureTime,
@@ -100,6 +79,11 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract int latestArrivalTime(int stopIndex);
 
   /**
+   * Return number-of-stops this trip visit.
+   */
+  public abstract int numberOfStops();
+
+  /**
    * Returns all the stops that are in this trip.
    * <p>
    * Note that they are in no specific order and don't correspond 1-to-1 to the stop times of the
@@ -108,6 +92,12 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
    * Location groups are expanded into their constituent stops.
    */
   public abstract Set<StopLocation> getStops();
+
+  /**
+   * Return a stop at given stop-index. Note! The visited order may not be the same as the
+   * indexing order.
+   */
+  public abstract StopLocation getStop(int stopIndex);
 
   public Trip getTrip() {
     return trip;

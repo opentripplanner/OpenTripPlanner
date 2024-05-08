@@ -25,6 +25,7 @@ import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -643,16 +644,14 @@ class UnscheduledTripTest {
 
     @Nonnull
     private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
-      return trip
-        .getFlexAccessTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
+      return new FlexTemplateFactory(CALCULATOR, FlexConfig.DEFAULT)
+        .createAccessTemplates(trip, NEARBY_STOP, FLEX_SERVICE_DATE);
     }
 
     @Nonnull
     private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
-      return trip
-        .getFlexEgressTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
+      return new FlexTemplateFactory(CALCULATOR, FlexConfig.DEFAULT)
+        .createEgressTemplates(trip, NEARBY_STOP, FLEX_SERVICE_DATE);
     }
   }
 

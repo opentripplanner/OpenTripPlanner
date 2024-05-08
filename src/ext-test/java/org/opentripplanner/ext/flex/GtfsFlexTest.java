@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -54,9 +55,8 @@ public class GtfsFlexTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
+    var accesses = new FlexTemplateFactory(calculator, FlexConfig.DEFAULT)
+      .createAccessTemplates(trip, nearbyStop, flexDate);
 
     assertEquals(1, accesses.size());
 
@@ -69,9 +69,8 @@ public class GtfsFlexTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
+    var egresses = new FlexTemplateFactory(calculator, FlexConfig.DEFAULT)
+      .createEgressTemplates(trip, nearbyStop, flexDate);
 
     assertEquals(1, egresses.size());
 

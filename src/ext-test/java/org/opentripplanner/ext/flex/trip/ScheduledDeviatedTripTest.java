@@ -21,6 +21,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.FlexTest;
+import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -96,9 +97,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
+    var accesses = new FlexTemplateFactory(calculator, FlexConfig.DEFAULT)
+      .createAccessTemplates(trip, nearbyStop, flexDate);
 
     assertEquals(3, accesses.size());
 
@@ -111,9 +111,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
+    var egresses = new FlexTemplateFactory(calculator, FlexConfig.DEFAULT)
+      .createEgressTemplates(trip, nearbyStop, flexDate);
 
     assertEquals(3, egresses.size());
 

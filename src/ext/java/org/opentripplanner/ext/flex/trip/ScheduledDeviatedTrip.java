@@ -4,7 +4,6 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,17 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -75,86 +66,6 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-    NearbyStop access,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  ) {
-    FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
-
-    int fromIndex = findBoardIndex(access.stop);
-
-    if (fromIndex == -1) {
-      return Stream.empty();
-    }
-
-    ArrayList<FlexAccessTemplate> res = new ArrayList<>();
-
-    for (int toIndex = fromIndex; toIndex < stopTimes.length; toIndex++) {
-      if (getAlightRule(toIndex).isNotRoutable()) {
-        continue;
-      }
-      for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
-        res.add(
-          new FlexAccessTemplate(
-            access,
-            this,
-            fromIndex,
-            toIndex,
-            stop,
-            date,
-            scheduledCalculator,
-            config
-          )
-        );
-      }
-    }
-
-    return res.stream();
-  }
-
-  @Override
-  public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-    NearbyStop egress,
-    FlexServiceDate date,
-    FlexPathCalculator calculator,
-    FlexConfig config
-  ) {
-    FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
-
-    var toIndex = findAlightIndex(egress.stop);
-
-    if (toIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
-      return Stream.empty();
-    }
-
-    ArrayList<FlexEgressTemplate> res = new ArrayList<>();
-
-    for (int fromIndex = toIndex; fromIndex >= 0; fromIndex--) {
-      if (getBoardRule(fromIndex).isNotRoutable()) {
-        continue;
-      }
-      for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
-        res.add(
-          new FlexEgressTemplate(
-            egress,
-            this,
-            fromIndex,
-            toIndex,
-            stop,
-            date,
-            scheduledCalculator,
-            config
-          )
-        );
-      }
-    }
-
-    return res.stream();
-  }
-
-  @Override
   public int earliestDepartureTime(
     int departureTime,
     int fromStopIndex,
@@ -193,11 +104,21 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
+  public int numberOfStops() {
+    return stopTimes.length;
+  }
+
+  @Override
   public Set<StopLocation> getStops() {
     return Arrays
       .stream(stopTimes)
       .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
       .collect(Collectors.toSet());
+  }
+
+  @Override
+  public StopLocation getStop(int stopIndex) {
+    return stopTimes[stopIndex].stop;
   }
 
   @Override
