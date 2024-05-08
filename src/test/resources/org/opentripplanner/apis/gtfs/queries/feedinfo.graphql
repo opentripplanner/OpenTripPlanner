@@ -1,0 +1,10 @@
+{
+    feeds {
+        agencies {
+	    name
+	    url
+	}
+	publisherUrl
+	publisherName
+    }
+}
