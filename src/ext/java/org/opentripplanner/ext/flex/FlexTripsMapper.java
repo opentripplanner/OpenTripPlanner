@@ -33,8 +33,7 @@ public class FlexTripsMapper {
     ProgressTracker progress = ProgressTracker.track("Create flex trips", 500, tripSize);
 
     for (Trip trip : stopTimesByTrip.keys()) {
-      /* Fetch the stop times for this trip. Copy the list since it's immutable. */
-      List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
+      var stopTimes = stopTimesByTrip.get(trip);
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
         var modifier = builder.getFlexDurationFactors().getOrDefault(trip, TimePenalty.ZERO);
         result.add(
