@@ -22,7 +22,7 @@ class UnscheduledDrivingDurationTest {
   private static final StopTime STOP_TIME = FlexStopTimesForTest.area("10:00", "18:00");
 
   @Test
-  void noModifier() {
+  void noPenalty() {
     var trip = UnscheduledTrip.of(id("1")).withStopTimes(List.of(STOP_TIME)).build();
 
     var calculator = trip.flexPathCalculator(STATIC_CALCULATOR);
@@ -31,11 +31,11 @@ class UnscheduledDrivingDurationTest {
   }
 
   @Test
-  void withModifier() {
+  void withPenalty() {
     var trip = UnscheduledTrip
       .of(id("1"))
       .withStopTimes(List.of(STOP_TIME))
-      .withDurationModifier(TimePenalty.of(Duration.ofMinutes(2), 1.5f))
+      .withTimePenalty(TimePenalty.of(Duration.ofMinutes(2), 1.5f))
       .build();
 
     var calculator = trip.flexPathCalculator(STATIC_CALCULATOR);

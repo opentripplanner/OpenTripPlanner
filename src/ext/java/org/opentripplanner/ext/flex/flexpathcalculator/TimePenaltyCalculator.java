@@ -8,12 +8,12 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * A calculator to delegates the main computation to another instance and applies a duration
  * modifier afterward.
  */
-public class DurationModifierCalculator implements FlexPathCalculator {
+public class TimePenaltyCalculator implements FlexPathCalculator {
 
   private final FlexPathCalculator delegate;
   private final TimePenalty factors;
 
-  public DurationModifierCalculator(FlexPathCalculator delegate, TimePenalty penalty) {
+  public TimePenaltyCalculator(FlexPathCalculator delegate, TimePenalty penalty) {
     this.delegate = delegate;
     this.factors = penalty;
   }

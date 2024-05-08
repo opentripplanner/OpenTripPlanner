@@ -15,11 +15,13 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.DurationModifierCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.lang.IntRange;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -53,7 +55,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  private final TimePenalty durationModifier;
+  private final TimePenalty timePenalty;
 
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
@@ -72,7 +74,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
       this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
-    this.durationModifier = Objects.requireNonNull(builder.durationModifier());
+    this.timePenalty = Objects.requireNonNull(builder.timePenalty());
+    DurationUtils.requireNonNegative(timePenalty.constant());
+    DoubleUtils.requireInRange(timePenalty.coefficient(), 0.05d, Double.MAX_VALUE);
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {
@@ -151,12 +155,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   /**
-   * Get the correct {@link FlexPathCalculator} depending on the {@code durationModifier}.
+   * Get the correct {@link FlexPathCalculator} depending on the {@code timePenalty}.
    * If the modifier doesn't actually modify, we return the regular calculator.
    */
   protected FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
-    if (!durationModifier.isZero()) {
-      return new DurationModifierCalculator(calculator, durationModifier);
+    if (timePenalty.modifies()) {
+      return new TimePenaltyCalculator(calculator, timePenalty);
     } else {
       return calculator;
     }

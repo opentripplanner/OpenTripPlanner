@@ -35,13 +35,13 @@ public class FlexTripsMapper {
     for (Trip trip : stopTimesByTrip.keys()) {
       var stopTimes = stopTimesByTrip.get(trip);
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        var modifier = builder.getFlexDurationFactors().getOrDefault(trip, TimePenalty.ZERO);
+        var timePenalty = builder.getFlexTimePenalty().getOrDefault(trip, TimePenalty.NONE);
         result.add(
           UnscheduledTrip
             .of(trip.getId())
             .withTrip(trip)
             .withStopTimes(stopTimes)
-            .withDurationModifier(modifier)
+            .withTimePenalty(timePenalty)
             .build()
         );
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {

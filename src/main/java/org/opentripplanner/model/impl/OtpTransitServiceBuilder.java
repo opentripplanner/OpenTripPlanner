@@ -213,7 +213,7 @@ public class OtpTransitServiceBuilder {
     return stopTimesByTrip;
   }
 
-  public Map<Trip, TimePenalty> getFlexDurationFactors() {
+  public Map<Trip, TimePenalty> getFlexTimePenalty() {
     return flexDurationFactors;
   }
 

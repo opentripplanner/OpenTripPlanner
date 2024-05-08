@@ -9,7 +9,7 @@ public class UnscheduledTripBuilder
   extends FlexTripBuilder<UnscheduledTrip, UnscheduledTripBuilder> {
 
   private List<StopTime> stopTimes;
-  private TimePenalty durationModifier = TimePenalty.ZERO;
+  private TimePenalty timePenalty = TimePenalty.NONE;
 
   UnscheduledTripBuilder(FeedScopedId id) {
     super(id);
@@ -31,13 +31,13 @@ public class UnscheduledTripBuilder
     return stopTimes;
   }
 
-  public UnscheduledTripBuilder withDurationModifier(TimePenalty factors) {
-    this.durationModifier = factors;
+  public UnscheduledTripBuilder withTimePenalty(TimePenalty factors) {
+    this.timePenalty = factors;
     return this;
   }
 
-  public TimePenalty durationModifier() {
-    return durationModifier;
+  public TimePenalty timePenalty() {
+    return timePenalty;
   }
 
   @Override

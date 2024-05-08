@@ -9,7 +9,7 @@ import org.opentripplanner._support.geometry.LineStrings;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 
-class DurationModifierCalculatorTest {
+class TimePenaltyCalculatorTest {
 
   private static final int THIRTY_MINS_IN_SECONDS = (int) Duration.ofMinutes(30).toSeconds();
 
@@ -19,7 +19,7 @@ class DurationModifierCalculatorTest {
       new FlexPath(10_000, THIRTY_MINS_IN_SECONDS, () -> LineStrings.SIMPLE);
 
     var mod = TimePenalty.of(Duration.ofMinutes(10), 1.5f);
-    var calc = new DurationModifierCalculator(delegate, mod);
+    var calc = new TimePenaltyCalculator(delegate, mod);
     var path = calc.calculateFlexPath(StreetModelForTest.V1, StreetModelForTest.V2, 0, 5);
     assertEquals(3300, path.durationSeconds);
   }
@@ -28,7 +28,7 @@ class DurationModifierCalculatorTest {
   void nullValue() {
     FlexPathCalculator delegate = (fromv, tov, fromStopIndex, toStopIndex) -> null;
     var mod = TimePenalty.of(Duration.ofMinutes(10), 1.5f);
-    var calc = new DurationModifierCalculator(delegate, mod);
+    var calc = new TimePenaltyCalculator(delegate, mod);
     var path = calc.calculateFlexPath(StreetModelForTest.V1, StreetModelForTest.V2, 0, 5);
     assertNull(path);
   }
