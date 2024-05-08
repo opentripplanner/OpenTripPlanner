@@ -173,12 +173,12 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public BookingInfo getDropOffBookingInfo() {
-    return edge.getFlexTrip().getDropOffBookingInfo(getBoardStopPosInPattern());
+    return edge.getFlexTrip().getDropOffBookingInfo(getAlightStopPosInPattern());
   }
 
   @Override
   public BookingInfo getPickupBookingInfo() {
-    return edge.getFlexTrip().getPickupBookingInfo(getAlightStopPosInPattern());
+    return edge.getFlexTrip().getPickupBookingInfo(getBoardStopPosInPattern());
   }
 
   @Override
