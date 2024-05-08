@@ -984,6 +984,12 @@ type Feed {
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
 
+    """Name of feed publisher"""
+    publisherName: String!
+
+    """Web address of feed publisher"""
+    publisherUrl: String!
+
     """
     Alerts relevant for the feed.
     """
