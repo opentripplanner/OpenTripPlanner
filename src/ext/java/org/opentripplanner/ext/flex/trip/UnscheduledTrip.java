@@ -104,7 +104,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     FlexConfig config
   ) {
     // Find boarding index, also check if it's boardable
-    final int fromIndex = getFromIndex(access);
+    final int fromIndex = getFromIndex(access.stop);
 
     // templates will be generated from the boardingIndex to the end of the trip
     final int lastIndexInTrip = stopTimes.length - 1;
@@ -154,7 +154,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int firstIndexInTrip = 0;
 
     // Find alighting index, also check if alighting is allowed
-    int toIndex = getToIndex(egress);
+    int toIndex = getToIndex(egress.stop);
 
     // Check if trip is possible
     if (toIndex == INDEX_NOT_FOUND || firstIndexInTrip > toIndex) {
@@ -272,12 +272,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public boolean isBoardingPossible(NearbyStop stop) {
+  public boolean isBoardingPossible(StopLocation stop) {
     return getFromIndex(stop) != INDEX_NOT_FOUND;
   }
 
   @Override
-  public boolean isAlightingPossible(NearbyStop stop) {
+  public boolean isAlightingPossible(StopLocation stop) {
     return getToIndex(stop) != INDEX_NOT_FOUND;
   }
 
@@ -304,18 +304,18 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       : Stream.of(new IndexedStopLocation(index, stop));
   }
 
-  private int getFromIndex(NearbyStop accessEgress) {
+  private int getFromIndex(StopLocation fromStop) {
     for (int i = 0; i < stopTimes.length; i++) {
       if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(fromStop)) {
           return i;
         }
       } else {
-        if (stop.equals(accessEgress.stop)) {
+        if (stop.equals(fromStop)) {
           return i;
         }
       }
@@ -323,18 +323,18 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return INDEX_NOT_FOUND;
   }
 
-  private int getToIndex(NearbyStop accessEgress) {
+  private int getToIndex(StopLocation toStop) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
       if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(toStop)) {
           return i;
         }
       } else {
-        if (stop.equals(accessEgress.stop)) {
+        if (stop.equals(toStop)) {
           return i;
         }
       }

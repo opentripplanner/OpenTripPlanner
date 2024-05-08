@@ -133,8 +133,8 @@ public class NearbyStopFinder {
         for (FlexTrip<?, ?> trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
           if (
             reverseDirection
-              ? trip.isAlightingPossible(nearbyStop)
-              : trip.isBoardingPossible(nearbyStop)
+              ? trip.isAlightingPossible(nearbyStop.stop)
+              : trip.isBoardingPossible(nearbyStop.stop)
           ) {
             closestStopForFlexTrip.putMin(trip, nearbyStop);
           }

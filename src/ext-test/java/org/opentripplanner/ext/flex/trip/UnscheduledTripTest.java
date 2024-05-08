@@ -33,7 +33,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -562,11 +561,11 @@ class UnscheduledTripTest {
       .build()
       .trip();
 
-    assertTrue(trip.isBoardingPossible(nearbyStop(AREA_STOP1)));
-    assertFalse(trip.isAlightingPossible(nearbyStop(AREA_STOP1)));
+    assertTrue(trip.isBoardingPossible(AREA_STOP1));
+    assertFalse(trip.isAlightingPossible(AREA_STOP1));
 
-    assertFalse(trip.isBoardingPossible(nearbyStop(AREA_STOP2)));
-    assertTrue(trip.isAlightingPossible(nearbyStop(AREA_STOP2)));
+    assertFalse(trip.isBoardingPossible(AREA_STOP2));
+    assertTrue(trip.isAlightingPossible(AREA_STOP2));
   }
 
   @Nested
@@ -688,11 +687,6 @@ class UnscheduledTripTest {
     stopTime.setArrivalTime(arrivalTime);
     stopTime.setDepartureTime(departureTime);
     return stopTime;
-  }
-
-  @Nonnull
-  private static NearbyStop nearbyStop(AreaStop stop) {
-    return new NearbyStop(stop, 1000, List.of(), null);
   }
 
   record TestCase(

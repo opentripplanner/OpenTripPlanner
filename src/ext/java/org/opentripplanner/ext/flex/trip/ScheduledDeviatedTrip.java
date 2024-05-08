@@ -83,7 +83,7 @@ public class ScheduledDeviatedTrip
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
-    int fromIndex = getFromIndex(access);
+    int fromIndex = getFromIndex(access.stop);
 
     if (fromIndex == -1) {
       return Stream.empty();
@@ -123,7 +123,7 @@ public class ScheduledDeviatedTrip
   ) {
     FlexPathCalculator scheduledCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
-    int toIndex = getToIndex(egress);
+    int toIndex = getToIndex(egress.stop);
 
     if (toIndex == -1) {
       return Stream.empty();
@@ -221,12 +221,12 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public boolean isBoardingPossible(NearbyStop stop) {
+  public boolean isBoardingPossible(StopLocation stop) {
     return getFromIndex(stop) != -1;
   }
 
   @Override
-  public boolean isAlightingPossible(NearbyStop stop) {
+  public boolean isAlightingPossible(StopLocation stop) {
     return getToIndex(stop) != -1;
   }
 
@@ -252,18 +252,18 @@ public class ScheduledDeviatedTrip
       : Collections.singleton(stop);
   }
 
-  private int getFromIndex(NearbyStop accessEgress) {
+  private int getFromIndex(StopLocation fromStop) {
     for (int i = 0; i < stopTimes.length; i++) {
       if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(fromStop)) {
           return i;
         }
       } else {
-        if (stop.equals(accessEgress.stop)) {
+        if (stop.equals(fromStop)) {
           return i;
         }
       }
@@ -271,18 +271,18 @@ public class ScheduledDeviatedTrip
     return -1;
   }
 
-  private int getToIndex(NearbyStop accessEgress) {
+  private int getToIndex(StopLocation toStop) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
       if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(toStop)) {
           return i;
         }
       } else {
-        if (stop.equals(accessEgress.stop)) {
+        if (stop.equals(toStop)) {
           return i;
         }
       }

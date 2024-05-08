@@ -226,8 +226,8 @@ public class FlexRouter {
           .stream()
           .filter(flexTrip ->
             pickup
-              ? flexTrip.isBoardingPossible(accessEgress)
-              : flexTrip.isAlightingPossible(accessEgress)
+              ? flexTrip.isBoardingPossible(accessEgress.stop)
+              : flexTrip.isAlightingPossible(accessEgress.stop)
           )
           .map(flexTrip -> new AccessEgressAndNearbyStop(accessEgress, flexTrip))
       );

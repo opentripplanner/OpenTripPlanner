@@ -119,9 +119,9 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
 
   public abstract PickDrop getAlightRule(int i);
 
-  public abstract boolean isBoardingPossible(NearbyStop stop);
+  public abstract boolean isBoardingPossible(StopLocation stop);
 
-  public abstract boolean isAlightingPossible(NearbyStop stop);
+  public abstract boolean isAlightingPossible(StopLocation stop);
 
   @Override
   public boolean sameAs(@Nonnull T other) {

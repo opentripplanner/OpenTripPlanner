@@ -83,18 +83,4 @@ public class FlexEgressTemplate extends AbstractFlexTemplate {
       flexPath
     );
   }
-
-  protected boolean isRouteable(Vertex flexVertex) {
-    if (accessEgress.state.getVertex() == flexVertex) {
-      return false;
-    } else return (
-      calculator.calculateFlexPath(
-        flexVertex,
-        accessEgress.state.getVertex(),
-        fromStopIndex,
-        toStopIndex
-      ) !=
-      null
-    );
-  }
 }
