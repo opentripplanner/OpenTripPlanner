@@ -532,7 +532,7 @@ class WalkableAreaBuilder {
         .withBack(false)
         .withArea(edgeList)
         .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.needsFallbackName())
+        .withBogusName(areaEntity.hasNoName())
         .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
         .withLink(areaEntity.isLink());
 
@@ -555,7 +555,7 @@ class WalkableAreaBuilder {
         .withBack(true)
         .withArea(edgeList)
         .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.needsFallbackName())
+        .withBogusName(areaEntity.hasNoName())
         .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
         .withLink(areaEntity.isLink());
 

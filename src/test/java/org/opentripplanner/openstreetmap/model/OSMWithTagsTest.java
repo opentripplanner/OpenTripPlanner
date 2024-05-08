@@ -266,9 +266,9 @@ public class OSMWithTagsTest {
   @Test
   void fallbackName() {
     var nameless = WayTestData.cycleway();
-    assertTrue(nameless.needsFallbackName());
+    assertTrue(nameless.hasNoName());
 
     var namedTunnel = WayTestData.carTunnel();
-    assertFalse(namedTunnel.needsFallbackName());
+    assertFalse(namedTunnel.hasNoName());
   }
 }

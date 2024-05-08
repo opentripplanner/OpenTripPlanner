@@ -72,7 +72,7 @@ public class SidewalkNamer implements EdgeNamer {
   @Override
   public void recordEdges(OSMWithTags way, StreetEdgePair pair) {
     // this way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
-    if (way.isSidewalk() && way.needsFallbackName() && !way.isExplicitlyUnnamed()) {
+    if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
       pair
         .asIterable()
         .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels())));

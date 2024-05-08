@@ -168,13 +168,6 @@ public class OSMWithTags {
     return isTag("footway", "sidewalk") && isTag("highway", "footway");
   }
 
-  /**
-   * Whether this entity explicity doesn't have a name.
-   */
-  public boolean isExplicitlyUnnamed() {
-    return isTagTrue("noname");
-  }
-
   protected boolean doesTagAllowAccess(String tag) {
     if (tags == null) {
       return false;
@@ -602,17 +595,33 @@ public class OSMWithTags {
   }
 
   /**
-   * Does this entity has a name of its own or if it needs to have a fallback one assigned?
-   */
-  public boolean needsFallbackName() {
-    return !isNamed();
-  }
-
-  /**
    * Does this entity have tags that allow extracting a name?
    */
   public boolean isNamed() {
     return hasTag("name") || hasTag("ref");
+  }
+
+  /**
+   * Is this entity unnamed?
+   * <p>
+   * Perhaps this entity has a name that isn't in the source data, but it's also possible that
+   * it's explicitly tagged as not having one.
+   *
+   * @see OSMWithTags#isExplicitlyUnnamed()
+   */
+  public boolean hasNoName() {
+    return !isNamed();
+  }
+
+  /**
+   * Whether this entity explicitly doesn't have a name. This is different to no name being
+   * set on the entity in OSM.
+   *
+   * @see OSMWithTags#isNamed()
+   * @see https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   */
+  public boolean isExplicitlyUnnamed() {
+    return isTagTrue("noname");
   }
 
   /**
