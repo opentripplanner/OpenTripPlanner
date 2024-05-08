@@ -380,6 +380,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
     public DataFetcher<String> feedId();
+
+    public DataFetcher<String> publisherName();
+
+    public DataFetcher<String> publisherUrl();
   }
 
   public interface GraphQLGeometry {
