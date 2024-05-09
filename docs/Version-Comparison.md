@@ -92,7 +92,7 @@ applications. See the [Analysis](Analysis.md) page for more details.
 
 ### Routers API and Hot Reloading
 
-Via it's Routers API, OTP1 allows loading data and serving APIs for multiple separate geographic
+Via its Routers API, OTP1 allows loading data and serving APIs for multiple separate geographic
 areas. This is functionally equivalent to running more than one OTP server with separate data sets.
 This system also allows reloading transportation network data when it changes, or even pushing new
 data over a network connection.
