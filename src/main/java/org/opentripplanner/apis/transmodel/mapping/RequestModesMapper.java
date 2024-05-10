@@ -1,12 +1,16 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 class RequestModesMapper {
 
+  private static final Predicate<StreetMode> IS_BIKE = m -> m == StreetMode.BIKE;
   private static final String accessModeKey = "accessMode";
   private static final String egressModeKey = "egressMode";
   private static final String directModeKey = "directMode";
@@ -15,22 +19,26 @@ class RequestModesMapper {
    * Maps GraphQL Modes input type to RequestModes.
    * <p>
    * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
-   * Default modes are WALK for access, egress & transfer.
    */
   static RequestModes mapRequestModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();
 
-    if (modesInput.containsKey(accessModeKey)) {
-      StreetMode accessMode = (StreetMode) modesInput.get(accessModeKey);
-      mBuilder.withAccessMode(accessMode);
-      mBuilder.withTransferMode(accessMode == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK);
-    }
-    if (modesInput.containsKey(egressModeKey)) {
-      mBuilder.withEgressMode((StreetMode) modesInput.get(egressModeKey));
-    }
-    // An unset directMode should overwrite the walk default, so we don't check for existence first.
-    mBuilder.withDirectMode((StreetMode) modesInput.get(directModeKey));
+    final StreetMode accessMode = (StreetMode) modesInput.get(accessModeKey);
+    ensureValueAndSet(accessMode, mBuilder::withAccessMode);
+    ensureValueAndSet((StreetMode) modesInput.get(egressModeKey), mBuilder::withEgressMode);
+    ensureValueAndSet((StreetMode) modesInput.get(directModeKey), mBuilder::withDirectMode);
+    Optional.ofNullable(accessMode).filter(IS_BIKE).ifPresent(mBuilder::withTransferMode);
 
     return mBuilder.build();
+  }
+
+  /**
+   * Use the provided consumer to apply the StreetMode if it's non-null, otherwise apply NOT_SET.
+   *
+   * @param streetMode
+   * @param consumer
+   */
+  private static void ensureValueAndSet(StreetMode streetMode, Consumer<StreetMode> consumer) {
+    consumer.accept(streetMode == null ? StreetMode.NOT_SET : streetMode);
   }
 }
