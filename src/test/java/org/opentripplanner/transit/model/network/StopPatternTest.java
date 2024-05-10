@@ -21,7 +21,7 @@ class StopPatternTest {
     var s3 = testModel.stop("3", 62.0, 11.0).build();
     var s4 = testModel.stop("4", 62.1, 11.0).build();
 
-    var s34 = testModel.groupStopForTest("3_4", List.of(s3, s4));
+    var s34 = testModel.groupStop("3_4", s3, s4);
 
     var areaStop = testModel.areaStop("area").build();
 

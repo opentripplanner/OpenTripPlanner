@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Coordinates;
@@ -164,12 +165,12 @@ public class TransitModelForTest {
       .withPriority(StopTransferPriority.ALLOWED);
   }
 
-  public GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
+  public GroupStop groupStop(String idAndName, RegularStop... stops) {
     var builder = stopModelBuilder
       .groupStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName));
 
-    stops.forEach(builder::addLocation);
+    Stream.of(stops).forEach(builder::addLocation);
 
     return builder.build();
   }
