@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -25,20 +23,7 @@ class StopPatternTest {
 
     var s34 = testModel.groupStopForTest("3_4", List.of(s3, s4));
 
-    var areaStop = testModel.areaStopForTest(
-      "area",
-      GeometryUtils
-        .getGeometryFactory()
-        .createPolygon(
-          new Coordinate[] {
-            new Coordinate(11.0, 63.0),
-            new Coordinate(11.5, 63.0),
-            new Coordinate(11.5, 63.5),
-            new Coordinate(11.0, 63.5),
-            new Coordinate(11.0, 63.0),
-          }
-        )
-    );
+    var areaStop = testModel.areaStop("area").build();
 
     Trip t = TransitModelForTest.trip("trip").build();
 

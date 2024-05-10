@@ -29,10 +29,10 @@ class AreaStopsToVerticesMapperTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
-  private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL.areaStopForTest(
-    "berlin",
-    Polygons.BERLIN
-  );
+  private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL
+    .areaStop("berlin")
+    .withGeometry(Polygons.BERLIN)
+    .build();
   public static final StopModel STOP_MODEL = TEST_MODEL
     .stopModelBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)

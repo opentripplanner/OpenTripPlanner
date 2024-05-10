@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
@@ -51,7 +50,7 @@ class UnscheduledTripTest {
 
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
 
-  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
+  private static final StopLocation AREA_STOP = TEST_MODEL.areaStop("area").build();
 
   @Nested
   class IsUnscheduledTrip {
@@ -546,9 +545,9 @@ class UnscheduledTripTest {
 
   @Test
   void boardingAlighting() {
-    var AREA_STOP1 = TEST_MODEL.areaStopForTest("area-1", Polygons.BERLIN);
-    var AREA_STOP2 = TEST_MODEL.areaStopForTest("area-2", Polygons.BERLIN);
-    var AREA_STOP3 = TEST_MODEL.areaStopForTest("area-3", Polygons.BERLIN);
+    var AREA_STOP1 = TEST_MODEL.areaStop("area-1").build();
+    var AREA_STOP2 = TEST_MODEL.areaStop("area-2").build();
+    var AREA_STOP3 = TEST_MODEL.areaStop("area-3").build();
 
     var first = area(AREA_STOP1, "10:00", "10:05");
     first.setDropOffType(NONE);

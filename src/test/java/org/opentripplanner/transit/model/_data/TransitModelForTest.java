@@ -5,8 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -23,7 +26,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
@@ -51,6 +54,18 @@ public class TransitModelForTest {
   public static final String TIME_ZONE_ID = "Europe/Paris";
   public static final String OTHER_TIME_ZONE_ID = "America/Los_Angeles";
   public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
+
+  // This is used to create valid objects - do not use it for verification
+  private static final Polygon ANY_POLYGON = GeometryUtils
+    .getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        Coordinates.of(61.0, 10.0),
+        Coordinates.of(61.0, 12.0),
+        Coordinates.of(60.0, 11.0),
+        Coordinates.of(61.0, 10.0),
+      }
+    );
 
   public static final Agency AGENCY = Agency
     .of(id("A1"))
@@ -159,12 +174,11 @@ public class TransitModelForTest {
     return builder.build();
   }
 
-  public AreaStop areaStopForTest(String idAndName, Geometry geometry) {
+  public AreaStopBuilder areaStop(String idAndName) {
     return stopModelBuilder
       .areaStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
-      .withGeometry(geometry)
-      .build();
+      .withGeometry(ANY_POLYGON);
   }
 
   public StopTime stopTime(Trip trip, int seq) {
