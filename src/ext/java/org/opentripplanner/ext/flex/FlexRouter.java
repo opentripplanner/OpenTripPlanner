@@ -171,7 +171,7 @@ public class FlexRouter {
       return;
     }
 
-    var templateFactory = new FlexTemplateFactory(accessFlexPathCalculator, config);
+    var templateFactory = FlexTemplateFactory.of(accessFlexPathCalculator, config);
 
     // Fetch the closest flexTrips reachable from the access stops
     this.flexAccessTemplates =
@@ -184,7 +184,10 @@ public class FlexRouter {
             .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
-              templateFactory.createAccessTemplates(it.flexTrip(), it.accessEgress(), date).stream()
+              templateFactory
+                .with(date, it.flexTrip(), it.accessEgress())
+                .createAccessTemplates()
+                .stream()
             )
         )
         .toList();
@@ -195,7 +198,7 @@ public class FlexRouter {
       return;
     }
 
-    var templateFactory = new FlexTemplateFactory(egressFlexPathCalculator, config);
+    var templateFactory = FlexTemplateFactory.of(egressFlexPathCalculator, config);
 
     // Fetch the closest flexTrips reachable from the egress stops
     this.flexEgressTemplates =
@@ -206,9 +209,12 @@ public class FlexRouter {
             .stream(dates)
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
-            // Create templates from trip, alighting at the nearbyStop
+            // Create templates from trips, alighting at the nearbyStop
             .flatMap(date ->
-              templateFactory.createEgressTemplates(it.flexTrip(), it.accessEgress(), date).stream()
+              templateFactory
+                .with(date, it.flexTrip(), it.accessEgress())
+                .createEgressTemplates()
+                .stream()
             )
         )
         .toList();

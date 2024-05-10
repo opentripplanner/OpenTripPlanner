@@ -116,14 +116,18 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   public abstract boolean isAlightingPossible(StopLocation stop);
 
   /**
-   * Find the first board-stop-position matching the given {@code fromStop}.
-   * Retuns {@link #STOP_INDEX_NOT_FOUND} if not found.
+   * Find the first stop-position matching the given {@code fromStop} where
+   * boarding is allowed.
+   *
+   * @return stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
   public abstract int findBoardIndex(StopLocation fromStop);
 
   /**
-   * Find the first alight-stop-position matching the given {@code toStop}.
-   * Retuns {@link #STOP_INDEX_NOT_FOUND} if not found.
+   * Find the first stop-position matching the given {@code toStop} where
+   * alighting is allowed.
+   *
+   * @return the stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
   public abstract int findAlightIndex(StopLocation toStop);
 

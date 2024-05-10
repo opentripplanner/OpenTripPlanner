@@ -644,14 +644,18 @@ class UnscheduledTripTest {
 
     @Nonnull
     private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
-      return new FlexTemplateFactory(CALCULATOR, FlexConfig.DEFAULT)
-        .createAccessTemplates(trip, NEARBY_STOP, FLEX_SERVICE_DATE);
+      return FlexTemplateFactory
+        .of(CALCULATOR, FlexConfig.DEFAULT)
+        .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
+        .createAccessTemplates();
     }
 
     @Nonnull
     private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
-      return new FlexTemplateFactory(CALCULATOR, FlexConfig.DEFAULT)
-        .createEgressTemplates(trip, NEARBY_STOP, FLEX_SERVICE_DATE);
+      return FlexTemplateFactory
+        .of(CALCULATOR, FlexConfig.DEFAULT)
+        .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
+        .createEgressTemplates();
     }
   }
 
