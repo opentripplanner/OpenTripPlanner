@@ -68,7 +68,7 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TransitModelForTest.of().unscheduledTrip(id("flex"), model.stop());
+      var flexTrip = TransitModelForTest.of().unscheduledTrip("flex", model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();

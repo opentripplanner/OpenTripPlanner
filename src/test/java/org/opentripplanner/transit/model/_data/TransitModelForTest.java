@@ -261,7 +261,7 @@ public class TransitModelForTest {
       .withStopPattern(stopPattern(3));
   }
 
-  public UnscheduledTrip unscheduledTrip(FeedScopedId id, StopLocation... stops) {
+  public UnscheduledTrip unscheduledTrip(String id, StopLocation... stops) {
     var stopTimes = Arrays
       .stream(stops)
       .map(s -> {
@@ -276,9 +276,9 @@ public class TransitModelForTest {
     return unscheduledTrip(id, stopTimes);
   }
 
-  public UnscheduledTrip unscheduledTrip(FeedScopedId id, List<StopTime> stopTimes) {
+  public UnscheduledTrip unscheduledTrip(String id, List<StopTime> stopTimes) {
     return UnscheduledTrip
-      .of(id)
+      .of(id(id))
       .withTrip(trip("flex-trip").build())
       .withStopTimes(stopTimes)
       .build();

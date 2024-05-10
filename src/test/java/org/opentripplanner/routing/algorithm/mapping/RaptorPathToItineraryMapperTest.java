@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -144,7 +143,7 @@ public class RaptorPathToItineraryMapperTest {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     var flexTrip = TEST_MODEL.unscheduledTrip(
-      id("flex"),
+      "flex",
       TEST_MODEL.stop("A:Stop:1").build(),
       TEST_MODEL.stop("A:Stop:2").build()
     );
