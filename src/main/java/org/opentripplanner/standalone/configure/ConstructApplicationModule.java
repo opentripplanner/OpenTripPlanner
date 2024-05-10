@@ -56,7 +56,7 @@ public class ConstructApplicationModule {
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
-      routerConfig.flexConfig(),
+      routerConfig.flexParameters(),
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,

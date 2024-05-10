@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -23,7 +24,6 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -120,7 +120,7 @@ public interface OtpServerRequestContext {
     return GraphFinder.getInstance(graph(), transitService()::findRegularStops);
   }
 
-  FlexConfig flexConfig();
+  FlexParameters flexParameters();
 
   VectorTileConfig vectorTileConfig();
 

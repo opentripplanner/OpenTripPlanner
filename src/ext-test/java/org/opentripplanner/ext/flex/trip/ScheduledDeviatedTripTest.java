@@ -19,6 +19,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
@@ -38,7 +39,6 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -97,7 +97,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    FlexTemplateFactory templateFactory = FlexTemplateFactory.of(calculator, FlexConfig.DEFAULT);
+    FlexTemplateFactory templateFactory = FlexTemplateFactory.of(
+      calculator,
+      FlexParameters.defaultValues().maxTransferDuration()
+    );
     var accesses = templateFactory.with(flexDate, trip, nearbyStop).createAccessTemplates();
 
     assertEquals(3, accesses.size());
@@ -112,7 +115,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
     var egresses = FlexTemplateFactory
-      .of(calculator, FlexConfig.DEFAULT)
+      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
       .with(flexDate, trip, nearbyStop)
       .createEgressTemplates();
 
@@ -134,7 +137,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var router = new FlexRouter(
       graph,
       new DefaultTransitService(transitModel),
-      FlexConfig.DEFAULT,
+      FlexParameters.defaultValues(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
       1,

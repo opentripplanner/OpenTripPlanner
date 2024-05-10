@@ -13,7 +13,6 @@ import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -56,7 +55,7 @@ public class GtfsFlexTest extends FlexTest {
     var nearbyStop = getNearbyStop(trip);
 
     var accesses = FlexTemplateFactory
-      .of(calculator, FlexConfig.DEFAULT)
+      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
       .with(flexDate, trip, nearbyStop)
       .createAccessTemplates();
 
@@ -68,7 +67,7 @@ public class GtfsFlexTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
     var egresses = FlexTemplateFactory
-      .of(calculator, FlexConfig.DEFAULT)
+      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
       .with(flexDate, trip, nearbyStop)
       .createEgressTemplates();
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.template;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +10,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculat
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -19,18 +19,21 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class FlexTemplateFactory {
 
   private final FlexPathCalculator calculator;
-  private final FlexConfig config;
+  private final Duration maxTransferDuration;
   private FlexServiceDate date;
   private FlexTrip<?, ?> trip;
   private NearbyStop nearbyStop;
 
-  private FlexTemplateFactory(FlexPathCalculator calculator, FlexConfig config) {
+  private FlexTemplateFactory(FlexPathCalculator calculator, Duration maxTransferDuration) {
     this.calculator = Objects.requireNonNull(calculator);
-    this.config = Objects.requireNonNull(config);
+    this.maxTransferDuration = Objects.requireNonNull(maxTransferDuration);
   }
 
-  public static FlexTemplateFactory of(FlexPathCalculator calculator, FlexConfig config) {
-    return new FlexTemplateFactory(calculator, config);
+  public static FlexTemplateFactory of(
+    FlexPathCalculator calculator,
+    Duration maxTransferDuration
+  ) {
+    return new FlexTemplateFactory(calculator, maxTransferDuration);
   }
 
   /**
@@ -114,11 +117,6 @@ public class FlexTemplateFactory {
    * we can add code to be backward compatible with the old GTFS version here.
    */
   private boolean isBoardingAndAlightingAtSameStopPositionAllowed() {
-    // If implemented:
-    //  - RegularStops should always return false,
-    //  - Area stops should return the value of a feature flag like
-    //    'OTPFeature.BoardingAndAlightingAtSameStopPositionAllowed'
-    //  - GroupStop - to be decided
     return false;
   }
 
@@ -155,7 +153,7 @@ public class FlexTemplateFactory {
       alightStop,
       date,
       createCalculator(flexTrip),
-      config
+      maxTransferDuration
     );
   }
 
@@ -173,7 +171,7 @@ public class FlexTemplateFactory {
       boardStop,
       date,
       createCalculator(flexTrip),
-      config
+      maxTransferDuration
     );
   }
 }

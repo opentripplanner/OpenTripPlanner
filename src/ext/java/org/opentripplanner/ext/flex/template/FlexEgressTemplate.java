@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.collect.Lists;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexPathDurations;
@@ -10,7 +11,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -28,9 +28,18 @@ public class FlexEgressTemplate extends AbstractFlexTemplate {
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexConfig config
+    Duration maxTransferDuration
   ) {
-    super(accessEgress, trip, fromStopIndex, toStopIndex, transferStop, date, calculator, config);
+    super(
+      accessEgress,
+      trip,
+      fromStopIndex,
+      toStopIndex,
+      transferStop,
+      date,
+      calculator,
+      maxTransferDuration
+    );
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {

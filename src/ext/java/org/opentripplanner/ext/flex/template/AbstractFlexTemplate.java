@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.template;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +18,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -41,14 +41,14 @@ public abstract class AbstractFlexTemplate {
    */
   private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
   protected final NearbyStop accessEgress;
-  protected final FlexTrip trip;
+  protected final FlexTrip<?, ?> trip;
   public final int fromStopIndex;
   public final int toStopIndex;
   protected final StopLocation transferStop;
   protected final int secondsFromStartOfTime;
   public final LocalDate serviceDate;
   protected final FlexPathCalculator calculator;
-  private final FlexConfig flexConfig;
+  private final Duration maxTransferDuration;
 
   /**
    * @param accessEgress  Path from origin to the point of boarding for this flex trip
@@ -61,13 +61,13 @@ public abstract class AbstractFlexTemplate {
    */
   AbstractFlexTemplate(
     NearbyStop accessEgress,
-    FlexTrip trip,
+    FlexTrip<?, ?> trip,
     int fromStopIndex,
     int toStopIndex,
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexConfig config
+    Duration maxTransferDuration
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
@@ -77,7 +77,7 @@ public abstract class AbstractFlexTemplate {
     this.secondsFromStartOfTime = date.secondsFromStartOfTime;
     this.serviceDate = date.serviceDate;
     this.calculator = calculator;
-    this.flexConfig = config;
+    this.maxTransferDuration = maxTransferDuration;
   }
 
   public StopLocation getTransferStop() {
@@ -105,7 +105,7 @@ public abstract class AbstractFlexTemplate {
     // transferStop is Location Area/Line
     else {
       double maxDistanceMeters =
-        flexConfig.maxTransferDuration().getSeconds() *
+        maxTransferDuration.getSeconds() *
         accessEgress.state.getRequest().preferences().walk().speed();
 
       return getTransfersFromTransferStop(transitService)
@@ -134,7 +134,7 @@ public abstract class AbstractFlexTemplate {
       .addServiceTime("secondsFromStartOfTime", secondsFromStartOfTime)
       .addDate("serviceDate", serviceDate)
       .addObj("calculator", calculator)
-      .addObj("flexConfig", flexConfig)
+      .addDuration("maxTransferDuration", maxTransferDuration)
       .toString();
   }
 

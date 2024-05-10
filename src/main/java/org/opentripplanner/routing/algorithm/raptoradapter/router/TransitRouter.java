@@ -269,7 +269,7 @@ public class TransitRouter {
         temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,
-        serverContext.flexConfig(),
+        serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
         type.isEgress()
       );

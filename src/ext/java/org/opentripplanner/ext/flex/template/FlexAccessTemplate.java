@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex.template;
 
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
@@ -28,15 +28,24 @@ public class FlexAccessTemplate extends AbstractFlexTemplate {
 
   public FlexAccessTemplate(
     NearbyStop accessEgress,
-    FlexTrip trip,
+    FlexTrip<?, ?> trip,
     int fromStopTime,
     int toStopTime,
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
-    FlexConfig config
+    Duration maxTransferDuration
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, config);
+    super(
+      accessEgress,
+      trip,
+      fromStopTime,
+      toStopTime,
+      transferStop,
+      date,
+      calculator,
+      maxTransferDuration
+    );
   }
 
   public Itinerary createDirectGraphPath(

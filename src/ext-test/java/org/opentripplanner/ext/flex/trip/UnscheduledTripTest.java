@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -32,7 +33,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -645,7 +645,7 @@ class UnscheduledTripTest {
     @Nonnull
     private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
       return FlexTemplateFactory
-        .of(CALCULATOR, FlexConfig.DEFAULT)
+        .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
         .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
         .createAccessTemplates();
     }
@@ -653,7 +653,7 @@ class UnscheduledTripTest {
     @Nonnull
     private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
       return FlexTemplateFactory
-        .of(CALCULATOR, FlexConfig.DEFAULT)
+        .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
         .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
         .createEgressTemplates();
     }

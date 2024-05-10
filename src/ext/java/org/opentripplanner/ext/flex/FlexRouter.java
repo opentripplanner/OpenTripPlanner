@@ -27,7 +27,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -37,7 +36,7 @@ public class FlexRouter {
 
   private final Graph graph;
   private final TransitService transitService;
-  private final FlexConfig config;
+  private final FlexParameters flexParameters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -59,7 +58,7 @@ public class FlexRouter {
   public FlexRouter(
     Graph graph,
     TransitService transitService,
-    FlexConfig config,
+    FlexParameters flexParameters,
     Instant searchInstant,
     boolean arriveBy,
     int additionalPastSearchDays,
@@ -69,7 +68,7 @@ public class FlexRouter {
   ) {
     this.graph = graph;
     this.transitService = transitService;
-    this.config = config;
+    this.flexParameters = flexParameters;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -82,9 +81,9 @@ public class FlexRouter {
 
     if (graph.hasStreets) {
       this.accessFlexPathCalculator =
-        new StreetFlexPathCalculator(false, config.maxFlexTripDuration());
+        new StreetFlexPathCalculator(false, this.flexParameters.maxFlexTripDuration());
       this.egressFlexPathCalculator =
-        new StreetFlexPathCalculator(true, config.maxFlexTripDuration());
+        new StreetFlexPathCalculator(true, this.flexParameters.maxFlexTripDuration());
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
@@ -171,7 +170,10 @@ public class FlexRouter {
       return;
     }
 
-    var templateFactory = FlexTemplateFactory.of(accessFlexPathCalculator, config);
+    var templateFactory = FlexTemplateFactory.of(
+      accessFlexPathCalculator,
+      flexParameters.maxTransferDuration()
+    );
 
     // Fetch the closest flexTrips reachable from the access stops
     this.flexAccessTemplates =
@@ -198,7 +200,10 @@ public class FlexRouter {
       return;
     }
 
-    var templateFactory = FlexTemplateFactory.of(egressFlexPathCalculator, config);
+    var templateFactory = FlexTemplateFactory.of(
+      egressFlexPathCalculator,
+      flexParameters.maxTransferDuration()
+    );
 
     // Fetch the closest flexTrips reachable from the egress stops
     this.flexEgressTemplates =

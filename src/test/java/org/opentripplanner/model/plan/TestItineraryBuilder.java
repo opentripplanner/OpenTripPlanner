@@ -15,6 +15,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -30,7 +31,6 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -220,7 +220,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       null,
       new FlexServiceDate(LocalDate.now(), 0, new TIntHashSet()),
       new DirectFlexPathCalculator(),
-      FlexConfig.DEFAULT
+      FlexParameters.defaultValues().maxTransferDuration()
     );
 
     var fromv = StreetModelForTest.intersectionVertex(

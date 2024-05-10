@@ -4,11 +4,12 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.time.Duration;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class FlexConfig {
+public class FlexConfig implements FlexParameters {
 
-  public static final FlexConfig DEFAULT = new FlexConfig();
+  private static final FlexParameters DEFAULT = FlexParameters.defaultValues();
 
   public static final String ACCESS_EGRESS_DESCRIPTION =
     """
@@ -58,7 +59,7 @@ public class FlexConfig {
             A lower value means that the routing is faster.
             """
         )
-        .asDuration(DEFAULT.maxTransferDuration);
+        .asDuration(DEFAULT.maxTransferDuration());
 
     maxFlexTripDuration =
       json
@@ -70,7 +71,7 @@ public class FlexConfig {
           "the access/egress duration to the boarding/alighting of the flex trip, as well as the " +
           "connection to the transit stop."
         )
-        .asDuration(DEFAULT.maxFlexTripDuration);
+        .asDuration(DEFAULT.maxFlexTripDuration());
 
     maxAccessWalkDuration =
       json
@@ -80,7 +81,7 @@ public class FlexConfig {
           "The maximum duration the passenger will be allowed to walk to reach a flex stop or zone."
         )
         .description(ACCESS_EGRESS_DESCRIPTION)
-        .asDuration(DEFAULT.maxAccessWalkDuration);
+        .asDuration(DEFAULT.maxAccessWalkDuration());
 
     maxEgressWalkDuration =
       json
@@ -90,7 +91,7 @@ public class FlexConfig {
           "The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination."
         )
         .description(ACCESS_EGRESS_DESCRIPTION)
-        .asDuration(DEFAULT.maxEgressWalkDuration);
+        .asDuration(DEFAULT.maxEgressWalkDuration());
   }
 
   public Duration maxFlexTripDuration() {
