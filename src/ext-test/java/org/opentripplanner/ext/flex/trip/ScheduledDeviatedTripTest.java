@@ -3,6 +3,10 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.CALCULATOR;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.COBB_FLEX_GTFS;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.FLEX_DATE;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.LINCOLN_COUNTY_GTFS;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -54,7 +58,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
-public class ScheduledDeviatedTripTest extends FlexIntegrationTestData {
+public class ScheduledDeviatedTripTest {
 
   static Graph graph;
   static TransitModel transitModel;

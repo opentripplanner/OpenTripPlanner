@@ -20,27 +20,27 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-public abstract class FlexIntegrationTestData {
+public final class FlexIntegrationTestData {
 
   private static final ResourceLoader RES = ResourceLoader.of(FlexIntegrationTestData.class);
 
-  protected static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
-  protected static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
+  public static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
+  public static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
   protected static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
   protected static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
-  protected static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
+  public static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
   protected static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
 
-  protected static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
-  protected static final LocalDate SERVICE_DATE = LocalDate.of(2021, 4, 11);
-  protected static final int SECONDS_SINCE_MIDNIGHT = LocalTime.of(10, 0).toSecondOfDay();
-  protected static final FlexServiceDate FLEX_DATE = new FlexServiceDate(
+  public static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2021, 4, 11);
+  private static final int SECONDS_SINCE_MIDNIGHT = LocalTime.of(10, 0).toSecondOfDay();
+  public static final FlexServiceDate FLEX_DATE = new FlexServiceDate(
     SERVICE_DATE,
     SECONDS_SINCE_MIDNIGHT,
     new TIntHashSet()
   );
 
-  protected static TestOtpModel buildFlexGraph(File file) {
+  public static TestOtpModel buildFlexGraph(File file) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);

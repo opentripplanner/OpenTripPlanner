@@ -2,6 +2,9 @@ package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.ASPEN_GTFS;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.CALCULATOR;
+import static org.opentripplanner.ext.flex.FlexIntegrationTestData.FLEX_DATE;
 
 import java.util.List;
 import java.util.Set;
@@ -24,7 +27,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
  * Flex.
  */
-public class GtfsFlexTest extends FlexIntegrationTestData {
+public class GtfsFlexTest {
 
   private static TransitModel transitModel;
 
