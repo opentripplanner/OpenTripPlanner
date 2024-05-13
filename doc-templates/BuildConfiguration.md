@@ -140,22 +140,6 @@ The mechanism is that for any two identical tags, OTP will use the first one.
 }
 ```
 
-### Custom naming
-
-You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field
-in `build-config.json`, such as:
-
-```JSON
-// build-config.json
-{
-  "osmNaming": "portland"
-}
-```
-
-There is currently only one custom naming module called `portland` (which has no parameters).
-
-
-
 ## Elevation data
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM). This allows
