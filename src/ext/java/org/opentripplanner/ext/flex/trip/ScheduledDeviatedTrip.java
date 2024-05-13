@@ -5,8 +5,6 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -165,12 +163,6 @@ public class ScheduledDeviatedTrip
   @Override
   public TransitBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> copy() {
     return new ScheduledDeviatedTripBuilder(this);
-  }
-
-  private Collection<StopLocation> expandStops(StopLocation stop) {
-    return stop instanceof GroupStop groupStop
-      ? groupStop.getChildLocations()
-      : Collections.singleton(stop);
   }
 
   @Override

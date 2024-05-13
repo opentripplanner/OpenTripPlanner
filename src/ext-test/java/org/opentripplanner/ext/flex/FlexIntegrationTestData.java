@@ -24,12 +24,13 @@ public final class FlexIntegrationTestData {
 
   private static final ResourceLoader RES = ResourceLoader.of(FlexIntegrationTestData.class);
 
-  public static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
-  public static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
-  protected static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
-  protected static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
-  public static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
-  protected static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
+  private static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
+  private static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
+
+  static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
+  static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
+  static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
+  static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
 
   public static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
   private static final LocalDate SERVICE_DATE = LocalDate.of(2021, 4, 11);
@@ -40,7 +41,31 @@ public final class FlexIntegrationTestData {
     new TIntHashSet()
   );
 
-  public static TestOtpModel buildFlexGraph(File file) {
+  public static TestOtpModel aspenGtfs() {
+    return buildFlexGraph(ASPEN_GTFS);
+  }
+
+  public static TestOtpModel cobbFlexGtfs() {
+    return buildFlexGraph(COBB_FLEX_GTFS);
+  }
+
+  public static TestOtpModel cobbBus30Gtfs() {
+    return buildFlexGraph(COBB_BUS_30_GTFS);
+  }
+
+  public static TestOtpModel martaBus856Gtfs() {
+    return buildFlexGraph(MARTA_BUS_856_GTFS);
+  }
+
+  public static TestOtpModel lincolnCountyGtfs() {
+    return buildFlexGraph(LINCOLN_COUNTY_GTFS);
+  }
+
+  public static TestOtpModel cobbOsm() {
+    return buildFlexGraph(COBB_OSM);
+  }
+
+  private static TestOtpModel buildFlexGraph(File file) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);

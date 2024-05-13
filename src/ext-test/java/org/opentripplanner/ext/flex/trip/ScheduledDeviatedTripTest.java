@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.ext.flex.FlexIntegrationTestData.CALCULATOR;
-import static org.opentripplanner.ext.flex.FlexIntegrationTestData.COBB_FLEX_GTFS;
 import static org.opentripplanner.ext.flex.FlexIntegrationTestData.FLEX_DATE;
-import static org.opentripplanner.ext.flex.FlexIntegrationTestData.LINCOLN_COUNTY_GTFS;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -58,7 +56,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
-public class ScheduledDeviatedTripTest {
+class ScheduledDeviatedTripTest {
 
   static Graph graph;
   static TransitModel transitModel;
@@ -228,13 +226,13 @@ public class ScheduledDeviatedTripTest {
    */
   @Test
   void parseContinuousPickup() {
-    var lincolnGraph = FlexIntegrationTestData.buildFlexGraph(LINCOLN_COUNTY_GTFS);
+    var lincolnGraph = FlexIntegrationTestData.lincolnCountyGtfs();
     assertNotNull(lincolnGraph);
   }
 
   @BeforeAll
   static void setup() {
-    TestOtpModel model = FlexIntegrationTestData.buildFlexGraph(COBB_FLEX_GTFS);
+    TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
     transitModel = model.transitModel();
   }
