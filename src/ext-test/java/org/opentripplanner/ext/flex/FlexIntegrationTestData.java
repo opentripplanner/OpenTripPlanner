@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -25,12 +26,11 @@ public final class FlexIntegrationTestData {
   private static final ResourceLoader RES = ResourceLoader.of(FlexIntegrationTestData.class);
 
   private static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
-  private static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
-
   static final File COBB_BUS_30_GTFS = RES.file("cobblinc-bus-30-only.gtfs.zip");
   static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
+  private static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
+  private static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
   static final File MARTA_BUS_856_GTFS = RES.file("marta-bus-856-only.gtfs.zip");
-  static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
 
   public static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
   private static final LocalDate SERVICE_DATE = LocalDate.of(2021, 4, 11);
@@ -62,7 +62,7 @@ public final class FlexIntegrationTestData {
   }
 
   public static TestOtpModel cobbOsm() {
-    return buildFlexGraph(COBB_OSM);
+    return ConstantsForTests.buildOsmGraph(COBB_OSM);
   }
 
   private static TestOtpModel buildFlexGraph(File file) {

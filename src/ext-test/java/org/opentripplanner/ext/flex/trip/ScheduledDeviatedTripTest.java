@@ -3,8 +3,6 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.ext.flex.FlexIntegrationTestData.CALCULATOR;
-import static org.opentripplanner.ext.flex.FlexIntegrationTestData.FLEX_DATE;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -24,7 +22,6 @@ import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -92,40 +89,6 @@ class ScheduledDeviatedTripTest {
       .orElseThrow();
     assertEquals(33.825846635310214, flexZone.getLat(), delta);
     assertEquals(-84.63430143459385, flexZone.getLon(), delta);
-  }
-
-  @Test
-  void calculateAccessTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-
-    FlexTemplateFactory templateFactory = FlexTemplateFactory.of(
-      CALCULATOR,
-      FlexParameters.defaultValues().maxTransferDuration()
-    );
-    var accesses = templateFactory.with(FLEX_DATE, trip, nearbyStop).createAccessTemplates();
-
-    assertEquals(3, accesses.size());
-
-    var access = accesses.get(0);
-    assertEquals(1, access.fromStopIndex);
-    assertEquals(1, access.toStopIndex);
-  }
-
-  @Test
-  void calculateEgressTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-    var egresses = FlexTemplateFactory
-      .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
-      .with(FLEX_DATE, trip, nearbyStop)
-      .createEgressTemplates();
-
-    assertEquals(3, egresses.size());
-
-    var egress = egresses.get(2);
-    assertEquals(2, egress.fromStopIndex);
-    assertEquals(2, egress.toStopIndex);
   }
 
   @Test

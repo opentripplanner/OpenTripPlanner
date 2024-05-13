@@ -17,7 +17,6 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -57,7 +56,7 @@ public class FlexIntegrationTest {
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(FlexIntegrationTestData.COBB_OSM);
+    TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     transitModel = model.transitModel();
 

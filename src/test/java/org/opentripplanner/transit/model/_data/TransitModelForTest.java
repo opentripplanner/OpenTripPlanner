@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Coordinates;
+import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -281,6 +282,14 @@ public class TransitModelForTest {
       .of(id(id))
       .withTrip(trip("flex-trip").build())
       .withStopTimes(stopTimes)
+      .build();
+  }
+
+  public ScheduledDeviatedTrip scheduledDeviatedTrip(String id, StopTime... stopTimes) {
+    return ScheduledDeviatedTrip
+      .of(id(id))
+      .withTrip(trip("flex-trip").build())
+      .withStopTimes(Arrays.asList(stopTimes))
       .build();
   }
 }

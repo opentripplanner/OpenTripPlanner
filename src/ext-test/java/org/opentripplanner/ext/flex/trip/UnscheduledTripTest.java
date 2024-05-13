@@ -9,8 +9,6 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import gnu.trove.set.hash.TIntHashSet;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -20,18 +18,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.ext.flex.FlexParameters;
-import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
-import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -566,96 +557,6 @@ class UnscheduledTripTest {
 
     assertFalse(trip.isBoardingPossible(AREA_STOP2));
     assertTrue(trip.isAlightingPossible(AREA_STOP2));
-  }
-
-  @Nested
-  class FlexTemplates {
-
-    private static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
-    static final StopTime FIRST = area("10:00", "10:05");
-    static final StopTime SECOND = area("10:10", "10:15");
-    static final StopTime THIRD = area("10:20", "10:25");
-    static final StopTime FOURTH = area("10:30", "10:35");
-    private static final FlexServiceDate FLEX_SERVICE_DATE = new FlexServiceDate(
-      LocalDate.of(2023, 9, 16),
-      0,
-      new TIntHashSet()
-    );
-    private static final NearbyStop NEARBY_STOP = new NearbyStop(
-      FOURTH.getStop(),
-      100,
-      List.of(),
-      null
-    );
-
-    @Test
-    void accessTemplates() {
-      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
-
-      var templates = accessTemplates(trip);
-
-      assertEquals(3, templates.size());
-
-      List
-        .of(0, 1, 2)
-        .forEach(index -> {
-          var template = templates.get(index);
-          assertEquals(0, template.fromStopIndex);
-          assertEquals(index + 1, template.toStopIndex);
-        });
-    }
-
-    @Test
-    void accessTemplatesNoAlighting() {
-      var second = area("10:10", "10:15");
-      second.setDropOffType(NONE);
-
-      var trip = trip(List.of(FIRST, second, THIRD, FOURTH));
-
-      var templates = accessTemplates(trip);
-
-      assertEquals(2, templates.size());
-      List
-        .of(0, 1)
-        .forEach(index -> {
-          var template = templates.get(index);
-          assertEquals(0, template.fromStopIndex);
-          assertEquals(index + 2, template.toStopIndex);
-        });
-    }
-
-    @Test
-    void egressTemplates() {
-      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
-
-      var templates = egressTemplates(trip);
-
-      assertEquals(4, templates.size());
-      var template = templates.get(0);
-      assertEquals(0, template.fromStopIndex);
-      assertEquals(3, template.toStopIndex);
-    }
-
-    @Nonnull
-    private static UnscheduledTrip trip(List<StopTime> stopTimes) {
-      return new TestCase.Builder(FIRST, THIRD).withStopTimes(stopTimes).build().trip();
-    }
-
-    @Nonnull
-    private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
-      return FlexTemplateFactory
-        .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
-        .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
-        .createAccessTemplates();
-    }
-
-    @Nonnull
-    private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
-      return FlexTemplateFactory
-        .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
-        .with(FLEX_SERVICE_DATE, trip, NEARBY_STOP)
-        .createEgressTemplates();
-    }
   }
 
   private static String timeToString(int time) {
