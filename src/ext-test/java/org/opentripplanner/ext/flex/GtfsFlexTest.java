@@ -55,8 +55,8 @@ public class GtfsFlexTest extends FlexIntegrationTestData {
     var nearbyStop = getNearbyStop(trip);
 
     var accesses = FlexTemplateFactory
-      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
-      .with(flexDate, trip, nearbyStop)
+      .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
+      .with(FLEX_DATE, trip, nearbyStop)
       .createAccessTemplates();
 
     assertFalse(accesses.isEmpty());
@@ -67,8 +67,8 @@ public class GtfsFlexTest extends FlexIntegrationTestData {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
     var egresses = FlexTemplateFactory
-      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
-      .with(flexDate, trip, nearbyStop)
+      .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
+      .with(FLEX_DATE, trip, nearbyStop)
       .createEgressTemplates();
 
     assertEquals(1, egresses.size());

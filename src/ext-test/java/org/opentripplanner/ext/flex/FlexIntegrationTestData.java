@@ -31,12 +31,12 @@ public abstract class FlexIntegrationTestData {
   protected static final File LINCOLN_COUNTY_GTFS = RES.file("lincoln-county-flex.gtfs");
   protected static final File COBB_OSM = RES.file("cobb-county.filtered.osm.pbf");
 
-  protected static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
-  protected static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
-  protected static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();
-  protected static final FlexServiceDate flexDate = new FlexServiceDate(
-    serviceDate,
-    secondsSinceMidnight,
+  protected static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
+  protected static final LocalDate SERVICE_DATE = LocalDate.of(2021, 4, 11);
+  protected static final int SECONDS_SINCE_MIDNIGHT = LocalTime.of(10, 0).toSecondOfDay();
+  protected static final FlexServiceDate FLEX_DATE = new FlexServiceDate(
+    SERVICE_DATE,
+    SECONDS_SINCE_MIDNIGHT,
     new TIntHashSet()
   );
 

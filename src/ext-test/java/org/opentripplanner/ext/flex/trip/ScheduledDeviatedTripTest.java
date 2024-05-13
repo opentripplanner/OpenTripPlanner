@@ -98,10 +98,10 @@ public class ScheduledDeviatedTripTest extends FlexIntegrationTestData {
     var nearbyStop = getNearbyStop(trip);
 
     FlexTemplateFactory templateFactory = FlexTemplateFactory.of(
-      calculator,
+      CALCULATOR,
       FlexParameters.defaultValues().maxTransferDuration()
     );
-    var accesses = templateFactory.with(flexDate, trip, nearbyStop).createAccessTemplates();
+    var accesses = templateFactory.with(FLEX_DATE, trip, nearbyStop).createAccessTemplates();
 
     assertEquals(3, accesses.size());
 
@@ -115,8 +115,8 @@ public class ScheduledDeviatedTripTest extends FlexIntegrationTestData {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
     var egresses = FlexTemplateFactory
-      .of(calculator, FlexParameters.defaultValues().maxTransferDuration())
-      .with(flexDate, trip, nearbyStop)
+      .of(CALCULATOR, FlexParameters.defaultValues().maxTransferDuration())
+      .with(FLEX_DATE, trip, nearbyStop)
       .createEgressTemplates();
 
     assertEquals(3, egresses.size());
