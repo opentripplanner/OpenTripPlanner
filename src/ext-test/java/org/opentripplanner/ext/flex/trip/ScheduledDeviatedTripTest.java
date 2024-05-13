@@ -19,9 +19,9 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
@@ -54,7 +54,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
-public class ScheduledDeviatedTripTest extends FlexTest {
+public class ScheduledDeviatedTripTest extends FlexIntegrationTestData {
 
   static Graph graph;
   static TransitModel transitModel;
@@ -224,13 +224,13 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    */
   @Test
   void parseContinuousPickup() {
-    var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GTFS);
+    var lincolnGraph = FlexIntegrationTestData.buildFlexGraph(LINCOLN_COUNTY_GTFS);
     assertNotNull(lincolnGraph);
   }
 
   @BeforeAll
   static void setup() {
-    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    TestOtpModel model = FlexIntegrationTestData.buildFlexGraph(COBB_FLEX_GTFS);
     graph = model.graph();
     transitModel = model.transitModel();
   }

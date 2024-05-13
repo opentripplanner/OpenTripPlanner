@@ -24,13 +24,13 @@ import org.opentripplanner.transit.service.TransitModel;
  * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
  * Flex.
  */
-public class GtfsFlexTest extends FlexTest {
+public class GtfsFlexTest extends FlexIntegrationTestData {
 
   private static TransitModel transitModel;
 
   @BeforeAll
   static void setup() {
-    TestOtpModel model = FlexTest.buildFlexGraph(ASPEN_GTFS);
+    TestOtpModel model = FlexIntegrationTestData.buildFlexGraph(ASPEN_GTFS);
     transitModel = model.transitModel();
   }
 

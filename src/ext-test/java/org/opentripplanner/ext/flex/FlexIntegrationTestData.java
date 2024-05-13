@@ -20,9 +20,9 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-public abstract class FlexTest {
+public abstract class FlexIntegrationTestData {
 
-  private static final ResourceLoader RES = ResourceLoader.of(FlexTest.class);
+  private static final ResourceLoader RES = ResourceLoader.of(FlexIntegrationTestData.class);
 
   protected static final File ASPEN_GTFS = RES.file("aspen-flex-on-demand.gtfs");
   protected static final File COBB_FLEX_GTFS = RES.file("cobblinc-scheduled-deviated-flex.gtfs");
