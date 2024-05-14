@@ -126,7 +126,7 @@ public class Timetable implements Serializable {
 
   public TripTimes getTripTimes(FeedScopedId tripId) {
     for (TripTimes tt : tripTimes) {
-      if (tt.getTrip().getId() == tripId) {
+      if (tt.getTrip().getId().equals(tripId)) {
         return tt;
       }
     }
