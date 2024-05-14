@@ -22,10 +22,10 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This verifies that the stopTransferCost is not applied for egress legs. If this is not correctly
- * handled by the heuristics optimization, the cheapest journey could be discarded.
+ * This verifies that the stopBoardAlightTransferCost is not applied for egress legs. If this is not
+ * correctly handled by the heuristics optimization, the cheapest journey could be discarded.
  */
-public class B05_EgressStopTransferCostTest implements RaptorTestConstants {
+public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -40,7 +40,7 @@ public class B05_EgressStopTransferCostTest implements RaptorTestConstants {
       .withRoute(route("R2", STOP_C, STOP_D).withTimetable(schedule("0:18, 0:20")));
 
     data.mcCostParamsBuilder().transferCost(0).boardCost(0);
-    data.withStopBoardAlightCost(STOP_D, 60000);
+    data.withStopBoardAlightTransferCost(STOP_D, 60000);
 
     requestBuilder
       .searchParams()
@@ -61,7 +61,7 @@ public class B05_EgressStopTransferCostTest implements RaptorTestConstants {
       .add(
         multiCriteria(),
         // We should get both the fastest and the c1-cheapest results
-        // The stopTransferCost should not be applied to the egress leg from STOP_D
+        // The stopBoardAlightTransferCost should not be applied to the egress leg from STOP_D
         "B ~ BUS R1 0:10 0:14 ~ C ~ Walk 5m [0:10 0:19 9m Tₓ0 C₁840]",
         "B ~ BUS R1 0:10 0:14 ~ C ~ BUS R2 0:18 0:20 ~ D ~ Walk 20s [0:10 0:20:20 10m20s Tₓ1 C₁640]"
       )
