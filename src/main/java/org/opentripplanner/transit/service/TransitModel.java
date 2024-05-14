@@ -371,8 +371,9 @@ public class TransitModel implements Serializable {
     return tripPatternForId.get(id);
   }
 
-  public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
-    return tripOnServiceDates;
+  public void addTripOnServiceDate(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+    invalidateIndex();
+    tripOnServiceDates.put(id, tripOnServiceDate);
   }
 
   /**
