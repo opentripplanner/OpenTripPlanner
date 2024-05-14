@@ -71,13 +71,13 @@ public class SidewalkNamer implements EdgeNamer {
 
   @Override
   public void recordEdges(OSMWithTags way, StreetEdgePair pair) {
-    // this way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
+    // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
       pair
         .asIterable()
         .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(edge, way.getLevels())));
     }
-    // the way is _not_ a sidewalk and does have a name
+    // The way is _not_ a sidewalk and does have a name
     else if (way.isNamed() && !way.isLink()) {
       // We generate two edges for each osm way: one there and one back. This spatial index only
       // needs to contain one item for each road segment with a unique geometry and name, so we
@@ -120,7 +120,7 @@ public class SidewalkNamer implements EdgeNamer {
 
     LOG.info(progress.completeMessage());
 
-    // set the indices to null so they can be garbage-collected
+    // Set the indices to null so they can be garbage-collected
     streetEdges = null;
     unnamedSidewalks = null;
   }
@@ -148,7 +148,7 @@ public class SidewalkNamer implements EdgeNamer {
     var candidates = streetEdges.query(buffer.getEnvelopeInternal());
 
     groupEdgesByName(candidates)
-      // make sure we only compare sidewalks and streets that are on the same level
+      // Make sure we only compare sidewalks and streets that are on the same level
       .filter(g -> g.levels.equals(sidewalkOnLevel.levels))
       .map(g -> computePercentInsideBuffer(g, buffer, sidewalkLength))
       // Remove those groups where less than a certain percentage is inside the buffer around

@@ -567,20 +567,6 @@ public class OSMWithTags {
     return highway != null && highway.endsWith(("_link"));
   }
 
-  public boolean isHighwayLink() {
-    String highway = getTag("highway");
-    return "motorway_link".equals(highway) || "trunk_link".equals(highway);
-  }
-
-  public boolean isLowerLink() {
-    String highway = getTag("highway");
-    return (
-      "secondary_link".equals(highway) ||
-      "primary_link".equals(highway) ||
-      "tertiary_link".equals(highway)
-    );
-  }
-
   public boolean isElevator() {
     return isTag("highway", "elevator");
   }

@@ -544,9 +544,7 @@ public class OsmModule implements GraphBuilderModule {
       .withWheelchairAccessible(way.isWheelchairAccessible())
       .withBogusName(way.hasNoName());
 
-    StreetEdge street = seb.buildAndConnect();
-
-    return street;
+    return seb.buildAndConnect();
   }
 
   private float getMaxCarSpeed() {

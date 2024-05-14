@@ -71,8 +71,8 @@ public class PortlandCustomNamer implements EdgeNamer {
 
   @Override
   public void recordEdges(OSMWithTags way, StreetEdgePair edgePair) {
-    final boolean isHighwayLink = way.isHighwayLink();
-    final boolean isLowerLink = way.isLowerLink();
+    final boolean isHighwayLink = isHighwayLink(way);
+    final boolean isLowerLink = isLowerLink(way);
     edgePair
       .asIterable()
       .forEach(edge -> {
@@ -184,5 +184,19 @@ public class PortlandCustomNamer implements EdgeNamer {
       }
     }
     return null;
+  }
+
+  private static boolean isHighwayLink(OSMWithTags way) {
+    String highway = way.getTag("highway");
+    return "motorway_link".equals(highway) || "trunk_link".equals(highway);
+  }
+
+  private static boolean isLowerLink(OSMWithTags way) {
+    String highway = way.getTag("highway");
+    return (
+      "secondary_link".equals(highway) ||
+      "primary_link".equals(highway) ||
+      "tertiary_link".equals(highway)
+    );
   }
 }
