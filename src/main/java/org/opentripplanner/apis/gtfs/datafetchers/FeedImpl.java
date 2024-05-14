@@ -13,6 +13,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.FeedPublisher;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
@@ -65,18 +66,13 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
   }
 
   @Override
-  public DataFetcher<String> publisherName() {
+  public DataFetcher<Object> publisher() {
     return environment -> {
       String id = getSource(environment);
-      return getTransitService(environment).getFeedInfo(id).getPublisherName();
-    };
-  }
-
-  @Override
-  public DataFetcher<String> publisherUrl() {
-    return environment -> {
-      String id = getSource(environment);
-      return getTransitService(environment).getFeedInfo(id).getPublisherUrl();
+      return new FeedPublisher(
+        getTransitService(environment).getFeedInfo(id).getPublisherName(),
+        getTransitService(environment).getFeedInfo(id).getPublisherUrl()
+      );
     };
   }
 

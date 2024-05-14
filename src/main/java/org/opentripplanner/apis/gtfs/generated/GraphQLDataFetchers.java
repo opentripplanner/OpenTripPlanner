@@ -381,9 +381,14 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> feedId();
 
-    public DataFetcher<String> publisherName();
+    public DataFetcher<Object> publisher();
+  }
 
-    public DataFetcher<String> publisherUrl();
+  /** Feed publisher information */
+  public interface GraphQLFeedPublisher {
+    public DataFetcher<String> name();
+
+    public DataFetcher<String> url();
   }
 
   public interface GraphQLGeometry {

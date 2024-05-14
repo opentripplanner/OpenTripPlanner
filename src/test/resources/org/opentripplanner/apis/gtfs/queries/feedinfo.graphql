@@ -4,7 +4,9 @@
 	    name
 	    url
 	}
-	publisherUrl
-	publisherName
+	publisher {
+	    name
+	    url
+        }
     }
 }

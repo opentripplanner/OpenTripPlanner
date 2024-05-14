@@ -8,8 +8,10 @@
             "url" : "www.otp-foo.bar"
           }
         ],
-        "publisherUrl" : "www.z.org",
-        "publisherName" : "publisher"
+        "publisher" : {
+          "name" : "publisher",
+          "url" : "www.z.org"
+        }
       }
     ]
   }
