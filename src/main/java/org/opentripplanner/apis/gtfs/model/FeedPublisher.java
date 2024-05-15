@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.model.organization;
+package org.opentripplanner.apis.gtfs.model;
 
 import java.util.Objects;
 
