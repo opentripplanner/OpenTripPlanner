@@ -109,17 +109,9 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
    */
   private final boolean purgeExpiredData;
 
-  protected LocalDate lastPurgeDate = null;
-
   private final Deduplicator deduplicator;
 
   private final Map<FeedScopedId, Integer> serviceCodes;
-
-  /**
-   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
-   * the purgeExpiredData feature.
-   */
-  private final Supplier<LocalDate> localDateNow;
 
   public TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
@@ -137,13 +129,12 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     TransitModel transitModel,
     Supplier<LocalDate> localDateNow
   ) {
-    super(transitModel.getTransitLayerUpdater(), parameters);
+    super(transitModel.getTransitLayerUpdater(), parameters, localDateNow);
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
     this.purgeExpiredData = parameters.purgeExpiredData();
-    this.localDateNow = localDateNow;
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
@@ -224,7 +215,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
         } else {
           // TODO: figure out the correct service date. For the special case that a trip
           // starts for example at 40:00, yesterday would probably be a better guess.
-          serviceDate = localDateNow.get();
+          serviceDate = localDateNow();
         }
 
         uIndex += 1;
@@ -1078,23 +1069,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       return UpdateError.result(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
     return Result.success(UpdateSuccess.noWarnings());
-  }
-
-  private boolean purgeExpiredData() {
-    final LocalDate today = localDateNow.get();
-    // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
-    final LocalDate previously = today.minusDays(2); // Just to be safe...
-
-    // Purge data only if we have changed date
-    if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
-      return false;
-    }
-
-    LOG.debug("purging expired realtime data");
-
-    lastPurgeDate = previously;
-
-    return buffer.purgeExpiredData(previously);
   }
 
   /**

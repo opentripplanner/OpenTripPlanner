@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.LocalDate;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -27,10 +29,12 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
 
   public AbstractTimetableSnapshotSource(
     TransitLayerUpdater transitLayerUpdater,
-    TimetableSnapshotSourceParameters parameters
+    TimetableSnapshotSourceParameters parameters,
+    Supplier<LocalDate> localDateNow
   ) {
     this.transitLayerUpdater = transitLayerUpdater;
     this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
+    this.localDateNow = localDateNow;
     // Force commit so that snapshot initializes
     commitTimetableSnapshot(true);
   }
@@ -46,7 +50,15 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  protected CountdownTimer snapshotFrequencyThrottle;
+  private final CountdownTimer snapshotFrequencyThrottle;
+
+  /**
+   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
+   * the purgeExpiredData feature.
+   */
+  private final Supplier<LocalDate> localDateNow;
+
+  private LocalDate lastPurgeDate = null;
 
   /**
    * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
@@ -86,5 +98,26 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     } else {
       LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
     }
+  }
+
+  protected boolean purgeExpiredData() {
+    final LocalDate today = localDateNow.get();
+    // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
+    final LocalDate previously = today.minusDays(2); // Just to be safe...
+
+    // Purge data only if we have changed date
+    if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
+      return false;
+    }
+
+    LOG.debug("purging expired realtime data");
+
+    lastPurgeDate = previously;
+
+    return buffer.purgeExpiredData(previously);
+  }
+
+  protected LocalDate localDateNow() {
+    return localDateNow.get();
   }
 }

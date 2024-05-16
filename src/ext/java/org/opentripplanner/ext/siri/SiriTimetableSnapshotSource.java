@@ -59,13 +59,11 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
   /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
-  protected LocalDate lastPurgeDate = null;
-
   public SiriTimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    super(transitModel.getTransitLayerUpdater(), parameters);
+    super(transitModel.getTransitLayerUpdater(), parameters, LocalDate::now);
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.purgeExpiredData = parameters.purgeExpiredData();
@@ -354,20 +352,5 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     }
 
     return success;
-  }
-
-  private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(transitModel.getTimeZone());
-    final LocalDate previously = today.minusDays(2); // Just to be safe...
-
-    if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
-      return false;
-    }
-
-    LOG.debug("purging expired real-time data");
-
-    lastPurgeDate = previously;
-
-    return buffer.purgeExpiredData(previously);
   }
 }

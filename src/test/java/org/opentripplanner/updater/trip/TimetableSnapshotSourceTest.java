@@ -158,6 +158,7 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern, null);
+    assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
     assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
 
@@ -360,8 +361,6 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdate),
       feedId
     );
-
-    updater.commitTimetableSnapshot(true);
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -1067,7 +1066,7 @@ public class TimetableSnapshotSourceTest {
   @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      new TimetableSnapshotSourceParameters(Duration.ofMillis(-1), true),
+      new TimetableSnapshotSourceParameters(Duration.ZERO, true),
       transitModel,
       () -> SERVICE_DATE
     );
