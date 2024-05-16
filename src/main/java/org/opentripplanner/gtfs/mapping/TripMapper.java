@@ -60,7 +60,6 @@ class TripMapper {
     lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
     lhs.withWheelchairBoarding(WheelchairAccessibilityMapper.map(rhs.getWheelchairAccessible()));
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
-    lhs.withGtfsFareId(rhs.getFareId());
 
     return lhs.build();
   }
