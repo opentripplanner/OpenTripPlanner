@@ -165,13 +165,10 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       return UpdateResult.empty();
     }
 
-    // Acquire lock on buffer
-    bufferLock.lock();
-
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    try {
+    withLock(() -> {
       if (fullDataset) {
         // Remove all updates from the buffer
         buffer.clear(feedId);
@@ -271,10 +268,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       }
 
       purgeAndCommit();
-    } finally {
-      // Always release lock
-      bufferLock.unlock();
-    }
+    });
 
     var updateResult = UpdateResult.ofResults(results);
 

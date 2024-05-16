@@ -18,7 +18,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
   /**
    * Lock to indicate that buffer is in use
    */
-  protected final ReentrantLock bufferLock = new ReentrantLock(true);
+  private final ReentrantLock bufferLock = new ReentrantLock(true);
 
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
@@ -136,5 +136,16 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
 
   protected final LocalDate localDateNow() {
     return localDateNow.get();
+  }
+
+  protected final void withLock(Runnable action) {
+    bufferLock.lock();
+
+    try {
+      action.run();
+    } finally {
+      // Always release lock
+      bufferLock.unlock();
+    }
   }
 }

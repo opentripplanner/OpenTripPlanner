@@ -56,9 +56,6 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
   private final TransitService transitService;
 
-  /** Should expired real-time data be purged from the graph. */
-  private final boolean purgeExpiredData;
-
   public SiriTimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
@@ -66,7 +63,6 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     super(transitModel.getTransitLayerUpdater(), parameters, LocalDate::now);
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
-    this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
@@ -94,12 +90,9 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
       return UpdateResult.empty();
     }
 
-    // Acquire lock on buffer
-    bufferLock.lock();
-
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    try {
+    withLock(() -> {
       if (fullDataset) {
         // Remove all updates from the buffer
         buffer.clear(feedId);
@@ -118,10 +111,8 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
       LOG.debug("message contains {} trip updates", updates.size());
 
       purgeAndCommit();
-    } finally {
-      // Always release lock
-      bufferLock.unlock();
-    }
+    });
+
     return UpdateResult.ofResults(results);
   }
 
