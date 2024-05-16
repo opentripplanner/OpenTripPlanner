@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class HslHubsDownloader {
 
-  private static final Logger log = LoggerFactory.getLogger(HslHubsDownloader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HslHubsDownloader.class);
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private final String jsonParsePath;
@@ -29,17 +30,18 @@ public class HslHubsDownloader {
   public HslHubsDownloader(
     String url,
     String jsonParsePath,
-    Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser
+    Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser,
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.hubsParser = hubsParser;
-    otpHttpClient = new OtpHttpClient();
+    otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   public Map<FeedScopedId, VehicleParkingGroup> downloadHubs() {
     if (url == null) {
-      log.warn("Cannot download updates, because url is null!");
+      LOG.warn("Cannot download updates, because url is null!");
       return null;
     }
     try {
@@ -50,17 +52,17 @@ public class HslHubsDownloader {
           try {
             return parseJSON(is);
           } catch (IllegalArgumentException e) {
-            log.warn("Error parsing hubs from {}", url, e);
+            LOG.warn("Error parsing hubs from {}", url, e);
           } catch (JsonProcessingException e) {
-            log.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
+            LOG.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
           } catch (IOException e) {
-            log.warn("Error reading hubs from {}", url, e);
+            LOG.warn("Error reading hubs from {}", url, e);
           }
           return null;
         }
       );
     } catch (OtpHttpClientException e) {
-      log.warn("Failed to get data from url {}", url);
+      LOG.warn("Failed to get data from url {}", url);
       return null;
     }
   }

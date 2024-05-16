@@ -15,6 +15,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -44,7 +45,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
     .put("lonMax", 0)
     .put("latMin", 0)
     .put("latMax", 0);
-  private final OtpHttpClient httpClient = new OtpHttpClient();
+  private final OtpHttpClient httpClient = new OtpHttpClientFactory().create(LOG);
   private final BikelyUpdaterParameters parameters;
   private List<VehicleParking> lots;
 
