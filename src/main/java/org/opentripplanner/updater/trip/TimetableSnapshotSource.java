@@ -134,7 +134,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     this.transitService = new DefaultTransitService(transitModel);
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
-    this.purgeExpiredData = parameters.purgeExpiredData();
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
@@ -271,15 +270,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
         }
       }
 
-      // Make a snapshot after each message in anticipation of incoming requests
-      // Purge data if necessary (and force new snapshot if anything was purged)
-      // Make sure that the public (locking) getTimetableSnapshot function is not called.
-      if (purgeExpiredData) {
-        final boolean modified = purgeExpiredData();
-        commitTimetableSnapshot(modified);
-      } else {
-        commitTimetableSnapshot(false);
-      }
+      purgeAndCommit();
     } finally {
       // Always release lock
       bufferLock.unlock();

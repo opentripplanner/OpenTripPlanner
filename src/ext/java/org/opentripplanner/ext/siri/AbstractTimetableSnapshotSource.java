@@ -40,6 +40,8 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    */
   private final CountdownTimer snapshotFrequencyThrottle;
 
+  /** Should expired real-time data be purged from the graph. */
+  private final boolean purgeExpiredData;
   /**
    * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
    * the purgeExpiredData feature.
@@ -55,6 +57,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
   ) {
     this.transitLayerUpdater = transitLayerUpdater;
     this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
+    this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = localDateNow;
     // Force commit so that snapshot initializes
     commitTimetableSnapshot(true);
@@ -100,6 +103,20 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     }
   }
 
+  /**
+   * Make a snapshot after each message in anticipation of incoming requests.
+   * Purge data if necessary (and force new snapshot if anything was purged).
+   * Make sure that the public (locking) getTimetableSnapshot function is not called.
+   */
+  protected void purgeAndCommit() {
+    if (purgeExpiredData) {
+      final boolean modified = purgeExpiredData();
+      commitTimetableSnapshot(modified);
+    } else {
+      commitTimetableSnapshot(false);
+    }
+  }
+
   protected final boolean purgeExpiredData() {
     final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
@@ -110,7 +127,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
       return false;
     }
 
-    LOG.debug("purging expired realtime data");
+    LOG.debug("Purging expired realtime data");
 
     lastPurgeDate = previously;
 

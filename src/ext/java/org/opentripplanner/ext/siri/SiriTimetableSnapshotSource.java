@@ -117,15 +117,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
       LOG.debug("message contains {} trip updates", updates.size());
 
-      // Make a snapshot after each message in anticipation of incoming requests
-      // Purge data if necessary (and force new snapshot if anything was purged)
-      // Make sure that the public (locking) getTimetableSnapshot function is not called.
-      if (purgeExpiredData) {
-        final boolean modified = purgeExpiredData();
-        commitTimetableSnapshot(modified);
-      } else {
-        commitTimetableSnapshot(false);
-      }
+      purgeAndCommit();
     } finally {
       // Always release lock
       bufferLock.unlock();
