@@ -197,7 +197,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    TimetableSnapshot timetableSnapshot = snapshot;
+    TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
     if (timetableSnapshot != null) {
       return timetableSnapshot.resolve(tripPattern, serviceDate);
     }

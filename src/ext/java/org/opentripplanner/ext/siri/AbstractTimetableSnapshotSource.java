@@ -27,23 +27,11 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    */
   protected final TimetableSnapshot buffer = new TimetableSnapshot();
 
-  public AbstractTimetableSnapshotSource(
-    TransitLayerUpdater transitLayerUpdater,
-    TimetableSnapshotSourceParameters parameters,
-    Supplier<LocalDate> localDateNow
-  ) {
-    this.transitLayerUpdater = transitLayerUpdater;
-    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
-    this.localDateNow = localDateNow;
-    // Force commit so that snapshot initializes
-    commitTimetableSnapshot(true);
-  }
-
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
    * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
-  protected volatile TimetableSnapshot snapshot = null;
+  private volatile TimetableSnapshot snapshot = null;
 
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
@@ -60,13 +48,25 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
 
   private LocalDate lastPurgeDate = null;
 
+  public AbstractTimetableSnapshotSource(
+    TransitLayerUpdater transitLayerUpdater,
+    TimetableSnapshotSourceParameters parameters,
+    Supplier<LocalDate> localDateNow
+  ) {
+    this.transitLayerUpdater = transitLayerUpdater;
+    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
+    this.localDateNow = localDateNow;
+    // Force commit so that snapshot initializes
+    commitTimetableSnapshot(true);
+  }
+
   /**
    * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
    * timetable objects it references are guaranteed to never change, so the requesting thread is
    * provided a consistent view of all TripTimes. The routing thread need only release its reference
    * to the snapshot to release resources.
    */
-  public TimetableSnapshot getTimetableSnapshot() {
+  public final TimetableSnapshot getTimetableSnapshot() {
     // Try to get a lock on the buffer
     if (bufferLock.tryLock()) {
       // Make a new snapshot if necessary
@@ -82,7 +82,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     return snapshot;
   }
 
-  public void commitTimetableSnapshot(final boolean force) {
+  public final void commitTimetableSnapshot(final boolean force) {
     if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
@@ -100,7 +100,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     }
   }
 
-  protected boolean purgeExpiredData() {
+  protected final boolean purgeExpiredData() {
     final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final LocalDate previously = today.minusDays(2); // Just to be safe...
@@ -117,7 +117,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     return buffer.purgeExpiredData(previously);
   }
 
-  protected LocalDate localDateNow() {
+  protected final LocalDate localDateNow() {
     return localDateNow.get();
   }
 }
