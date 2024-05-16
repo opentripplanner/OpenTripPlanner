@@ -397,6 +397,10 @@ public class TimetableSnapshot {
     this.patternsForStop = patternsForStop;
   }
 
+  public boolean isEmpty() {
+    return timetables.isEmpty() && realtimeAddedTripPattern.isEmpty();
+  }
+
   /**
    * Clear timetable for all patterns matching the provided feed id.
    *

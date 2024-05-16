@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -68,18 +67,15 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    super(transitModel.getTransitLayerUpdater());
+    super(transitModel.getTransitLayerUpdater(), parameters);
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
-    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
     transitModel.initTimetableSnapshotProvider(this);
 
-    // Force commit so that snapshot initializes
-    commitTimetableSnapshot(true);
   }
 
 

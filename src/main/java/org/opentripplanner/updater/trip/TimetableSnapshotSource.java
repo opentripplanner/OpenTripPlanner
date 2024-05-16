@@ -21,7 +21,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.text.ParseException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -106,20 +104,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   private final ZoneId timeZone;
   private final TransitEditorService transitService;
-  private final TransitLayerUpdater transitLayerUpdater;
-
-  /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern → Timetable map and indexing the new Timetables.
-   */
-  private final Duration maxSnapshotFrequency;
-
-  /**
-   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
-   * to more than one routing thread if the maximum snapshot frequency is exceeded.
-   */
-  private volatile TimetableSnapshot snapshot = null;
 
   /**
    * Should expired real-time data be purged from the graph.
@@ -128,9 +112,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
-
-  /** Epoch time in milliseconds at which the last snapshot was generated. */
-  protected long lastSnapshotTime = -1;
 
   private final Deduplicator deduplicator;
 
@@ -158,13 +139,11 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     TransitModel transitModel,
     Supplier<LocalDate> localDateNow
   ) {
-    super(transitModel.getTransitLayerUpdater());
+    super(transitModel.getTransitLayerUpdater(), parameters);
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
-    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
-    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = localDateNow;
 
@@ -186,7 +165,8 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     if (bufferLock.tryLock()) {
       // Make a new snapshot if necessary
       try {
-        snapshotToReturn = getTimetableSnapshot(false);
+        commitTimetableSnapshot(false);
+        snapshotToReturn = snapshot;
       } finally {
         bufferLock.unlock();
       }
@@ -335,9 +315,9 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       // Make sure that the public (locking) getTimetableSnapshot function is not called.
       if (purgeExpiredData) {
         final boolean modified = purgeExpiredData();
-        getTimetableSnapshot(modified);
+        commitTimetableSnapshot(modified);
       } else {
-        getTimetableSnapshot(false);
+        commitTimetableSnapshot(false);
       }
     } finally {
       // Always release lock
@@ -370,22 +350,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
         var count = warnings.get(key).size();
         LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
       });
-  }
-
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer);
-        snapshot = buffer.commit(transitLayerUpdater, force);
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-      lastSnapshotTime = System.currentTimeMillis();
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-    return snapshot;
   }
 
   /**

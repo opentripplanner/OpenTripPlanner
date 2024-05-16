@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
@@ -105,7 +104,7 @@ public class TimetableSnapshotSourceTest {
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
-    assertSame(snapshot, updater.getTimetableSnapshot());
+    assertNotSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
@@ -154,10 +153,11 @@ public class TimetableSnapshotSourceTest {
       feedId
     );
 
+    updater.commitTimetableSnapshot(true);
+
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern, null);
-    assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
     assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
 
@@ -231,7 +231,7 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(
+        var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
           fullDataset,
@@ -239,8 +239,7 @@ public class TimetableSnapshotSourceTest {
           feedId
         );
 
-        var snapshot = updater.getTimetableSnapshot();
-        assertNull(snapshot);
+        assertEquals(0, result.successful());
       });
   }
 
@@ -361,6 +360,8 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdate),
       feedId
     );
+
+    updater.commitTimetableSnapshot(true);
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -611,7 +612,8 @@ public class TimetableSnapshotSourceTest {
 
       // THEN
       final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-      assertNull(snapshot);
+      assertTrue(snapshot.isEmpty());
+      assertFalse(snapshot.isDirty());
       assertEquals(1, result.failed());
       var errors = result.failures();
       assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
@@ -1065,7 +1067,7 @@ public class TimetableSnapshotSourceTest {
   @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
+      new TimetableSnapshotSourceParameters(Duration.ofMillis(-1), true),
       transitModel,
       () -> SERVICE_DATE
     );

@@ -5,6 +5,7 @@ import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,11 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    */
   protected final TimetableSnapshot buffer = new TimetableSnapshot();
 
-  public AbstractTimetableSnapshotSource(TransitLayerUpdater transitLayerUpdater) {
+  public AbstractTimetableSnapshotSource(TransitLayerUpdater transitLayerUpdater, TimetableSnapshotSourceParameters parameters) {
     this.transitLayerUpdater = transitLayerUpdater;
+    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
+    // Force commit so that snapshot initializes
+    commitTimetableSnapshot(true);
   }
 
   /**
@@ -64,7 +68,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     return snapshot;
   }
 
-  protected void commitTimetableSnapshot(final boolean force) {
+  public void commitTimetableSnapshot(final boolean force) {
     if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
