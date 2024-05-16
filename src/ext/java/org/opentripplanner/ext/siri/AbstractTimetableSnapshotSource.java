@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvider {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTimetableSnapshotSource.class);
   private final TransitLayerUpdater transitLayerUpdater;
   /**
@@ -24,7 +25,10 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    */
   protected final TimetableSnapshot buffer = new TimetableSnapshot();
 
-  public AbstractTimetableSnapshotSource(TransitLayerUpdater transitLayerUpdater, TimetableSnapshotSourceParameters parameters) {
+  public AbstractTimetableSnapshotSource(
+    TransitLayerUpdater transitLayerUpdater,
+    TimetableSnapshotSourceParameters parameters
+  ) {
     this.transitLayerUpdater = transitLayerUpdater;
     this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     // Force commit so that snapshot initializes
@@ -44,7 +48,6 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    */
   protected CountdownTimer snapshotFrequencyThrottle;
 
-
   /**
    * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
    * timetable objects it references are guaranteed to never change, so the requesting thread is
@@ -52,7 +55,6 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
    * to the snapshot to release resources.
    */
   public TimetableSnapshot getTimetableSnapshot() {
-
     // Try to get a lock on the buffer
     if (bufferLock.tryLock()) {
       // Make a new snapshot if necessary

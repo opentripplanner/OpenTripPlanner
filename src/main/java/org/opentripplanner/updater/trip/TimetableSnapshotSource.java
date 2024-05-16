@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.siri.AbstractTimetableSnapshotSource;
@@ -40,7 +39,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -149,34 +147,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
-  }
-
-  /**
-   * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   * timetable objects it references are guaranteed to never change, so the requesting thread is
-   * provided a consistent view of all TripTimes. The routing thread need only release its reference
-   * to the snapshot to release resources.
-   */
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    TimetableSnapshot snapshotToReturn;
-
-    // Try to get a lock on the buffer
-    if (bufferLock.tryLock()) {
-      // Make a new snapshot if necessary
-      try {
-        commitTimetableSnapshot(false);
-        snapshotToReturn = snapshot;
-      } finally {
-        bufferLock.unlock();
-      }
-    } else {
-      // No lock could be obtained because there is either a snapshot commit busy or updates
-      // are applied at this moment, just return the current snapshot
-      snapshotToReturn = snapshot;
-    }
-
-    return snapshotToReturn;
   }
 
   /**

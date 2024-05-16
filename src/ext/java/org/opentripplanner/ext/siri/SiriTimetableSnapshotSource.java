@@ -56,8 +56,6 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
   private final TransitService transitService;
 
-
-
   /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
@@ -75,10 +73,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
     transitModel.initTimetableSnapshotProvider(this);
-
   }
-
-
 
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
@@ -197,8 +192,6 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     // And if the trip has not been added before
     return entityResolver.resolveTrip(vehicleJourney) == null;
   }
-
-
 
   /**
    * Get the latest timetable for TripPattern for a given service date.

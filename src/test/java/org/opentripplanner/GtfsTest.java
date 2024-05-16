@@ -13,6 +13,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -207,7 +208,9 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false),
+        TimetableSnapshotSourceParameters.DEFAULT
+          .withPurgeExpiredData(true)
+          .withMaxSnapshotFrequency(Duration.ZERO),
         transitModel
       );
     alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
