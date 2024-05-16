@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.siri.AbstractTimetableSnapshotSource;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.StringUtils;
@@ -41,7 +42,6 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class TimetableSnapshotSource implements TimetableSnapshotProvider {
+public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
@@ -158,6 +158,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitModel transitModel,
     Supplier<LocalDate> localDateNow
   ) {
+    super(transitModel.getTransitLayerUpdater());
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
@@ -177,6 +178,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * provided a consistent view of all TripTimes. The routing thread need only release its reference
    * to the snapshot to release resources.
    */
+  @Override
   public TimetableSnapshot getTimetableSnapshot() {
     TimetableSnapshot snapshotToReturn;
 

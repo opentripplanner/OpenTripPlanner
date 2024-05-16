@@ -11,13 +11,10 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOW
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -42,20 +39,10 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
  * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
-public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
+public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
-  /**
-   * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
-   * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
-   * might modify this buffer will correctly acquire the lock.
-   */
-  private final TimetableSnapshot buffer = new TimetableSnapshot();
-  /**
-   * Lock to indicate that buffer is in use
-   */
-  private final ReentrantLock bufferLock = new ReentrantLock(true);
   /**
    * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
@@ -69,20 +56,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TransitModel transitModel;
 
   private final TransitService transitService;
-  private final TransitLayerUpdater transitLayerUpdater;
 
-  /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
-   */
-  protected CountdownTimer snapshotFrequencyThrottle;
 
-  /**
-   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
-   * to more than one routing thread if the maximum snapshot frequency is exceeded.
-   */
-  private volatile TimetableSnapshot snapshot = null;
 
   /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
@@ -93,9 +68,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
+    super(transitModel.getTransitLayerUpdater());
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
-    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
@@ -107,29 +82,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     commitTimetableSnapshot(true);
   }
 
-  /**
-   * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   * timetable objects it references are guaranteed to never change, so the requesting thread is
-   * provided a consistent view of all TripTimes. The routing thread need only release its reference
-   * to the snapshot to release resources.
-   */
-  public TimetableSnapshot getTimetableSnapshot() {
-    TimetableSnapshot snapshotToReturn;
 
-    // Try to get a lock on the buffer
-    if (bufferLock.tryLock()) {
-      // Make a new snapshot if necessary
-      try {
-        commitTimetableSnapshot(false);
-        return snapshot;
-      } finally {
-        bufferLock.unlock();
-      }
-    }
-    // No lock could be obtained because there is either a snapshot commit busy or updates
-    // are applied at this moment, just return the current snapshot
-    return snapshot;
-  }
 
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
@@ -249,23 +202,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return entityResolver.resolveTrip(vehicleJourney) == null;
   }
 
-  private void commitTimetableSnapshot(final boolean force) {
-    if (force || snapshotFrequencyThrottle.timeIsUp()) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer);
-        snapshot = buffer.commit(transitLayerUpdater, force);
 
-        // We only reset the timer when the snapshot is updated. This will cause the first
-        // update to be committed after a silent period. This should not have any effect in
-        // a busy updater. It is however useful when manually testing the updater.
-        snapshotFrequencyThrottle.restart();
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-  }
 
   /**
    * Get the latest timetable for TripPattern for a given service date.
