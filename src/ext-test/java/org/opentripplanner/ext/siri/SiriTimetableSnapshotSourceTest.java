@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -38,10 +39,6 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 class SiriTimetableSnapshotSourceTest {
-
-  // TODO testcases:
-  // Error case: Et message contains a call for stop that is not expected and is not marked as
-  //   extra call. This silently works currently by ignoring the extra call, but should probably fail.
 
   @Test
   void testCancelTrip() {
@@ -201,9 +198,9 @@ class SiriTimetableSnapshotSourceTest {
     assertEquals(PickDrop.SCHEDULED, pattern.getAlightType(2));
   }
 
-  // Ignore this for now since it isn't supported
   // TODO: support this
-  // @Test
+  @Test
+  @Disabled("Not supported yet")
   void testAddStop() {
     var env = new RealtimeTestEnvironment();
 
@@ -328,6 +325,32 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME);
+  }
+
+  // TODO: support this
+  @Test
+  @Disabled("Not supported yet")
+  void testExtraUnknownStop() {
+    var env = new RealtimeTestEnvironment();
+
+    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withEstimatedCalls(builder ->
+        builder
+          .call(env.stopA1)
+          .departAimedExpected("00:00:11", "00:00:15")
+          // Unexpected extra stop without isExtraCall flag
+          .call(env.stopD1)
+          .arriveAimedExpected("00:00:19", "00:00:20")
+          .departAimedExpected("00:00:24", "00:00:25")
+          .call(env.stopB1)
+          .arriveAimedExpected("00:00:20", "00:00:33")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(updates);
+
+    assertFailure(result, UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE);
   }
 
   private void assertFailure(UpdateResult result, UpdateError.UpdateErrorType errorType) {
