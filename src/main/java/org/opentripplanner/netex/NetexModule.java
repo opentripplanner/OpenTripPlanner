@@ -69,7 +69,7 @@ public class NetexModule implements GraphBuilderModule {
         );
         transitBuilder.limitServiceDays(transitPeriodLimit);
         for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
-          transitModel.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
+          transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
         }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 

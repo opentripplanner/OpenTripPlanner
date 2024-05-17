@@ -60,6 +60,10 @@ public class OSMWay extends OSMWithTags {
     return isTag("highway", "steps");
   }
 
+  /**
+   * Checks the wheelchair-accessibility of this way. Stairs are by default inaccessible but
+   * can be made accessible if they explicitly set wheelchair=true.
+   */
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
       return isTagTrue("wheelchair");
@@ -103,20 +107,6 @@ public class OSMWay extends OSMWithTags {
   public boolean isOneWayReverseBicycle() {
     String oneWayBicycle = getTag("oneway:bicycle");
     return "-1".equals(oneWayBicycle) || isTagFalse("bicycle:forward");
-  }
-
-  /**
-   * Returns true if bikes must use sidepath in forward direction
-   */
-  public boolean isForwardDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:forward"));
-  }
-
-  /**
-   * Returns true if bikes must use sidepath in reverse direction
-   */
-  public boolean isReverseDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:backward"));
   }
 
   /**
@@ -182,18 +172,6 @@ public class OSMWay extends OSMWithTags {
         permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
         permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
       }
-    }
-
-    //This needs to be after adding permissions for oneway:bicycle=no
-    //removes bicycle permission when bicycles need to use sidepath
-    //TAG: bicycle:forward=use_sidepath
-    if (isForwardDirectionSidepath()) {
-      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
-    }
-
-    //TAG bicycle:backward=use_sidepath
-    if (isReverseDirectionSidepath()) {
-      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
     }
 
     if (isOpposableCycleway()) {

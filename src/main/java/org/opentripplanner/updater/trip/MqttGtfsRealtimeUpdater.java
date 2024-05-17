@@ -13,6 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -78,6 +79,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
+    LOG.info("Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url);
   }
 
   @Override
@@ -186,5 +188,15 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {}
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(MqttGtfsRealtimeUpdater.class)
+      .addStr("url", url)
+      .addStr("topic", topic)
+      .addStr("feedId", feedId)
+      .toString();
   }
 }

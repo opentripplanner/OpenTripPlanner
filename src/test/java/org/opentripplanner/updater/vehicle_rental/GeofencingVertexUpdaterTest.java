@@ -8,10 +8,10 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
@@ -35,30 +35,16 @@ class GeofencingVertexUpdaterTest {
   final GeofencingVertexUpdater updater = new GeofencingVertexUpdater(ignored ->
     List.of(insideFrognerPark, halfInHalfOutFrognerPark, businessBorder)
   );
-  StreetEdge outsideFrognerPark = streetEdge(outsideFrognerPark1, outsideFrognerPark2);
 
-  GeometryFactory fac = GeometryUtils.getGeometryFactory();
-  Polygon frognerPark = fac.createPolygon(
-    new Coordinate[] {
-      new Coordinate(59.93112978539807, 10.691099320272173),
-      new Coordinate(59.92231848097069, 10.691099320272173),
-      new Coordinate(59.92231848097069, 10.711758464910503),
-      new Coordinate(59.92231848097069, 10.691099320272173),
-      new Coordinate(59.93112978539807, 10.691099320272173),
-    }
-  );
-  final GeofencingZone zone = new GeofencingZone(id("frogner-park"), frognerPark, true, false);
-  Polygon osloPolygon = fac.createPolygon(
-    new Coordinate[] {
-      new Coordinate(59.961055202323195, 10.62535658370308),
-      new Coordinate(59.889009435700416, 10.62535658370308),
-      new Coordinate(59.889009435700416, 10.849791142928694),
-      new Coordinate(59.961055202323195, 10.849791142928694),
-      new Coordinate(59.961055202323195, 10.62535658370308),
-    }
+  static GeometryFactory fac = GeometryUtils.getGeometryFactory();
+  final GeofencingZone zone = new GeofencingZone(
+    id("frogner-park"),
+    Polygons.OSLO_FROGNER_PARK,
+    true,
+    false
   );
 
-  MultiPolygon osloMultiPolygon = fac.createMultiPolygon(new Polygon[] { osloPolygon });
+  MultiPolygon osloMultiPolygon = fac.createMultiPolygon(new Polygon[] { Polygons.OSLO });
   final GeofencingZone businessArea = new GeofencingZone(
     id("oslo"),
     osloMultiPolygon,

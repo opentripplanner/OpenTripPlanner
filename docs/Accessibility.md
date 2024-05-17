@@ -2,10 +2,16 @@
 
 ## Preamble
 
-GTFS and Netex define accessibility primarily in terms of binary access for wheelchair users: it's
-either on or off. Whilst it is the desire of the OTP developers to broaden the scope of
-accessibility the lack of data limits us to use this definition in the implementation and in this
-document.
+In this document and in OTP, the term "accessibility" is used with its most common 
+meaning: design of products, devices, services, vehicles, or environments to ensure they are usable by 
+people with disabilities. If you have reached this page looking for cumulative opportunities 
+accessibility indicators (access to opportunities metrics) please see the [Analysis](Analysis.md) page.
+
+While accessibility is a complex subject, at this point GTFS and Netex mostly represent it very
+simply as a yes/no possibility of wheelchair use. While OTP developers hope to broaden the
+scope and nuance of accessibility support in OTP, the lack of detailed data from data producers
+currently limits implementation and discussion in this document to this binary
+"wheelchair accessible" definition.
 
 ## Unknown data
 

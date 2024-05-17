@@ -13,6 +13,7 @@ import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
@@ -49,6 +50,15 @@ public class DebugStyleSpec {
     1,
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
+  private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
+    StreetEdge.class,
+    AreaEdge.class,
+    EscalatorEdge.class,
+    PathwayEdge.class,
+    ElevatorHopEdge.class,
+    TemporaryPartialStreetEdge.class,
+    TemporaryFreeEdge.class,
+  };
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -73,17 +83,18 @@ public class DebugStyleSpec {
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(MAGENTA)
-          .edgeFilter(
-            StreetEdge.class,
-            AreaEdge.class,
-            EscalatorEdge.class,
-            PathwayEdge.class,
-            ElevatorHopEdge.class,
-            TemporaryPartialStreetEdge.class,
-            TemporaryFreeEdge.class
-          )
+          .edgeFilter(EDGES_TO_DISPLAY)
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
+        StyleBuilder
+          .ofId("edge-name")
+          .typeSymbol()
+          .lineText("name")
+          .vectorSourceLayer(edges)
+          .edgeFilter(EDGES_TO_DISPLAY)
+          .minZoom(17)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder

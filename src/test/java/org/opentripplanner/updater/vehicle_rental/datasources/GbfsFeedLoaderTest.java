@@ -28,8 +28,9 @@ import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.slf4j.LoggerFactory;
 
 /**
  * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
@@ -90,7 +91,10 @@ class GbfsFeedLoaderTest {
   @Test
   @Disabled
   void fetchAllPublicFeeds() {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
+      var otpHttpClient = otpHttpClientFactory.create(
+        LoggerFactory.getLogger(GbfsFeedLoaderTest.class)
+      );
       List<Exception> exceptions = otpHttpClient.getAndMap(
         URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
         Map.of(),

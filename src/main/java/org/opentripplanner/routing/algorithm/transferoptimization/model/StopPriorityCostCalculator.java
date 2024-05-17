@@ -1,22 +1,29 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 
 /**
- * This calculator is used to give the stop-priority-cost a boost, by multiplying it with a {@code
- * factor}.
+ * This class calculates an extra stop priority cost by using the stop-board-alight-transfer-cost
+ * and boosting it by multiplying it with a {@code factor}.
  */
 public class StopPriorityCostCalculator {
 
-  private final int[] stopTransferCost;
-  private final double extraStopTransferCostFactor;
+  /**
+   * @see TransitLayer#getStopBoardAlightTransferCosts()
+   */
+  private final int[] stopBoardAlightTransferCosts;
+  private final double extraStopBoardAlightCostFactor;
 
-  StopPriorityCostCalculator(double extraStopTransferCostFactor, int[] stopTransferCost) {
-    this.stopTransferCost = stopTransferCost;
-    this.extraStopTransferCostFactor = extraStopTransferCostFactor;
+  StopPriorityCostCalculator(
+    double extraStopBoardAlightCostFactor,
+    int[] stopBoardAlightTransferCosts
+  ) {
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
+    this.extraStopBoardAlightCostFactor = extraStopBoardAlightCostFactor;
   }
 
   int extraStopPriorityCost(int stop) {
-    return IntUtils.round(stopTransferCost[stop] * extraStopTransferCostFactor);
+    return IntUtils.round(stopBoardAlightTransferCosts[stop] * extraStopBoardAlightCostFactor);
   }
 }

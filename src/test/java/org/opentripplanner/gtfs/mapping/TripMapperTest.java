@@ -23,7 +23,6 @@ public class TripMapperTest {
   private static final int BIKES_ALLOWED = 1;
   private static final String BLOCK_ID = "Block Id";
   private static final int DIRECTION_ID = 1;
-  private static final String FARE_ID = "Fare Id";
   private static final String TRIP_HEADSIGN = "Trip Headsign";
   private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
@@ -46,7 +45,6 @@ public class TripMapperTest {
     TRIP.setBikesAllowed(BIKES_ALLOWED);
     TRIP.setBlockId(BLOCK_ID);
     TRIP.setDirectionId(Integer.toString(DIRECTION_ID));
-    TRIP.setFareId(FARE_ID);
     TRIP.setRoute(data.route);
     TRIP.setServiceId(AGENCY_AND_ID);
     TRIP.setShapeId(AGENCY_AND_ID);
@@ -69,7 +67,6 @@ public class TripMapperTest {
     assertEquals("A:1", result.getId().toString());
     assertEquals(BLOCK_ID, result.getGtfsBlockId());
     assertEquals(Direction.INBOUND, result.getDirection());
-    assertEquals(FARE_ID, result.getGtfsFareId());
     assertNotNull(result.getRoute());
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals("A:1", result.getShapeId().toString());
@@ -91,7 +88,6 @@ public class TripMapperTest {
     assertNotNull(result.getRoute());
 
     assertNull(result.getGtfsBlockId());
-    assertNull(result.getGtfsFareId());
     assertNull(result.getServiceId());
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());

@@ -26,7 +26,8 @@ the selector in the upper left of the published documentation.
 
 **Releases**
  
-- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.4.0 (the git master branch)
+- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.5 (the git master branch)
+- [v2.4.0](http://docs.opentripplanner.org/en/v2.4.0) - Version 2.4
 - [v2.3.0](http://docs.opentripplanner.org/en/v2.3.0) - Version 2.3
 - [v2.2.0](http://docs.opentripplanner.org/en/v2.2.0) - Version 2.2
 - [v2.1.0](http://docs.opentripplanner.org/en/v2.1.0) - Version 2.1
@@ -59,12 +60,7 @@ your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tut
 
 # Getting help
 
-The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner)
-where most of the core developers are.
-You can also send questions and comments to the [mailing list](http://groups.google.com/group/opentripplanner-users)
-or file bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). 
-Note that the issue tracker is not intended for support questions or discussions. Please use the
-chat or the mailing list instead.
+The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) where most of the core developers are. Bug reports may be filed via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). The issue tracker is not intended for support questions or discussions. Please use the chat for this purpose. The OpenTripPlanner [mailing list](http://groups.google.com/group/opentripplanner-users) is treated as a legacy communications channel and used almost exclusively for project announcements. Again, please direct development and support discussions to the Gitter chat.
 
 # Financial and In-Kind Support
 

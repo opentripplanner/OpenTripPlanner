@@ -14,12 +14,19 @@ it takes a bit of time, but reformat the entire codebase. Only code you have cha
 formatted, since the existing code is already formatted. The second way is to set up prettier and
 run it manually or hick it into your IDE, so it runs every time a file is changed.
 
-### How to run Prittier with Maven
+### How to run Prettier with Maven
 
-Format all code is done in the validate phase (run before test, package, install)
+Prettier will automatically format all code in the Maven "validate" phase, which runs before the test, package, and install phases. So formatting will happen for example when you run:
 
 ```
 % mvn test
+```
+
+You can manually run _only_ the formatting process with:
+
+```
+% mvn prettier:write
+
 ```
 
 To skip the prettier formating use profile `prettierSkip`:
@@ -31,7 +38,7 @@ To skip the prettier formating use profile `prettierSkip`:
 The check for formatting errors use profile `prettierCheck`:
 
 ```
-% mvn test -P prettierSkip
+% mvn test -P prettierCheck
 ```
 
 The check is run by the CI server and will fail the build if the code is incorrectly formatted.

@@ -33,6 +33,8 @@ public class TransitLayer {
   /**
    * Transit data required for routing, indexed by each local date(Graph TimeZone) it runs through.
    * A Trip "runs through" a date if any of its arrivals or departures is happening on that date.
+   * The same trip pattern can therefore have multiple running dates and trip pattern is not
+   * required to "run" on its service date.
    */
   private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate;
 
@@ -57,7 +59,8 @@ public class TransitLayer {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  private final int[] stopBoardAlightCosts;
+  @Nullable
+  private final int[] stopBoardAlightTransferCosts;
 
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
@@ -74,7 +77,7 @@ public class TransitLayer {
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
-      transitLayer.stopBoardAlightCosts
+      transitLayer.stopBoardAlightTransferCosts
     );
   }
 
@@ -87,7 +90,7 @@ public class TransitLayer {
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
-    int[] stopBoardAlightCosts
+    @Nullable int[] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -97,7 +100,7 @@ public class TransitLayer {
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
-    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
 
   @Nullable
@@ -105,7 +108,12 @@ public class TransitLayer {
     return stop == -1 ? null : this.stopModel.stopByIndex(stop);
   }
 
-  public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
+  /**
+   * Returns trip patterns for the given running date. Running date is not necessarily the same
+   * as the service date. A Trip "runs through" a date if any of its arrivals or departures is
+   * happening on that date. Trip pattern can have multiple running dates.
+   */
+  public Collection<TripPatternForDate> getTripPatternsForRunningDate(LocalDate date) {
     return tripPatternsRunningOnDate.getOrDefault(date, List.of());
   }
 
@@ -123,16 +131,29 @@ public class TransitLayer {
     return stopModel.stopIndexSize();
   }
 
+  /**
+   * Returns a copy of the list of trip patterns for the given running date. Running date is not
+   * necessarily the same as the service date. A Trip "runs through" a date if any of its arrivals
+   * or departures is happening on that date. Trip pattern can have multiple running dates.
+   */
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
     List<TripPatternForDate> tripPatternForDate = tripPatternsRunningOnDate.get(runningPeriodDate);
     return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : new ArrayList<>();
   }
 
-  public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
-    List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate
+  /**
+   * Returns a copy of the list of trip patterns for the given service date. Service date is not
+   * necessarily the same as any of the trip pattern's running dates.
+   */
+  public List<TripPatternForDate> getTripPatternsOnServiceDateCopy(LocalDate date) {
+    List<TripPatternForDate> tripPatternsRunningOnDates = getTripPatternsRunningOnDateCopy(date);
+    // Trip pattern can run only after midnight. Therefore, we need to get the trip pattern's for
+    // the next running date as well and filter out duplicates.
+    tripPatternsRunningOnDates.addAll(getTripPatternsRunningOnDateCopy(date.plusDays(1)));
+    return tripPatternsRunningOnDates
       .stream()
-      .filter(t -> t.getLocalDate().equals(date))
+      .filter(t -> t.getServiceDate().equals(date))
+      .distinct()
       .collect(Collectors.toList());
   }
 
@@ -157,8 +178,13 @@ public class TransitLayer {
     return transferIndexGenerator;
   }
 
-  public int[] getStopBoardAlightCosts() {
-    return stopBoardAlightCosts;
+  /**
+   * Costs for both boarding and alighting at a given stop during transfer. Note that this is in
+   * raptor centi-second units.
+   */
+  @Nullable
+  public int[] getStopBoardAlightTransferCosts() {
+    return stopBoardAlightTransferCosts;
   }
 
   /**

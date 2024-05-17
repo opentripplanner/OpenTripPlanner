@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan.legreference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -85,5 +86,20 @@ class LegReferenceSerializerTest {
     assertEquals(SERVICE_DATE, ref.serviceDate());
     assertEquals(FROM_STOP_POS, ref.fromStopPositionInPattern());
     assertEquals(TO_STOP_POS, ref.toStopPositionInPattern());
+  }
+
+  @Test
+  void testNullSerializedLegReference() {
+    assertNull(LegReferenceSerializer.decode(null));
+  }
+
+  @Test
+  void testEmptySerializedLegReference() {
+    assertNull(LegReferenceSerializer.decode(""));
+  }
+
+  @Test
+  void testIllegalBase64CharacterInSerializedLegReference() {
+    assertNull(LegReferenceSerializer.decode("RUT:Line:5"));
   }
 }

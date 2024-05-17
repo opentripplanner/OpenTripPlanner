@@ -20,13 +20,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.geotools.api.coverage.Coverage;
 import org.geotools.api.coverage.PointOutsideCoverageException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.Position2D;
+import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -61,6 +62,25 @@ import org.slf4j.LoggerFactory;
 public class ElevationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
+  /**
+   * The WGS84 CRS with longitude-first axis order. The first time a CRS lookup is
+   * performed is surprisingly expensive (around 500ms), apparently due to  initializing
+   * an HSQLDB JDBC connection. For this reason, the constant is defined in this
+   * narrower scope rather than a shared utility class, where it was seen to incur the
+   * initialization cost in a broader range of tests than is necessary.
+   */
+  private static final CoordinateReferenceSystem WGS84_XY;
+
+  static {
+    try {
+      WGS84_XY = CRS.getAuthorityFactory(true).createCoordinateReferenceSystem("EPSG:4326");
+    } catch (Exception ex) {
+      LOG.error("Unable to create longitude-first WGS84 CRS", ex);
+      throw new RuntimeException(
+        "Could not create longitude-first WGS84 coordinate reference system."
+      );
+    }
+  }
 
   /** The elevation data to be used in calculating elevations. */
   private final ElevationGridCoverageFactory gridCoverageFactory;
@@ -564,7 +584,7 @@ public class ElevationModule implements GraphBuilderModule {
       // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
       // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
       // rasters to also use (long, lat).
-      coverage.evaluate(new Position2D(GeometryUtils.WGS84_XY, x, y), values);
+      coverage.evaluate(new Position2D(WGS84_XY, x, y), values);
     } catch (PointOutsideCoverageException e) {
       nPointsOutsideDEM.incrementAndGet();
       throw e;

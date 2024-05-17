@@ -2,6 +2,7 @@ package org.opentripplanner.framework.lang;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.framework.lang.IntUtils.concat;
 import static org.opentripplanner.framework.lang.IntUtils.intArray;
@@ -9,6 +10,7 @@ import static org.opentripplanner.framework.lang.IntUtils.intArrayToString;
 import static org.opentripplanner.framework.lang.IntUtils.intToString;
 import static org.opentripplanner.framework.lang.IntUtils.requireInRange;
 import static org.opentripplanner.framework.lang.IntUtils.requireNotNegative;
+import static org.opentripplanner.framework.lang.IntUtils.requireNullOrNotNegative;
 import static org.opentripplanner.framework.lang.IntUtils.shiftArray;
 import static org.opentripplanner.framework.lang.IntUtils.standardDeviation;
 
@@ -100,6 +102,14 @@ class IntUtilsTest {
 
     ex = assertThrows(IllegalArgumentException.class, () -> requireNotNegative(-1));
     assertEquals("Negative value not expected for value: -1", ex.getMessage());
+  }
+
+  @Test
+  void testRequireNotNegativeOrNull() {
+    assertNull(requireNullOrNotNegative(null, "ok"));
+    assertEquals(5, requireNullOrNotNegative(5, "ok"));
+    assertEquals(0, requireNullOrNotNegative(0, "ok"));
+    assertThrows(IllegalArgumentException.class, () -> requireNullOrNotNegative(-5, "ok"));
   }
 
   @Test

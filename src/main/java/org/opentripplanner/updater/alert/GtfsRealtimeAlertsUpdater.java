@@ -3,6 +3,7 @@ package org.opentripplanner.updater.alert;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -50,12 +51,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     this.updateHandler.setFeedId(config.feedId());
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
-    this.otpHttpClient = new OtpHttpClient();
-    LOG.info(
-      "Creating real-time alert updater running every {} seconds : {}",
-      pollingPeriod(),
-      url
-    );
+    this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
+    LOG.info("Creating real-time alert updater running every {}: {}", pollingPeriod(), url);
   }
 
   @Override

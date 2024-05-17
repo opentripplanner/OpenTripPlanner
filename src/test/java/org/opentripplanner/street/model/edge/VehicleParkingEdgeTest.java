@@ -10,6 +10,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -130,8 +131,8 @@ class VehicleParkingEdgeTest {
     boolean carPlaces,
     VehicleParkingSpaces availability
   ) {
-    return VehicleParking
-      .builder()
+    return StreetModelForTest
+      .vehicleParking()
       .id(TransitModelForTest.id("VehicleParking"))
       .bicyclePlaces(bicyclePlaces)
       .carPlaces(carPlaces)
