@@ -19,6 +19,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix handling of implicit access and egress mode parameters. [#5821](https://github.com/opentripplanner/OpenTripPlanner/pull/5821)
 - Add prettier:write to docs and rephrase slightly [ci skip] [#5831](https://github.com/opentripplanner/OpenTripPlanner/pull/5831)
 - Make naming of stopTransferCosts/stopBoardAlightCosts consistent [#5822](https://github.com/opentripplanner/OpenTripPlanner/pull/5822)
+- Namer for applying street names to nearby sidewalks [#5774](https://github.com/opentripplanner/OpenTripPlanner/pull/5774)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
