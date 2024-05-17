@@ -1146,6 +1146,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdateYesterday),
       feedId
     );
+    updater.commitTimetableSnapshot(true);
 
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
