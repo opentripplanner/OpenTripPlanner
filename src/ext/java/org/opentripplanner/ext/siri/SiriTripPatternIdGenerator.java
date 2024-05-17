@@ -9,11 +9,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class generates new unique IDs for TripPatterns created in response to real-time updates
- * from the SIRI updaters. It is important to create only one instance of this class, and inject
- * that single instance wherever it is needed. The ID generation is threadsafe, even if that is
- * probably not needed.
- * TODO RT: To make this simpler to use we could make it a "Singelton" (static getInstance() method) - that would
- *              enforce one instance only, and simplify injection (use getInstance() where needed).
+ * from the SIRI updaters. In non-test usage it is important to create only one instance of this
+ * class, and inject that single instance wherever it is needed. However, this single-instance
+ * usage pattern is not enforced due to differing needs in tests.
+ * The ID generation is threadsafe, even if that is probably not needed.
  */
 class SiriTripPatternIdGenerator {
 

@@ -42,10 +42,14 @@ import org.slf4j.LoggerFactory;
  * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
  * later trip.
  * <p>
- * The Route and StopPattern together form the natural key of the TripPattern. They are the shared
- * set of characteristics that group many trips together into one TripPattern. This grouping saves
- * memory by not replicating any details shared across all trips in the TripPattern, but it is
- * also essential to some optimizations in routing algorithms like Raptor.
+ * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All trips
+ * grouped under a TripPattern should have the same values for these characteristics (with possible
+ * exceptions for TransitMode and SubMode).
+ * TODO RT_AB: We need to clarify exactly which characteristics are identical across the trips.
+ *   Grouping into patterns serves more than one purpose: it conserves memory by not replicating
+ *   details shared across all trips in the TripPattern; it reflects business practices outside
+ *   routing; it is essential to optimizations in routing algorithms like Raptor. We may be
+ *   conflating a domain model grouping with an internal routing grouping.
  * <p>
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
  * JOURNEY a "trip", thus TripPattern.
