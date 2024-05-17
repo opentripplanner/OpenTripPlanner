@@ -1,13 +1,8 @@
-# IBI Group Accessibility Score - OTP Sandbox Extension
+# IBI Group Accessibility Score
 
 ## Contact Info
 
 - IBI Group ([transitrealtime@ibigroup.com](mailto:transitrealtime@ibigroup.com))
-
-## Changelog
-
-- Create initial
-  implementation [#4221](https://github.com/opentripplanner/OpenTripPlanner/pull/4221)
 
 ## Documentation
 
@@ -33,3 +28,7 @@ To enable the feature add the following to `router-config.json`:
 ```
 
 The score is only computed when you search for wheelchair-accessible routes.
+
+## Changelog
+
+- Create initial implementation [#4221](https://github.com/opentripplanner/OpenTripPlanner/pull/4221)

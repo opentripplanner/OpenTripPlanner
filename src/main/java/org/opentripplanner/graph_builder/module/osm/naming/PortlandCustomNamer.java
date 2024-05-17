@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm.naming;
 import java.util.HashSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -69,28 +70,29 @@ public class PortlandCustomNamer implements EdgeNamer {
   }
 
   @Override
-  public void recordEdge(OSMWithTags way, StreetEdge edge) {
-    if (!edge.hasBogusName()) {
-      return; // this edge already has a real name so there is nothing to do
-    }
-    String highway = way.getTag("highway");
-    if ("motorway_link".equals(highway) || "trunk_link".equals(highway)) {
-      if (edge.isBack()) {
-        nameByDestination.add(edge);
-      } else {
-        nameByOrigin.add(edge);
-      }
-    } else if (
-      "secondary_link".equals(highway) ||
-      "primary_link".equals(highway) ||
-      "tertiary_link".equals(highway)
-    ) {
-      if (edge.isBack()) {
-        nameByOrigin.add(edge);
-      } else {
-        nameByDestination.add(edge);
-      }
-    }
+  public void recordEdges(OSMWithTags way, StreetEdgePair edgePair) {
+    final boolean isHighwayLink = isHighwayLink(way);
+    final boolean isLowerLink = isLowerLink(way);
+    edgePair
+      .asIterable()
+      .forEach(edge -> {
+        if (!edge.hasBogusName()) {
+          return; // this edge already has a real name so there is nothing to do
+        }
+        if (isHighwayLink) {
+          if (edge.isBack()) {
+            nameByDestination.add(edge);
+          } else {
+            nameByOrigin.add(edge);
+          }
+        } else if (isLowerLink) {
+          if (edge.isBack()) {
+            nameByOrigin.add(edge);
+          } else {
+            nameByDestination.add(edge);
+          }
+        }
+      });
   }
 
   @Override
@@ -182,5 +184,19 @@ public class PortlandCustomNamer implements EdgeNamer {
       }
     }
     return null;
+  }
+
+  private static boolean isHighwayLink(OSMWithTags way) {
+    String highway = way.getTag("highway");
+    return "motorway_link".equals(highway) || "trunk_link".equals(highway);
+  }
+
+  private static boolean isLowerLink(OSMWithTags way) {
+    String highway = way.getTag("highway");
+    return (
+      "secondary_link".equals(highway) ||
+      "primary_link".equals(highway) ||
+      "tertiary_link".equals(highway)
+    );
   }
 }

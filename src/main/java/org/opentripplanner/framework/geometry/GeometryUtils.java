@@ -244,7 +244,7 @@ public class GeometryUtils {
   }
 
   /**
-   * Extract individual line string from a mult-line string.
+   * Extract individual line strings from a multi-line string.
    */
   public static List<LineString> getLineStrings(MultiLineString mls) {
     var ret = new ArrayList<LineString>();

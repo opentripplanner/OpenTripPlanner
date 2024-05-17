@@ -20,7 +20,7 @@ public class Polygons {
     }
   );
 
-  public static Polygon OSLO = FAC.createPolygon(
+  public static final Polygon OSLO = FAC.createPolygon(
     new Coordinate[] {
       Coordinates.of(59.961055202323195, 10.62535658370308),
       Coordinates.of(59.889009435700416, 10.62535658370308),
@@ -29,7 +29,7 @@ public class Polygons {
       Coordinates.of(59.961055202323195, 10.62535658370308),
     }
   );
-  public static Polygon OSLO_FROGNER_PARK = FAC.createPolygon(
+  public static final Polygon OSLO_FROGNER_PARK = FAC.createPolygon(
     new Coordinate[] {
       Coordinates.of(59.92939032560119, 10.69770054003061),
       Coordinates.of(59.929138466684975, 10.695210909925208),

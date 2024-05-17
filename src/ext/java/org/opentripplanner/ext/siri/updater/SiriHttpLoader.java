@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBException;
 import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class SiriHttpLoader implements SiriLoader {
     this.timeout = timeout;
     this.requestHeaders = requestHeaders;
     this.previewInterval = previewInterval;
-    this.otpHttpClient = new OtpHttpClient(timeout, timeout);
+    this.otpHttpClient = new OtpHttpClientFactory(timeout, timeout).create(LOG);
   }
 
   /**

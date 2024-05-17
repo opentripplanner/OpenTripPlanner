@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs;
 
-import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.language.FloatValue;
@@ -19,16 +18,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 
-  private static final ObjectMapper GEOJSON_MAPPER = new ObjectMapper()
-    .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
+  private static final ObjectMapper GEOJSON_MAPPER = ObjectMappers.geoJson();
   public static final GraphQLScalarType DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
 
   public static final GraphQLScalarType POLYLINE_SCALAR = GraphQLScalarType

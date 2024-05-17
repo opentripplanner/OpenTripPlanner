@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,16 @@ public class FlexTripsMapper {
     ProgressTracker progress = ProgressTracker.track("Create flex trips", 500, tripSize);
 
     for (Trip trip : stopTimesByTrip.keys()) {
-      /* Fetch the stop times for this trip. Copy the list since it's immutable. */
-      List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
-
+      var stopTimes = stopTimesByTrip.get(trip);
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
+        var timePenalty = builder.getFlexTimePenalty().getOrDefault(trip, TimePenalty.NONE);
         result.add(
-          UnscheduledTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
+          UnscheduledTrip
+            .of(trip.getId())
+            .withTrip(trip)
+            .withStopTimes(stopTimes)
+            .withTimePenalty(timePenalty)
+            .build()
         );
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         result.add(

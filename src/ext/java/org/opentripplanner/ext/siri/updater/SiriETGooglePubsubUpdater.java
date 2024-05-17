@@ -28,7 +28,7 @@ import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
@@ -312,7 +312,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   private ByteString fetchInitialData() {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
+      var otpHttpClient = otpHttpClientFactory.create(LOG);
       return otpHttpClient.getAndMap(
         dataInitializationUrl,
         initialGetDataTimeout,

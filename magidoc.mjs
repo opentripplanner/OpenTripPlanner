@@ -29,7 +29,7 @@ at http://localhost:8080/graphiql
 This API is activated by default.
 
 To learn how to deactivate it, read the
-[documentation](https://docs.opentripplanner.org/en/dev-2.x/apis/GTFS-GraphQ-API/).
+[documentation](https://docs.opentripplanner.org/en/dev-2.x/apis/GTFS-GraphQL-API/).
 `,
       }],
       appTitle: 'OTP GTFS GraphQL API',

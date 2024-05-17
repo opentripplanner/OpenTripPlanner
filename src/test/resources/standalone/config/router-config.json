@@ -171,7 +171,7 @@
       "minWindow": "1h",
       "maxWindow": "5h"
     },
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 1500,
       "ALLOWED": 75,
       "RECOMMENDED": 30,
@@ -420,6 +420,12 @@
         "fromDateTime": "-P1D",
         "timeout": 300000
       }
+    },
+    {
+      "type": "vehicle-parking",
+      "feedId": "bikeep",
+      "sourceType": "bikeep",
+      "url": "https://services.bikeep.com/location/v1/public-areas/no-baia-mobility/locations"
     }
   ],
   "rideHailingServices": [
