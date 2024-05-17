@@ -49,8 +49,8 @@ public class PlanPageInfo {
   @Override
   public int hashCode() {
     return Objects.hash(
-      startCursor.getValue(),
-      endCursor.getValue(),
+      startCursor != null ? startCursor.getValue() : null,
+      endCursor != null ? endCursor.getValue() : null,
       hasPreviousPage,
       hasNextPage,
       searchWindowUsed
@@ -67,8 +67,22 @@ public class PlanPageInfo {
     }
     PlanPageInfo that = (PlanPageInfo) o;
     return (
-      Objects.equals(startCursor.getValue(), that.startCursor.getValue()) &&
-      Objects.equals(endCursor.getValue(), that.endCursor.getValue()) &&
+      (
+        (startCursor == null && that.startCursor == null) ||
+        (
+          startCursor != null &&
+          that.startCursor != null &&
+          Objects.equals(startCursor.getValue(), that.startCursor.getValue())
+        )
+      ) &&
+      (
+        (endCursor == null && that.endCursor == null) ||
+        (
+          endCursor != null &&
+          that.endCursor != null &&
+          Objects.equals(endCursor.getValue(), that.endCursor.getValue())
+        )
+      ) &&
       Objects.equals(searchWindowUsed, that.searchWindowUsed) &&
       hasPreviousPage == that.hasPreviousPage &&
       hasNextPage == that.hasNextPage
