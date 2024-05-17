@@ -3,6 +3,9 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularArrival;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularDeparture;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
@@ -48,10 +51,9 @@ class UnscheduledTripTest {
   private static final int T15_00 = TimeUtils.hm2time(15, 0);
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
 
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
-
-  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
 
   @Nested
   class IsUnscheduledTrip {
@@ -659,35 +661,6 @@ class UnscheduledTripTest {
 
   private static String timeToString(int time) {
     return TimeUtils.timeToStrCompact(time, MISSING_VALUE, "MISSING_VALUE");
-  }
-
-  private static StopTime area(String startTime, String endTime) {
-    return area(AREA_STOP, endTime, startTime);
-  }
-
-  @Nonnull
-  private static StopTime area(StopLocation areaStop, String endTime, String startTime) {
-    var stopTime = new StopTime();
-    stopTime.setStop(areaStop);
-    stopTime.setFlexWindowStart(TimeUtils.time(startTime));
-    stopTime.setFlexWindowEnd(TimeUtils.time(endTime));
-    return stopTime;
-  }
-
-  private static StopTime regularDeparture(String departureTime) {
-    return regularStopTime(MISSING_VALUE, TimeUtils.time(departureTime));
-  }
-
-  private static StopTime regularArrival(String arrivalTime) {
-    return regularStopTime(TimeUtils.time(arrivalTime), MISSING_VALUE);
-  }
-
-  private static StopTime regularStopTime(int arrivalTime, int departureTime) {
-    var stopTime = new StopTime();
-    stopTime.setStop(REGULAR_STOP);
-    stopTime.setArrivalTime(arrivalTime);
-    stopTime.setDepartureTime(departureTime);
-    return stopTime;
   }
 
   @Nonnull
