@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
@@ -29,6 +30,7 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -45,7 +47,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * <p>
  * For a discussion of this behaviour see https://github.com/MobilityData/gtfs-flex/issues/76
  */
-public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
+public class UnscheduledTrip
+  extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder>
+  implements LogInfo {
 
   private static final Set<Integer> N_STOPS = Set.of(1, 2);
   private static final int INDEX_NOT_FOUND = -1;
@@ -152,6 +156,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
           config
         )
       );
+  }
+
+  @Nullable
+  @Override
+  public String logName() {
+    return "timePenalty=(%s)".formatted(timePenalty.toString());
   }
 
   /**

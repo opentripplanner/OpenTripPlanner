@@ -41,12 +41,8 @@ public class FlexPath {
   /**
    * Returns an (immutable) copy of this path with the duration modified.
    */
-  public FlexPath withTimePenalty(TimePenalty mod) {
-    if (mod.isZero()) {
-      return this;
-    } else {
-      int updatedDuration = (int) mod.calculate(Duration.ofSeconds(durationSeconds)).toSeconds();
-      return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
-    }
+  public FlexPath withTimePenalty(TimePenalty penalty) {
+    int updatedDuration = (int) penalty.calculate(Duration.ofSeconds(durationSeconds)).toSeconds();
+    return new FlexPath(distanceMeters, updatedDuration, geometrySupplier);
   }
 }

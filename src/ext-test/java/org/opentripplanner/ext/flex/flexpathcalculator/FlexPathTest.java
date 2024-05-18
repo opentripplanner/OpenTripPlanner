@@ -21,7 +21,7 @@ class FlexPathTest {
 
   static List<Arguments> cases() {
     return List.of(
-      Arguments.of(TimePenalty.ZERO, THIRTY_MINS_IN_SECONDS),
+      Arguments.of(TimePenalty.NONE, THIRTY_MINS_IN_SECONDS),
       Arguments.of(TimePenalty.of(Duration.ofMinutes(10), 1), 2400),
       Arguments.of(TimePenalty.of(Duration.ofMinutes(10), 1.5f), 3300),
       Arguments.of(TimePenalty.of(Duration.ZERO, 3), 5400)
