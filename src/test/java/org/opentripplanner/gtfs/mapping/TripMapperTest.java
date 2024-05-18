@@ -111,14 +111,14 @@ public class TripMapperTest {
   }
 
   @Test
-  void noFlexDurationModifier() {
+  void noFlexTimePenalty() {
     var mapper = defaultTripMapper();
     mapper.map(TRIP);
-    assertTrue(mapper.flexSafeDurationModifiers().isEmpty());
+    assertTrue(mapper.flexSafeTimePenalties().isEmpty());
   }
 
   @Test
-  void flexDurationModifier() {
+  void flexTimePenalty() {
     var flexTrip = new Trip();
     flexTrip.setId(new AgencyAndId("1", "1"));
     flexTrip.setSafeDurationFactor(1.5);
@@ -126,7 +126,7 @@ public class TripMapperTest {
     flexTrip.setRoute(new GtfsTestData().route);
     var mapper = defaultTripMapper();
     var mapped = mapper.map(flexTrip);
-    var mod = mapper.flexSafeDurationModifiers().get(mapped);
+    var mod = mapper.flexSafeTimePenalties().get(mapped);
     assertEquals(1.5f, mod.coefficient());
     assertEquals(600, mod.constant().toSeconds());
   }

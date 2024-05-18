@@ -11,11 +11,11 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class TimePenaltyCalculator implements FlexPathCalculator {
 
   private final FlexPathCalculator delegate;
-  private final TimePenalty factors;
+  private final TimePenalty penalty;
 
   public TimePenaltyCalculator(FlexPathCalculator delegate, TimePenalty penalty) {
     this.delegate = delegate;
-    this.factors = penalty;
+    this.penalty = penalty;
   }
 
   @Nullable
@@ -26,7 +26,7 @@ public class TimePenaltyCalculator implements FlexPathCalculator {
     if (path == null) {
       return null;
     } else {
-      return path.withDurationModifier(factors);
+      return path.withTimePenalty(penalty);
     }
   }
 }

@@ -18,7 +18,7 @@ class TripMapper {
   private final TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Trip, Trip> mappedTrips = new HashMap<>();
-  private final Map<Trip, TimePenalty> flexSafeDurationModifiers = new HashMap<>();
+  private final Map<Trip, TimePenalty> flexSafeTimePenalties = new HashMap<>();
 
   TripMapper(
     RouteMapper routeMapper,
@@ -45,8 +45,8 @@ class TripMapper {
   /**
    * The map of flex duration factors per flex trip.
    */
-  Map<Trip, TimePenalty> flexSafeDurationModifiers() {
-    return flexSafeDurationModifiers;
+  Map<Trip, TimePenalty> flexSafeTimePenalties() {
+    return flexSafeTimePenalties;
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
@@ -73,11 +73,11 @@ class TripMapper {
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
 
     var trip = lhs.build();
-    mapSafeDurationModifier(rhs).ifPresent(f -> flexSafeDurationModifiers.put(trip, f));
+    mapSafeTimePenalty(rhs).ifPresent(f -> flexSafeTimePenalties.put(trip, f));
     return trip;
   }
 
-  private Optional<TimePenalty> mapSafeDurationModifier(org.onebusaway.gtfs.model.Trip rhs) {
+  private Optional<TimePenalty> mapSafeTimePenalty(org.onebusaway.gtfs.model.Trip rhs) {
     if (rhs.getSafeDurationFactor() == null && rhs.getSafeDurationOffset() == null) {
       return Optional.empty();
     } else {

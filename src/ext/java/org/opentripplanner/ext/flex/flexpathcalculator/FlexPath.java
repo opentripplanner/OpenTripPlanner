@@ -41,7 +41,7 @@ public class FlexPath {
   /**
    * Returns an (immutable) copy of this path with the duration modified.
    */
-  public FlexPath withDurationModifier(TimePenalty mod) {
+  public FlexPath withTimePenalty(TimePenalty mod) {
     if (mod.isZero()) {
       return this;
     } else {

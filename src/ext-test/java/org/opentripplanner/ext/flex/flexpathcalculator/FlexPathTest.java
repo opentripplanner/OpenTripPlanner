@@ -30,8 +30,8 @@ class FlexPathTest {
 
   @ParameterizedTest
   @MethodSource("cases")
-  void calculate(TimePenalty mod, int expectedSeconds) {
-    var modified = PATH.withDurationModifier(mod);
+  void calculate(TimePenalty penalty, int expectedSeconds) {
+    var modified = PATH.withTimePenalty(penalty);
     assertEquals(expectedSeconds, modified.durationSeconds);
     assertEquals(LineStrings.SIMPLE, modified.getGeometry());
   }
