@@ -67,6 +67,12 @@ public class TimetableTest {
   }
 
   @Test
+  public void getGetTripTimes() {
+    var tt = timetable.getTripTimes(new FeedScopedId(feedId, TRIP_ID));
+    assertNotNull(tt);
+  }
+
+  @Test
   public void tripNotFoundInPattern() {
     // non-existing trip
     var tripDescriptorBuilder = tripDescriptorBuilder("b");
