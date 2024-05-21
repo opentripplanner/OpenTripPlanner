@@ -503,10 +503,10 @@ class SiriTimetableSnapshotSourceTest {
      */
     public TripTimes getTripTimesForTrip(FeedScopedId tripId, LocalDate serviceDate) {
       var transitService = getTransitService();
-      var trip = transitService.getTripOnServiceDateById(tripId);
-      var pattern = transitService.getPatternForTrip(trip.getTrip(), serviceDate);
+      var trip = transitService.getTripOnServiceDateById(tripId).getTrip();
+      var pattern = transitService.getPatternForTrip(trip, serviceDate);
       var timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
-      return timetable.getTripTimes(tripId);
+      return timetable.getTripTimes(trip);
     }
 
     public DateTimeHelper getDateTimeHelper() {
