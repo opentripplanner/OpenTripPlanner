@@ -21,6 +21,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make naming of stopTransferCosts/stopBoardAlightCosts consistent [#5822](https://github.com/opentripplanner/OpenTripPlanner/pull/5822)
 - Namer for applying street names to nearby sidewalks [#5774](https://github.com/opentripplanner/OpenTripPlanner/pull/5774)
 - Implement GTFS Flex safe duration spec draft [#5796](https://github.com/opentripplanner/OpenTripPlanner/pull/5796)
+- SiriTimetableSnapshot tests [#5852](https://github.com/opentripplanner/OpenTripPlanner/pull/5852)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
