@@ -52,14 +52,13 @@ public class LuceneIndex implements Serializable {
 
   private static final String TYPE = "type";
   private static final String ID = "id";
+  private static final String SECONDARY_IDS = "secondary_ids";
   private static final String SUGGEST = "suggest";
   private static final String NAME = "name";
   private static final String NAME_NGRAM = "name_ngram";
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
-  private static final String MODE = "mode";
-  private static final String AGENCY_IDS = "agency_ids";
 
   private final TransitService transitService;
   private final Analyzer analyzer;
@@ -96,12 +95,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocation.class,
               stopLocation.getId().toString(),
+              List.of(),
               ListUtils.ofNullable(stopLocation.getName()),
               ListUtils.ofNullable(stopLocation.getCode()),
               stopLocation.getCoordinate().latitude(),
-              stopLocation.getCoordinate().longitude(),
-              Set.of(),
-              Set.of()
+              stopLocation.getCoordinate().longitude()
             )
           );
 
@@ -112,12 +110,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocationsGroup.class,
               stopLocationsGroup.getId().toString(),
+              List.of(),
               ListUtils.ofNullable(stopLocationsGroup.getName()),
               List.of(),
               stopLocationsGroup.getCoordinate().latitude(),
-              stopLocationsGroup.getCoordinate().longitude(),
-              Set.of(),
-              Set.of()
+              stopLocationsGroup.getCoordinate().longitude()
             )
           );
 
@@ -131,12 +128,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopCluster.class,
               stopCluster.primaryId(),
+              stopCluster.secondaryIds(),
               stopCluster.names(),
               stopCluster.codes(),
               stopCluster.coordinate().lat(),
-              stopCluster.coordinate().lon(),
-              stopCluster.modes(),
-              List.of()
+              stopCluster.coordinate().lon()
             )
           );
       }
@@ -187,7 +183,13 @@ public class LuceneIndex implements Serializable {
     var primaryId = FeedScopedId.parse(document.get(ID));
     var primary = stopClusterMapper.toLocation(primaryId);
 
-    return new StopCluster(primary, List.of());
+    var secondaryIds = Arrays
+      .stream(document.getValues(SECONDARY_IDS))
+      .map(FeedScopedId::parse)
+      .map(stopClusterMapper::toLocation)
+      .toList();
+
+    return new StopCluster(primary, secondaryIds);
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
@@ -211,17 +213,19 @@ public class LuceneIndex implements Serializable {
     IndexWriter writer,
     Class<?> type,
     String id,
+    Collection<String> secondaryIds,
     Collection<I18NString> names,
     Collection<String> codes,
     double latitude,
-    double longitude,
-    Collection<String> modes,
-    Collection<String> agencyIds
+    double longitude
   ) {
     String typeName = type.getSimpleName();
 
     Document document = new Document();
     document.add(new StoredField(ID, id));
+    for (var secondaryId : secondaryIds) {
+      document.add(new StoredField(SECONDARY_IDS, secondaryId));
+    }
     document.add(new TextField(TYPE, typeName, Store.YES));
     for (var name : names) {
       document.add(new TextField(NAME, Objects.toString(name), Store.YES));
@@ -234,13 +238,6 @@ public class LuceneIndex implements Serializable {
     for (var code : codes) {
       document.add(new TextField(CODE, code, Store.YES));
       document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
-    }
-
-    for (var mode : modes) {
-      document.add(new TextField(MODE, mode, Store.YES));
-    }
-    for (var aId : agencyIds) {
-      document.add(new TextField(AGENCY_IDS, aId, Store.YES));
     }
 
     try {

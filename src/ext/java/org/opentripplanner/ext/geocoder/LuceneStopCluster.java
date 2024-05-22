@@ -10,7 +10,6 @@ record LuceneStopCluster(
   String primaryId,
   Collection<String> secondaryIds,
   Collection<I18NString> names,
-  Collection<String> modes,
   Collection<String> codes,
   StopCluster.Coordinate coordinate
 ) {}

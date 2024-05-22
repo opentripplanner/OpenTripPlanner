@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -39,7 +40,7 @@ class StopClusterMapper {
     Collection<StopLocation> stopLocations,
     Collection<StopLocationsGroup> stopLocationsGroups
   ) {
-    var stops = stopLocations
+    List<StopLocation> stops = stopLocations
       .stream()
       // remove stop locations without a parent station
       .filter(sl -> sl.getParentStation() == null)
@@ -48,13 +49,17 @@ class StopClusterMapper {
       .toList();
 
     // if they are very close to each other and have the same name, only one is chosen (at random)
-    var deduplicatedStops = ListUtils
-      .distinctByKey(
-        stops,
-        sl -> new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
-      )
+    var deduplicatedStops = stops
       .stream()
-      .flatMap(s -> this.map(s).stream())
+      .collect(
+        Collectors.groupingBy(sl ->
+          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
+        )
+      )
+      .values()
+      .stream()
+      .map(group -> this.map(group).orElse(null))
+      .filter(Objects::nonNull)
       .toList();
     var stations = stopLocationsGroups.stream().map(this::map).toList();
 
@@ -62,8 +67,6 @@ class StopClusterMapper {
   }
 
   LuceneStopCluster map(StopLocationsGroup g) {
-    var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-
     var childStops = g.getChildStops();
     var ids = childStops.stream().map(s -> s.getId().toString()).toList();
     var childNames = childStops
@@ -78,32 +81,34 @@ class StopClusterMapper {
       ids,
       ListUtils.combine(List.of(g.getName()), childNames),
       codes,
-      modes,
       toCoordinate(g.getCoordinate())
     );
   }
 
-  Optional<LuceneStopCluster> map(StopLocation sl) {
+  Optional<LuceneStopCluster> map(List<StopLocation> stopLocations) {
+    var primary = stopLocations.getFirst();
+    var secondaryIds = stopLocations.stream().skip(1).map(sl -> sl.getId().toString()).toList();
+    var names = stopLocations.stream().map(StopLocation::getName).toList();
+    var codes = stopLocations.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
+
     return Optional
-      .ofNullable(sl.getName())
-      .map(name -> {
-        var modes = transitService.getModesOfStopLocation(sl).stream().map(Enum::name).toList();
-        return new LuceneStopCluster(
-          sl.getId().toString(),
-          List.of(),
-          List.of(name),
-          modes,
-          ListUtils.ofNullable(sl.getCode()),
-          toCoordinate(sl.getCoordinate())
-        );
-      });
+      .ofNullable(primary.getName())
+      .map(name ->
+        new LuceneStopCluster(
+          primary.getId().toString(),
+          secondaryIds,
+          names,
+          codes,
+          toCoordinate(primary.getCoordinate())
+        )
+      );
   }
 
-  List<Agency> agenciesForStopLocation(StopLocation stop) {
+  private List<Agency> agenciesForStopLocation(StopLocation stop) {
     return transitService.getRoutesForStop(stop).stream().map(Route::getAgency).distinct().toList();
   }
 
-  List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
+  private List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
     return group
       .getChildStops()
       .stream()
@@ -112,28 +117,10 @@ class StopClusterMapper {
       .toList();
   }
 
-  private static StopCluster.Coordinate toCoordinate(WgsCoordinate c) {
-    return new StopCluster.Coordinate(c.latitude(), c.longitude());
-  }
-
-  static StopCluster.Agency toAgency(Agency a) {
-    return new StopCluster.Agency(a.getId(), a.getName());
-  }
-
-  static StopCluster.FeedPublisher toFeedPublisher(FeedInfo fi) {
-    if (fi == null) {
-      return null;
-    } else {
-      return new StopCluster.FeedPublisher(fi.getPublisherName());
-    }
-  }
-
   StopCluster.Location toLocation(FeedScopedId id) {
     var loc = transitService.getStopLocation(id);
     if (loc != null) {
-      var feedPublisher = toFeedPublisher(
-        transitService.getFeedInfo(id.getFeedId())
-      );
+      var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService.getModesOfStopLocation(loc).stream().map(Enum::name).toList();
       var agencies = agenciesForStopLocation(loc)
         .stream()
@@ -150,10 +137,12 @@ class StopClusterMapper {
       );
     } else {
       var group = transitService.getStopLocationsGroup(id);
-      var feedPublisher = toFeedPublisher(
-        transitService.getFeedInfo(id.getFeedId())
-      );
-      var modes = transitService.getModesOfStopLocationsGroup(group).stream().map(Enum::name).toList();
+      var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
+      var modes = transitService
+        .getModesOfStopLocationsGroup(group)
+        .stream()
+        .map(Enum::name)
+        .toList();
       var agencies = agenciesForStopLocationsGroup(group)
         .stream()
         .map(StopClusterMapper::toAgency)
@@ -167,6 +156,22 @@ class StopClusterMapper {
         agencies,
         feedPublisher
       );
+    }
+  }
+
+  private static StopCluster.Coordinate toCoordinate(WgsCoordinate c) {
+    return new StopCluster.Coordinate(c.latitude(), c.longitude());
+  }
+
+  static StopCluster.Agency toAgency(Agency a) {
+    return new StopCluster.Agency(a.getId(), a.getName());
+  }
+
+  private static StopCluster.FeedPublisher toFeedPublisher(FeedInfo fi) {
+    if (fi == null) {
+      return null;
+    } else {
+      return new StopCluster.FeedPublisher(fi.getPublisherName());
     }
   }
 
