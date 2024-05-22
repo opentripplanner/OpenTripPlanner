@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri;
+package org.opentripplanner.updater.trip;
 
 import java.time.LocalDate;
 import java.util.concurrent.locks.ReentrantLock;
