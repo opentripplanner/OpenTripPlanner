@@ -15,10 +15,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  *  - if a stop has a parent station only the parent is returned
  *  - if stops are closer than 10 meters to each and have an identical name, only one is returned
  */
-record StopCluster(
-  Location primary,
-  Collection<Location> secondaries
-) {
+record StopCluster(Location primary, Collection<Location> secondaries) {
   /**
    * Easily serializable version of a coordinate
    */
@@ -42,8 +39,8 @@ record StopCluster(
     Collection<String> modes,
     List<Agency> agencies,
     @Nullable FeedPublisher feedPublisher
-  ){
-    public Location{
+  ) {
+    public Location {
       Objects.requireNonNull(id);
       Objects.requireNonNull(name);
       Objects.requireNonNull(coordinate);

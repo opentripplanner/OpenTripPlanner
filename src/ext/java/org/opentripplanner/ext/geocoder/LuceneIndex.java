@@ -65,10 +65,11 @@ public class LuceneIndex implements Serializable {
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
+  private final StopClusterMapper stopClusterMapper;
 
   public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
-    StopClusterMapper stopClusterMapper = new StopClusterMapper(transitService);
+    this.stopClusterMapper = new StopClusterMapper(transitService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -184,32 +185,52 @@ public class LuceneIndex implements Serializable {
   }
 
   private StopCluster toStopCluster(Document document) {
-    var clusterId = FeedScopedId.parse(document.get(ID));
-    var name = document.get(NAME);
-    var code = document.get(CODE);
-    var lat = document.getField(LAT).numericValue().doubleValue();
-    var lon = document.getField(LON).numericValue().doubleValue();
-    var modes = Arrays.asList(document.getValues(MODE));
-    var agencies = Arrays
-      .stream(document.getValues(AGENCY_IDS))
-      .map(id -> transitService.getAgencyForId(FeedScopedId.parse(id)))
-      .filter(Objects::nonNull)
-      .map(StopClusterMapper::toAgency)
-      .toList();
-    var feedPublisher = StopClusterMapper.toFeedPublisher(
-      transitService.getFeedInfo(clusterId.getFeedId())
-    );
-    var primary = new StopCluster.Location(
-      clusterId,
-      code,
-      name,
-      new Coordinate(lat, lon),
-      modes,
-      agencies,
-      feedPublisher
-    );
+    var primaryId = FeedScopedId.parse(document.get(ID));
+    var primary = toLocation(primaryId);
 
     return new StopCluster(primary, List.of());
+  }
+
+  private StopCluster.Location toLocation(FeedScopedId id) {
+    var loc = transitService.getStopLocation(id);
+    if (loc != null) {
+      var feedPublisher = StopClusterMapper.toFeedPublisher(
+        transitService.getFeedInfo(id.getFeedId())
+      );
+      var agencies = stopClusterMapper
+        .agenciesForStopLocation(loc)
+        .stream()
+        .map(StopClusterMapper::toAgency)
+        .toList();
+      return new StopCluster.Location(
+        loc.getId(),
+        loc.getCode(),
+        loc.getName().toString(),
+        new Coordinate(loc.getLat(), loc.getLon()),
+        List.of(),
+        agencies,
+        feedPublisher
+      );
+    } else {
+      var group = transitService.getStopLocationsGroup(id);
+      var feedPublisher = StopClusterMapper.toFeedPublisher(
+        transitService.getFeedInfo(id.getFeedId())
+      );
+      var agencies = stopClusterMapper
+        .agenciesForStopLocationsGroup(group)
+        .stream()
+        .map(StopClusterMapper::toAgency)
+        .toList();
+      return new StopCluster.Location(
+        group.getId(),
+        group.getCode(),
+        group.getName().toString(),
+        new Coordinate(group.getLat(), group.getLon()),
+        List.of(),
+        agencies,
+        feedPublisher
+      );
+    }
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
@@ -245,7 +266,7 @@ public class LuceneIndex implements Serializable {
     Document document = new Document();
     document.add(new StoredField(ID, id));
     document.add(new TextField(TYPE, typeName, Store.YES));
-    for(var name: names) {
+    for (var name : names) {
       document.add(new TextField(NAME, Objects.toString(name), Store.YES));
       document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
       document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));

@@ -63,10 +63,9 @@ public class ListUtils {
    * return a list with one element.
    */
   public static <T> List<T> ofNullable(T input) {
-    if(input == null){
+    if (input == null) {
       return List.of();
-    }
-    else {
+    } else {
       return List.of(input);
     }
   }

@@ -12,5 +12,5 @@ record LuceneStopCluster(
   Collection<I18NString> names,
   Collection<String> modes,
   Collection<String> codes,
-  StopCluster.Coordinate coordinate){
-}
+  StopCluster.Coordinate coordinate
+) {}

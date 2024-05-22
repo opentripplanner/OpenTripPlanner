@@ -65,7 +65,11 @@ class StopClusterMapper {
 
     var childStops = g.getChildStops();
     var ids = childStops.stream().map(s -> s.getId().toString()).toList();
-    var childNames = childStops.stream().map(StopLocation::getName).filter(Objects::nonNull).toList();
+    var childNames = childStops
+      .stream()
+      .map(StopLocation::getName)
+      .filter(Objects::nonNull)
+      .toList();
     var codes = childStops.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
 
     return new LuceneStopCluster(
@@ -94,11 +98,11 @@ class StopClusterMapper {
       });
   }
 
-  private List<Agency> agenciesForStopLocation(StopLocation stop) {
+  List<Agency> agenciesForStopLocation(StopLocation stop) {
     return transitService.getRoutesForStop(stop).stream().map(Route::getAgency).distinct().toList();
   }
 
-  private List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
+  List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
     return group
       .getChildStops()
       .stream()

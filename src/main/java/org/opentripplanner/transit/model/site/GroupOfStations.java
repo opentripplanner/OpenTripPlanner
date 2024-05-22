@@ -51,6 +51,12 @@ public class GroupOfStations
     return coordinate;
   }
 
+  @Nullable
+  @Override
+  public String getCode() {
+    return null;
+  }
+
   @Nonnull
   public Collection<StopLocation> getChildStops() {
     return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();

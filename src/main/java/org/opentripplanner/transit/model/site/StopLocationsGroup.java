@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -39,4 +40,7 @@ public interface StopLocationsGroup extends LogInfo {
   default String logName() {
     return ObjectUtils.ifNotNull(getName(), Object::toString, null);
   }
+
+  @Nullable
+  String getCode();
 }
