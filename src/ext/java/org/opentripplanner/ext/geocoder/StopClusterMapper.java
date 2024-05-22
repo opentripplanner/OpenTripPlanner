@@ -3,6 +3,7 @@ package org.opentripplanner.ext.geocoder;
 import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -61,33 +62,34 @@ class StopClusterMapper {
 
   LuceneStopCluster map(StopLocationsGroup g) {
     var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-    var agencies = agenciesForStopLocationsGroup(g)
-      .stream()
-      .map(s -> s.getId().toString())
-      .toList();
+
+    var childStops = g.getChildStops();
+    var ids = childStops.stream().map(s -> s.getId().toString()).toList();
+    var childNames = childStops.stream().map(StopLocation::getName).filter(Objects::nonNull).toList();
+    var codes = childStops.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
+
     return new LuceneStopCluster(
-      g.getId(),
-      null,
-      g.getName().toString(),
-      toCoordinate(g.getCoordinate()),
+      g.getId().toString(),
+      ids,
+      ListUtils.combine(List.of(g.getName()), childNames),
+      codes,
       modes,
-      agencies
+      toCoordinate(g.getCoordinate())
     );
   }
 
   Optional<LuceneStopCluster> map(StopLocation sl) {
-    var agencies = agenciesForStopLocation(sl).stream().map(a -> a.getId().toString()).toList();
     return Optional
       .ofNullable(sl.getName())
       .map(name -> {
         var modes = transitService.getModesOfStopLocation(sl).stream().map(Enum::name).toList();
         return new LuceneStopCluster(
-          sl.getId(),
-          sl.getCode(),
-          name.toString(),
-          toCoordinate(sl.getCoordinate()),
+          sl.getId().toString(),
+          List.of(),
+          List.of(name),
           modes,
-          agencies
+          ListUtils.ofNullable(sl.getCode()),
+          toCoordinate(sl.getCoordinate())
         );
       });
   }

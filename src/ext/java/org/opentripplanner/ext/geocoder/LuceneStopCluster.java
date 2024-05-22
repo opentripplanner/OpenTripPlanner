@@ -1,17 +1,16 @@
 package org.opentripplanner.ext.geocoder;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.framework.i18n.I18NString;
 
 /**
  * A package-private helper type for transporting data before serializing.
  */
 record LuceneStopCluster(
-  FeedScopedId id,
-  @Nullable String code,
-  String name,
-  StopCluster.Coordinate coordinate,
+  String primaryId,
+  Collection<String> secondaryIds,
+  Collection<I18NString> names,
   Collection<String> modes,
-  Collection<String> agencyIds
-) {}
+  Collection<String> codes,
+  StopCluster.Coordinate coordinate){
+}
