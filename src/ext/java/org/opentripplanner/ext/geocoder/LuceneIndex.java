@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -198,7 +199,7 @@ public class LuceneIndex implements Serializable {
     var feedPublisher = StopClusterMapper.toFeedPublisher(
       transitService.getFeedInfo(clusterId.getFeedId())
     );
-    return new StopCluster(
+    var primary = new StopCluster.Location(
       clusterId,
       code,
       name,
@@ -207,6 +208,8 @@ public class LuceneIndex implements Serializable {
       agencies,
       feedPublisher
     );
+
+    return new StopCluster(primary, List.of());
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
