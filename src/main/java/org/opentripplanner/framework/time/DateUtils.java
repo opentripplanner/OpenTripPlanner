@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,7 @@ public class DateUtils {
    * Returns a Date object based on input date and time parameters Defaults to today / now (when
    * date / time are null)
    */
+  @Nullable
   public static ZonedDateTime toZonedDateTime(String date, String time, ZoneId tz) {
     //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
     LOG.debug("Parsing date {} and time {}", date, time);
@@ -179,7 +181,18 @@ public class DateUtils {
     }
   }
 
-  private static LocalTime parseTime(String time) {
+  /**
+   * Parse a time string on different formats:
+   *
+   * <pre>
+   * Hour Minute Second      "10:02:03"
+   * Hour Minute             "10:02"
+   * Seconds past midningt   "3600"
+   * AM / PM                 "11:30 PM"
+   * </pre>
+   */
+  @Nullable
+  public static LocalTime parseTime(String time) {
     boolean amPm = false;
     int addHours = 0;
     int hour = 0, min = 0, sec = 0;
