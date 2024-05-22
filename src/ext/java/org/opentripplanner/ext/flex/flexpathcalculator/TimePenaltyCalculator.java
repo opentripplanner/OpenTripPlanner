@@ -5,8 +5,8 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
- * A calculator to delegates the main computation to another instance and applies a duration
- * modifier afterward.
+ * A calculator to delegates the main computation to another instance and applies a time penalty
+ * afterward.
  */
 public class TimePenaltyCalculator implements FlexPathCalculator {
 

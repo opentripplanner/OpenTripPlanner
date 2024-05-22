@@ -126,8 +126,8 @@ public class TripMapperTest {
     flexTrip.setRoute(new GtfsTestData().route);
     var mapper = defaultTripMapper();
     var mapped = mapper.map(flexTrip);
-    var mod = mapper.flexSafeTimePenalties().get(mapped);
-    assertEquals(1.5f, mod.coefficient());
-    assertEquals(600, mod.constant().toSeconds());
+    var penalty = mapper.flexSafeTimePenalties().get(mapped);
+    assertEquals(1.5f, penalty.coefficient());
+    assertEquals(600, penalty.constant().toSeconds());
   }
 }

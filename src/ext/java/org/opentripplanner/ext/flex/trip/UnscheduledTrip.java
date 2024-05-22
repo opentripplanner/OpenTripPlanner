@@ -166,7 +166,7 @@ public class UnscheduledTrip
 
   /**
    * Get the correct {@link FlexPathCalculator} depending on the {@code timePenalty}.
-   * If the modifier doesn't actually modify, we return the regular calculator.
+   * If the penalty would not change the result, we return the regular calculator.
    */
   protected FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
     if (timePenalty.modifies()) {
