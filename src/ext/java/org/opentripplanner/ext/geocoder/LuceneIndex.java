@@ -40,7 +40,6 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -186,51 +185,9 @@ public class LuceneIndex implements Serializable {
 
   private StopCluster toStopCluster(Document document) {
     var primaryId = FeedScopedId.parse(document.get(ID));
-    var primary = toLocation(primaryId);
+    var primary = stopClusterMapper.toLocation(primaryId);
 
     return new StopCluster(primary, List.of());
-  }
-
-  private StopCluster.Location toLocation(FeedScopedId id) {
-    var loc = transitService.getStopLocation(id);
-    if (loc != null) {
-      var feedPublisher = StopClusterMapper.toFeedPublisher(
-        transitService.getFeedInfo(id.getFeedId())
-      );
-      var agencies = stopClusterMapper
-        .agenciesForStopLocation(loc)
-        .stream()
-        .map(StopClusterMapper::toAgency)
-        .toList();
-      return new StopCluster.Location(
-        loc.getId(),
-        loc.getCode(),
-        loc.getName().toString(),
-        new Coordinate(loc.getLat(), loc.getLon()),
-        List.of(),
-        agencies,
-        feedPublisher
-      );
-    } else {
-      var group = transitService.getStopLocationsGroup(id);
-      var feedPublisher = StopClusterMapper.toFeedPublisher(
-        transitService.getFeedInfo(id.getFeedId())
-      );
-      var agencies = stopClusterMapper
-        .agenciesForStopLocationsGroup(group)
-        .stream()
-        .map(StopClusterMapper::toAgency)
-        .toList();
-      return new StopCluster.Location(
-        group.getId(),
-        group.getCode(),
-        group.getName().toString(),
-        new Coordinate(group.getLat(), group.getLon()),
-        List.of(),
-        agencies,
-        feedPublisher
-      );
-    }
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {

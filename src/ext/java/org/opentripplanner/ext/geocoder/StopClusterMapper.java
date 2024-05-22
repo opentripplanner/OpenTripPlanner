@@ -9,6 +9,7 @@ import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -124,6 +125,48 @@ class StopClusterMapper {
       return null;
     } else {
       return new StopCluster.FeedPublisher(fi.getPublisherName());
+    }
+  }
+
+  StopCluster.Location toLocation(FeedScopedId id) {
+    var loc = transitService.getStopLocation(id);
+    if (loc != null) {
+      var feedPublisher = toFeedPublisher(
+        transitService.getFeedInfo(id.getFeedId())
+      );
+      var modes = transitService.getModesOfStopLocation(loc).stream().map(Enum::name).toList();
+      var agencies = agenciesForStopLocation(loc)
+        .stream()
+        .map(StopClusterMapper::toAgency)
+        .toList();
+      return new StopCluster.Location(
+        loc.getId(),
+        loc.getCode(),
+        loc.getName().toString(),
+        new StopCluster.Coordinate(loc.getLat(), loc.getLon()),
+        modes,
+        agencies,
+        feedPublisher
+      );
+    } else {
+      var group = transitService.getStopLocationsGroup(id);
+      var feedPublisher = toFeedPublisher(
+        transitService.getFeedInfo(id.getFeedId())
+      );
+      var modes = transitService.getModesOfStopLocationsGroup(group).stream().map(Enum::name).toList();
+      var agencies = agenciesForStopLocationsGroup(group)
+        .stream()
+        .map(StopClusterMapper::toAgency)
+        .toList();
+      return new StopCluster.Location(
+        group.getId(),
+        group.getCode(),
+        group.getName().toString(),
+        new StopCluster.Coordinate(group.getLat(), group.getLon()),
+        modes,
+        agencies,
+        feedPublisher
+      );
     }
   }
 
