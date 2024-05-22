@@ -15,7 +15,6 @@ import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQ
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -59,8 +58,7 @@ public class TimetableSnapshotSourceTest {
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
-  private final boolean fullDataset = false;
-  private byte[] cancellation;
+  private final boolean FULL_DATASET = false;
   private String feedId;
 
   @BeforeEach
@@ -69,28 +67,30 @@ public class TimetableSnapshotSourceTest {
     transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
+  }
 
+  private static TripUpdate cancellation(String tripId) {
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
-    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setTripId(tripId);
     tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
 
     final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
-    cancellation = tripUpdateBuilder.build().toByteArray();
+    return tripUpdateBuilder.build();
   }
 
   @Test
-  public void testGetSnapshot() throws InvalidProtocolBufferException {
+  public void testGetSnapshot() {
     var updater = defaultUpdater();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
+      FULL_DATASET,
+      List.of(cancellation("1.1")),
       feedId
     );
 
@@ -101,16 +101,15 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
+      FULL_DATASET,
+      List.of(cancellation("1.1")),
       feedId
     );
     assertSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
-  public void testGetSnapshotWithMaxSnapshotFrequencyCleared()
-    throws InvalidProtocolBufferException {
+  public void testGetSnapshotWithMaxSnapshotFrequencyCleared() {
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequency(Duration.ofMillis(-1)),
       transitModel
@@ -121,8 +120,8 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
+      FULL_DATASET,
+      List.of(cancellation("1.1")),
       feedId
     );
 
@@ -132,7 +131,7 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
+  public void testHandleCanceledTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
     final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
@@ -149,8 +148,8 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
+      FULL_DATASET,
+      List.of(cancellation("1.1")),
       feedId
     );
 
@@ -167,7 +166,7 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleDeletedTrip() throws InvalidProtocolBufferException {
+  public void testHandleDeletedTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
     final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
@@ -186,13 +185,13 @@ public class TimetableSnapshotSourceTest {
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
-    var deletion = tripUpdateBuilder.build().toByteArray();
+    var deletion = tripUpdateBuilder.build();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(deletion)),
+      FULL_DATASET,
+      List.of(deletion),
       feedId
     );
 
@@ -234,7 +233,7 @@ public class TimetableSnapshotSourceTest {
         updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
-          fullDataset,
+          FULL_DATASET,
           List.of(tripUpdate),
           feedId
         );
@@ -357,7 +356,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
+      FULL_DATASET,
       List.of(tripUpdate),
       feedId
     );
@@ -476,7 +475,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -521,7 +520,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -604,7 +603,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -641,7 +640,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -772,7 +771,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -875,7 +874,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -944,7 +943,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -995,7 +994,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -1037,7 +1036,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -1048,7 +1047,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        fullDataset,
+        FULL_DATASET,
         List.of(tripUpdate),
         feedId
       );
@@ -1141,7 +1140,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
+      FULL_DATASET,
       List.of(tripUpdateYesterday),
       feedId
     );
@@ -1154,7 +1153,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      fullDataset,
+      FULL_DATASET,
       List.of(tripUpdateToday),
       feedId
     );
