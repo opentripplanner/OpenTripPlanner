@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.time.CountdownTimer;
@@ -58,7 +59,7 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     this.transitLayerUpdater = transitLayerUpdater;
     this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     this.purgeExpiredData = parameters.purgeExpiredData();
-    this.localDateNow = localDateNow;
+    this.localDateNow = Objects.requireNonNull(localDateNow);
     // Force commit so that snapshot initializes
     commitTimetableSnapshot(true);
   }
