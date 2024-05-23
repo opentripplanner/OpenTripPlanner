@@ -45,7 +45,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       sharedKeyValues,
       List.of(
         new KeyValue("closedByServiceAlert", noServiceAlert),
-        new KeyValue("noServiceOnServiceDay", !stopTimesExist)
+        new KeyValue("servicesRunningOnServiceDay", stopTimesExist)
       )
     );
   }
