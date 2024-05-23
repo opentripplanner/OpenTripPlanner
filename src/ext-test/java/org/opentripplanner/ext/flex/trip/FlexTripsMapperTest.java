@@ -1,10 +1,14 @@
-package org.opentripplanner.ext.flex;
+package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.flex.FlexStopTimesForTest;
+import org.opentripplanner.ext.flex.FlexTripsMapper;
+import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -18,7 +22,10 @@ class FlexTripsMapperTest {
     var stopTimes = List.of(stopTime(0), stopTime(1));
     builder.getStopTimesSortedByTrip().addAll(stopTimes);
     var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);
-    assertEquals("[UnscheduledTrip{F:flex-1 timePenalty=(0s + 1.00 t)}]", trips.toString());
+    assertEquals("[UnscheduledTrip{F:flex-1}]", trips.toString());
+    var unscheduled = (UnscheduledTrip) trips.getFirst();
+    var unchanged = unscheduled.flexPathCalculator(new DirectFlexPathCalculator());
+    assertInstanceOf(DirectFlexPathCalculator.class, unchanged);
   }
 
   private static StopTime stopTime(int seq) {
