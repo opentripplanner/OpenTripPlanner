@@ -35,9 +35,18 @@ import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 /**
- * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds. NOTE
- * this cannot handle situations where there are multiple feeds with different IDs (for now it may
- * only work in single-feed regions).
+ * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange (SX) feeds.
+ * As the incoming SIRI SX messages are mapped to internal TransitAlerts, their FeedScopedIds will
+ * be the single feed ID associated with this update handler, plus the situation number provided in
+ * the SIRI SX message.
+ * This class cannot handle situations where incoming messages are being applied to multiple static
+ * feeds with different IDs. For now it may only work in single-feed regions. A possible workaround
+ * is to assign the same feed ID to multiple static feeds where it is known that their entity IDs
+ * are all drawn from the same namespace (i.e. they are functionally fragments of the same feed).
+ * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or configurable.
+ *   TG has indicated this is a necessary condition for moving this updater out of sandbox.
+ * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it
+ *   is referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
  */
 public class SiriAlertsUpdateHandler {
 
@@ -45,10 +54,17 @@ public class SiriAlertsUpdateHandler {
   private final String feedId;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private final TransitAlertService transitAlertService;
-  /** How long before the posted start of an event it should be displayed to users */
   private final Duration earlyStart;
+
+  /**
+   * This takes the parts of the SIRI SX message saying which transit entities are affected and
+   * maps them to the corresponding OTP internal model entity or entities.
+   */
   private final AffectsMapper affectsMapper;
 
+  /**
+   * @param earlyStart display the alerts to users this long before their activePeriod begins
+   */
   public SiriAlertsUpdateHandler(
     String feedId,
     TransitModel transitModel,
@@ -90,7 +106,7 @@ public class SiriAlertsUpdateHandler {
           } else {
             TransitAlert alert = null;
             try {
-              alert = handleAlert(sxElement);
+              alert = mapSituationToAlert(sxElement);
               addedCounter++;
             } catch (Exception e) {
               LOG.info(
@@ -120,7 +136,12 @@ public class SiriAlertsUpdateHandler {
     }
   }
 
-  private TransitAlert handleAlert(PtSituationElement situation) {
+  /**
+   * Build an internal model Alert from an incoming SIRI situation exchange element.
+   * May return null if the header, description, and detail text are all empty or missing in the
+   * SIRI message. In all other cases it will return a valid TransitAlert instance.
+   */
+  private TransitAlert mapSituationToAlert(PtSituationElement situation) {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 
     if (
@@ -199,7 +220,10 @@ public class SiriAlertsUpdateHandler {
   }
 
   /*
-   * Creates alert from PtSituation with all textual content
+   * Creates a builder for an internal model TransitAlert. The builder is pre-filled with all
+   * textual content from the supplied SIRI PtSituation. The builder also has the feed scoped ID
+   * pre-set to the single feed ID associated with this update handler, plus the situation number
+   * provided in the SIRI PtSituation.
    */
   private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
     return TransitAlert

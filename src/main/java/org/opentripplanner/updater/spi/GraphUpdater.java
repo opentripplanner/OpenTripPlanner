@@ -1,39 +1,45 @@
 package org.opentripplanner.updater.spi;
 
 /**
- * Interface for graph updaters. Objects that implement this interface should always be configured
- * via PreferencesConfigurable.configure after creating the object. GraphUpdaterConfigurator should
- * take care of that. Beware that updaters run in separate threads at the same time.
+ * Interface for classes that fetch or receive information while the OTP instance is running and
+ * make changes to the Graph and associated transit data to reflect the current situation. This is
+ * typically information about disruptions to service, bicycle or parking availability, etc.
  * <p>
- * The only allowed way to make changes to the graph in an updater is by executing (anonymous)
- * GraphWriterRunnable objects via GraphUpdaterManager.execute.
+ * Each GraphUpdater implementation will be run in a separate thread, allowing it to make blocking
+ * calls to fetch data or even sleep between periodic polling operations without affecting the rest
+ * of the OTP instance.
  * <p>
- * Example implementations can be found in ExampleGraphUpdater and ExamplePollingGraphUpdater.
+ * GraphUpdater implementations are instantiated by UpdaterConfigurator. Each updater configuration
+ * item in the router-config for a ThingUpdater is mapped to a corresponding configuration class
+ * ThingUpdaterParameters, which is passed to the ThingUpdater constructor.
+ * <p>
+ * GraphUpdater implementations are only allowed to make changes to the Graph and related structures
+ * by submitting instances implementing GraphWriterRunnable (often anonymous functions) to the
+ * Graph writing callback function supplied to them by the GraphUpdaterManager after they're
+ * constructed. In this way, changes are queued up by many GraphUpdaters running in parallel on
+ * different threads, but are applied sequentially in a single-threaded manner to simplify reasoning
+ * about concurrent reads and writes to the Graph.
  */
 public interface GraphUpdater {
   /**
-   * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.
-   * GraphUpdaterConfigurator should take care of calling this function.
+   * After a GraphUpdater is instantiated, the GraphUpdaterManager that instantiated it will
+   * immediately supply a callback via this method. The GraphUpdater will employ that callback
+   * every time it wants to queue up a write modification to the Graph or related data structures.
    */
-  void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph);
+  void setup(WriteToGraphCallback writeToGraphCallback);
 
   /**
-   * Here the updater can be initialized. If it throws, the updater won't be started (i.e. the run
-   * method won't be called). All updaters' setup methods will be run sequentially in a
-   * single-threaded manner before updates begin, in order to avoid concurrent reads/writes.
-   */
-  //void setup(Graph graph, TransitModel transitModel) throws Exception;
-
-  /**
-   * This method will run in its own thread. It pulls or receives updates and applies them to the
-   * graph. It must perform any writes to the graph by passing GraphWriterRunnables to
-   * GraphUpdaterManager.execute(). This queues up the write operations, ensuring that only one
-   * updater performs writes at a time.
+   * The GraphUpdaterManager will run this method in its own long-running thread. This method then
+   * pulls or receives updates and applies them to the graph. It must perform any writes to the
+   * graph by passing GraphWriterRunnables to the WriteToGraphCallback, which queues up the write
+   * operations, ensuring that only one submitted update performs writes at a time.
    */
   void run() throws Exception;
 
   /**
-   * Here the updater can clean up after itself.
+   * When the GraphUpdaterManager wants to stop all GraphUpdaters (for example when OTP is shutting
+   * down) it will call this method, allowing the GraphUpdater implementation to shut down cleanly
+   * and release resources.
    */
   default void teardown() {}
 
@@ -49,8 +55,10 @@ public interface GraphUpdater {
   }
 
   /**
-   * This is the updater "type" used in the configuration file. It should ONLY be used to provide
-   * human friendly messages while logging and debugging.
+   * A GraphUpdater implementation uses this method to report its corresponding value of the "type"
+   * field in the configuration file. This value should ONLY be used when providing human-friendly
+   * messages while logging and debugging. Association of configuration to particular types is
+   * performed by the UpdatersConfig.Type constructor calling factory methods.
    */
   String getConfigRef();
 }

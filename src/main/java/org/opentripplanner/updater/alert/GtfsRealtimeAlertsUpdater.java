@@ -56,8 +56,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   }
 
   @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   public TransitAlertService getTransitAlertService() {

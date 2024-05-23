@@ -37,18 +37,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for
- * each vertex, but those are in the vertex now.
+ * This is one of the main data structures in OpenTripPlanner. It represents a mathematical object
+ * called a graph (https://en.wikipedia.org/wiki/Graph_theory) relative to which many routing
+ * algorithms are defined. A graph is made up of vertices and edges. These are also referred to as
+ * nodes and arcs or links, but in OTP we always use the vertices and edges terminology.
+ * <p>
+ * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
+ * including edges representing both street segments and public transit lines connecting stops. In
+ * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
+ * other data structures suited to the Raptor algorithm (the TransitModel). Some transit-related
+ * vertices are still present in the Graph, specifically those representing transit stops,
+ * entrances, and elevators. Their presence in the street graph creates a connection between the two
+ * routable data structures (identifying where stops in the TransitModel are located relative to
+ * roads).
+ * <p>
+ * Other data structures related to street routing, such as elevation data and vehicle parking
+ * information, are also collected here as fields of the Graph. For historical reasons the Graph
+ * sometimes serves as a catch-all, as it used to be the root of the object tree representing the
+ * whole transportation network. This use of the Graph object is being phased out and discouraged.
+ * <p>
+ * In some sense the Graph is just some indexes into a set of vertices. The Graph used to hold lists
+ * of edges for each vertex, but those lists are now attached to the vertices themselves.
+ * <p>
+ * TODO RT_AB: I favor renaming to StreetGraph to emphasize what it represents. TG agreed in review.
  */
 public class Graph implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
+  /** Attaches text notes to street edges, which do not affect routing. */
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
-  /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
+  // Ideally we could just get rid of vertex labels, but they're used in tests and graph building.
   private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
 
+  /** Conserve memory by reusing immutable instances of Strings, integer arrays, etc. */
   public final transient Deduplicator deduplicator;
 
   public final Instant buildTime = Instant.now();
@@ -58,10 +81,10 @@ public class Graph implements Serializable {
 
   private transient StreetIndex streetIndex;
 
-  //ConvexHull of all the graph vertices. Generated at Graph build time.
+  /** The convex hull of all the graph vertices. Generated at the time the Graph is built. */
   private Geometry convexHull = null;
 
-  /* The preferences that were used for graph building. */
+  /** The preferences that were used for building this Graph instance. */
   public Preferences preferences = null;
 
   /** True if OSM data was loaded into this Graph. */
@@ -71,26 +94,27 @@ public class Graph implements Serializable {
    * Have bike parks already been linked to the graph. As the linking happens twice if a base graph
    * is used, we store information on whether bike park linking should be skipped.
    */
+
   public boolean hasLinkedBikeParks = false;
   /**
    * The difference in meters between the WGS84 ellipsoid height and geoid height at the graph's
    * center
    */
   public Double ellipsoidToGeoidDifference = 0.0;
-  /**
-   * Does this graph contain elevation data?
-   */
+
+  /** True if this graph contains elevation data. */
   public boolean hasElevation = false;
-  /**
-   * If this graph contains elevation data, the minimum value.
-   */
+
+  /** If this graph contains elevation data, the minimum elevation value. Otherwise null. */
   public Double minElevation = null;
-  /**
-   * If this graph contains elevation data, the maximum value.
-   */
+
+  /** If this graph contains elevation data, the maximum elevation value. Otherwise null. */
   public Double maxElevation = null;
 
-  /** The distance between elevation samples used in CompactElevationProfile. */
+  /**
+   * The horizontal distance across the ground between successive elevation samples in
+   * CompactElevationProfile.
+   */
   // TODO refactoring transit model: remove  and instead always serialize directly from and to the
   //  static variable in CompactElevationProfile in SerializedGraphObject
   private double distanceBetweenElevationSamples;
@@ -132,9 +156,7 @@ public class Graph implements Serializable {
     this(new Deduplicator(), null);
   }
 
-  /**
-   * Add the given vertex to the graph.
-   */
+  /** Add the given vertex to the graph. */
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);
     if (old != null) {

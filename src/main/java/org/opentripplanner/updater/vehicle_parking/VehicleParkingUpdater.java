@@ -64,8 +64,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   @Override
