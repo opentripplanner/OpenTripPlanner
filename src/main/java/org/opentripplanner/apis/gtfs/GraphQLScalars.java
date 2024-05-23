@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.graphql.scalar.DateScalarFactory;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.framework.model.Grams;
@@ -110,6 +111,10 @@ public class GraphQLScalars {
       }
     )
     .build();
+
+  public static final GraphQLScalarType LOCAL_DATE_SCALAR = DateScalarFactory.createDateScalar(
+    "LocalDate"
+  );
 
   public static final GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()

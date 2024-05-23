@@ -2751,6 +2751,26 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLRoutePatternsArgs {
+
+    private GraphQLServiceDayFilterInput serviceDays;
+
+    public GraphQLRoutePatternsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDays =
+          new GraphQLServiceDayFilterInput((Map<String, Object>) args.get("serviceDays"));
+      }
+    }
+
+    public GraphQLServiceDayFilterInput getGraphQLServiceDays() {
+      return this.serviceDays;
+    }
+
+    public void setGraphQLServiceDays(GraphQLServiceDayFilterInput serviceDays) {
+      this.serviceDays = serviceDays;
+    }
+  }
+
   /** Entities that are relevant for routes that can contain alerts */
   public enum GraphQLRouteAlertType {
     AGENCY,
@@ -2770,6 +2790,35 @@ public class GraphQLTypes {
     OUTSIDE_BOUNDS,
     OUTSIDE_SERVICE_PERIOD,
     WALKING_BETTER_THAN_TRANSIT,
+  }
+
+  public static class GraphQLServiceDayFilterInput {
+
+    private java.time.LocalDate end;
+    private java.time.LocalDate start;
+
+    public GraphQLServiceDayFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        this.end = (java.time.LocalDate) args.get("end");
+        this.start = (java.time.LocalDate) args.get("start");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLEnd() {
+      return this.end;
+    }
+
+    public java.time.LocalDate getGraphQLStart() {
+      return this.start;
+    }
+
+    public void setGraphQLEnd(java.time.LocalDate end) {
+      this.end = end;
+    }
+
+    public void setGraphQLStart(java.time.LocalDate start) {
+      this.start = start;
+    }
   }
 
   public static class GraphQLStopAlertsArgs {

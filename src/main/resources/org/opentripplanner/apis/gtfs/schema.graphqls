@@ -2542,6 +2542,13 @@ enum Qualifier {
     HAIL
 }
 
+scalar LocalDate
+
+input ServiceDayFilterInput {
+    start: LocalDate
+    end: LocalDate
+}
+
 type QueryType {
     """Fetches an object given its ID"""
     node(
@@ -3421,7 +3428,10 @@ type Route implements Node {
     bikesAllowed: BikesAllowed
 
     """List of patterns which operate on this route"""
-    patterns: [Pattern]
+    patterns(
+        "Filter patterns by the service day they operate on."
+        serviceDays: ServiceDayFilterInput
+    ): [Pattern]
 
     """List of stops on this route"""
     stops: [Stop]

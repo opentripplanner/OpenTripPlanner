@@ -28,6 +28,7 @@ config:
     Grams: org.opentripplanner.framework.model.Grams
     OffsetDateTime: java.time.OffsetDateTime
     Duration: java.time.Duration
+    LocalDate: java.time.LocalDate
   mappers:
     AbsoluteDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection#GraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency

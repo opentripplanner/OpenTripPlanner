@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.scalars;
+package org.opentripplanner.framework.graphql.scalar;
 
 import graphql.language.StringValue;
 import graphql.schema.Coercing;
@@ -8,6 +8,7 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 
 public class DateScalarFactory {
@@ -15,14 +16,21 @@ public class DateScalarFactory {
   private static final String DOCUMENTATION =
     "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+  private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+    .optionalStart()
+    .append(DateTimeFormatter.ofPattern("yyyyMMdd"))
+    .optionalEnd()
+    .optionalStart()
+    .append(DateTimeFormatter.ISO_LOCAL_DATE)
+    .optionalStart()
+    .toFormatter();
 
   private DateScalarFactory() {}
 
-  public static GraphQLScalarType createDateScalar() {
+  public static GraphQLScalarType createDateScalar(String scalarName) {
     return GraphQLScalarType
       .newScalar()
-      .name("Date")
+      .name(scalarName)
       .description(DOCUMENTATION)
       .coercing(
         new Coercing<LocalDate, String>() {
@@ -33,7 +41,7 @@ public class DateScalarFactory {
             }
 
             throw new CoercingSerializeException(
-              "Only LocalDate is supported to serialize but found " + input
+              "Only %s is supported to serialize but found %s".formatted(scalarName, input)
             );
           }
 
@@ -43,7 +51,7 @@ public class DateScalarFactory {
               return LocalDate.from(FORMATTER.parse((String) input));
             } catch (DateTimeParseException e) {
               throw new CoercingParseValueException(
-                "Expected type 'Date' but was '" + input + "'."
+                "Expected type '%s' but was '%s'.".formatted(scalarName, input)
               );
             }
           }

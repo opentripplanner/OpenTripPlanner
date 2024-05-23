@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -174,9 +175,31 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment ->
-      getTransitService(environment).getPatternsForRoute(getSource(environment));
+    return environment -> {
+      final TransitService transitService = getTransitService(environment);
+      var patterns = transitService.getPatternsForRoute(getSource(environment));
+
+      var args = new GraphQLTypes.GraphQLRoutePatternsArgs(environment.getArguments());
+
+      var serviceDays = args.getGraphQLServiceDays();
+      if (
+        serviceDays != null &&
+        (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
+      ) {
+        var start = args.getGraphQLServiceDays().getGraphQLStart();
+        return patterns
+          .stream()
+          .filter(pattern ->
+            hasServicesOnDate(patterns, transitService, start)
+          )
+          .toList();
+      } else {
+        return patterns;
+      }
+    };
   }
+
+
 
   @Override
   public DataFetcher<String> shortName() {
@@ -240,5 +263,23 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   private Route getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  private static boolean hasServicesOnDate(Collection<TripPattern> patterns, TransitService transitService, LocalDate start) {
+    return patterns
+      .stream()
+      .anyMatch(p ->
+        p
+          .scheduledTripsAsStream()
+          .anyMatch(trip -> {
+            var dates = transitService
+              .getCalendarService()
+              .getServiceDatesForServiceId(trip.getServiceId());
+
+            return dates
+              .stream()
+              .anyMatch(date -> date.isEqual(start) || date.isAfter(start));
+          })
+      );
   }
 }
