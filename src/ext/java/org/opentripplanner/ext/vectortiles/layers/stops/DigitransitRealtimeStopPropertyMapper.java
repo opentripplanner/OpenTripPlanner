@@ -34,7 +34,7 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       .stream()
       .anyMatch(alert -> alert.noServiceAt(currentTime));
 
-    var serviceDate = LocalDate.ofInstant(currentTime, transitService.getTimeZone());
+    var serviceDate = LocalDate.now(transitService.getTimeZone());
     boolean stopTimesExist = transitService
       .getStopTimesForStop(stop, serviceDate, ArrivalDeparture.BOTH, true)
       .stream()
