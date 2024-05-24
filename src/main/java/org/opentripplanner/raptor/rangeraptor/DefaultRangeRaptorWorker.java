@@ -55,11 +55,11 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   private final RoutingStrategy<T> transitWorker;
 
   /**
-   * The RangeRaptor state - we delegate keeping track of state to the state object, this allows the
-   * worker implementation to focus on the algorithm, while the state keep track of the result.
+   * The RangeRaptor state - we delegate keeping track of state to the state object, this allows
+   * the worker implementation to focus on the algorithm, while the state keep track of the result.
    * <p/>
-   * This also allow us to try out different strategies for storing the result in memory. For a long
-   * time we had a state which stored all data as int arrays in addition to the current
+   * This also allows us to try out different strategies for storing the result in memory. For a
+   * long time, we had a state which stored all data as int arrays in addition to the current
    * object-oriented approach. There were no performance differences(=> GC is not the bottleneck),
    * so we dropped the integer array implementation.
    */
@@ -135,11 +135,18 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
       while (it.hasNext()) {
-        OTPRequestTimeoutException.checkForTimeout();
-        // Run the raptor search for this particular iteration departure time
-        iterationDepartureTime = it.next();
-        lifeCycle.setupIteration(iterationDepartureTime);
+        setupIteration(it.next());
         runRaptorForMinute();
+      }
+
+      // Iterate over virtual departure times - this is needed to allow access with a time-penalty
+      // which falls outside the search-window due to the added time-penalty.
+      if (!calculator.oneIterationOnly()) {
+        final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
+        while (as.hasNext()) {
+          setupIteration(as.next());
+          runRaptorForMinute();
+        }
       }
     });
     return state.results();
@@ -260,12 +267,25 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     });
   }
 
+  private int round() {
+    return roundTracker.round();
+  }
+
   private void findAccessOnStreetForRound() {
-    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides().get(round()));
+    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
   }
 
   private void findAccessOnBoardForRound() {
-    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides().get(round()));
+    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
+  }
+
+  /**
+   * Run the raptor search for this particular iteration departure time
+   */
+  private void setupIteration(int iterationDepartureTime) {
+    OTPRequestTimeoutException.checkForTimeout();
+    this.iterationDepartureTime = iterationDepartureTime;
+    lifeCycle.setupIteration(this.iterationDepartureTime);
   }
 
   /**
@@ -273,10 +293,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * scheduled search at the next-earlier minute.
    */
   private void addAccessPaths(Collection<RaptorAccessEgress> accessPaths) {
-    if (accessPaths == null) {
-      return;
-    }
-
     for (RaptorAccessEgress it : accessPaths) {
       int departureTime = calculator.departureTime(it, iterationDepartureTime);
 
@@ -285,9 +301,5 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         transitWorker.setAccessToStop(it, departureTime);
       }
     }
-  }
-
-  private int round() {
-    return roundTracker.round();
   }
 }

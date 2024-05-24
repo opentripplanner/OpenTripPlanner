@@ -46,4 +46,9 @@ public final class StyleSpec {
   public List<JsonNode> layers() {
     return layers;
   }
+
+  @JsonSerialize
+  public String glyphs() {
+    return "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf";
+  }
 }

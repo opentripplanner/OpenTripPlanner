@@ -11,9 +11,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -62,9 +62,8 @@ class VehicleParkingPreferredTagsTest {
     double expectedCost,
     boolean arriveBy
   ) {
-    var parking = VehicleParking
-      .builder()
-      .coordinate(COORDINATE)
+    var parking = StreetModelForTest
+      .vehicleParking()
       .tags(parkingTags)
       .availability(VehicleParkingSpaces.builder().bicycleSpaces(100).build())
       .bicyclePlaces(true)

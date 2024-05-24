@@ -8,20 +8,19 @@ import org.geojson.LngLatAlt;
 import org.geojson.Polygon;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Location;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.StopModel;
 
 class LocationMapperTest {
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(null, true),
-    Arguments.of("a name", false)
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(Arguments.of(null, true), Arguments.of("a name", false));
+  }
 
   @ParameterizedTest(name = "a name of <{0}> should set bogusName={1}")
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void testMapping(String name, boolean isBogusName) {
     var gtfsLocation = new Location();
     gtfsLocation.setId(new AgencyAndId("1", "zone-3"));

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import static org.opentripplanner.raptor.api.request.Optimization.PARALLEL;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -21,7 +20,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.routing.api.request.DebugEventType;
@@ -34,7 +32,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final RouteRequest request;
   private final Collection<? extends RaptorAccessEgress> accessPaths;
   private final Collection<? extends RaptorAccessEgress> egressPaths;
-  private final Duration searchWindowAccessSlack;
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
@@ -44,7 +41,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     boolean isMultiThreaded,
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
-    Duration searchWindowAccessSlack,
     long transitSearchTimeZeroEpocSecond,
     MeterRegistry meterRegistry
   ) {
@@ -52,7 +48,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.isMultiThreadedEnbled = isMultiThreaded;
     this.accessPaths = accessPaths;
     this.egressPaths = egressPaths;
-    this.searchWindowAccessSlack = searchWindowAccessSlack;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
   }
@@ -63,7 +58,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     boolean isMultiThreaded,
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
-    Duration searchWindowAccessSlack,
     MeterRegistry meterRegistry
   ) {
     return new RaptorRequestMapper<T>(
@@ -71,7 +65,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       isMultiThreaded,
       accessPaths,
       egressPaths,
-      searchWindowAccessSlack,
       transitSearchTimeZero.toEpochSecond(),
       meterRegistry
     )
@@ -170,10 +163,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
     if (!request.timetableView() && request.arriveBy()) {
       builder.searchParams().preferLateArrival(true);
-    }
-
-    if (searchWindowAccessSlack.toSeconds() > 0) {
-      builder.searchParams().searchWindowAccessSlack(searchWindowAccessSlack);
     }
 
     // Add this last, it depends on generating an alias from the set values

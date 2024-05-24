@@ -113,8 +113,6 @@ public class OsmModule implements GraphBuilderModule {
     return elevationData;
   }
 
-  private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
-
   private void build() {
     var parkingProcessor = new ParkingProcessor(
       graph,
@@ -390,8 +388,10 @@ public class OsmModule implements GraphBuilderModule {
             geometry
           );
 
-          StreetEdge street = streets.main;
-          StreetEdge backStreet = streets.back;
+          params.edgeNamer().recordEdges(way, streets);
+
+          StreetEdge street = streets.main();
+          StreetEdge backStreet = streets.back();
           normalizer.applyWayProperties(street, backStreet, wayData, way);
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -541,16 +541,10 @@ public class OsmModule implements GraphBuilderModule {
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isSteps())
-      .withWheelchairAccessible(way.isWheelchairAccessible());
+      .withWheelchairAccessible(way.isWheelchairAccessible())
+      .withBogusName(way.hasNoName());
 
-    if (!way.hasTag("name") && !way.hasTag("ref")) {
-      seb.withBogusName(true);
-    }
-
-    StreetEdge street = seb.buildAndConnect();
-    params.edgeNamer().recordEdge(way, street);
-
-    return street;
+    return seb.buildAndConnect();
   }
 
   private float getMaxCarSpeed() {

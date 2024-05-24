@@ -41,7 +41,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
         var agency = leg.getAgency();
         // to show the name on the stop signage we use the primary stop's name
-        var from = service.primaryStop(stl.getFrom().stop.getId());
+        var from = service.primaryStop(stl.getFrom().stop.getId()).orElse(stl.getFrom().stop);
         // to show the name that's on the display inside the vehicle we use the agency-specific name
         var to = service.agencySpecificStop(stl.getTo().stop, agency);
         return new ConsolidatedStopLeg(stl, from, to);

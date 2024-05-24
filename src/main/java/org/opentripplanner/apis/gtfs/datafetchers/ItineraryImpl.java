@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.OffsetDateTime;
 import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
@@ -33,6 +34,12 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  public DataFetcher<OffsetDateTime> end() {
+    return environment -> getSource(environment).endTime().toOffsetDateTime();
+  }
+
+  @Deprecated
+  @Override
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).endTime().toInstant().toEpochMilli();
   }
@@ -57,6 +64,12 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
     return environment -> getSource(environment).getNumberOfTransfers();
   }
 
+  @Override
+  public DataFetcher<OffsetDateTime> start() {
+    return environment -> getSource(environment).startTime().toOffsetDateTime();
+  }
+
+  @Deprecated
   @Override
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).startTime().toInstant().toEpochMilli();

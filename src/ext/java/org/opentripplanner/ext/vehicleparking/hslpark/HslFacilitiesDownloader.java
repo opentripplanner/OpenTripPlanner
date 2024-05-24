@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class HslFacilitiesDownloader {
 
-  private static final Logger log = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private final String jsonParsePath;
@@ -31,19 +32,20 @@ public class HslFacilitiesDownloader {
   public HslFacilitiesDownloader(
     String url,
     String jsonParsePath,
-    BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser
+    BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser,
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.facilitiesParser = facilitiesParser;
-    this.otpHttpClient = new OtpHttpClient();
+    this.otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   public List<VehicleParking> downloadFacilities(
     Map<FeedScopedId, VehicleParkingGroup> hubForPark
   ) {
     if (url == null) {
-      log.warn("Cannot download updates, because url is null!");
+      LOG.warn("Cannot download updates, because url is null!");
       return null;
     }
 
@@ -55,17 +57,17 @@ public class HslFacilitiesDownloader {
           try {
             return parseJSON(is, hubForPark);
           } catch (IllegalArgumentException e) {
-            log.warn("Error parsing facilities from {}", url, e);
+            LOG.warn("Error parsing facilities from {}", url, e);
           } catch (JsonProcessingException e) {
-            log.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
+            LOG.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
           } catch (IOException e) {
-            log.warn("Error reading facilities from {}", url, e);
+            LOG.warn("Error reading facilities from {}", url, e);
           }
           return null;
         }
       );
     } catch (OtpHttpClientException e) {
-      log.warn("Failed to get data from url {}", url);
+      LOG.warn("Failed to get data from url {}", url);
       return null;
     }
   }

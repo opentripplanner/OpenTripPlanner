@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { graphql } from '../gql';
-import request from 'graphql-request';
+import { request } from 'graphql-request'; // eslint-disable-line import/no-unresolved
 import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
 
 const endpoint = import.meta.env.VITE_API_URL;

@@ -88,20 +88,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
-   * might modify this buffer will correctly acquire the lock.
+   * might modify this buffer will correctly acquire the lock. By design, only one thread should
+   * ever be writing to this buffer.
+   * TODO RT_AB: research and document why this lock is needed since only one thread should ever be
+   *   writing to this buffer. One possible reason may be a need to suspend writes while indexing
+   *   and swapping out the buffer. But the original idea was to make a new copy of the buffer
+   *   before re-indexing it. While refactoring or rewriting parts of this system, we could throw
+   *   an exception if a writing section is entered by more than one thread.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
 
-  /**
-   * Lock to indicate that buffer is in use
-   */
+  /** Lock to indicate that buffer is in use. */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
 
-  /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
-   * messages.
-   */
-
+  /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
@@ -121,7 +121,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired real-time data be purged from the graph. */
+  /**
+   * Should expired real-time data be purged from the graph.
+   * TODO RT_AB: Clarify exactly what "purge" means and in what circumstances would one turn it off.
+   */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
@@ -489,8 +492,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // If there are skipped stops, we need to change the pattern from the scheduled one
     if (skippedStopIndices.size() > 0) {
       StopPattern newStopPattern = pattern
-        .getStopPattern()
-        .mutate()
+        .copyPlannedStopPattern()
         .cancelStops(skippedStopIndices)
         .build();
 

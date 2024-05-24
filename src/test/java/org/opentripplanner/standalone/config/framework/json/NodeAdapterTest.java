@@ -34,7 +34,7 @@ public class NodeAdapterTest {
   public static final String NON_UNUSED_PARAMETERS = "EXPECTED_NONE";
 
   @Test
-  public void testAsRawNode() {
+  void testAsRawNode() {
     NodeAdapter subject = newNodeAdapterForTest("{ child : { foo : 'bar' } }");
 
     // Define child
@@ -53,7 +53,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void isEmpty() {
+  void isEmpty() {
     NodeAdapter subject = newNodeAdapterForTest("");
     assertTrue(subject.of("alf").asObject().isEmpty());
 
@@ -64,7 +64,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void path() {
+  void path() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
     assertFalse(subject.of("foo").asObject().isEmpty());
     assertTrue(subject.of("missingObject").asObject().isEmpty());
@@ -72,7 +72,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void docInfo() {
+  void docInfo() {
     NodeAdapter subject = newNodeAdapterForTest("{ bool: false }");
     subject.of("bool").since(V2_0).summary("B Summary").description("Ddd").asBoolean();
     subject.of("en").since(V2_1).summary("EN Summary").asEnum(SECONDS);
@@ -95,7 +95,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asBoolean() {
+  void asBoolean() {
     NodeAdapter subject = newNodeAdapterForTest("{ aBoolean : true }");
     assertTrue(subject.of("aBoolean").asBoolean());
     assertTrue(subject.of("aBoolean").asBoolean(false));
@@ -103,7 +103,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asDouble() {
+  void asDouble() {
     NodeAdapter subject = newNodeAdapterForTest("{ aDouble : 7.0 }");
     assertEquals(7.0, subject.of("aDouble").asDouble(-1d), 0.01);
     assertEquals(7.0, subject.of("aDouble").asDouble(), 0.01);
@@ -111,28 +111,28 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asDoubles() {
+  void asDoubles() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 2.0, 3.0, 5.0 ] }");
     assertEquals(List.of(2d, 3d, 5d), subject.of("key").asDoubles(null));
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
-  public void asInt() {
+  void asInt() {
     NodeAdapter subject = newNodeAdapterForTest("{ aInt : 5 }");
     assertEquals(5, subject.of("aInt").asInt(-1));
     assertEquals(-1, subject.of("missingField").asInt(-1));
   }
 
   @Test
-  public void asLong() {
+  void asLong() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 5 }");
     assertEquals(5, subject.of("key").asLong(-1));
     assertEquals(-1, subject.of("missingField").asLong(-1));
   }
 
   @Test
-  public void asText() {
+  void asText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
     assertEquals("TEXT", subject.of("aText").asString("DEFAULT"));
     assertEquals("DEFAULT", subject.of("missingField").asString("DEFAULT"));
@@ -142,19 +142,19 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void requiredAsText() {
+  void requiredAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
     assertThrows(OtpAppException.class, () -> subject.of("missingField").asString());
   }
 
   @Test
-  public void rawAsText() {
+  void rawAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
     assertEquals("TEXT", subject.of("aText").asObject().asText());
   }
 
   @Test
-  public void asEnum() {
+  void asEnum() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ a : 'A', abc : 'a-b-c' }");
 
@@ -169,7 +169,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumWithIllegalPropertySet() {
+  void asEnumWithIllegalPropertySet() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest(
       """
@@ -205,7 +205,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMap() {
+  void asEnumMap() {
     // With optional enum values in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
     assertEquals(
@@ -220,7 +220,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapWithCustomType() {
+  void asEnumMapWithCustomType() {
     // With optional enum values in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: {a:'Foo'} } }");
     assertEquals(
@@ -235,7 +235,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapWithDefaultValue() {
+  void asEnumMapWithDefaultValue() {
     var subject = newNodeAdapterForTest("{}");
     final Map<AnEnum, ARecord> dflt = Map.of(AnEnum.A, new ARecord("Foo"));
     assertEquals(dflt, subject.of("key").asEnumMap(AnEnum.class, ARecord::fromJson, dflt));
@@ -243,7 +243,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapWithUnknownKey() {
+  void asEnumMapWithUnknownKey() {
     NodeAdapter subject = newNodeAdapterForTest("{ enumMap : { unknown : 7 } }");
 
     subject.of("enumMap").asEnumMap(AnEnum.class, Double.class);
@@ -261,7 +261,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapAllKeysRequired() {
+  void asEnumMapAllKeysRequired() {
     var subject = newNodeAdapterForTest("{ key : { A: true, b: false, a_B_c: true } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.A_B_C, true),
@@ -280,7 +280,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapWithRequiredMissingValue() {
+  void asEnumMapWithRequiredMissingValue() {
     // A value for C is missing in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
 
@@ -291,7 +291,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumSet() {
+  void asEnumSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 'A', 'B' ] }");
     assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.of("key").asEnumSet(AnEnum.class));
     assertEquals(Set.of(), subject.of("missing-key").asEnumSet(AnEnum.class));
@@ -299,13 +299,13 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumSetFailsUsingWrongFormat() {
+  void asEnumSetFailsUsingWrongFormat() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A,B' }");
     assertThrows(OtpAppException.class, () -> subject.of("key").asEnumSet(AnEnum.class));
   }
 
   @Test
-  public void asFeedScopedId() {
+  void asFeedScopedId() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1: 'A:23', key2: 'B:12' }");
     assertEquals("A:23", subject.of("key1").asFeedScopedId(null).toString());
     assertEquals("B:12", subject.of("key2").asFeedScopedId(null).toString());
@@ -316,7 +316,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asFeedScopedIds() {
+  void asFeedScopedIds() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
     assertEquals("[A:23, B:12]", subject.of("routes").asFeedScopedIds(List.of()).toString());
     assertEquals("[]", subject.of("missing-key").asFeedScopedIds(List.of()).toString());
@@ -328,7 +328,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asFeedScopedIdSet() {
+  void asFeedScopedIdSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12', 'A:23']}");
     assertEquals(
       List.of(
@@ -342,7 +342,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asDateOrRelativePeriod() {
+  void asDateOrRelativePeriod() {
     // Given
     var subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
     var utc = ZoneIds.UTC;
@@ -362,7 +362,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void testParsePeriodDateThrowsException() {
+  void testParsePeriodDateThrowsException() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
@@ -374,7 +374,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asDuration() {
+  void asDuration() {
     NodeAdapter subject = newNodeAdapterForTest("{ k1:'PT1s', k2:'3h2m1s', k3:7 }");
 
     // as required duration
@@ -390,13 +390,13 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void requiredAsDuration() {
+  void requiredAsDuration() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
     assertThrows(OtpAppException.class, () -> subject.of("missingField").asDuration());
   }
 
   @Test
-  public void asDurations() {
+  void asDurations() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
     assertEquals("[PT1S, PT2H]", subject.of("key1").asDurations(List.of()).toString());
     assertEquals("[PT3H]", subject.of("missing-key").asDurations(List.of(D3h)).toString());
@@ -404,7 +404,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asLocale() {
+  void asLocale() {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'no', key2 : 'no_NO', key3 : 'no_NO_NY' }"
     );
@@ -415,14 +415,14 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asPattern() {
+  void asPattern() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'Ab*a' }");
     assertEquals("Ab*a", subject.of("key").asPattern("ABC").toString());
     assertEquals("ABC", subject.of("missingField").asPattern("ABC").toString());
   }
 
   @Test
-  public void uri() {
+  void uri() {
     var URL = "gs://bucket/a.obj";
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : '" + URL + "' }");
 
@@ -433,14 +433,14 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void uriSyntaxException() {
+  void uriSyntaxException() {
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : 'error$%uri' }");
 
     assertThrows(OtpAppException.class, () -> subject.of("aUri").asUri(null), "error$%uri");
   }
 
   @Test
-  public void uriRequiredValueMissing() {
+  void uriRequiredValueMissing() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
 
     assertThrows(
@@ -451,7 +451,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void uris() {
+  void uris() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : ['gs://a/b', 'gs://c/d'] }");
     assertEquals("[gs://a/b, gs://c/d]", subject.of("foo").asUris().toString());
 
@@ -461,7 +461,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void urisNotAnArrayException() {
+  void urisNotAnArrayException() {
     NodeAdapter subject = newNodeAdapterForTest("{ 'uris': 'no array' }");
 
     assertThrows(
@@ -472,7 +472,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void objectAsList() {
+  void objectAsList() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [{ a: 'I' }, { a: '2' } ] }");
 
     List<ARecord> result = subject
@@ -487,21 +487,21 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asCostLinearFunction() {
+  void asCostLinearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
     assertEquals("6m40s + 8.0 t", subject.of("key").asCostLinearFunction(null).toString());
     assertNull(subject.of("no-key").asCostLinearFunction(null));
   }
 
   @Test
-  public void asTimePenalty() {
+  void asTimePenalty() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
     assertEquals("6m40s + 8.0 t", subject.of("key").asTimePenalty(null).toString());
     assertNull(subject.of("no-key").asTimePenalty(null));
   }
 
   @Test
-  public void asZoneId() {
+  void asZoneId() {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'UTC', key2 : 'Europe/Oslo', key3 : '+02:00', key4: 'invalid' }"
     );
@@ -515,7 +515,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asTextSet() {
+  void asTextSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
     assertEquals(
       Set.of("A", "C", "F"),
@@ -528,7 +528,7 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void isNonEmptyArray() {
+  void isNonEmptyArray() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : ['A'], bar: [], foobar: true }");
     assertTrue(subject.of("foo").asObject().isNonEmptyArray());
     assertFalse(subject.of("bar").asObject().isNonEmptyArray());
@@ -538,13 +538,13 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void deduplicateChildren() {
+  void deduplicateChildren() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : { enabled: true } }");
     assertSame(subject.of("foo").asObject(), subject.of("foo").asObject());
   }
 
   @Test
-  public void unusedParams() {
+  void unusedParams() {
     // Given: two parameters a and b
     NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
     var buf = new StringBuilder();
@@ -555,6 +555,29 @@ public class NodeAdapterTest {
     // Then: expect 'b' to be unused
     subject.logAllWarnings(buf::append);
     assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
+  }
+
+  @Test
+  void unknownParameters() {
+    // Given: two parameters a and b
+    var subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+
+    // When: Access ONLY parameter 'a', but not 'b'
+    subject.of("foo").asObject().of("a").asBoolean();
+
+    assertTrue(subject.hasUnknownParameters());
+  }
+
+  @Test
+  void allParametersAreKnown() {
+    // Given: two parameters a and b
+    var subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+
+    var object = subject.of("foo").asObject();
+    object.of("a").asBoolean();
+    object.of("b").asBoolean();
+
+    assertFalse(subject.hasUnknownParameters());
   }
 
   private static String unusedParams(NodeAdapter subject) {

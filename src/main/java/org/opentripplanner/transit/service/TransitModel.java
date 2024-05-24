@@ -55,7 +55,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Repository for Transit entities.
+ * The TransitModel groups together all instances making up OTP's primary internal representation
+ * of the public transportation network. Although the names of many entities are derived from
+ * GTFS concepts, these are actually independent of the data source from which they are loaded.
+ * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
+ * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
+ * only in NeTEx, the NeTEx name is used in the internal model.
+ *
+ * A TransitModel instance also includes references to some transient indexes of its contents, to
+ * the TransitLayer derived from it, and to some other services and utilities that operate upon
+ * its contents.
+ *
+ * The TransitModel stands in opposition to two other aggregates: the Graph (representing the
+ * street network) and the TransitLayer (representing many of the same things in the TransitModel
+ * but rearranged to be more efficient for Raptor routing).
+ *
+ * At this point the TransitModel is not often read directly. Many requests will look at the
+ * TransitLayer rather than the TransitModel it's derived from. Both are often accessed via the
+ * TransitService rather than directly reading the fields of TransitModel or TransitLayer.
+ *
+ * TODO RT_AB: consider renaming. By some definitions this is not really the model, but a top-level
+ *   object grouping together instances of model classes with things that operate on and map those
+ *   instances.
  */
 public class TransitModel implements Serializable {
 
@@ -79,6 +100,25 @@ public class TransitModel implements Serializable {
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
+  /**
+   * The TransitLayer representation (optimized and rearranged for Raptor) of this TransitModel's
+   * scheduled (non-realtime) contents.
+   */
+  private transient TransitLayer transitLayer;
+
+  /**
+   * This updater applies realtime changes queued up for the next TimetableSnapshot such that
+   * this TransitModel.realtimeSnapshot remains aligned with the service represented in
+   * (this TransitModel instance + that next TimetableSnapshot). This is a way of keeping the
+   * TransitLayer up to date without repeatedly deriving it from scratch every few seconds. The
+   * same incremental changes are applied to both sets of data and they are published together.
+   */
+  private transient TransitLayerUpdater transitLayerUpdater;
+
+  /**
+   * An optionally present second TransitLayer representing the contents of this TransitModel plus
+   * the results of realtime updates in the latest TimetableSnapshot.
+   */
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
@@ -102,9 +142,6 @@ public class TransitModel implements Serializable {
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
-  private transient TransitLayer transitLayer;
-  private transient TransitLayerUpdater transitLayerUpdater;
-
   private transient TransitAlertService transitAlertService;
 
   @Inject
@@ -113,15 +150,15 @@ public class TransitModel implements Serializable {
     this.deduplicator = deduplicator;
   }
 
-  /** Constructor for deserialization. */
+  /** No-argument constructor, required for deserialization. */
   public TransitModel() {
     this(new StopModel(), new Deduplicator());
   }
 
   /**
-   * Perform indexing on timetables, and create transient data structures. This used to be done in
-   * readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
-   * graphbuilder to server in memory, without a round trip through serialization.
+   * Perform indexing on timetables, and create transient data structures. This used to be done
+   * inline in readObject methods upon deserialization, but it is now possible to pass transit data
+   * from the graph builder to the server in memory, without a round trip through serialization.
    */
   public void index() {
     if (index == null) {
@@ -371,8 +408,9 @@ public class TransitModel implements Serializable {
     return tripPatternForId.get(id);
   }
 
-  public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
-    return tripOnServiceDates;
+  public void addTripOnServiceDate(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+    invalidateIndex();
+    tripOnServiceDates.put(id, tripOnServiceDate);
   }
 
   /**

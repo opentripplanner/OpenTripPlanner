@@ -5,6 +5,7 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,12 +16,16 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.lang.IntRange;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -50,6 +55,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
+  private final TimePenalty timePenalty;
+
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -64,9 +71,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     for (int i = 0; i < size; i++) {
       this.stopTimes[i] = new StopTimeWindow(stopTimes.get(i));
-      this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
-      this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
+      this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
+      this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
+    this.timePenalty = Objects.requireNonNull(builder.timePenalty());
+    DurationUtils.requireNonNegative(timePenalty.constant());
+    DoubleUtils.requireInRange(timePenalty.coefficient(), 0.05d, Double.MAX_VALUE);
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {
@@ -81,8 +91,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    *  - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> hasFlexWindow = st ->
-      st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> hasContinuousStops = stopTime ->
       stopTime.getFlexContinuousDropOff() != NONE || stopTime.getFlexContinuousPickup() != NONE;
     if (stopTimes.isEmpty()) {
@@ -90,9 +98,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     } else if (stopTimes.stream().anyMatch(hasContinuousStops)) {
       return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
-      return stopTimes.stream().anyMatch(hasFlexWindow);
+      return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);
     } else {
-      return stopTimes.stream().allMatch(hasFlexWindow);
+      return stopTimes.stream().allMatch(StopTime::hasFlexWindow);
     }
   }
 
@@ -120,6 +128,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     } else {
       indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
     }
+
+    final var updatedCalculator = flexPathCalculator(calculator);
+
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices
       // if you cannot alight at an index, the trip is not possible
@@ -137,10 +148,22 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
           alightStop.index,
           alightStop.stop,
           date,
-          calculator,
+          updatedCalculator,
           config
         )
       );
+  }
+
+  /**
+   * Get the correct {@link FlexPathCalculator} depending on the {@code timePenalty}.
+   * If the modifier doesn't actually modify, we return the regular calculator.
+   */
+  protected FlexPathCalculator flexPathCalculator(FlexPathCalculator calculator) {
+    if (timePenalty.modifies()) {
+      return new TimePenaltyCalculator(calculator, timePenalty);
+    } else {
+      return calculator;
+    }
   }
 
   @Override

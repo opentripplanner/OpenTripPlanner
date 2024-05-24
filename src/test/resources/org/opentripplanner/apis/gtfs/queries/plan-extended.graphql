@@ -16,6 +16,9 @@
             }
         ]) {
         itineraries {
+            start
+            end
+            # next two are deprecated
             startTime
             endTime
             generalizedCost
@@ -28,10 +31,38 @@
             walkTime
             legs {
                 mode
+                start {
+                    scheduledTime
+                    estimated {
+                        time
+                        delay
+                    }
+                }
+                end {
+                    scheduledTime
+                    estimated {
+                        time
+                        delay
+                    }
+                }
                 from {
                     name
                     lat
                     lon
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
+                    departure {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
                     departureTime
                     arrivalTime
                 }
@@ -39,6 +70,20 @@
                     name
                     lat
                     lon
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
+                    departure {
+                        scheduledTime
+                        estimated {
+                            delay
+                            time
+                        }
+                    }
                     departureTime
                     arrivalTime
                 }
@@ -49,6 +94,25 @@
                 headsign
                 trip {
                     tripHeadsign
+                }
+                intermediatePlaces {
+                    arrival {
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
+                    }
+                    departure {
+                        scheduledTime
+                        estimated {
+                            time
+                            delay
+                        }
+                    }
+                    stop {
+                        name
+                    }
                 }
                 alerts {
                     id

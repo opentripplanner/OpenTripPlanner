@@ -37,7 +37,8 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
 /**
- * Dagger dependency injection Factory to create components for the OTP construct application phase.
+ * A Factory used by the Dagger dependency injection system to create the components of OTP, which
+ * are then wired up to construct the application.
  */
 @Singleton
 @Component(

@@ -102,6 +102,7 @@ class StopTimeMapper {
     lhs.setFarePeriodId(rhs.getFarePeriodId());
     lhs.setFlexWindowStart(rhs.getStartPickupDropOffWindow());
     lhs.setFlexWindowEnd(rhs.getEndPickupDropOffWindow());
+
     lhs.setFlexContinuousPickup(
       PickDropMapper.mapFlexContinuousPickDrop(rhs.getContinuousPickup())
     );

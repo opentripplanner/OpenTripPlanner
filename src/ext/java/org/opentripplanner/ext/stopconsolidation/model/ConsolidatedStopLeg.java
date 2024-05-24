@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
+import java.util.Objects;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
@@ -12,8 +13,8 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
 
   public ConsolidatedStopLeg(ScheduledTransitLeg original, StopLocation from, StopLocation to) {
     super(new ScheduledTransitLegBuilder<>(original));
-    this.from = from;
-    this.to = to;
+    this.from = Objects.requireNonNull(from);
+    this.to = Objects.requireNonNull(to);
   }
 
   @Override

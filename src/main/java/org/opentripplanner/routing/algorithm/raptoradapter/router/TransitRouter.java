@@ -127,7 +127,6 @@ public class TransitRouter {
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
-      accessEgresses.calculateMaxAccessTimePenalty(),
       serverContext.meterRegistry()
     );
 
@@ -147,7 +146,7 @@ public class TransitRouter {
         requestTransitDataProvider.stopNameResolver(),
         serverContext.transitService().getTransferService(),
         requestTransitDataProvider,
-        transitLayer.getStopBoardAlightCosts(),
+        transitLayer.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
         raptorRequest.multiCriteria()
       );

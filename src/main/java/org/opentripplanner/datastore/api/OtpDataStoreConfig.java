@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 
 /**
@@ -67,6 +68,12 @@ public interface OtpDataStoreConfig {
    * The URI to the street graph object file to load and/or save.
    */
   URI streetGraph();
+
+  /**
+   * The URI to the stop consolidation data source.
+   */
+  @Nullable
+  URI stopConsolidation();
 
   /**
    *

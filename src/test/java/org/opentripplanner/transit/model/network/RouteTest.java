@@ -128,7 +128,7 @@ class RouteTest {
     assertFalse(subject.sameAs(subject.copy().withColor("X").build()));
     assertFalse(subject.sameAs(subject.copy().withTextColor("X").build()));
     assertFalse(subject.sameAs(subject.copy().withGtfsType(-1).build()));
-    assertFalse(subject.sameAs(subject.copy().withGtfsSortOrder(-1).build()));
+    assertFalse(subject.sameAs(subject.copy().withGtfsSortOrder(99).build()));
     assertFalse(subject.sameAs(subject.copy().withFlexibleLineType("X").build()));
     assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
   }

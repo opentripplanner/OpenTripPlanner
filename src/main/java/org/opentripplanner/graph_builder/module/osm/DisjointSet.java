@@ -12,7 +12,7 @@ import java.util.Set;
 import org.opentripplanner.framework.collection.MapUtils;
 
 /** Basic union-find data structure with path compression */
-public class DisjointSet<T> {
+class DisjointSet<T> {
 
   TIntList sets = new TIntArrayList();
 

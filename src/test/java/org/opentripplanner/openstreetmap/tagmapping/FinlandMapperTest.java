@@ -162,6 +162,13 @@ public class FinlandMapperTest {
       wps.getDataForWay(wayWithMixinsAndCustomSafety).walkSafety().forward(),
       epsilon
     );
+
+    OSMWithTags wayWithBicycleSidePath = new OSMWithTags();
+    wayWithBicycleSidePath.addTag("bicycle", "use_sidepath");
+    assertEquals(8, wps.getDataForWay(wayWithBicycleSidePath).walkSafety().forward(), epsilon);
+    OSMWithTags wayWithFootSidePath = new OSMWithTags();
+    wayWithFootSidePath.addTag("foot", "use_sidepath");
+    assertEquals(8, wps.getDataForWay(wayWithFootSidePath).walkSafety().forward(), epsilon);
   }
 
   @Test

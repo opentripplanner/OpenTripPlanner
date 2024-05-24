@@ -120,6 +120,13 @@
   padding-left: 2px;
 }
 
+/* geometry popup */
+
+.geometry-popup-osm-link {
+  text-align: right;
+  padding: 0 5px;
+}
+
 /* debug layer selector */
 
 .maplibregl-ctrl-group.layer-select {

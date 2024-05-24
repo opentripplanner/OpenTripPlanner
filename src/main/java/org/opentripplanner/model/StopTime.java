@@ -62,28 +62,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public StopTime() {}
 
-  public StopTime(StopTime st) {
-    this.trip = st.trip;
-    this.stop = st.stop;
-    this.arrivalTime = st.arrivalTime;
-    this.departureTime = st.departureTime;
-    this.timepoint = st.timepoint;
-    this.stopSequence = st.stopSequence;
-    this.stopHeadsign = st.stopHeadsign;
-    this.routeShortName = st.routeShortName;
-    this.pickupType = st.pickupType;
-    this.dropOffType = st.dropOffType;
-    this.shapeDistTraveled = st.shapeDistTraveled;
-    this.farePeriodId = st.farePeriodId;
-    this.flexWindowStart = st.flexWindowStart;
-    this.flexWindowEnd = st.flexWindowEnd;
-    this.flexContinuousPickup = st.flexContinuousPickup;
-    this.flexContinuousDropOff = st.flexContinuousDropOff;
-    this.dropOffBookingInfo = st.dropOffBookingInfo;
-    this.pickupBookingInfo = st.pickupBookingInfo;
-    this.headsignVias = st.headsignVias;
-  }
-
   /**
    * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
    * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
@@ -318,5 +296,12 @@ public final class StopTime implements Comparable<StopTime> {
     }
 
     return MISSING_VALUE;
+  }
+
+  /**
+   * Does this stop time define a flex window?
+   */
+  public boolean hasFlexWindow() {
+    return flexWindowStart != MISSING_VALUE || flexWindowEnd != MISSING_VALUE;
   }
 }

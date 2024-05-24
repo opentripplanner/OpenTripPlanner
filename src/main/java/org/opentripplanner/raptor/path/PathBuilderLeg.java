@@ -15,6 +15,8 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessWithPenalty;
+import org.opentripplanner.raptor.rangeraptor.transit.EgressWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
@@ -447,7 +449,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider
   ) {
     int cost = egressCost(costCalculator, slackProvider);
-    return new EgressPathLeg<>(asEgressLeg().streetPath, fromTime, toTime, cost);
+    var egressPath = asEgressLeg().streetPath;
+    return new EgressPathLeg<>(egressPath, fromTime, toTime, cost);
   }
 
   /**
@@ -694,12 +697,22 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     final RaptorAccessEgress streetPath;
 
     MyStreetLeg(RaptorAccessEgress streetPath) {
-      this.streetPath = streetPath;
+      this.streetPath = removeTimePenaltyDecorator(streetPath);
     }
 
     @Override
     public boolean hasRides() {
       return streetPath.hasRides();
+    }
+
+    private static RaptorAccessEgress removeTimePenaltyDecorator(RaptorAccessEgress path) {
+      if (path instanceof AccessWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      if (path instanceof EgressWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      return path;
     }
   }
 

@@ -147,6 +147,48 @@ public class DefaultMapperTest {
     assertEquals(2.94, discouragedProps.bicycleSafety().forward(), epsilon);
   }
 
+  @Test
+  void footUseSidepath() {
+    var regular = WayTestData.pedestrianTunnel();
+    var props = wps.getDataForWay(regular);
+    assertEquals(PEDESTRIAN_AND_BICYCLE, props.getPermission());
+    assertEquals(1, props.walkSafety().forward());
+
+    var useSidepath = WayTestData.pedestrianTunnel().addTag("foot", "use_sidepath");
+    var useSidepathProps = wps.getDataForWay(useSidepath);
+    assertEquals(PEDESTRIAN_AND_BICYCLE, useSidepathProps.getPermission());
+    assertEquals(5, useSidepathProps.walkSafety().forward());
+  }
+
+  @Test
+  void bicycleUseSidepath() {
+    var regular = WayTestData.southeastLaBonitaWay();
+    var props = wps.getDataForWay(regular);
+    assertEquals(ALL, props.getPermission());
+    assertEquals(.98, props.bicycleSafety().forward());
+
+    var useSidepath = WayTestData.southeastLaBonitaWay().addTag("bicycle", "use_sidepath");
+    var useSidepathProps = wps.getDataForWay(useSidepath);
+    assertEquals(ALL, useSidepathProps.getPermission());
+    assertEquals(4.9, useSidepathProps.bicycleSafety().forward(), epsilon);
+
+    var useSidepathForward = WayTestData
+      .southeastLaBonitaWay()
+      .addTag("bicycle:forward", "use_sidepath");
+    var useSidepathForwardProps = wps.getDataForWay(useSidepathForward);
+    assertEquals(ALL, useSidepathForwardProps.getPermission());
+    assertEquals(4.9, useSidepathForwardProps.bicycleSafety().forward(), epsilon);
+    assertEquals(0.98, useSidepathForwardProps.bicycleSafety().back(), epsilon);
+
+    var useSidepathBackward = WayTestData
+      .southeastLaBonitaWay()
+      .addTag("bicycle:backward", "use_sidepath");
+    var useSidepathBackwardProps = wps.getDataForWay(useSidepathBackward);
+    assertEquals(ALL, useSidepathBackwardProps.getPermission());
+    assertEquals(0.98, useSidepathBackwardProps.bicycleSafety().forward(), epsilon);
+    assertEquals(4.9, useSidepathBackwardProps.bicycleSafety().back(), epsilon);
+  }
+
   /**
    * Test that two values are within epsilon of each other.
    */

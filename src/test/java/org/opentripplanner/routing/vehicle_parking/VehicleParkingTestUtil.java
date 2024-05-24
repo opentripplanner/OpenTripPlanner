@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingTestUtil {
@@ -25,8 +26,8 @@ public class VehicleParkingTestUtil {
         .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true);
 
-    return VehicleParking
-      .builder()
+    return StreetModelForTest
+      .vehicleParking()
       .id(new FeedScopedId(TEST_FEED_ID, id))
       .bicyclePlaces(true)
       .capacity(vehiclePlaces)

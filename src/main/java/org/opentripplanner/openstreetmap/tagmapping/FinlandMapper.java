@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
@@ -162,6 +163,10 @@ class FinlandMapper implements OsmTagMapper {
     // Remove Helsinki city center service tunnel network from graph
     props.setProperties("highway=service;tunnel=yes;access=destination", withModes(NONE));
     props.setProperties("highway=service;access=destination", withModes(ALL).bicycleSafety(1.1));
+
+    // Typically if this tag is used on a way, there is also a better option for walking.
+    // We don't need to set bicycle safety as cycling is not currently allowed on these ways.
+    props.setMixinProperties("bicycle=use_sidepath", ofWalkSafety(5));
 
     // Automobile speeds in Finland.
     // General speed limit is 80kph unless signs says otherwise.

@@ -1,6 +1,6 @@
 import { Leg } from '../../gql/graphql.ts';
 import { useHeaderLegContentStyleCalculations } from './useHeaderLegContentStyleCalculations.ts';
-const modeIcons = import.meta.glob('../../static/img/mode/*.png', { as: 'url', eager: true });
+const modeIcons = import.meta.glob('../../static/img/mode/*.png', { query: '?url', import: 'default', eager: true });
 
 function getModeIconUrl(leg: Leg) {
   return modeIcons[`../../static/img/mode/${leg.mode.toLowerCase()}.png`];

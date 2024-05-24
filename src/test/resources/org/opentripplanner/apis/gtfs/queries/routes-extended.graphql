@@ -8,6 +8,7 @@
             name
         }
         mode
+        sortOrder
         bikesAllowed
     }
 }

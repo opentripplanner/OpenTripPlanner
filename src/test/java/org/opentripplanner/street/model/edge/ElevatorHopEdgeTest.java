@@ -8,13 +8,13 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 class ElevatorHopEdgeTest {
@@ -22,12 +22,12 @@ class ElevatorHopEdgeTest {
   Vertex from = intersectionVertex(0, 0);
   Vertex to = intersectionVertex(1, 1);
 
-  static Stream<Arguments> noTraverse = Stream
-    .of(Accessibility.NO_INFORMATION, Accessibility.NOT_POSSIBLE)
-    .map(Arguments::of);
+  static Stream<Arguments> noTraverse() {
+    return Stream.of(Accessibility.NO_INFORMATION, Accessibility.NOT_POSSIBLE).map(Arguments::of);
+  }
 
   @ParameterizedTest(name = "{0} should be allowed to traverse when requesting onlyAccessible")
-  @VariableSource("noTraverse")
+  @MethodSource("noTraverse")
   void shouldNotTraverse(Accessibility wheelchair) {
     var req = StreetSearchRequest.of();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
@@ -52,17 +52,19 @@ class ElevatorHopEdgeTest {
     assertTrue(State.isEmpty(result));
   }
 
-  static Stream<Arguments> all = Stream.of(
-    // no extra cost
-    Arguments.of(Accessibility.POSSIBLE, 20),
-    // low extra cost
-    Arguments.of(Accessibility.NO_INFORMATION, 40),
-    // high extra cost
-    Arguments.of(Accessibility.NOT_POSSIBLE, 3620)
-  );
+  static Stream<Arguments> all() {
+    return Stream.of(
+      // no extra cost
+      Arguments.of(Accessibility.POSSIBLE, 20),
+      // low extra cost
+      Arguments.of(Accessibility.NO_INFORMATION, 40),
+      // high extra cost
+      Arguments.of(Accessibility.NOT_POSSIBLE, 3620)
+    );
+  }
 
   @ParameterizedTest(name = "{0} should allowed to traverse with a cost of {1}")
-  @VariableSource("all")
+  @MethodSource("all")
   void allowByDefault(Accessibility wheelchair, double expectedCost) {
     var req = StreetSearchRequest.of().build();
     var result = traverse(wheelchair, req)[0];

@@ -42,14 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A Timetable is a TripTimes (stop-level details like arrival and departure times) for each of the
+ * trips on a particular TripPattern.
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
  * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
  * <p>
- *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *            - after as Entur NeTEx PRs are merged.
- *            - Also consider moving its dependencies in: org.opentripplanner.routing
- *            - The NEW Timetable should not have any dependencies to
+ * TODO OTP2 - Move this to package: org.opentripplanner.model after as Entur NeTEx PRs are merged.
+ *     Also consider moving its dependencies into package org.opentripplanner.routing. The NEW
+ *     Timetable should not have any dependencies to [?]
  */
 public class Timetable implements Serializable {
 
@@ -61,6 +62,7 @@ public class Timetable implements Serializable {
 
   private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
+  @Nullable
   private final LocalDate serviceDate;
 
   /** Construct an empty Timetable. */
@@ -125,7 +127,7 @@ public class Timetable implements Serializable {
 
   public TripTimes getTripTimes(FeedScopedId tripId) {
     for (TripTimes tt : tripTimes) {
-      if (tt.getTrip().getId() == tripId) {
+      if (tt.getTrip().getId().equals(tripId)) {
         return tt;
       }
     }

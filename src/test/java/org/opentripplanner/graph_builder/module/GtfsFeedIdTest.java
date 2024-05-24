@@ -9,16 +9,18 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.test.support.VariableSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class GtfsFeedIdTest {
 
   private static final String NUMBERS_ONLY_REGEX = "^\\d+$";
 
-  static Stream<Arguments> emptyCases = Stream.of(null, "", "     ", "\n", "  ").map(Arguments::of);
+  static Stream<Arguments> emptyCases() {
+    return Stream.of(null, "", "     ", "\n", "  ").map(Arguments::of);
+  }
 
   @ParameterizedTest
-  @VariableSource("emptyCases")
+  @MethodSource("emptyCases")
   void autogenerateNumber(String id) {
     String feedId = feedId(id);
     assertTrue(feedId.matches(NUMBERS_ONLY_REGEX), "'%s' is not an integer.".formatted(feedId));

@@ -39,8 +39,8 @@ public class PlaceMapper {
   public ApiPlace mapStopArrival(StopArrival domain) {
     return mapPlace(
       domain.place,
-      domain.arrival,
-      domain.departure,
+      domain.arrival.time(),
+      domain.departure.time(),
       domain.stopPosInPattern,
       domain.gtfsStopSequence
     );

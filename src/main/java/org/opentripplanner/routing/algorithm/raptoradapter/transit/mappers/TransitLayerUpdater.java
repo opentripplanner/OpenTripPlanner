@@ -30,6 +30,11 @@ import org.slf4j.LoggerFactory;
  * id and replaced by their updated versions. The realtime TransitLayer is then switched out with
  * the updated copy in an atomic operation. This ensures that any TransitLayer that is referenced
  * from the Graph is never changed.
+ *
+ * This is a way of keeping the TransitLayer up to date (in sync with the TransitModel plus its most
+ * recent TimetableSnapshot) without repeatedly deriving it from scratch every few seconds. The same
+ * incremental changes are applied to both the TimetableSnapshot and the TransitLayer and they are
+ * published together.
  */
 public class TransitLayerUpdater {
 
@@ -96,7 +101,7 @@ public class TransitLayerUpdater {
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
-          .getTripPatternsStartingOnDateCopy(date)
+          .getTripPatternsOnServiceDateCopy(date)
           .stream()
           .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t));
         tripPatternsStartingOnDateMapCache.put(date, map);
@@ -146,7 +151,7 @@ public class TransitLayerUpdater {
           } else {
             LOG.debug(
               "NEW TripPatternForDate: {} - {}",
-              newTripPatternForDate.getLocalDate(),
+              newTripPatternForDate.getServiceDate(),
               newTripPatternForDate.getTripPattern().debugInfo()
             );
           }
@@ -179,7 +184,7 @@ public class TransitLayerUpdater {
       }
 
       for (TripPatternForDate tripPatternForDate : previouslyUsedPatterns) {
-        if (tripPatternForDate.getLocalDate().equals(date)) {
+        if (tripPatternForDate.getServiceDate().equals(date)) {
           TripPattern pattern = tripPatternForDate.getTripPattern().getPattern();
           if (!pattern.isCreatedByRealtimeUpdater()) {
             continue;

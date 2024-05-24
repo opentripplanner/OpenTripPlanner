@@ -24,7 +24,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private int earliestDepartureTime;
   private int latestArrivalTime;
   private int searchWindowInSeconds;
-  private int searchWindowAccessSlackInSeconds;
   private boolean preferLateArrival;
   private int numberOfAdditionalTransfers;
   private int maxNumberOfTransfers;
@@ -37,7 +36,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.earliestDepartureTime = defaults.earliestDepartureTime();
     this.latestArrivalTime = defaults.latestArrivalTime();
     this.searchWindowInSeconds = defaults.searchWindowInSeconds();
-    this.searchWindowAccessSlackInSeconds = defaults.searchWindowAccessSlackInSeconds();
     this.preferLateArrival = defaults.preferLateArrival();
     this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
@@ -169,14 +167,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public int searchWindowAccessSlackInSeconds() {
-    return searchWindowAccessSlackInSeconds;
-  }
-
-  public void searchWindowAccessSlack(Duration searchWindowAccessSlack) {
-    this.searchWindowAccessSlackInSeconds = (int) searchWindowAccessSlack.toSeconds();
-  }
-
   public boolean allowEmptyAccessEgressPaths() {
     return allowEmptyAccessEgressPaths;
   }
@@ -197,7 +187,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
       .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)
-      .addDurationSec("searchWindowAccessSlack", searchWindowAccessSlackInSeconds, 0)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
       .addCollection("accessPaths", accessPaths, 5)

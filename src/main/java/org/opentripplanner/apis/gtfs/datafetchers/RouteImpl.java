@@ -184,6 +184,11 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   }
 
   @Override
+  public DataFetcher<Integer> sortOrder() {
+    return env -> getSource(env).getGtfsSortOrder();
+  }
+
+  @Override
   public DataFetcher<Iterable<Object>> stops() {
     return this::getStops;
   }

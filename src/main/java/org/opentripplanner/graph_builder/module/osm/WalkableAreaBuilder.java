@@ -68,7 +68,7 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
  * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  */
-public class WalkableAreaBuilder {
+class WalkableAreaBuilder {
 
   private final DataImportIssueStore issueStore;
 
@@ -400,7 +400,7 @@ public class WalkableAreaBuilder {
     Set<Edge> edges,
     Set<Edge> edgesToKeep
   ) {
-    if (edges.size() == 0) return;
+    if (edges.isEmpty()) return;
     StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
@@ -496,7 +496,7 @@ public class WalkableAreaBuilder {
     }
     // do we need to recurse?
     if (intersects.size() == 1) {
-      Area area = intersects.get(0);
+      Area area = intersects.getFirst();
       OSMWithTags areaEntity = area.parent;
 
       StreetTraversalPermission areaPermissions = areaEntity.overridePermissions(
@@ -531,15 +531,10 @@ public class WalkableAreaBuilder {
         .withPermission(areaPermissions)
         .withBack(false)
         .withArea(edgeList)
-        .withCarSpeed(carSpeed);
-
-      if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        streetEdgeBuilder.withBogusName(true);
-      }
-
-      streetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
-
-      streetEdgeBuilder.withLink(areaEntity.isLink());
+        .withCarSpeed(carSpeed)
+        .withBogusName(areaEntity.hasNoName())
+        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
+        .withLink(areaEntity.isLink());
 
       label =
         "way (area) " +
@@ -559,15 +554,10 @@ public class WalkableAreaBuilder {
         .withPermission(areaPermissions)
         .withBack(true)
         .withArea(edgeList)
-        .withCarSpeed(carSpeed);
-
-      if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        backStreetEdgeBuilder.withBogusName(true);
-      }
-
-      backStreetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
-
-      backStreetEdgeBuilder.withLink(areaEntity.isLink());
+        .withCarSpeed(carSpeed)
+        .withBogusName(areaEntity.hasNoName())
+        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
+        .withLink(areaEntity.isLink());
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity

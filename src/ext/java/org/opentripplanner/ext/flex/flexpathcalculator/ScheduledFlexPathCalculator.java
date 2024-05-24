@@ -20,7 +20,7 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
 
   @Override
   public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
-    FlexPath flexPath = flexPathCalculator.calculateFlexPath(
+    final var flexPath = flexPathCalculator.calculateFlexPath(
       fromv,
       tov,
       fromStopIndex,
@@ -29,7 +29,6 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
     if (flexPath == null) {
       return null;
     }
-    int distance = flexPath.distanceMeters;
     int departureTime = trip.earliestDepartureTime(
       Integer.MIN_VALUE,
       fromStopIndex,
@@ -50,6 +49,10 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
     if (departureTime >= arrivalTime) {
       return null;
     }
-    return new FlexPath(distance, arrivalTime - departureTime, flexPath::getGeometry);
+    return new FlexPath(
+      flexPath.distanceMeters,
+      arrivalTime - departureTime,
+      flexPath::getGeometry
+    );
   }
 }

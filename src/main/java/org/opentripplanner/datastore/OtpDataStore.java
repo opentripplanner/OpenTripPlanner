@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -59,6 +60,7 @@ public class OtpDataStore {
   /* Named resources available for both reading and writing. */
   private DataSource streetGraph;
   private DataSource graph;
+  private DataSource stopConsolidation;
   private CompositeDataSource buildReportDir;
   private boolean opened = false;
 
@@ -103,6 +105,11 @@ public class OtpDataStore {
     streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
     buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
+
+    if (config.stopConsolidation() != null) {
+      stopConsolidation =
+        findSingleSource(config.stopConsolidation(), config.stopConsolidation().toString(), GTFS);
+    }
 
     addAll(Arrays.asList(streetGraph, graph, buildReportDir));
 
@@ -150,6 +157,10 @@ public class OtpDataStore {
   public CompositeDataSource getBuildReportDir() {
     assertDataStoreIsOpened();
     return buildReportDir;
+  }
+
+  public Optional<DataSource> stopConsolidation() {
+    return Optional.ofNullable(stopConsolidation);
   }
 
   /* private methods */

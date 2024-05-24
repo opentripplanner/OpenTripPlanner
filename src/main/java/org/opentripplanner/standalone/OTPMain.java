@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.ConstructApplication;
 import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
@@ -113,6 +114,8 @@ public class OTPMain {
     var loadApp = new LoadApplication(cli);
     var config = loadApp.config();
 
+    detectUnusedConfigParams(cli, config);
+
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
     loadApp.validateConfigAndDataSources();
@@ -170,6 +173,15 @@ public class OTPMain {
       startOtpWebServer(cli, app);
     } else {
       LOG.info("Done building graph. Exiting.");
+    }
+  }
+
+  /**
+   * Optionally, check if the config is valid and if not abort the startup process.
+   */
+  private static void detectUnusedConfigParams(CommandLineParameters cli, ConfigModel config) {
+    if (cli.abortOnUnknownConfig) {
+      config.abortOnUnknownParameters();
     }
   }
 

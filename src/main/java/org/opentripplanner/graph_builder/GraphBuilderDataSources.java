@@ -19,7 +19,6 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
-import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
@@ -186,13 +185,8 @@ public class GraphBuilderDataSources {
   /**
    * Returns the optional data source for the stop consolidation configuration.
    */
-  public Optional<DataSource> stopConsolidationDataSource() {
-    return Optional
-      .ofNullable(buildConfig.stopConsolidationFile)
-      .map(fileName -> {
-        var f = baseDirectory.toPath().resolve(fileName).toFile();
-        return new FileDataSource(f, FileType.CONFIG);
-      });
+  public Optional<DataSource> stopConsolidation() {
+    return store.stopConsolidation();
   }
 
   /**

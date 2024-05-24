@@ -12,9 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 public class ReverseRaptorTransitCalculatorTest {
+
+  private static final int BIG_TIME = hm2time(100, 0);
 
   private int latestArrivalTime = hm2time(8, 0);
   private int searchWindowSizeInSeconds = 2 * 60 * 60;
@@ -37,10 +40,10 @@ public class ReverseRaptorTransitCalculatorTest {
       create().exceedsTimeLimitReason()
     );
 
-    earliestAcceptableDepartureTime = -1;
+    earliestAcceptableDepartureTime = RaptorConstants.TIME_NOT_SET;
     subject = create();
-    assertFalse(subject.exceedsTimeLimit(0));
-    assertFalse(subject.exceedsTimeLimit(2_000_000_000));
+    assertFalse(subject.exceedsTimeLimit(-BIG_TIME));
+    assertFalse(subject.exceedsTimeLimit(BIG_TIME));
   }
 
   @Test

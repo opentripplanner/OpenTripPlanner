@@ -19,22 +19,28 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   private final int boardAndTransferCost;
   private final int waitFactor;
   private final FactorStrategy transitFactors;
-  private final int[] stopTransferCost;
+
+  /**
+   * Costs for boarding and alighting at a given stop during transfer.
+   * See TransitLayer.getStopBoardAlightTransferCosts()
+   */
+  @Nullable
+  private final int[] stopBoardAlightTransferCosts;
 
   /**
    * Cost unit: SECONDS - The unit for all input parameters are in the OTP TRANSIT model cost unit
    * (in Raptor the unit for cost is centi-seconds).
    *
-   * @param stopTransferCost Unit centi-seconds. This parameter is used "as-is" and not transformed
-   *                      into the Raptor cast unit to avoid the transformation for each request.
-   *                      Use {@code null} to ignore stop cost.
+   * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
+   *                      transformed into the Raptor cast unit to avoid the transformation for each
+   *                      request. Use {@code null} to ignore stop cost.
    */
   public DefaultCostCalculator(
     int boardCost,
     int transferCost,
     double waitReluctanceFactor,
     @Nullable double[] transitReluctanceFactors,
-    @Nullable int[] stopTransferCost
+    @Nullable int[] stopBoardAlightTransferCosts
   ) {
     this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
     this.transferCostOnly = RaptorCostConverter.toRaptorCost(transferCost);
@@ -46,16 +52,19 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
         ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
         : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
-    this.stopTransferCost = stopTransferCost;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
 
-  public DefaultCostCalculator(GeneralizedCostParameters params, int[] stopTransferCost) {
+  public DefaultCostCalculator(
+    GeneralizedCostParameters params,
+    @Nullable int[] stopBoardAlightTransferCosts
+  ) {
     this(
       params.boardCost(),
       params.transferCost(),
       params.waitReluctanceFactor(),
       params.transitReluctanceFactors(),
-      stopTransferCost
+      stopBoardAlightTransferCosts
     );
   }
 
@@ -108,8 +117,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
     // Add transfer cost on all alighting events.
     // If it turns out to be the last one this cost will be removed during costEgress phase.
-    if (stopTransferCost != null) {
-      cost += stopTransferCost[toStop];
+    if (stopBoardAlightTransferCosts != null) {
+      cost += stopBoardAlightTransferCosts[toStop];
     }
 
     return cost;
@@ -121,26 +130,35 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-    return (
-      boardCostOnly +
-      boardAndTransferCost *
-      minNumTransfers +
-      transitFactors.minFactor() *
-      minTravelTime
-    );
+  public int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop) {
+    if (minNumTransfers > -1) {
+      return (
+        boardCostOnly +
+        boardAndTransferCost *
+        minNumTransfers +
+        transitFactors.minFactor() *
+        minTravelTime
+      );
+    } else {
+      // Remove cost that was added during alighting similar as we do in the costEgress() method
+      int fixedCost = transitFactors.minFactor() * minTravelTime;
+
+      return stopBoardAlightTransferCosts == null
+        ? fixedCost
+        : fixedCost - stopBoardAlightTransferCosts[fromStop];
+    }
   }
 
   @Override
   public int costEgress(RaptorAccessEgress egress) {
     if (egress.hasRides()) {
       return egress.c1() + transferCostOnly;
-    } else if (stopTransferCost != null) {
+    } else if (stopBoardAlightTransferCosts != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
-      return egress.c1() - stopTransferCost[egress.stop()];
+      return egress.c1() - stopBoardAlightTransferCosts[egress.stop()];
     } else {
       return egress.c1();
     }
@@ -164,8 +182,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
 
     // If it's first boarding event then it is not a transfer
-    if (stopTransferCost != null && !firstBoarding) {
-      cost += stopTransferCost[boardStop];
+    if (stopBoardAlightTransferCosts != null && !firstBoarding) {
+      cost += stopBoardAlightTransferCosts[boardStop];
     }
     return cost;
   }
@@ -203,8 +221,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
       // For a guaranteed transfer we skip board- and transfer-cost
       final int boardWaitTime = boardTime - prevArrivalTime;
 
-      // StopTransferCost is NOT added to the cost here. This is because a trip-to-trip constrained transfer take
-      // precedence over stop-to-stop transfer priority (NeTEx station transfer priority).
+      // StopBoardAlightTransferCost is NOT added to the cost here. This is because a trip-to-trip
+      // constrained transfer take precedence over stop-to-stop transfer priority (NeTEx station
+      // transfer priority).
       return waitFactor * boardWaitTime;
     }
 

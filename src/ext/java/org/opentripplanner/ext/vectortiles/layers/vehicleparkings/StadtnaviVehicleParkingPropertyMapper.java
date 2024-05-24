@@ -1,11 +1,12 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.json.simple.JSONObject;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
+import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -13,6 +14,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 
 public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 
+  private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private final DigitransitVehicleParkingPropertyMapper digitransitMapper;
   private final I18NStringMapper i18NStringMapper;
 
@@ -57,13 +59,13 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
       return List.of();
     }
 
-    var json = new JSONObject();
+    var json = OBJECT_MAPPER.createObjectNode();
     json.put("bicyclePlaces", places.getBicycleSpaces());
     json.put("carPlaces", places.getCarSpaces());
     json.put("wheelchairAccessibleCarPlaces", places.getWheelchairAccessibleCarSpaces());
 
     return List.of(
-      new KeyValue(key, JSONObject.toJSONString(json)),
+      new KeyValue(key, json.toString()),
       new KeyValue(subKey(key, "bicyclePlaces"), places.getBicycleSpaces()),
       new KeyValue(subKey(key, "carPlaces"), places.getCarSpaces()),
       new KeyValue(
