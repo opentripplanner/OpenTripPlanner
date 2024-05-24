@@ -15,7 +15,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -24,7 +23,6 @@ import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A container for a few pieces of information that can be used to calculate flex accesses, egresses,
@@ -92,11 +90,10 @@ public abstract class AbstractFlexTemplate {
    * here will lead to noticeable speedups.
    */
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(
-    Graph graph,
-    TransitService transitService
+    FlexAccessEgressCallbackService callback
   ) {
     if (transferStop instanceof RegularStop stop) {
-      TransitStopVertex flexVertex = graph.getStopVertexForStopId(stop.getId());
+      TransitStopVertex flexVertex = callback.getStopVertexForStopId(stop.getId());
       return Stream
         .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (RegularStop) transferStop))
         .filter(Objects::nonNull);
@@ -107,7 +104,7 @@ public abstract class AbstractFlexTemplate {
         maxTransferDuration.getSeconds() *
         accessEgress.state.getRequest().preferences().walk().speed();
 
-      return getTransfersFromTransferStop(transitService)
+      return getTransfersFromTransferStop(callback)
         .stream()
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= maxDistanceMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
@@ -153,7 +150,7 @@ public abstract class AbstractFlexTemplate {
    * flex ride for the access/egress.
    */
   protected abstract Collection<PathTransfer> getTransfersFromTransferStop(
-    TransitService transitService
+    FlexAccessEgressCallbackService callback
   );
 
   /**

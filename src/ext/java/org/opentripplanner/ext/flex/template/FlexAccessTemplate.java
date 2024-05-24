@@ -21,7 +21,6 @@ import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessTemplate extends AbstractFlexTemplate {
 
@@ -126,8 +125,10 @@ public class FlexAccessTemplate extends AbstractFlexTemplate {
     return transfer.to instanceof RegularStop ? (RegularStop) transfer.to : null;
   }
 
-  protected Collection<PathTransfer> getTransfersFromTransferStop(TransitService transitService) {
-    return transitService.getTransfersByStop(transferStop);
+  protected Collection<PathTransfer> getTransfersFromTransferStop(
+    FlexAccessEgressCallbackService callback
+  ) {
+    return callback.getTransfersFromStop(transferStop);
   }
 
   protected Vertex getFlexVertex(Edge edge) {

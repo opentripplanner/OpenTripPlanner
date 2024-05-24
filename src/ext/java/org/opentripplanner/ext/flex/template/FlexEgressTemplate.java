@@ -15,13 +15,12 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 
 public class FlexEgressTemplate extends AbstractFlexTemplate {
 
   public FlexEgressTemplate(
     NearbyStop accessEgress,
-    FlexTrip trip,
+    FlexTrip<?, ?> trip,
     int fromStopIndex,
     int toStopIndex,
     StopLocation transferStop,
@@ -49,8 +48,10 @@ public class FlexEgressTemplate extends AbstractFlexTemplate {
     return transfer.from instanceof RegularStop regularStop ? regularStop : null;
   }
 
-  protected Collection<PathTransfer> getTransfersFromTransferStop(TransitService transitService) {
-    return transitService.getFlexIndex().getTransfersToStop(transferStop);
+  protected Collection<PathTransfer> getTransfersFromTransferStop(
+    FlexAccessEgressCallbackService callback
+  ) {
+    return callback.getTransfersToStop(transferStop);
   }
 
   protected Vertex getFlexVertex(Edge edge) {

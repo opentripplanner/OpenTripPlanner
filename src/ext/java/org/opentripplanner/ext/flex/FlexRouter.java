@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
+import org.opentripplanner.ext.flex.template.FlexAccessEgressCallbackService;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.template.FlexServiceDate;
@@ -24,14 +25,17 @@ import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FlexRouter {
+public class FlexRouter implements FlexAccessEgressCallbackService {
 
   /* Transit data */
 
@@ -153,7 +157,7 @@ public class FlexRouter {
     calculateFlexAccessTemplates();
 
     return this.flexAccessTemplates.stream()
-      .flatMap(template -> template.createFlexAccessEgressStream(graph, transitService))
+      .flatMap(template -> template.createFlexAccessEgressStream(this))
       .toList();
   }
 
@@ -162,8 +166,28 @@ public class FlexRouter {
     calculateFlexEgressTemplates();
 
     return this.flexEgressTemplates.stream()
-      .flatMap(template -> template.createFlexAccessEgressStream(graph, transitService))
+      .flatMap(template -> template.createFlexAccessEgressStream(this))
       .toList();
+  }
+
+  @Override
+  public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
+    return graph.getStopVertexForStopId(stopId);
+  }
+
+  @Override
+  public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
+    return transitService.getTransfersByStop(stop);
+  }
+
+  @Override
+  public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
+    return transitService.getFlexIndex().getTransfersToStop(stop);
+  }
+
+  @Override
+  public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
+    return date.isFlexTripRunning(trip, transitService);
   }
 
   private void calculateFlexAccessTemplates() {
@@ -184,7 +208,7 @@ public class FlexRouter {
           Arrays
             .stream(dates)
             // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
+            .filter(date -> isDateActive(date, it.flexTrip()))
             // Create templates from trip, boarding at the nearbyStop
             .flatMap(date ->
               templateFactory
@@ -214,7 +238,7 @@ public class FlexRouter {
           Arrays
             .stream(dates)
             // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(it.flexTrip(), this.transitService))
+            .filter(date -> isDateActive(date, it.flexTrip()))
             // Create templates from trips, alighting at the nearbyStop
             .flatMap(date ->
               templateFactory
