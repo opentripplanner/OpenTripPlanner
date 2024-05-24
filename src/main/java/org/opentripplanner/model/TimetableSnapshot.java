@@ -262,15 +262,15 @@ public class TimetableSnapshot {
   }
 
   /**
-   * If a previous realtime update has changed which trip pattern is used for this trip on the given
-   * service date, this removes the timetables for this trip on the service date for the trip
-   * pattern and also the connection of that trip pattern for this trip on the given service date.
-   * The original trip pattern from the scheduled data will be used for the trip again on this
-   * service date until a new trip pattern is used for the trip.
+   * If a previous realtime update has changed which trip pattern is associated with the given trip
+   * on the given service date, this method will dissociate the trip from that pattern and remove
+   * the trip's timetables from that pattern on that particular service date.
    *
-   * @return true if a new trip pattern was used for the trip previously and its connection to the
-   * trip one the given service date was attempted to removed together with its timetables for the
-   * trip.
+   * For this service date, the trip will revert to its original trip pattern from the scheduled
+   * data, remaining on that pattern unless it's changed again by a future realtime update.
+   *
+   * @return true if the trip was found to be shifted to a different trip pattern by a realtime
+   * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public boolean removeRealtimeAddedTripPatternAndTimetablesForTrip(
     FeedScopedId tripId,
@@ -280,9 +280,11 @@ public class TimetableSnapshot {
 
     final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);
     if (pattern != null) {
-      // Remove the previous real-time-added TripPattern from buffer.
-      // Only one version of the real-time-update should exist
+      // Dissociate the given trip from any realtime-added pattern.
+      // The trip will then fall back to its original scheduled pattern.
       realtimeAddedTripPattern.remove(new TripIdAndServiceDate(tripId, serviceDate));
+      // Remove times for the trip from any timetables
+      // under that now-obsolete realtime-added pattern.
       SortedSet<Timetable> sortedTimetables = this.timetables.get(pattern);
       if (sortedTimetables != null) {
         TripTimes tripTimesToRemove = null;

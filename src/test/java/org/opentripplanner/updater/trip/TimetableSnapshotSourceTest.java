@@ -853,6 +853,15 @@ public class TimetableSnapshotSourceTest {
       }
     }
 
+    /**
+     * Test realtime system behavior under one very particular case from issue #5725.
+     * When applying differential realtime updates, an update may cancel some stops on a trip. A
+     * later update may then revert the trip back to its originally scheduled sequence of stops.
+     * When this happens, we expect the trip to be associated with a new trip pattern (where some
+     * stops have no pickup or dropoff) then dissociated from that new pattern and re-associated
+     * with its originally scheduled pattern. Any trip times that were created in timetables under
+     * the new stop-skipping trip pattern should also be removed.
+     */
     @Test
     public void scheduledTripWithPreviouslySkipped() {
       // Create update with a skipped stop at first
@@ -1185,6 +1194,16 @@ public class TimetableSnapshotSourceTest {
       );
     }
 
+    /**
+     * Test behavior of the realtime system in a case related to #5725 that is discussed at:
+     * https://github.com/opentripplanner/OpenTripPlanner/pull/5726#discussion_r1521653840
+     * When a trip is added by a realtime message, in the realtime data indexes a corresponding
+     * trip pattern should be associated with the stops that trip visits. When a subsequent 
+     * realtime message cancels or deletes that trip, the pattern should continue to be present in
+     * the realtime data indexes, and it should still contain the previously added trip, but that
+     * trip should be marked as having canceled or deleted status. At no point should the trip
+     * added by realtime data be present in the trip pattern for scheduled service. 
+     */
     @ParameterizedTest
     @MethodSource("addedRemovalTestCase")
     public void cancelingAddedTrip(
