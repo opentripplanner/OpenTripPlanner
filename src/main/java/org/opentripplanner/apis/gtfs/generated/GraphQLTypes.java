@@ -2266,6 +2266,7 @@ public class GraphQLTypes {
 
     private List<String> feeds;
     private List<String> ids;
+    private GraphQLServiceDayFilterInput limitByPatternServiceDays;
     private String name;
     private List<GraphQLMode> transportModes;
 
@@ -2273,6 +2274,10 @@ public class GraphQLTypes {
       if (args != null) {
         this.feeds = (List<String>) args.get("feeds");
         this.ids = (List<String>) args.get("ids");
+        this.limitByPatternServiceDays =
+          new GraphQLServiceDayFilterInput(
+            (Map<String, Object>) args.get("limitByPatternServiceDays")
+          );
         this.name = (String) args.get("name");
         if (args.get("transportModes") != null) {
           this.transportModes =
@@ -2292,6 +2297,10 @@ public class GraphQLTypes {
       return this.ids;
     }
 
+    public GraphQLServiceDayFilterInput getGraphQLLimitByPatternServiceDays() {
+      return this.limitByPatternServiceDays;
+    }
+
     public String getGraphQLName() {
       return this.name;
     }
@@ -2306,6 +2315,12 @@ public class GraphQLTypes {
 
     public void setGraphQLIds(List<String> ids) {
       this.ids = ids;
+    }
+
+    public void setGraphQLLimitByPatternServiceDays(
+      GraphQLServiceDayFilterInput limitByPatternServiceDays
+    ) {
+      this.limitByPatternServiceDays = limitByPatternServiceDays;
     }
 
     public void setGraphQLName(String name) {

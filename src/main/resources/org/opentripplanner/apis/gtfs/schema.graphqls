@@ -2707,6 +2707,8 @@ type QueryType {
 
         """Only include routes, which use one of these modes"""
         transportModes: [Mode]
+
+        limitByPatternServiceDays: ServiceDayFilterInput
     ): [Route]
 
     """

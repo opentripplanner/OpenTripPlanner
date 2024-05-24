@@ -13,20 +13,14 @@ import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.PatternByServiceDaysFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
@@ -46,11 +40,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.routing.graphfinder.*;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -603,6 +593,16 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             GraphQLUtils.startsWith(route.getShortName(), name, environment.getLocale()) ||
             GraphQLUtils.startsWith(route.getLongName(), name, environment.getLocale())
           );
+      }
+
+      if (
+        PatternByServiceDaysFilter.hasServiceDayFilter(args.getGraphQLLimitByPatternServiceDays())
+      ) {
+        var filter = new PatternByServiceDaysFilter(
+          transitService,
+          args.getGraphQLLimitByPatternServiceDays()
+        );
+        routeStream = filter.filterRoutes(routeStream);
       }
       return routeStream.toList();
     };

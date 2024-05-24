@@ -3,13 +3,13 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.PatternByServiceDaysFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
@@ -181,25 +181,14 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
       var args = new GraphQLTypes.GraphQLRoutePatternsArgs(environment.getArguments());
 
-      var serviceDays = args.getGraphQLServiceDays();
-      if (
-        serviceDays != null &&
-        (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
-      ) {
-        var start = args.getGraphQLServiceDays().getGraphQLStart();
-        return patterns
-          .stream()
-          .filter(pattern ->
-            hasServicesOnDate(patterns, transitService, start)
-          )
-          .toList();
+      if (PatternByServiceDaysFilter.hasServiceDayFilter(args.getGraphQLServiceDays())) {
+        var filter = new PatternByServiceDaysFilter(transitService, args.getGraphQLServiceDays());
+        return filter.filterPatterns(patterns);
       } else {
         return patterns;
       }
     };
   }
-
-
 
   @Override
   public DataFetcher<String> shortName() {
@@ -263,23 +252,5 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   private Route getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
-  }
-
-  private static boolean hasServicesOnDate(Collection<TripPattern> patterns, TransitService transitService, LocalDate start) {
-    return patterns
-      .stream()
-      .anyMatch(p ->
-        p
-          .scheduledTripsAsStream()
-          .anyMatch(trip -> {
-            var dates = transitService
-              .getCalendarService()
-              .getServiceDatesForServiceId(trip.getServiceId());
-
-            return dates
-              .stream()
-              .anyMatch(date -> date.isEqual(start) || date.isAfter(start));
-          })
-      );
   }
 }
