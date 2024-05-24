@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
@@ -120,15 +121,16 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          Itinerary itinerary = template.createDirectGraphPath(
-            egress,
-            arriveBy,
-            departureTime,
-            startOfTime,
-            graphPathToItineraryMapper
-          );
-          if (itinerary != null) {
-            itineraries.add(itinerary);
+          var directFlexPath = template.createDirectGraphPath(egress, arriveBy, departureTime);
+          if(directFlexPath.isPresent()) {
+            var startTime = startOfTime.plusSeconds(directFlexPath.get().startTime());
+            var itinerary = graphPathToItineraryMapper
+              .generateItinerary(new GraphPath<>(directFlexPath.get().state()))
+              .withTimeShiftToStartAt(startTime);
+
+            if (itinerary != null) {
+              itineraries.add(itinerary);
+            }
           }
         }
       }
