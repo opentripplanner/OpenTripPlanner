@@ -27,7 +27,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.PatternByServiceDaysFilter;
+import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
@@ -607,11 +607,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       if (
-        PatternByServiceDaysFilter.hasServiceDayFilter(args.getGraphQLLimitByPatternServiceDays())
+        PatternByServiceDatesFilter.hasServiceDayFilter(args.getGraphQLLimitByPatternServiceDates())
       ) {
-        var filter = new PatternByServiceDaysFilter(
+        var filter = new PatternByServiceDatesFilter(
           transitService,
-          args.getGraphQLLimitByPatternServiceDays()
+          args.getGraphQLLimitByPatternServiceDates()
         );
         routeStream = filter.filterRoutes(routeStream).stream();
       }

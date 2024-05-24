@@ -4,8 +4,8 @@ import static java.time.LocalDate.parse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDaysFilterTest.FilterExpectation.NOT_REMOVED;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDaysFilterTest.FilterExpectation.REMOVED;
+import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
+import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
-class PatternByServiceDaysFilterTest {
+class PatternByServiceDatesFilterTest {
 
   private static final TransitService EMPTY_SERVICE = new DefaultTransitService(new TransitModel());
   private static final Route ROUTE_1 = TransitModelForTest.route("1").build();
@@ -71,7 +71,7 @@ class PatternByServiceDaysFilterTest {
   void invalidRange(LocalDate start, LocalDate end) {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new PatternByServiceDaysFilter(EMPTY_SERVICE, start, end)
+      () -> new PatternByServiceDatesFilter(EMPTY_SERVICE, start, end)
     );
   }
 
@@ -88,7 +88,7 @@ class PatternByServiceDaysFilterTest {
   @ParameterizedTest
   @MethodSource("validRange")
   void validRange(LocalDate start, LocalDate end) {
-    assertDoesNotThrow(() -> new PatternByServiceDaysFilter(EMPTY_SERVICE, start, end));
+    assertDoesNotThrow(() -> new PatternByServiceDatesFilter(EMPTY_SERVICE, start, end));
   }
 
   static List<Arguments> ranges() {
@@ -110,7 +110,7 @@ class PatternByServiceDaysFilterTest {
   @MethodSource("ranges")
   void filterPatterns(LocalDate start, LocalDate end, FilterExpectation expectation) {
     var service = mockService();
-    var filter = new PatternByServiceDaysFilter(service, start, end);
+    var filter = new PatternByServiceDatesFilter(service, start, end);
 
     var filterInput = List.of(PATTERN_1);
     var filterOutput = filter.filterPatterns(filterInput);
@@ -126,7 +126,7 @@ class PatternByServiceDaysFilterTest {
   @MethodSource("ranges")
   void filterRoutes(LocalDate start, LocalDate end, FilterExpectation expectation) {
     var service = mockService();
-    var filter = new PatternByServiceDaysFilter(service, start, end);
+    var filter = new PatternByServiceDatesFilter(service, start, end);
 
     var filterInput = List.of(ROUTE_1);
     var filterOutput = filter.filterRoutes(filterInput.stream());

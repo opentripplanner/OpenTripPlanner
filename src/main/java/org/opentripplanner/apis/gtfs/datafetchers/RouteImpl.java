@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.PatternByServiceDaysFilter;
+import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
@@ -181,8 +181,8 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
       var args = new GraphQLTypes.GraphQLRoutePatternsArgs(environment.getArguments());
 
-      if (PatternByServiceDaysFilter.hasServiceDayFilter(args.getGraphQLServiceDays())) {
-        var filter = new PatternByServiceDaysFilter(transitService, args.getGraphQLServiceDays());
+      if (PatternByServiceDatesFilter.hasServiceDayFilter(args.getGraphQLServiceDates())) {
+        var filter = new PatternByServiceDatesFilter(transitService, args.getGraphQLServiceDates());
         return filter.filterPatterns(patterns);
       } else {
         return patterns;

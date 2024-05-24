@@ -2266,7 +2266,7 @@ public class GraphQLTypes {
 
     private List<String> feeds;
     private List<String> ids;
-    private GraphQLServiceDayFilterInput limitByPatternServiceDays;
+    private GraphQLServiceDateFilterInput limitByPatternServiceDates;
     private String name;
     private List<GraphQLMode> transportModes;
 
@@ -2274,9 +2274,9 @@ public class GraphQLTypes {
       if (args != null) {
         this.feeds = (List<String>) args.get("feeds");
         this.ids = (List<String>) args.get("ids");
-        this.limitByPatternServiceDays =
-          new GraphQLServiceDayFilterInput(
-            (Map<String, Object>) args.get("limitByPatternServiceDays")
+        this.limitByPatternServiceDates =
+          new GraphQLServiceDateFilterInput(
+            (Map<String, Object>) args.get("limitByPatternServiceDates")
           );
         this.name = (String) args.get("name");
         if (args.get("transportModes") != null) {
@@ -2297,8 +2297,8 @@ public class GraphQLTypes {
       return this.ids;
     }
 
-    public GraphQLServiceDayFilterInput getGraphQLLimitByPatternServiceDays() {
-      return this.limitByPatternServiceDays;
+    public GraphQLServiceDateFilterInput getGraphQLLimitByPatternServiceDates() {
+      return this.limitByPatternServiceDates;
     }
 
     public String getGraphQLName() {
@@ -2317,10 +2317,10 @@ public class GraphQLTypes {
       this.ids = ids;
     }
 
-    public void setGraphQLLimitByPatternServiceDays(
-      GraphQLServiceDayFilterInput limitByPatternServiceDays
+    public void setGraphQLLimitByPatternServiceDates(
+      GraphQLServiceDateFilterInput limitByPatternServiceDates
     ) {
-      this.limitByPatternServiceDays = limitByPatternServiceDays;
+      this.limitByPatternServiceDates = limitByPatternServiceDates;
     }
 
     public void setGraphQLName(String name) {
@@ -2768,21 +2768,21 @@ public class GraphQLTypes {
 
   public static class GraphQLRoutePatternsArgs {
 
-    private GraphQLServiceDayFilterInput serviceDays;
+    private GraphQLServiceDateFilterInput serviceDates;
 
     public GraphQLRoutePatternsArgs(Map<String, Object> args) {
       if (args != null) {
-        this.serviceDays =
-          new GraphQLServiceDayFilterInput((Map<String, Object>) args.get("serviceDays"));
+        this.serviceDates =
+          new GraphQLServiceDateFilterInput((Map<String, Object>) args.get("serviceDates"));
       }
     }
 
-    public GraphQLServiceDayFilterInput getGraphQLServiceDays() {
-      return this.serviceDays;
+    public GraphQLServiceDateFilterInput getGraphQLServiceDates() {
+      return this.serviceDates;
     }
 
-    public void setGraphQLServiceDays(GraphQLServiceDayFilterInput serviceDays) {
-      this.serviceDays = serviceDays;
+    public void setGraphQLServiceDates(GraphQLServiceDateFilterInput serviceDates) {
+      this.serviceDates = serviceDates;
     }
   }
 
@@ -2807,12 +2807,12 @@ public class GraphQLTypes {
     WALKING_BETTER_THAN_TRANSIT,
   }
 
-  public static class GraphQLServiceDayFilterInput {
+  public static class GraphQLServiceDateFilterInput {
 
     private java.time.LocalDate end;
     private java.time.LocalDate start;
 
-    public GraphQLServiceDayFilterInput(Map<String, Object> args) {
+    public GraphQLServiceDateFilterInput(Map<String, Object> args) {
       if (args != null) {
         this.end = (java.time.LocalDate) args.get("end");
         this.start = (java.time.LocalDate) args.get("start");

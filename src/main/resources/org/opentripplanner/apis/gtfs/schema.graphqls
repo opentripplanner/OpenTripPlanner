@@ -1664,6 +1664,11 @@ type RideHailingEstimate {
 }
 
 """
+An ISO-8601-formatted local date, i.e. `2024-05-24` for the 24th of May, 2024.
+"""
+scalar LocalDate
+
+"""
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
 
 ISO-8601 allows many different formats but OTP will only return the profile specified in RFC3339.
@@ -2542,10 +2547,18 @@ enum Qualifier {
     HAIL
 }
 
-scalar LocalDate
 
-input ServiceDayFilterInput {
+"""Filters entity by their service dates."""
+input ServiceDateFilterInput {
+    """
+    Inclusive start date of the filter. If `null` this means that no `start` filter is applied and all
+    dates that are before or on `end` are selected.
+    """
     start: LocalDate
+    """
+    Inclusive end date of the filter. If `null` this means that no end filter is applied and all
+    entities that are after or on `start` are selected.
+    """
     end: LocalDate
 }
 
@@ -2708,7 +2721,8 @@ type QueryType {
         """Only include routes, which use one of these modes"""
         transportModes: [Mode]
 
-        limitByPatternServiceDays: ServiceDayFilterInput
+        """Only include routes whose pattern operates on at least one service date specified by this filter."""
+        limitByPatternServiceDates: ServiceDateFilterInput
     ): [Route]
 
     """
@@ -3431,8 +3445,8 @@ type Route implements Node {
 
     """List of patterns which operate on this route"""
     patterns(
-        "Filter patterns by the service day they operate on."
-        serviceDays: ServiceDayFilterInput
+        "Filter patterns by the service dates they operate on."
+        serviceDates: ServiceDateFilterInput
     ): [Pattern]
 
     """List of stops on this route"""
