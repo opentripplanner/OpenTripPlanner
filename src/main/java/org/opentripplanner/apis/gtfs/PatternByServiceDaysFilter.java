@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDayFilterInput;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -17,14 +18,19 @@ public class PatternByServiceDaysFilter {
 
   PatternByServiceDaysFilter(
     TransitService transitService,
-    LocalDate startInclusive,
-    LocalDate endInclusive
+    @Nullable LocalDate startInclusive,
+    @Nullable LocalDate endInclusive
   ) {
     Objects.requireNonNull(transitService);
     this.transitService = transitService;
+
     // optional
     this.startInclusive = startInclusive;
     this.endInclusive = endInclusive;
+
+    if (startInclusive != null && endInclusive != null && startInclusive.isAfter(endInclusive)) {
+      throw new IllegalArgumentException("start must be before end");
+    }
   }
 
   public PatternByServiceDaysFilter(
