@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -53,7 +52,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   private final ZonedDateTime startOfTime;
   private final int departureTime;
   private final boolean arriveBy;
-  private final FlexServiceDate[] dates;
+  private final List<FlexServiceDate> dates;
 
   public FlexRouter(
     Graph graph,
@@ -96,21 +95,13 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
     this.departureTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, searchInstant);
     this.arriveBy = arriveBy;
-
-    int totalDays = additionalPastSearchDays + 1 + additionalFutureSearchDays;
-
-    this.dates = new FlexServiceDate[totalDays];
-
-    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
-      LocalDate date = searchDate.plusDays(d);
-      int index = d + additionalPastSearchDays;
-      dates[index] =
-        new FlexServiceDate(
-          date,
-          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
-          transitService.getServiceCodesRunningForDate(date)
-        );
-    }
+    this.dates =
+      createFlexServiceDates(
+        transitService,
+        additionalPastSearchDays,
+        additionalFutureSearchDays,
+        searchDate
+      );
   }
 
   public Collection<Itinerary> createFlexOnlyItineraries() {
@@ -196,8 +187,8 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     return getClosestFlexTrips(streetAccesses, true)
       // For each date the router has data for
       .flatMap(it ->
-        Arrays
-          .stream(dates)
+        dates
+          .stream()
           // Discard if service is not running on date
           .filter(date -> isDateActive(date, it.flexTrip()))
           // Create templates from trip, boarding at the nearbyStop
@@ -221,8 +212,8 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     return getClosestFlexTrips(streetEgresses, false)
       // For each date the router has data for
       .flatMap(it ->
-        Arrays
-          .stream(dates)
+        dates
+          .stream()
           // Discard if service is not running on date
           .filter(date -> isDateActive(date, it.flexTrip()))
           // Create templates from trips, alighting at the nearbyStop
@@ -269,6 +260,27 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
           .min(Comparator.comparingLong(t2 -> t2.accessEgress().state.getElapsedTimeSeconds()))
       )
       .flatMap(Optional::stream);
+  }
+
+  private List<FlexServiceDate> createFlexServiceDates(
+    TransitService transitService,
+    int additionalPastSearchDays,
+    int additionalFutureSearchDays,
+    LocalDate searchDate
+  ) {
+    final List<FlexServiceDate> dates = new ArrayList<>();
+
+    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
+      LocalDate date = searchDate.plusDays(d);
+      dates.add(
+        new FlexServiceDate(
+          date,
+          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, date),
+          transitService.getServiceCodesRunningForDate(date)
+        )
+      );
+    }
+    return List.copyOf(dates);
   }
 
   private record AccessEgressAndNearbyStop(NearbyStop accessEgress, FlexTrip<?, ?> flexTrip) {}
