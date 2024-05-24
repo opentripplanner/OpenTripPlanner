@@ -53,12 +53,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   private final ZonedDateTime startOfTime;
   private final int departureTime;
   private final boolean arriveBy;
-
   private final FlexServiceDate[] dates;
-
-  /* State */
-  private List<FlexAccessTemplate> flexAccessTemplates = null;
-  private List<FlexEgressTemplate> flexEgressTemplates = null;
 
   public FlexRouter(
     Graph graph,
@@ -120,19 +115,18 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
 
   public Collection<Itinerary> createFlexOnlyItineraries() {
     OTPRequestTimeoutException.checkForTimeout();
-    calculateFlexAccessTemplates();
-    calculateFlexEgressTemplates();
+    var flexAccessTemplates = calculateFlexAccessTemplates();
+    var flexEgressTemplates = calculateFlexEgressTemplates();
 
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
 
     Collection<Itinerary> itineraries = new ArrayList<>();
 
-    for (FlexAccessTemplate template : this.flexAccessTemplates) {
+    for (FlexAccessTemplate template : flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
       if (
-        this.flexEgressTemplates.stream()
-          .anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
+        flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
           Itinerary itinerary = template.createDirectGraphPath(
@@ -154,18 +148,20 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
 
   public Collection<FlexAccessEgress> createFlexAccesses() {
     OTPRequestTimeoutException.checkForTimeout();
-    calculateFlexAccessTemplates();
+    var flexAccessTemplates = calculateFlexAccessTemplates();
 
-    return this.flexAccessTemplates.stream()
+    return flexAccessTemplates
+      .stream()
       .flatMap(template -> template.createFlexAccessEgressStream(this))
       .toList();
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
     OTPRequestTimeoutException.checkForTimeout();
-    calculateFlexEgressTemplates();
+    var flexEgressTemplates = calculateFlexEgressTemplates();
 
-    return this.flexEgressTemplates.stream()
+    return flexEgressTemplates
+      .stream()
       .flatMap(template -> template.createFlexAccessEgressStream(this))
       .toList();
   }
@@ -190,64 +186,54 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     return date.isFlexTripRunning(trip, transitService);
   }
 
-  private void calculateFlexAccessTemplates() {
-    if (this.flexAccessTemplates != null) {
-      return;
-    }
-
+  private List<FlexAccessTemplate> calculateFlexAccessTemplates() {
     var templateFactory = FlexTemplateFactory.of(
       accessFlexPathCalculator,
       flexParameters.maxTransferDuration()
     );
 
     // Fetch the closest flexTrips reachable from the access stops
-    this.flexAccessTemplates =
-      getClosestFlexTrips(streetAccesses, true)
-        // For each date the router has data for
-        .flatMap(it ->
-          Arrays
-            .stream(dates)
-            // Discard if service is not running on date
-            .filter(date -> isDateActive(date, it.flexTrip()))
-            // Create templates from trip, boarding at the nearbyStop
-            .flatMap(date ->
-              templateFactory
-                .with(date, it.flexTrip(), it.accessEgress())
-                .createAccessTemplates()
-                .stream()
-            )
-        )
-        .toList();
+    return getClosestFlexTrips(streetAccesses, true)
+      // For each date the router has data for
+      .flatMap(it ->
+        Arrays
+          .stream(dates)
+          // Discard if service is not running on date
+          .filter(date -> isDateActive(date, it.flexTrip()))
+          // Create templates from trip, boarding at the nearbyStop
+          .flatMap(date ->
+            templateFactory
+              .with(date, it.flexTrip(), it.accessEgress())
+              .createAccessTemplates()
+              .stream()
+          )
+      )
+      .toList();
   }
 
-  private void calculateFlexEgressTemplates() {
-    if (this.flexEgressTemplates != null) {
-      return;
-    }
-
+  private List<FlexEgressTemplate> calculateFlexEgressTemplates() {
     var templateFactory = FlexTemplateFactory.of(
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration()
     );
 
     // Fetch the closest flexTrips reachable from the egress stops
-    this.flexEgressTemplates =
-      getClosestFlexTrips(streetEgresses, false)
-        // For each date the router has data for
-        .flatMap(it ->
-          Arrays
-            .stream(dates)
-            // Discard if service is not running on date
-            .filter(date -> isDateActive(date, it.flexTrip()))
-            // Create templates from trips, alighting at the nearbyStop
-            .flatMap(date ->
-              templateFactory
-                .with(date, it.flexTrip(), it.accessEgress())
-                .createEgressTemplates()
-                .stream()
-            )
-        )
-        .toList();
+    return getClosestFlexTrips(streetEgresses, false)
+      // For each date the router has data for
+      .flatMap(it ->
+        Arrays
+          .stream(dates)
+          // Discard if service is not running on date
+          .filter(date -> isDateActive(date, it.flexTrip()))
+          // Create templates from trips, alighting at the nearbyStop
+          .flatMap(date ->
+            templateFactory
+              .with(date, it.flexTrip(), it.accessEgress())
+              .createEgressTemplates()
+              .stream()
+          )
+      )
+      .toList();
   }
 
   private Stream<AccessEgressAndNearbyStop> getClosestFlexTrips(
