@@ -588,7 +588,8 @@ class SiriTimetableSnapshotSourceTest {
     public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
       List<EstimatedTimetableDeliveryStructure> updates
     ) {
-      return applyEstimatedTimetable(updates, SiriFuzzyTripMatcher.of(getTransitService()));
+      SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
+      return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
     }
 
     private UpdateResult applyEstimatedTimetable(
