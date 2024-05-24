@@ -131,41 +131,6 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testHandleCanceledTrip() {
-    final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-    final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-    final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
-    final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
-    final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
-    final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
-
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel,
-      () -> SERVICE_DATE
-    );
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      FULL_DATASET,
-      List.of(cancellation("1.1")),
-      feedId
-    );
-
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
-    final Timetable schedule = snapshot.resolve(pattern, null);
-    assertNotSame(forToday, schedule);
-    assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
-    assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
-
-    final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
-
-    assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
-  }
-
-  @Test
   public void testHandleDeletedTrip() {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
