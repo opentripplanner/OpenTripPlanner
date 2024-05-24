@@ -35,10 +35,26 @@ public class FlexTemplateFactory {
     return new FlexTemplateFactory(calculator, maxTransferDuration);
   }
 
+  public List<FlexAccessTemplate> createAccessTemplates(
+    FlexServiceDate date,
+    FlexTrip<?, ?> flexTrip,
+    NearbyStop nearbyStop
+  ) {
+    return with(date, flexTrip, nearbyStop).createAccessTemplates();
+  }
+
+  public List<FlexEgressTemplate> createEgressTemplates(
+    FlexServiceDate date,
+    FlexTrip<?, ?> flexTrip,
+    NearbyStop nearbyStop
+  ) {
+    return with(date, flexTrip, nearbyStop).createEgressTemplates();
+  }
+
   /**
    * Add required parameters to the factory before calling the create methods.
    */
-  public FlexTemplateFactory with(
+  private FlexTemplateFactory with(
     FlexServiceDate date,
     FlexTrip<?, ?> flexTrip,
     NearbyStop nearbyStop
@@ -49,7 +65,7 @@ public class FlexTemplateFactory {
     return this;
   }
 
-  public List<FlexAccessTemplate> createAccessTemplates() {
+  private List<FlexAccessTemplate> createAccessTemplates() {
     assertRequiredParametersSet();
 
     int boardIndex = trip.findBoardIndex(stop());
@@ -74,7 +90,7 @@ public class FlexTemplateFactory {
     return result;
   }
 
-  public List<FlexEgressTemplate> createEgressTemplates() {
+  private List<FlexEgressTemplate> createEgressTemplates() {
     assertRequiredParametersSet();
 
     var alightIndex = trip.findAlightIndex(stop());

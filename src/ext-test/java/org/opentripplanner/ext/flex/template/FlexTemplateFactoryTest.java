@@ -93,7 +93,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with access boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_A)).createAccessTemplates();
+    var subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_A));
 
     var template = subject.get(0);
     assertEquals(0, template.fromStopIndex);
@@ -106,11 +106,11 @@ class FlexTemplateFactoryTest {
 
     // We are not allowed to board and alight at the same stop so boarding the last stop
     // will result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createAccessTemplates();
+    subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_B));
     assertTrue(subject.isEmpty(), subject::toString);
 
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_C)).createAccessTemplates();
+    subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_C));
     assertTrue(subject.isEmpty(), subject::toString);
   }
 
@@ -125,7 +125,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with egress alighting at stop B
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createEgressTemplates();
+    var subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_B));
 
     var template = subject.get(0);
     assertEquals(0, template.fromStopIndex);
@@ -138,11 +138,11 @@ class FlexTemplateFactoryTest {
 
     // We are not allowed to board and alight at the same stop so boarding the last stop
     // will result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_A)).createEgressTemplates();
+    subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_A));
     assertTrue(subject.isEmpty(), subject::toString);
 
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_C)).createEgressTemplates();
+    subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_C));
     assertTrue(subject.isEmpty(), subject::toString);
   }
 
@@ -159,7 +159,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_A)).createAccessTemplates();
+    var subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_A));
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
@@ -170,7 +170,7 @@ class FlexTemplateFactoryTest {
     assertEquals(2, subject.size());
 
     // Board at stop C
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_C)).createAccessTemplates();
+    subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_C));
 
     t1 = subject.get(0);
     assertEquals(2, t1.fromStopIndex);
@@ -179,11 +179,11 @@ class FlexTemplateFactoryTest {
 
     // We are not allowed to board and alight at the same stop so boarding the last stop
     // will result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createAccessTemplates();
+    subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_B));
     assertTrue(subject.isEmpty(), subject::toString);
 
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_D)).createAccessTemplates();
+    subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_D));
     assertTrue(subject.isEmpty(), subject::toString);
   }
 
@@ -200,7 +200,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_D)).createEgressTemplates();
+    var subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_D));
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
@@ -211,7 +211,7 @@ class FlexTemplateFactoryTest {
     assertEquals(2, subject.size());
 
     // Board at stop C
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createEgressTemplates();
+    subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_B));
 
     t1 = subject.get(0);
     assertEquals(0, t1.fromStopIndex);
@@ -220,11 +220,11 @@ class FlexTemplateFactoryTest {
 
     // We are not allowed to board and alight at the same stop so boarding the last stop
     // will result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_C)).createEgressTemplates();
+    subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_C));
     assertTrue(subject.isEmpty(), subject::toString);
 
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.with(DATE, flexTrip, nearbyStop(STOP_A)).createEgressTemplates();
+    subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_A));
     assertTrue(subject.isEmpty(), subject::toString);
   }
 
@@ -239,7 +239,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with access boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_G1)).createAccessTemplates();
+    var subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_G1));
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
@@ -262,7 +262,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with access boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_G4)).createEgressTemplates();
+    var subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_G4));
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
@@ -286,7 +286,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with access boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createAccessTemplates();
+    var subject = factory.createAccessTemplates(DATE, flexTrip, nearbyStop(STOP_B));
 
     var template = subject.get(0);
     assertEquals(1, template.fromStopIndex);
@@ -308,7 +308,7 @@ class FlexTemplateFactoryTest {
     var factory = FlexTemplateFactory.of(CALCULATOR, MAX_TRANSFER_DURATION);
 
     // Create template with access boarding at stop A
-    var subject = factory.with(DATE, flexTrip, nearbyStop(STOP_B)).createEgressTemplates();
+    var subject = factory.createEgressTemplates(DATE, flexTrip, nearbyStop(STOP_B));
 
     var template = subject.get(0);
     assertEquals(0, template.fromStopIndex);

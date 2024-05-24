@@ -122,7 +122,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
           var directFlexPath = template.createDirectGraphPath(egress, arriveBy, departureTime);
-          if(directFlexPath.isPresent()) {
+          if (directFlexPath.isPresent()) {
             var startTime = startOfTime.plusSeconds(directFlexPath.get().startTime());
             var itinerary = graphPathToItineraryMapper
               .generateItinerary(new GraphPath<>(directFlexPath.get().state()))
@@ -195,10 +195,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
           .filter(date -> isDateActive(date, it.flexTrip()))
           // Create templates from trip, boarding at the nearbyStop
           .flatMap(date ->
-            templateFactory
-              .with(date, it.flexTrip(), it.accessEgress())
-              .createAccessTemplates()
-              .stream()
+            templateFactory.createAccessTemplates(date, it.flexTrip(), it.accessEgress()).stream()
           )
       )
       .toList();
@@ -220,10 +217,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
           .filter(date -> isDateActive(date, it.flexTrip()))
           // Create templates from trips, alighting at the nearbyStop
           .flatMap(date ->
-            templateFactory
-              .with(date, it.flexTrip(), it.accessEgress())
-              .createEgressTemplates()
-              .stream()
+            templateFactory.createEgressTemplates(date, it.flexTrip(), it.accessEgress()).stream()
           )
       )
       .toList();
