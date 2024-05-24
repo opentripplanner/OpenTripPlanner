@@ -263,7 +263,9 @@ public final class RealTimeTripTimes implements TripTimes {
    * found.
    */
   public void validateNonIncreasingTimes() {
-    final int nStops = arrivalTimes.length;
+    final int nStops = arrivalTimes != null
+      ? arrivalTimes.length
+      : scheduledTripTimes.getNumStops();
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
