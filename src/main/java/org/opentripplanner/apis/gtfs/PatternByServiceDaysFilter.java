@@ -59,19 +59,14 @@ public class PatternByServiceDaysFilter {
           .getCalendarService()
           .getServiceDatesForServiceId(trip.getServiceId());
 
-        var matchesStartInclusive = dates
+        return dates
           .stream()
           .anyMatch(date ->
-            date == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)
+            (
+              startInclusive == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)
+            ) &&
+            (endInclusive == null || date.isEqual(endInclusive) || date.isBefore(endInclusive))
           );
-
-        var matchesEndInclusive = dates
-          .stream()
-          .anyMatch(date ->
-            date == null || date.isEqual(endInclusive) || date.isBefore(endInclusive)
-          );
-
-        return matchesStartInclusive && matchesEndInclusive;
       });
   }
 
