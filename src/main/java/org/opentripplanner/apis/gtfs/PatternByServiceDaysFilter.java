@@ -44,11 +44,13 @@ public class PatternByServiceDaysFilter {
     return tripPatterns.stream().filter(this::hasServicesOnDate).toList();
   }
 
-  public Stream<Route> filterRoutes(Stream<Route> routeStream) {
-    return routeStream.filter(r -> {
-      var patterns = transitService.getPatternsForRoute(r);
-      return !this.filterPatterns(patterns).isEmpty();
-    });
+  public Collection<Route> filterRoutes(Stream<Route> routeStream) {
+    return routeStream
+      .filter(r -> {
+        var patterns = transitService.getPatternsForRoute(r);
+        return !this.filterPatterns(patterns).isEmpty();
+      })
+      .toList();
   }
 
   private boolean hasServicesOnDate(TripPattern pattern) {

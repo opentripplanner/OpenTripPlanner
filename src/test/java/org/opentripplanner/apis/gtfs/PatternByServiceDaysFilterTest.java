@@ -4,6 +4,8 @@ import static java.time.LocalDate.parse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.apis.gtfs.PatternByServiceDaysFilterTest.FilterExpectation.NOT_REMOVED;
+import static org.opentripplanner.apis.gtfs.PatternByServiceDaysFilterTest.FilterExpectation.REMOVED;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -35,8 +37,11 @@ class PatternByServiceDaysFilterTest {
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
   private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_1, STOP_1);
   private static final TripPattern PATTERN_1 = pattern();
-  private static final List<TripPattern> NOT_REMOVED = List.of(PATTERN_1);
-  private static final List<Object> REMOVED = List.of();
+
+  enum FilterExpectation {
+    REMOVED,
+    NOT_REMOVED,
+  }
 
   private static TripPattern pattern() {
     var pattern = TransitModelForTest
@@ -86,7 +91,7 @@ class PatternByServiceDaysFilterTest {
     assertDoesNotThrow(() -> new PatternByServiceDaysFilter(EMPTY_SERVICE, start, end));
   }
 
-  static List<Arguments> patternRanges() {
+  static List<Arguments> ranges() {
     return List.of(
       Arguments.of(null, null, NOT_REMOVED),
       Arguments.of(null, parse("2024-05-03"), NOT_REMOVED),
@@ -102,20 +107,39 @@ class PatternByServiceDaysFilterTest {
   }
 
   @ParameterizedTest
-  @MethodSource("patternRanges")
-  void filterPatterns(LocalDate start, LocalDate end, List<TripPattern> expectedPatterns) {
-    var model = new TransitModel();
-    var service = mockService(model);
-
+  @MethodSource("ranges")
+  void filterPatterns(LocalDate start, LocalDate end, FilterExpectation expectation) {
+    var service = mockService();
     var filter = new PatternByServiceDaysFilter(service, start, end);
 
-    var result = filter.filterPatterns(NOT_REMOVED);
+    var filterInput = List.of(PATTERN_1);
+    var filterOutput = filter.filterPatterns(filterInput);
 
-    assertEquals(expectedPatterns, result);
+    if (expectation == NOT_REMOVED) {
+      assertEquals(filterOutput, filterInput);
+    } else {
+      assertEquals(List.of(), filterOutput);
+    }
   }
 
-  private static TransitService mockService(TransitModel model) {
-    return new DefaultTransitService(model) {
+  @ParameterizedTest
+  @MethodSource("ranges")
+  void filterRoutes(LocalDate start, LocalDate end, FilterExpectation expectation) {
+    var service = mockService();
+    var filter = new PatternByServiceDaysFilter(service, start, end);
+
+    var filterInput = List.of(ROUTE_1);
+    var filterOutput = filter.filterRoutes(filterInput.stream());
+
+    if (expectation == NOT_REMOVED) {
+      assertEquals(filterOutput, filterInput);
+    } else {
+      assertEquals(List.of(), filterOutput);
+    }
+  }
+
+  private static TransitService mockService() {
+    return new DefaultTransitService(new TransitModel()) {
       @Override
       public Collection<TripPattern> getPatternsForRoute(Route route) {
         return Set.of(PATTERN_1);
