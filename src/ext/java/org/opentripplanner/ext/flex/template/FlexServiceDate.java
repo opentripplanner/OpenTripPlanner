@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.flex;
+package org.opentripplanner.ext.flex.template;
 
 import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
@@ -33,7 +33,7 @@ public class FlexServiceDate {
     this.servicesRunning = servicesRunning;
   }
 
-  boolean isFlexTripRunning(FlexTrip flexTrip, TransitService transitService) {
+  public boolean isFlexTripRunning(FlexTrip<?, ?> flexTrip, TransitService transitService) {
     return (
       servicesRunning != null &&
       servicesRunning.contains(

@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;

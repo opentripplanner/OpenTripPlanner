@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;

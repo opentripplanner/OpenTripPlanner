@@ -11,6 +11,7 @@ import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
+import org.opentripplanner.ext.flex.template.FlexServiceDate;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;

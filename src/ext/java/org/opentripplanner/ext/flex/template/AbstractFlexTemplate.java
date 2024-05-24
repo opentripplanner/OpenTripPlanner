@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
-import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;

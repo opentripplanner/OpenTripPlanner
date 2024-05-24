@@ -19,6 +19,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.ext.flex.template.FlexServiceDate;
 import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
