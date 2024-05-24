@@ -116,10 +116,6 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (calls.getFirst().getAimedDepartureTime() == null) {
-      LOG.warn(
-        "Missing aimed departure time on first stop for estimated vehicle journey '{}'",
-        DebugString.of(journey)
-      );
       return null;
     }
 
