@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexTripEdge extends Edge {
 
-  private final FlexTrip trip;
+  private final FlexTrip<?, ?> trip;
   public final StopLocation s1;
   public final StopLocation s2;
   public final AbstractFlexTemplate flexTemplate;
@@ -27,7 +27,7 @@ public class FlexTripEdge extends Edge {
     Vertex v2,
     StopLocation s1,
     StopLocation s2,
-    FlexTrip trip,
+    FlexTrip<?, ?> trip,
     AbstractFlexTemplate flexTemplate,
     FlexPath flexPath
   ) {
@@ -48,7 +48,7 @@ public class FlexTripEdge extends Edge {
     Vertex v2,
     StopLocation s1,
     StopLocation s2,
-    FlexTrip trip,
+    FlexTrip<?, ?> trip,
     AbstractFlexTemplate flexTemplate,
     FlexPath flexPath
   ) {

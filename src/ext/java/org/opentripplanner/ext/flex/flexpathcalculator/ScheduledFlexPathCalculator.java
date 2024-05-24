@@ -13,7 +13,7 @@ public class ScheduledFlexPathCalculator implements FlexPathCalculator {
   private final FlexPathCalculator flexPathCalculator;
   private final FlexTrip trip;
 
-  public ScheduledFlexPathCalculator(FlexPathCalculator flexPathCalculator, FlexTrip trip) {
+  public ScheduledFlexPathCalculator(FlexPathCalculator flexPathCalculator, FlexTrip<?, ?> trip) {
     this.flexPathCalculator = flexPathCalculator;
     this.trip = trip;
   }
