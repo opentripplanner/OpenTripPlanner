@@ -1198,11 +1198,11 @@ public class TimetableSnapshotSourceTest {
      * Test behavior of the realtime system in a case related to #5725 that is discussed at:
      * https://github.com/opentripplanner/OpenTripPlanner/pull/5726#discussion_r1521653840
      * When a trip is added by a realtime message, in the realtime data indexes a corresponding
-     * trip pattern should be associated with the stops that trip visits. When a subsequent 
+     * trip pattern should be associated with the stops that trip visits. When a subsequent
      * realtime message cancels or deletes that trip, the pattern should continue to be present in
      * the realtime data indexes, and it should still contain the previously added trip, but that
      * trip should be marked as having canceled or deleted status. At no point should the trip
-     * added by realtime data be present in the trip pattern for scheduled service. 
+     * added by realtime data be present in the trip pattern for scheduled service.
      */
     @ParameterizedTest
     @MethodSource("addedRemovalTestCase")
