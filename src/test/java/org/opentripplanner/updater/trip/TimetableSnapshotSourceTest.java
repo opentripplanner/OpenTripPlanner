@@ -1013,7 +1013,7 @@ public class TimetableSnapshotSourceTest {
       boolean forceSnapshotCommit
     ) {
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-      // Get trip pattern of last (most recently added) outgoing edge
+      // Get the trip pattern of the added trip which goes through stopA
       var snapshot = updater.getTimetableSnapshot(forceSnapshotCommit);
       var patternsAtA = snapshot.getPatternsForStop(stopA);
 
@@ -1184,7 +1184,7 @@ public class TimetableSnapshotSourceTest {
       assertNotNull(transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
     }
 
-    static List<Arguments> addedRemovalTestCase() {
+    static List<Arguments> cancelingAddedTripTestCases() {
       return List.of(
         // TODO we might want to change the behaviour so that only the trip without pattern is
         // persisted if the added trip is cancelled
@@ -1204,7 +1204,7 @@ public class TimetableSnapshotSourceTest {
      * added by realtime data be present in the trip pattern for scheduled service.
      */
     @ParameterizedTest
-    @MethodSource("addedRemovalTestCase")
+    @MethodSource("cancelingAddedTripTestCases")
     public void cancelingAddedTrip(
       ScheduleRelationship scheduleRelationship,
       RealTimeState expectedState
@@ -1234,8 +1234,6 @@ public class TimetableSnapshotSourceTest {
       // THEN
       assertAddedTrip(SERVICE_DATE, this.addedTripId, updater, true);
 
-      builder = new TripUpdateBuilder(addedTripId, SERVICE_DATE, ADDED, transitModel.getTimeZone());
-
       var tripDescriptorBuilder = TripDescriptor.newBuilder();
       tripDescriptorBuilder.setTripId(addedTripId);
       tripDescriptorBuilder.setScheduleRelationship(scheduleRelationship);
@@ -1253,9 +1251,9 @@ public class TimetableSnapshotSourceTest {
       );
 
       // THEN
-      // Get trip pattern of last (most recently added) outgoing edge
       var snapshot = updater.getTimetableSnapshot(true);
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
+      // Get the trip pattern of the added trip which goes through stopA
       var patternsAtA = snapshot.getPatternsForStop(stopA);
 
       assertNotNull(patternsAtA, "Added trip pattern should be found");
@@ -1269,7 +1267,7 @@ public class TimetableSnapshotSourceTest {
       final int forTodayAddedTripIndex = forToday.getTripIndex(addedTripId);
       assertTrue(
         forTodayAddedTripIndex > -1,
-        "Added trip should not be found in time table for service date"
+        "Added trip should be found in time table for the service date"
       );
       assertEquals(expectedState, forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState());
 

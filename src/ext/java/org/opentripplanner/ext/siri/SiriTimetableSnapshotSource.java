@@ -356,7 +356,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
     // remove the previously created trip
-    this.buffer.removeRealtimeAddedTripPatternAndTimetablesForTrip(trip.getId(), serviceDate);
+    this.buffer.revertTripToScheduledTripPattern(trip.getId(), serviceDate);
 
     return updateResult;
   }

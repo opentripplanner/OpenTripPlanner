@@ -303,10 +303,7 @@ public class TimetableSnapshot {
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
    * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
-  public boolean removeRealtimeAddedTripPatternAndTimetablesForTrip(
-    FeedScopedId tripId,
-    LocalDate serviceDate
-  ) {
+  public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     boolean success = false;
 
     final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);

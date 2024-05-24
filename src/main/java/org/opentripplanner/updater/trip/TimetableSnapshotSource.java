@@ -290,7 +290,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
           // Remove previous realtime updates for this trip. This is necessary to avoid previous
           // stop pattern modifications from persisting
-          this.buffer.removeRealtimeAddedTripPatternAndTimetablesForTrip(tripId, serviceDate);
+          this.buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
         }
 
         uIndex += 1;
