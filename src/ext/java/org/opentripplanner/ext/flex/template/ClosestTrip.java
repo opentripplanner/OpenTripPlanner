@@ -42,13 +42,7 @@ public class ClosestTrip {
         int stopPos = pickup ? trip.findBoardIndex(stop) : trip.findAlightIndex(stop);
         if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND) {
           var existing = map.get(trip);
-          if (
-            existing == null ||
-            (
-              nearbyStop.state.getElapsedTimeSeconds() <
-              existing.nearbyStop().state.getElapsedTimeSeconds()
-            )
-          ) {
+          if (existing == null || nearbyStop.isBetter(existing.nearbyStop())) {
             map.put(trip, new ClosestTrip(nearbyStop, trip, stopPos));
           }
         }
