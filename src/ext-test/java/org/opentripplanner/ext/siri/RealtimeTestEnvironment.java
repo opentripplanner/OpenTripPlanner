@@ -35,6 +35,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 public class RealtimeTestEnvironment {
 
+  private static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -84,12 +85,11 @@ public class RealtimeTestEnvironment {
       );
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
-    var cal_id = TransitModelForTest.id("CAL_1");
     calendarServiceData.putServiceDatesForServiceId(
-      cal_id,
+      CAL_ID,
       List.of(serviceDate.minusDays(1), serviceDate, serviceDate.plusDays(1))
     );
-    transitModel.getServiceCodes().put(cal_id, 0);
+    transitModel.getServiceCodes().put(CAL_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
     transitModel.index();
@@ -102,7 +102,7 @@ public class RealtimeTestEnvironment {
   private record Stop(RegularStop stop, int arrivalTime, int departureTime) {}
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {
-    var trip = Trip.of(id(id)).withRoute(route).build();
+    var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();
 
     var tripOnServiceDate = TripOnServiceDate
       .of(trip.getId())
