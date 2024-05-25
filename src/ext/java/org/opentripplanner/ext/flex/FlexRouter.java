@@ -8,15 +8,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Map;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
+import org.opentripplanner.ext.flex.template.DirectFlexPath;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressCallbackService;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
@@ -107,36 +106,56 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
 
   public Collection<Itinerary> createFlexOnlyItineraries() {
     OTPRequestTimeoutException.checkForTimeout();
+
+    var directFlexPaths = calculateDirectFlexPaths();
+    var itineraries = new ArrayList<Itinerary>();
+
+    for (DirectFlexPath it : directFlexPaths) {
+      var startTime = startOfTime.plusSeconds(it.startTime());
+      var itinerary = graphPathToItineraryMapper
+        .generateItinerary(new GraphPath<>(it.state()))
+        .withTimeShiftToStartAt(startTime);
+
+      if (itinerary != null) {
+        itineraries.add(itinerary);
+      }
+    }
+    return itineraries;
+  }
+
+  private Collection<DirectFlexPath> calculateDirectFlexPaths() {
+    Collection<DirectFlexPath> directFlexPaths = new ArrayList<>();
+
     var flexAccessTemplates = calculateFlexAccessTemplates();
     var flexEgressTemplates = calculateFlexEgressTemplates();
 
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
 
-    Collection<Itinerary> itineraries = new ArrayList<>();
-
     for (FlexAccessTemplate template : flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
+
+      // TODO: Document or reimplement this. Why are we using the egress to see if the
+      //      access-transfer-stop (last-stop) is used by at least one egress-template?
+      //      Is it because:
+      //      - of the group-stop expansion?
+      //      - of the alight-restriction check?
+      //      - nearest stop to trip match?
+      //      Fix: Find out why and refactor out the business logic and reuse it.
+      //      Problem: Any asymmetrical restriction witch apply/do not apply to the egress,
+      //               but do not apply/apply to the access, like booking-notice.
       if (
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          var directFlexPath = template.createDirectGraphPath(egress, arriveBy, departureTime);
-          if (directFlexPath.isPresent()) {
-            var startTime = startOfTime.plusSeconds(directFlexPath.get().startTime());
-            var itinerary = graphPathToItineraryMapper
-              .generateItinerary(new GraphPath<>(directFlexPath.get().state()))
-              .withTimeShiftToStartAt(startTime);
-
-            if (itinerary != null) {
-              itineraries.add(itinerary);
-            }
-          }
+          template
+            .createDirectGraphPath(egress, arriveBy, departureTime)
+            .ifPresent(directFlexPaths::add);
         }
       }
     }
 
-    return itineraries;
+    return directFlexPaths;
   }
 
   public Collection<FlexAccessEgress> createFlexAccesses() {
@@ -175,6 +194,11 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   }
 
   @Override
+  public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
+    return flexIndex.getFlexTripsByStop(stopLocation);
+  }
+
+  @Override
   public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
     return date.isFlexTripRunning(trip, transitService);
   }
@@ -185,20 +209,15 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
       flexParameters.maxTransferDuration()
     );
 
-    // Fetch the closest flexTrips reachable from the access stops
-    return getClosestFlexTrips(streetAccesses, true)
-      // For each date the router has data for
-      .flatMap(it ->
-        dates
-          .stream()
-          // Discard if service is not running on date
-          .filter(date -> isDateActive(date, it.flexTrip()))
-          // Create templates from trip, boarding at the nearbyStop
-          .flatMap(date ->
-            templateFactory.createAccessTemplates(date, it.flexTrip(), it.accessEgress()).stream()
-          )
-      )
-      .toList();
+    var result = new ArrayList<FlexAccessTemplate>();
+    var closestFlexTrips = getClosestFlexTrips(this, streetAccesses, dates, true);
+
+    for (var it : closestFlexTrips) {
+      for (var date : it.activeDates) {
+        result.addAll(templateFactory.createAccessTemplates(date, it.flexTrip(), it.nearbyStop()));
+      }
+    }
+    return result;
   }
 
   private List<FlexEgressTemplate> calculateFlexEgressTemplates() {
@@ -207,55 +226,50 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
       flexParameters.maxTransferDuration()
     );
 
-    // Fetch the closest flexTrips reachable from the egress stops
-    return getClosestFlexTrips(streetEgresses, false)
-      // For each date the router has data for
-      .flatMap(it ->
-        dates
-          .stream()
-          // Discard if service is not running on date
-          .filter(date -> isDateActive(date, it.flexTrip()))
-          // Create templates from trips, alighting at the nearbyStop
-          .flatMap(date ->
-            templateFactory.createEgressTemplates(date, it.flexTrip(), it.accessEgress()).stream()
-          )
-      )
-      .toList();
+    var result = new ArrayList<FlexEgressTemplate>();
+    var closestFlexTrips = getClosestFlexTrips(this, streetEgresses, dates, false);
+
+    for (var it : closestFlexTrips) {
+      for (var date : it.activeDates) {
+        result.addAll(templateFactory.createEgressTemplates(date, it.flexTrip, it.nearbyStop()));
+      }
+    }
+    return result;
   }
 
-  private Stream<AccessEgressAndNearbyStop> getClosestFlexTrips(
+  /** This method is static, so we can move it to the FlexTemplateFactory later. */
+  private static Collection<ClosestTrip> getClosestFlexTrips(
+    FlexAccessEgressCallbackService callbackService,
     Collection<NearbyStop> nearbyStops,
+    List<FlexServiceDate> dates,
     boolean pickup
   ) {
+    Map<FlexTrip<?, ?>, ClosestTrip> map = new HashMap<>();
     // Find all trips reachable from the nearbyStops
-    Stream<AccessEgressAndNearbyStop> flexTripsReachableFromNearbyStops = nearbyStops
-      .stream()
-      .flatMap(accessEgress ->
-        flexIndex
-          .getFlexTripsByStop(accessEgress.stop)
-          .stream()
-          .filter(flexTrip ->
-            pickup
-              ? flexTrip.isBoardingPossible(accessEgress.stop)
-              : flexTrip.isAlightingPossible(accessEgress.stop)
-          )
-          .map(flexTrip -> new AccessEgressAndNearbyStop(accessEgress, flexTrip))
-      );
+    for (NearbyStop nearbyStop : nearbyStops) {
+      var stop = nearbyStop.stop;
+      for (var trip : callbackService.getFlexTripsByStop(stop)) {
+        int stopPos = pickup ? trip.findBoardIndex(stop) : trip.findAlightIndex(stop);
+        if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND) {
+          var existing = map.get(trip);
+          if (existing == null || nearbyStop.isBetter(existing.nearbyStop())) {
+            map.put(trip, new ClosestTrip(nearbyStop, trip, stopPos));
+          }
+        }
+      }
+    }
 
-    // Group all (NearbyStop, FlexTrip) tuples by flexTrip
-    Collection<List<AccessEgressAndNearbyStop>> groupedReachableFlexTrips = flexTripsReachableFromNearbyStops
-      .collect(Collectors.groupingBy(AccessEgressAndNearbyStop::flexTrip))
-      .values();
-
-    // Get the tuple with least walking time from each group
-    return groupedReachableFlexTrips
-      .stream()
-      .map(t2s ->
-        t2s
-          .stream()
-          .min(Comparator.comparingLong(t2 -> t2.accessEgress().state.getElapsedTimeSeconds()))
-      )
-      .flatMap(Optional::stream);
+    // Add active dates
+    for (Map.Entry<FlexTrip<?, ?>, ClosestTrip> e : map.entrySet()) {
+      var closestTrip = e.getValue();
+      // Include dates where the service is running
+      dates
+        .stream()
+        .filter(date -> callbackService.isDateActive(date, e.getKey()))
+        .forEach(closestTrip::addDate);
+    }
+    // Filter inactive trips and return
+    return map.values().stream().filter(ClosestTrip::hasActiveDates).toList();
   }
 
   private List<FlexServiceDate> createFlexServiceDates(
@@ -279,5 +293,28 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     return List.copyOf(dates);
   }
 
-  private record AccessEgressAndNearbyStop(NearbyStop accessEgress, FlexTrip<?, ?> flexTrip) {}
+  /**
+   * The combination of the closest stop and trip with active dates where the trip is in service.
+   *
+   * @param activeDates This is a mutable list, when building an instance the
+   *                    {@link #addDate(FlexServiceDate)} can be used to add dates to the list.
+   */
+  private record ClosestTrip(
+    NearbyStop nearbyStop,
+    FlexTrip<?, ?> flexTrip,
+    int stopPos,
+    List<FlexServiceDate> activeDates
+  ) {
+    public ClosestTrip(NearbyStop nearbyStop, FlexTrip<?, ?> flexTrip, int stopPos) {
+      this(nearbyStop, flexTrip, stopPos, new ArrayList<>());
+    }
+
+    public void addDate(FlexServiceDate date) {
+      activeDates.add(date);
+    }
+
+    public boolean hasActiveDates() {
+      return !activeDates.isEmpty();
+    }
+  }
 }

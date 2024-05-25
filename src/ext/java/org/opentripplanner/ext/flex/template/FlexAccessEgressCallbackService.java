@@ -11,6 +11,7 @@ public interface FlexAccessEgressCallbackService {
   TransitStopVertex getStopVertexForStopId(FeedScopedId id);
   Collection<PathTransfer> getTransfersFromStop(StopLocation stop);
   Collection<PathTransfer> getTransfersToStop(StopLocation stop);
+  Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation);
 
   /**
    * Return true if date is an active service date for the given trip, and can be used for
