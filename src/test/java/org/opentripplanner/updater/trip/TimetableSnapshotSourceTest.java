@@ -372,54 +372,6 @@ public class TimetableSnapshotSourceTest {
   class Scheduled {
 
     @Test
-    public void delayed() {
-      final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-      final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
-      final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
-      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
-      final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
-
-      var tripUpdateBuilder = new TripUpdateBuilder(
-        tripId.getId(),
-        SERVICE_DATE,
-        ScheduleRelationship.SCHEDULED,
-        transitModel.getTimeZone()
-      );
-
-      int stopSequence = 2;
-      int delay = 1;
-      tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
-
-      final TripUpdate tripUpdate = tripUpdateBuilder.build();
-
-      var updater = defaultUpdater();
-
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        FULL_DATASET,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-      final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
-      final Timetable schedule = snapshot.resolve(pattern, null);
-      assertNotSame(forToday, schedule);
-      assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
-      assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
-      assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
-      assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
-
-      assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
-      assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
-
-      assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
-      assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
-    }
-
-    @Test
     public void scheduled() {
       // GIVEN
 

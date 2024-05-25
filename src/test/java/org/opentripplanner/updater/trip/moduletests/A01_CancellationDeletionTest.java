@@ -8,10 +8,10 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.ext.siri.RealtimeTestEnvironment;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class A01_CancellationDeletionTest {
@@ -26,7 +26,7 @@ public class A01_CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   public void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = new RealtimeTestEnvironment();
+    var env = new GtfsRealtimeTestEnvironment();
     var pattern1 = env.transitModel.getTransitModelIndex().getPatternForTrip().get(env.trip1);
 
     final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
@@ -42,7 +42,7 @@ public class A01_CancellationDeletionTest {
 
     assertEquals(1, result.successful());
 
-    final TimetableSnapshot snapshot = env.gtfsSource.getTimetableSnapshot();
+    final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern1, env.serviceDate);
     final Timetable schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);

@@ -15,7 +15,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testCancelTrip() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(env.trip1).getRealTimeState());
 
@@ -32,7 +32,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testAddJourney() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
@@ -54,7 +54,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testReplaceJourney() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
@@ -88,7 +88,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourney() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())
@@ -117,7 +117,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testChangeQuay() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())
@@ -145,7 +145,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testCancelStop() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip2.getId().getId())
@@ -175,7 +175,7 @@ class SiriTimetableSnapshotSourceTest {
   @Test
   @Disabled("Not supported yet")
   void testAddStop() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())
@@ -221,7 +221,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNotMonitored() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withMonitored(false)
@@ -234,7 +234,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testReplaceJourneyWithoutEstimatedVehicleJourneyCode() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef("newJourney")
@@ -259,7 +259,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNegativeHopTime() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())
@@ -279,7 +279,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNegativeDwellTime() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip2.getId().getId())
@@ -304,7 +304,7 @@ class SiriTimetableSnapshotSourceTest {
   @Test
   @Disabled("Not supported yet")
   void testExtraUnknownStop() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())

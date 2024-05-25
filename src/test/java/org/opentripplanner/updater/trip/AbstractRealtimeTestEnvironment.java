@@ -1,13 +1,12 @@
-package org.opentripplanner.ext.siri;
+package org.opentripplanner.updater.trip;
 
-import com.google.transit.realtime.GtfsRealtime;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
+import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -27,15 +26,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.TimetableSnapshotSource;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
-public class RealtimeTestEnvironment {
-
-  private static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
+public class AbstractRealtimeTestEnvironment {
+  protected static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -55,20 +48,15 @@ public class RealtimeTestEnvironment {
     .withRegularStop(stopC1)
     .withRegularStop(stopD1)
     .build();
-
   public final LocalDate serviceDate = LocalDate.of(2024, 5, 8);
-  public TransitModel transitModel;
-  public SiriTimetableSnapshotSource siriSource;
-  public final TimetableSnapshotSource gtfsSource;
-
   public final FeedScopedId operator1Id = TransitModelForTest.id("TestOperator1");
   public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
   public final Trip trip1;
   public final Trip trip2;
-
   public final DateTimeHelper dateTimeHelper = new DateTimeHelper(timeZone, serviceDate);
+  public TransitModel transitModel;
 
-  public RealtimeTestEnvironment() {
+  public AbstractRealtimeTestEnvironment() {
     transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
@@ -93,44 +81,6 @@ public class RealtimeTestEnvironment {
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
     transitModel.index();
-
-    var parameters = new TimetableSnapshotSourceParameters(Duration.ZERO, false);
-    //siriSource = new SiriTimetableSnapshotSource(parameters, transitModel);
-    gtfsSource = new TimetableSnapshotSource(parameters, transitModel);
-  }
-
-  private record Stop(RegularStop stop, int arrivalTime, int departureTime) {}
-
-  private Trip createTrip(String id, Route route, List<Stop> stops) {
-    var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();
-
-    var tripOnServiceDate = TripOnServiceDate
-      .of(trip.getId())
-      .withTrip(trip)
-      .withServiceDate(serviceDate)
-      .build();
-
-    transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
-
-    var stopTimes = IntStream
-      .range(0, stops.size())
-      .mapToObj(i -> {
-        var stop = stops.get(i);
-        return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
-      })
-      .collect(Collectors.toList());
-
-    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
-
-    final TripPattern pattern = TransitModelForTest
-      .tripPattern(id + "Pattern", route)
-      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(Stop::stop).toList()))
-      .build();
-    pattern.add(tripTimes);
-
-    transitModel.addTripPattern(pattern.getId(), pattern);
-
-    return trip;
   }
 
   public FeedScopedId id(String id) {
@@ -187,6 +137,42 @@ public class RealtimeTestEnvironment {
     return dateTimeHelper;
   }
 
+  public String getFeedId() {
+    return TransitModelForTest.FEED_ID;
+  }
+
+  protected Trip createTrip(String id, Route route, List<Stop> stops) {
+    var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();
+
+    var tripOnServiceDate = TripOnServiceDate
+      .of(trip.getId())
+      .withTrip(trip)
+      .withServiceDate(serviceDate)
+      .build();
+
+    transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
+
+    var stopTimes = IntStream
+      .range(0, stops.size())
+      .mapToObj(i -> {
+        var stop = stops.get(i);
+        return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
+      })
+      .collect(Collectors.toList());
+
+    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
+
+    final TripPattern pattern = TransitModelForTest
+      .tripPattern(id + "Pattern", route)
+      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(Stop::stop).toList()))
+      .build();
+    pattern.add(tripTimes);
+
+    transitModel.addTripPattern(pattern.getId(), pattern);
+
+    return trip;
+  }
+
   private StopTime createStopTime(
     Trip trip,
     int stopSequence,
@@ -203,27 +189,6 @@ public class RealtimeTestEnvironment {
     return st;
   }
 
-  public String getFeedId() {
-    return TransitModelForTest.FEED_ID;
-  }
-
-  public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return this.siriSource.applyEstimatedTimetable(
-        null,
-        getEntityResolver(),
-        getFeedId(),
-        false,
-        updates
-      );
-  }
-
-  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
-    return gtfsSource.applyTripUpdates(
-      null,
-      BackwardsDelayPropagationType.REQUIRED,
-      true,
-      updates,
-      getFeedId()
-    );
+  protected record Stop(RegularStop stop, int arrivalTime, int departureTime) {
   }
 }

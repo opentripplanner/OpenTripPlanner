@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.siri.RealtimeTestEnvironment;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class B01_DelayedTest {
@@ -17,7 +17,7 @@ public class B01_DelayedTest {
 
     @Test
     public void delayed() {
-      var env = new RealtimeTestEnvironment();
+      var env = new GtfsRealtimeTestEnvironment();
 
       final TripPattern pattern = env.transitModel.getTransitModelIndex().getPatternForTrip().get(env.trip1);
       final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip1.getId());
@@ -30,7 +30,7 @@ public class B01_DelayedTest {
         env.timeZone
       );
 
-      int stopSequence = 2;
+      int stopSequence = 1;
       int delay = 1;
       tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
 
@@ -43,7 +43,7 @@ public class B01_DelayedTest {
 
       assertEquals(1, result.successful());
 
-      final TimetableSnapshot snapshot = env.gtfsSource.getTimetableSnapshot();
+      final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
       final Timetable forToday = snapshot.resolve(pattern, env.serviceDate);
       final Timetable schedule = snapshot.resolve(pattern, null);
       assertNotSame(forToday, schedule);
