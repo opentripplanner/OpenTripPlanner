@@ -63,8 +63,6 @@ class FlexTemplateFactory {
   }
 
   private List<FlexAccessTemplate> createAccessTemplates() {
-    assertRequiredParametersSet();
-
     int boardIndex = trip.findBoardIndex(stop());
 
     if (boardIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
@@ -88,8 +86,6 @@ class FlexTemplateFactory {
   }
 
   private List<FlexEgressTemplate> createEgressTemplates() {
-    assertRequiredParametersSet();
-
     var alightIndex = trip.findAlightIndex(stop());
 
     if (alightIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
@@ -108,12 +104,6 @@ class FlexTemplateFactory {
       }
     }
     return result;
-  }
-
-  private void assertRequiredParametersSet() {
-    Objects.requireNonNull(date);
-    Objects.requireNonNull(trip);
-    Objects.requireNonNull(nearbyStop);
   }
 
   /**
@@ -143,12 +133,6 @@ class FlexTemplateFactory {
   private static List<StopLocation> expandStopsAt(FlexTrip<?, ?> flexTrip, int index) {
     var stop = flexTrip.getStop(index);
     return stop instanceof GroupStop groupStop ? groupStop.getChildLocations() : List.of(stop);
-  }
-
-  private FlexPathCalculator createCalculator(FlexTrip<?, ?> flexTrip) {
-    return flexTrip instanceof ScheduledDeviatedTrip
-      ? new ScheduledFlexPathCalculator(calculator, flexTrip)
-      : calculator;
   }
 
   private FlexAccessTemplate createAccessTemplate(
@@ -185,5 +169,11 @@ class FlexTemplateFactory {
       createCalculator(flexTrip),
       maxTransferDuration
     );
+  }
+
+  private FlexPathCalculator createCalculator(FlexTrip<?, ?> flexTrip) {
+    return flexTrip instanceof ScheduledDeviatedTrip
+      ? new ScheduledFlexPathCalculator(calculator, flexTrip)
+      : calculator;
   }
 }
