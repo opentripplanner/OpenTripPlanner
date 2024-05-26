@@ -28,6 +28,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
 public class AbstractRealtimeTestEnvironment {
+
   protected static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
@@ -189,6 +190,5 @@ public class AbstractRealtimeTestEnvironment {
     return st;
   }
 
-  protected record Stop(RegularStop stop, int arrivalTime, int departureTime) {
-  }
+  protected record Stop(RegularStop stop, int arrivalTime, int departureTime) {}
 }

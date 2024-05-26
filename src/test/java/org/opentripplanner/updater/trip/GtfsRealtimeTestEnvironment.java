@@ -13,7 +13,7 @@ public class GtfsRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
   public GtfsRealtimeTestEnvironment() {
     super();
     var parameters = new TimetableSnapshotSourceParameters(Duration.ZERO, false);
-    source  = new TimetableSnapshotSource(parameters, transitModel);
+    source = new TimetableSnapshotSource(parameters, transitModel);
   }
 
   public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {

@@ -14,17 +14,10 @@ public class SiriRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
   public SiriRealtimeTestEnvironment() {
     super();
     var parameters = new TimetableSnapshotSourceParameters(Duration.ZERO, false);
-    source  = new SiriTimetableSnapshotSource(parameters, transitModel);
+    source = new SiriTimetableSnapshotSource(parameters, transitModel);
   }
 
   public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return source.applyEstimatedTimetable(
-        null,
-        getEntityResolver(),
-        getFeedId(),
-        false,
-        updates
-      );
+    return source.applyEstimatedTimetable(null, getEntityResolver(), getFeedId(), false, updates);
   }
-
 }
