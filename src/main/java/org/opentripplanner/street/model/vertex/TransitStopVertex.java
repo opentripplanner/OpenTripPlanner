@@ -41,6 +41,10 @@ public class TransitStopVertex extends StationElementVertex {
     this.wheelchairAccessibility = stop.getWheelchairAccessibility();
   }
 
+  public static TransitStopVertexBuilder of() {
+    return TransitStopVertex.of();
+  }
+
   public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
