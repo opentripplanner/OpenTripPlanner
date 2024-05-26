@@ -11,8 +11,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 public class FlexAccessFactory {
 
   private final FlexAccessEgressCallbackAdapter callbackService;
-  private final FlexPathCalculator pathCalculator;
-  private final Duration maxTransferDuration;
+  private final FlexTemplateFactory templateFactory;
 
   public FlexAccessFactory(
     FlexAccessEgressCallbackAdapter callbackService,
@@ -20,8 +19,7 @@ public class FlexAccessFactory {
     Duration maxTransferDuration
   ) {
     this.callbackService = callbackService;
-    this.pathCalculator = pathCalculator;
-    this.maxTransferDuration = maxTransferDuration;
+    this.templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
   }
 
   public Collection<FlexAccessEgress> createFlexAccesses(
@@ -40,8 +38,6 @@ public class FlexAccessFactory {
     Collection<NearbyStop> streetAccesses,
     List<FlexServiceDate> dates
   ) {
-    var templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
-
     var result = new ArrayList<FlexAccessTemplate>();
     var closestFlexTrips = ClosestTrip.of(callbackService, streetAccesses, dates, true);
 
