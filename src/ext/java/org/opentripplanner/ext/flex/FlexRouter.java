@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.flex;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -13,13 +11,12 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.ClosestTrip;
 import org.opentripplanner.ext.flex.template.DirectFlexPath;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressCallbackService;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
+import org.opentripplanner.ext.flex.template.FlexAccessFactory;
+import org.opentripplanner.ext.flex.template.FlexDirectPathFactory;
+import org.opentripplanner.ext.flex.template.FlexEgressFactory;
 import org.opentripplanner.ext.flex.template.FlexServiceDate;
-import org.opentripplanner.ext.flex.template.FlexTemplateFactory;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -33,7 +30,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FlexRouter implements FlexAccessEgressCallbackService {
+public class FlexRouter {
 
   /* Transit data */
 
@@ -46,6 +43,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
+  private final FlexAccessEgressCallbackService callbackService;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -70,6 +68,7 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
+    this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -106,7 +105,14 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   public Collection<Itinerary> createFlexOnlyItineraries() {
     OTPRequestTimeoutException.checkForTimeout();
 
-    var directFlexPaths = calculateDirectFlexPaths();
+    var directFlexPaths = new FlexDirectPathFactory(
+      callbackService,
+      accessFlexPathCalculator,
+      egressFlexPathCalculator,
+      flexParameters.maxTransferDuration()
+    )
+      .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, departureTime, arriveBy);
+
     var itineraries = new ArrayList<Itinerary>();
 
     for (DirectFlexPath it : directFlexPaths) {
@@ -122,118 +128,25 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
     return itineraries;
   }
 
-  private Collection<DirectFlexPath> calculateDirectFlexPaths() {
-    Collection<DirectFlexPath> directFlexPaths = new ArrayList<>();
-
-    var flexAccessTemplates = calculateFlexAccessTemplates();
-    var flexEgressTemplates = calculateFlexEgressTemplates();
-
-    Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
-    streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
-
-    for (FlexAccessTemplate template : flexAccessTemplates) {
-      StopLocation transferStop = template.getTransferStop();
-
-      // TODO: Document or reimplement this. Why are we using the egress to see if the
-      //      access-transfer-stop (last-stop) is used by at least one egress-template?
-      //      Is it because:
-      //      - of the group-stop expansion?
-      //      - of the alight-restriction check?
-      //      - nearest stop to trip match?
-      //      Fix: Find out why and refactor out the business logic and reuse it.
-      //      Problem: Any asymmetrical restriction witch apply/do not apply to the egress,
-      //               but do not apply/apply to the access, like booking-notice.
-      if (
-        flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
-      ) {
-        for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          template
-            .createDirectGraphPath(egress, arriveBy, departureTime)
-            .ifPresent(directFlexPaths::add);
-        }
-      }
-    }
-
-    return directFlexPaths;
-  }
-
   public Collection<FlexAccessEgress> createFlexAccesses() {
     OTPRequestTimeoutException.checkForTimeout();
-    var flexAccessTemplates = calculateFlexAccessTemplates();
 
-    return flexAccessTemplates
-      .stream()
-      .flatMap(template -> template.createFlexAccessEgressStream(this))
-      .toList();
+    return new FlexAccessFactory(
+      callbackService,
+      accessFlexPathCalculator,
+      flexParameters.maxTransferDuration()
+    )
+      .createFlexAccesses(streetAccesses, dates);
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
     OTPRequestTimeoutException.checkForTimeout();
-    var flexEgressTemplates = calculateFlexEgressTemplates();
-
-    return flexEgressTemplates
-      .stream()
-      .flatMap(template -> template.createFlexAccessEgressStream(this))
-      .toList();
-  }
-
-  @Override
-  public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
-    return graph.getStopVertexForStopId(stopId);
-  }
-
-  @Override
-  public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
-    return transitService.getTransfersByStop(stop);
-  }
-
-  @Override
-  public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
-    return transitService.getFlexIndex().getTransfersToStop(stop);
-  }
-
-  @Override
-  public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
-    return flexIndex.getFlexTripsByStop(stopLocation);
-  }
-
-  @Override
-  public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-    return date.isFlexTripRunning(trip, transitService);
-  }
-
-  private List<FlexAccessTemplate> calculateFlexAccessTemplates() {
-    var templateFactory = FlexTemplateFactory.of(
-      accessFlexPathCalculator,
-      flexParameters.maxTransferDuration()
-    );
-
-    var result = new ArrayList<FlexAccessTemplate>();
-    var closestFlexTrips = ClosestTrip.of(this, streetAccesses, dates, true);
-
-    for (var it : closestFlexTrips) {
-      for (var date : it.activeDates()) {
-        result.addAll(templateFactory.createAccessTemplates(date, it.flexTrip(), it.nearbyStop()));
-      }
-    }
-    return result;
-  }
-
-  private List<FlexEgressTemplate> calculateFlexEgressTemplates() {
-    var templateFactory = FlexTemplateFactory.of(
+    return new FlexEgressFactory(
+      callbackService,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration()
-    );
-
-    var result = new ArrayList<FlexEgressTemplate>();
-    var closestFlexTrips = ClosestTrip.of(this, streetEgresses, dates, false);
-
-    for (var it : closestFlexTrips) {
-      for (var date : it.activeDates()) {
-        result.addAll(templateFactory.createEgressTemplates(date, it.flexTrip(), it.nearbyStop()));
-      }
-    }
-    return result;
+    )
+      .createFlexEgresses(streetEgresses, dates);
   }
 
   private List<FlexServiceDate> createFlexServiceDates(
@@ -244,6 +157,8 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
   ) {
     final List<FlexServiceDate> dates = new ArrayList<>();
 
+
+    // TODO - This code id not DRY, the same logic is in RaptorRoutingRequestTransitDataCreator
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
       dates.add(
@@ -255,5 +170,39 @@ public class FlexRouter implements FlexAccessEgressCallbackService {
       );
     }
     return List.copyOf(dates);
+  }
+
+  /**
+   * This class work as an adaptor around OTP services. This allows us to pass in this instance
+   * and not the implementations (graph, transitService, flexIndex). We can easily mock this in
+   * unit-tests. This also serves as documentation of witch services the flex access/egress
+   * generation logic needs.
+   */
+  private class CallbackAdapter implements FlexAccessEgressCallbackService {
+
+    @Override
+    public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {
+      return graph.getStopVertexForStopId(stopId);
+    }
+
+    @Override
+    public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
+      return transitService.getTransfersByStop(stop);
+    }
+
+    @Override
+    public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
+      return transitService.getFlexIndex().getTransfersToStop(stop);
+    }
+
+    @Override
+    public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
+      return flexIndex.getFlexTripsByStop(stopLocation);
+    }
+
+    @Override
+    public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
+      return date.isFlexTripRunning(trip, transitService);
+    }
   }
 }

@@ -16,9 +16,9 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class FlexEgressTemplate extends AbstractFlexTemplate {
+class FlexEgressTemplate extends AbstractFlexTemplate {
 
-  public FlexEgressTemplate(
+  FlexEgressTemplate(
     NearbyStop accessEgress,
     FlexTrip<?, ?> trip,
     int fromStopIndex,

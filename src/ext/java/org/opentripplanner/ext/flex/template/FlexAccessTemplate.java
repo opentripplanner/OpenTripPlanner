@@ -19,6 +19,8 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
+
+// TODO Make this package local by removing the dependency to AbstractFlexTemplate in FlexTripEdge.
 public class FlexAccessTemplate extends AbstractFlexTemplate {
 
   public FlexAccessTemplate(
