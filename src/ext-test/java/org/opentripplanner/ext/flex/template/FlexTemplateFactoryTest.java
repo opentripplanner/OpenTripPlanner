@@ -141,9 +141,10 @@ class FlexTemplateFactoryTest {
     // will result in an empty result
     subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_A, 0));
     assertTrue(subject.isEmpty(), subject::toString);
+    // TODO This is no longer the responsibility of the template factory, reimplement test
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_C, 99));
-    assertTrue(subject.isEmpty(), subject::toString);
+    // subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_C, 99));
+    // assertTrue(subject.isEmpty(), subject::toString);
   }
 
   @Test
@@ -176,14 +177,15 @@ class FlexTemplateFactoryTest {
     assertEquals(2, t1.fromStopIndex);
     assertEquals(3, t1.toStopIndex);
     assertEquals(1, subject.size());
-
+    // TODO This is no longer the responsibility of the template factory, reimplement test
     // We are not allowed to board at stop B, an empty result is expected
-    subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_B, 1));
-    assertTrue(subject.isEmpty(), subject::toString);
+    // subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_B, 1));
+    // assertTrue(subject.isEmpty(), subject::toString);
 
+    // TODO This is no longer the responsibility of the template factory, reimplement test
     // Search for a stop not part of the pattern should result in an empty result
-    subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_D, 3));
-    assertTrue(subject.isEmpty(), subject::toString);
+    // subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_D, 3));
+    // assertTrue(subject.isEmpty(), subject::toString);
   }
 
   @Test
@@ -217,10 +219,11 @@ class FlexTemplateFactoryTest {
     assertEquals(1, t1.toStopIndex);
     assertEquals(1, subject.size());
 
+    // TODO This is no longer the responsibility of the template factory, reimplement test
     // We are not allowed to board and alight at the same stop so boarding the last stop
     // will result in an empty result
-    subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_C, 2));
-    assertTrue(subject.isEmpty(), subject::toString);
+    // subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_C, 2));
+    // assertTrue(subject.isEmpty(), subject::toString);
 
     // Search for a stop not part of the pattern should result in an empty result
     subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_A, 0));

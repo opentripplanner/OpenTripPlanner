@@ -20,6 +20,7 @@ class FlexTemplateFactory {
   private final FlexPathCalculator calculator;
   private final Duration maxTransferDuration;
   private NearbyStop nearbyStop;
+  private int stopPos;
   private FlexTrip<?, ?> trip;
   private FlexServiceDate date;
 
@@ -45,17 +46,14 @@ class FlexTemplateFactory {
    */
   private FlexTemplateFactory with(ClosestTrip closestTrip) {
     this.nearbyStop = closestTrip.nearbyStop();
+    this.stopPos = closestTrip.stopPos();
     this.trip = closestTrip.flexTrip();
     this.date = closestTrip.activeDate();
     return this;
   }
 
   private List<FlexAccessTemplate> createAccessTemplates() {
-    int boardStopPos = trip.findBoardIndex(stop());
-
-    if (boardStopPos == FlexTrip.STOP_INDEX_NOT_FOUND) {
-      return List.of();
-    }
+    int boardStopPos = stopPos;
 
     var result = new ArrayList<FlexAccessTemplate>();
     int alightStopPos = isBoardingAndAlightingAtSameStopPositionAllowed()
@@ -73,11 +71,7 @@ class FlexTemplateFactory {
   }
 
   private List<FlexEgressTemplate> createEgressTemplates() {
-    var alightStopPos = trip.findAlightIndex(stop());
-
-    if (alightStopPos == FlexTrip.STOP_INDEX_NOT_FOUND) {
-      return List.of();
-    }
+    var alightStopPos = stopPos;
 
     var result = new ArrayList<FlexEgressTemplate>();
     int end = isBoardingAndAlightingAtSameStopPositionAllowed() ? alightStopPos : alightStopPos - 1;
