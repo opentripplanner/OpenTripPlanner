@@ -42,7 +42,7 @@ public class TransitStopVertex extends StationElementVertex {
   }
 
   public static TransitStopVertexBuilder of() {
-    return TransitStopVertex.of();
+    return new TransitStopVertexBuilder();
   }
 
   public Accessibility getWheelchairAccessibility() {
