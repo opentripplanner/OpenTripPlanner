@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,6 +36,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
@@ -70,16 +72,7 @@ public class TimetableSnapshotSourceTest {
   }
 
   private static TripUpdate cancellation(String tripId) {
-    final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
-
-    tripDescriptorBuilder.setTripId(tripId);
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-
-    final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-    return tripUpdateBuilder.build();
+    return new TripUpdateBuilder(tripId, SERVICE_DATE, CANCELED, ZoneIds.NEW_YORK).build();
   }
 
   @Test
