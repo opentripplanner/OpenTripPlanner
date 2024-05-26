@@ -19,10 +19,9 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-// TODO Make this package local by removing the dependency to AbstractFlexTemplate in FlexTripEdge.
-public class FlexAccessTemplate extends AbstractFlexTemplate {
+class FlexAccessTemplate extends AbstractFlexTemplate {
 
-  public FlexAccessTemplate(
+  FlexAccessTemplate(
     NearbyStop accessEgress,
     FlexTrip<?, ?> trip,
     int fromStopTime,
@@ -44,7 +43,7 @@ public class FlexAccessTemplate extends AbstractFlexTemplate {
     );
   }
 
-  public Optional<DirectFlexPath> createDirectGraphPath(
+  Optional<DirectFlexPath> createDirectGraphPath(
     NearbyStop egress,
     boolean arriveBy,
     int departureTime

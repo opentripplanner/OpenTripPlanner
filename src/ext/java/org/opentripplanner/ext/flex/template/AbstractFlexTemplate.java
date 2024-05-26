@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * <p>
  * Please also see Flex.svg for an illustration of how the flex concepts relate to each other.
  */
-public abstract class AbstractFlexTemplate {
+abstract class AbstractFlexTemplate {
 
   /**
    * We do not want extremely short flex trips, they will normally be dominated in the
@@ -77,11 +77,11 @@ public abstract class AbstractFlexTemplate {
     this.maxTransferDuration = maxTransferDuration;
   }
 
-  public StopLocation getTransferStop() {
+  StopLocation getTransferStop() {
     return transferStop;
   }
 
-  public StopLocation getAccessEgressStop() {
+  StopLocation getAccessEgressStop() {
     return accessEgress.stop;
   }
 
@@ -89,9 +89,7 @@ public abstract class AbstractFlexTemplate {
    * This method is very much the hot code path in the flex access/egress search so any optimization
    * here will lead to noticeable speedups.
    */
-  public Stream<FlexAccessEgress> createFlexAccessEgressStream(
-    FlexAccessEgressCallbackAdapter callback
-  ) {
+  Stream<FlexAccessEgress> createFlexAccessEgressStream(FlexAccessEgressCallbackAdapter callback) {
     if (transferStop instanceof RegularStop stop) {
       TransitStopVertex flexVertex = callback.getStopVertexForStopId(stop.getId());
       return Stream

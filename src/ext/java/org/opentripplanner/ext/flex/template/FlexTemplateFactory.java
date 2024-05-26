@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * The factory is used to create flex trip templates.
  */
-public class FlexTemplateFactory {
+class FlexTemplateFactory {
 
   private final FlexPathCalculator calculator;
   private final Duration maxTransferDuration;
@@ -28,14 +28,11 @@ public class FlexTemplateFactory {
     this.maxTransferDuration = Objects.requireNonNull(maxTransferDuration);
   }
 
-  public static FlexTemplateFactory of(
-    FlexPathCalculator calculator,
-    Duration maxTransferDuration
-  ) {
+  static FlexTemplateFactory of(FlexPathCalculator calculator, Duration maxTransferDuration) {
     return new FlexTemplateFactory(calculator, maxTransferDuration);
   }
 
-  public List<FlexAccessTemplate> createAccessTemplates(
+  List<FlexAccessTemplate> createAccessTemplates(
     FlexServiceDate date,
     FlexTrip<?, ?> flexTrip,
     NearbyStop nearbyStop
@@ -43,7 +40,7 @@ public class FlexTemplateFactory {
     return with(date, flexTrip, nearbyStop).createAccessTemplates();
   }
 
-  public List<FlexEgressTemplate> createEgressTemplates(
+  List<FlexEgressTemplate> createEgressTemplates(
     FlexServiceDate date,
     FlexTrip<?, ?> flexTrip,
     NearbyStop nearbyStop
@@ -148,7 +145,7 @@ public class FlexTemplateFactory {
     return stop instanceof GroupStop groupStop ? groupStop.getChildLocations() : List.of(stop);
   }
 
-  FlexPathCalculator createCalculator(FlexTrip<?, ?> flexTrip) {
+  private FlexPathCalculator createCalculator(FlexTrip<?, ?> flexTrip) {
     return flexTrip instanceof ScheduledDeviatedTrip
       ? new ScheduledFlexPathCalculator(calculator, flexTrip)
       : calculator;

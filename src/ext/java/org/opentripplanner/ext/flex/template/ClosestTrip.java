@@ -14,7 +14,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
  * @param activeDates This is a mutable list, when building an instance the
  *                    {@link #addDate(FlexServiceDate)} can be used to add dates to the list.
  */
-public class ClosestTrip {
+class ClosestTrip {
 
   private final NearbyStop nearbyStop;
   private final FlexTrip<?, ?> flexTrip;
@@ -62,27 +62,27 @@ public class ClosestTrip {
     return map.values().stream().filter(ClosestTrip::hasActiveDates).toList();
   }
 
-  public NearbyStop nearbyStop() {
+  NearbyStop nearbyStop() {
     return nearbyStop;
   }
 
-  public FlexTrip<?, ?> flexTrip() {
+  FlexTrip<?, ?> flexTrip() {
     return flexTrip;
   }
 
-  public int stopPos() {
+  int stopPos() {
     return stopPos;
   }
 
-  public Iterable<FlexServiceDate> activeDates() {
+  Iterable<FlexServiceDate> activeDates() {
     return activeDates;
   }
 
-  public void addDate(FlexServiceDate date) {
+  void addDate(FlexServiceDate date) {
     activeDates.add(date);
   }
 
-  public boolean hasActiveDates() {
+  boolean hasActiveDates() {
     return !activeDates.isEmpty();
   }
 }
