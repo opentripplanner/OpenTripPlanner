@@ -10,12 +10,12 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 public class FlexAccessFactory {
 
-  private final FlexAccessEgressCallbackService callbackService;
+  private final FlexAccessEgressCallbackAdapter callbackService;
   private final FlexPathCalculator pathCalculator;
   private final Duration maxTransferDuration;
 
   public FlexAccessFactory(
-    FlexAccessEgressCallbackService callbackService,
+    FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator pathCalculator,
     Duration maxTransferDuration
   ) {

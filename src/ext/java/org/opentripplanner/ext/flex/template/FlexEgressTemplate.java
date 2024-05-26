@@ -49,7 +49,7 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
   }
 
   protected Collection<PathTransfer> getTransfersFromTransferStop(
-    FlexAccessEgressCallbackService callback
+    FlexAccessEgressCallbackAdapter callback
   ) {
     return callback.getTransfersToStop(transferStop);
   }

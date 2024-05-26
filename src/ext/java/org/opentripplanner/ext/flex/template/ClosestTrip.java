@@ -29,7 +29,7 @@ public class ClosestTrip {
 
   /** This method is static, so we can move it to the FlexTemplateFactory later. */
   public static Collection<ClosestTrip> of(
-    FlexAccessEgressCallbackService callbackService,
+    FlexAccessEgressCallbackAdapter callbackService,
     Collection<NearbyStop> nearbyStops,
     List<FlexServiceDate> dates,
     boolean pickup

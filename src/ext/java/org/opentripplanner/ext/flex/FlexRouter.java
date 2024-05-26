@@ -12,7 +12,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.DirectFlexPath;
-import org.opentripplanner.ext.flex.template.FlexAccessEgressCallbackService;
+import org.opentripplanner.ext.flex.template.FlexAccessEgressCallbackAdapter;
 import org.opentripplanner.ext.flex.template.FlexAccessFactory;
 import org.opentripplanner.ext.flex.template.FlexDirectPathFactory;
 import org.opentripplanner.ext.flex.template.FlexEgressFactory;
@@ -43,7 +43,7 @@ public class FlexRouter {
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
-  private final FlexAccessEgressCallbackService callbackService;
+  private final FlexAccessEgressCallbackAdapter callbackService;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -157,7 +157,6 @@ public class FlexRouter {
   ) {
     final List<FlexServiceDate> dates = new ArrayList<>();
 
-
     // TODO - This code id not DRY, the same logic is in RaptorRoutingRequestTransitDataCreator
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
@@ -178,7 +177,7 @@ public class FlexRouter {
    * unit-tests. This also serves as documentation of witch services the flex access/egress
    * generation logic needs.
    */
-  private class CallbackAdapter implements FlexAccessEgressCallbackService {
+  private class CallbackAdapter implements FlexAccessEgressCallbackAdapter {
 
     @Override
     public TransitStopVertex getStopVertexForStopId(FeedScopedId stopId) {

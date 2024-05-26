@@ -90,7 +90,7 @@ public abstract class AbstractFlexTemplate {
    * here will lead to noticeable speedups.
    */
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(
-    FlexAccessEgressCallbackService callback
+    FlexAccessEgressCallbackAdapter callback
   ) {
     if (transferStop instanceof RegularStop stop) {
       TransitStopVertex flexVertex = callback.getStopVertexForStopId(stop.getId());
@@ -150,7 +150,7 @@ public abstract class AbstractFlexTemplate {
    * flex ride for the access/egress.
    */
   protected abstract Collection<PathTransfer> getTransfersFromTransferStop(
-    FlexAccessEgressCallbackService callback
+    FlexAccessEgressCallbackAdapter callback
   );
 
   /**

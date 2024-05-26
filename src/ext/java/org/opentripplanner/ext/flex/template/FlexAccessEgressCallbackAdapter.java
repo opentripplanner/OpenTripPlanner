@@ -7,10 +7,26 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public interface FlexAccessEgressCallbackService {
+/**
+ * To perform access/egress/direct flex searches, this module (this package) needs these
+ * services. We do not want to inject the implementations here and create unnecessary
+ * hard dependencies. By doing this, we explicitly list all external services needed and make
+ * testing easier. This also serves as documentation.
+ * <p>
+ * The implementation of this interface will for the most part just delegate to the implementing
+ * OTP service - look in these services for the documentation.
+ */
+public interface FlexAccessEgressCallbackAdapter {
+  /** Adapter, look at implementing service for documentation.  */
   TransitStopVertex getStopVertexForStopId(FeedScopedId id);
+
+  /** Adapter, look at implementing service for documentation.  */
   Collection<PathTransfer> getTransfersFromStop(StopLocation stop);
+
+  /** Adapter, look at implementing service for documentation.  */
   Collection<PathTransfer> getTransfersToStop(StopLocation stop);
+
+  /** Adapter, look at implementing service for documentation.  */
   Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation);
 
   /**

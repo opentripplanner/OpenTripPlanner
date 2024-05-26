@@ -12,13 +12,13 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexDirectPathFactory {
 
-  private final FlexAccessEgressCallbackService callbackService;
+  private final FlexAccessEgressCallbackAdapter callbackService;
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
 
   public FlexDirectPathFactory(
-    FlexAccessEgressCallbackService callbackService,
+    FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
     Duration maxTransferDuration

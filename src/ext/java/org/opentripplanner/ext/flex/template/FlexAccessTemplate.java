@@ -118,7 +118,7 @@ public class FlexAccessTemplate extends AbstractFlexTemplate {
   }
 
   protected Collection<PathTransfer> getTransfersFromTransferStop(
-    FlexAccessEgressCallbackService callback
+    FlexAccessEgressCallbackAdapter callback
   ) {
     return callback.getTransfersFromStop(transferStop);
   }
