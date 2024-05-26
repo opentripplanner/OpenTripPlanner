@@ -133,17 +133,17 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public LocalDate getServiceDate() {
-    return edge.flexTemplate.serviceDate;
+    return edge.serviceDate();
   }
 
   @Override
   public Place getFrom() {
-    return Place.forFlexStop(edge.s1, edge.getFromVertex());
+    return Place.forFlexStop(edge.s1(), edge.getFromVertex());
   }
 
   @Override
   public Place getTo() {
-    return Place.forFlexStop(edge.s2, edge.getToVertex());
+    return Place.forFlexStop(edge.s2(), edge.getToVertex());
   }
 
   @Override
@@ -183,12 +183,12 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Integer getBoardStopPosInPattern() {
-    return edge.flexTemplate.fromStopIndex;
+    return edge.boardStopPosInPattern();
   }
 
   @Override
   public Integer getAlightStopPosInPattern() {
-    return edge.flexTemplate.toStopIndex;
+    return edge.alightStopPosInPattern();
   }
 
   @Override

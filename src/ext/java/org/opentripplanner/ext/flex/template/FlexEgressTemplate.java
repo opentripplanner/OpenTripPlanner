@@ -82,13 +82,15 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
       return null;
     }
 
-    return FlexTripEdge.createFlexTripEdge(
+    return new FlexTripEdge(
       flexFromVertex,
       accessEgress.state.getVertex(),
       transferStop,
       accessEgress.stop,
       trip,
-      this,
+      fromStopIndex,
+      toStopIndex,
+      serviceDate,
       flexPath
     );
   }
