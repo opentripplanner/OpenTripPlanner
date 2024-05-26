@@ -60,14 +60,13 @@ public class DirectFlexRouter {
         serverContext.transitService(),
         serverContext.flexParameters(),
         request.dateTime(),
-        request.arriveBy(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,
         egressStops
       );
 
-      return new ArrayList<>(flexRouter.createFlexOnlyItineraries());
+      return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
     }
   }
 }

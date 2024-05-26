@@ -102,14 +102,6 @@ class FlexTemplateFactory {
     return false;
   }
 
-  /**
-   * Return the access/egress stop, can be Regular-, Group- and AreaStop.
-   * Se also {@link #expandStopsAt(FlexTrip, int)}.
-   */
-  private StopLocation stop() {
-    return nearbyStop.stop;
-  }
-
   private static List<StopLocation> expandStopsAt(FlexTrip<?, ?> flexTrip, int index) {
     var stop = flexTrip.getStop(index);
     return stop instanceof GroupStop groupStop ? groupStop.getChildLocations() : List.of(stop);
@@ -117,16 +109,16 @@ class FlexTemplateFactory {
 
   private FlexAccessTemplate createAccessTemplate(
     FlexTrip<?, ?> flexTrip,
-    int boardIndex,
+    int boardStopPosition,
     StopLocation alightStop,
-    int alightStopIndex
+    int alightStopPosition
   ) {
     return new FlexAccessTemplate(
-      nearbyStop,
       flexTrip,
-      boardIndex,
-      alightStopIndex,
+      nearbyStop,
+      boardStopPosition,
       alightStop,
+      alightStopPosition,
       date,
       createCalculator(flexTrip),
       maxTransferDuration
@@ -136,15 +128,15 @@ class FlexTemplateFactory {
   private FlexEgressTemplate createEgressTemplate(
     FlexTrip<?, ?> flexTrip,
     StopLocation boardStop,
-    int boardStopIndex,
-    int alightIndex
+    int boardStopPosition,
+    int alightStopPosition
   ) {
     return new FlexEgressTemplate(
-      nearbyStop,
       flexTrip,
-      boardStopIndex,
-      alightIndex,
       boardStop,
+      boardStopPosition,
+      nearbyStop,
+      alightStopPosition,
       date,
       createCalculator(flexTrip),
       maxTransferDuration

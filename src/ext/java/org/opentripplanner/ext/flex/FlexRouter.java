@@ -48,15 +48,13 @@ public class FlexRouter {
   /* Request data */
   private final ZonedDateTime startOfTime;
   private final int departureTime;
-  private final boolean arriveBy;
   private final List<FlexServiceDate> dates;
 
   public FlexRouter(
     Graph graph,
     TransitService transitService,
     FlexParameters flexParameters,
-    Instant searchInstant,
-    boolean arriveBy,
+    Instant requestedTime,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     Collection<NearbyStop> streetAccesses,
@@ -78,9 +76,9 @@ public class FlexRouter {
 
     if (graph.hasStreets) {
       this.accessFlexPathCalculator =
-        new StreetFlexPathCalculator(false, this.flexParameters.maxFlexTripDuration());
+        new StreetFlexPathCalculator(false, flexParameters.maxFlexTripDuration());
       this.egressFlexPathCalculator =
-        new StreetFlexPathCalculator(true, this.flexParameters.maxFlexTripDuration());
+        new StreetFlexPathCalculator(true, flexParameters.maxFlexTripDuration());
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
@@ -89,10 +87,9 @@ public class FlexRouter {
     }
 
     ZoneId tz = transitService.getTimeZone();
-    LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
+    LocalDate searchDate = LocalDate.ofInstant(requestedTime, tz);
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
-    this.departureTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, searchInstant);
-    this.arriveBy = arriveBy;
+    this.departureTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
     this.dates =
       createFlexServiceDates(
         transitService,
@@ -102,7 +99,7 @@ public class FlexRouter {
       );
   }
 
-  public Collection<Itinerary> createFlexOnlyItineraries() {
+  public List<Itinerary> createFlexOnlyItineraries(boolean arriveBy) {
     OTPRequestTimeoutException.checkForTimeout();
 
     var directFlexPaths = new FlexDirectPathFactory(

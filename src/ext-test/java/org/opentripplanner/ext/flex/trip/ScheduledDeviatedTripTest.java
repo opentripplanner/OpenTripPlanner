@@ -104,7 +104,6 @@ class ScheduledDeviatedTripTest {
       new DefaultTransitService(transitModel),
       FlexParameters.defaultValues(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
-      false,
       1,
       1,
       List.of(from),
@@ -113,7 +112,11 @@ class ScheduledDeviatedTripTest {
 
     var filter = new DecorateWithFare(graph.getFareService());
 
-    var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
+    var itineraries = router
+      .createFlexOnlyItineraries(false)
+      .stream()
+      .peek(filter::decorate)
+      .toList();
 
     var itinerary = itineraries.getFirst();
 

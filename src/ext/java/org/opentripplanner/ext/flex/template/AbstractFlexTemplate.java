@@ -17,7 +17,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
@@ -37,6 +36,10 @@ abstract class AbstractFlexTemplate {
    * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
    */
   private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
+
+  // TODO - This is confusing, and not following OO principles. The from/to stop
+  //      - changes type for access/egress, move them down into child class.
+  //      - this apply to transferStop as well.
   protected final NearbyStop accessEgress;
   protected final FlexTrip<?, ?> trip;
   public final int fromStopIndex;
@@ -48,28 +51,31 @@ abstract class AbstractFlexTemplate {
   private final Duration maxTransferDuration;
 
   /**
-   * @param accessEgress  Path from origin to the point of boarding for this flex trip
-   * @param trip          The FlexTrip used for this Template
-   * @param fromStopIndex Stop sequence index where this FlexTrip is boarded
-   * @param toStopIndex   The stop where this FlexTrip alights
-   * @param transferStop  The stop location where this FlexTrip alights
-   * @param date          The service date of this FlexTrip
-   * @param calculator    Calculates the path and duration of the FlexTrip
+   * @param trip                The FlexTrip used for this template
+   * @param accessEgress        Path from origin/destination to the point of boarding/alighting for
+   *                            this flex trip
+   * @param transferStop        The stop location where this FlexTrip transfers to another transit
+   *                            service.
+   * @param boardStopPosition   The stop-board-position in the trip pattern
+   * @param alightStopPosition  The stop-alight-position in the trip pattern
+   * @param date                The service date of this FlexTrip
+   * @param calculator          Calculates the path and duration of the FlexTrip
+   * @param maxTransferDuration The limit for how long a transfer is allowed to be
    */
   AbstractFlexTemplate(
-    NearbyStop accessEgress,
     FlexTrip<?, ?> trip,
-    int fromStopIndex,
-    int toStopIndex,
+    NearbyStop accessEgress,
     StopLocation transferStop,
+    int boardStopPosition,
+    int alightStopPosition,
     FlexServiceDate date,
     FlexPathCalculator calculator,
     Duration maxTransferDuration
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
-    this.fromStopIndex = fromStopIndex;
-    this.toStopIndex = toStopIndex;
+    this.fromStopIndex = boardStopPosition;
+    this.toStopIndex = alightStopPosition;
     this.transferStop = transferStop;
     this.secondsFromStartOfTime = date.secondsFromStartOfTime;
     this.serviceDate = date.serviceDate;
@@ -86,14 +92,14 @@ abstract class AbstractFlexTemplate {
   }
 
   /**
-   * This method is very much the hot code path in the flex access/egress search so any optimization
-   * here will lead to noticeable speedups.
+   * This method is very much the hot code path in the flex access/egress search, so any
+   * optimization here will lead to noticeable speedups.
    */
   Stream<FlexAccessEgress> createFlexAccessEgressStream(FlexAccessEgressCallbackAdapter callback) {
     if (transferStop instanceof RegularStop stop) {
-      TransitStopVertex flexVertex = callback.getStopVertexForStopId(stop.getId());
+      var flexVertex = callback.getStopVertexForStopId(stop.getId());
       return Stream
-        .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (RegularStop) transferStop))
+        .of(createFlexAccessEgress(new ArrayList<>(), flexVertex, stop))
         .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
@@ -107,10 +113,10 @@ abstract class AbstractFlexTemplate {
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= maxDistanceMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
         .map(transfer -> {
-          List<Edge> edges = getTransferEdges(transfer);
-          Vertex flexVertex = getFlexVertex(edges.get(0));
-          RegularStop finalStop = getFinalStop(transfer);
-          return getFlexAccessEgress(edges, flexVertex, finalStop);
+          var edges = getTransferEdges(transfer);
+          var flexVertex = getFlexVertex(edges.get(0));
+          var finalStop = getFinalStop(transfer);
+          return createFlexAccessEgress(edges, flexVertex, finalStop);
         })
         .filter(Objects::nonNull);
     }
@@ -171,21 +177,21 @@ abstract class AbstractFlexTemplate {
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
   @Nullable
-  protected FlexAccessEgress getFlexAccessEgress(
+  private FlexAccessEgress createFlexAccessEgress(
     List<Edge> transferEdges,
     Vertex flexVertex,
     RegularStop stop
   ) {
     var flexEdge = getFlexEdge(flexVertex, transferStop);
 
-    // Drop none routable and  very short(<10s) trips
+    // Drop none routable and very short(<10s) trips
     if (flexEdge == null || flexEdge.getTimeInSeconds() < MIN_FLEX_TRIP_DURATION_SECONDS) {
       return null;
     }
 
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
-    // was traversed twice leading to a noticeable slowdown.
+    // was traversed twice, leading to a noticeable slowdown.
     final var afterFlexState = flexEdge.traverse(accessEgress.state);
     if (State.isEmpty(afterFlexState)) {
       return null;

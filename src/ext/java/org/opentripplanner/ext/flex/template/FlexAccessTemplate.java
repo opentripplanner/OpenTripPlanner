@@ -22,21 +22,21 @@ import org.opentripplanner.transit.model.site.StopLocation;
 class FlexAccessTemplate extends AbstractFlexTemplate {
 
   FlexAccessTemplate(
-    NearbyStop accessEgress,
     FlexTrip<?, ?> trip,
-    int fromStopTime,
-    int toStopTime,
-    StopLocation transferStop,
+    NearbyStop boardStop,
+    int boardStopPosition,
+    StopLocation alightStop,
+    int alightStopPosition,
     FlexServiceDate date,
     FlexPathCalculator calculator,
     Duration maxTransferDuration
   ) {
     super(
-      accessEgress,
       trip,
-      fromStopTime,
-      toStopTime,
-      transferStop,
+      boardStop,
+      alightStop,
+      boardStopPosition,
+      alightStopPosition,
       date,
       calculator,
       maxTransferDuration
