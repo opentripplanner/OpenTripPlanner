@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.flex.template;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
@@ -22,7 +21,7 @@ public class FlexEgressFactory {
     this.templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
   }
 
-  public Collection<FlexAccessEgress> createFlexEgresses(
+  public List<FlexAccessEgress> createFlexEgresses(
     Collection<NearbyStop> streetEgresses,
     List<FlexServiceDate> dates
   ) {
@@ -38,14 +37,10 @@ public class FlexEgressFactory {
     Collection<NearbyStop> streetEgresses,
     List<FlexServiceDate> dates
   ) {
-    var result = new ArrayList<FlexEgressTemplate>();
     var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, dates, false);
-
-    for (var it : closestFlexTrips) {
-      for (var date : it.activeDates()) {
-        result.addAll(templateFactory.createEgressTemplates(date, it.flexTrip(), it.nearbyStop()));
-      }
-    }
-    return result;
+    return closestFlexTrips
+      .stream()
+      .flatMap(it -> templateFactory.createEgressTemplates(it).stream())
+      .toList();
   }
 }

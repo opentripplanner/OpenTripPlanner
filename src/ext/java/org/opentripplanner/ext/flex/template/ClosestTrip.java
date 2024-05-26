@@ -5,37 +5,73 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 /**
- * The combination of the closest stop and trip with active dates where the trip is in service.
- *
- * @param activeDates This is a mutable list, when building an instance the
- *                    {@link #addDate(FlexServiceDate)} can be used to add dates to the list.
+ * The combination of the closest stop, trip and trip active date.
  */
-class ClosestTrip {
-
-  private final NearbyStop nearbyStop;
-  private final FlexTrip<?, ?> flexTrip;
-  private final int stopPos;
-  private final List<FlexServiceDate> activeDates = new ArrayList<>();
-
-  private ClosestTrip(NearbyStop nearbyStop, FlexTrip<?, ?> flexTrip, int stopPos) {
-    this.nearbyStop = nearbyStop;
-    this.flexTrip = flexTrip;
-    this.stopPos = stopPos;
+record ClosestTrip(
+  NearbyStop nearbyStop,
+  FlexTrip<?, ?> flexTrip,
+  int stopPos,
+  FlexServiceDate activeDate
+) {
+  public ClosestTrip(
+    NearbyStop nearbyStop,
+    FlexTrip<?, ?> flexTrip,
+    int stopPos,
+    FlexServiceDate activeDate
+  ) {
+    this.nearbyStop = Objects.requireNonNull(nearbyStop);
+    this.flexTrip = Objects.requireNonNull(flexTrip);
+    this.stopPos = IntUtils.requireNotNegative(stopPos, "stopPos");
+    this.activeDate = activeDate;
   }
 
-  /** This method is static, so we can move it to the FlexTemplateFactory later. */
-  public static Collection<ClosestTrip> of(
+  /**
+   * Create a temporary closest-trip without an active-date
+   */
+  private ClosestTrip(NearbyStop nearbyStop, FlexTrip<?, ?> flexTrip, int stopPos) {
+    this(nearbyStop, flexTrip, stopPos, null);
+  }
+
+  private ClosestTrip(ClosestTrip original, FlexServiceDate activeDate) {
+    this(original.nearbyStop, original.flexTrip, original.stopPos, activeDate);
+  }
+
+  /**
+   * Create a set of the closest trips running on the dates provided. Only the
+   * combination of the closest nearby-stop and trip is kept. For each combination,
+   * the set of dates is checked, and an instance with each active date is returned.
+   */
+  static Collection<ClosestTrip> of(
     FlexAccessEgressCallbackAdapter callbackService,
     Collection<NearbyStop> nearbyStops,
     List<FlexServiceDate> dates,
     boolean pickup
   ) {
-    Map<FlexTrip<?, ?>, ClosestTrip> map = new HashMap<>();
-    // Find all trips reachable from the nearbyStops
+    var closestTrips = findAllTripsReachableFromNearbyStop(callbackService, nearbyStops, pickup);
+    return findActiveDatesForTripAndDecorateResult(callbackService, dates, closestTrips);
+  }
+
+  @Override
+  public FlexServiceDate activeDate() {
+    // The active date is not required as an internal "trick" to create closest-trips
+    // in two steps, but the instance is not valid before the active-date is added. This
+    // method should not be used inside this class, only on fully constructed valid instances;
+    // Hence the active-date should not be null.
+    return Objects.requireNonNull(activeDate);
+  }
+
+  private static Map<FlexTrip<?, ?>, ClosestTrip> findAllTripsReachableFromNearbyStop(
+    FlexAccessEgressCallbackAdapter callbackService,
+    Collection<NearbyStop> nearbyStops,
+    boolean pickup
+  ) {
+    var map = new HashMap<FlexTrip<?, ?>, ClosestTrip>();
     for (NearbyStop nearbyStop : nearbyStops) {
       var stop = nearbyStop.stop;
       for (var trip : callbackService.getFlexTripsByStop(stop)) {
@@ -48,41 +84,31 @@ class ClosestTrip {
         }
       }
     }
+    return map;
+  }
 
+  private static ArrayList<ClosestTrip> findActiveDatesForTripAndDecorateResult(
+    FlexAccessEgressCallbackAdapter callbackService,
+    List<FlexServiceDate> dates,
+    Map<FlexTrip<?, ?>, ClosestTrip> map
+  ) {
+    var result = new ArrayList<ClosestTrip>();
     // Add active dates
     for (Map.Entry<FlexTrip<?, ?>, ClosestTrip> e : map.entrySet()) {
+      var trip = e.getKey();
       var closestTrip = e.getValue();
       // Include dates where the service is running
-      dates
-        .stream()
-        .filter(date -> callbackService.isDateActive(date, e.getKey()))
-        .forEach(closestTrip::addDate);
+      for (FlexServiceDate date : dates) {
+        if (callbackService.isDateActive(date, trip)) {
+          result.add(closestTrip.withDate(date));
+        }
+      }
     }
-    // Filter inactive trips and return
-    return map.values().stream().filter(ClosestTrip::hasActiveDates).toList();
+    return result;
   }
 
-  NearbyStop nearbyStop() {
-    return nearbyStop;
-  }
-
-  FlexTrip<?, ?> flexTrip() {
-    return flexTrip;
-  }
-
-  int stopPos() {
-    return stopPos;
-  }
-
-  Iterable<FlexServiceDate> activeDates() {
-    return activeDates;
-  }
-
-  void addDate(FlexServiceDate date) {
-    activeDates.add(date);
-  }
-
-  boolean hasActiveDates() {
-    return !activeDates.isEmpty();
+  private ClosestTrip withDate(FlexServiceDate date) {
+    Objects.requireNonNull(date);
+    return new ClosestTrip(this, date);
   }
 }

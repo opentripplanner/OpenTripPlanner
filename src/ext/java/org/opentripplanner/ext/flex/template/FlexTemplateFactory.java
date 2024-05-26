@@ -19,9 +19,9 @@ class FlexTemplateFactory {
 
   private final FlexPathCalculator calculator;
   private final Duration maxTransferDuration;
-  private FlexServiceDate date;
-  private FlexTrip<?, ?> trip;
   private NearbyStop nearbyStop;
+  private FlexTrip<?, ?> trip;
+  private FlexServiceDate date;
 
   private FlexTemplateFactory(FlexPathCalculator calculator, Duration maxTransferDuration) {
     this.calculator = Objects.requireNonNull(calculator);
@@ -32,53 +32,40 @@ class FlexTemplateFactory {
     return new FlexTemplateFactory(calculator, maxTransferDuration);
   }
 
-  List<FlexAccessTemplate> createAccessTemplates(
-    FlexServiceDate date,
-    FlexTrip<?, ?> flexTrip,
-    NearbyStop nearbyStop
-  ) {
-    return with(date, flexTrip, nearbyStop).createAccessTemplates();
+  List<FlexAccessTemplate> createAccessTemplates(ClosestTrip closestTrip) {
+    return with(closestTrip).createAccessTemplates();
   }
 
-  List<FlexEgressTemplate> createEgressTemplates(
-    FlexServiceDate date,
-    FlexTrip<?, ?> flexTrip,
-    NearbyStop nearbyStop
-  ) {
-    return with(date, flexTrip, nearbyStop).createEgressTemplates();
+  List<FlexEgressTemplate> createEgressTemplates(ClosestTrip closestTrip) {
+    return with(closestTrip).createEgressTemplates();
   }
 
   /**
    * Add required parameters to the factory before calling the create methods.
    */
-  private FlexTemplateFactory with(
-    FlexServiceDate date,
-    FlexTrip<?, ?> flexTrip,
-    NearbyStop nearbyStop
-  ) {
-    this.date = Objects.requireNonNull(date);
-    this.trip = Objects.requireNonNull(flexTrip);
-    this.nearbyStop = Objects.requireNonNull(nearbyStop);
+  private FlexTemplateFactory with(ClosestTrip closestTrip) {
+    this.nearbyStop = closestTrip.nearbyStop();
+    this.trip = closestTrip.flexTrip();
+    this.date = closestTrip.activeDate();
     return this;
   }
 
   private List<FlexAccessTemplate> createAccessTemplates() {
-    int boardIndex = trip.findBoardIndex(stop());
+    int boardStopPos = trip.findBoardIndex(stop());
 
-    if (boardIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
+    if (boardStopPos == FlexTrip.STOP_INDEX_NOT_FOUND) {
       return List.of();
     }
 
-    ArrayList<FlexAccessTemplate> result = new ArrayList<>();
+    var result = new ArrayList<FlexAccessTemplate>();
+    int alightStopPos = isBoardingAndAlightingAtSameStopPositionAllowed()
+      ? boardStopPos
+      : boardStopPos + 1;
 
-    int alightIndex = isBoardingAndAlightingAtSameStopPositionAllowed()
-      ? boardIndex
-      : boardIndex + 1;
-
-    for (; alightIndex < trip.numberOfStops(); alightIndex++) {
-      if (trip.getAlightRule(alightIndex).isRoutable()) {
-        for (var stop : expandStopsAt(trip, alightIndex)) {
-          result.add(createAccessTemplate(trip, boardIndex, stop, alightIndex));
+    for (; alightStopPos < trip.numberOfStops(); alightStopPos++) {
+      if (trip.getAlightRule(alightStopPos).isRoutable()) {
+        for (var stop : expandStopsAt(trip, alightStopPos)) {
+          result.add(createAccessTemplate(trip, boardStopPos, stop, alightStopPos));
         }
       }
     }
@@ -86,20 +73,19 @@ class FlexTemplateFactory {
   }
 
   private List<FlexEgressTemplate> createEgressTemplates() {
-    var alightIndex = trip.findAlightIndex(stop());
+    var alightStopPos = trip.findAlightIndex(stop());
 
-    if (alightIndex == FlexTrip.STOP_INDEX_NOT_FOUND) {
+    if (alightStopPos == FlexTrip.STOP_INDEX_NOT_FOUND) {
       return List.of();
     }
 
-    List<FlexEgressTemplate> result = new ArrayList<>();
-
-    int end = isBoardingAndAlightingAtSameStopPositionAllowed() ? alightIndex : alightIndex - 1;
+    var result = new ArrayList<FlexEgressTemplate>();
+    int end = isBoardingAndAlightingAtSameStopPositionAllowed() ? alightStopPos : alightStopPos - 1;
 
     for (int boardIndex = 0; boardIndex <= end; boardIndex++) {
       if (trip.getBoardRule(boardIndex).isRoutable()) {
         for (var stop : expandStopsAt(trip, boardIndex)) {
-          result.add(createEgressTemplate(trip, stop, boardIndex, alightIndex));
+          result.add(createEgressTemplate(trip, stop, boardIndex, alightStopPos));
         }
       }
     }
