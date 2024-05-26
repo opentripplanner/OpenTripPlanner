@@ -16,10 +16,14 @@ public class GtfsRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
     source = new TimetableSnapshotSource(parameters, transitModel);
   }
 
+  public UpdateResult applyTripUpdates(GtfsRealtime.TripUpdate update) {
+    return applyTripUpdates(List.of(update));
+  }
+
   public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
     return source.applyTripUpdates(
       null,
-      BackwardsDelayPropagationType.REQUIRED,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       true,
       updates,
       getFeedId()

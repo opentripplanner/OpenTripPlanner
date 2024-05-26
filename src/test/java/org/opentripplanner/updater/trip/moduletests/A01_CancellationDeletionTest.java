@@ -37,7 +37,7 @@ public class A01_CancellationDeletionTest {
       relationship,
       env.timeZone
     )
-      .buildList();
+      .build();
     var result = env.applyTripUpdates(update);
 
     assertEquals(1, result.successful());

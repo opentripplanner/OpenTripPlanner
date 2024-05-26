@@ -36,7 +36,7 @@ public class B01_DelayedTest {
     int delay = 1;
     tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
 
-    var tripUpdate = tripUpdateBuilder.buildList();
+    var tripUpdate = tripUpdateBuilder.build();
 
     var result = env.applyTripUpdates(tripUpdate);
 

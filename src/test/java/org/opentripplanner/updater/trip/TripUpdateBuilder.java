@@ -7,7 +7,6 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
@@ -173,10 +172,6 @@ public class TripUpdateBuilder {
   public GtfsRealtime.TripUpdate build() {
     tripUpdateBuilder.setTrip(tripDescriptorBuilder.build());
     return tripUpdateBuilder.build();
-  }
-
-  public List<GtfsRealtime.TripUpdate> buildList() {
-    return List.of(build());
   }
 
   /**

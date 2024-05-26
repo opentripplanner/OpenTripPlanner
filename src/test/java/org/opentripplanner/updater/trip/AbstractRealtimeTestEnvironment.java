@@ -55,7 +55,7 @@ public class AbstractRealtimeTestEnvironment {
   public final Trip trip1;
   public final Trip trip2;
   public final DateTimeHelper dateTimeHelper = new DateTimeHelper(timeZone, serviceDate);
-  public TransitModel transitModel;
+  public final TransitModel transitModel;
 
   public AbstractRealtimeTestEnvironment() {
     transitModel = new TransitModel(stopModel, new Deduplicator());
