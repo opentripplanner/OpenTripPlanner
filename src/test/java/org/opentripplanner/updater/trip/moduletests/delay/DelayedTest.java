@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.moduletests;
+package org.opentripplanner.updater.trip.moduletests.delay;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class B01_DelayedTest {
+public class DelayedTest {
 
   @Test
   public void delayed() {

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.moduletests;
+package org.opentripplanner.updater.trip.moduletests.rejection;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,21 +10,19 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class C01_InvalidInputTest {
+/**
+ * A trip with start date that is outside the service period shouldn't throw an exception and is
+ * ignored instead.
+ */
+public class InvalidInputTest {
 
-  /**
-   * This test asserts that trip with start date that is outside the service period doesn't
-   * throw an exception and is ignored instead.
-   */
   @Test
   public void invalidTripDate() {
     var env = new GtfsRealtimeTestEnvironment();
 
-    String scheduledTripId = env.trip1.getId().getId();
-
     var serviceDateOutsideService = env.serviceDate.minusYears(10);
     var builder = new TripUpdateBuilder(
-      scheduledTripId,
+      env.trip1.getId().getId(),
       serviceDateOutsideService,
       SCHEDULED,
       env.timeZone

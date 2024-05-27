@@ -1,7 +1,8 @@
-package org.opentripplanner.updater.trip.moduletests;
+package org.opentripplanner.updater.trip.moduletests.cancellation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import java.util.List;
@@ -14,7 +15,11 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class A01_CancellationDeletionTest {
+/**
+ * Cancellations and deletions should end up in the internal data model and make trips unavailable
+ * for routing.
+ */
+public class CancellationDeletionTest {
 
   static List<Arguments> cases() {
     return List.of(
@@ -51,5 +56,6 @@ public class A01_CancellationDeletionTest {
     var tripTimes = forToday.getTripTimes(tripIndex1);
 
     assertEquals(state, tripTimes.getRealTimeState());
+    assertTrue(tripTimes.isCanceledOrDeleted());
   }
 }
