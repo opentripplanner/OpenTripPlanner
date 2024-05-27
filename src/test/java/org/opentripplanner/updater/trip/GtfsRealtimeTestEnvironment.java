@@ -3,6 +3,8 @@ package org.opentripplanner.updater.trip;
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 
@@ -28,5 +30,9 @@ public class GtfsRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
       updates,
       getFeedId()
     );
+  }
+
+  public TripPattern getPatternForTrip(Trip trip) {
+    return transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
   }
 }

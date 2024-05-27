@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
-import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -27,7 +26,7 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
-public class AbstractRealtimeTestEnvironment {
+public abstract class AbstractRealtimeTestEnvironment {
 
   protected static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
@@ -93,34 +92,6 @@ public class AbstractRealtimeTestEnvironment {
    */
   public TransitService getTransitService() {
     return new DefaultTransitService(transitModel);
-  }
-
-  public EntityResolver getEntityResolver() {
-    return new EntityResolver(getTransitService(), getFeedId());
-  }
-
-  public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, serviceDate);
-  }
-
-  public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
-    var transitService = getTransitService();
-    var trip = transitService.getTripOnServiceDateById(tripId);
-    return transitService.getPatternForTrip(trip.getTrip(), serviceDate);
-  }
-
-  /**
-   * Find the current TripTimes for a trip id on the default serviceDate
-   */
-  public TripTimes getTripTimesForTrip(Trip trip) {
-    return getTripTimesForTrip(trip.getId(), serviceDate);
-  }
-
-  /**
-   * Find the current TripTimes for a trip id on the default serviceDate
-   */
-  public TripTimes getTripTimesForTrip(String id) {
-    return getTripTimesForTrip(id(id), serviceDate);
   }
 
   /**

@@ -17,6 +17,9 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
+/**
+ * A mixture of delayed and skipped stops should result in both delayed and cancelled stops.
+ */
 public class SkippedTest {
 
   @Test

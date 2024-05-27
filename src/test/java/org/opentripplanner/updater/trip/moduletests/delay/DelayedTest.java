@@ -3,57 +3,83 @@ package org.opentripplanner.updater.trip.moduletests.delay;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
+/**
+ * Delays should be applied to the first trip but should leave the second trip untouched.
+ */
 public class DelayedTest {
+
+  private static final int DELAY = 1;
+  private static final int STOP_SEQUENCE = 1;
 
   @Test
   public void delayed() {
     var env = new GtfsRealtimeTestEnvironment();
 
-    final TripPattern pattern = env.transitModel
-      .getTransitModelIndex()
-      .getPatternForTrip()
-      .get(env.trip1);
-    final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip1.getId());
-    //final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(env.trip2.getId());
-
-    var tripUpdateBuilder = new TripUpdateBuilder(
+    var tripUpdate = new TripUpdateBuilder(
       env.trip1.getId().getId(),
       env.serviceDate,
       SCHEDULED,
       env.timeZone
-    );
-
-    int stopSequence = 1;
-    int delay = 1;
-    tripUpdateBuilder.addDelayedStopTime(stopSequence, delay);
-
-    var tripUpdate = tripUpdateBuilder.build();
+    )
+      .addDelayedStopTime(STOP_SEQUENCE, DELAY)
+      .build();
 
     var result = env.applyTripUpdates(tripUpdate);
 
     assertEquals(1, result.successful());
 
-    final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern, env.serviceDate);
-    final Timetable schedule = snapshot.resolve(pattern, null);
-    assertNotSame(forToday, schedule);
-    assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
-    //assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
-    assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
-    assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+    // trip1 should be modified
+    {
+      var pattern1 = env.getPatternForTrip(env.trip1);
+      final int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
-    assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
-    assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
-    //assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex2).getRealTimeState());
-    //assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex2).getRealTimeState());
+      final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
+      final Timetable trip1Realtime = snapshot.resolve(pattern1, env.serviceDate);
+      final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
+
+      assertNotSame(trip1Realtime, trip1Scheduled);
+      assertNotSame(
+        trip1Realtime.getTripTimes(trip1Index),
+        trip1Scheduled.getTripTimes(trip1Index)
+      );
+      assertEquals(1, trip1Realtime.getTripTimes(trip1Index).getArrivalDelay(STOP_SEQUENCE));
+      assertEquals(1, trip1Realtime.getTripTimes(trip1Index).getDepartureDelay(STOP_SEQUENCE));
+
+      assertEquals(
+        RealTimeState.SCHEDULED,
+        trip1Scheduled.getTripTimes(trip1Index).getRealTimeState()
+      );
+      assertEquals(
+        RealTimeState.UPDATED,
+        trip1Realtime.getTripTimes(trip1Index).getRealTimeState()
+      );
+    }
+
+    // trip2 should keep the scheduled information
+    {
+      var pattern = env.getPatternForTrip(env.trip2);
+      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip2.getId());
+
+      final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
+      final Timetable realtime = snapshot.resolve(pattern, env.serviceDate);
+      final Timetable scheduled = snapshot.resolve(pattern, null);
+
+      assertSame(realtime, scheduled);
+      assertSame(realtime.getTripTimes(tripIndex), scheduled.getTripTimes(tripIndex));
+      assertEquals(0, realtime.getTripTimes(tripIndex).getArrivalDelay(STOP_SEQUENCE));
+      assertEquals(0, realtime.getTripTimes(tripIndex).getDepartureDelay(STOP_SEQUENCE));
+
+      assertEquals(RealTimeState.SCHEDULED, scheduled.getTripTimes(tripIndex).getRealTimeState());
+      assertEquals(RealTimeState.SCHEDULED, realtime.getTripTimes(tripIndex).getRealTimeState());
+    }
   }
 }
