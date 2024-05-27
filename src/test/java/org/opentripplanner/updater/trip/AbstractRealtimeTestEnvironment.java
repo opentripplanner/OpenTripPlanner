@@ -28,6 +28,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 public abstract class AbstractRealtimeTestEnvironment {
 
+  public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   protected static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
@@ -48,12 +49,11 @@ public abstract class AbstractRealtimeTestEnvironment {
     .withRegularStop(stopC1)
     .withRegularStop(stopD1)
     .build();
-  public final LocalDate serviceDate = LocalDate.of(2024, 5, 8);
   public final FeedScopedId operator1Id = TransitModelForTest.id("TestOperator1");
   public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
   public final Trip trip1;
   public final Trip trip2;
-  public final DateTimeHelper dateTimeHelper = new DateTimeHelper(timeZone, serviceDate);
+  public final DateTimeHelper dateTimeHelper = new DateTimeHelper(timeZone, SERVICE_DATE);
   public final TransitModel transitModel;
 
   public AbstractRealtimeTestEnvironment() {
@@ -75,7 +75,7 @@ public abstract class AbstractRealtimeTestEnvironment {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(
       CAL_ID,
-      List.of(serviceDate.minusDays(1), serviceDate, serviceDate.plusDays(1))
+      List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
     transitModel.getServiceCodes().put(CAL_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
@@ -119,7 +119,7 @@ public abstract class AbstractRealtimeTestEnvironment {
     var tripOnServiceDate = TripOnServiceDate
       .of(trip.getId())
       .withTrip(trip)
-      .withServiceDate(serviceDate)
+      .withServiceDate(SERVICE_DATE)
       .build();
 
     transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);

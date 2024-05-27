@@ -29,7 +29,7 @@ public class SkippedTest {
 
     var tripUpdate = new TripUpdateBuilder(
       scheduledTripId,
-      env.serviceDate,
+      env.SERVICE_DATE,
       SCHEDULED,
       env.timeZone
     )
@@ -42,7 +42,6 @@ public class SkippedTest {
 
     assertEquals(1, result.successful());
 
-    // THEN
     final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
 
     // Original trip pattern
@@ -56,7 +55,7 @@ public class SkippedTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        env.serviceDate
+        env.SERVICE_DATE
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -78,10 +77,10 @@ public class SkippedTest {
     {
       final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         env.trip2.getId(),
-        env.serviceDate
+        env.SERVICE_DATE
       );
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, env.serviceDate);
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, env.SERVICE_DATE);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);

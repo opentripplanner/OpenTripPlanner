@@ -30,7 +30,7 @@ public class SiriRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, serviceDate);
+    return getPatternForTrip(tripId, SERVICE_DATE);
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
@@ -43,14 +43,14 @@ public class SiriRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
    * Find the current TripTimes for a trip id on the default serviceDate
    */
   public TripTimes getTripTimesForTrip(Trip trip) {
-    return getTripTimesForTrip(trip.getId(), serviceDate);
+    return getTripTimesForTrip(trip.getId(), SERVICE_DATE);
   }
 
   /**
    * Find the current TripTimes for a trip id on the default serviceDate
    */
   public TripTimes getTripTimesForTrip(String id) {
-    return getTripTimesForTrip(id(id), serviceDate);
+    return getTripTimesForTrip(id(id), SERVICE_DATE);
   }
 
   public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {

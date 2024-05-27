@@ -38,7 +38,7 @@ public class CancellationDeletionTest {
 
     var update = new TripUpdateBuilder(
       env.trip1.getId().getId(),
-      env.serviceDate,
+      env.SERVICE_DATE,
       relationship,
       env.timeZone
     )
@@ -48,7 +48,7 @@ public class CancellationDeletionTest {
     assertEquals(1, result.successful());
 
     final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern1, env.serviceDate);
+    final Timetable forToday = snapshot.resolve(pattern1, env.SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex1), schedule.getTripTimes(tripIndex1));

@@ -26,7 +26,7 @@ public class DelayedTest {
 
     var tripUpdate = new TripUpdateBuilder(
       env.trip1.getId().getId(),
-      env.serviceDate,
+      env.SERVICE_DATE,
       SCHEDULED,
       env.timeZone
     )
@@ -43,7 +43,7 @@ public class DelayedTest {
       final int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
       final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-      final Timetable trip1Realtime = snapshot.resolve(pattern1, env.serviceDate);
+      final Timetable trip1Realtime = snapshot.resolve(pattern1, env.SERVICE_DATE);
       final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
 
       assertNotSame(trip1Realtime, trip1Scheduled);
@@ -70,7 +70,7 @@ public class DelayedTest {
       final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip2.getId());
 
       final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-      final Timetable realtime = snapshot.resolve(pattern, env.serviceDate);
+      final Timetable realtime = snapshot.resolve(pattern, env.SERVICE_DATE);
       final Timetable scheduled = snapshot.resolve(pattern, null);
 
       assertSame(realtime, scheduled);
