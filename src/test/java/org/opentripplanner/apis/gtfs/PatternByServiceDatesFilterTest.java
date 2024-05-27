@@ -3,17 +3,22 @@ package org.opentripplanner.apis.gtfs;
 import static java.time.LocalDate.parse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
 import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDateFilterInput;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -37,6 +42,7 @@ class PatternByServiceDatesFilterTest {
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
   private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_1, STOP_1);
   private static final TripPattern PATTERN_1 = pattern();
+  private static final LocalDate DATE = LocalDate.parse("2024-05-27");
 
   enum FilterExpectation {
     REMOVED,
@@ -165,5 +171,29 @@ class PatternByServiceDatesFilterTest {
         };
       }
     };
+  }
+
+  public static List<GraphQLServiceDateFilterInput> noFilterCases() {
+    var list = new ArrayList<GraphQLServiceDateFilterInput>();
+    list.add(null);
+    list.add(new GraphQLServiceDateFilterInput(Map.of()));
+    return list;
+  }
+
+  @ParameterizedTest
+  @MethodSource("noFilterCases")
+  void hasNoServiceDateFilter(GraphQLServiceDateFilterInput input) {
+    assertFalse(PatternByServiceDatesFilter.hasServiceDateFilter(input));
+  }
+
+  public static List<Map<String, Object>> hasFilterCases() {
+    return List.of(Map.of("start", DATE), Map.of("end", DATE), Map.of("start", DATE, "end", DATE));
+  }
+
+  @ParameterizedTest
+  @MethodSource("hasFilterCases")
+  void hasServiceDateFilter(Map<String, Object> params) {
+    var input = new GraphQLServiceDateFilterInput(params);
+    assertTrue(PatternByServiceDatesFilter.hasServiceDateFilter(input));
   }
 }

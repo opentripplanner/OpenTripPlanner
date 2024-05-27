@@ -607,7 +607,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       if (
-        PatternByServiceDatesFilter.hasServiceDayFilter(args.getGraphQLLimitByPatternServiceDates())
+        PatternByServiceDatesFilter.hasServiceDateFilter(
+          args.getGraphQLLimitByPatternServiceDates()
+        )
       ) {
         var filter = new PatternByServiceDatesFilter(
           transitService,

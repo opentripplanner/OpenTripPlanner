@@ -181,7 +181,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
       var args = new GraphQLTypes.GraphQLRoutePatternsArgs(environment.getArguments());
 
-      if (PatternByServiceDatesFilter.hasServiceDayFilter(args.getGraphQLServiceDates())) {
+      if (PatternByServiceDatesFilter.hasServiceDateFilter(args.getGraphQLServiceDates())) {
         var filter = new PatternByServiceDatesFilter(transitService, args.getGraphQLServiceDates());
         return filter.filterPatterns(patterns);
       } else {

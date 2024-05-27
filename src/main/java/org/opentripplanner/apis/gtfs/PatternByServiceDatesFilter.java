@@ -91,7 +91,7 @@ public class PatternByServiceDatesFilter {
       });
   }
 
-  public static boolean hasServiceDayFilter(GraphQLServiceDateFilterInput serviceDays) {
+  public static boolean hasServiceDateFilter(GraphQLServiceDateFilterInput serviceDays) {
     return (
       serviceDays != null &&
       (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
