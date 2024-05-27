@@ -66,7 +66,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
   }
 
   @Override
-  public DataFetcher<Object> publisher() {
+  public DataFetcher<FeedPublisher> publisher() {
     return environment -> {
       String id = getSource(environment);
       return new FeedPublisher(
