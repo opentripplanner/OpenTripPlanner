@@ -12,6 +12,15 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A base class for which abstracts away locking, updating, committing and purging of the timetable snapshot.
+ * In order to keep code reviews easier this is an intermediate stage and will be refactored further.
+ * In particular the following refactorings are planned:
+ *
+ * - use composition instead of inheritance
+ * - make the buffer private to this class and add an API for its access
+ * - create only one "snapshot manager" per transit model that
+ */
 public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTimetableSnapshotSource.class);
@@ -96,6 +105,13 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     return snapshot;
   }
 
+  /**
+   * Request a commit of the timetable snapshot.
+   * <p>
+   * If there are no updated buffered up or not enough time has elapsed, no snapshot is created.
+   *
+   * @param force Force the committing of a new snapshot even if the above conditions are not met.
+   */
   public final void commitTimetableSnapshot(final boolean force) {
     if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
@@ -128,6 +144,13 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     }
   }
 
+  /**
+   * Remove realtime data from previous service dates from the snapshot. This is useful so that
+   * instances that run for multiple days don't accumulate a lot of realtime data for past
+   * dates which would increase memory consumption.
+   * If your OTP instances are restarted throughout the day, this is less useful and can be
+   * turned off.
+   */
   protected final boolean purgeExpiredData() {
     final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
@@ -149,6 +172,11 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
     return localDateNow.get();
   }
 
+  /**
+   * Execute a {@code Runnable} with a locked snapshot buffer and release the lock afterwards. While
+   * the action of locking an unlocking is not complicated to do for calling code, this method
+   * exist so that the lock instance is a private field.
+   */
   protected final void withLock(Runnable action) {
     bufferLock.lock();
 

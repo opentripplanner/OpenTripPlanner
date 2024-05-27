@@ -397,8 +397,11 @@ public class TimetableSnapshot {
     this.patternsForStop = patternsForStop;
   }
 
+  /**
+   * Does this snapshot contain any realtime data or is it completely empty?
+   */
   public boolean isEmpty() {
-    return timetables.isEmpty() && realtimeAddedTripPattern.isEmpty();
+    return dirtyTimetables.isEmpty() && timetables.isEmpty() && realtimeAddedTripPattern.isEmpty();
   }
 
   /**
