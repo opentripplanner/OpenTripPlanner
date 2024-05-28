@@ -42,7 +42,7 @@ public class RaptorRequestTransferCache {
       cacheKey.request
     );
 
-    LOG.info("Adding request from config to cache: {}", cacheKey.options);
+    LOG.info("Initializing cache with request: {}", cacheKey.options);
     transferCache.put(cacheKey, raptorTransferIndex);
   }
 
