@@ -152,6 +152,7 @@ class SiriTimetableSnapshotSourceTest {
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
+    assertFailure(result, UpdateError.UpdateErrorType.TRIP_NOT_FOUND);
   }
 
   /**
@@ -190,6 +191,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
+    assertFailure(result, UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
   }
 
   /**

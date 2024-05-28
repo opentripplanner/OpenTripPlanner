@@ -159,7 +159,9 @@ public class SiriEtBuilder {
 
     public FramedVehicleJourneyRefStructure build() {
       DataFrameRefStructure dataFrameRefStructure = new DataFrameRefStructure();
-      dataFrameRefStructure.setValue(DateTimeFormatter.ISO_LOCAL_DATE.format(serviceDate));
+      if (serviceDate != null) {
+        dataFrameRefStructure.setValue(DateTimeFormatter.ISO_LOCAL_DATE.format(serviceDate));
+      }
       FramedVehicleJourneyRefStructure framedVehicleJourneyRefStructure = new FramedVehicleJourneyRefStructure();
       framedVehicleJourneyRefStructure.setDataFrameRef(dataFrameRefStructure);
       framedVehicleJourneyRefStructure.setDatedVehicleJourneyRef(vehicleJourneyRef);
@@ -246,7 +248,10 @@ public class SiriEtBuilder {
       return this;
     }
 
-    public EstimatedCallsBuilder arriveAimedExpected(String aimedTime, String expectedTime) {
+    public EstimatedCallsBuilder arriveAimedExpected(
+      @Nullable String aimedTime,
+      @Nullable String expectedTime
+    ) {
       var call = calls.getLast();
       if (aimedTime != null) {
         call.setAimedArrivalTime(dateTimeHelper.zonedDateTime(aimedTime));
@@ -257,7 +262,10 @@ public class SiriEtBuilder {
       return this;
     }
 
-    public EstimatedCallsBuilder departAimedExpected(String aimedTime, String expectedTime) {
+    public EstimatedCallsBuilder departAimedExpected(
+      @Nullable String aimedTime,
+      @Nullable String expectedTime
+    ) {
       var call = calls.getLast();
       if (aimedTime != null) {
         call.setAimedDepartureTime(dateTimeHelper.zonedDateTime(aimedTime));
