@@ -997,7 +997,7 @@ type Feed {
     agencies: [Agency]
 
     """publisher"""
-    publisher: FeedPublisher!
+    publisher: FeedPublisher
 
     """
     Alerts relevant for the feed.
