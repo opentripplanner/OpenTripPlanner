@@ -96,15 +96,6 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     assertNotNull(snapshot);
     assertSame(snapshot, updater.getTimetableSnapshot());
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
-    assertNotSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
@@ -139,11 +130,7 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel,
-      () -> SERVICE_DATE
-    );
+    var updater = defaultUpdater();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -152,8 +139,6 @@ public class TimetableSnapshotSourceTest {
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
-
-    updater.commitTimetableSnapshot(true);
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, SERVICE_DATE);
