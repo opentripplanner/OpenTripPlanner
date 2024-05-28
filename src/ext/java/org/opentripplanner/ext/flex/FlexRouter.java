@@ -47,7 +47,7 @@ public class FlexRouter {
 
   /* Request data */
   private final ZonedDateTime startOfTime;
-  private final int departureTime;
+  private final int requestedTime;
   private final List<FlexServiceDate> dates;
 
   public FlexRouter(
@@ -89,7 +89,7 @@ public class FlexRouter {
     ZoneId tz = transitService.getTimeZone();
     LocalDate searchDate = LocalDate.ofInstant(requestedTime, tz);
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
-    this.departureTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
+    this.requestedTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
     this.dates =
       createFlexServiceDates(
         transitService,
@@ -108,7 +108,7 @@ public class FlexRouter {
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration()
     )
-      .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, departureTime, arriveBy);
+      .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
     var itineraries = new ArrayList<Itinerary>();
 

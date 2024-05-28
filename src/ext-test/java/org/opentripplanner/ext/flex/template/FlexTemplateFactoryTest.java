@@ -97,8 +97,8 @@ class FlexTemplateFactoryTest {
     var subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_A, 0));
 
     var template = subject.get(0);
-    assertEquals(0, template.fromStopIndex);
-    assertEquals(1, template.toStopIndex);
+    assertEquals(0, template.boardStopPosition);
+    assertEquals(1, template.alightStopPosition);
     assertSame(CALCULATOR, template.calculator);
     assertSame(STOP_B, template.transferStop);
     assertSame(DATE.serviceDate(), template.serviceDate);
@@ -129,8 +129,8 @@ class FlexTemplateFactoryTest {
     var subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_B, 1));
 
     var template = subject.get(0);
-    assertEquals(0, template.fromStopIndex);
-    assertEquals(1, template.toStopIndex);
+    assertEquals(0, template.boardStopPosition);
+    assertEquals(1, template.alightStopPosition);
     assertSame(CALCULATOR, template.calculator);
     assertSame(STOP_A, template.transferStop);
     assertSame(DATE.serviceDate(), template.serviceDate);
@@ -165,17 +165,17 @@ class FlexTemplateFactoryTest {
     var t1 = subject.get(0);
     var t2 = subject.get(1);
 
-    assertEquals(0, t1.fromStopIndex);
-    assertEquals(0, t2.fromStopIndex);
-    assertEquals(Set.of(1, 3), Set.of(t1.toStopIndex, t2.toStopIndex));
+    assertEquals(0, t1.boardStopPosition);
+    assertEquals(0, t2.boardStopPosition);
+    assertEquals(Set.of(1, 3), Set.of(t1.alightStopPosition, t2.alightStopPosition));
     assertEquals(2, subject.size());
 
     // Board at stop C
     subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_C, 2));
 
     t1 = subject.get(0);
-    assertEquals(2, t1.fromStopIndex);
-    assertEquals(3, t1.toStopIndex);
+    assertEquals(2, t1.boardStopPosition);
+    assertEquals(3, t1.alightStopPosition);
     assertEquals(1, subject.size());
     // TODO This is no longer the responsibility of the template factory, reimplement test
     // We are not allowed to board at stop B, an empty result is expected
@@ -206,17 +206,17 @@ class FlexTemplateFactoryTest {
     var t1 = subject.get(0);
     var t2 = subject.get(1);
 
-    assertEquals(Set.of(0, 2), Set.of(t1.fromStopIndex, t2.fromStopIndex));
-    assertEquals(3, t1.toStopIndex);
-    assertEquals(3, t2.toStopIndex);
+    assertEquals(Set.of(0, 2), Set.of(t1.boardStopPosition, t2.boardStopPosition));
+    assertEquals(3, t1.alightStopPosition);
+    assertEquals(3, t2.alightStopPosition);
     assertEquals(2, subject.size());
 
     // Board at stop C
     subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_B, 1));
 
     t1 = subject.get(0);
-    assertEquals(0, t1.fromStopIndex);
-    assertEquals(1, t1.toStopIndex);
+    assertEquals(0, t1.boardStopPosition);
+    assertEquals(1, t1.alightStopPosition);
     assertEquals(1, subject.size());
 
     // TODO This is no longer the responsibility of the template factory, reimplement test
@@ -245,10 +245,10 @@ class FlexTemplateFactoryTest {
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
-    assertEquals(0, t1.fromStopIndex);
-    assertEquals(0, t2.fromStopIndex);
-    assertEquals(1, t1.toStopIndex);
-    assertEquals(1, t2.toStopIndex);
+    assertEquals(0, t1.boardStopPosition);
+    assertEquals(0, t2.boardStopPosition);
+    assertEquals(1, t1.alightStopPosition);
+    assertEquals(1, t2.alightStopPosition);
     assertEquals(Set.of(STOP_G3, STOP_G4), Set.of(t1.transferStop, t2.transferStop));
     assertEquals(2, subject.size(), subject::toString);
   }
@@ -268,10 +268,10 @@ class FlexTemplateFactoryTest {
 
     var t1 = subject.get(0);
     var t2 = subject.get(1);
-    assertEquals(0, t1.fromStopIndex);
-    assertEquals(0, t2.fromStopIndex);
-    assertEquals(1, t1.toStopIndex);
-    assertEquals(1, t2.toStopIndex);
+    assertEquals(0, t1.boardStopPosition);
+    assertEquals(0, t2.boardStopPosition);
+    assertEquals(1, t1.alightStopPosition);
+    assertEquals(1, t2.alightStopPosition);
     assertEquals(Set.of(STOP_G1, STOP_G2), Set.of(t1.transferStop, t2.transferStop));
     assertEquals(2, subject.size(), subject::toString);
   }
@@ -291,8 +291,8 @@ class FlexTemplateFactoryTest {
     var subject = factory.createAccessTemplates(closestTrip(flexTrip, STOP_B, 1));
 
     var template = subject.get(0);
-    assertEquals(1, template.fromStopIndex);
-    assertEquals(2, template.toStopIndex);
+    assertEquals(1, template.boardStopPosition);
+    assertEquals(2, template.alightStopPosition);
     assertEquals(STOP_C, template.transferStop);
     assertTrue(template.calculator instanceof ScheduledFlexPathCalculator);
     assertEquals(1, subject.size(), subject::toString);
@@ -313,8 +313,8 @@ class FlexTemplateFactoryTest {
     var subject = factory.createEgressTemplates(closestTrip(flexTrip, STOP_B, 1));
 
     var template = subject.get(0);
-    assertEquals(0, template.fromStopIndex);
-    assertEquals(1, template.toStopIndex);
+    assertEquals(0, template.boardStopPosition);
+    assertEquals(1, template.alightStopPosition);
     assertEquals(STOP_A, template.transferStop);
     assertTrue(template.calculator instanceof ScheduledFlexPathCalculator);
     assertEquals(1, subject.size(), subject::toString);

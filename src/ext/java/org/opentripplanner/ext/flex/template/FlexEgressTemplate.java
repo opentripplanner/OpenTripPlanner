@@ -74,8 +74,8 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
     var flexPath = calculator.calculateFlexPath(
       flexFromVertex,
       accessEgress.state.getVertex(),
-      fromStopIndex,
-      toStopIndex
+      boardStopPosition,
+      alightStopPosition
     );
 
     if (flexPath == null) {
@@ -88,8 +88,8 @@ class FlexEgressTemplate extends AbstractFlexTemplate {
       transferStop,
       accessEgress.stop,
       trip,
-      fromStopIndex,
-      toStopIndex,
+      boardStopPosition,
+      alightStopPosition,
       serviceDate,
       flexPath
     );

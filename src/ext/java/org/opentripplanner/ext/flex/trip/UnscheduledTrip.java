@@ -98,13 +98,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   @Override
   public int earliestDepartureTime(
     int requestedDepartureTime,
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int tripDurationSeconds
   ) {
     var optionalDepartureTimeWindow = departureTimeWindow(
-      fromStopIndex,
-      toStopIndex,
+      boardStopPosition,
+      alightStopPosition,
       tripDurationSeconds
     );
 
@@ -126,13 +126,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   @Override
   public int latestArrivalTime(
     int requestedArrivalTime,
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int tripDurationSeconds
   ) {
     var optionalArrivalTimeWindow = arrivalTimeWindow(
-      fromStopIndex,
-      toStopIndex,
+      boardStopPosition,
+      alightStopPosition,
       tripDurationSeconds
     );
 
@@ -264,13 +264,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   private Optional<IntRange> departureTimeWindow(
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int tripDurationSeconds
   ) {
     // Align the from and to time-windows by subtracting the trip-duration from the to-time-window.
-    var fromTime = stopTimes[fromStopIndex].timeWindow();
-    var toTimeShifted = stopTimes[toStopIndex].timeWindow().minus(tripDurationSeconds);
+    var fromTime = stopTimes[boardStopPosition].timeWindow();
+    var toTimeShifted = stopTimes[alightStopPosition].timeWindow().minus(tripDurationSeconds);
 
     // Then take the intersection of the aligned windows to find the window where the
     // requested-departure-time must be within
@@ -278,13 +278,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   private Optional<IntRange> arrivalTimeWindow(
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int tripDurationSeconds
   ) {
     // Align the from and to time-windows by adding the trip-duration to the from-time-window.
-    var fromTimeShifted = stopTimes[fromStopIndex].timeWindow().plus(tripDurationSeconds);
-    var toTime = stopTimes[toStopIndex].timeWindow();
+    var fromTimeShifted = stopTimes[boardStopPosition].timeWindow().plus(tripDurationSeconds);
+    var toTime = stopTimes[alightStopPosition].timeWindow();
 
     // Then take the intersection of the aligned windows to find the window where the
     // requested-arrival-time must be within

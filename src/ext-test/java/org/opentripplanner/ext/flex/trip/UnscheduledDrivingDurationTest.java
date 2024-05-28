@@ -17,7 +17,12 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 class UnscheduledDrivingDurationTest {
 
-  static final FlexPathCalculator STATIC_CALCULATOR = (fromv, tov, fromStopIndex, toStopIndex) ->
+  static final FlexPathCalculator STATIC_CALCULATOR = (
+      fromv,
+      tov,
+      boardStopPosition,
+      alightStopPosition
+    ) ->
     new FlexPath(10_000, (int) Duration.ofMinutes(10).toSeconds(), () -> LineStrings.SIMPLE);
   private static final StopTime STOP_TIME = FlexStopTimesForTest.area("10:00", "18:00");
 

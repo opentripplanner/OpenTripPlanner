@@ -68,12 +68,12 @@ public class ScheduledDeviatedTrip
   @Override
   public int earliestDepartureTime(
     int departureTime,
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int flexTripDurationSeconds
   ) {
     int stopTime = MISSING_VALUE;
-    for (int i = fromStopIndex; stopTime == MISSING_VALUE && i >= 0; i--) {
+    for (int i = boardStopPosition; stopTime == MISSING_VALUE && i >= 0; i--) {
       stopTime = stopTimes[i].departureTime;
     }
     return stopTime >= departureTime ? stopTime : MISSING_VALUE;
@@ -87,12 +87,12 @@ public class ScheduledDeviatedTrip
   @Override
   public int latestArrivalTime(
     int arrivalTime,
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     int flexTripDurationSeconds
   ) {
     int stopTime = MISSING_VALUE;
-    for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
+    for (int i = alightStopPosition; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;
     }
     return stopTime <= arrivalTime ? stopTime : MISSING_VALUE;

@@ -42,8 +42,8 @@ abstract class AbstractFlexTemplate {
   //      - this apply to transferStop as well.
   protected final NearbyStop accessEgress;
   protected final FlexTrip<?, ?> trip;
-  protected final int fromStopIndex;
-  protected final int toStopIndex;
+  protected final int boardStopPosition;
+  protected final int alightStopPosition;
   protected final StopLocation transferStop;
   protected final int secondsFromStartOfTime;
   protected final LocalDate serviceDate;
@@ -74,8 +74,8 @@ abstract class AbstractFlexTemplate {
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
-    this.fromStopIndex = boardStopPosition;
-    this.toStopIndex = alightStopPosition;
+    this.boardStopPosition = boardStopPosition;
+    this.alightStopPosition = alightStopPosition;
     this.transferStop = transferStop;
     this.secondsFromStartOfTime = date.secondsFromStartOfTime();
     this.serviceDate = date.serviceDate();
@@ -128,8 +128,8 @@ abstract class AbstractFlexTemplate {
       .of(AbstractFlexTemplate.class)
       .addObj("accessEgress", accessEgress)
       .addObj("trip", trip)
-      .addNum("fromStopIndex", fromStopIndex)
-      .addNum("toStopIndex", toStopIndex)
+      .addNum("boardStopPosition", boardStopPosition)
+      .addNum("alightStopPosition", alightStopPosition)
       .addObj("transferStop", transferStop)
       .addServiceTime("secondsFromStartOfTime", secondsFromStartOfTime)
       .addDate("serviceDate", serviceDate)
@@ -206,8 +206,8 @@ abstract class AbstractFlexTemplate {
         return new FlexAccessEgress(
           stop,
           durations,
-          fromStopIndex,
-          toStopIndex,
+          boardStopPosition,
+          alightStopPosition,
           trip,
           finalState,
           transferEdges.isEmpty()

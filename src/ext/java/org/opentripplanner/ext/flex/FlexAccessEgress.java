@@ -12,8 +12,8 @@ public final class FlexAccessEgress {
 
   private final RegularStop stop;
   private final FlexPathDurations pathDurations;
-  private final int fromStopIndex;
-  private final int toStopIndex;
+  private final int boardStopPosition;
+  private final int alightStopPosition;
   private final FlexTrip<?, ?> trip;
   private final State lastState;
   private final boolean stopReachedOnBoard;
@@ -21,16 +21,16 @@ public final class FlexAccessEgress {
   public FlexAccessEgress(
     RegularStop stop,
     FlexPathDurations pathDurations,
-    int fromStopIndex,
-    int toStopIndex,
+    int boardStopPosition,
+    int alightStopPosition,
     FlexTrip<?, ?> trip,
     State lastState,
     boolean stopReachedOnBoard
   ) {
     this.stop = stop;
     this.pathDurations = pathDurations;
-    this.fromStopIndex = fromStopIndex;
-    this.toStopIndex = toStopIndex;
+    this.boardStopPosition = boardStopPosition;
+    this.alightStopPosition = alightStopPosition;
     this.trip = Objects.requireNonNull(trip);
     this.lastState = lastState;
     this.stopReachedOnBoard = stopReachedOnBoard;
@@ -49,11 +49,11 @@ public final class FlexAccessEgress {
   }
 
   public int earliestDepartureTime(int departureTime) {
-    int requestedDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
+    int tripDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
     int earliestDepartureTime = trip.earliestDepartureTime(
-      requestedDepartureTime,
-      fromStopIndex,
-      toStopIndex,
+      tripDepartureTime,
+      boardStopPosition,
+      alightStopPosition,
       pathDurations.trip()
     );
     if (earliestDepartureTime == MISSING_VALUE) {
@@ -63,11 +63,11 @@ public final class FlexAccessEgress {
   }
 
   public int latestArrivalTime(int arrivalTime) {
-    int requestedArrivalTime = pathDurations.mapToFlexTripArrivalTime(arrivalTime);
+    int tripArrivalTime = pathDurations.mapToFlexTripArrivalTime(arrivalTime);
     int latestArrivalTime = trip.latestArrivalTime(
-      requestedArrivalTime,
-      fromStopIndex,
-      toStopIndex,
+      tripArrivalTime,
+      boardStopPosition,
+      alightStopPosition,
       pathDurations.trip()
     );
     if (latestArrivalTime == MISSING_VALUE) {
@@ -80,8 +80,8 @@ public final class FlexAccessEgress {
   public String toString() {
     return ToStringBuilder
       .of(FlexAccessEgress.class)
-      .addNum("fromStopIndex", fromStopIndex)
-      .addNum("toStopIndex", toStopIndex)
+      .addNum("boardStopPosition", boardStopPosition)
+      .addNum("alightStopPosition", alightStopPosition)
       .addObj("durations", pathDurations)
       .addObj("stop", stop)
       .addObj("trip", trip.getId())

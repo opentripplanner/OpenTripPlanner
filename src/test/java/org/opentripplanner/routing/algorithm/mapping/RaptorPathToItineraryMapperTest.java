@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -149,7 +150,8 @@ public class RaptorPathToItineraryMapperTest {
     );
 
     State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
-    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(S1, null, 0, 1, flexTrip, state, true);
+    var flexDur = new FlexPathDurations(0, (int) state.getElapsedTimeSeconds(), 0, 0);
+    var flexAccessEgress = new FlexAccessEgress(S1, flexDur, 0, 1, flexTrip, state, true);
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
     Transfer transfer = new Transfer(S2.getIndex(), 0);
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);

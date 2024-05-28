@@ -33,7 +33,7 @@ public class FlexDirectPathFactory {
     Collection<NearbyStop> streetAccesses,
     Collection<NearbyStop> streetEgresses,
     List<FlexServiceDate> dates,
-    int departureTime,
+    int requestTime,
     boolean arriveBy
   ) {
     Collection<DirectFlexPath> directFlexPaths = new ArrayList<>();
@@ -72,7 +72,7 @@ public class FlexDirectPathFactory {
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
           template
-            .createDirectGraphPath(egress, arriveBy, departureTime)
+            .createDirectGraphPath(egress, arriveBy, requestTime)
             .ifPresent(directFlexPaths::add);
         }
       }

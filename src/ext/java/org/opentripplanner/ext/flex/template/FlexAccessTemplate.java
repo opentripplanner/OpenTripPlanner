@@ -79,8 +79,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       int lastStopArrivalTime = flexDurations.mapToFlexTripArrivalTime(departureTime);
       int latestArrivalTime = trip.latestArrivalTime(
         lastStopArrivalTime,
-        fromStopIndex,
-        toStopIndex,
+        boardStopPosition,
+        alightStopPosition,
         flexDurations.trip()
       );
 
@@ -94,8 +94,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(departureTime);
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,
-        fromStopIndex,
-        toStopIndex,
+        boardStopPosition,
+        alightStopPosition,
         flexDurations.trip()
       );
 
@@ -142,8 +142,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
     var flexPath = calculator.calculateFlexPath(
       accessEgress.state.getVertex(),
       flexToVertex,
-      fromStopIndex,
-      toStopIndex
+      boardStopPosition,
+      alightStopPosition
     );
 
     if (flexPath == null) {
@@ -156,8 +156,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       accessEgress.stop,
       transferStop,
       trip,
-      fromStopIndex,
-      toStopIndex,
+      boardStopPosition,
+      alightStopPosition,
       serviceDate,
       flexPath
     );
@@ -170,8 +170,8 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
       calculator.calculateFlexPath(
         accessEgress.state.getVertex(),
         flexVertex,
-        fromStopIndex,
-        toStopIndex
+        boardStopPosition,
+        alightStopPosition
       ) !=
       null
     );
