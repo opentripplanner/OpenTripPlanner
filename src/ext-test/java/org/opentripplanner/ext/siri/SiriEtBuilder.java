@@ -248,21 +248,23 @@ public class SiriEtBuilder {
 
     public EstimatedCallsBuilder arriveAimedExpected(String aimedTime, String expectedTime) {
       var call = calls.getLast();
-      call.setAimedArrivalTime(aimedTime == null ? null : dateTimeHelper.zonedDateTime(aimedTime));
-      call.setExpectedArrivalTime(
-        expectedTime == null ? null : dateTimeHelper.zonedDateTime(expectedTime)
-      );
+      if (aimedTime != null) {
+        call.setAimedArrivalTime(dateTimeHelper.zonedDateTime(aimedTime));
+      }
+      if (expectedTime != null) {
+        call.setExpectedArrivalTime(dateTimeHelper.zonedDateTime(expectedTime));
+      }
       return this;
     }
 
     public EstimatedCallsBuilder departAimedExpected(String aimedTime, String expectedTime) {
       var call = calls.getLast();
-      call.setAimedDepartureTime(
-        aimedTime == null ? null : dateTimeHelper.zonedDateTime(aimedTime)
-      );
-      call.setExpectedDepartureTime(
-        expectedTime == null ? null : dateTimeHelper.zonedDateTime(expectedTime)
-      );
+      if (aimedTime != null) {
+        call.setAimedDepartureTime(dateTimeHelper.zonedDateTime(aimedTime));
+      }
+      if (expectedTime != null) {
+        call.setExpectedDepartureTime(dateTimeHelper.zonedDateTime(expectedTime));
+      }
       return this;
     }
 
