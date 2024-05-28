@@ -996,7 +996,7 @@ type Feed {
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
 
-    """publisher"""
+    "The publisher of the input transit data."
     publisher: FeedPublisher
 
     """
