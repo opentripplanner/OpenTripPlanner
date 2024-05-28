@@ -61,7 +61,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    super(transitModel.getTransitLayerUpdater(), parameters, LocalDate::now);
+    super(transitModel.getTransitLayerUpdater(), parameters, () -> LocalDate.now(transitModel.getTimeZone()));
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.tripPatternCache =
