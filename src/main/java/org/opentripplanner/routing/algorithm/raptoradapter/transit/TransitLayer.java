@@ -165,6 +165,10 @@ public class TransitLayer {
     return transferCache.get(transfersByStopIndex, request);
   }
 
+  public void initTransferCacheForRequest(RouteRequest request) {
+    transferCache.put(transfersByStopIndex, request);
+  }
+
   public RaptorRequestTransferCache getTransferCache() {
     return transferCache;
   }
