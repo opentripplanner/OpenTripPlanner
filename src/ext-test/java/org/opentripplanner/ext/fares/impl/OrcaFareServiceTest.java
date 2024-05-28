@@ -199,16 +199,11 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 150)
     );
 
-    var SIX_TIMES_DEFAULT = DEFAULT_TEST_RIDE_PRICE.times(6);
-    calculateFare(rides, regular, SIX_TIMES_DEFAULT);
-    calculateFare(rides, FareType.senior, SIX_TIMES_DEFAULT);
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.youth, ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
-    calculateFare(
-      rides,
-      FareType.electronicRegular,
-      DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE)
-    );
+    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
@@ -228,11 +223,11 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 121),
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 150, "Fauntleroy-VashonIsland")
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(4).plus(FERRY_FARE));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3).plus(FERRY_FARE));
     calculateFare(
       rides,
       FareType.senior,
-      DEFAULT_TEST_RIDE_PRICE.times(3).plus(usDollars(.50f)).plus(HALF_FERRY_FARE)
+      DEFAULT_TEST_RIDE_PRICE.times(2).plus(usDollars(.50f)).plus(HALF_FERRY_FARE)
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     // We don't get any fares for the skagit transit leg below here because they don't accept ORCA (electronic)
@@ -267,8 +262,8 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 240),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 270)
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(10));
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(10));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(3));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, usDollars(3));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(3));
@@ -290,8 +285,8 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 120),
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 149)
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(6));
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(6));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, DEFAULT_TEST_RIDE_PRICE.plus(ONE_DOLLAR));
     calculateFare(
@@ -424,16 +419,18 @@ public class OrcaFareServiceTest {
   }
 
   @Test
-  void calculateCashFreeTransferKCMetro() {
+  void calculateCashFreeTransferKCMetroAndKitsap() {
     List<Leg> rides = List.of(
       getLeg(KC_METRO_AGENCY_ID, 0),
       getLeg(KC_METRO_AGENCY_ID, 20),
       getLeg(COMM_TRANS_AGENCY_ID, 45),
       getLeg(KC_METRO_AGENCY_ID, 60),
-      getLeg(KC_METRO_AGENCY_ID, 130)
+      getLeg(KC_METRO_AGENCY_ID, 130),
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 131),
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 132)
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(3));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(4));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(4));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, usDollars(1.25f));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(2));

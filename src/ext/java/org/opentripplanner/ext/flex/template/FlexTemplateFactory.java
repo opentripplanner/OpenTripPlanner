@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -120,7 +118,7 @@ class FlexTemplateFactory {
       alightStop,
       alightStopPosition,
       date,
-      createCalculator(flexTrip),
+      setupCalculator(flexTrip),
       maxTransferDuration
     );
   }
@@ -138,14 +136,12 @@ class FlexTemplateFactory {
       nearbyStop,
       alightStopPosition,
       date,
-      createCalculator(flexTrip),
+      setupCalculator(flexTrip),
       maxTransferDuration
     );
   }
 
-  private FlexPathCalculator createCalculator(FlexTrip<?, ?> flexTrip) {
-    return flexTrip instanceof ScheduledDeviatedTrip
-      ? new ScheduledFlexPathCalculator(calculator, flexTrip)
-      : calculator;
+  private FlexPathCalculator setupCalculator(FlexTrip<?, ?> flexTrip) {
+    return flexTrip.decorateFlexPathCalculator(calculator);
   }
 }

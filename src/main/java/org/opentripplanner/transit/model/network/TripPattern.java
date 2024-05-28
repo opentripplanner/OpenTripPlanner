@@ -42,6 +42,15 @@ import org.slf4j.LoggerFactory;
  * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
  * later trip.
  * <p>
+ * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All trips
+ * grouped under a TripPattern should have the same values for these characteristics (with possible
+ * exceptions for TransitMode and SubMode).
+ * TODO RT_AB: We need to clarify exactly which characteristics are identical across the trips.
+ *   Grouping into patterns serves more than one purpose: it conserves memory by not replicating
+ *   details shared across all trips in the TripPattern; it reflects business practices outside
+ *   routing; it is essential to optimizations in routing algorithms like Raptor. We may be
+ *   conflating a domain model grouping with an internal routing grouping.
+ * <p>
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
  * JOURNEY a "trip", thus TripPattern.
  * <p>
@@ -56,29 +65,58 @@ public final class TripPattern
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final Route route;
+
   /**
-   * The stop-pattern help us reuse the same stops in several trip-patterns; Hence saving memory.
-   * The field should not be accessible outside the class, and all access is done through method
-   * delegation, like the {@link #numberOfStops()} and {@link #canBoard(int)} methods.
+   * This field should not be accessed outside this class. All access to the StopPattern is
+   * performed through method  delegation, like the {@link #numberOfStops()} and
+   * {@link #canBoard(int)} methods.
    */
   private final StopPattern stopPattern;
+
+  /**
+   * TripPatterns hold a reference to a Timetable (i.e. TripTimes for all Trips in the pattern) for
+   * only scheduled trips from the GTFS or NeTEx data. If any trips were later updated in real time,
+   * there will be another Timetable holding those updates and reading through to the scheduled one.
+   * That other realtime Timetable is retrieved from a TimetableSnapshot (see end of Javadoc on
+   * TimetableSnapshot for more details).
+   * TODO RT_AB: The above system should be changed to integrate realtime and scheduled data more
+   *   closely. The Timetable may become obsolete or change significantly when they are integrated.
+   */
   private final Timetable scheduledTimetable;
+
+  // This TransitMode is arguably a redundant replication/memoization of information on the Route.
+  // It appears that in the TripPatternBuilder it is only ever set from a Trip which is itself set
+  // from a Route. This does not just read through to Route because in Netex trips may override
+  // the mode of their route. But we need to establish with more clarity whether our internal model
+  // TripPatterns allow trips of mixed modes, or rather if a single mode is part of their unique key.
   private final TransitMode mode;
+
   private final SubMode netexSubMode;
   private final boolean containsMultipleModes;
   private String name;
+
   /**
    * Geometries of each inter-stop segment of the tripPattern.
+   * Not used in routing, only for API listing.
+   * TODO: Encapsulate the byte arrays in a class.
    */
   private final byte[][] hopGeometries;
 
   /**
    * The original TripPattern this replaces at least for one modified trip.
+   *
+   * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
+   * SiriTripPatternCache.
+   *
+   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    */
   private final TripPattern originalTripPattern;
 
   /**
-   * Has the TripPattern been created by a real-time update.
+   * When a trip is added or rerouted by a realtime update, this may give rise to a new TripPattern
+   * that did not exist in the scheduled data. For such TripPatterns this field will be true. If on
+   * the other hand this TripPattern instance was created from the schedule data, this field will be
+   * false.
    */
   private final boolean createdByRealtimeUpdater;
 
@@ -169,8 +207,8 @@ public final class TripPattern
    */
   public StopPattern.StopPatternBuilder copyPlannedStopPattern() {
     return isModified()
-      ? originalTripPattern.stopPattern.mutate(stopPattern)
-      : stopPattern.mutate();
+      ? originalTripPattern.stopPattern.copyOf(stopPattern)
+      : stopPattern.copyOf();
   }
 
   public LineString getGeometry() {

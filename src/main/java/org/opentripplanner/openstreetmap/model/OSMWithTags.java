@@ -30,7 +30,7 @@ public class OSMWithTags {
   /**
    * highway=* values that we don't want to even consider when building the graph.
    */
-  public static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
+  private static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
     "proposed",
     "planned",
     "construction",
@@ -46,7 +46,8 @@ public class OSMWithTags {
     "escape"
   );
 
-  static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
+  private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
+  private static final Set<String> DEFAULT_LEVEL = Set.of("0");
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -161,6 +162,10 @@ public class OSMWithTags {
    */
   public boolean isBicycleDismountForced() {
     return isTag("bicycle", "dismount");
+  }
+
+  public boolean isSidewalk() {
+    return isTag("footway", "sidewalk") && isTag("highway", "footway");
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -554,6 +559,9 @@ public class OSMWithTags {
     return false;
   }
 
+  /**
+   * Is this a link to another road, like a highway ramp.
+   */
   public boolean isLink() {
     String highway = getTag("highway");
     return highway != null && highway.endsWith(("_link"));
@@ -573,6 +581,36 @@ public class OSMWithTags {
   }
 
   /**
+   * Does this entity have tags that allow extracting a name?
+   */
+  public boolean isNamed() {
+    return hasTag("name") || hasTag("ref");
+  }
+
+  /**
+   * Is this entity unnamed?
+   * <p>
+   * Perhaps this entity has a name that isn't in the source data, but it's also possible that
+   * it's explicitly tagged as not having one.
+   *
+   * @see OSMWithTags#isExplicitlyUnnamed()
+   */
+  public boolean hasNoName() {
+    return !isNamed();
+  }
+
+  /**
+   * Whether this entity explicitly doesn't have a name. This is different to no name being
+   * set on the entity in OSM.
+   *
+   * @see OSMWithTags#isNamed()
+   * @see https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
+   */
+  public boolean isExplicitlyUnnamed() {
+    return isTagTrue("noname");
+  }
+
+  /**
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isTagDeniedAccess(String tagName) {
@@ -589,7 +627,7 @@ public class OSMWithTags {
     var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {
       // default
-      return Set.of("0");
+      return DEFAULT_LEVEL;
     }
     return levels;
   }

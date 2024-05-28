@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
@@ -28,7 +29,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private final RaptorStopNameResolver stopNameResolver;
   private final TransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
-  private final int[] stopBoardAlightCosts;
+
+  @Nullable
+  private final int[] stopBoardAlightTransferCosts;
+
   private final TransferOptimizationParameters config;
   private final MultiCriteriaRequest<T> multiCriteriaRequest;
 
@@ -37,7 +41,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     RaptorStopNameResolver stopNameResolver,
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
-    int[] stopBoardAlightCosts,
+    int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
     MultiCriteriaRequest<T> multiCriteriaRequest
   ) {
@@ -45,7 +49,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     this.stopNameResolver = stopNameResolver;
     this.transferService = transferService;
     this.transitDataProvider = transitDataProvider;
-    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
     this.config = config;
     this.multiCriteriaRequest = multiCriteriaRequest;
   }
@@ -60,7 +64,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     RaptorStopNameResolver stopNameResolver,
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
-    int[] stopBoardAlightCosts,
+    @Nullable int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
     MultiCriteriaRequest<T> multiCriteriaRequest
   ) {
@@ -69,7 +73,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       stopNameResolver,
       transferService,
       transitDataProvider,
-      stopBoardAlightCosts,
+      stopBoardAlightTransferCosts,
       config,
       multiCriteriaRequest
     )
@@ -113,7 +117,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       costCalculator,
       transitDataProvider.slackProvider(),
       transferWaitTimeCostCalculator,
-      stopBoardAlightCosts,
+      stopBoardAlightTransferCosts,
       config.extraStopBoardAlightCostsFactor(),
       createFilter(),
       stopNameResolver

@@ -42,6 +42,11 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the
+ *   parameter, or building a concrete key-value pair for a parameter in a config file being read
+ *   at server startup, or both.
+ */
 public class ParameterBuilder {
 
   private static final Object UNDEFINED = new Object();

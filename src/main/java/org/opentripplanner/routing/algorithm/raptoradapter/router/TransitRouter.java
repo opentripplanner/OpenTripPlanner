@@ -148,7 +148,7 @@ public class TransitRouter {
         requestTransitDataProvider.stopNameResolver(),
         serverContext.transitService().getTransferService(),
         requestTransitDataProvider,
-        transitLayer.getStopBoardAlightCosts(),
+        transitLayer.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
         raptorRequest.multiCriteria()
       );

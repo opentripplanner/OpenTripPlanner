@@ -60,6 +60,10 @@ public class OSMWay extends OSMWithTags {
     return isTag("highway", "steps");
   }
 
+  /**
+   * Checks the wheelchair-accessibility of this way. Stairs are by default inaccessible but
+   * can be made accessible if they explicitly set wheelchair=true.
+   */
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
       return isTagTrue("wheelchair");

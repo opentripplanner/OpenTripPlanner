@@ -10,7 +10,7 @@ import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -28,6 +28,8 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sets up and starts all the graph updaters.
@@ -37,6 +39,8 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
  * GraphUpdaterManager.
  */
 public class UpdaterConfigurator {
+
+  private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfigurator.class);
 
   private final Graph graph;
   private final TransitModel transitModel;
@@ -137,11 +141,11 @@ public class UpdaterConfigurator {
 
     if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
       int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
-      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections);
+      var otpHttpClientFactory = new OtpHttpClientFactory(maxHttpConnections);
       for (var configItem : updatersParameters.getVehicleRentalParameters()) {
         var source = VehicleRentalDataSourceFactory.create(
           configItem.sourceParameters(),
-          otpHttpClient
+          otpHttpClientFactory
         );
         updaters.add(
           new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)

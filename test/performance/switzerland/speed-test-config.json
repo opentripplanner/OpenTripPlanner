@@ -31,7 +31,7 @@
       // stepMinutes: 10
       // stepMinutes: 10
     },
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 86400,
       "ALLOWED": 3000,
       "RECOMMENDED": 300,

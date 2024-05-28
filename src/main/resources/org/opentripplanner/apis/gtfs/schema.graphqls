@@ -1082,7 +1082,7 @@ input InputBanned {
     banned for boarding and disembarking vehicles — it is possible to get an
     itinerary where a vehicle stops at one of these stops
     """
-    stops: String
+    stops: String @deprecated(reason: "Not implemented in OTP2.")
 
     """
     A comma-separated list of banned stop ids. Only itineraries where these stops
@@ -1090,7 +1090,7 @@ input InputBanned {
     these stops, that route will not be used in the itinerary, even if the stop is
     not used for boarding or disembarking the vehicle.
     """
-    stopsHard: String
+    stopsHard: String @deprecated(reason: "Not implemented in OTP2.")
 }
 
 input InputCoordinates {

@@ -53,14 +53,14 @@ class OptimizedPathTailTest implements RaptorTestConstants {
    *  Extra cost = (30.0 + 2 * 10.0) * 2.0 = $100.00
    *  </pre>
    */
-  private final int[] stopBoardAlightCost = new int[] { 0, 0, 3000, 0, 1000, 0 };
+  private final int[] stopBoardAlightTransferCosts = new int[] { 0, 0, 3000, 0, 1000, 0 };
 
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
     SLACK_PROVIDER,
     BasicPathTestCase.C1_CALCULATOR,
     0,
     waitTimeCalc,
-    stopBoardAlightCost,
+    stopBoardAlightTransferCosts,
     2.0,
     this::stopIndexToName
   );

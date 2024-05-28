@@ -5,15 +5,21 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
+import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.lang.IntRange;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -41,6 +47,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
+  private final TimePenalty timePenalty;
+
   public UnscheduledTrip(UnscheduledTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
@@ -55,9 +63,12 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
     for (int i = 0; i < size; i++) {
       this.stopTimes[i] = new StopTimeWindow(stopTimes.get(i));
-      this.dropOffBookingInfos[i] = stopTimes.get(0).getDropOffBookingInfo();
-      this.pickupBookingInfos[i] = stopTimes.get(0).getPickupBookingInfo();
+      this.dropOffBookingInfos[i] = stopTimes.get(i).getDropOffBookingInfo();
+      this.pickupBookingInfos[i] = stopTimes.get(i).getPickupBookingInfo();
     }
+    this.timePenalty = Objects.requireNonNull(builder.timePenalty());
+    DurationUtils.requireNonNegative(timePenalty.constant());
+    DoubleUtils.requireInRange(timePenalty.coefficient(), 0.05d, Double.MAX_VALUE);
   }
 
   public static UnscheduledTripBuilder of(FeedScopedId id) {
@@ -72,8 +83,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    *  - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> hasFlexWindow = st ->
-      st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> hasContinuousStops = stopTime ->
       stopTime.getFlexContinuousDropOff() != NONE || stopTime.getFlexContinuousPickup() != NONE;
     if (stopTimes.isEmpty()) {
@@ -81,9 +90,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     } else if (stopTimes.stream().anyMatch(hasContinuousStops)) {
       return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
-      return stopTimes.stream().anyMatch(hasFlexWindow);
+      return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);
     } else {
-      return stopTimes.stream().allMatch(hasFlexWindow);
+      return stopTimes.stream().allMatch(StopTime::hasFlexWindow);
     }
   }
 
@@ -244,11 +253,15 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return FlexTrip.STOP_INDEX_NOT_FOUND;
   }
 
-  private Stream<IndexedStopLocation> expandStops(int index) {
-    var stop = stopTimes[index].stop();
-    return stop instanceof GroupStop groupStop
-      ? groupStop.getChildLocations().stream().map(s -> new IndexedStopLocation(index, s))
-      : Stream.of(new IndexedStopLocation(index, stop));
+  @Override
+  public FlexPathCalculator decorateFlexPathCalculator(FlexPathCalculator defaultCalculator) {
+    // Get the correct {@link FlexPathCalculator} depending on the {@code timePenalty}.
+    // Ff the modifier doesn't actually modify, we return the regular calculator.
+    if (timePenalty.modifies()) {
+      return new TimePenaltyCalculator(defaultCalculator, timePenalty);
+    } else {
+      return defaultCalculator;
+    }
   }
 
   private Optional<IntRange> departureTimeWindow(

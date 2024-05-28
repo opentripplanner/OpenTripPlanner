@@ -171,7 +171,7 @@
       "minWindow": "1h",
       "maxWindow": "5h"
     },
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 1500,
       "ALLOWED": 75,
       "RECOMMENDED": 30,

@@ -3,6 +3,9 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularArrival;
+import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularDeparture;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
@@ -23,7 +26,9 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -567,7 +572,6 @@ class UnscheduledTripTest {
     return area(AREA_STOP, endTime, startTime);
   }
 
-  @Nonnull
   private static StopTime area(StopLocation areaStop, String endTime, String startTime) {
     var stopTime = new StopTime();
     stopTime.setStop(areaStop);

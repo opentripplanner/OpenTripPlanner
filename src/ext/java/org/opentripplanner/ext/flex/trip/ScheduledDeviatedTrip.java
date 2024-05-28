@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -203,6 +205,11 @@ public class ScheduledDeviatedTrip
       }
     }
     return STOP_INDEX_NOT_FOUND;
+  }
+
+  @Override
+  public FlexPathCalculator decorateFlexPathCalculator(FlexPathCalculator defaultCalculator) {
+    return new ScheduledFlexPathCalculator(defaultCalculator, this);
   }
 
   private static class ScheduledDeviatedStopTime implements Serializable {

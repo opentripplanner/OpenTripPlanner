@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
@@ -91,6 +93,8 @@ public class OtpTransitServiceBuilder {
   private final EntityById<BoardingArea> boardingAreasById = new DefaultEntityById<>();
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
+
+  private final Map<Trip, TimePenalty> flexDurationFactors = new HashMap<>();
 
   private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
@@ -207,6 +211,10 @@ public class OtpTransitServiceBuilder {
 
   public TripStopTimes getStopTimesSortedByTrip() {
     return stopTimesByTrip;
+  }
+
+  public Map<Trip, TimePenalty> getFlexTimePenalty() {
+    return flexDurationFactors;
   }
 
   public EntityById<FareZone> getFareZonesById() {

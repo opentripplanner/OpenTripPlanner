@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -130,6 +131,13 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
    * @return the stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
   public abstract int findAlightIndex(StopLocation toStop);
+
+  /**
+   * Allow each FlexTrip type to decorate or replace the router defaultCalculator.
+   */
+  public abstract FlexPathCalculator decorateFlexPathCalculator(
+    FlexPathCalculator defaultCalculator
+  );
 
   @Override
   public boolean sameAs(@Nonnull T other) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -23,7 +24,7 @@ public class SmooveBikeRentalDataSource
   extends GenericJsonDataSource<VehicleRentalPlace>
   implements VehicleRentalDatasource {
 
-  private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
   public static final String DEFAULT_NETWORK_NAME = "smoove";
 
@@ -33,14 +34,14 @@ public class SmooveBikeRentalDataSource
   private final RentalVehicleType vehicleType;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    this(config, new OtpHttpClient());
+    this(config, new OtpHttpClientFactory());
   }
 
   public SmooveBikeRentalDataSource(
     SmooveBikeRentalDataSourceParameters config,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
-    super(config.url(), "result", config.httpHeaders(), otpHttpClient);
+    super(config.url(), "result", config.httpHeaders(), otpHttpClientFactory.create(LOG));
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     overloadingAllowed = config.overloadingAllowed();
@@ -76,7 +77,7 @@ public class SmooveBikeRentalDataSource
       station.longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      log.warn("Error parsing bike rental station {}", station.id, e);
+      LOG.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
     if (!node.path("style").asText().equals("Station on")) {

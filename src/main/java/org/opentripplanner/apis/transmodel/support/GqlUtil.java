@@ -103,6 +103,25 @@ public class GqlUtil {
     return environment.containsArgument(name) && environment.getArgument(name) != null;
   }
 
+  /**
+   * Return the integer value of the argument or throw an exception if the value is null
+   * or strictly negative.
+   * This should generally be handled at the GraphQL schema level,
+   * but must sometimes be implemented programmatically to preserve backward compatibility.
+   */
+  public static int getPositiveNonNullIntegerArgument(
+    DataFetchingEnvironment environment,
+    String argumentName
+  ) {
+    Integer argumentValue = environment.getArgument(argumentName);
+    if (argumentValue == null || argumentValue < 0) {
+      throw new IllegalArgumentException(
+        "The argument '" + argumentName + "' should be a non-null positive value: " + argumentValue
+      );
+    }
+    return argumentValue;
+  }
+
   public static <T> List<T> listOfNullSafe(T element) {
     return element == null ? List.of() : List.of(element);
   }

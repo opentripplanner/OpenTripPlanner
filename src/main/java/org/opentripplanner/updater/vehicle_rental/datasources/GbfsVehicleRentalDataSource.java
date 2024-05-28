@@ -16,6 +16,7 @@ import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -46,10 +47,10 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   public GbfsVehicleRentalDataSource(
     GbfsVehicleRentalDataSourceParameters parameters,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.params = parameters;
-    this.otpHttpClient = otpHttpClient;
+    this.otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   @Override

@@ -2,8 +2,10 @@ package org.opentripplanner.framework.io;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -14,17 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
@@ -32,14 +30,9 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
-import org.apache.hc.core5.pool.PoolReusePolicy;
-import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * HTTP client providing convenience methods to send HTTP requests and map HTTP responses to Java
@@ -50,101 +43,27 @@ import org.slf4j.LoggerFactory;
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}
- * <h3>Timeout configuration</h3>
- * The same timeout value is applied to the following parameters:
- * <ul>
- *  <li>Connection request timeout: the maximum waiting time for leasing a connection in the
- *  connection pool.
- *  <li>Connect timeout: the maximum waiting time for the first packet received from the server.
- *  <li>Socket timeout: the maximum waiting time between two packets received from the server.
- * </ul>
- * The default timeout is set to 5 seconds.
- * <h3>Connection time-to-live</h3>
- * Maximum time an HTTP connection can stay in the connection pool before being closed.
- * Note that HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to
- * close idle connections at any time.
- * The default connection time-to-live is set to 1 minute.
  * <h3>Resource management</h3>
- * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods
- * in this class since they
- * ensure that the underlying network resources are properly released.
- * The method {@link #getAsInputStream} gives access to an input stream on the body response but
- * requires the caller to close this stream. For most use cases, this method is not recommended .
- * <h3>Connection Pooling</h3>
- * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections
- * per host.
+ * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods in
+ * this class since they ensure that the underlying network resources are properly released. The
+ * method {@link #getAsInputStream} gives access to an input stream on the body response but
+ * requires the caller to close this stream. For most use cases, this method is not recommended.
  *
  * <h3>Thread-safety</h3>
  * Instances of this class are thread-safe.
  */
-public class OtpHttpClient implements AutoCloseable {
-
-  private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClient.class);
-  private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
-
-  private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
-
-  /**
-   * see {@link PoolingHttpClientConnectionManager#DEFAULT_MAX_TOTAL_CONNECTIONS}
-   */
-  public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 25;
+public class OtpHttpClient {
 
   private final CloseableHttpClient httpClient;
 
-  /**
-   * Creates an HTTP client with default timeout, default connection time-to-live and default max
-   * number of connections.
-   */
-  public OtpHttpClient() {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL);
-  }
-
-  /**
-   * Creates an HTTP client with default timeout, default connection time-to-live and the given max
-   * number of connections.
-   */
-  public OtpHttpClient(int maxConnections) {
-    this(DEFAULT_TIMEOUT, DEFAULT_TTL, maxConnections);
-  }
-
-  /**
-   * Creates an HTTP client the given timeout and connection time-to-live and the default max
-   * number of connections.
-   */
-  public OtpHttpClient(Duration timeout, Duration connectionTtl) {
-    this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS);
-  }
+  private final Logger log;
 
   /**
    * Creates an HTTP client with custom configuration.
    */
-  private OtpHttpClient(Duration timeout, Duration connectionTtl, int maxConnections) {
-    Objects.requireNonNull(timeout);
-    Objects.requireNonNull(connectionTtl);
-
-    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder
-      .create()
-      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
-      .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
-      .setConnPoolPolicy(PoolReusePolicy.LIFO)
-      .setMaxConnTotal(maxConnections)
-      .setDefaultConnectionConfig(
-        ConnectionConfig
-          .custom()
-          .setSocketTimeout(Timeout.of(timeout))
-          .setConnectTimeout(Timeout.of(timeout))
-          .setTimeToLive(TimeValue.of(connectionTtl))
-          .build()
-      )
-      .build();
-
-    HttpClientBuilder httpClientBuilder = HttpClients
-      .custom()
-      .setUserAgent("OpenTripPlanner")
-      .setConnectionManager(connectionManager)
-      .setDefaultRequestConfig(requestConfig(timeout));
-
-    httpClient = httpClientBuilder.build();
+  OtpHttpClient(CloseableHttpClient httpClient, Logger logger) {
+    this.httpClient = httpClient;
+    log = logger;
   }
 
   /**
@@ -162,7 +81,8 @@ public class OtpHttpClient implements AutoCloseable {
       requestHeaderValues,
       response -> {
         if (isFailedRequest(response)) {
-          LOG.warn(
+          logResponse(response);
+          log.warn(
             "Headers of resource {} unavailable. HTTP error code {}",
             sanitizeUri(uri),
             response.getCode()
@@ -347,15 +267,6 @@ public class OtpHttpClient implements AutoCloseable {
     );
   }
 
-  @Override
-  public void close() {
-    try {
-      httpClient.close();
-    } catch (IOException e) {
-      throw new OtpHttpClientException(e);
-    }
-  }
-
   /**
    * Executes an HTTP GET request and returns an input stream on the response body. The caller must
    * close the stream in order to release resources. Use preferably the provided getAndMapXXX
@@ -416,6 +327,7 @@ public class OtpHttpClient implements AutoCloseable {
 
   private <T> T mapResponse(ClassicHttpResponse response, ResponseMapper<T> contentMapper) {
     if (isFailedRequest(response)) {
+      logResponse(response);
       throw new OtpHttpClientException(
         "HTTP request failed with status code " + response.getCode()
       );
@@ -483,6 +395,24 @@ public class OtpHttpClient implements AutoCloseable {
    */
   private static String sanitizeUri(URI uri) {
     return uri.toString().replace('?' + uri.getQuery(), "");
+  }
+
+  private void logResponse(ClassicHttpResponse response) {
+    try {
+      if (
+        log.isTraceEnabled() &&
+        response.getEntity() != null &&
+        response.getEntity().getContent() != null
+      ) {
+        var entity = response.getEntity();
+        String content = new BufferedReader(new InputStreamReader(entity.getContent()))
+          .lines()
+          .collect(Collectors.joining("\n"));
+        log.trace("HTTP request failed with status code {}: \n{}", response.getCode(), content);
+      }
+    } catch (Exception e) {
+      log.debug(e.getMessage());
+    }
   }
 
   @FunctionalInterface

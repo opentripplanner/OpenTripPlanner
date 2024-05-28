@@ -196,6 +196,7 @@ public class FlexibleTransitLeg implements TransitLeg {
     return generalizedCost;
   }
 
+  @Override
   public void addAlert(TransitAlert alert) {
     transitAlerts.add(alert);
   }

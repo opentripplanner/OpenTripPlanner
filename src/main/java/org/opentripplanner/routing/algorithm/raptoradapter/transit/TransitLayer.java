@@ -17,6 +17,17 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
+/**
+ * This is a replica of public transportation data already present in TransitModel, but rearranged
+ * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
+ * by days, retaining only the services actually running on any particular day.
+ *
+ * TODO RT_AB: this name may reflect usage in R5, where the TransportNetwork encompasses two
+ *  sub-aggregates (one for the streets and one for the public transit data). Here, the TransitLayer
+ *  seems to just be an indexed and rearranged copy of the main TransitModel instance. TG has
+ *  indicated that "layer" should be restricted in its standard OO meaning, and this class should
+ *  really be merged into TransitModel.
+ */
 public class TransitLayer {
 
   /**
@@ -48,7 +59,8 @@ public class TransitLayer {
 
   private final TransferIndexGenerator transferIndexGenerator;
 
-  private final int[] stopBoardAlightCosts;
+  @Nullable
+  private final int[] stopBoardAlightTransferCosts;
 
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
@@ -65,7 +77,7 @@ public class TransitLayer {
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
-      transitLayer.stopBoardAlightCosts
+      transitLayer.stopBoardAlightTransferCosts
     );
   }
 
@@ -78,7 +90,7 @@ public class TransitLayer {
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
-    int[] stopBoardAlightCosts
+    @Nullable int[] stopBoardAlightTransferCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -88,7 +100,7 @@ public class TransitLayer {
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
-    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
 
   @Nullable
@@ -166,8 +178,13 @@ public class TransitLayer {
     return transferIndexGenerator;
   }
 
-  public int[] getStopBoardAlightCosts() {
-    return stopBoardAlightCosts;
+  /**
+   * Costs for both boarding and alighting at a given stop during transfer. Note that this is in
+   * raptor centi-second units.
+   */
+  @Nullable
+  public int[] getStopBoardAlightTransferCosts() {
+    return stopBoardAlightTransferCosts;
   }
 
   /**

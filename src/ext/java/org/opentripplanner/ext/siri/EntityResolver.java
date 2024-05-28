@@ -7,6 +7,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -207,6 +208,7 @@ public class EntityResolver {
     return transitService.getOperatorForId(resolveId(operatorRef));
   }
 
+  @Nullable
   public LocalDate resolveServiceDate(EstimatedVehicleJourney vehicleJourney) {
     if (vehicleJourney.getFramedVehicleJourneyRef() != null) {
       var dataFrame = vehicleJourney.getFramedVehicleJourneyRef().getDataFrameRef();
@@ -227,15 +229,18 @@ public class EntityResolver {
       }
     }
 
-    ZonedDateTime date = CallWrapper.of(vehicleJourney).get(0).getAimedDepartureTime();
-
-    if (date == null) {
+    var datetime = CallWrapper
+      .of(vehicleJourney)
+      .stream()
+      .findFirst()
+      .map(CallWrapper::getAimedDepartureTime);
+    if (datetime.isEmpty()) {
       return null;
     }
 
     var daysOffset = calculateDayOffset(vehicleJourney);
 
-    return date.toLocalDate().minusDays(daysOffset);
+    return datetime.get().toLocalDate().minusDays(daysOffset);
   }
 
   /**

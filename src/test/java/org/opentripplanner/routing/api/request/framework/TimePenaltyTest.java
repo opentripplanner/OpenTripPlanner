@@ -64,4 +64,11 @@ class TimePenaltyTest {
     var subject = TimePenalty.of(D2m, 0.5);
     assertEquals(120 + 150, subject.calculate(Duration.ofMinutes(5)).toSeconds());
   }
+
+  @Test
+  void modifies() {
+    var subject = TimePenalty.of(D2m, 0.5);
+    assertTrue(subject.modifies());
+    assertFalse(TimePenalty.ZERO.modifies());
+  }
 }
