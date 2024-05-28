@@ -15,6 +15,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public class FlexDirectPathFactory {
 
@@ -96,6 +97,7 @@ public class FlexDirectPathFactory {
     var trip = accessTemplate.trip;
     int accessBoardStopPosition = accessTemplate.boardStopPosition;
     int accessAlightStopPosition = accessTemplate.alightStopPosition;
+    int requestedBookingTime = accessTemplate.requestedBookingTime;
 
     var flexToVertex = egress.state.getVertex();
 
@@ -135,10 +137,28 @@ public class FlexDirectPathFactory {
         return Optional.empty();
       }
 
+      // No need to time-shift latestArrivalTime for meeting the min-booking notice restriction,
+      // the time is already as-late-as-possible
+      var bookingInfo = RoutingBookingInfo.of(
+        requestedBookingTime,
+        trip.getPickupBookingInfo(accessTemplate.boardStopPosition)
+      );
+      if (bookingInfo.exceedsMinimumBookingNotice(latestArrivalTime)) {
+        return Optional.empty();
+      }
+
       // Shift from departing at departureTime to arriving at departureTime
       timeShift = flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
     } else {
       int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(requestTime);
+
+      // Time-shift departure so the minimum-booking-notice restriction is honored.
+      var bookingInfo = trip.getPickupBookingInfo(accessBoardStopPosition);
+      firstStopDepartureTime =
+        RoutingBookingInfo
+          .of(requestedBookingTime, bookingInfo)
+          .earliestDepartureTime(firstStopDepartureTime);
+
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,
         accessBoardStopPosition,

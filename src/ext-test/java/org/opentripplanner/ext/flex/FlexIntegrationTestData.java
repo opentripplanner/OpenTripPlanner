@@ -19,6 +19,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -39,6 +40,7 @@ public final class FlexIntegrationTestData {
   public static final FlexServiceDate FLEX_DATE = new FlexServiceDate(
     SERVICE_DATE,
     SECONDS_SINCE_MIDNIGHT,
+    RoutingBookingInfo.NOT_SET,
     new TIntHashSet()
   );
 

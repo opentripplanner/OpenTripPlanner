@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 /**
  * The factory is used to create flex trip templates.
@@ -75,13 +76,25 @@ class FlexTemplateFactory {
     int end = isBoardingAndAlightingAtSameStopPositionAllowed() ? alightStopPos : alightStopPos - 1;
 
     for (int boardStopPos = 0; boardStopPos <= end; boardStopPos++) {
-      if (trip.getBoardRule(boardStopPos).isRoutable()) {
+      if (isAllowedToBoardAt(boardStopPos)) {
         for (var stop : expandStopsAt(trip, boardStopPos)) {
           result.add(createEgressTemplate(trip, stop, boardStopPos, alightStopPos));
         }
       }
     }
     return result;
+  }
+
+  /**
+   * Check if stop position is routable and that the latest-booking time criteria is met.
+   */
+  private boolean isAllowedToBoardAt(int boardStopPosition) {
+    return (
+      trip.getBoardRule(boardStopPosition).isRoutable() &&
+      !RoutingBookingInfo
+        .of(date.requestedBookingTime(), trip.getPickupBookingInfo(boardStopPosition))
+        .exceedsLatestBookingTime()
+    );
   }
 
   /**

@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 /**
  * The combination of the closest stop, trip and trip active date.
@@ -54,7 +55,7 @@ record ClosestTrip(
     boolean pickup
   ) {
     var closestTrips = findAllTripsReachableFromNearbyStop(callbackService, nearbyStops, pickup);
-    return findActiveDatesForTripAndDecorateResult(callbackService, dates, closestTrips);
+    return findActiveDatesForTripAndDecorateResult(callbackService, dates, closestTrips, true);
   }
 
   @Override
@@ -90,7 +91,8 @@ record ClosestTrip(
   private static ArrayList<ClosestTrip> findActiveDatesForTripAndDecorateResult(
     FlexAccessEgressCallbackAdapter callbackService,
     List<FlexServiceDate> dates,
-    Map<FlexTrip<?, ?>, ClosestTrip> map
+    Map<FlexTrip<?, ?>, ClosestTrip> map,
+    boolean pickup
   ) {
     var result = new ArrayList<ClosestTrip>();
     // Add active dates
@@ -99,6 +101,11 @@ record ClosestTrip(
       var closestTrip = e.getValue();
       // Include dates where the service is running
       for (FlexServiceDate date : dates) {
+        // Filter away boardings early. This needs to be done for egress as well when the
+        // board stop is known (not known here).
+        if (pickup && exceedsLatestBookingTime(trip, date, closestTrip.stopPos())) {
+          continue;
+        }
         if (callbackService.isDateActive(date, trip)) {
           result.add(closestTrip.withDate(date));
         }
@@ -110,5 +117,18 @@ record ClosestTrip(
   private ClosestTrip withDate(FlexServiceDate date) {
     Objects.requireNonNull(date);
     return new ClosestTrip(this, date);
+  }
+
+  /**
+   * Check if the trip can be booked at the given date and boarding stop position.
+   */
+  private static boolean exceedsLatestBookingTime(
+    FlexTrip<?, ?> trip,
+    FlexServiceDate date,
+    int stopPos
+  ) {
+    return RoutingBookingInfo
+      .of(date.requestedBookingTime(), trip.getPickupBookingInfo(stopPos))
+      .exceedsLatestBookingTime();
   }
 }

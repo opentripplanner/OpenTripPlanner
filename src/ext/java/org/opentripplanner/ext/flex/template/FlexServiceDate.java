@@ -21,13 +21,17 @@ public class FlexServiceDate {
   /** Which services are running on the date. */
   private final TIntSet servicesRunning;
 
+  private final int requestedBookingTime;
+
   public FlexServiceDate(
     LocalDate serviceDate,
     int secondsFromStartOfTime,
+    int requestedBookingTime,
     TIntSet servicesRunning
   ) {
     this.serviceDate = serviceDate;
     this.secondsFromStartOfTime = secondsFromStartOfTime;
+    this.requestedBookingTime = requestedBookingTime;
     this.servicesRunning = servicesRunning;
   }
 
@@ -39,7 +43,14 @@ public class FlexServiceDate {
     return secondsFromStartOfTime;
   }
 
+  int requestedBookingTime() {
+    return requestedBookingTime;
+  }
+
+  /**
+   * Return true if the given {@code serviceCode} is active and running.
+   */
   public boolean isTripServiceRunning(int serviceCode) {
-    return (servicesRunning != null && servicesRunning.contains(serviceCode));
+    return servicesRunning != null && servicesRunning.contains(serviceCode);
   }
 }

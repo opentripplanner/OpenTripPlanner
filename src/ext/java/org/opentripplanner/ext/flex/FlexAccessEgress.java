@@ -7,6 +7,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public final class FlexAccessEgress {
 
@@ -17,6 +18,7 @@ public final class FlexAccessEgress {
   private final FlexTrip<?, ?> trip;
   private final State lastState;
   private final boolean stopReachedOnBoard;
+  private final RoutingBookingInfo routingBookingInfo;
 
   public FlexAccessEgress(
     RegularStop stop,
@@ -25,7 +27,8 @@ public final class FlexAccessEgress {
     int alightStopPosition,
     FlexTrip<?, ?> trip,
     State lastState,
-    boolean stopReachedOnBoard
+    boolean stopReachedOnBoard,
+    int requestedBookingTime
   ) {
     this.stop = stop;
     this.pathDurations = pathDurations;
@@ -34,6 +37,8 @@ public final class FlexAccessEgress {
     this.trip = Objects.requireNonNull(trip);
     this.lastState = lastState;
     this.stopReachedOnBoard = stopReachedOnBoard;
+    this.routingBookingInfo =
+      RoutingBookingInfo.of(requestedBookingTime, trip.getPickupBookingInfo(boardStopPosition));
   }
 
   public RegularStop stop() {
@@ -50,6 +55,10 @@ public final class FlexAccessEgress {
 
   public int earliestDepartureTime(int departureTime) {
     int tripDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
+
+    // Apply minimum-booking-notice
+    tripDepartureTime = routingBookingInfo.earliestDepartureTime(tripDepartureTime);
+
     int earliestDepartureTime = trip.earliestDepartureTime(
       tripDepartureTime,
       boardStopPosition,
@@ -71,6 +80,9 @@ public final class FlexAccessEgress {
       pathDurations.trip()
     );
     if (latestArrivalTime == MISSING_VALUE) {
+      return MISSING_VALUE;
+    }
+    if (routingBookingInfo.exceedsMinimumBookingNotice(latestArrivalTime - pathDurations.trip())) {
       return MISSING_VALUE;
     }
     return pathDurations.mapToRouterArrivalTime(latestArrivalTime);

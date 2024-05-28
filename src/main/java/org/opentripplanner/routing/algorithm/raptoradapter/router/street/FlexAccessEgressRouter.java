@@ -64,6 +64,7 @@ public class FlexAccessEgressRouter {
       transitService,
       config,
       request.dateTime(),
+      request.bookingTime(),
       searchDays.additionalSearchDaysInPast(),
       searchDays.additionalSearchDaysInFuture(),
       accessStops,

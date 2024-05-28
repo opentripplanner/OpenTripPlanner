@@ -58,6 +58,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -150,8 +151,16 @@ public class RaptorPathToItineraryMapperTest {
     );
 
     State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
-    var flexDur = new FlexPathDurations(0, (int) state.getElapsedTimeSeconds(), 0, 0);
-    var flexAccessEgress = new FlexAccessEgress(S1, flexDur, 0, 1, flexTrip, state, true);
+    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(
+      S1,
+      new FlexPathDurations(0, (int) state.getElapsedTimeSeconds(), 0, 0),
+      0,
+      1,
+      flexTrip,
+      state,
+      true,
+      RoutingBookingInfo.NOT_SET
+    );
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
     Transfer transfer = new Transfer(S2.getIndex(), 0);
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);

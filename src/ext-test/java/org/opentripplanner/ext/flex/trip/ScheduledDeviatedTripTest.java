@@ -104,6 +104,7 @@ class ScheduledDeviatedTripTest {
       new DefaultTransitService(transitModel),
       FlexParameters.defaultValues(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
+      null,
       1,
       1,
       List.of(from),

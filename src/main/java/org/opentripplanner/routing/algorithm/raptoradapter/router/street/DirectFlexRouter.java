@@ -60,6 +60,7 @@ public class DirectFlexRouter {
         serverContext.transitService(),
         serverContext.flexParameters(),
         request.dateTime(),
+        request.bookingTime(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,
