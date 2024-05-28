@@ -70,6 +70,11 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
 
   private LocalDate lastPurgeDate = null;
 
+  /**
+   *
+   * @param localDateNow This supplier allows you to inject a custom lambda to override what is
+   *                     considered 'today'. This is useful for unit testing.
+   */
   public AbstractTimetableSnapshotSource(
     TransitLayerUpdater transitLayerUpdater,
     TimetableSnapshotSourceParameters parameters,
