@@ -1,13 +1,19 @@
 package org.opentripplanner.ext.flex.template;
 
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.EdgeTraverser;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class FlexDirectPathFactory {
@@ -71,13 +77,96 @@ public class FlexDirectPathFactory {
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          template
-            .createDirectGraphPath(egress, arriveBy, requestTime)
+          createDirectGraphPath(template, egress, arriveBy, requestTime)
             .ifPresent(directFlexPaths::add);
         }
       }
     }
 
     return directFlexPaths;
+  }
+
+  private Optional<DirectFlexPath> createDirectGraphPath(
+    FlexAccessTemplate accessTemplate,
+    NearbyStop egress,
+    boolean arriveBy,
+    int requestTime
+  ) {
+    var accessNearbyStop = accessTemplate.accessEgress;
+    var trip = accessTemplate.trip;
+    int accessBoardStopPosition = accessTemplate.boardStopPosition;
+    int accessAlightStopPosition = accessTemplate.alightStopPosition;
+
+    var flexToVertex = egress.state.getVertex();
+
+    if (!isRouteable(accessTemplate, flexToVertex)) {
+      return Optional.empty();
+    }
+
+    var flexEdge = accessTemplate.getFlexEdge(flexToVertex, egress.stop);
+
+    if (flexEdge == null) {
+      return Optional.empty();
+    }
+
+    final State[] afterFlexState = flexEdge.traverse(accessNearbyStop.state);
+
+    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egress.edges);
+
+    if (finalStateOpt.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var finalState = finalStateOpt.get();
+    var flexDurations = accessTemplate.calculateFlexPathDurations(flexEdge, finalState);
+
+    int timeShift;
+
+    if (arriveBy) {
+      int lastStopArrivalTime = flexDurations.mapToFlexTripArrivalTime(requestTime);
+      int latestArrivalTime = trip.latestArrivalTime(
+        lastStopArrivalTime,
+        accessBoardStopPosition,
+        accessAlightStopPosition,
+        flexDurations.trip()
+      );
+
+      if (latestArrivalTime == MISSING_VALUE) {
+        return Optional.empty();
+      }
+
+      // Shift from departing at departureTime to arriving at departureTime
+      timeShift = flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
+    } else {
+      int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(requestTime);
+      int earliestDepartureTime = trip.earliestDepartureTime(
+        firstStopDepartureTime,
+        accessBoardStopPosition,
+        accessAlightStopPosition,
+        flexDurations.trip()
+      );
+
+      if (earliestDepartureTime == MISSING_VALUE) {
+        return Optional.empty();
+      }
+
+      timeShift = flexDurations.mapToRouterDepartureTime(earliestDepartureTime);
+    }
+
+    return Optional.of(new DirectFlexPath(timeShift, finalState));
+  }
+
+  protected boolean isRouteable(FlexAccessTemplate accessTemplate, Vertex flexVertex) {
+    if (accessTemplate.accessEgress.state.getVertex() == flexVertex) {
+      return false;
+    } else return (
+      accessTemplate.calculator.calculateFlexPath(
+        accessTemplate.accessEgress.state.getVertex(),
+        flexVertex,
+        accessTemplate.boardStopPosition,
+        accessTemplate.alightStopPosition
+      ) !=
+      null
+    );
   }
 }
