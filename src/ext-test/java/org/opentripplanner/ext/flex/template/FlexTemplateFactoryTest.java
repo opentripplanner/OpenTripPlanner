@@ -101,7 +101,7 @@ class FlexTemplateFactoryTest {
     assertEquals(1, template.toStopIndex);
     assertSame(CALCULATOR, template.calculator);
     assertSame(STOP_B, template.transferStop);
-    assertSame(DATE.serviceDate, template.serviceDate);
+    assertSame(DATE.serviceDate(), template.serviceDate);
     assertEquals(SERVICE_TIME_OFFSET, template.secondsFromStartOfTime);
     assertEquals(1, subject.size(), subject::toString);
 
@@ -133,7 +133,7 @@ class FlexTemplateFactoryTest {
     assertEquals(1, template.toStopIndex);
     assertSame(CALCULATOR, template.calculator);
     assertSame(STOP_A, template.transferStop);
-    assertSame(DATE.serviceDate, template.serviceDate);
+    assertSame(DATE.serviceDate(), template.serviceDate);
     assertEquals(SERVICE_TIME_OFFSET, template.secondsFromStartOfTime);
     assertEquals(1, subject.size(), subject::toString);
 

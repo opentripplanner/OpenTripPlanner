@@ -198,7 +198,8 @@ public class FlexRouter {
 
     @Override
     public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-      return date.isFlexTripRunning(trip, transitService);
+      int serviceCode = transitService.getServiceCodeForId(trip.getTrip().getServiceId());
+      return date.isTripServiceRunning(serviceCode);
     }
   }
 }

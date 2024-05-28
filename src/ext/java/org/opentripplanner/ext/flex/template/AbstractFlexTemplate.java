@@ -42,11 +42,11 @@ abstract class AbstractFlexTemplate {
   //      - this apply to transferStop as well.
   protected final NearbyStop accessEgress;
   protected final FlexTrip<?, ?> trip;
-  public final int fromStopIndex;
-  public final int toStopIndex;
+  protected final int fromStopIndex;
+  protected final int toStopIndex;
   protected final StopLocation transferStop;
   protected final int secondsFromStartOfTime;
-  public final LocalDate serviceDate;
+  protected final LocalDate serviceDate;
   protected final FlexPathCalculator calculator;
   private final Duration maxTransferDuration;
 
@@ -77,8 +77,8 @@ abstract class AbstractFlexTemplate {
     this.fromStopIndex = boardStopPosition;
     this.toStopIndex = alightStopPosition;
     this.transferStop = transferStop;
-    this.secondsFromStartOfTime = date.secondsFromStartOfTime;
-    this.serviceDate = date.serviceDate;
+    this.secondsFromStartOfTime = date.secondsFromStartOfTime();
+    this.serviceDate = date.serviceDate();
     this.calculator = calculator;
     this.maxTransferDuration = maxTransferDuration;
   }

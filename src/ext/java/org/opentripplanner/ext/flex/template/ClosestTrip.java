@@ -19,7 +19,7 @@ record ClosestTrip(
   int stopPos,
   FlexServiceDate activeDate
 ) {
-  public ClosestTrip(
+  ClosestTrip(
     NearbyStop nearbyStop,
     FlexTrip<?, ?> flexTrip,
     int stopPos,
