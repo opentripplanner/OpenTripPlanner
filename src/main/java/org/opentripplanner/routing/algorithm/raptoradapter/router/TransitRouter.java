@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
-import static org.opentripplanner.framework.time.TimeUtils.toTransitTimeSeconds;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.ACCESS;
 import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingRestrictionAccessEgress.decorateAccessEgressBookingRestriction;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -275,16 +273,6 @@ public class TransitRouter {
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type.isEgress()));
-    }
-
-    if (request.bookingTime() != null) {
-      int requestedBookingTime = toTransitTimeSeconds(transitSearchTimeZero, request.bookingTime());
-      return results
-        .stream()
-        .map(accessEgress ->
-          decorateAccessEgressBookingRestriction(accessEgress, requestedBookingTime)
-        )
-        .toList();
     }
 
     return results;

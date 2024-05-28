@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import java.util.Optional;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 /**
  * Encapsulate information about an access or egress path. This interface extends
@@ -32,11 +30,4 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   boolean hasPenalty();
 
   TimeAndCost penalty();
-
-  /**
-   * Booking info enforced by the router. By default nothing is returned.
-   */
-  default Optional<RoutingBookingInfo> routingBookingInfo() {
-    return Optional.empty();
-  }
 }
