@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -74,7 +74,7 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals("ADDED | C1 0:02 0:02 | D1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals("ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
     assertEquals(
       "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
       env.getScheduledTimetable("newJourney")
@@ -100,7 +100,7 @@ class SiriTimetableSnapshotSourceTest {
 
     assertEquals(1, result.successful());
 
-    assertEquals("ADDED | A1 0:02 0:02 | C1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals("ADDED | A1 [R] 0:02 0:02 | C1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
     assertEquals(
       "SCHEDULED | A1 0:01 0:01 | C1 0:03 0:03",
       env.getScheduledTimetable("newJourney")
@@ -220,7 +220,7 @@ class SiriTimetableSnapshotSourceTest {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "MODIFIED | A1 0:00:15 0:00:15 | B2 0:00:33 0:00:33",
+      "MODIFIED | A1 [R] 0:00:15 0:00:15 | B2 0:00:33 0:00:33",
       env.getRealtimeTimetable(env.trip1)
     );
   }
@@ -246,7 +246,7 @@ class SiriTimetableSnapshotSourceTest {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "MODIFIED | A1 0:01:01 0:01:01 | B1 0:01:10 0:01:11 CANCELLED | C1 0:01:30 0:01:30",
+      "MODIFIED | A1 0:01:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 0:01:30 0:01:30",
       env.getRealtimeTimetable(env.trip2)
     );
   }
@@ -277,7 +277,7 @@ class SiriTimetableSnapshotSourceTest {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "MODIFIED | A1 0:00:15 0:00:15 | D1 0:00:20 0:00:25 CANCELLED | B1 0:00:33 0:00:33",
+      "MODIFIED | A1 0:00:15 0:00:15 | D1 [C] 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
       env.getRealtimeTimetable(env.trip1)
     );
   }
@@ -579,7 +579,15 @@ class SiriTimetableSnapshotSourceTest {
      * This encodes the times and information about stops in a readable way in order to simplify
      * testing. The format is:
      *
-     * REALTIME_STATE | stop1 arrivalTime departureTime [CANCELLED] | stop2 ...
+     * <pre>
+     * REALTIME_STATE | stop1 [FLAGS] arrivalTime departureTime | stop2 ...
+     *
+     * Where flags are:
+     * C: Canceled
+     * R: Recorded
+     * PI: Prediction Inaccurate
+     * ND: No Data
+     * </pre>
      */
     private String encodeTimetable(TripTimes tripTimes, TripPattern pattern) {
       var stops = pattern.getStops();
@@ -588,18 +596,29 @@ class SiriTimetableSnapshotSourceTest {
       for (int i = 0; i < tripTimes.getNumStops(); i++) {
         var depart = tripTimes.getDepartureTime(i);
         var arrive = tripTimes.getArrivalTime(i);
+        var flags = new ArrayList<String>();
+        if (tripTimes.isCancelledStop(i)) {
+          flags.add("C");
+        }
+        if (tripTimes.isRecordedStop(i)) {
+          flags.add("R");
+        }
+        if (tripTimes.isPredictionInaccurate(i)) {
+          flags.add("PI");
+        }
+        if (tripTimes.isNoDataStop(i)) {
+          flags.add("ND");
+        }
 
+        s.append(" | ").append(stops.get(i).getName());
+        if (!flags.isEmpty()) {
+          s.append(" [").append(String.join(",", flags)).append("]");
+        }
         s
-          .append(" | ")
-          .append(stops.get(i).getName())
           .append(" ")
           .append(TimeUtils.timeToStrCompact(arrive))
           .append(" ")
           .append(TimeUtils.timeToStrCompact(depart));
-
-        if (tripTimes.isCancelledStop(i)) {
-          s.append(" CANCELLED");
-        }
       }
       return s.toString();
     }
