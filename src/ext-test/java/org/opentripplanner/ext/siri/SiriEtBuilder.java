@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -8,11 +10,13 @@ import javax.annotation.Nullable;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import uk.org.siri.siri20.DataFrameRefStructure;
 import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
+import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.LineRef;
 import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.QuayRefStructure;
@@ -129,6 +133,42 @@ public class SiriEtBuilder {
     return this;
   }
 
+  public SiriEtBuilder withFramedVehicleJourneyRef(
+    Function<FramedVehicleRefBuilder, FramedVehicleRefBuilder> producer
+  ) {
+    var builder = new FramedVehicleRefBuilder();
+    builder = producer.apply(builder);
+    evj.setFramedVehicleJourneyRef(builder.build());
+    return this;
+  }
+
+  public static class FramedVehicleRefBuilder {
+
+    private LocalDate serviceDate;
+    private String vehicleJourneyRef;
+
+    public SiriEtBuilder.FramedVehicleRefBuilder withServiceDate(LocalDate serviceDate) {
+      this.serviceDate = serviceDate;
+      return this;
+    }
+
+    public SiriEtBuilder.FramedVehicleRefBuilder withVehicleJourneyRef(String vehicleJourneyRef) {
+      this.vehicleJourneyRef = vehicleJourneyRef;
+      return this;
+    }
+
+    public FramedVehicleJourneyRefStructure build() {
+      DataFrameRefStructure dataFrameRefStructure = new DataFrameRefStructure();
+      if (serviceDate != null) {
+        dataFrameRefStructure.setValue(DateTimeFormatter.ISO_LOCAL_DATE.format(serviceDate));
+      }
+      FramedVehicleJourneyRefStructure framedVehicleJourneyRefStructure = new FramedVehicleJourneyRefStructure();
+      framedVehicleJourneyRefStructure.setDataFrameRef(dataFrameRefStructure);
+      framedVehicleJourneyRefStructure.setDatedVehicleJourneyRef(vehicleJourneyRef);
+      return framedVehicleJourneyRefStructure;
+    }
+  }
+
   public static class RecordedCallsBuilder {
 
     private final ArrayList<RecordedCall> calls;
@@ -208,17 +248,31 @@ public class SiriEtBuilder {
       return this;
     }
 
-    public EstimatedCallsBuilder arriveAimedExpected(String aimedTime, String expectedTime) {
+    public EstimatedCallsBuilder arriveAimedExpected(
+      @Nullable String aimedTime,
+      @Nullable String expectedTime
+    ) {
       var call = calls.getLast();
-      call.setAimedArrivalTime(dateTimeHelper.zonedDateTime(aimedTime));
-      call.setExpectedArrivalTime(dateTimeHelper.zonedDateTime(expectedTime));
+      if (aimedTime != null) {
+        call.setAimedArrivalTime(dateTimeHelper.zonedDateTime(aimedTime));
+      }
+      if (expectedTime != null) {
+        call.setExpectedArrivalTime(dateTimeHelper.zonedDateTime(expectedTime));
+      }
       return this;
     }
 
-    public EstimatedCallsBuilder departAimedExpected(String aimedTime, String expectedTime) {
+    public EstimatedCallsBuilder departAimedExpected(
+      @Nullable String aimedTime,
+      @Nullable String expectedTime
+    ) {
       var call = calls.getLast();
-      call.setAimedDepartureTime(dateTimeHelper.zonedDateTime(aimedTime));
-      call.setExpectedDepartureTime(dateTimeHelper.zonedDateTime(expectedTime));
+      if (aimedTime != null) {
+        call.setAimedDepartureTime(dateTimeHelper.zonedDateTime(aimedTime));
+      }
+      if (expectedTime != null) {
+        call.setExpectedDepartureTime(dateTimeHelper.zonedDateTime(expectedTime));
+      }
       return this;
     }
 
