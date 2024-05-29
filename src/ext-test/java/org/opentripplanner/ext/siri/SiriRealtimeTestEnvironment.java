@@ -18,11 +18,11 @@ public class SiriRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
     Duration.ZERO,
     false
   );
-  private final SiriTimetableSnapshotSource source;
+  private final SiriTimetableSnapshotSource snapshotSource;
 
   public SiriRealtimeTestEnvironment() {
     super();
-    source = new SiriTimetableSnapshotSource(PARAMETERS, transitModel);
+    snapshotSource = new SiriTimetableSnapshotSource(PARAMETERS, transitModel);
   }
 
   public EntityResolver getEntityResolver() {
@@ -54,6 +54,32 @@ public class SiriRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
   }
 
   public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return source.applyEstimatedTimetable(null, getEntityResolver(), getFeedId(), false, updates);
+    return snapshotSource.applyEstimatedTimetable(
+      null,
+      getEntityResolver(),
+      getFeedId(),
+      false,
+      updates
+    );
+  }
+
+  public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
+    List<EstimatedTimetableDeliveryStructure> updates
+  ) {
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
+    return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
+  }
+
+  private UpdateResult applyEstimatedTimetable(
+    List<EstimatedTimetableDeliveryStructure> updates,
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher
+  ) {
+    return this.snapshotSource.applyEstimatedTimetable(
+        siriFuzzyTripMatcher,
+        getEntityResolver(),
+        getFeedId(),
+        false,
+        updates
+      );
   }
 }

@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.moduletests.rejection;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.trip.AbstractRealtimeTestEnvironment.SERVICE_DATE;
 
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -38,8 +37,8 @@ public class InvalidInputTest {
 
     var result = env.applyTripUpdates(update);
 
-    final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-    assertNull(snapshot);
+    var snapshot = env.source.getTimetableSnapshot();
+    assertTrue(snapshot.isEmpty());
     assertEquals(1, result.failed());
     var errors = result.failures().keySet();
     assertEquals(Set.of(NO_SERVICE_ON_DATE), errors);

@@ -103,11 +103,11 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.serviceDate).withVehicleJourneyRef(env.trip1.getId().getId())
+        builder.withServiceDate(env.SERVICE_DATE).withVehicleJourneyRef(env.trip1.getId().getId())
       )
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -120,7 +120,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -133,7 +133,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
@@ -147,11 +147,11 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
-    var env = new RealtimeTestEnvironment();
+    var env = new SiriRealtimeTestEnvironment();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.serviceDate).withVehicleJourneyRef("XXX")
+        builder.withServiceDate(env.SERVICE_DATE).withVehicleJourneyRef("XXX")
       )
       .withEstimatedCalls(builder ->
         builder
@@ -385,7 +385,7 @@ class SiriTimetableSnapshotSourceTest {
     assertEquals(result.failures().keySet(), Set.of(errorType));
   }
 
-  private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
+  private static SiriEtBuilder updatedJourneyBuilder(SiriRealtimeTestEnvironment env) {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withRecordedCalls(builder ->
         builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
@@ -395,33 +395,12 @@ class SiriTimetableSnapshotSourceTest {
       );
   }
 
-  private static void assertTripUpdated(RealtimeTestEnvironment env) {
+  private static void assertTripUpdated(SiriRealtimeTestEnvironment env) {
     var tripTimes = env.getTripTimesForTrip(env.trip1);
     assertEquals(RealTimeState.UPDATED, tripTimes.getRealTimeState());
     assertEquals(11, tripTimes.getScheduledDepartureTime(0));
     assertEquals(15, tripTimes.getDepartureTime(0));
     assertEquals(20, tripTimes.getScheduledArrivalTime(1));
     assertEquals(25, tripTimes.getArrivalTime(1));
-  }
-
-    public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
-      List<EstimatedTimetableDeliveryStructure> updates
-    ) {
-      SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
-      return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
-    }
-
-    private UpdateResult applyEstimatedTimetable(
-      List<EstimatedTimetableDeliveryStructure> updates,
-      SiriFuzzyTripMatcher siriFuzzyTripMatcher
-    ) {
-      return this.snapshotSource.applyEstimatedTimetable(
-          siriFuzzyTripMatcher,
-          getEntityResolver(),
-          getFeedId(),
-          false,
-          updates
-        );
-    }
   }
 }
