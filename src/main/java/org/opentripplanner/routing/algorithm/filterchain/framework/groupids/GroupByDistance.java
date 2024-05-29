@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 
 /**
- * This class create a group identifier for an itinerary based on the longest legs which together
+ * This class creates a group identifier for an itinerary based on the longest legs which together
  * account for more than 'p' part of the total distance. Transit legs must overlap and ride the
  * same trip, while street-legs only need to have the same mode. We call the set of legs the
  * 'key-set-of-legs' or just 'key-set'.
