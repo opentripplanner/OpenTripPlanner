@@ -46,7 +46,7 @@
     // noise, so we slow it down a bit
     {
       "matchPackageNames": [
-        "org.entur.gbfs:gbfs-java-model"
+        "org.mobilitydata:gbfs-java-model"
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",

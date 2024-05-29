@@ -3,8 +3,8 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
-import org.entur.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.junit.jupiter.api.Test;
+import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.street.model.RentalFormFactor;
