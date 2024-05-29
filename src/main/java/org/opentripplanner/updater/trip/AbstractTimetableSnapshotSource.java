@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  *
  * - use composition instead of inheritance
  * - make the buffer private to this class and add an API for its access
- * - create only one "snapshot manager" per transit model that
+ * - create only one "snapshot manager" per transit model that is shared between Siri/GTFS-RT updaters
  */
 public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvider {
 
@@ -113,7 +113,8 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
   /**
    * Request a commit of the timetable snapshot.
    * <p>
-   * If there are no updated buffered up or not enough time has elapsed, no snapshot is created.
+   * If there are no updates buffered up or not enough time has elapsed, the existing snapshot
+   * is returned.
    *
    * @param force Force the committing of a new snapshot even if the above conditions are not met.
    */
@@ -179,8 +180,8 @@ public class AbstractTimetableSnapshotSource implements TimetableSnapshotProvide
 
   /**
    * Execute a {@code Runnable} with a locked snapshot buffer and release the lock afterwards. While
-   * the action of locking an unlocking is not complicated to do for calling code, this method
-   * exist so that the lock instance is a private field.
+   * the action of locking and unlocking is not complicated to do for calling code, this method
+   * exists so that the lock instance is a private field.
    */
   protected final void withLock(Runnable action) {
     bufferLock.lock();
