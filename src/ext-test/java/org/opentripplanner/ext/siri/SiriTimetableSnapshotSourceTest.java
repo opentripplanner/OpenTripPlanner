@@ -157,7 +157,7 @@ class SiriTimetableSnapshotSourceTest {
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
-    assertFailure(result, UpdateError.UpdateErrorType.TRIP_NOT_FOUND);
+    assertFailure(UpdateError.UpdateErrorType.TRIP_NOT_FOUND, result);
   }
 
   /**
@@ -196,7 +196,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
-    assertFailure(result, UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
+    assertFailure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
   }
 
   /**
@@ -296,7 +296,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NOT_MONITORED);
+    assertFailure(UpdateError.UpdateErrorType.NOT_MONITORED, result);
   }
 
   @Test
@@ -321,7 +321,7 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     // TODO: this should have a more specific error type
-    assertFailure(result, UpdateError.UpdateErrorType.UNKNOWN);
+    assertFailure(UpdateError.UpdateErrorType.UNKNOWN, result);
   }
 
   @Test
@@ -341,7 +341,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME);
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
   @Test
@@ -364,7 +364,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME);
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME, result);
   }
 
   // TODO: support this
@@ -390,11 +390,11 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE);
+    assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
   }
 
-  private void assertFailure(UpdateResult result, UpdateError.UpdateErrorType errorType) {
-    assertEquals(result.failures().keySet(), Set.of(errorType));
+  private void assertFailure(UpdateError.UpdateErrorType expectedError, UpdateResult result) {
+    assertEquals(Set.of(expectedError), result.failures().keySet());
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
