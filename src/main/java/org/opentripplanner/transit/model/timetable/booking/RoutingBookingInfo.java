@@ -9,11 +9,11 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  * This is the contract between booking info and the router. The router will enforce
  * this information if the request sets the earliest-booking-time request parameter.
  * <p>
- * Both {@code latestBookingTime} and {@code minimumBookingNotice} can be {@code null},
- * but at least one ot them must be none {@code null}.
+ * Either {@code latestBookingTime} and {@code minimumBookingNotice} must be set to
+ * an actual value, both can not be set to {@NOT_SET} simultaneously.
  * <p>
- * This class is not used by Raptor directly, but used by the BookingTimeAccessEgress with
- * implement the RaptorAccessEgress interface.
+ * This class is not used by Raptor directly, but used by the BookingTimeAccessEgress which
+ * implements the RaptorAccessEgress interface.
  */
 public final class RoutingBookingInfo {
 

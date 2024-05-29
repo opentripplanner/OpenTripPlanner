@@ -29,7 +29,7 @@ public class RideHailingAccessShifter {
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
 
   /**
-   * Given a list of {@link RoutingAccessEgress} shift the access ones that contain driving
+   * Given a list of {@link RoutingAccessEgress}, shift the access ones that contain driving
    * so that they only start at the time when the ride hailing vehicle can actually be there
    * to pick up passengers.
    */

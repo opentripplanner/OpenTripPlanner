@@ -128,7 +128,7 @@ public class BookingInfo implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(BookingInfo.class)
-      .addObj("cntactInfo", contactInfo)
+      .addObj("contactInfo", contactInfo)
       .addObj("bookingMethods", bookingMethods)
       .addObj("earliestBookingTime", earliestBookingTime)
       .addObj("latestBookingTime", latestBookingTime)
