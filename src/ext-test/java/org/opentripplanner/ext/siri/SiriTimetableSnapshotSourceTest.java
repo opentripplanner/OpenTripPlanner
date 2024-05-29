@@ -84,32 +84,87 @@ class SiriTimetableSnapshotSourceTest {
   }
 
   /**
-   * Update calls without changing the pattern
+   * Update calls without changing the pattern. Match trip by dated vehicle journey.
    */
   @Test
-  void testUpdateJourney() {
+  void testUpdateJourneyWithDatedVehicleJourneyRef() {
     var env = new SiriRealtimeTestEnvironment();
 
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+    var updates = updatedJourneyBuilder(env)
       .withDatedVehicleJourneyRef(env.trip1.getId().getId())
-      .withRecordedCalls(builder ->
-        builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
+      .buildEstimatedTimetableDeliveries();
+    var result = env.applyEstimatedTimetable(updates);
+    assertEquals(1, result.successful());
+    assertTripUpdated(env);
+  }
+
+  /**
+   * Update calls without changing the pattern. Match trip by framed vehicle journey.
+   */
+  @Test
+  void testUpdateJourneyWithFramedVehicleJourneyRef() {
+    var env = new RealtimeTestEnvironment();
+
+    var updates = updatedJourneyBuilder(env)
+      .withFramedVehicleJourneyRef(builder ->
+        builder.withServiceDate(env.serviceDate).withVehicleJourneyRef(env.trip1.getId().getId())
+      )
+      .buildEstimatedTimetableDeliveries();
+    var result = env.applyEstimatedTimetable(updates);
+    assertEquals(1, result.successful());
+    assertTripUpdated(env);
+  }
+
+  /**
+   * Update calls without changing the pattern. Missing reference to vehicle journey.
+   */
+  @Test
+  void testUpdateJourneyWithoutJourneyRef() {
+    var env = new RealtimeTestEnvironment();
+
+    var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
+    var result = env.applyEstimatedTimetable(updates);
+    assertEquals(0, result.successful());
+    assertFailure(result, UpdateError.UpdateErrorType.TRIP_NOT_FOUND);
+  }
+
+  /**
+   * Update calls without changing the pattern. Fuzzy matching.
+   */
+  @Test
+  void testUpdateJourneyWithFuzzyMatching() {
+    var env = new RealtimeTestEnvironment();
+
+    var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
+    var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
+    assertEquals(1, result.successful());
+    assertTripUpdated(env);
+  }
+
+  /**
+   * Update calls without changing the pattern. Fuzzy matching.
+   * Edge case: invalid reference to vehicle journey and missing aimed departure time.
+   */
+  @Test
+  void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
+    var env = new RealtimeTestEnvironment();
+
+    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+      .withFramedVehicleJourneyRef(builder ->
+        builder.withServiceDate(env.serviceDate).withVehicleJourneyRef("XXX")
       )
       .withEstimatedCalls(builder ->
-        builder.call(env.stopB1).arriveAimedExpected("00:00:20", "00:00:25")
+        builder
+          .call(env.stopA1)
+          .departAimedExpected(null, "00:00:12")
+          .call(env.stopB1)
+          .arriveAimedExpected("00:00:20", "00:00:22")
       )
       .buildEstimatedTimetableDeliveries();
 
-    var result = env.applyEstimatedTimetable(updates);
-
-    assertEquals(1, result.successful());
-
-    var tripTimes = env.getTripTimesForTrip(env.trip1);
-    assertEquals(RealTimeState.UPDATED, tripTimes.getRealTimeState());
-    assertEquals(11, tripTimes.getScheduledDepartureTime(0));
-    assertEquals(15, tripTimes.getDepartureTime(0));
-    assertEquals(20, tripTimes.getScheduledArrivalTime(1));
-    assertEquals(25, tripTimes.getArrivalTime(1));
+    var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
+    assertEquals(0, result.successful(), "Should fail gracefully");
+    assertFailure(result, UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
   }
 
   /**
@@ -328,5 +383,45 @@ class SiriTimetableSnapshotSourceTest {
 
   private void assertFailure(UpdateResult result, UpdateError.UpdateErrorType errorType) {
     assertEquals(result.failures().keySet(), Set.of(errorType));
+  }
+
+  private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
+    return new SiriEtBuilder(env.getDateTimeHelper())
+      .withRecordedCalls(builder ->
+        builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
+      )
+      .withEstimatedCalls(builder ->
+        builder.call(env.stopB1).arriveAimedExpected("00:00:20", "00:00:25")
+      );
+  }
+
+  private static void assertTripUpdated(RealtimeTestEnvironment env) {
+    var tripTimes = env.getTripTimesForTrip(env.trip1);
+    assertEquals(RealTimeState.UPDATED, tripTimes.getRealTimeState());
+    assertEquals(11, tripTimes.getScheduledDepartureTime(0));
+    assertEquals(15, tripTimes.getDepartureTime(0));
+    assertEquals(20, tripTimes.getScheduledArrivalTime(1));
+    assertEquals(25, tripTimes.getArrivalTime(1));
+  }
+
+    public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
+      List<EstimatedTimetableDeliveryStructure> updates
+    ) {
+      SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
+      return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
+    }
+
+    private UpdateResult applyEstimatedTimetable(
+      List<EstimatedTimetableDeliveryStructure> updates,
+      SiriFuzzyTripMatcher siriFuzzyTripMatcher
+    ) {
+      return this.snapshotSource.applyEstimatedTimetable(
+          siriFuzzyTripMatcher,
+          getEntityResolver(),
+          getFeedId(),
+          false,
+          updates
+        );
+    }
   }
 }

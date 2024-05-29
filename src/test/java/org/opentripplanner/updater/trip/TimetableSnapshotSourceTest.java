@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
@@ -92,15 +91,6 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     assertNotNull(snapshot);
     assertSame(snapshot, updater.getTimetableSnapshot());
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      FULL_DATASET,
-      List.of(CANCELLATION),
-      feedId
-    );
-    assertSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
@@ -148,7 +138,7 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(
+        var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
           FULL_DATASET,
@@ -156,8 +146,7 @@ public class TimetableSnapshotSourceTest {
           feedId
         );
 
-        var snapshot = updater.getTimetableSnapshot();
-        assertNull(snapshot);
+        assertEquals(0, result.successful());
       });
   }
 
@@ -790,7 +779,7 @@ public class TimetableSnapshotSourceTest {
   @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
+      new TimetableSnapshotSourceParameters(Duration.ZERO, true),
       transitModel,
       () -> SERVICE_DATE
     );
@@ -870,6 +859,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdateYesterday),
       feedId
     );
+    updater.commitTimetableSnapshot(true);
 
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 

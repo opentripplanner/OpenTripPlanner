@@ -233,7 +233,7 @@ public class ConstructApplication {
       LOG.info(progress.startMessage());
 
       transferCacheRequests.forEach(request -> {
-        transitModel.getTransitLayer().getRaptorTransfersForRequest(request);
+        transitModel.getTransitLayer().initTransferCacheForRequest(request);
 
         //noinspection Convert2MethodRef
         progress.step(s -> LOG.info(s));
