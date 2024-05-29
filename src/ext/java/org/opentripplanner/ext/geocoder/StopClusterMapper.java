@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.geocoder;
 
+import static org.opentripplanner.ext.geocoder.StopCluster.LocationType.STATION;
+import static org.opentripplanner.ext.geocoder.StopCluster.LocationType.STOP;
+
 import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
@@ -129,6 +132,7 @@ class StopClusterMapper {
       return new StopCluster.Location(
         loc.getId(),
         loc.getCode(),
+        STOP,
         loc.getName().toString(),
         new StopCluster.Coordinate(loc.getLat(), loc.getLon()),
         modes,
@@ -150,6 +154,7 @@ class StopClusterMapper {
       return new StopCluster.Location(
         group.getId(),
         group.getCode(),
+        STATION,
         group.getName().toString(),
         new StopCluster.Coordinate(group.getLat(), group.getLon()),
         modes,

@@ -31,9 +31,15 @@ record StopCluster(Location primary, Collection<Location> secondaries) {
    */
   public record FeedPublisher(String name) {}
 
+  public enum LocationType {
+    STATION,
+    STOP,
+  }
+
   public record Location(
     FeedScopedId id,
     @Nullable String code,
+    LocationType type,
     String name,
     Coordinate coordinate,
     Collection<String> modes,
@@ -43,6 +49,7 @@ record StopCluster(Location primary, Collection<Location> secondaries) {
     public Location {
       Objects.requireNonNull(id);
       Objects.requireNonNull(name);
+      Objects.requireNonNull(type);
       Objects.requireNonNull(coordinate);
       Objects.requireNonNull(modes);
       Objects.requireNonNull(agencies);
