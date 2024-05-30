@@ -19,12 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A base class for which abstracts away locking, updating, committing and purging of the timetable snapshot.
+ * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
  * In order to keep code reviews easier this is an intermediate stage and will be refactored further.
  * In particular the following refactorings are planned:
  * <p>
- * - use composition instead of inheritance
- * - make the buffer private to this class and add an API for its access
  * - create only one "snapshot manager" per transit model that is shared between Siri/GTFS-RT updaters
  */
 public final class TimetableSnapshotManager {
@@ -142,8 +140,16 @@ public final class TimetableSnapshotManager {
     }
   }
 
-  public TripPattern getRealtimeAddedTripPattern(FeedScopedId id, LocalDate localDate) {
-    return buffer.getRealtimeAddedTripPattern(id, localDate);
+  /**
+   * Get the current trip pattern given a trip id and a service date, if it has been changed from
+   * the scheduled pattern with an update, for which the stopPattern is different.
+   *
+   * @param trioId trip id
+   * @param serviceDate service date
+   * @return trip pattern created by the updater; null if trip is on the original trip pattern
+   */
+  public TripPattern getRealtimeAddedTripPattern(FeedScopedId trioId, LocalDate serviceDate) {
+    return buffer.getRealtimeAddedTripPattern(trioId, serviceDate);
   }
 
   /**
@@ -200,10 +206,22 @@ public final class TimetableSnapshotManager {
     }
   }
 
+  /**
+   * Clear all data of snapshot for the provided feed id
+   */
   public void clearBuffer(String feedId) {
     buffer.clear(feedId);
   }
 
+  /**
+   * Update the TripTimes of one Trip in a Timetable of a TripPattern. If the Trip of the TripTimes
+   * does not exist yet in the Timetable, add it. This method will make a protective copy
+   * of the Timetable if such a copy has not already been made while building up this snapshot,
+   * handling both cases where patterns were pre-existing in static data or created by realtime data.
+   *
+   * @param serviceDate service day for which this update is valid
+   * @return whether the update was actually applied
+   */
   public Result<UpdateSuccess, UpdateError> updateBuffer(
     TripPattern pattern,
     TripTimes tripTimes,
@@ -212,6 +230,10 @@ public final class TimetableSnapshotManager {
     return buffer.update(pattern, tripTimes, serviceDate);
   }
 
+  /**
+   * Removes the latest added trip pattern from the cache. This should be done when removing the
+   * trip times from the timetable the trip has been added to.
+   */
   public void removeLastAddedTripPattern(FeedScopedId id, LocalDate serviceDate) {
     buffer.removeLastAddedTripPattern(id, serviceDate);
   }
@@ -224,6 +246,10 @@ public final class TimetableSnapshotManager {
     buffer.removeRealtimeUpdatedTripTimes(pattern, id, serviceDate);
   }
 
+  /**
+   * Returns an updated timetable for the specified pattern if one is available in this snapshot, or
+   * the originally scheduled timetable if there are no updates in this snapshot.
+   */
   public Timetable resolve(TripPattern pattern, LocalDate serviceDate) {
     return buffer.resolve(pattern, serviceDate);
   }

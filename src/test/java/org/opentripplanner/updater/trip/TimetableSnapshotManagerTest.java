@@ -79,7 +79,6 @@ class TimetableSnapshotManagerTest {
     SameAssert expSnapshots,
     SameAssert expPatternAeqB
   ) {
-
     // We will simulate the clock turning midnight into tomorrow, data on
     // yesterday is candidate to expire
     final AtomicReference<LocalDate> clock = new AtomicReference<>(YESTERDAY);
