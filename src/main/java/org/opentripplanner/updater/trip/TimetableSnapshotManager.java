@@ -167,7 +167,7 @@ public final class TimetableSnapshotManager {
    * If your OTP instances are restarted throughout the day, this is less useful and can be
    * turned off.
    */
-  protected final boolean purgeExpiredData() {
+  private boolean purgeExpiredData() {
     final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final LocalDate previously = today.minusDays(2); // Just to be safe...
