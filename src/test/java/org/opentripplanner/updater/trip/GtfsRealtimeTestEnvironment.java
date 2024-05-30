@@ -8,14 +8,18 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 
-public class GtfsRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment {
+public class GtfsRealtimeTestEnvironment {
 
+  private static final TimetableSnapshotSourceParameters PARAMETERS = new TimetableSnapshotSourceParameters(
+    Duration.ZERO,
+    false
+  );
   public final TimetableSnapshotSource source;
 
+  public final RealtimeTestData testData = new RealtimeTestData();
+
   public GtfsRealtimeTestEnvironment() {
-    super();
-    var parameters = new TimetableSnapshotSourceParameters(Duration.ZERO, false);
-    source = new TimetableSnapshotSource(parameters, transitModel);
+    source = new TimetableSnapshotSource(PARAMETERS, testData.transitModel);
   }
 
   public UpdateResult applyTripUpdates(GtfsRealtime.TripUpdate update) {
@@ -28,11 +32,11 @@ public class GtfsRealtimeTestEnvironment extends AbstractRealtimeTestEnvironment
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       true,
       updates,
-      getFeedId()
+      testData.getFeedId()
     );
   }
 
   public TripPattern getPatternForTrip(Trip trip) {
-    return transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    return testData.transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
   }
 }

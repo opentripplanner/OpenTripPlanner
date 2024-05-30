@@ -15,6 +15,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestData;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -25,13 +26,13 @@ public class SkippedTest {
   @Test
   public void scheduledTripWithSkippedAndScheduled() {
     var env = new GtfsRealtimeTestEnvironment();
-    String scheduledTripId = env.trip2.getId().getId();
+    String scheduledTripId = env.testData.trip2.getId().getId();
 
     var tripUpdate = new TripUpdateBuilder(
       scheduledTripId,
-      env.SERVICE_DATE,
+      RealtimeTestData.SERVICE_DATE,
       SCHEDULED,
-      env.timeZone
+      env.testData.timeZone
     )
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
@@ -46,16 +47,16 @@ public class SkippedTest {
 
     // Original trip pattern
     {
-      final FeedScopedId tripId = env.trip2.getId();
-      final Trip trip = env.transitModel.getTransitModelIndex().getTripForId().get(tripId);
-      final TripPattern originalTripPattern = env.transitModel
+      final FeedScopedId tripId = env.testData.trip2.getId();
+      final Trip trip = env.testData.transitModel.getTransitModelIndex().getTripForId().get(tripId);
+      final TripPattern originalTripPattern = env.testData.transitModel
         .getTransitModelIndex()
         .getPatternForTrip()
         .get(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        env.SERVICE_DATE
+        RealtimeTestData.SERVICE_DATE
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -76,11 +77,14 @@ public class SkippedTest {
     // New trip pattern
     {
       final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
-        env.trip2.getId(),
-        env.SERVICE_DATE
+        env.testData.trip2.getId(),
+        RealtimeTestData.SERVICE_DATE
       );
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, env.SERVICE_DATE);
+      final Timetable newTimetableForToday = snapshot.resolve(
+        newTripPattern,
+        RealtimeTestData.SERVICE_DATE
+      );
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);

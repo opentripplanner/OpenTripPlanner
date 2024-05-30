@@ -4,7 +4,7 @@ import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRe
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.updater.trip.AbstractRealtimeTestEnvironment.SERVICE_DATE;
+import static org.opentripplanner.updater.trip.RealtimeTestData.SERVICE_DATE;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,7 +29,12 @@ public class InvalidInputTest {
   public void invalidTripDate(LocalDate date) {
     var env = new GtfsRealtimeTestEnvironment();
 
-    var update = new TripUpdateBuilder(env.trip1.getId().getId(), date, SCHEDULED, env.timeZone)
+    var update = new TripUpdateBuilder(
+      env.testData.trip1.getId().getId(),
+      date,
+      SCHEDULED,
+      env.testData.timeZone
+    )
       .addDelayedStopTime(1, 0)
       .addDelayedStopTime(2, 60, 80)
       .addDelayedStopTime(3, 90, 90)

@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -26,10 +25,10 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
-public abstract class AbstractRealtimeTestEnvironment {
+public final class RealtimeTestData {
 
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
-  protected static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
+  public static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -53,10 +52,9 @@ public abstract class AbstractRealtimeTestEnvironment {
   public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
   public final Trip trip1;
   public final Trip trip2;
-  public final DateTimeHelper dateTimeHelper = new DateTimeHelper(timeZone, SERVICE_DATE);
   public final TransitModel transitModel;
 
-  public AbstractRealtimeTestEnvironment() {
+  public RealtimeTestData() {
     transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
@@ -105,15 +103,11 @@ public abstract class AbstractRealtimeTestEnvironment {
     return timetable.getTripTimes(trip);
   }
 
-  public DateTimeHelper getDateTimeHelper() {
-    return dateTimeHelper;
-  }
-
   public String getFeedId() {
     return TransitModelForTest.FEED_ID;
   }
 
-  protected Trip createTrip(String id, Route route, List<Stop> stops) {
+  private Trip createTrip(String id, Route route, List<Stop> stops) {
     var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();
 
     var tripOnServiceDate = TripOnServiceDate
