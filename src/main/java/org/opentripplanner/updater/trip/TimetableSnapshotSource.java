@@ -267,10 +267,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return snapshotManager.getTimetableSnapshot();
   }
 
-  protected void commitTimetableSnapshot() {
-    snapshotManager.commitTimetableSnapshot(true);
-  }
-
   private static void logUpdateResult(
     String feedId,
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
