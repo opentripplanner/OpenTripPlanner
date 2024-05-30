@@ -25,6 +25,13 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * This class exists so that you can share the data building logic for GTFS and Siri tests.
+ * Since it's not possible to add a Siri and GTFS updater to the transit model at the same time,
+ * they each have their own test environment.
+ * <p>
+ * It is however a goal to change that and then these two can be combined together.
+ */
 public final class RealtimeTestData {
 
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
