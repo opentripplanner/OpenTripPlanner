@@ -186,7 +186,7 @@ abstract class AbstractFlexTemplate {
   ) {
     var flexEdge = getFlexEdge(flexVertex, transferStop);
 
-    // Drop none routable and very short(<10s) trips
+    // Drop non-routable and very short(<10s) trips
     if (flexEdge == null || flexEdge.getTimeInSeconds() < MIN_FLEX_TRIP_DURATION_SECONDS) {
       return null;
     }

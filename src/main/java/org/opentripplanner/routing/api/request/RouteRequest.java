@@ -117,7 +117,7 @@ public class RouteRequest implements Cloneable, Serializable {
   /**
    * The booking time is used to exclude services which are not bookable at the
    * requested booking time. If a service is bookable at this time or later, the service
-   * is included. Currently, OTP only supports this for FLEX access and egress.
+   * is included. This apply to FLEX access, egress and direct services.
    */
   public Instant bookingTime() {
     return bookingTime;

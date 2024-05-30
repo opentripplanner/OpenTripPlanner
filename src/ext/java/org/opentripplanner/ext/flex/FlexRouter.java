@@ -180,7 +180,7 @@ public class FlexRouter {
   /**
    * This class work as an adaptor around OTP services. This allows us to pass in this instance
    * and not the implementations (graph, transitService, flexIndex). We can easily mock this in
-   * unit-tests. This also serves as documentation of witch services the flex access/egress
+   * unit-tests. This also serves as documentation of which services the flex access/egress
    * generation logic needs.
    */
   private class CallbackAdapter implements FlexAccessEgressCallbackAdapter {

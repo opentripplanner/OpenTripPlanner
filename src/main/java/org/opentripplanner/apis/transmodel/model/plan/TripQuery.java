@@ -52,7 +52,7 @@ public class TripQuery {
           .name("dateTime")
           .description(
             "The date and time for the earliest time the user is willing to start the journey " +
-            "(if `false`or not set) or the latest acceptable time of arriving " +
+            "(if `false` or not set) or the latest acceptable time of arriving " +
             "(`true`). Defaults to now"
           )
           .type(gqlUtil.dateTimeScalar)

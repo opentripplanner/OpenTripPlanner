@@ -255,7 +255,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   @Override
   public FlexPathCalculator decorateFlexPathCalculator(FlexPathCalculator defaultCalculator) {
     // Get the correct {@link FlexPathCalculator} depending on the {@code timePenalty}.
-    // Ff the modifier doesn't actually modify, we return the regular calculator.
+    // If the modifier doesn't actually modify, we return the regular calculator.
     if (timePenalty.modifies()) {
       return new TimePenaltyCalculator(defaultCalculator, timePenalty);
     } else {

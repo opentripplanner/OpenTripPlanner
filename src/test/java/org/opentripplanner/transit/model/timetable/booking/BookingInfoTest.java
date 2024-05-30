@@ -43,7 +43,7 @@ class BookingInfoTest {
     assertEquals("dropoff", subject.getDropOffMessage());
 
     assertEquals(
-      "BookingInfo{cntactInfo: ContactInfo{contactPerson: 'Jo Contact', bookingUrl: 'http://booking.otp.org'}, bookingMethods: [CALL_DRIVER], latestBookingTime: 12:00, message: 'message', pickupMessage: 'pickup', dropOffMessage: 'dropoff'}",
+      "BookingInfo{contactInfo: ContactInfo{contactPerson: 'Jo Contact', bookingUrl: 'http://booking.otp.org'}, bookingMethods: [CALL_DRIVER], latestBookingTime: 12:00, message: 'message', pickupMessage: 'pickup', dropOffMessage: 'dropoff'}",
       subject.toString()
     );
   }

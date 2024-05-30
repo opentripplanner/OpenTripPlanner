@@ -15,7 +15,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Flex trips are not connected to the graph.
+ * Flex trips edges are not connected to the graph.
  */
 public class FlexTripEdge extends Edge {
 
