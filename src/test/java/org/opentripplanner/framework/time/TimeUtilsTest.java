@@ -184,7 +184,7 @@ public class TimeUtilsTest {
   }
 
   @Test
-  void testOtpTime() {
+  void toTransitTimeSeconds() {
     var timeZero = ZonedDateTime.of(
       LocalDate.of(2024, Month.JANUARY, 15),
       LocalTime.of(0, 0, 0),
