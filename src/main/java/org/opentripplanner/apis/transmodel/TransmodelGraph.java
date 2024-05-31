@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.ExecutionStrategy;
 import graphql.execution.UnknownOperationException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
@@ -79,10 +78,7 @@ class TransmodelGraph {
   }
 
   private static Instrumentation createInstrumentation(int maxResolves, Iterable<Tag> tracingTags) {
-    Instrumentation instrumentation = new ChainedInstrumentation(
-      new MaxQueryComplexityInstrumentation(maxResolves),
-      new OTPRequestTimeoutInstrumentation()
-    );
+    Instrumentation instrumentation = new MaxFieldsInResultInstrumentation(maxResolves);
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation =
