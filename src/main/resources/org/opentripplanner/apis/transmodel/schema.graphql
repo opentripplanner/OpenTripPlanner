@@ -801,7 +801,7 @@ type QueryType {
     restrictions are applied - all journeys are listed.
     """
     bookingTime: DateTime,
-    "The date and time for the earliest time the user is willing to start the journey (if `false`or not set) or the latest acceptable time of arriving (`true`). Defaults to now"
+    "The date and time for the earliest time the user is willing to start the journey (if `false` or not set) or the latest acceptable time of arriving (`true`). Defaults to now"
     dateTime: DateTime,
     "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
     debugItineraryFilter: Boolean = false @deprecated(reason : "Use `itineraryFilter.debug` instead."),
