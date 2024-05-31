@@ -65,6 +65,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                              | *Optional* |               |  2.3  |
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                         | *Optional* |               |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                               | *Optional* | `false`       |   na  |
+|    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                      | *Optional* | `1000000`     |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
 | [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                             | *Optional* |               |   na  |
@@ -422,6 +423,15 @@ If not set, the default behavior is to cache stop-to-stop transfers using the de
 Hide the FeedId in all API output, and add it to input.
 
 Only turn this feature on if you have unique ids across all feeds, without the feedId prefix.
+
+<h3 id="transmodelApi_maxNumberOfResultFields">maxNumberOfResultFields</h3>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000000`   
+**Path:** /transmodelApi 
+
+The maximum number of fields in a GraphQL result
+
+Enforce rate limiting based on query complexity: queries that return too much data are cancelled.
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
