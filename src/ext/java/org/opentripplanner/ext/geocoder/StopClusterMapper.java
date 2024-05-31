@@ -63,23 +63,19 @@ class StopClusterMapper {
       )
       .values()
       .stream()
-      .map(group -> this.map(group).orElse(null))
+      .map(group -> map(group).orElse(null))
       .filter(Objects::nonNull)
       .toList();
-    var stations = stopLocationsGroups.stream().map(this::map).toList();
+    var stations = stopLocationsGroups.stream().map(StopClusterMapper::map).toList();
 
     return Iterables.concat(deduplicatedStops, stations);
   }
 
-  LuceneStopCluster map(StopLocationsGroup g) {
+  private static LuceneStopCluster map(StopLocationsGroup g) {
     var childStops = g.getChildStops();
     var ids = childStops.stream().map(s -> s.getId().toString()).toList();
-    var childNames = childStops
-      .stream()
-      .map(StopLocation::getName)
-      .filter(Objects::nonNull)
-      .toList();
-    var codes = childStops.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
+    var childNames = getNames(childStops);
+    var codes = getCodes(childStops);
 
     return new LuceneStopCluster(
       g.getId().toString(),
@@ -90,11 +86,19 @@ class StopClusterMapper {
     );
   }
 
-  Optional<LuceneStopCluster> map(List<StopLocation> stopLocations) {
+  private static List<String> getCodes(Collection<StopLocation> childStops) {
+    return childStops.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
+  }
+
+  private static List<I18NString> getNames(Collection<StopLocation> childStops) {
+    return childStops.stream().map(StopLocation::getName).filter(Objects::nonNull).toList();
+  }
+
+  private static Optional<LuceneStopCluster> map(List<StopLocation> stopLocations) {
     var primary = stopLocations.getFirst();
     var secondaryIds = stopLocations.stream().skip(1).map(sl -> sl.getId().toString()).toList();
-    var names = stopLocations.stream().map(StopLocation::getName).toList();
-    var codes = stopLocations.stream().map(StopLocation::getCode).filter(Objects::nonNull).toList();
+    var names = getNames(stopLocations);
+    var codes = getCodes(stopLocations);
 
     return Optional
       .ofNullable(primary.getName())

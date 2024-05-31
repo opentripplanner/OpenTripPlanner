@@ -277,17 +277,17 @@ class LuceneIndexTest {
     void modes() {
       var result = index.queryStopClusters("westh").toList();
       assertEquals(1, result.size());
-      var stop = result.getFirst();
-      assertEquals(WESTHAFEN.getName().toString(), stop.primary().name());
-      assertEquals(List.of(FERRY.name(), BUS.name()), stop.primary().modes());
+      var cluster = result.getFirst();
+      assertEquals(WESTHAFEN.getName().toString(), cluster.primary().name());
+      assertEquals(List.of(FERRY.name(), BUS.name()), cluster.primary().modes());
     }
 
     @Test
     void agenciesAndFeedPublisher() {
-      var result = index.queryStopClusters("alexanderplatz").toList().getFirst();
-      assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), result.primary().name());
-      assertEquals(List.of(StopClusterMapper.toAgency(BVG)), result.primary().agencies());
-      assertEquals("A Publisher", result.primary().feedPublisher().name());
+      var cluster = index.queryStopClusters("alexanderplatz").toList().getFirst();
+      assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), cluster.primary().name());
+      assertEquals(List.of(StopClusterMapper.toAgency(BVG)), cluster.primary().agencies());
+      assertEquals("A Publisher", cluster.primary().feedPublisher().name());
     }
   }
 
