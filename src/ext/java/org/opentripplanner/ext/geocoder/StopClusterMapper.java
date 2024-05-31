@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -16,6 +17,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
@@ -153,7 +155,7 @@ class StopClusterMapper {
         .toList();
       return new StopCluster.Location(
         group.getId(),
-        group.getCode(),
+        extractCode(group),
         STATION,
         group.getName().toString(),
         new StopCluster.Coordinate(group.getLat(), group.getLon()),
@@ -161,6 +163,15 @@ class StopClusterMapper {
         agencies,
         feedPublisher
       );
+    }
+  }
+
+  @Nullable
+  private static String extractCode(StopLocationsGroup group) {
+    if (group instanceof Station station) {
+      return station.getCode();
+    } else {
+      return null;
     }
   }
 
