@@ -79,7 +79,10 @@ class TransmodelGraph {
   }
 
   private static Instrumentation createInstrumentation(int maxResolves, Iterable<Tag> tracingTags) {
-    Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+    Instrumentation instrumentation = new ChainedInstrumentation(
+      new MaxQueryComplexityInstrumentation(maxResolves),
+      new OTPRequestTimeoutInstrumentation()
+    );
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation =
