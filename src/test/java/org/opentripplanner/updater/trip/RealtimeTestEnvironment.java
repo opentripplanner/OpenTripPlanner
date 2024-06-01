@@ -1,12 +1,19 @@
 package org.opentripplanner.updater.trip;
 
+import com.google.transit.realtime.GtfsRealtime;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.opentripplanner.DateTimeHelper;
+import org.opentripplanner.ext.siri.EntityResolver;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -24,6 +31,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.UpdateResult;
+import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 /**
  * This class exists so that you can share the data building logic for GTFS and Siri tests.
@@ -32,8 +42,12 @@ import org.opentripplanner.transit.service.TransitService;
  * <p>
  * It is however a goal to change that and then these two can be combined together.
  */
-public final class RealtimeTestData {
+public final class RealtimeTestEnvironment {
 
+  private static final TimetableSnapshotSourceParameters PARAMETERS = new TimetableSnapshotSourceParameters(
+    Duration.ZERO,
+    false
+  );
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   public static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
@@ -60,8 +74,24 @@ public final class RealtimeTestData {
   public final Trip trip1;
   public final Trip trip2;
   public final TransitModel transitModel;
+  private final SiriTimetableSnapshotSource siriSource;
+  private final TimetableSnapshotSource gtfsSource;
+  private final DateTimeHelper dateTimeHelper;
 
-  public RealtimeTestData() {
+  private enum SourceType {
+    GTFS_RT,
+    SIRI,
+  }
+
+  public static RealtimeTestEnvironment siri() {
+    return new RealtimeTestEnvironment(SourceType.SIRI);
+  }
+
+  public static RealtimeTestEnvironment gtfs() {
+    return new RealtimeTestEnvironment(SourceType.GTFS_RT);
+  }
+
+  private RealtimeTestEnvironment(SourceType sourceType) {
     transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
@@ -86,6 +116,18 @@ public final class RealtimeTestData {
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
     transitModel.index();
+
+    // SIRI and GTFS-RT cannot be registered with the transit model at the same time
+    // we are actively refactoring to remove this restriction
+    // for the time being you cannot run a SIRI and GTFS-RT test at the same time
+    if (sourceType == SourceType.SIRI) {
+      siriSource = new SiriTimetableSnapshotSource(PARAMETERS, transitModel);
+      gtfsSource = null;
+    } else {
+      gtfsSource = new TimetableSnapshotSource(PARAMETERS, transitModel);
+      siriSource = null;
+    }
+    dateTimeHelper = new DateTimeHelper(timeZone, RealtimeTestEnvironment.SERVICE_DATE);
   }
 
   public FeedScopedId id(String id) {
@@ -113,6 +155,96 @@ public final class RealtimeTestData {
   public String getFeedId() {
     return TransitModelForTest.FEED_ID;
   }
+
+  public UpdateResult applyTripUpdates(GtfsRealtime.TripUpdate update) {
+    return applyTripUpdates(List.of(update));
+  }
+
+  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
+    return gtfsSource.applyTripUpdates(
+      null,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
+      true,
+      updates,
+      getFeedId()
+    );
+  }
+
+  public EntityResolver getEntityResolver() {
+    return new EntityResolver(getTransitService(), getFeedId());
+  }
+
+  public TripPattern getPatternForTrip(FeedScopedId tripId) {
+    return getPatternForTrip(tripId, RealtimeTestEnvironment.SERVICE_DATE);
+  }
+
+  public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
+    var transitService = getTransitService();
+    var trip = transitService.getTripOnServiceDateById(tripId);
+    return transitService.getPatternForTrip(trip.getTrip(), serviceDate);
+  }
+
+  /**
+   * Find the current TripTimes for a trip id on the default serviceDate
+   */
+  public TripTimes getTripTimesForTrip(Trip trip) {
+    return getTripTimesForTrip(trip.getId(), SERVICE_DATE);
+  }
+
+  /**
+   * Find the current TripTimes for a trip id on the default serviceDate
+   */
+  public TripTimes getTripTimesForTrip(String id) {
+    return getTripTimesForTrip(id(id), SERVICE_DATE);
+  }
+
+  public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
+    return siriSource.applyEstimatedTimetable(
+      null,
+      getEntityResolver(),
+      getFeedId(),
+      false,
+      updates
+    );
+  }
+
+  public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
+    List<EstimatedTimetableDeliveryStructure> updates
+  ) {
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
+    return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
+  }
+
+  public DateTimeHelper getDateTimeHelper() {
+    return dateTimeHelper;
+  }
+
+  private UpdateResult applyEstimatedTimetable(
+    List<EstimatedTimetableDeliveryStructure> updates,
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher
+  ) {
+    return siriSource.applyEstimatedTimetable(
+      siriFuzzyTripMatcher,
+      getEntityResolver(),
+      getFeedId(),
+      false,
+      updates
+    );
+  }
+
+  public TripPattern getPatternForTrip(Trip trip) {
+    return transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+  }
+
+  public TimetableSnapshot getTimetableSnapshot() {
+    if (siriSource != null) {
+      return siriSource.getTimetableSnapshot();
+    } else {
+      return gtfsSource.getTimetableSnapshot();
+    }
+  }
+
+  // private methods
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {
     var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();

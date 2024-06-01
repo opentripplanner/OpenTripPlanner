@@ -4,14 +4,14 @@ import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRe
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.updater.trip.RealtimeTestData.SERVICE_DATE;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -27,14 +27,9 @@ public class InvalidInputTest {
   @ParameterizedTest
   @MethodSource("cases")
   public void invalidTripDate(LocalDate date) {
-    var env = new GtfsRealtimeTestEnvironment();
+    var env = RealtimeTestEnvironment.gtfs();
 
-    var update = new TripUpdateBuilder(
-      env.testData.trip1.getId().getId(),
-      date,
-      SCHEDULED,
-      env.testData.timeZone
-    )
+    var update = new TripUpdateBuilder(env.trip1.getId().getId(), date, SCHEDULED, env.timeZone)
       .addDelayedStopTime(1, 0)
       .addDelayedStopTime(2, 60, 80)
       .addDelayedStopTime(3, 90, 90)
@@ -42,7 +37,7 @@ public class InvalidInputTest {
 
     var result = env.applyTripUpdates(update);
 
-    var snapshot = env.source.getTimetableSnapshot();
+    var snapshot = env.getTimetableSnapshot();
     assertTrue(snapshot.isEmpty());
     assertEquals(1, result.failed());
     var errors = result.failures().keySet();

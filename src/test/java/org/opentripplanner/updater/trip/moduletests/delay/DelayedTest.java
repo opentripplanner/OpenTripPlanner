@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestData;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -23,14 +22,13 @@ public class DelayedTest {
 
   @Test
   public void delayed() {
-    var env = new GtfsRealtimeTestEnvironment();
-    var testData = env.testData;
+    var env = RealtimeTestEnvironment.gtfs();
 
     var tripUpdate = new TripUpdateBuilder(
-      env.testData.trip1.getId().getId(),
-      RealtimeTestData.SERVICE_DATE,
+      env.trip1.getId().getId(),
+      RealtimeTestEnvironment.SERVICE_DATE,
       SCHEDULED,
-      testData.timeZone
+      env.timeZone
     )
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
@@ -41,13 +39,14 @@ public class DelayedTest {
 
     // trip1 should be modified
     {
-      var pattern1 = env.getPatternForTrip(env.testData.trip1);
-      final int trip1Index = pattern1
-        .getScheduledTimetable()
-        .getTripIndex(env.testData.trip1.getId());
+      var pattern1 = env.getPatternForTrip(env.trip1);
+      final int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
-      final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-      final Timetable trip1Realtime = snapshot.resolve(pattern1, RealtimeTestData.SERVICE_DATE);
+      final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+      final Timetable trip1Realtime = snapshot.resolve(
+        pattern1,
+        RealtimeTestEnvironment.SERVICE_DATE
+      );
       final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
 
       assertNotSame(trip1Realtime, trip1Scheduled);
@@ -70,11 +69,11 @@ public class DelayedTest {
 
     // trip2 should keep the scheduled information
     {
-      var pattern = env.getPatternForTrip(testData.trip2);
-      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(testData.trip2.getId());
+      var pattern = env.getPatternForTrip(env.trip2);
+      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip2.getId());
 
-      final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-      final Timetable realtime = snapshot.resolve(pattern, RealtimeTestData.SERVICE_DATE);
+      final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+      final Timetable realtime = snapshot.resolve(pattern, RealtimeTestEnvironment.SERVICE_DATE);
       final Timetable scheduled = snapshot.resolve(pattern, null);
 
       assertSame(realtime, scheduled);

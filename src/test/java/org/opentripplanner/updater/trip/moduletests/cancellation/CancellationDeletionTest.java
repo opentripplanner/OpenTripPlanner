@@ -12,8 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.updater.trip.GtfsRealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTestData;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -32,26 +31,24 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   public void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = new GtfsRealtimeTestEnvironment();
-    var pattern1 = env.getPatternForTrip(env.testData.trip1);
+    var env = RealtimeTestEnvironment.gtfs();
+    var pattern1 = env.getPatternForTrip(env.trip1);
 
-    final int tripIndex1 = pattern1
-      .getScheduledTimetable()
-      .getTripIndex(env.testData.trip1.getId());
+    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
     var update = new TripUpdateBuilder(
-      env.testData.trip1.getId().getId(),
-      RealtimeTestData.SERVICE_DATE,
+      env.trip1.getId().getId(),
+      RealtimeTestEnvironment.SERVICE_DATE,
       relationship,
-      env.testData.timeZone
+      env.timeZone
     )
       .build();
     var result = env.applyTripUpdates(update);
 
     assertEquals(1, result.successful());
 
-    final TimetableSnapshot snapshot = env.source.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(pattern1, RealtimeTestData.SERVICE_DATE);
+    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    final Timetable forToday = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex1), schedule.getTripTimes(tripIndex1));
