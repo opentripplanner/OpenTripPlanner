@@ -38,7 +38,7 @@ public class SkippedTest {
       .addDelayedStopTime(2, 90)
       .build();
 
-    var result = env.applyTripUpdates(tripUpdate);
+    var result = env.applyTripUpdate(tripUpdate);
 
     assertEquals(1, result.successful());
 

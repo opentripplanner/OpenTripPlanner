@@ -33,7 +33,7 @@ public class DelayedTest {
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
 
-    var result = env.applyTripUpdates(tripUpdate);
+    var result = env.applyTripUpdate(tripUpdate);
 
     assertEquals(1, result.successful());
 

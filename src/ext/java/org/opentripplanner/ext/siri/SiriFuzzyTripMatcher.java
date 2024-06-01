@@ -66,7 +66,7 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Constructor with package access for tests only.
+   * Constructor with public access for tests only.
    */
   public SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;

@@ -35,7 +35,7 @@ public class InvalidInputTest {
       .addDelayedStopTime(3, 90, 90)
       .build();
 
-    var result = env.applyTripUpdates(update);
+    var result = env.applyTripUpdate(update);
 
     var snapshot = env.getTimetableSnapshot();
     assertTrue(snapshot.isEmpty());

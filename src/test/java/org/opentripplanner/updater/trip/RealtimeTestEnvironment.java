@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
@@ -156,20 +157,6 @@ public final class RealtimeTestEnvironment {
     return TransitModelForTest.FEED_ID;
   }
 
-  public UpdateResult applyTripUpdates(GtfsRealtime.TripUpdate update) {
-    return applyTripUpdates(List.of(update));
-  }
-
-  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
-    return gtfsSource.applyTripUpdates(
-      null,
-      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      true,
-      updates,
-      getFeedId()
-    );
-  }
-
   public EntityResolver getEntityResolver() {
     return new EntityResolver(getTransitService(), getFeedId());
   }
@@ -198,38 +185,8 @@ public final class RealtimeTestEnvironment {
     return getTripTimesForTrip(id(id), SERVICE_DATE);
   }
 
-  public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return siriSource.applyEstimatedTimetable(
-      null,
-      getEntityResolver(),
-      getFeedId(),
-      false,
-      updates
-    );
-  }
-
-  public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
-    List<EstimatedTimetableDeliveryStructure> updates
-  ) {
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
-    return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
-  }
-
   public DateTimeHelper getDateTimeHelper() {
     return dateTimeHelper;
-  }
-
-  private UpdateResult applyEstimatedTimetable(
-    List<EstimatedTimetableDeliveryStructure> updates,
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher
-  ) {
-    return siriSource.applyEstimatedTimetable(
-      siriFuzzyTripMatcher,
-      getEntityResolver(),
-      getFeedId(),
-      false,
-      updates
-    );
   }
 
   public TripPattern getPatternForTrip(Trip trip) {
@@ -244,7 +201,57 @@ public final class RealtimeTestEnvironment {
     }
   }
 
+  // SIRI updates
+
+  public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
+    List<EstimatedTimetableDeliveryStructure> updates
+  ) {
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
+    return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
+  }
+
+  public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
+    return siriSource.applyEstimatedTimetable(
+      null,
+      getEntityResolver(),
+      getFeedId(),
+      false,
+      updates
+    );
+  }
+
+  // GTFS-RT updates
+
+  public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update) {
+    return applyTripUpdates(List.of(update));
+  }
+
+  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
+    Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
+    return gtfsSource.applyTripUpdates(
+      null,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA,
+      true,
+      updates,
+      getFeedId()
+    );
+  }
+
   // private methods
+
+  private UpdateResult applyEstimatedTimetable(
+    List<EstimatedTimetableDeliveryStructure> updates,
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher
+  ) {
+    Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
+    return siriSource.applyEstimatedTimetable(
+      siriFuzzyTripMatcher,
+      getEntityResolver(),
+      getFeedId(),
+      false,
+      updates
+    );
+  }
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {
     var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();

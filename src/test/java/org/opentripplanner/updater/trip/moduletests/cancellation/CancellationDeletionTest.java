@@ -43,7 +43,7 @@ public class CancellationDeletionTest {
       env.timeZone
     )
       .build();
-    var result = env.applyTripUpdates(update);
+    var result = env.applyTripUpdate(update);
 
     assertEquals(1, result.successful());
 
