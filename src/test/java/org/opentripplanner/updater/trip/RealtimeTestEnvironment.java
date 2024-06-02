@@ -41,7 +41,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  * Since it's not possible to add a Siri and GTFS updater to the transit model at the same time,
  * they each have their own test environment.
  * <p>
- * It is however a goal to change that and then these two can be combined together.
+ * It is however a goal to change that and then these two can be combined.
  */
 public final class RealtimeTestEnvironment {
 
@@ -50,7 +50,7 @@ public final class RealtimeTestEnvironment {
     false
   );
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
-  public static final FeedScopedId CAL_ID = TransitModelForTest.id("CAL_1");
+  public static final FeedScopedId SERVICE_ID = TransitModelForTest.id("CAL_1");
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -84,10 +84,16 @@ public final class RealtimeTestEnvironment {
     SIRI,
   }
 
+  /**
+   * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
+   */
   public static RealtimeTestEnvironment siri() {
     return new RealtimeTestEnvironment(SourceType.SIRI);
   }
 
+  /**
+   * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
+   */
   public static RealtimeTestEnvironment gtfs() {
     return new RealtimeTestEnvironment(SourceType.GTFS_RT);
   }
@@ -110,10 +116,10 @@ public final class RealtimeTestEnvironment {
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(
-      CAL_ID,
+      SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    transitModel.getServiceCodes().put(CAL_ID, 0);
+    transitModel.getServiceCodes().put(SERVICE_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
     transitModel.index();
@@ -131,7 +137,7 @@ public final class RealtimeTestEnvironment {
     dateTimeHelper = new DateTimeHelper(timeZone, RealtimeTestEnvironment.SERVICE_DATE);
   }
 
-  public FeedScopedId id(String id) {
+  public static FeedScopedId id(String id) {
     return TransitModelForTest.id(id);
   }
 
@@ -254,7 +260,7 @@ public final class RealtimeTestEnvironment {
   }
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {
-    var trip = Trip.of(id(id)).withRoute(route).withServiceId(CAL_ID).build();
+    var trip = Trip.of(id(id)).withRoute(route).withServiceId(SERVICE_ID).build();
 
     var tripOnServiceDate = TripOnServiceDate
       .of(trip.getId())
