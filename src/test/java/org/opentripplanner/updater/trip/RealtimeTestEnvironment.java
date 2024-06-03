@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -205,6 +206,32 @@ public final class RealtimeTestEnvironment {
     } else {
       return gtfsSource.getTimetableSnapshot();
     }
+  }
+
+  public String getRealtimeTimetable(String tripId) {
+    return getRealtimeTimetable(id(tripId), SERVICE_DATE);
+  }
+
+  public String getRealtimeTimetable(Trip trip) {
+    return getRealtimeTimetable(trip.getId(), SERVICE_DATE);
+  }
+
+  public String getRealtimeTimetable(FeedScopedId tripId, LocalDate serviceDate) {
+    var tt = getTripTimesForTrip(tripId, serviceDate);
+    var pattern = getPatternForTrip(tripId);
+
+    return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
+  }
+
+  public String getScheduledTimetable(String tripId) {
+    return getScheduledTimetable(id(tripId));
+  }
+
+  public String getScheduledTimetable(FeedScopedId tripId) {
+    var pattern = getPatternForTrip(tripId);
+    var tt = pattern.getScheduledTimetable().getTripTimes(tripId);
+
+    return TripTimesStringBuilder.encodeTripTimes(tt, pattern);
   }
 
   // SIRI updates
