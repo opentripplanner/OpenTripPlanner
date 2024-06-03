@@ -129,7 +129,6 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(DepartureRowImpl.class))
         .type(typeWiring.build(elevationProfileComponentImpl.class))
         .type(typeWiring.build(FeedImpl.class))
-        .type(typeWiring.build(FeedImpl.class))
         .type(typeWiring.build(GeometryImpl.class))
         .type(typeWiring.build(ItineraryImpl.class))
         .type(typeWiring.build(LegImpl.class))
