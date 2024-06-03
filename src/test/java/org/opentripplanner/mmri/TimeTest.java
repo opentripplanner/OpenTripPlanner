@@ -2,7 +2,6 @@ package org.opentripplanner.mmri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.plan.Itinerary;
@@ -35,30 +34,6 @@ public class TimeTest extends GtfsTest {
     validateLeg(leg, 1388530860000L, 1388530920000L, "1g2", "1g1", null);
 
     assertEquals("Stop 1g1 ~ BUS bus 0:01 0:02 ~ Stop 1g2 [C₁90]", itinerary.toStr());
-  }
-
-  @Test
-  @Disabled
-  public void test1g3() {
-    Itinerary itinerary = plan(+1388617380L, "1g1", "1g2", null, false, false, null, "", "", 1);
-
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
-
-    validateLeg(leg, 1388703660000L, 1388703720000L, "1g2", "1g1", null);
-
-    assertEquals("", itinerary.toStr());
-  }
-
-  @Test
-  @Disabled
-  public void test1g4() {
-    Itinerary itinerary = plan(-1388617440L, "1g1", "1g2", null, false, false, null, "", "", 1);
-
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
-
-    validateLeg(leg, 1388531100000L, 1388531160000L, "1g2", "1g1", null);
-
-    assertEquals("", itinerary.toStr());
   }
 
   @Test

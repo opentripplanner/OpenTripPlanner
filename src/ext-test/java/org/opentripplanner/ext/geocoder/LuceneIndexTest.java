@@ -10,7 +10,9 @@ import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -213,13 +215,13 @@ class LuceneIndexTest {
     )
     void stopClustersWithTypos(String searchTerm) {
       var results = index.queryStopClusters(searchTerm).toList();
-      var ids = results.stream().map(StopCluster::id).toList();
+      var ids = results.stream().map(primaryId()).toList();
       assertEquals(List.of(ALEXANDERPLATZ_STATION.getId()), ids);
     }
 
     @Test
     void fuzzyStopClusters() {
-      var result1 = index.queryStopClusters("arts").map(StopCluster::id).toList();
+      var result1 = index.queryStopClusters("arts").map(primaryId()).toList();
       assertEquals(List.of(ARTS_CENTER.getId()), result1);
     }
 
@@ -227,7 +229,7 @@ class LuceneIndexTest {
     void deduplicatedStopClusters() {
       var result = index.queryStopClusters("lich").toList();
       assertEquals(1, result.size());
-      assertEquals(LICHTERFELDE_OST_1.getName().toString(), result.getFirst().name());
+      assertEquals(LICHTERFELDE_OST_1.getName().toString(), result.getFirst().primary().name());
     }
 
     @ParameterizedTest
@@ -259,7 +261,7 @@ class LuceneIndexTest {
       }
     )
     void stopClustersWithSpace(String query) {
-      var result = index.queryStopClusters(query).map(StopCluster::id).toList();
+      var result = index.queryStopClusters(query).map(primaryId()).toList();
       assertEquals(List.of(FIVE_POINTS_STATION.getId()), result);
     }
 
@@ -268,24 +270,28 @@ class LuceneIndexTest {
     void fuzzyStopCode(String query) {
       var result = index.queryStopClusters(query).toList();
       assertEquals(1, result.size());
-      assertEquals(ARTS_CENTER.getName().toString(), result.getFirst().name());
+      assertEquals(ARTS_CENTER.getName().toString(), result.getFirst().primary().name());
     }
 
     @Test
     void modes() {
       var result = index.queryStopClusters("westh").toList();
       assertEquals(1, result.size());
-      var stop = result.getFirst();
-      assertEquals(WESTHAFEN.getName().toString(), stop.name());
-      assertEquals(List.of(FERRY.name(), BUS.name()), stop.modes());
+      var cluster = result.getFirst();
+      assertEquals(WESTHAFEN.getName().toString(), cluster.primary().name());
+      assertEquals(List.of(FERRY.name(), BUS.name()), cluster.primary().modes());
     }
 
     @Test
     void agenciesAndFeedPublisher() {
-      var result = index.queryStopClusters("alexanderplatz").toList().getFirst();
-      assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), result.name());
-      assertEquals(List.of(StopClusterMapper.toAgency(BVG)), result.agencies());
-      assertEquals("A Publisher", result.feedPublisher().name());
+      var cluster = index.queryStopClusters("alexanderplatz").toList().getFirst();
+      assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), cluster.primary().name());
+      assertEquals(List.of(StopClusterMapper.toAgency(BVG)), cluster.primary().agencies());
+      assertEquals("A Publisher", cluster.primary().feedPublisher().name());
     }
+  }
+
+  private static @Nonnull Function<StopCluster, FeedScopedId> primaryId() {
+    return c -> c.primary().id();
   }
 }

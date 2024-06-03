@@ -56,6 +56,7 @@ config:
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
     Emissions: org.opentripplanner.model.plan.Emissions#Emissions
     Feed: String
+    FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
