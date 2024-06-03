@@ -49,8 +49,8 @@ public class PlanPageInfo {
   @Override
   public int hashCode() {
     return Objects.hash(
-      startCursor != null ? startCursor.getValue() : null,
-      endCursor != null ? endCursor.getValue() : null,
+      startCursor == null ? null : startCursor.getValue(),
+      endCursor == null ? null : endCursor.getValue(),
       hasPreviousPage,
       hasNextPage,
       searchWindowUsed
