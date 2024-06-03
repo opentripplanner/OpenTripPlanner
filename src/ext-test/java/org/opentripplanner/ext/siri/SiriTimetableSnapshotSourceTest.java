@@ -8,6 +8,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -47,10 +56,11 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    var tripTimes = env.getTripTimesForTrip("newJourney");
-    assertEquals(RealTimeState.ADDED, tripTimes.getRealTimeState());
-    assertEquals(2 * 60, tripTimes.getDepartureTime(0));
-    assertEquals(4 * 60, tripTimes.getDepartureTime(1));
+    assertEquals("ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals(
+      "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
+      env.getScheduledTimetable("newJourney")
+    );
   }
 
   @Test
@@ -72,14 +82,13 @@ class SiriTimetableSnapshotSourceTest {
 
     assertEquals(1, result.successful());
 
-    var tripTimes = env.getTripTimesForTrip("newJourney");
-    var pattern = env.getPatternForTrip(env.id("newJourney"));
-    assertEquals(RealTimeState.ADDED, tripTimes.getRealTimeState());
-    assertEquals(2 * 60, tripTimes.getDepartureTime(0));
-    assertEquals(4 * 60, tripTimes.getDepartureTime(1));
-    assertEquals(env.stopA1.getId(), pattern.getStop(0).getId());
-    assertEquals(env.stopC1.getId(), pattern.getStop(1).getId());
+    assertEquals("ADDED | A1 [R] 0:02 0:02 | C1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals(
+      "SCHEDULED | A1 0:01 0:01 | C1 0:03 0:03",
+      env.getScheduledTimetable("newJourney")
+    );
 
+    // Original trip should not get canceled
     var originalTripTimes = env.getTripTimesForTrip(env.trip1);
     assertEquals(RealTimeState.SCHEDULED, originalTripTimes.getRealTimeState());
   }
@@ -97,6 +106,10 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(1, result.successful());
     assertTripUpdated(env);
+    assertEquals(
+      "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
+      env.getRealtimeTimetable(env.trip1)
+    );
   }
 
   /**
@@ -128,7 +141,7 @@ class SiriTimetableSnapshotSourceTest {
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
-    assertFailure(result, UpdateError.UpdateErrorType.TRIP_NOT_FOUND);
+    assertFailure(UpdateError.UpdateErrorType.TRIP_NOT_FOUND, result);
   }
 
   /**
@@ -167,7 +180,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
     assertEquals(0, result.successful(), "Should fail gracefully");
-    assertFailure(result, UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
+    assertFailure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH, result);
   }
 
   /**
@@ -190,15 +203,10 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-
-    var pattern = env.getPatternForTrip(env.trip1.getId());
-    var tripTimes = env.getTripTimesForTrip(env.trip1);
-    assertEquals(RealTimeState.MODIFIED, tripTimes.getRealTimeState());
-    assertEquals(11, tripTimes.getScheduledDepartureTime(0));
-    assertEquals(15, tripTimes.getDepartureTime(0));
-    assertEquals(20, tripTimes.getScheduledArrivalTime(1));
-    assertEquals(33, tripTimes.getArrivalTime(1));
-    assertEquals(env.stopB2, pattern.getStop(1));
+    assertEquals(
+      "MODIFIED | A1 [R] 0:00:15 0:00:15 | B2 0:00:33 0:00:33",
+      env.getRealtimeTimetable(env.trip1)
+    );
   }
 
   @Test
@@ -221,12 +229,10 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-
-    var pattern = env.getPatternForTrip(env.trip2.getId());
-
-    assertEquals(PickDrop.SCHEDULED, pattern.getAlightType(0));
-    assertEquals(PickDrop.CANCELLED, pattern.getAlightType(1));
-    assertEquals(PickDrop.SCHEDULED, pattern.getAlightType(2));
+    assertEquals(
+      "MODIFIED | A1 0:01:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 0:01:30 0:01:30",
+      env.getRealtimeTimetable(env.trip2)
+    );
   }
 
   // TODO: support this
@@ -254,23 +260,10 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-
-    var pattern = env.getPatternForTrip(env.trip1.getId());
-    var tripTimes = env.getTripTimesForTrip(env.trip1);
-    assertEquals(RealTimeState.MODIFIED, tripTimes.getRealTimeState());
-    assertEquals(11, tripTimes.getScheduledDepartureTime(0));
-    assertEquals(15, tripTimes.getDepartureTime(0));
-
-    // Should it work to get the scheduled times from an extra call?
-    assertEquals(19, tripTimes.getScheduledArrivalTime(1));
-    assertEquals(24, tripTimes.getScheduledDepartureTime(1));
-
-    assertEquals(20, tripTimes.getDepartureTime(1));
-    assertEquals(25, tripTimes.getDepartureTime(1));
-
-    assertEquals(20, tripTimes.getScheduledArrivalTime(2));
-    assertEquals(33, tripTimes.getArrivalTime(2));
-    assertEquals(List.of(env.stopA1, env.stopD1, env.stopB1), pattern.getStops());
+    assertEquals(
+      "MODIFIED | A1 0:00:15 0:00:15 | D1 [C] 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
+      env.getRealtimeTimetable(env.trip1)
+    );
   }
 
   /////////////////
@@ -287,7 +280,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NOT_MONITORED);
+    assertFailure(UpdateError.UpdateErrorType.NOT_MONITORED, result);
   }
 
   @Test
@@ -312,7 +305,7 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     // TODO: this should have a more specific error type
-    assertFailure(result, UpdateError.UpdateErrorType.UNKNOWN);
+    assertFailure(UpdateError.UpdateErrorType.UNKNOWN, result);
   }
 
   @Test
@@ -332,7 +325,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME);
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
   @Test
@@ -355,7 +348,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME);
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME, result);
   }
 
   // TODO: support this
@@ -381,29 +374,28 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(updates);
 
-    assertFailure(result, UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE);
+    assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
   }
 
-  private void assertFailure(UpdateResult result, UpdateError.UpdateErrorType errorType) {
-    assertEquals(result.failures().keySet(), Set.of(errorType));
+  private void assertFailure(UpdateError.UpdateErrorType expectedError, UpdateResult result) {
+    assertEquals(Set.of(expectedError), result.failures().keySet());
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
     return new SiriEtBuilder(env.getDateTimeHelper())
-      .withRecordedCalls(builder ->
-        builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
-      )
       .withEstimatedCalls(builder ->
-        builder.call(env.stopB1).arriveAimedExpected("00:00:20", "00:00:25")
+        builder
+          .call(env.stopA1)
+          .departAimedExpected("00:00:11", "00:00:15")
+          .call(env.stopB1)
+          .arriveAimedExpected("00:00:20", "00:00:25")
       );
   }
 
   private static void assertTripUpdated(RealtimeTestEnvironment env) {
-    var tripTimes = env.getTripTimesForTrip(env.trip1);
-    assertEquals(RealTimeState.UPDATED, tripTimes.getRealTimeState());
-    assertEquals(11, tripTimes.getScheduledDepartureTime(0));
-    assertEquals(15, tripTimes.getDepartureTime(0));
-    assertEquals(20, tripTimes.getScheduledArrivalTime(1));
-    assertEquals(25, tripTimes.getArrivalTime(1));
+    assertEquals(
+      "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
+      env.getRealtimeTimetable(env.trip1)
+    );
   }
 }

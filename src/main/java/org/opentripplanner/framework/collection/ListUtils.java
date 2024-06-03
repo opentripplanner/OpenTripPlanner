@@ -57,4 +57,16 @@ public class ListUtils {
 
     return ret;
   }
+
+  /**
+   * Take a single nullable variable and return an empty list if it is null. Otherwise
+   * return a list with one element.
+   */
+  public static <T> List<T> ofNullable(T input) {
+    if (input == null) {
+      return List.of();
+    } else {
+      return List.of(input);
+    }
+  }
 }

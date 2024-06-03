@@ -43,6 +43,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
@@ -84,6 +85,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -150,6 +152,18 @@ class GraphQLIntegrationTest {
     pattern.add(tripTimes);
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
+
+    var feedId = "testfeed";
+    var feedInfo = FeedInfo.dummyForTest(feedId);
+    transitModel.addFeedInfo(feedInfo);
+
+    var agency = Agency
+      .of(new FeedScopedId(feedId, "agency-xx"))
+      .withName("speedtransit")
+      .withUrl("www.otp-foo.bar")
+      .withTimezone("Europe/Berlin")
+      .build();
+    transitModel.addAgency(agency);
 
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();

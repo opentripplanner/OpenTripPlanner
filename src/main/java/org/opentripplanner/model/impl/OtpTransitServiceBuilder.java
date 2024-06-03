@@ -94,7 +94,7 @@ public class OtpTransitServiceBuilder {
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
-  private final Map<Trip, TimePenalty> flexDurationFactors = new HashMap<>();
+  private final Map<Trip, TimePenalty> flexTimePenalties = new HashMap<>();
 
   private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
@@ -214,7 +214,7 @@ public class OtpTransitServiceBuilder {
   }
 
   public Map<Trip, TimePenalty> getFlexTimePenalty() {
-    return flexDurationFactors;
+    return flexTimePenalties;
   }
 
   public EntityById<FareZone> getFareZonesById() {

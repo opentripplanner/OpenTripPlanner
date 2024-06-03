@@ -23,6 +23,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Document and validate timeRange GraphQL parameter [#5834](https://github.com/opentripplanner/OpenTripPlanner/pull/5834)
 - Log the origin of a request that causes a transfer cache addition. [#5874](https://github.com/opentripplanner/OpenTripPlanner/pull/5874)
 - Fix handling of missing aimed departure time [#5865](https://github.com/opentripplanner/OpenTripPlanner/pull/5865)
+- Add OTP request timeout GraphQL instrumentation [#5881](https://github.com/opentripplanner/OpenTripPlanner/pull/5881)
+- Add feed publisher name and url to GTFS GraphQL API [#5835](https://github.com/opentripplanner/OpenTripPlanner/pull/5835)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

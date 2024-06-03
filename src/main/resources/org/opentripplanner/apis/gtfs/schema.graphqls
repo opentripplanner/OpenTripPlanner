@@ -974,6 +974,18 @@ type fareComponent {
     routes: [Route] @deprecated
 }
 
+
+"""
+Feed publisher information
+"""
+type FeedPublisher {
+    """Name of feed publisher"""
+    name: String!
+
+    """Web address of feed publisher"""
+    url: String!
+}
+
 """
 A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies.
 """
@@ -983,6 +995,9 @@ type Feed {
 
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
+
+    "The publisher of the input transit data."
+    publisher: FeedPublisher
 
     """
     Alerts relevant for the feed.

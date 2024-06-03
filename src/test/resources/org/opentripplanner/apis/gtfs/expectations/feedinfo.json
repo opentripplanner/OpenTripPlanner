@@ -1,0 +1,18 @@
+{
+  "data" : {
+    "feeds" : [
+      {
+        "agencies" : [
+          {
+            "name" : "speedtransit",
+            "url" : "www.otp-foo.bar"
+          }
+        ],
+        "publisher" : {
+          "name" : "publisher",
+          "url" : "www.z.org"
+        }
+      }
+    ]
+  }
+}
