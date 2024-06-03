@@ -67,25 +67,21 @@ public class PlanPageInfo {
     }
     PlanPageInfo that = (PlanPageInfo) o;
     return (
-      (
-        (startCursor == null && that.startCursor == null) ||
-        (
-          startCursor != null &&
-          that.startCursor != null &&
-          Objects.equals(startCursor.getValue(), that.startCursor.getValue())
-        )
-      ) &&
-      (
-        (endCursor == null && that.endCursor == null) ||
-        (
-          endCursor != null &&
-          that.endCursor != null &&
-          Objects.equals(endCursor.getValue(), that.endCursor.getValue())
-        )
-      ) &&
+      equalsCursors(startCursor, that.startCursor) &&
+      equalsCursors(endCursor, that.endCursor) &&
       Objects.equals(searchWindowUsed, that.searchWindowUsed) &&
       hasPreviousPage == that.hasPreviousPage &&
       hasNextPage == that.hasNextPage
+    );
+  }
+
+  /**
+   * Only checks that the values of the cursors are equal and ignores rest of the fields.
+   */
+  private static boolean equalsCursors(ConnectionCursor a, ConnectionCursor b) {
+    return (
+      (a == null && b == null) ||
+      (a != null && b != null && Objects.equals(a.getValue(), b.getValue()))
     );
   }
 }
