@@ -229,9 +229,13 @@ public class TransitModelForTest {
   }
 
   public static StopPattern stopPattern(RegularStop... stops) {
-    var builder = StopPattern.create(stops.length);
-    for (int i = 0; i < stops.length; i++) {
-      builder.stops.with(i, stops[i]);
+    return stopPattern(Arrays.asList(stops));
+  }
+
+  public static StopPattern stopPattern(List<RegularStop> stops) {
+    var builder = StopPattern.create(stops.size());
+    for (int i = 0; i < stops.size(); i++) {
+      builder.stops.with(i, stops.get(i));
       builder.pickups.with(i, PickDrop.SCHEDULED);
       builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }

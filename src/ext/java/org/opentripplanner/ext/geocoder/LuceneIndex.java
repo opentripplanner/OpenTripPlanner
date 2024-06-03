@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -40,7 +40,7 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -52,22 +52,22 @@ public class LuceneIndex implements Serializable {
 
   private static final String TYPE = "type";
   private static final String ID = "id";
+  private static final String SECONDARY_IDS = "secondary_ids";
   private static final String SUGGEST = "suggest";
   private static final String NAME = "name";
   private static final String NAME_NGRAM = "name_ngram";
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
-  private static final String MODE = "mode";
-  private static final String AGENCY_IDS = "agency_ids";
 
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
+  private final StopClusterMapper stopClusterMapper;
 
   public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
-    StopClusterMapper stopClusterMapper = new StopClusterMapper(transitService);
+    this.stopClusterMapper = new StopClusterMapper(transitService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -95,12 +95,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocation.class,
               stopLocation.getId().toString(),
-              stopLocation.getName(),
-              stopLocation.getCode(),
+              List.of(),
+              ListUtils.ofNullable(stopLocation.getName()),
+              ListUtils.ofNullable(stopLocation.getCode()),
               stopLocation.getCoordinate().latitude(),
-              stopLocation.getCoordinate().longitude(),
-              Set.of(),
-              Set.of()
+              stopLocation.getCoordinate().longitude()
             )
           );
 
@@ -111,12 +110,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocationsGroup.class,
               stopLocationsGroup.getId().toString(),
-              stopLocationsGroup.getName(),
-              null,
+              List.of(),
+              ListUtils.ofNullable(stopLocationsGroup.getName()),
+              List.of(),
               stopLocationsGroup.getCoordinate().latitude(),
-              stopLocationsGroup.getCoordinate().longitude(),
-              Set.of(),
-              Set.of()
+              stopLocationsGroup.getCoordinate().longitude()
             )
           );
 
@@ -129,13 +127,12 @@ public class LuceneIndex implements Serializable {
             addToIndex(
               directoryWriter,
               StopCluster.class,
-              stopCluster.id().toString(),
-              I18NString.of(stopCluster.name()),
-              stopCluster.code(),
+              stopCluster.primaryId(),
+              stopCluster.secondaryIds(),
+              stopCluster.names(),
+              stopCluster.codes(),
               stopCluster.coordinate().lat(),
-              stopCluster.coordinate().lon(),
-              stopCluster.modes(),
-              stopCluster.agencyIds()
+              stopCluster.coordinate().lon()
             )
           );
       }
@@ -183,30 +180,16 @@ public class LuceneIndex implements Serializable {
   }
 
   private StopCluster toStopCluster(Document document) {
-    var clusterId = FeedScopedId.parse(document.get(ID));
-    var name = document.get(NAME);
-    var code = document.get(CODE);
-    var lat = document.getField(LAT).numericValue().doubleValue();
-    var lon = document.getField(LON).numericValue().doubleValue();
-    var modes = Arrays.asList(document.getValues(MODE));
-    var agencies = Arrays
-      .stream(document.getValues(AGENCY_IDS))
-      .map(id -> transitService.getAgencyForId(FeedScopedId.parse(id)))
-      .filter(Objects::nonNull)
-      .map(StopClusterMapper::toAgency)
+    var primaryId = FeedScopedId.parse(document.get(ID));
+    var primary = stopClusterMapper.toLocation(primaryId);
+
+    var secondaryIds = Arrays
+      .stream(document.getValues(SECONDARY_IDS))
+      .map(FeedScopedId::parse)
+      .map(stopClusterMapper::toLocation)
       .toList();
-    var feedPublisher = StopClusterMapper.toFeedPublisher(
-      transitService.getFeedInfo(clusterId.getFeedId())
-    );
-    return new StopCluster(
-      clusterId,
-      code,
-      name,
-      new Coordinate(lat, lon),
-      modes,
-      agencies,
-      feedPublisher
-    );
+
+    return new StopCluster(primary, secondaryIds);
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
@@ -230,34 +213,31 @@ public class LuceneIndex implements Serializable {
     IndexWriter writer,
     Class<?> type,
     String id,
-    I18NString name,
-    @Nullable String code,
+    Collection<String> secondaryIds,
+    Collection<I18NString> names,
+    Collection<String> codes,
     double latitude,
-    double longitude,
-    Collection<String> modes,
-    Collection<String> agencyIds
+    double longitude
   ) {
     String typeName = type.getSimpleName();
 
     Document document = new Document();
     document.add(new StoredField(ID, id));
+    for (var secondaryId : secondaryIds) {
+      document.add(new StoredField(SECONDARY_IDS, secondaryId));
+    }
     document.add(new TextField(TYPE, typeName, Store.YES));
-    document.add(new TextField(NAME, Objects.toString(name), Store.YES));
-    document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
-    document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
+    for (var name : names) {
+      document.add(new TextField(NAME, Objects.toString(name), Store.YES));
+      document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
+      document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
+    }
     document.add(new StoredField(LAT, latitude));
     document.add(new StoredField(LON, longitude));
 
-    if (code != null) {
+    for (var code : codes) {
       document.add(new TextField(CODE, code, Store.YES));
       document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
-    }
-
-    for (var mode : modes) {
-      document.add(new TextField(MODE, mode, Store.YES));
-    }
-    for (var ids : agencyIds) {
-      document.add(new TextField(AGENCY_IDS, ids, Store.YES));
     }
 
     try {

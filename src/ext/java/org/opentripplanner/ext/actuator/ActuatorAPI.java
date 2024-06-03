@@ -2,8 +2,7 @@ package org.opentripplanner.ext.actuator;
 
 import static org.apache.hc.core5.http.HttpHeaders.ACCEPT;
 
-import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.prometheus.client.exporter.common.TextFormat;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
@@ -23,6 +22,9 @@ import org.slf4j.LoggerFactory;
 public class ActuatorAPI {
 
   private static final Logger LOG = LoggerFactory.getLogger(ActuatorAPI.class);
+  public static final String CONTENT_TYPE_004 = "text/plain; version=0.0.4; charset=utf-8";
+  public static final String CONTENT_TYPE_OPENMETRICS_100 =
+    "application/openmetrics-text; version=1.0.0; charset=utf-8";
 
   /**
    * List the actuator endpoints available
@@ -93,14 +95,14 @@ public class ActuatorAPI {
    */
   @GET
   @Path("/prometheus")
-  @Produces({ TextFormat.CONTENT_TYPE_004, TextFormat.CONTENT_TYPE_OPENMETRICS_100 })
+  @Produces({ CONTENT_TYPE_004, CONTENT_TYPE_OPENMETRICS_100 })
   public Response prometheus(
     @Context final PrometheusMeterRegistry prometheusRegistry,
     @HeaderParam(ACCEPT) @DefaultValue("*/*") final String acceptHeader
   ) {
     final var contentType = acceptHeader.contains("application/openmetrics-text")
-      ? TextFormat.CONTENT_TYPE_OPENMETRICS_100
-      : TextFormat.CONTENT_TYPE_004;
+      ? CONTENT_TYPE_OPENMETRICS_100
+      : CONTENT_TYPE_004;
 
     return Response
       .status(Response.Status.OK)

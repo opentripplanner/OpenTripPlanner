@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.stop;
 
 import static java.lang.Boolean.TRUE;
+import static org.opentripplanner.apis.transmodel.support.GqlUtil.getPositiveNonNullIntegerArgument;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -289,6 +290,9 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("timeRange")
+              .description(
+                "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
+              )
               .type(Scalars.GraphQLInt)
               .defaultValue(24 * 60 * 60)
               .build()
@@ -356,8 +360,8 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            Integer timeRangeInput = environment.getArgument("timeRange");
-            Duration timeRage = Duration.ofSeconds(timeRangeInput.longValue());
+            int timeRangeInput = getPositiveNonNullIntegerArgument(environment, "timeRange");
+            Duration timeRange = Duration.ofSeconds(timeRangeInput);
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
@@ -374,7 +378,7 @@ public class StopPlaceType {
                 getTripTimesForStop(
                   singleStop,
                   startTime,
-                  timeRage,
+                  timeRange,
                   arrivalDeparture,
                   includeCancelledTrips,
                   numberOfDepartures,
@@ -419,7 +423,7 @@ public class StopPlaceType {
   public static Stream<TripTimeOnDate> getTripTimesForStop(
     StopLocation stop,
     Instant startTimeSeconds,
-    Duration timeRage,
+    Duration timeRange,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     int numberOfDepartures,
@@ -434,7 +438,7 @@ public class StopPlaceType {
     List<StopTimesInPattern> stopTimesInPatterns = transitService.stopTimesForStop(
       stop,
       startTimeSeconds,
-      timeRage,
+      timeRange,
       numberOfDepartures,
       arrivalDeparture,
       includeCancelledTrips

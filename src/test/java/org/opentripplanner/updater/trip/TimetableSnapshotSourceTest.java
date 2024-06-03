@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
@@ -97,15 +96,6 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     assertNotNull(snapshot);
     assertSame(snapshot, updater.getTimetableSnapshot());
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
-    assertSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
@@ -140,11 +130,7 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel,
-      () -> SERVICE_DATE
-    );
+    var updater = defaultUpdater();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -231,7 +217,7 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(
+        var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
           fullDataset,
@@ -239,8 +225,7 @@ public class TimetableSnapshotSourceTest {
           feedId
         );
 
-        var snapshot = updater.getTimetableSnapshot();
-        assertNull(snapshot);
+        assertEquals(0, result.successful());
       });
   }
 
@@ -611,7 +596,8 @@ public class TimetableSnapshotSourceTest {
 
       // THEN
       final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-      assertNull(snapshot);
+      assertTrue(snapshot.isEmpty());
+      assertFalse(snapshot.isDirty());
       assertEquals(1, result.failed());
       var errors = result.failures();
       assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
@@ -1065,7 +1051,7 @@ public class TimetableSnapshotSourceTest {
   @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
+      new TimetableSnapshotSourceParameters(Duration.ZERO, true),
       transitModel,
       () -> SERVICE_DATE
     );
@@ -1145,6 +1131,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdateYesterday),
       feedId
     );
+    updater.commitTimetableSnapshot(true);
 
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 

@@ -46,6 +46,7 @@ public class RealtimeStopsLayerTest {
         .withName(name)
         .withDescription(desc)
         .withCoordinate(50, 10)
+        .withTimeZone(ZoneIds.HELSINKI)
         .build();
     stop2 =
       StopModel
@@ -54,6 +55,7 @@ public class RealtimeStopsLayerTest {
         .withName(name)
         .withDescription(desc)
         .withCoordinate(51, 10)
+        .withTimeZone(ZoneIds.HELSINKI)
         .build();
   }
 
@@ -100,5 +102,6 @@ public class RealtimeStopsLayerTest {
     assertEquals("name", map.get("name"));
     assertEquals("desc", map.get("desc"));
     assertEquals(true, map.get("closedByServiceAlert"));
+    assertEquals(false, map.get("servicesRunningOnServiceDate"));
   }
 }

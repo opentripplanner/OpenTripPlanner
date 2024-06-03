@@ -21,7 +21,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.text.ParseException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -40,9 +38,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -76,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class TimetableSnapshotSource implements TimetableSnapshotProvider {
+public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
@@ -85,59 +80,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
-  /**
-   * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
-   * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
-   * might modify this buffer will correctly acquire the lock.
-   */
-  private final TimetableSnapshot buffer = new TimetableSnapshot();
-
-  /**
-   * Lock to indicate that buffer is in use
-   */
-  private final ReentrantLock bufferLock = new ReentrantLock(true);
-
-  /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
-   * messages.
-   */
-
+  /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
   private final TransitEditorService transitService;
-  private final TransitLayerUpdater transitLayerUpdater;
-
-  /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern → Timetable map and indexing the new Timetables.
-   */
-  private final Duration maxSnapshotFrequency;
-
-  /**
-   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
-   * to more than one routing thread if the maximum snapshot frequency is exceeded.
-   */
-  private volatile TimetableSnapshot snapshot = null;
-
-  /** Should expired real-time data be purged from the graph. */
-  private final boolean purgeExpiredData;
-
-  protected LocalDate lastPurgeDate = null;
-
-  /** Epoch time in milliseconds at which the last snapshot was generated. */
-  protected long lastSnapshotTime = -1;
 
   private final Deduplicator deduplicator;
 
   private final Map<FeedScopedId, Integer> serviceCodes;
-
-  /**
-   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
-   * the purgeExpiredData feature.
-   */
-  private final Supplier<LocalDate> localDateNow;
 
   public TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
@@ -155,43 +106,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitModel transitModel,
     Supplier<LocalDate> localDateNow
   ) {
+    super(transitModel.getTransitLayerUpdater(), parameters, localDateNow);
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
-    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
-    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
-    this.purgeExpiredData = parameters.purgeExpiredData();
-    this.localDateNow = localDateNow;
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
-  }
-
-  /**
-   * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   * timetable objects it references are guaranteed to never change, so the requesting thread is
-   * provided a consistent view of all TripTimes. The routing thread need only release its reference
-   * to the snapshot to release resources.
-   */
-  public TimetableSnapshot getTimetableSnapshot() {
-    TimetableSnapshot snapshotToReturn;
-
-    // Try to get a lock on the buffer
-    if (bufferLock.tryLock()) {
-      // Make a new snapshot if necessary
-      try {
-        snapshotToReturn = getTimetableSnapshot(false);
-      } finally {
-        bufferLock.unlock();
-      }
-    } else {
-      // No lock could be obtained because there is either a snapshot commit busy or updates
-      // are applied at this moment, just return the current snapshot
-      snapshotToReturn = snapshot;
-    }
-
-    return snapshotToReturn;
   }
 
   /**
@@ -220,13 +142,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateResult.empty();
     }
 
-    // Acquire lock on buffer
-    bufferLock.lock();
-
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    try {
+    withLock(() -> {
       if (fullDataset) {
         // Remove all updates from the buffer
         buffer.clear(feedId);
@@ -269,7 +188,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         } else {
           // TODO: figure out the correct service date. For the special case that a trip
           // starts for example at 40:00, yesterday would probably be a better guess.
-          serviceDate = localDateNow.get();
+          serviceDate = localDateNow();
         }
 
         uIndex += 1;
@@ -325,19 +244,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
       }
 
-      // Make a snapshot after each message in anticipation of incoming requests
-      // Purge data if necessary (and force new snapshot if anything was purged)
-      // Make sure that the public (locking) getTimetableSnapshot function is not called.
-      if (purgeExpiredData) {
-        final boolean modified = purgeExpiredData();
-        getTimetableSnapshot(modified);
-      } else {
-        getTimetableSnapshot(false);
-      }
-    } finally {
-      // Always release lock
-      bufferLock.unlock();
-    }
+      purgeAndCommit();
+    });
 
     var updateResult = UpdateResult.ofResults(results);
 
@@ -365,22 +273,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         var count = warnings.get(key).size();
         LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
       });
-  }
-
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer);
-        snapshot = buffer.commit(transitLayerUpdater, force);
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
-      lastSnapshotTime = System.currentTimeMillis();
-    } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-    }
-    return snapshot;
   }
 
   /**
@@ -1139,23 +1031,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateError.result(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
     return Result.success(UpdateSuccess.noWarnings());
-  }
-
-  private boolean purgeExpiredData() {
-    final LocalDate today = localDateNow.get();
-    // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
-    final LocalDate previously = today.minusDays(2); // Just to be safe...
-
-    // Purge data only if we have changed date
-    if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
-      return false;
-    }
-
-    LOG.debug("purging expired realtime data");
-
-    lastPurgeDate = previously;
-
-    return buffer.purgeExpiredData(previously);
   }
 
   /**
