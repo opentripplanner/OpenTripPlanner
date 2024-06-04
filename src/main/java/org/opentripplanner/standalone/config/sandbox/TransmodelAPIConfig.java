@@ -15,9 +15,9 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
 
   private final boolean hideFeedId;
   private final Collection<String> tracingHeaderTags;
-  private int maxNumberOfResultFields;
+  private final int maxNumberOfResultFields;
 
-  public TransmodelAPIConfig(String parameterName, NodeAdapter root) {
+  public TransmodelAPIConfig(NodeAdapter root) {
     var c = root
       .of("transmodelApi")
       .since(V2_1)
@@ -27,7 +27,6 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
     hideFeedId =
       c
         .of("hideFeedId")
-        .since(NA)
         .summary("Hide the FeedId in all API output, and add it to input.")
         .description(
           "Only turn this feature on if you have unique ids across all feeds, without the " +
@@ -37,14 +36,12 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
     tracingHeaderTags =
       c
         .of("tracingHeaderTags")
-        .since(NA)
         .summary("Used to group requests when monitoring OTP.")
         .asStringList(Set.of());
 
     maxNumberOfResultFields =
       c
         .of("maxNumberOfResultFields")
-        .since(NA)
         .summary("The maximum number of fields in a GraphQL result")
         .description(
           "Enforce rate limiting based on query complexity: queries that return too much data are" +
