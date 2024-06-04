@@ -205,8 +205,17 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
           canceledPreviouslyAddedTrip =
             cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
           // Remove previous realtime updates for this trip. This is necessary to avoid previous
-          // stop pattern modifications from persisting
-          this.buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
+          // stop pattern modifications from persisting. If a trip was previously added with the ScheduleRelationship
+          // ADDED and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
+          if (
+            !canceledPreviouslyAddedTrip ||
+            (
+              tripScheduleRelationship != TripDescriptor.ScheduleRelationship.CANCELED &&
+              tripScheduleRelationship != TripDescriptor.ScheduleRelationship.DELETED
+            )
+          ) {
+            this.buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
+          }
         }
 
         uIndex += 1;
@@ -893,7 +902,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     final LocalDate serviceDate,
     CancelationType cancelationType
   ) {
-    boolean success = false;
+    boolean cancelledAddedTrip = false;
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
     if (pattern != null) {
@@ -911,11 +920,10 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
           case DELETE -> newTripTimes.deleteTrip();
         }
         buffer.update(pattern, newTripTimes, serviceDate);
-        success = true;
+        cancelledAddedTrip = pattern.getOriginalTripPattern() == null;
       }
     }
-
-    return success;
+    return cancelledAddedTrip;
   }
 
   /**
