@@ -65,7 +65,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
-    var env = new RealtimeTestEnvironment();
+    var env = RealtimeTestEnvironment.siri();
 
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
@@ -85,7 +85,7 @@ class SiriTimetableSnapshotSourceTest {
 
     var result = env.applyEstimatedTimetable(createExtraJourney);
     assertEquals(0, result.successful());
-    assertFailure(result, UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME);
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
   }
 
   @Test
