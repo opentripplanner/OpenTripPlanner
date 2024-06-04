@@ -15,7 +15,7 @@ class DateScalarFactoryTest {
   private static final GraphQLScalarType SCALAR = DateScalarFactory.createDateScalar("Date");
 
   @ParameterizedTest
-  @ValueSource(strings = { "2024-05-23", "20240523" })
+  @ValueSource(strings = { "2024-05-23" })
   void parse(String input) {
     var result = SCALAR.getCoercing().parseValue(input);
     assertInstanceOf(LocalDate.class, result);
@@ -24,7 +24,7 @@ class DateScalarFactoryTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = { "2024-05", "2024", "2024-99-04", "202405-23" })
+  @ValueSource(strings = { "2024-05", "2024", "2024-99-04", "202405-23", "20240523" })
   void failParsing(String input) {
     assertThrows(CoercingParseValueException.class, () -> SCALAR.getCoercing().parseValue(input));
   }

@@ -8,7 +8,6 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 
 public class DateScalarFactory {
@@ -16,14 +15,7 @@ public class DateScalarFactory {
   private static final String DOCUMENTATION =
     "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-  private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-    .optionalStart()
-    .append(DateTimeFormatter.ofPattern("yyyyMMdd"))
-    .optionalEnd()
-    .optionalStart()
-    .append(DateTimeFormatter.ISO_LOCAL_DATE)
-    .optionalStart()
-    .toFormatter();
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private DateScalarFactory() {}
 
