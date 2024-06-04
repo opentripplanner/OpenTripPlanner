@@ -66,9 +66,9 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Constructor with package access for tests only.
+   * Constructor with public access for tests only.
    */
-  SiriFuzzyTripMatcher(TransitService transitService) {
+  public SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
     initCache(this.transitService);
   }
