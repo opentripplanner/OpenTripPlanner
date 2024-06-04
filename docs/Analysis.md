@@ -14,7 +14,6 @@ Much of the analysis code present in the v1.x legacy branch of OTP is essentiall
 
 OTP2's new transit router is quite similar to R5 (indeed it was directly influenced by R5) and would not face the same technical problems. Nonetheless, we have decided not to port the OTP1 analysis features over to OTP2 since it would broaden the scope of OTP2 away from passenger information and draw the finite amount of available attention and resources away from existing open source analytics tools. If you would like to apply the routing innovations present in OTP2 in analytics situations, we recommend taking a look at projects like R5 or the R and Python language wrappers for it created by the community.
 
-Some analytics features may still be available as optional "sandbox" features in OTP2 (such as [Travel Time](sandbox/TravelTime.md)), but these do not work in the same way as the features you may have used or read about in OTP1. They are unmaintained and unsupported, and may be removed in the near future.
 
 ## Terminology Note
 
