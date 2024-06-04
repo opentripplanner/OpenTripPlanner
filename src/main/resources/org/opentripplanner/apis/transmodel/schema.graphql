@@ -788,7 +788,7 @@ type QueryType {
     bicycleOptimisationMethod: BicycleOptimisationMethod = safe,
     "The maximum bike speed along streets, in meters per second"
     bikeSpeed: Float = 5.0,
-    "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
+    "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
     boardSlackDefault: Int = 0,
     "List of boardSlack for a given set of modes. Defaults: []"
     boardSlackList: [TransportModeSlack],
@@ -987,7 +987,7 @@ type RoutingParameters {
   bikeRentalPickupTime: Int
   "Max bike speed along streets, in meters per second"
   bikeSpeed: Float
-  "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
+  "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
   boardSlackDefault: Int
   "List of boardSlack for a given set of modes."
   boardSlackList: [TransportModeSlackType]
