@@ -2548,7 +2548,13 @@ enum Qualifier {
 }
 
 
-"""Filters entity by their service dates."""
+"""
+Filters entity by their service dates.
+
+**Note**: A service date is a technical term useful for transit planning purposes and might not
+correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+"""
 input ServiceDateFilterInput {
     """
     Inclusive start date of the filter. If `null` this means that no `start` filter is applied and all
@@ -2721,7 +2727,13 @@ type QueryType {
         """Only include routes, which use one of these modes"""
         transportModes: [Mode]
 
-        """Only include routes whose pattern operates on at least one service date specified by this filter."""
+        """
+        Only include routes whose pattern operates on at least one service date specified by this filter.
+
+        **Note**: A service date is a technical term useful for transit planning purposes and might not
+        correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+        on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+        """
         limitByPatternServiceDates: ServiceDateFilterInput
     ): [Route]
 
@@ -3445,7 +3457,13 @@ type Route implements Node {
 
     """List of patterns which operate on this route"""
     patterns(
-        "Filter patterns by the service dates they operate on."
+        """
+        Filter patterns by the service dates they operate on.
+
+        **Note**: A service date is a technical term useful for transit planning purposes and might not
+        correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+        on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+        """
         serviceDates: ServiceDateFilterInput
     ): [Pattern]
 
