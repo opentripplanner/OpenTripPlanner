@@ -885,11 +885,10 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   /**
    * Cancel previously added trip from buffer if there is a previously added trip with given trip id
-   * (without agency id) on service date. This does not remove the modified/added trip from the
-   * buffer, it just marks it as canceled. This also does not remove the corresponding vertices and
-   * edges from the Graph. Any TripPattern that was created for the added/modified trip continues to
-   * exist, and will be reused if a similar added/modified trip message is received with the same
-   * route and stop sequence.
+   * on service date. This does not remove the added trip from the buffer, it just marks it as
+   * canceled or deleted. Any TripPattern that was created for the added trip continues to exist,
+   * and will be reused if a similar added trip message is received with the same route and stop
+   * sequence.
    *
    * @return true if a previously added trip was cancelled
    */
@@ -901,7 +900,8 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     boolean cancelledAddedTrip = false;
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
-    if (pattern != null) {
+    // If pattern doesn't have an original trip pattern, it was created through an ADDED update.
+    if (pattern != null && pattern.getOriginalTripPattern() == null) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
@@ -916,7 +916,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
           case DELETE -> newTripTimes.deleteTrip();
         }
         buffer.update(pattern, newTripTimes, serviceDate);
-        cancelledAddedTrip = pattern.getOriginalTripPattern() == null;
+        cancelledAddedTrip = true;
       }
     }
     return cancelledAddedTrip;
