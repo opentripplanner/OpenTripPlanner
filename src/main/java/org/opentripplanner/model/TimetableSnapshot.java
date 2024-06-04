@@ -410,6 +410,13 @@ public class TimetableSnapshot {
   }
 
   /**
+   * Does this snapshot contain any realtime data or is it completely empty?
+   */
+  public boolean isEmpty() {
+    return dirtyTimetables.isEmpty() && timetables.isEmpty() && realtimeAddedTripPattern.isEmpty();
+  }
+
+  /**
    * Clear timetable for all patterns matching the provided feed id.
    *
    * @param feedId feed id to clear out

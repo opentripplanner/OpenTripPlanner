@@ -571,6 +571,7 @@ type Quay implements PlaceInterface {
     omitNonBoarding: Boolean = false @deprecated(reason : "Non-functional. Use arrivalDeparture instead."),
     "DateTime for when to fetch estimated calls from. Default value is current time"
     startTime: DateTime,
+    "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
     timeRange: Int = 86400,
     "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
     whiteListed: InputWhiteListed,
@@ -1132,6 +1133,7 @@ type StopPlace implements PlaceInterface {
     numberOfDeparturesPerLineAndDestinationDisplay: Int,
     "DateTime for when to fetch estimated calls from. Default value is current time"
     startTime: DateTime,
+    "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
     timeRange: Int = 86400,
     "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
     whiteListed: InputWhiteListed,

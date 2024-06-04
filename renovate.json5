@@ -46,7 +46,7 @@
     // noise, so we slow it down a bit
     {
       "matchPackageNames": [
-        "org.entur.gbfs:gbfs-java-model"
+        "org.mobilitydata:gbfs-java-model"
       ],
       "matchUpdateTypes": ["patch"],
       "schedule": "on the 18th day of the month",
@@ -122,7 +122,8 @@
         "com.google.cloud.tools:jib-maven-plugin",
         "org.apache.maven.plugins:maven-shade-plugin",
         "org.apache.maven.plugins:maven-compiler-plugin",
-        "org.apache.maven.plugins:maven-jar-plugin"
+        "org.apache.maven.plugins:maven-jar-plugin",
+        "org.sonatype.plugins:nexus-staging-maven-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

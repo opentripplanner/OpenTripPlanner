@@ -99,15 +99,6 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     assertNotNull(snapshot);
     assertSame(snapshot, updater.getTimetableSnapshot());
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
-      feedId
-    );
-    assertSame(snapshot, updater.getTimetableSnapshot());
   }
 
   @Test
@@ -142,11 +133,7 @@ public class TimetableSnapshotSourceTest {
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel,
-      () -> SERVICE_DATE
-    );
+    var updater = defaultUpdater();
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -233,7 +220,7 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(
+        var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
           fullDataset,
@@ -241,8 +228,7 @@ public class TimetableSnapshotSourceTest {
           feedId
         );
 
-        var snapshot = updater.getTimetableSnapshot();
-        assertNull(snapshot);
+        assertEquals(0, result.successful());
       });
   }
 
@@ -613,7 +599,8 @@ public class TimetableSnapshotSourceTest {
 
       // THEN
       final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-      assertNull(snapshot);
+      assertTrue(snapshot.isEmpty());
+      assertFalse(snapshot.isDirty());
       assertEquals(1, result.failed());
       var errors = result.failures();
       assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
@@ -891,7 +878,7 @@ public class TimetableSnapshotSourceTest {
 
       // Force a snapshot commit. This is done to mimic normal behaviour where a new update arrives
       // after the original snapshot has been committed
-      updater.getTimetableSnapshot(true);
+      updater.commitTimetableSnapshot(true);
 
       // Create update to the same trip but now the skipped stop is no longer skipped
       var scheduledBuilder = new TripUpdateBuilder(
@@ -917,7 +904,7 @@ public class TimetableSnapshotSourceTest {
 
       // Check that the there is no longer a realtime added trip pattern for the trip and that the
       // stoptime updates have gone through
-      var snapshot = updater.getTimetableSnapshot(true);
+      var snapshot = updater.getTimetableSnapshot();
       {
         final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
           new FeedScopedId(feedId, scheduledTripId),
@@ -1014,7 +1001,10 @@ public class TimetableSnapshotSourceTest {
     ) {
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
       // Get the trip pattern of the added trip which goes through stopA
-      var snapshot = updater.getTimetableSnapshot(forceSnapshotCommit);
+      if (forceSnapshotCommit) {
+        updater.commitTimetableSnapshot(true);
+      }
+      var snapshot = updater.getTimetableSnapshot();
       var patternsAtA = snapshot.getPatternsForStop(stopA);
 
       assertNotNull(patternsAtA, "Added trip pattern should be found");
@@ -1251,7 +1241,7 @@ public class TimetableSnapshotSourceTest {
       );
 
       // THEN
-      var snapshot = updater.getTimetableSnapshot(true);
+      var snapshot = updater.getTimetableSnapshot();
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
       // Get the trip pattern of the added trip which goes through stopA
       var patternsAtA = snapshot.getPatternsForStop(stopA);
@@ -1279,7 +1269,7 @@ public class TimetableSnapshotSourceTest {
   @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
+      new TimetableSnapshotSourceParameters(Duration.ZERO, true),
       transitModel,
       () -> SERVICE_DATE
     );
@@ -1359,6 +1349,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdateYesterday),
       feedId
     );
+    updater.commitTimetableSnapshot(true);
 
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 

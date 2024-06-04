@@ -56,5 +56,11 @@ class ListUtilsTest {
     assertEquals(List.of(first, third), deduplicated);
   }
 
+  @Test
+  void ofNullable() {
+    assertEquals(List.of(), ListUtils.ofNullable(null));
+    assertEquals(List.of("A"), ListUtils.ofNullable("A"));
+  }
+
   private record Wrapper(int i, String string) {}
 }
