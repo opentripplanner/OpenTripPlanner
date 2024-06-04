@@ -264,7 +264,7 @@ public final class RealtimeTestEnvironment {
     return gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      true,
+      UpdateSemantics.FULL,
       updates,
       getFeedId()
     );

@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.updater.trip.UpdateSemantics.FULL;
+import static org.opentripplanner.updater.trip.UpdateSemantics.INCREMENTAL;
+
 import com.google.protobuf.ExtensionRegistry;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -25,7 +28,7 @@ public class GtfsRealtimeTripUpdateSource {
   private final String feedId;
   private final String url;
   private final HttpHeaders headers;
-  private boolean fullDataset = true;
+  private UpdateSemantics updateSemantics = FULL;
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
   private final OtpHttpClient otpHttpClient;
 
@@ -41,7 +44,7 @@ public class GtfsRealtimeTripUpdateSource {
     FeedMessage feedMessage;
     List<FeedEntity> feedEntityList;
     List<TripUpdate> updates = null;
-    fullDataset = true;
+    updateSemantics = FULL;
     try {
       // Decode message
       feedMessage =
@@ -61,7 +64,7 @@ public class GtfsRealtimeTripUpdateSource {
           .getIncrementality()
           .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
       ) {
-        fullDataset = false;
+        updateSemantics = INCREMENTAL;
       }
 
       // Create List of TripUpdates
@@ -85,10 +88,10 @@ public class GtfsRealtimeTripUpdateSource {
   }
 
   /**
-   * @return true iff the last list with updates represent all updates that are active right now,
-   * i.e. all previous updates should be disregarded
+   * @return the semantics of the last list with updates, i.e. if all previous updates
+   * should be disregarded
    */
-  public boolean getFullDatasetValueOfLastUpdates() {
-    return fullDataset;
+  public UpdateSemantics updateSemanticsOfLastUpdates() {
+    return updateSemantics;
   }
 }

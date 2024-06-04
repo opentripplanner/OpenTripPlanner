@@ -83,7 +83,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   public void runPolling() {
     // Get update lists from update source
     List<TripUpdate> updates = updateSource.getUpdates();
-    boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+    var updateSemantics = updateSource.updateSemanticsOfLastUpdates();
 
     if (updates != null) {
       // Handle trip updates via graph writer runnable
@@ -91,7 +91,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         snapshotSource,
         fuzzyTripMatcher,
         backwardsDelayPropagationType,
-        fullDataset,
+        updateSemantics,
         updates,
         feedId,
         recordMetrics

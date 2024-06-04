@@ -12,6 +12,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VAL
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.trip.UpdateSemantics.FULL;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -125,15 +126,14 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
-   * @param fullDataset                   true if the list with updates represent all updates that
-   *                                      are active right now, i.e. all previous updates should be
-   *                                      disregarded
+   * @param updateSemantics               Determines the semantics of the updates. FULL updates clear the buffer
+   *                                      of all previous updates for the given feed id.
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
-    boolean fullDataset,
+    UpdateSemantics updateSemantics,
     List<TripUpdate> updates,
     String feedId
   ) {
@@ -146,7 +146,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     withLock(() -> {
-      if (fullDataset) {
+      if (updateSemantics == FULL) {
         // Remove all updates from the buffer
         buffer.clear(feedId);
       }
@@ -249,7 +249,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
     var updateResult = UpdateResult.ofResults(results);
 
-    if (fullDataset) {
+    if (updateSemantics == FULL) {
       logUpdateResult(feedId, failuresByRelationship, updateResult);
     }
     return updateResult;

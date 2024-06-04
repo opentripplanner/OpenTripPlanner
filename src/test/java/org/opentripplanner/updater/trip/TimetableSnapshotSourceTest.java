@@ -65,7 +65,7 @@ public class TimetableSnapshotSourceTest {
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
-  private final boolean FULL_DATASET = false;
+  private final UpdateSemantics UPDATE_SEMANTICS = UpdateSemantics.INCREMENTAL;
   private String feedId;
 
   @BeforeEach
@@ -83,7 +83,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      FULL_DATASET,
+      UPDATE_SEMANTICS,
       List.of(CANCELLATION),
       feedId
     );
@@ -105,7 +105,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      FULL_DATASET,
+      UPDATE_SEMANTICS,
       List.of(CANCELLATION),
       feedId
     );
@@ -141,7 +141,7 @@ public class TimetableSnapshotSourceTest {
         var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
-          FULL_DATASET,
+          UPDATE_SEMANTICS,
           List.of(tripUpdate),
           feedId
         );
@@ -263,7 +263,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      FULL_DATASET,
+      UPDATE_SEMANTICS,
       List.of(tripUpdate),
       feedId
     );
@@ -379,7 +379,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -457,7 +457,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -589,7 +589,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -658,7 +658,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -709,7 +709,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -751,7 +751,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -762,7 +762,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        FULL_DATASET,
+        UPDATE_SEMANTICS,
         List.of(tripUpdate),
         feedId
       );
@@ -855,7 +855,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      FULL_DATASET,
+      UPDATE_SEMANTICS,
       List.of(tripUpdateYesterday),
       feedId
     );
@@ -869,7 +869,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      FULL_DATASET,
+      UPDATE_SEMANTICS,
       List.of(tripUpdateToday),
       feedId
     );
