@@ -145,8 +145,6 @@ public class TimetableSnapshot {
    * Get the current trip pattern given a trip id and a service date, if it has been changed from
    * the scheduled pattern with an update, for which the stopPattern is different.
    *
-   * @param tripId      trip id
-   * @param serviceDate service date
    * @return trip pattern created by the updater; null if trip is on the original trip pattern
    */
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {

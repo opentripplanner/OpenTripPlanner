@@ -295,7 +295,6 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
   /**
    * Mark the scheduled trip in the buffer as deleted, given trip on service date
    *
-   * @param serviceDate service date
    * @return true if scheduled trip was marked as deleted
    */
   private boolean markScheduledTripAsDeleted(Trip trip, final LocalDate serviceDate) {

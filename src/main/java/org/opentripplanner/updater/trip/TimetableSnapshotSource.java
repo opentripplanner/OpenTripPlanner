@@ -850,8 +850,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
   /**
    * Cancel scheduled trip in buffer given trip id  on service date
    *
-   * @param tripId      trip id
-   * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
   private boolean cancelScheduledTrip(
@@ -893,8 +891,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
    * exist, and will be reused if a similar added/modified trip message is received with the same
    * route and stop sequence.
    *
-   * @param tripId      trip id without agency id
-   * @param serviceDate service date
    * @return true if a previously added trip was cancelled
    */
   private boolean cancelPreviouslyAddedTrip(
