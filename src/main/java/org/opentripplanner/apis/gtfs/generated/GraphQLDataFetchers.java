@@ -20,6 +20,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
@@ -380,6 +381,15 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
     public DataFetcher<String> feedId();
+
+    public DataFetcher<FeedPublisher> publisher();
+  }
+
+  /** Feed publisher information */
+  public interface GraphQLFeedPublisher {
+    public DataFetcher<String> name();
+
+    public DataFetcher<String> url();
   }
 
   public interface GraphQLGeometry {
