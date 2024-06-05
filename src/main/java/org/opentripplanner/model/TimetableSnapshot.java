@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -181,6 +182,7 @@ public class TimetableSnapshot {
    * @param serviceDate service date
    * @return trip pattern created by the updater; null if trip is on the original trip pattern
    */
+  @Nullable
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return realtimeAddedTripPattern.get(tripIdAndServiceDate);
