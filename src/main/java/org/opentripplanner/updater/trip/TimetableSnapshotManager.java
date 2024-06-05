@@ -145,7 +145,7 @@ public final class TimetableSnapshotManager {
    * Get the current trip pattern given a trip id and a service date, if it has been changed from
    * the scheduled pattern with an update, for which the stopPattern is different.
    *
-   * @param trioId trip id
+   * @param tripId trip id
    * @param serviceDate service date
    * @return trip pattern created by the updater; null if pattern has not been changed for this trip.
    */
