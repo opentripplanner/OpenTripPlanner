@@ -146,7 +146,7 @@ public final class TimetableSnapshotManager {
    *
    * @param trioId trip id
    * @param serviceDate service date
-   * @return trip pattern created by the updater; null if trip is on the original trip pattern
+   * @return trip pattern created by the updater; null if pattern has not been changed for this trip.
    */
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId trioId, LocalDate serviceDate) {
     return buffer.getRealtimeAddedTripPattern(trioId, serviceDate);
