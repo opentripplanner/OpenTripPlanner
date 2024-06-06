@@ -7,6 +7,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_STA
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.trip.UpdateSemantics.FULL;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.AbstractTimetableSnapshotSource;
+import org.opentripplanner.updater.trip.UpdateSemantics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -79,15 +81,15 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
    * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
    *              same internal model.
    *
-   * @param fullDataset  true iff the list with updates represent all updates that are active right
-   *                     now, i.e. all previous updates should be disregarded
-   * @param updates      SIRI EstimatedTimetable deliveries that should be applied atomically.
+   * @param semantics  the semantics of the update, for example list with updates represent all
+   *                   updates that are active right now, i.e. all previous updates should be disregarded
+   * @param updates    SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     String feedId,
-    boolean fullDataset,
+    UpdateSemantics semantics,
     List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
@@ -98,7 +100,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     withLock(() -> {
-      if (fullDataset) {
+      if (semantics == FULL) {
         // Remove all updates from the buffer
         buffer.clear(feedId);
       }

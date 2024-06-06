@@ -1,9 +1,13 @@
 package org.opentripplanner.updater.trip;
 
+/**
+ * Describes the semantics of a collection of realtime updates and how they are related to previous
+ * ones.
+ */
 public enum UpdateSemantics {
   /**
-   * The update contains all available realtime information for a given feed. The previously stored
-   * updates can be deleted and replaced with the information from this one.
+   * The update contains all available realtime information for all trips in a given feed. The
+   * previously stored updates must be deleted and replaced with the information from this one.
    */
   FULL,
   /**

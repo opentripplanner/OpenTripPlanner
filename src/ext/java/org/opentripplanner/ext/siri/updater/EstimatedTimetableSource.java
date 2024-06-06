@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.Optional;
+import org.opentripplanner.updater.trip.UpdateSemantics;
 import uk.org.siri.siri20.Siri;
 
 /**
@@ -18,10 +19,10 @@ public interface EstimatedTimetableSource {
   Optional<Siri> getUpdates();
 
   /**
-   * @return true iff the last list with updates represent all updates that are active right now,
-   * i.e. all previous updates should be disregarded
+   * @return The update semantics of the last collection of updates.
+   * {@link UpdateSemantics}
    */
-  boolean getFullDatasetValueOfLastUpdates();
+  UpdateSemantics updateSemanticsOfLastUpdates();
 
   String getFeedId();
 }

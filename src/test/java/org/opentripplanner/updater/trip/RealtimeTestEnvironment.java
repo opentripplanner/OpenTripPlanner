@@ -248,7 +248,7 @@ public final class RealtimeTestEnvironment {
       null,
       getEntityResolver(),
       getFeedId(),
-      false,
+      UpdateSemantics.INCREMENTAL,
       updates
     );
   }
@@ -281,7 +281,7 @@ public final class RealtimeTestEnvironment {
       siriFuzzyTripMatcher,
       getEntityResolver(),
       getFeedId(),
-      false,
+      UpdateSemantics.INCREMENTAL,
       updates
     );
   }

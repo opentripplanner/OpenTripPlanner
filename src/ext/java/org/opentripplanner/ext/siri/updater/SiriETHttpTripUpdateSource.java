@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.siri.updater;
 
+import static org.opentripplanner.updater.trip.UpdateSemantics.FULL;
+import static org.opentripplanner.updater.trip.UpdateSemantics.INCREMENTAL;
+
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -7,6 +10,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.trip.UpdateSemantics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -26,10 +30,9 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private final String requestorRef;
 
   /**
-   * True iff the last list with updates represent all updates that are active right now, i.e. all
-   * previous updates should be disregarded
+   * The update semantics of the last received collection of updates.
    */
-  private boolean fullDataset = true;
+  private UpdateSemantics updateSemantics = FULL;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
   public SiriETHttpTripUpdateSource(Parameters parameters) {
@@ -61,7 +64,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       lastTimestamp = serviceDelivery.getResponseTimestamp();
 
       //All subsequent requests will return changes since last request
-      fullDataset = false;
+      updateSemantics = INCREMENTAL;
       return siri;
     } catch (OtpHttpClientException e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
@@ -74,8 +77,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   }
 
   @Override
-  public boolean getFullDatasetValueOfLastUpdates() {
-    return fullDataset;
+  public UpdateSemantics updateSemanticsOfLastUpdates() {
+    return updateSemantics;
   }
 
   @Override
