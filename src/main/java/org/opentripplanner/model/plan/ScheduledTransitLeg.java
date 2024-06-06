@@ -63,7 +63,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
-  private List<FareProductUse> fareProducts;
+  private List<FareProductUse> fareProducts = List.of();
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     this.tripTimes = builder.tripTimes();
