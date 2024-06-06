@@ -20,8 +20,13 @@ public class TimePenaltyCalculator implements FlexPathCalculator {
 
   @Nullable
   @Override
-  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
-    var path = delegate.calculateFlexPath(fromv, tov, fromStopIndex, toStopIndex);
+  public FlexPath calculateFlexPath(
+    Vertex fromv,
+    Vertex tov,
+    int boardStopPosition,
+    int alightStopPosition
+  ) {
+    var path = delegate.calculateFlexPath(fromv, tov, boardStopPosition, alightStopPosition);
 
     if (path == null) {
       return null;

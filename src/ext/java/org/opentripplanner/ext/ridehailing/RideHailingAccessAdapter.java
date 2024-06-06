@@ -3,6 +3,7 @@ package org.opentripplanner.ext.ridehailing;
 import java.time.Duration;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 
 /**
  * This class is used to adapt the ride hailing accesses (not egresses) into a time-dependent
@@ -12,7 +13,7 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
 
   private final Duration arrival;
 
-  public RideHailingAccessAdapter(DefaultAccessEgress access, Duration arrival) {
+  public RideHailingAccessAdapter(RoutingAccessEgress access, Duration arrival) {
     super(access.stop(), access.getLastState());
     this.arrival = arrival;
   }
@@ -49,7 +50,7 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
   }
 
   @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
     return new RideHailingAccessAdapter(this, penalty);
   }
 

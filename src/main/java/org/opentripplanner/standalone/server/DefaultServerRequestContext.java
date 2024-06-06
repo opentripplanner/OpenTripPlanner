@@ -6,6 +6,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -24,7 +25,6 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -41,7 +41,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final TileRendererManager tileRendererManager;
   private final VectorTileConfig vectorTileConfig;
-  private final FlexConfig flexConfig;
+  private final FlexParameters flexParameters;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
@@ -69,7 +69,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     List<RideHailingService> rideHailingServices,
     StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
-    FlexConfig flexConfig,
+    FlexParameters flexParameters,
     TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
@@ -80,7 +80,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.tileRendererManager = tileRendererManager;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
-    this.flexConfig = flexConfig;
+    this.flexParameters = flexParameters;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
@@ -106,7 +106,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     @Nullable EmissionsService emissionsService,
-    FlexConfig flexConfig,
+    FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -128,7 +128,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
-      flexConfig,
+      flexParameters,
       traverseVisitor
     );
   }
@@ -226,8 +226,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public FlexConfig flexConfig() {
-    return flexConfig;
+  public FlexParameters flexParameters() {
+    return flexParameters;
   }
 
   @Override

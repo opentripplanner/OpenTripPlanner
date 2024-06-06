@@ -51,9 +51,26 @@ public class TripQuery {
           .newArgument()
           .name("dateTime")
           .description(
-            "Date and time for the earliest time the user is willing to start the journey " +
-            "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
-            "(arriveBy=true). Defaults to now"
+            "The date and time for the earliest time the user is willing to start the journey " +
+            "(if `false` or not set) or the latest acceptable time of arriving " +
+            "(`true`). Defaults to now."
+          )
+          .type(gqlUtil.dateTimeScalar)
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("bookingTime")
+          .description(
+            """
+            The date and time for the latest time the user is expected to book the journey.
+            Normally this is when the search is performed (now), plus a small grace period to
+            complete the booking. Services which must be booked before this time is excluded. The
+            `latestBookingTime` and `minimumBookingPeriod` in `BookingArrangement` (flexible
+            services only) is used to enforce this. If this parameter is _not set_, no booking-time
+            restrictions are applied - all journeys are listed.
+            """
           )
           .type(gqlUtil.dateTimeScalar)
           .build()

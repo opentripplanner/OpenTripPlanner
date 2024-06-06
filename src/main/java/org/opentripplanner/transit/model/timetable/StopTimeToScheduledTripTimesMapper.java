@@ -5,9 +5,9 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 class StopTimeToScheduledTripTimesMapper {
 

@@ -52,6 +52,12 @@ public class TripRequestMapper {
       "dateTime",
       millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
+
+    callWith.argument(
+      "bookingTime",
+      millisSinceEpoch -> request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+    );
+
     callWith.argument(
       "searchWindow",
       (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))

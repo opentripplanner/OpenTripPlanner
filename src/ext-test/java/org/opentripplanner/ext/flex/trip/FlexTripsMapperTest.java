@@ -24,7 +24,7 @@ class FlexTripsMapperTest {
     var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);
     assertEquals("[UnscheduledTrip{F:flex-1}]", trips.toString());
     var unscheduled = (UnscheduledTrip) trips.getFirst();
-    var unchanged = unscheduled.flexPathCalculator(new DirectFlexPathCalculator());
+    var unchanged = unscheduled.decorateFlexPathCalculator(new DirectFlexPathCalculator());
     assertInstanceOf(DirectFlexPathCalculator.class, unchanged);
   }
 

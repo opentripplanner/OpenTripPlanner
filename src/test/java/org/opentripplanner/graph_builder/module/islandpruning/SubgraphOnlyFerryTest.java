@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -19,7 +18,8 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasOnlyFerry() {
-    TransitStopVertex transitStopVertex = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of(TransitMode.FERRY))
       .build();
@@ -32,7 +32,8 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasOnlyNoFerry() {
-    TransitStopVertex transitStopVertex1 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex1 = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of(TransitMode.BUS))
       .build();
@@ -45,7 +46,8 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasOnlyNoMode() {
-    TransitStopVertex transitStopVertex1 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex1 = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of())
       .build();
@@ -58,11 +60,13 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasOnlyFerryMoreStops() {
-    TransitStopVertex transitStopVertex1 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex1 = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of(TransitMode.FERRY))
       .build();
-    TransitStopVertex transitStopVertex2 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex2 = TransitStopVertex
+      .of()
       .withStop(regularStop2)
       .withModes(Set.of(TransitMode.FERRY))
       .build();
@@ -76,11 +80,13 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasNotOnlyFerryMoreStops() {
-    TransitStopVertex transitStopVertex1 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex1 = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of(TransitMode.FERRY))
       .build();
-    TransitStopVertex transitStopVertex2 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex2 = TransitStopVertex
+      .of()
       .withStop(regularStop2)
       .withModes(Set.of(TransitMode.BUS))
       .build();
@@ -94,11 +100,13 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasNoModeMoreStops() {
-    TransitStopVertex transitStopVertex1 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex1 = TransitStopVertex
+      .of()
       .withStop(regularStop1)
       .withModes(Set.of(TransitMode.FERRY))
       .build();
-    TransitStopVertex transitStopVertex2 = new TransitStopVertexBuilder()
+    TransitStopVertex transitStopVertex2 = TransitStopVertex
+      .of()
       .withStop(regularStop2)
       .withModes(Set.of())
       .build();

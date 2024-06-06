@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -57,6 +58,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -142,8 +144,23 @@ public class RaptorPathToItineraryMapperTest {
   void createItineraryWithOnBoardFlexAccess() {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
+    var flexTrip = TEST_MODEL.unscheduledTrip(
+      "flex",
+      TEST_MODEL.stop("A:Stop:1").build(),
+      TEST_MODEL.stop("A:Stop:2").build()
+    );
+
     State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
-    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(S1, null, 0, 1, null, state, true);
+    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(
+      S1,
+      new FlexPathDurations(0, (int) state.getElapsedTimeSeconds(), 0, 0),
+      0,
+      1,
+      flexTrip,
+      state,
+      true,
+      RoutingBookingInfo.NOT_SET
+    );
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
     Transfer transfer = new Transfer(S2.getIndex(), 0);
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);

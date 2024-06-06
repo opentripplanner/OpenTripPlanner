@@ -17,7 +17,12 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 class UnscheduledDrivingDurationTest {
 
-  static final FlexPathCalculator STATIC_CALCULATOR = (fromv, tov, fromStopIndex, toStopIndex) ->
+  static final FlexPathCalculator STATIC_CALCULATOR = (
+      fromv,
+      tov,
+      boardStopPosition,
+      alightStopPosition
+    ) ->
     new FlexPath(10_000, (int) Duration.ofMinutes(10).toSeconds(), () -> LineStrings.SIMPLE);
   private static final StopTime STOP_TIME = FlexStopTimesForTest.area("10:00", "18:00");
 
@@ -25,7 +30,7 @@ class UnscheduledDrivingDurationTest {
   void noPenalty() {
     var trip = UnscheduledTrip.of(id("1")).withStopTimes(List.of(STOP_TIME)).build();
 
-    var calculator = trip.flexPathCalculator(STATIC_CALCULATOR);
+    var calculator = trip.decorateFlexPathCalculator(STATIC_CALCULATOR);
     var path = calculator.calculateFlexPath(V1, V2, 0, 0);
     assertEquals(600, path.durationSeconds);
   }
@@ -38,7 +43,7 @@ class UnscheduledDrivingDurationTest {
       .withTimePenalty(TimePenalty.of(Duration.ofMinutes(2), 1.5f))
       .build();
 
-    var calculator = trip.flexPathCalculator(STATIC_CALCULATOR);
+    var calculator = trip.decorateFlexPathCalculator(STATIC_CALCULATOR);
     var path = calculator.calculateFlexPath(V1, V2, 0, 0);
     assertEquals(1020, path.durationSeconds);
   }

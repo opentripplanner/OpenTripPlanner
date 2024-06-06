@@ -21,7 +21,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -68,7 +67,7 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TransitModelForTest.of().unscheduledTrip(id("flex"), model.stop());
+      var flexTrip = TransitModelForTest.of().unscheduledTrip("flex", model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -126,7 +125,7 @@ class StreetLinkerModuleTest {
 
       transitModel = new TransitModel(builder.build(), new Deduplicator());
 
-      stopVertex = new TransitStopVertexBuilder().withStop(stop).build();
+      stopVertex = TransitStopVertex.of().withStop(stop).build();
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 

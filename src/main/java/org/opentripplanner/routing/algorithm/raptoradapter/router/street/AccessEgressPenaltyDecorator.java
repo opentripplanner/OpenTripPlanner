@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
 
@@ -25,19 +25,23 @@ public class AccessEgressPenaltyDecorator {
     this.penalty = penalty;
   }
 
-  public Collection<DefaultAccessEgress> decorateAccess(Collection<DefaultAccessEgress> list) {
+  public Collection<? extends RoutingAccessEgress> decorateAccess(
+    Collection<RoutingAccessEgress> list
+  ) {
     return decorate(list, accessMode);
   }
 
-  public Collection<DefaultAccessEgress> decorateEgress(Collection<DefaultAccessEgress> list) {
+  public Collection<? extends RoutingAccessEgress> decorateEgress(
+    Collection<RoutingAccessEgress> list
+  ) {
     return decorate(list, egressMode);
   }
 
   /**
    * Decorate each access-egress with a penalty according to the specified street-mode.
    */
-  private Collection<DefaultAccessEgress> decorate(
-    Collection<DefaultAccessEgress> input,
+  private Collection<? extends RoutingAccessEgress> decorate(
+    Collection<RoutingAccessEgress> input,
     StreetMode requestedMode
   ) {
     if (input.isEmpty()) {
