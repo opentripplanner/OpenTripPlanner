@@ -12,7 +12,7 @@ import org.opentripplanner.updater.spi.UpdateResult;
 
 class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
-  private final UpdateSemantics updateSemantics;
+  private final UpdateIncrementality updateIncrementality;
 
   /**
    * The list with updates to apply to the graph
@@ -31,7 +31,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     TimetableSnapshotSource snapshotSource,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
-    UpdateSemantics updateSemantics,
+    UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
     String feedId,
     Consumer<UpdateResult> sendMetrics
@@ -39,7 +39,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     this.snapshotSource = snapshotSource;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    this.updateSemantics = updateSemantics;
+    this.updateIncrementality = updateIncrementality;
     this.updates = Objects.requireNonNull(updates);
     this.feedId = Objects.requireNonNull(feedId);
     this.sendMetrics = sendMetrics;
@@ -50,7 +50,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     var result = snapshotSource.applyTripUpdates(
       fuzzyTripMatcher,
       backwardsDelayPropagationType,
-      updateSemantics,
+      updateIncrementality,
       updates,
       feedId
     );

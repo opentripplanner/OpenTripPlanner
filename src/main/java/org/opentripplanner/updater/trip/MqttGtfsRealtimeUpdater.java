@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.updater.trip.UpdateSemantics.FULL;
-import static org.opentripplanner.updater.trip.UpdateSemantics.INCREMENTAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
@@ -142,7 +142,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void messageArrived(String topic, MqttMessage message) {
       List<GtfsRealtime.TripUpdate> updates = null;
-      UpdateSemantics updateSemantics = FULL;
+      UpdateIncrementality updateIncrementality = FULL_DATASET;
       try {
         // Decode message
         GtfsRealtime.FeedMessage feedMessage = GtfsRealtime.FeedMessage.PARSER.parseFrom(
@@ -159,7 +159,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             .getIncrementality()
             .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
         ) {
-          updateSemantics = INCREMENTAL;
+          updateIncrementality = DIFFERENTIAL;
         }
 
         // Create List of TripUpdates
@@ -180,7 +180,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             snapshotSource,
             fuzzyTripMatcher,
             backwardsDelayPropagationType,
-            updateSemantics,
+            updateIncrementality,
             updates,
             feedId,
             recordMetrics

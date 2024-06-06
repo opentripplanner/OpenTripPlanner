@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.Optional;
-import org.opentripplanner.updater.trip.UpdateSemantics;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.Siri;
 
 /**
@@ -20,9 +20,9 @@ public interface EstimatedTimetableSource {
 
   /**
    * @return The update semantics of the last collection of updates.
-   * {@link UpdateSemantics}
+   * {@link UpdateIncrementality}
    */
-  UpdateSemantics updateSemanticsOfLastUpdates();
+  UpdateIncrementality incrementalityOfLastUpdates();
 
   String getFeedId();
 }

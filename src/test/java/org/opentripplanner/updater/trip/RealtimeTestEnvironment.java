@@ -248,7 +248,7 @@ public final class RealtimeTestEnvironment {
       null,
       getEntityResolver(),
       getFeedId(),
-      UpdateSemantics.INCREMENTAL,
+      UpdateIncrementality.DIFFERENTIAL,
       updates
     );
   }
@@ -264,7 +264,7 @@ public final class RealtimeTestEnvironment {
     return gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      UpdateSemantics.FULL,
+      UpdateIncrementality.FULL_DATASET,
       updates,
       getFeedId()
     );
@@ -281,7 +281,7 @@ public final class RealtimeTestEnvironment {
       siriFuzzyTripMatcher,
       getEntityResolver(),
       getFeedId(),
-      UpdateSemantics.INCREMENTAL,
+      UpdateIncrementality.DIFFERENTIAL,
       updates
     );
   }

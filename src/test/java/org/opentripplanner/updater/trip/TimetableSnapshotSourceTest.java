@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -65,7 +66,6 @@ public class TimetableSnapshotSourceTest {
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
-  private final UpdateSemantics UPDATE_SEMANTICS = UpdateSemantics.INCREMENTAL;
   private String feedId;
 
   @BeforeEach
@@ -83,7 +83,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      UPDATE_SEMANTICS,
+      DIFFERENTIAL,
       List.of(CANCELLATION),
       feedId
     );
@@ -105,7 +105,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      UPDATE_SEMANTICS,
+      DIFFERENTIAL,
       List.of(CANCELLATION),
       feedId
     );
@@ -141,7 +141,7 @@ public class TimetableSnapshotSourceTest {
         var result = updater.applyTripUpdates(
           TRIP_MATCHER_NOOP,
           REQUIRED_NO_DATA,
-          UPDATE_SEMANTICS,
+          DIFFERENTIAL,
           List.of(tripUpdate),
           feedId
         );
@@ -263,7 +263,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      UPDATE_SEMANTICS,
+      DIFFERENTIAL,
       List.of(tripUpdate),
       feedId
     );
@@ -379,7 +379,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -457,7 +457,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -589,7 +589,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -658,7 +658,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -709,7 +709,7 @@ public class TimetableSnapshotSourceTest {
       var result = updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -751,7 +751,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -762,7 +762,7 @@ public class TimetableSnapshotSourceTest {
       updater.applyTripUpdates(
         TRIP_MATCHER_NOOP,
         REQUIRED_NO_DATA,
-        UPDATE_SEMANTICS,
+        DIFFERENTIAL,
         List.of(tripUpdate),
         feedId
       );
@@ -855,7 +855,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      UPDATE_SEMANTICS,
+      DIFFERENTIAL,
       List.of(tripUpdateYesterday),
       feedId
     );
@@ -869,7 +869,7 @@ public class TimetableSnapshotSourceTest {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
-      UPDATE_SEMANTICS,
+      DIFFERENTIAL,
       List.of(tripUpdateToday),
       feedId
     );
