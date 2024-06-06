@@ -3,6 +3,8 @@ package org.opentripplanner.model.plan;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -24,6 +26,8 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private int generalizedCost;
   private Float accessibilityScore;
 
+  private List<FareProductUse> fareProducts;
+
   public ScheduledTransitLegBuilder() {}
 
   public ScheduledTransitLegBuilder(ScheduledTransitLeg original) {
@@ -40,6 +44,11 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     generalizedCost = original.getGeneralizedCost();
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
+    fareProducts = original.fareProducts();
+  }
+
+  public List<FareProductUse> fareProducts() {
+    return fareProducts;
   }
 
   public B withTripTimes(TripTimes tripTimes) {
