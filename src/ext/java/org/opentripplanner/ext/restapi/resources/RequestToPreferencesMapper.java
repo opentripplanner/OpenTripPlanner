@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.restapi.resources;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.Duration;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.restapi.mapping.LegacyVehicleRoutingOptimizeType;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -152,7 +151,7 @@ class RequestToPreferencesMapper {
             "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
           );
         }
-        transfer.withSlack(Duration.ofSeconds(req.minTransferTime - boardAndAlightSlack.value));
+        transfer.withSlackSec(req.minTransferTime - boardAndAlightSlack.value);
       }
 
       setIfNotNull(req.nonpreferredTransferPenalty, transfer::withNonpreferredCost);

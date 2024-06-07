@@ -225,6 +225,10 @@ public final class TransferPreferences implements Serializable {
       return this;
     }
 
+    public Builder withSlackSec(Number seconds) {
+      return withSlack(Duration.ofSeconds(seconds.longValue()));
+    }
+
     public Builder withSlack(Duration slack) {
       this.slack = slack;
       return this;

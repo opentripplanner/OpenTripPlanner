@@ -12,6 +12,7 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +30,7 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -215,6 +217,18 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
     var noParamsRequest = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
     assertNotEquals(reluctance, noParamsRequest.preferences().walk().reluctance());
+  }
+
+  @Test
+  void transferSlack() {
+    var seconds = 119L;
+    Map<String, Object> arguments = Map.of("minTransferTime", seconds);
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    assertEquals(Duration.ofSeconds(seconds), routeRequest.preferences().transfer().slack());
+
+    var noParamsReq = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

@@ -163,7 +163,7 @@ public class RouteRequestMapper {
       });
       preferences.withTransfer(tx -> {
         callWith.argument("transferPenalty", tx::withCost);
-        callWith.argument("minTransferTime", tx::withSlack);
+        callWith.argument("minTransferTime", tx::withSlackSec);
         callWith.argument("waitReluctance", tx::withWaitReluctance);
         callWith.argument("maxTransfers", tx::withMaxTransfers);
         callWith.argument("nonpreferredTransferPenalty", tx::withNonpreferredCost);

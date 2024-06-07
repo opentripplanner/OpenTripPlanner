@@ -403,11 +403,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"transferSlack",  "minimumTransferTime"})
+  @ValueSource(strings = { "transferSlack", "minimumTransferTime" })
   public void testTransferSlack(String name) {
-    Map<String, Object> arguments = Map.of(
-      name, 101
-    );
+    Map<String, Object> arguments = Map.of(name, 101);
     var req = TripRequestMapper.createRequest(executionContext(arguments));
     assertEquals(Duration.ofSeconds(101), req.preferences().transfer().slack());
   }
