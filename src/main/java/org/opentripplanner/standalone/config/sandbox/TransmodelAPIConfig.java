@@ -17,9 +17,9 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final Collection<String> tracingHeaderTags;
   private final int maxNumberOfResultFields;
 
-  public TransmodelAPIConfig(NodeAdapter root) {
+  public TransmodelAPIConfig(String parameterName, NodeAdapter root) {
     var c = root
-      .of("transmodelApi")
+      .of(parameterName)
       .since(V2_1)
       .summary("Configuration for the Transmodel GraphQL API.")
       .asObject();
@@ -44,7 +44,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
         .of("maxNumberOfResultFields")
         .summary("The maximum number of fields in a GraphQL result")
         .description(
-          "Enforce rate limiting based on query complexity: queries that return too much data are" +
+          "Enforce rate limiting based on query complexity; Queries that return too much data are" +
           " cancelled."
         )
         .asInt(1_000_000);

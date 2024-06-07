@@ -431,7 +431,7 @@ Only turn this feature on if you have unique ids across all feeds, without the f
 
 The maximum number of fields in a GraphQL result
 
-Enforce rate limiting based on query complexity: queries that return too much data are cancelled.
+Enforce rate limiting based on query complexity; Queries that return too much data are cancelled.
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
