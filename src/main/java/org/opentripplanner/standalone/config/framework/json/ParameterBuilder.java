@@ -389,9 +389,12 @@ public class ParameterBuilder {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
   }
 
+  /**
+   * Accepts both a string-formatted duration or a number of seconds as a number.
+   * In the documentation it will claim that it only accepts durations as the number is only for
+   * backwards compatibility.
+   */
   public Duration asDurationOrSeconds(Duration dflt) {
-    // we claim that this only accepts durations but in reality it also accepts number of seconds
-    // we don't want to advertise this fact though
     info.withType(DURATION);
     setInfoOptional(dflt.toString());
     var node = build();
