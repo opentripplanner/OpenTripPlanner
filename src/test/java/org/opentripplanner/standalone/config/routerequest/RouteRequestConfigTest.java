@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 class RouteRequestConfigTest {
@@ -96,13 +99,14 @@ class RouteRequestConfigTest {
     );
   }
 
-  @Test
-  public void transferSlackAsInt() {
-    var slack = mapSlack("99");
-    assertEquals(99, slack);
+  @ParameterizedTest
+  @ValueSource(strings = { "99", "\"99s\"", "\"1m39s\"", "\"PT1m39s\"" })
+  public void transferSlackAsIntOrDuration(String input) {
+    var slack = mapSlack(input);
+    assertEquals(Duration.ofSeconds(99), slack);
   }
 
-  private static int mapSlack(String input) {
+  private static Duration mapSlack(String input) {
     var nodeAdapter = newNodeAdapterForTest(
       """
       {

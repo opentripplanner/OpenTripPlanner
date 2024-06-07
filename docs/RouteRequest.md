@@ -38,7 +38,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                     | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                      | *Optional* | `0`              |  2.0  |
-| [transferSlack](#rd_transferSlack)                                                                           |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                                      | *Optional* | `120`            |  2.0  |
+| [transferSlack](#rd_transferSlack)                                                                           |       `duration`       | The extra time needed to make a safe transfer in seconds.                                                                                      | *Optional* | `"PT2M"`         |  2.0  |
 | turnReluctance                                                                                               |        `double`        | Multiplicative factor on expected turning time.                                                                                                | *Optional* | `1.0`            |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                                       | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.2  |
 | waitReluctance                                                                                               |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                              | *Optional* | `1.0`            |  2.0  |
@@ -351,7 +351,7 @@ significant time or walking will still be taken.
 
 <h3 id="rd_transferSlack">transferSlack</h3>
 
-**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `120`   
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT2M"`   
 **Path:** /routingDefaults 
 
 The extra time needed to make a safe transfer in seconds.
@@ -1181,7 +1181,7 @@ include stairs as a last result.
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,
-    "transferSlack" : 120,
+    "transferSlack" : "2m",
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },

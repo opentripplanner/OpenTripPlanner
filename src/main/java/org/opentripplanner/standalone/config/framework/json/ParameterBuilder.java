@@ -389,6 +389,19 @@ public class ParameterBuilder {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
   }
 
+  public Duration asDurationOrSeconds(Duration dflt) {
+    // we claim that this only accepts durations but in reality it also accepts number of seconds
+    // we don't want to advertise this fact though
+    info.withType(DURATION);
+    setInfoOptional(dflt.toString());
+    var node = build();
+    if (node.isTextual()) {
+      return asDuration(dflt);
+    } else {
+      return Duration.ofSeconds((long) asDouble(dflt.toSeconds()));
+    }
+  }
+
   public List<Duration> asDurations(List<Duration> defaultValues) {
     return ofArrayAsList(DURATION, defaultValues, node -> parseDuration(node.asText()));
   }

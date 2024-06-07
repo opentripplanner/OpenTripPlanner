@@ -4,10 +4,12 @@ import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 
@@ -23,7 +25,7 @@ public final class TransferPreferences implements Serializable {
   private static final int MAX_NUMBER_OF_TRANSFERS = 30;
 
   private final Cost cost;
-  private final int slack;
+  private final Duration slack;
   private final double waitReluctance;
   private final int maxTransfers;
   private final int maxAdditionalTransfers;
@@ -32,7 +34,7 @@ public final class TransferPreferences implements Serializable {
 
   private TransferPreferences() {
     this.cost = Cost.ZERO;
-    this.slack = 120;
+    this.slack = Duration.ofMinutes(2);
     this.waitReluctance = 1.0;
     this.maxTransfers = 12;
     this.maxAdditionalTransfers = 5;
@@ -42,7 +44,7 @@ public final class TransferPreferences implements Serializable {
 
   private TransferPreferences(Builder builder) {
     this.cost = builder.cost;
-    this.slack = Units.duration(builder.slack);
+    this.slack = DurationUtils.requireNonNegative(builder.slack);
     this.waitReluctance = Units.reluctance(builder.waitReluctance);
     this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.maxAdditionalTransfers =
@@ -89,7 +91,7 @@ public final class TransferPreferences implements Serializable {
    * <p>
    * Unit is seconds. Default value is 2 minutes.
    */
-  public int slack() {
+  public Duration slack() {
     return slack;
   }
 
@@ -183,7 +185,7 @@ public final class TransferPreferences implements Serializable {
     return ToStringBuilder
       .of(TransferPreferences.class)
       .addObj("cost", cost, DEFAULT.cost)
-      .addNum("slack", slack, DEFAULT.slack)
+      .addDuration("slack", slack, DEFAULT.slack)
       .addNum("waitReluctance", waitReluctance, DEFAULT.waitReluctance)
       .addNum("maxTransfers", maxTransfers, DEFAULT.maxTransfers)
       .addNum("maxAdditionalTransfers", maxAdditionalTransfers, DEFAULT.maxAdditionalTransfers)
@@ -196,7 +198,7 @@ public final class TransferPreferences implements Serializable {
 
     private final TransferPreferences original;
     private Cost cost;
-    private int slack;
+    private Duration slack;
     private Integer maxTransfers;
     private Integer maxAdditionalTransfers;
     private double waitReluctance;
@@ -223,7 +225,7 @@ public final class TransferPreferences implements Serializable {
       return this;
     }
 
-    public Builder withSlack(int slack) {
+    public Builder withSlack(Duration slack) {
       this.slack = slack;
       return this;
     }

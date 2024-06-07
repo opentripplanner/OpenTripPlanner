@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
@@ -71,7 +72,7 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithTransferChanges() {
     var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withTransfer(t -> t.withSlack(2)).build();
+    var copy = pref.copyOf().withTransfer(t -> t.withSlack(Duration.ofSeconds(2))).build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.transfer(), copy.transfer());

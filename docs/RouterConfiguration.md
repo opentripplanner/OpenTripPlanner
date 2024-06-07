@@ -522,7 +522,7 @@ Used to group requests when monitoring OTP.
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,
-    "transferSlack" : 120,
+    "transferSlack" : "2m",
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },

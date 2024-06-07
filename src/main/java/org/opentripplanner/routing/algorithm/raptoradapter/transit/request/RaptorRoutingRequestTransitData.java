@@ -109,7 +109,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     this.slackProvider =
       new SlackProvider(
-        request.preferences().transfer().slack(),
+        (int) request.preferences().transfer().slack().toSeconds(),
         request.preferences().transit().boardSlack(),
         request.preferences().transit().alightSlack()
       );

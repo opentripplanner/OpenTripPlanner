@@ -46,7 +46,7 @@ class TransferConfig {
             `alightSlack`.
             """
           )
-          .asInt(dft.slack())
+          .asDurationOrSeconds(dft.slack())
       )
       .withWaitReluctance(
         c
