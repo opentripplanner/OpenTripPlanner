@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
 import org.rutebanken.netex.model.BookingMethodEnumeration;
 import org.rutebanken.netex.model.ContactStructure;
@@ -45,14 +45,14 @@ public class BookingInfoMapper {
     ServiceJourney serviceJourney,
     FlexibleLine flexibleLine
   ) {
-    return new BookingInfoBuilder()
+    return new NetexBookingInfoBuilder()
       .withFlexibleLine(flexibleLine)
       .withServiceJourney(serviceJourney)
       .withStopPoint(stopPoint)
       .build();
   }
 
-  private class BookingInfoBuilder {
+  private class NetexBookingInfoBuilder {
 
     private ContactStructure bookingContact;
     private List<BookingMethodEnumeration> bookingMethods = new ArrayList<>();
@@ -65,7 +65,7 @@ public class BookingInfoMapper {
     private String serviceJourneyRef;
     private String stopPointRef;
 
-    private BookingInfoBuilder withFlexibleLine(FlexibleLine flexibleLine) {
+    private NetexBookingInfoBuilder withFlexibleLine(FlexibleLine flexibleLine) {
       if (flexibleLine != null) {
         this.hasBookingInfo = true;
         this.flexibleLineRef = ref("FlexibleLine", flexibleLine);
@@ -81,7 +81,7 @@ public class BookingInfoMapper {
       return this;
     }
 
-    private BookingInfoBuilder withServiceJourney(ServiceJourney serviceJourney) {
+    private NetexBookingInfoBuilder withServiceJourney(ServiceJourney serviceJourney) {
       if (serviceJourney != null && serviceJourney.getFlexibleServiceProperties() != null) {
         this.hasBookingInfo = true;
         this.serviceJourneyRef = ref("ServiceJourney", serviceJourney);
@@ -98,7 +98,7 @@ public class BookingInfoMapper {
       return this;
     }
 
-    private BookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
+    private NetexBookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
       BookingArrangementsStructure bookingArrangements = stopPoint.getBookingArrangements();
       if (bookingArrangements != null) {
         this.hasBookingInfo = true;
@@ -220,17 +220,16 @@ public class BookingInfoMapper {
       }
 
       String bookingInfoMessage = bookingNote != null ? bookingNote.getValue() : null;
-      return new BookingInfo(
-        contactInfo,
-        filteredBookingMethods,
-        otpEarliestBookingTime,
-        otpLatestBookingTime,
-        minimumBookingNotice,
-        Duration.ZERO,
-        bookingInfoMessage,
-        null,
-        null
-      );
+      return BookingInfo
+        .of()
+        .withContactInfo(contactInfo)
+        .withBookingMethods(filteredBookingMethods)
+        .withEarliestBookingTime(otpEarliestBookingTime)
+        .withLatestBookingTime(otpLatestBookingTime)
+        .withMinimumBookingNotice(minimumBookingNotice)
+        .withMaximumBookingNotice(Duration.ZERO)
+        .withMessage(bookingInfoMessage)
+        .build();
     }
 
     private void setIfNotEmpty(
@@ -241,24 +240,18 @@ public class BookingInfoMapper {
       Duration minimumBookingPeriod,
       MultilingualString bookingNote
     ) {
-      if (bookingContact != null) {
-        this.bookingContact = bookingContact;
-      }
       if (bookingMethods != null && !bookingMethods.isEmpty()) {
         this.bookingMethods = bookingMethods;
       }
-      if (latestBookingTime != null) {
-        this.latestBookingTime = latestBookingTime;
-      }
-      if (bookWhen != null) {
-        this.bookWhen = bookWhen;
-      }
-      if (minimumBookingPeriod != null) {
-        this.minimumBookingPeriod = minimumBookingPeriod;
-      }
-      if (bookingNote != null) {
-        this.bookingNote = bookingNote;
-      }
+      this.bookingContact = getOrDefault(bookingContact, this.bookingContact);
+      this.minimumBookingPeriod = getOrDefault(minimumBookingPeriod, this.minimumBookingPeriod);
+      this.latestBookingTime = getOrDefault(latestBookingTime, this.latestBookingTime);
+      this.bookWhen = getOrDefault(bookWhen, this.bookWhen);
+      this.bookingNote = getOrDefault(bookingNote, this.bookingNote);
     }
+  }
+
+  private static <T> T getOrDefault(T value, T defaultValue) {
+    return value == null ? defaultValue : value;
   }
 }

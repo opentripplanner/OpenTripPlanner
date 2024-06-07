@@ -3,9 +3,9 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
 

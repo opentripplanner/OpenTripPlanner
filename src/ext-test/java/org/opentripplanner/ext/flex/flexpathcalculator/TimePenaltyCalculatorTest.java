@@ -15,7 +15,7 @@ class TimePenaltyCalculatorTest {
 
   @Test
   void calculate() {
-    FlexPathCalculator delegate = (fromv, tov, fromStopIndex, toStopIndex) ->
+    FlexPathCalculator delegate = (fromv, tov, boardStopPosition, alightStopPosition) ->
       new FlexPath(10_000, THIRTY_MINS_IN_SECONDS, () -> LineStrings.SIMPLE);
 
     var mod = TimePenalty.of(Duration.ofMinutes(10), 1.5f);
@@ -26,7 +26,7 @@ class TimePenaltyCalculatorTest {
 
   @Test
   void nullValue() {
-    FlexPathCalculator delegate = (fromv, tov, fromStopIndex, toStopIndex) -> null;
+    FlexPathCalculator delegate = (fromv, tov, boardStopPosition, alightStopPosition) -> null;
     var mod = TimePenalty.of(Duration.ofMinutes(10), 1.5f);
     var calc = new TimePenaltyCalculator(delegate, mod);
     var path = calc.calculateFlexPath(StreetModelForTest.V1, StreetModelForTest.V2, 0, 5);

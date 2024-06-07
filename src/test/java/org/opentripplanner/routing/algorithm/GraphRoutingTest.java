@@ -40,7 +40,6 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
@@ -253,7 +252,7 @@ public abstract class GraphRoutingTest {
       boolean noTransfers
     ) {
       return vertexFactory.transitStop(
-        new TransitStopVertexBuilder().withStop(stopEntity(id, latitude, longitude, noTransfers))
+        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, noTransfers))
       );
     }
 

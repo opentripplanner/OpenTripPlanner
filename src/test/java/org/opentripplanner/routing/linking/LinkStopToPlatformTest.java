@@ -26,7 +26,6 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -111,7 +110,7 @@ public class LinkStopToPlatformTest {
     graph.index(transitModel.getStopModel());
 
     for (RegularStop s : transitStops) {
-      var v = new TransitStopVertexBuilder().withStop(s).build();
+      var v = TransitStopVertex.of().withStop(s).build();
       graph.addVertex(v);
     }
 

@@ -64,6 +64,31 @@ class SiriTimetableSnapshotSourceTest {
   }
 
   @Test
+  void testAddedJourneyWithInvalidScheduledData() {
+    var env = RealtimeTestEnvironment.siri();
+
+    // Create an extra journey with invalid planned data (travel back in time)
+    // and valid real time data
+    var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
+      .withEstimatedVehicleJourneyCode("newJourney")
+      .withIsExtraJourney(true)
+      .withOperatorRef(env.operator1Id.getId())
+      .withLineRef(env.route1Id.getId())
+      .withEstimatedCalls(builder ->
+        builder
+          .call(env.stopA1)
+          .departAimedExpected("10:58", "10:48")
+          .call(env.stopB1)
+          .arriveAimedExpected("10:08", "10:58")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(createExtraJourney);
+    assertEquals(0, result.successful());
+    assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
+  }
+
+  @Test
   void testReplaceJourney() {
     var env = RealtimeTestEnvironment.siri();
 

@@ -142,9 +142,10 @@ public class LegMapper {
     api.boardRule = getBoardAlightMessage(domain.getBoardRule());
     api.alightRule = getBoardAlightMessage(domain.getAlightRule());
 
-    api.pickupBookingInfo = BookingInfoMapper.mapBookingInfo(domain.getPickupBookingInfo(), true);
+    api.pickupBookingInfo =
+      BookingInfoMapper.mapBookingInfoForPickup(domain.getPickupBookingInfo());
     api.dropOffBookingInfo =
-      BookingInfoMapper.mapBookingInfo(domain.getDropOffBookingInfo(), false);
+      BookingInfoMapper.mapBookingInfoForDropOff(domain.getDropOffBookingInfo());
 
     api.rentedBike = domain.getRentedVehicle();
     api.walkingBike = domain.getWalkingBike();

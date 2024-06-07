@@ -21,7 +21,7 @@ import org.opentripplanner.routing.api.request.preference.AccessibilityPreferenc
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -89,10 +89,7 @@ class StreetTransitEntityLinkTest {
 
     private State[] traverse(RegularStop stop, boolean onlyAccessible) {
       var from = StreetModelForTest.intersectionVertex("A", 10, 10);
-      var to = new TransitStopVertexBuilder()
-        .withStop(stop)
-        .withModes(Set.of(TransitMode.RAIL))
-        .build();
+      var to = TransitStopVertex.of().withStop(stop).withModes(Set.of(TransitMode.RAIL)).build();
 
       var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
       AccessibilityPreferences feature;
@@ -166,7 +163,7 @@ class StreetTransitEntityLinkTest {
     }
 
     private void testTraversalWithState(State state, boolean canTraverse) {
-      var transitStopVertex = new TransitStopVertexBuilder().withStop(ACCESSIBLE_STOP).build();
+      var transitStopVertex = TransitStopVertex.of().withStop(ACCESSIBLE_STOP).build();
       var edge = StreetTransitStopLink.createStreetTransitStopLink(
         (StreetVertex) state.getVertex(),
         transitStopVertex

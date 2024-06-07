@@ -6,6 +6,10 @@
     "nb": {
       "feeds": [
         {
+          "name": "gbfs",
+          "url": "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json"
+        },
+        {
           "name": "system_information",
           "url": "file:src/test/resources/gbfs/lillestrombysykkel/system_information.json"
         },

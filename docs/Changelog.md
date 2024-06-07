@@ -25,6 +25,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix handling of missing aimed departure time [#5865](https://github.com/opentripplanner/OpenTripPlanner/pull/5865)
 - Add OTP request timeout GraphQL instrumentation [#5881](https://github.com/opentripplanner/OpenTripPlanner/pull/5881)
 - Add feed publisher name and url to GTFS GraphQL API [#5835](https://github.com/opentripplanner/OpenTripPlanner/pull/5835)
+- Add support for query parameter to enforce booking time in trip search for flexible services [#5606](https://github.com/opentripplanner/OpenTripPlanner/pull/5606)
+- Fix parsing of GBFS feeds [#5891](https://github.com/opentripplanner/OpenTripPlanner/pull/5891)
+- Fix SIRI update travel back in time [#5867](https://github.com/opentripplanner/OpenTripPlanner/pull/5867)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.restapi.mapping;
 
 import org.opentripplanner.ext.restapi.model.ApiBookingTime;
-import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class BookingTimeMapper {
 

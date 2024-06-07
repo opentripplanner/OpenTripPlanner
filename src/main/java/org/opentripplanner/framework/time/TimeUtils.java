@@ -2,10 +2,12 @@ package org.opentripplanner.framework.time;
 
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
@@ -245,5 +247,15 @@ public class TimeUtils {
       value |= rnd.nextLong();
     }
     return value;
+  }
+
+  /**
+   * Calculate the relative time in seconds with the given {@code transitSearchTimeZero} as the
+   * base. There is no restriction on the returned time, it can be in the past(negative) and
+   * many days ahead of the base. This method can be used to translate an API instance of time
+   * into the OTP internal transit model time, when the search zero-point-in-time is known.
+   */
+  public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
+    return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
   }
 }

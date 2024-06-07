@@ -40,7 +40,6 @@ import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -165,8 +164,8 @@ public class TestHalfEdges {
     stopModelBuilder.withRegularStop(s1).withRegularStop(s2);
     transitModel = new TransitModel(stopModelBuilder.build(), deduplicator);
 
-    station1 = factory.transitStop(new TransitStopVertexBuilder().withStop(s1));
-    station2 = factory.transitStop(new TransitStopVertexBuilder().withStop(s2));
+    station1 = factory.transitStop(TransitStopVertex.of().withStop(s1));
+    station2 = factory.transitStop(TransitStopVertex.of().withStop(s2));
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 
