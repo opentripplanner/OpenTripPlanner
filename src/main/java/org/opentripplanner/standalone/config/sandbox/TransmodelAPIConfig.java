@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
 import java.util.Collection;
 import java.util.Set;
@@ -42,6 +42,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
     maxNumberOfResultFields =
       c
         .of("maxNumberOfResultFields")
+        .since(V2_6)
         .summary("The maximum number of fields in a GraphQL result")
         .description(
           "Enforce rate limiting based on query complexity; Queries that return too much data are" +
