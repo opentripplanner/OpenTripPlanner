@@ -4,6 +4,7 @@
         to: { lat: 52.5147, lon: 13.3927 }
         date: "2023-02-15",
         time: "11:37",
+        minTransferTime: 120
         parking: {
             unpreferredCost: 555,
             preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
