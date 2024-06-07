@@ -261,9 +261,15 @@ public final class RealTimeTripTimes implements TripTimes {
    *
    * @throws org.opentripplanner.transit.model.framework.DataValidationException of the first error
    * found.
+   *
+   * Note! This is a duplicate (almost) of the same method in ScheduledTripTimes.
+   * We should aim for just one implementation. We need to decide how to do this.
+   * A common abstract base class would simplify it, but may lead to other problems and performance
+   * overhead. We should look back on this after refactoring
+   * the rest of the timetable classes (calendar/patterns).
    */
   public void validateNonIncreasingTimes() {
-    final int nStops = arrivalTimes.length;
+    final int nStops = scheduledTripTimes.getNumStops();
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
