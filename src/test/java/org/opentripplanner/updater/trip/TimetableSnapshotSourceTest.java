@@ -595,20 +595,16 @@ public class TimetableSnapshotSourceTest {
       );
 
       // THEN
-      assertAddedTrip(SERVICE_DATE, this.addedTripId, updater, false);
+      assertAddedTrip(SERVICE_DATE, this.addedTripId, updater);
     }
 
     private TripPattern assertAddedTrip(
       LocalDate serviceDate,
       String tripId,
-      TimetableSnapshotSource updater,
-      boolean forceSnapshotCommit
+      TimetableSnapshotSource updater
     ) {
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
       // Get the trip pattern of the added trip which goes through stopA
-      if (forceSnapshotCommit) {
-        updater.commitTimetableSnapshot(true);
-      }
       var snapshot = updater.getTimetableSnapshot();
       var patternsAtA = snapshot.getPatternsForStop(stopA);
 
@@ -671,7 +667,7 @@ public class TimetableSnapshotSourceTest {
 
       assertTrue(result.warnings().isEmpty());
 
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater, false);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
 
       var route = pattern.getRoute();
       assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
@@ -724,7 +720,7 @@ public class TimetableSnapshotSourceTest {
 
       assertEquals(List.of(WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP), result.warnings());
 
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater, false);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
 
       assertEquals(2, pattern.getStops().size());
     }
@@ -759,7 +755,7 @@ public class TimetableSnapshotSourceTest {
         List.of(tripUpdate),
         feedId
       );
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater, false);
+      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
       var firstRoute = pattern.getRoute();
 
       // apply the update a second time to check that no new route instance is created but the old one is reused
@@ -770,7 +766,7 @@ public class TimetableSnapshotSourceTest {
         List.of(tripUpdate),
         feedId
       );
-      var secondPattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater, false);
+      var secondPattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
       var secondRoute = secondPattern.getRoute();
 
       // THEN

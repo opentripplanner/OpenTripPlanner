@@ -147,10 +147,6 @@ public class SkippedTest {
 
     assertEquals(1, result.successful());
 
-    // Force a snapshot commit. This is done to mimic normal behaviour where a new update arrives
-    // after the original snapshot has been committed
-    env.commitTimetableSnapshot(true);
-
     // Create update to the same trip but now the skipped stop is no longer skipped
     var scheduledBuilder = new TripUpdateBuilder(
       tripId.getId(),

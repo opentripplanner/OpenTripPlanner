@@ -91,8 +91,6 @@ public class CancellationDeletionTest {
 
     assertEquals(1, result.successful());
 
-    env.commitTimetableSnapshot(true);
-
     // Cancel or delete the added trip
     update =
       new TripUpdateBuilder(

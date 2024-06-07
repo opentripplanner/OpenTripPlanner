@@ -208,14 +208,6 @@ public final class RealtimeTestEnvironment {
     }
   }
 
-  public void commitTimetableSnapshot(boolean force) {
-    if (siriSource != null) {
-      siriSource.commitTimetableSnapshot(force);
-    } else {
-      gtfsSource.commitTimetableSnapshot(force);
-    }
-  }
-
   public String getRealtimeTimetable(String tripId) {
     return getRealtimeTimetable(id(tripId), SERVICE_DATE);
   }
