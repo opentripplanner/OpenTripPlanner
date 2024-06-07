@@ -37,13 +37,19 @@ class TransferConfig {
         c
           .of("transferSlack")
           .since(V2_0)
-          .summary("The extra time needed to make a safe transfer in seconds.")
+          .summary("The extra time needed to make a safe transfer.")
           .description(
             """
-            An expected transfer time in seconds that specifies the amount of time that must pass
+            An expected transfer time that specifies the amount of time that must pass
             between exiting one public transport vehicle and boarding another. This time is in
             addition to time it might take to walk between stops plus `boardSlack` and
             `alightSlack`.
+            
+            The total transfer time from one vehicle to another is thus calculated as follows:
+            
+            ```
+            totalTransferDuration = alightSlack + walkDuration + transferSlack + boardSlack
+            ```
             """
           )
           .asDurationOrSeconds(dft.slack())

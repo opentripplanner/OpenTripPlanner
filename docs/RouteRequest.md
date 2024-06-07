@@ -15,9 +15,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 
 | Config Parameter                                                                                             |          Type          | Summary                                                                                                                                        |  Req./Opt. | Default Value    | Since |
 |--------------------------------------------------------------------------------------------------------------|:----------------------:|------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|------------------|:-----:|
-| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The minimum extra time after exiting a public transport vehicle.                                                                               | *Optional* | `"PT0S"`         |  2.0  |
+| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The extra time after exiting a public transport vehicle.                                                                                       | *Optional* | `"PT0S"`         |  2.0  |
 | arriveBy                                                                                                     |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                                       | *Optional* | `false`          |  2.0  |
-| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The boardSlack is the minimum extra time to board a public transport vehicle.                                                                  | *Optional* | `"PT0S"`         |  2.0  |
+| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The extra time before boarding a public transport vehicle.                                                                                     | *Optional* | `"PT0S"`         |  2.0  |
 | [drivingDirection](#rd_drivingDirection)                                                                     |         `enum`         | The driving direction to use in the intersection traversal calculation                                                                         | *Optional* | `"right"`        |  2.2  |
 | elevatorBoardCost                                                                                            |        `integer`       | What is the cost of boarding a elevator?                                                                                                       | *Optional* | `90`             |  2.0  |
 | elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`             |  2.0  |
@@ -38,7 +38,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                     | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                      | *Optional* | `0`              |  2.0  |
-| [transferSlack](#rd_transferSlack)                                                                           |       `duration`       | The extra time needed to make a safe transfer in seconds.                                                                                      | *Optional* | `"PT2M"`         |  2.0  |
+| [transferSlack](#rd_transferSlack)                                                                           |       `duration`       | The extra time needed to make a safe transfer.                                                                                                 | *Optional* | `"PT2M"`         |  2.0  |
 | turnReluctance                                                                                               |        `double`        | Multiplicative factor on expected turning time.                                                                                                | *Optional* | `1.0`            |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                                       | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.2  |
 | waitReluctance                                                                                               |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                              | *Optional* | `1.0`            |  2.0  |
@@ -192,22 +192,31 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The minimum extra time after exiting a public transport vehicle.
+The extra time after exiting a public transport vehicle.
 
 The slack is added to the time when going from the transit vehicle to the stop.
+This also influences the total time it takes to transfer. See `transferSlack` for more details about
+how the total transfer time is calculated.
+
 
 <h3 id="rd_boardSlack">boardSlack</h3>
 
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The boardSlack is the minimum extra time to board a public transport vehicle.
+The extra time before boarding a public transport vehicle.
 
-The board time is added to the time when going from the stop (offboard) to onboard a transit
-vehicle.
+The slack is added to the time when going from the stop (offboard) to onboard a transit
+vehicle. It is useful for suggesting passengers arrive at the stop a little earlier than they strictly
+need to to allow for unexpected circumstances.
 
-This is the same as the `transferSlack`, except that this also applies to to the first
-transit leg in the trip. This is the default value used, if not overridden by the `boardSlackList`.
+This is similar to `transferSlack`, except that this also applies to the first
+transit leg in the trip.
+
+This also influences the total time it takes to transfer. See `transferSlack` for more details about
+how the total transfer time is calculated.
+
+This is the default value used, if not overridden by the `boardSlackList`.
 
 
 <h3 id="rd_drivingDirection">drivingDirection</h3>
@@ -354,12 +363,18 @@ significant time or walking will still be taken.
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT2M"`   
 **Path:** /routingDefaults 
 
-The extra time needed to make a safe transfer in seconds.
+The extra time needed to make a safe transfer.
 
-An expected transfer time in seconds that specifies the amount of time that must pass
+An expected transfer time that specifies the amount of time that must pass
 between exiting one public transport vehicle and boarding another. This time is in
 addition to time it might take to walk between stops plus `boardSlack` and
 `alightSlack`.
+
+The total transfer time from one vehicle to another is thus calculated as follows:
+
+```
+totalTransferDuration = alightSlack + walkDuration + transferSlack + boardSlack
+```
 
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>

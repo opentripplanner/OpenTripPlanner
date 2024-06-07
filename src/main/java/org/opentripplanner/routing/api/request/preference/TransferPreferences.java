@@ -80,16 +80,16 @@ public final class TransferPreferences implements Serializable {
   }
 
   /**
-   * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must
+   * A global minimum transfer time that specifies the minimum amount of time that must
    * pass between exiting one transit vehicle and boarding another. This time is in addition to time
    * it might take to walk between transit stops, the {@link TransitPreferences#alightSlack()}, and the {@link
-   * TransitPreferences#boardSlack()}. This time should also be overridden by specific transfer timing information in
-   * transfers.txt
+   * TransitPreferences#boardSlack()}.
+   * This time can also be overridden by specific transfer timing information in transfers.txt
    * <p>
-   * This only apply to transfer between two trips, it does not apply when boarding the first
+   * This only applies to transfer between two trips, it does not apply when boarding the first
    * transit.
    * <p>
-   * Unit is seconds. Default value is 2 minutes.
+   * Default value is 2 minutes.
    */
   public Duration slack() {
     return slack;

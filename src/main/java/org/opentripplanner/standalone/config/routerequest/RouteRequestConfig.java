@@ -202,9 +202,13 @@ travel time `x` (in seconds).
             c
               .of("alightSlack")
               .since(V2_0)
-              .summary("The minimum extra time after exiting a public transport vehicle.")
+              .summary("The extra time after exiting a public transport vehicle.")
               .description(
-                "The slack is added to the time when going from the transit vehicle to the stop."
+                """
+The slack is added to the time when going from the transit vehicle to the stop.
+This also influences the total time it takes to transfer. See `transferSlack` for more details about
+how the total transfer time is calculated.
+"""
               )
               .asDuration(dft.alightSlack().defaultValue())
           )
@@ -228,16 +232,20 @@ travel time `x` (in seconds).
             c
               .of("boardSlack")
               .since(V2_0)
-              .summary(
-                "The boardSlack is the minimum extra time to board a public transport vehicle."
-              )
+              .summary("The extra time before boarding a public transport vehicle.")
               .description(
                 """
-The board time is added to the time when going from the stop (offboard) to onboard a transit
-vehicle.
+The slack is added to the time when going from the stop (offboard) to onboard a transit
+vehicle. It is useful for suggesting passengers arrive at the stop a little earlier than they strictly 
+need to to allow for unexpected circumstances.
 
-This is the same as the `transferSlack`, except that this also applies to to the first
-transit leg in the trip. This is the default value used, if not overridden by the `boardSlackList`.
+This is similar to `transferSlack`, except that this also applies to the first
+transit leg in the trip. 
+
+This also influences the total time it takes to transfer. See `transferSlack` for more details about
+how the total transfer time is calculated.
+
+This is the default value used, if not overridden by the `boardSlackList`.
 """
               )
               .asDuration(dft.boardSlack().defaultValue())
