@@ -725,7 +725,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
+            <version>33.2.1-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>
