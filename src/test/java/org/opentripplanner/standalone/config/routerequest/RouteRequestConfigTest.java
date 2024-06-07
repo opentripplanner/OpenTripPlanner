@@ -95,4 +95,23 @@ class RouteRequestConfigTest {
       streetPreferences.accessEgress().penalty().valueOf(StreetMode.CAR).toString()
     );
   }
+
+  @Test
+  public void transferSlackAsInt() {
+    var slack = mapSlack("99");
+    assertEquals(99, slack);
+  }
+
+  private static int mapSlack(String input) {
+    var nodeAdapter = newNodeAdapterForTest(
+      """
+      {
+        "transferSlack": %s
+      }
+      """.formatted(input)
+    );
+
+    var subject = RouteRequestConfig.mapRouteRequest(nodeAdapter);
+    return subject.preferences().transfer().slack();
+  }
 }
