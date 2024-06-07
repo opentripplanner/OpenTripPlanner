@@ -83,7 +83,7 @@ class TransferPreferencesTest {
     assertEquals(
       "TransferPreferences{" +
       "cost: $200, " +
-      "slack: 150, " +
+      "slack: 2m30s, " +
       "waitReluctance: 0.95, " +
       "maxTransfers: 17, " +
       "maxAdditionalTransfers: 7, " +

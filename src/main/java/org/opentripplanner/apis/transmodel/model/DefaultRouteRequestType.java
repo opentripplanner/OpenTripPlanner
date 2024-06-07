@@ -296,7 +296,7 @@ public class DefaultRouteRequestType {
             "A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.transfer().slack())
+          .dataFetcher(env -> preferences.transfer().slack().toSeconds())
           .build()
       )
       .field(
