@@ -73,7 +73,7 @@ class PatternByServiceDatesFilterTest {
     return pattern;
   }
 
-  static List<Arguments> invalidRange() {
+  static List<Arguments> invalidRangeCases() {
     return List.of(
       Arguments.of(parse("2024-05-02"), parse("2024-05-01")),
       Arguments.of(parse("2024-05-03"), parse("2024-05-01"))
@@ -81,7 +81,7 @@ class PatternByServiceDatesFilterTest {
   }
 
   @ParameterizedTest
-  @MethodSource("invalidRange")
+  @MethodSource("invalidRangeCases")
   void invalidRange(LocalDate start, LocalDate end) {
     assertThrows(
       IllegalArgumentException.class,
@@ -89,7 +89,7 @@ class PatternByServiceDatesFilterTest {
     );
   }
 
-  static List<Arguments> validRange() {
+  static List<Arguments> validRangeCases() {
     return List.of(
       Arguments.of(parse("2024-05-02"), parse("2024-05-02")),
       Arguments.of(parse("2024-05-02"), parse("2024-05-03")),
@@ -100,7 +100,7 @@ class PatternByServiceDatesFilterTest {
   }
 
   @ParameterizedTest
-  @MethodSource("validRange")
+  @MethodSource("validRangeCases")
   void validRange(LocalDate start, LocalDate end) {
     assertDoesNotThrow(() -> new PatternByServiceDatesFilter(EMPTY_SERVICE, start, end));
   }
