@@ -15,12 +15,10 @@ import graphql.schema.DataFetchingEnvironmentImpl;
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -146,7 +144,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           List.of(),
           null,
           new DefaultStreetLimitationParametersService(new StreetLimitationParameters()),
-          null
+          null, null
         ),
         null,
         transitService

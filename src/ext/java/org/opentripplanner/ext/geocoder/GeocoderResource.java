@@ -24,10 +24,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
-  private final OtpServerRequestContext serverContext;
+  private final LuceneIndex luceneIndex;
 
   public GeocoderResource(@Context OtpServerRequestContext requestContext) {
-    luceneIndex = Objects.requireNonNull(requestContext.lucenceIndex());
+    luceneIndex = requestContext.lucenceIndex();
   }
 
   /**
@@ -56,7 +56,7 @@ public class GeocoderResource {
   @GET
   @Path("stopClusters")
   public Response stopClusters(@QueryParam("query") String query) {
-    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query).toList();
+    var clusters = luceneIndex.queryStopClusters(query).toList();
 
     return Response.status(Response.Status.OK).entity(clusters).build();
   }
@@ -81,8 +81,8 @@ public class GeocoderResource {
   }
 
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
-    return LuceneIndex
-      .forServer(serverContext)
+    return
+      luceneIndex
       .queryStopLocations(query, autocomplete)
       .map(sl ->
         new SearchResult(
@@ -96,8 +96,8 @@ public class GeocoderResource {
   }
 
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
-    return LuceneIndex
-      .forServer(serverContext)
+    return
+      luceneIndex
       .queryStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(

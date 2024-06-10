@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
@@ -136,7 +135,6 @@ public class Graph implements Serializable {
    * creating the data overlay context when routing.
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
-  private LuceneIndex luceneIndex;
 
   @Inject
   public Graph(
@@ -382,14 +380,6 @@ public class Graph implements Serializable {
 
   public void setFareService(FareService fareService) {
     this.fareService = fareService;
-  }
-
-  public LuceneIndex getLuceneIndex() {
-    return luceneIndex;
-  }
-
-  public void setLuceneIndex(LuceneIndex luceneIndex) {
-    this.luceneIndex = luceneIndex;
   }
 
   private void indexIfNotIndexed(StopModel stopModel) {

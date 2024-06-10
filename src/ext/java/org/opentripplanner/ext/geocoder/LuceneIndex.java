@@ -42,7 +42,6 @@ import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
@@ -144,18 +143,6 @@ public class LuceneIndex implements Serializable {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
-    var graph = serverContext.graph();
-    var existingIndex = graph.getLuceneIndex();
-    if (existingIndex != null) {
-      return existingIndex;
-    }
-
-    var newIndex = new LuceneIndex(serverContext.transitService());
-    graph.setLuceneIndex(newIndex);
-    return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
