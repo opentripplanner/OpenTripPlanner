@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.ExecutionStrategy;
 import graphql.execution.UnknownOperationException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
@@ -48,12 +47,12 @@ class TransmodelGraph {
     OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
-    int maxResolves,
+    int maxNumberOfResultFields,
     Iterable<Tag> tracingTags
   ) {
     try (var executionStrategy = new AbortOnTimeoutExecutionStrategy()) {
       variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
-      var instrumentation = createInstrumentation(maxResolves, tracingTags);
+      var instrumentation = createInstrumentation(maxNumberOfResultFields, tracingTags);
       var transmodelRequestContext = createRequestContext(serverContext);
       var executionInput = createExecutionInput(
         query,
@@ -78,11 +77,11 @@ class TransmodelGraph {
     }
   }
 
-  private static Instrumentation createInstrumentation(int maxResolves, Iterable<Tag> tracingTags) {
-    Instrumentation instrumentation = new ChainedInstrumentation(
-      new MaxQueryComplexityInstrumentation(maxResolves),
-      new OTPRequestTimeoutInstrumentation()
-    );
+  private static Instrumentation createInstrumentation(
+    int maxNumberOfResultFields,
+    Iterable<Tag> tracingTags
+  ) {
+    Instrumentation instrumentation = new MaxFieldsInResultInstrumentation(maxNumberOfResultFields);
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation =
