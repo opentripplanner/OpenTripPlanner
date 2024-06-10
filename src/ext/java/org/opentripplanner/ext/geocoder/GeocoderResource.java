@@ -81,8 +81,7 @@ public class GeocoderResource {
   }
 
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
-    return
-      luceneIndex
+    return luceneIndex
       .queryStopLocations(query, autocomplete)
       .map(sl ->
         new SearchResult(
@@ -96,8 +95,7 @@ public class GeocoderResource {
   }
 
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
-    return
-      luceneIndex
+    return luceneIndex
       .queryStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(

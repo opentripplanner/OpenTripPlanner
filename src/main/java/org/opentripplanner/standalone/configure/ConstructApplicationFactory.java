@@ -6,6 +6,8 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -56,6 +58,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
+    GeocoderModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -86,6 +89,9 @@ public interface ConstructApplicationFactory {
   StopConsolidationRepository stopConsolidationRepository();
 
   StreetLimitationParameters streetLimitationParameters();
+
+  @Nullable
+  LuceneIndex luceneIndex();
 
   @Component.Builder
   interface Builder {

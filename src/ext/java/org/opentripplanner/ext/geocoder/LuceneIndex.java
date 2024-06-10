@@ -46,8 +46,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LuceneIndex implements Serializable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(LuceneIndex.class);
 
   private static final String TYPE = "type";
   private static final String ID = "id";

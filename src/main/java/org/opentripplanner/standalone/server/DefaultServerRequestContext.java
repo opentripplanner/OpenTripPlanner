@@ -134,7 +134,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       stopConsolidationService,
       streetLimitationParametersService,
       flexParameters,
-      traverseVisitor, luceneIndex
+      traverseVisitor,
+      luceneIndex
     );
   }
 

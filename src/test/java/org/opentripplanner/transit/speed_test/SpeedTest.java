@@ -121,7 +121,8 @@ public class SpeedTest {
         List.of(),
         null,
         TestServerContext.createStreetLimitationParametersService(),
-        null, null
+        null,
+        null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here
