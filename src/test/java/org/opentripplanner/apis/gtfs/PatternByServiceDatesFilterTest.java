@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
 import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDateFilterInput;
 import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -37,7 +40,12 @@ class PatternByServiceDatesFilterTest {
 
   private static final TransitService EMPTY_SERVICE = new DefaultTransitService(new TransitModel());
   private static final Route ROUTE_1 = TransitModelForTest.route("1").build();
-  private static final Trip TRIP = TransitModelForTest.trip("t1").withRoute(ROUTE_1).build();
+  private static final FeedScopedId SERVICE_ID = id("service");
+  private static final Trip TRIP = TransitModelForTest
+    .trip("t1")
+    .withRoute(ROUTE_1)
+    .withServiceId(SERVICE_ID)
+    .build();
   private static final TransitModelForTest MODEL = new TransitModelForTest(StopModel.of());
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
   private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_1, STOP_1);
@@ -146,6 +154,9 @@ class PatternByServiceDatesFilterTest {
   }
 
   private static TransitService mockService() {
+    var data = new CalendarServiceData();
+    data.putServiceDatesForServiceId(SERVICE_ID, List.of(parse("2024-05-01"), parse("2024-06-01")));
+    var service = new CalendarServiceImpl(data);
     return new DefaultTransitService(new TransitModel()) {
       @Override
       public Collection<TripPattern> getPatternsForRoute(Route route) {
@@ -154,22 +165,7 @@ class PatternByServiceDatesFilterTest {
 
       @Override
       public CalendarService getCalendarService() {
-        return new CalendarService() {
-          @Override
-          public Set<FeedScopedId> getServiceIds() {
-            return Set.of();
-          }
-
-          @Override
-          public Set<LocalDate> getServiceDatesForServiceId(FeedScopedId serviceId) {
-            return Set.of(parse("2024-05-01"), parse("2024-06-01"));
-          }
-
-          @Override
-          public Set<FeedScopedId> getServiceIdsOnDate(LocalDate date) {
-            return Set.of();
-          }
-        };
+        return service;
       }
     };
   }
