@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -127,7 +128,7 @@ public class RouterConfig implements Serializable {
     return vectorTileConfig;
   }
 
-  public FlexConfig flexConfig() {
+  public FlexParameters flexParameters() {
     return flexConfig;
   }
 

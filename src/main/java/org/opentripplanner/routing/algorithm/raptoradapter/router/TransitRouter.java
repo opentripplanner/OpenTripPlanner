@@ -23,7 +23,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -171,8 +171,8 @@ public class TransitRouter {
   }
 
   private AccessEgresses fetchAccessEgresses() {
-    final var asyncAccessList = new ArrayList<DefaultAccessEgress>();
-    final var asyncEgressList = new ArrayList<DefaultAccessEgress>();
+    final var accessList = new ArrayList<RoutingAccessEgress>();
+    final var egressList = new ArrayList<RoutingAccessEgress>();
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
@@ -180,19 +180,19 @@ public class TransitRouter {
         //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture
           .allOf(
-            CompletableFuture.runAsync(() -> asyncAccessList.addAll(fetchAccess())),
-            CompletableFuture.runAsync(() -> asyncEgressList.addAll(fetchEgress()))
+            CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
+            CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
           )
           .join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
-      asyncAccessList.addAll(fetchAccess());
-      asyncEgressList.addAll(fetchEgress());
+      accessList.addAll(fetchAccess());
+      egressList.addAll(fetchEgress());
     }
 
-    verifyAccessEgress(asyncAccessList, asyncEgressList);
+    verifyAccessEgress(accessList, egressList);
 
     // Decorate access/egress with a penalty to make it less favourable than transit
     var penaltyDecorator = new AccessEgressPenaltyDecorator(
@@ -201,27 +201,27 @@ public class TransitRouter {
       request.preferences().street().accessEgress().penalty()
     );
 
-    var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
-    var egressList = penaltyDecorator.decorateEgress(asyncEgressList);
+    var accessListWithPenalty = penaltyDecorator.decorateAccess(accessList);
+    var egressListWithPenalty = penaltyDecorator.decorateEgress(egressList);
 
-    return new AccessEgresses(accessList, egressList);
+    return new AccessEgresses(accessListWithPenalty, egressListWithPenalty);
   }
 
-  private Collection<DefaultAccessEgress> fetchAccess() {
+  private Collection<? extends RoutingAccessEgress> fetchAccess() {
     debugTimingAggregator.startedAccessCalculating();
     var list = fetchAccessEgresses(ACCESS);
     debugTimingAggregator.finishedAccessCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchEgress() {
+  private Collection<? extends RoutingAccessEgress> fetchEgress() {
     debugTimingAggregator.startedEgressCalculating();
     var list = fetchAccessEgresses(EGRESS);
     debugTimingAggregator.finishedEgressCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchAccessEgresses(AccessEgressType type) {
+  private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
 
     // Prepare access/egress lists
@@ -255,7 +255,7 @@ public class TransitRouter {
       stopCountLimit
     );
 
-    List<DefaultAccessEgress> results = new ArrayList<>(
+    List<RoutingAccessEgress> results = new ArrayList<>(
       AccessEgressMapper.mapNearbyStops(nearbyStops, type.isEgress())
     );
     results = timeshiftRideHailing(streetRequest, type, results);
@@ -267,7 +267,7 @@ public class TransitRouter {
         temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,
-        serverContext.flexConfig(),
+        serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
         type.isEgress()
       );
@@ -288,10 +288,10 @@ public class TransitRouter {
    * This method is a good candidate to be moved to the access/egress filter chain when that has
    * been added.
    */
-  private List<DefaultAccessEgress> timeshiftRideHailing(
+  private List<RoutingAccessEgress> timeshiftRideHailing(
     StreetRequest streetRequest,
     AccessEgressType type,
-    List<DefaultAccessEgress> accessEgressList
+    List<RoutingAccessEgress> accessEgressList
   ) {
     if (streetRequest.mode() != StreetMode.CAR_HAILING) {
       return accessEgressList;

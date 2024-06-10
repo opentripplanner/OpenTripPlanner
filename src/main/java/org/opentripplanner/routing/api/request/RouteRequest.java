@@ -81,6 +81,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private boolean wheelchair = false;
 
+  private Instant bookingTime;
+
   /* CONSTRUCTORS */
 
   /** Constructor for options; modes defaults to walk and transit */
@@ -110,6 +112,20 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
     this.preferences = preferences.copyOf().apply(body).build();
+  }
+
+  /**
+   * The booking time is used to exclude services which are not bookable at the
+   * requested booking time. If a service is bookable at this time or later, the service
+   * is included. This apply to FLEX access, egress and direct services.
+   */
+  public Instant bookingTime() {
+    return bookingTime;
+  }
+
+  public RouteRequest setBookingTime(Instant bookingTime) {
+    this.bookingTime = bookingTime;
+    return this;
   }
 
   void setPreferences(RoutingPreferences preferences) {

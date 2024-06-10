@@ -32,7 +32,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -266,7 +266,7 @@ public class TestStateBuilder {
   @Nonnull
   private TestStateBuilder arriveAtStop(RegularStop stop) {
     var from = (StreetVertex) currentState.vertex;
-    var to = new TransitStopVertexBuilder().withStop(stop).build();
+    var to = TransitStopVertex.of().withStop(stop).build();
 
     Edge edge;
     if (currentState.getRequest().arriveBy()) {

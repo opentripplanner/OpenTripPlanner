@@ -12,7 +12,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class FlexStopTimesForTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
-  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
+  private static final StopLocation AREA_STOP = TEST_MODEL
+    .areaStop("area")
+    .withGeometry(Polygons.BERLIN)
+    .build();
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
 
   public static StopTime area(String startTime, String endTime) {

@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.format.DateTimeFormatter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class BookingTimeImpl implements GraphQLDataFetchers.GraphQLBookingTime {
 

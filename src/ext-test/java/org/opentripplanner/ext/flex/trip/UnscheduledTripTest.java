@@ -12,8 +12,6 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import gnu.trove.set.hash.TIntHashSet;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -23,18 +21,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.ext.flex.FlexServiceDate;
-import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
-import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -51,9 +43,10 @@ class UnscheduledTripTest {
   private static final int T15_00 = TimeUtils.hm2time(15, 0);
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
-  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
 
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
+
+  private static final StopLocation AREA_STOP = TEST_MODEL.areaStop("area").build();
 
   @Nested
   class IsUnscheduledTrip {
@@ -548,9 +541,9 @@ class UnscheduledTripTest {
 
   @Test
   void boardingAlighting() {
-    var AREA_STOP1 = TEST_MODEL.areaStopForTest("area-1", Polygons.BERLIN);
-    var AREA_STOP2 = TEST_MODEL.areaStopForTest("area-2", Polygons.BERLIN);
-    var AREA_STOP3 = TEST_MODEL.areaStopForTest("area-3", Polygons.BERLIN);
+    var AREA_STOP1 = TEST_MODEL.areaStop("area-1").build();
+    var AREA_STOP2 = TEST_MODEL.areaStop("area-2").build();
+    var AREA_STOP3 = TEST_MODEL.areaStop("area-3").build();
 
     var first = area(AREA_STOP1, "10:00", "10:05");
     first.setDropOffType(NONE);
@@ -564,108 +557,43 @@ class UnscheduledTripTest {
       .build()
       .trip();
 
-    assertTrue(trip.isBoardingPossible(nearbyStop(AREA_STOP1)));
-    assertFalse(trip.isAlightingPossible(nearbyStop(AREA_STOP1)));
+    assertTrue(trip.isBoardingPossible(AREA_STOP1));
+    assertFalse(trip.isAlightingPossible(AREA_STOP1));
 
-    assertFalse(trip.isBoardingPossible(nearbyStop(AREA_STOP2)));
-    assertTrue(trip.isAlightingPossible(nearbyStop(AREA_STOP2)));
-  }
-
-  @Nested
-  class FlexTemplates {
-
-    private static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
-    static final StopTime FIRST = area("10:00", "10:05");
-    static final StopTime SECOND = area("10:10", "10:15");
-    static final StopTime THIRD = area("10:20", "10:25");
-    static final StopTime FOURTH = area("10:30", "10:35");
-    private static final FlexServiceDate FLEX_SERVICE_DATE = new FlexServiceDate(
-      LocalDate.of(2023, 9, 16),
-      0,
-      new TIntHashSet()
-    );
-    private static final NearbyStop NEARBY_STOP = new NearbyStop(
-      FOURTH.getStop(),
-      100,
-      List.of(),
-      null
-    );
-
-    @Test
-    void accessTemplates() {
-      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
-
-      var templates = accessTemplates(trip);
-
-      assertEquals(3, templates.size());
-
-      List
-        .of(0, 1, 2)
-        .forEach(index -> {
-          var template = templates.get(index);
-          assertEquals(0, template.fromStopIndex);
-          assertEquals(index + 1, template.toStopIndex);
-        });
-    }
-
-    @Test
-    void accessTemplatesNoAlighting() {
-      var second = area("10:10", "10:15");
-      second.setDropOffType(NONE);
-
-      var trip = trip(List.of(FIRST, second, THIRD, FOURTH));
-
-      var templates = accessTemplates(trip);
-
-      assertEquals(2, templates.size());
-      List
-        .of(0, 1)
-        .forEach(index -> {
-          var template = templates.get(index);
-          assertEquals(0, template.fromStopIndex);
-          assertEquals(index + 2, template.toStopIndex);
-        });
-    }
-
-    @Test
-    void egressTemplates() {
-      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
-
-      var templates = egressTemplates(trip);
-
-      assertEquals(4, templates.size());
-      var template = templates.get(0);
-      assertEquals(0, template.fromStopIndex);
-      assertEquals(3, template.toStopIndex);
-    }
-
-    @Nonnull
-    private static UnscheduledTrip trip(List<StopTime> stopTimes) {
-      return new TestCase.Builder(FIRST, THIRD).withStopTimes(stopTimes).build().trip();
-    }
-
-    @Nonnull
-    private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
-      return trip
-        .getFlexAccessTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
-    }
-
-    @Nonnull
-    private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
-      return trip
-        .getFlexEgressTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
-    }
+    assertFalse(trip.isBoardingPossible(AREA_STOP2));
+    assertTrue(trip.isAlightingPossible(AREA_STOP2));
   }
 
   private static String timeToString(int time) {
     return TimeUtils.timeToStrCompact(time, MISSING_VALUE, "MISSING_VALUE");
   }
 
-  @Nonnull
-  private static NearbyStop nearbyStop(AreaStop stop) {
-    return new NearbyStop(stop, 1000, List.of(), null);
+  private static StopTime area(String startTime, String endTime) {
+    return area(AREA_STOP, endTime, startTime);
+  }
+
+  private static StopTime area(StopLocation areaStop, String endTime, String startTime) {
+    var stopTime = new StopTime();
+    stopTime.setStop(areaStop);
+    stopTime.setFlexWindowStart(TimeUtils.time(startTime));
+    stopTime.setFlexWindowEnd(TimeUtils.time(endTime));
+    return stopTime;
+  }
+
+  private static StopTime regularDeparture(String departureTime) {
+    return regularStopTime(MISSING_VALUE, TimeUtils.time(departureTime));
+  }
+
+  private static StopTime regularArrival(String arrivalTime) {
+    return regularStopTime(TimeUtils.time(arrivalTime), MISSING_VALUE);
+  }
+
+  private static StopTime regularStopTime(int arrivalTime, int departureTime) {
+    var stopTime = new StopTime();
+    stopTime.setStop(REGULAR_STOP);
+    stopTime.setArrivalTime(arrivalTime);
+    stopTime.setDepartureTime(departureTime);
+    return stopTime;
   }
 
   record TestCase(

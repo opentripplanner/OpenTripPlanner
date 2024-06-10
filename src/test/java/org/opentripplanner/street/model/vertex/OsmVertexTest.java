@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 
@@ -15,14 +14,8 @@ class OsmVertexTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
-  private static final AreaStop AREA_STOP1 = TEST_MODEL.areaStopForTest(
-    "flex-zone-1",
-    Polygons.BERLIN
-  );
-  private static final AreaStop AREA_STOP2 = TEST_MODEL.areaStopForTest(
-    "flex-zone-2",
-    Polygons.BERLIN
-  );
+  private static final AreaStop AREA_STOP1 = TEST_MODEL.areaStop("flex-zone-1").build();
+  private static final AreaStop AREA_STOP2 = TEST_MODEL.areaStop("flex-zone-2").build();
 
   @Test
   void areaStops() {

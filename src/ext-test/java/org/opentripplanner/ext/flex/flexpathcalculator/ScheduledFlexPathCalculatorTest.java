@@ -29,7 +29,7 @@ class ScheduledFlexPathCalculatorTest {
 
   @Test
   void calculateTime() {
-    var c = (FlexPathCalculator) (fromv, tov, fromStopIndex, toStopIndex) ->
+    var c = (FlexPathCalculator) (fromv, tov, boardStopPosition, alightStopPosition) ->
       new FlexPath(10_000, (int) Duration.ofMinutes(10).toSeconds(), () -> LineStrings.SIMPLE);
     var calc = new ScheduledFlexPathCalculator(c, TRIP);
     var path = calc.calculateFlexPath(V1, V2, 0, 1);

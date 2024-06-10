@@ -1,11 +1,23 @@
 package org.opentripplanner.ext.restapi.mapping;
 
 import org.opentripplanner.ext.restapi.model.ApiBookingInfo;
-import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 public class BookingInfoMapper {
 
-  static ApiBookingInfo mapBookingInfo(BookingInfo info, boolean isPickup) {
+  static ApiBookingInfo mapBookingInfoForPickup(BookingInfo info) {
+    return mapBookingInfo(info, true);
+  }
+
+  static ApiBookingInfo mapBookingInfoForDropOff(BookingInfo info) {
+    return mapBookingInfo(info, false);
+  }
+
+  /**
+   * @param isPickup either pickup or dropOff message must be set, not both. We only want to show
+   *                 the pick-up message for pickups, and the drop-off message for drop-offs.
+   */
+  private static ApiBookingInfo mapBookingInfo(BookingInfo info, boolean isPickup) {
     if (info == null) {
       return null;
     }
@@ -18,9 +30,7 @@ public class BookingInfoMapper {
       info.getMinimumBookingNotice(),
       info.getMaximumBookingNotice(),
       info.getMessage(),
-      // we only want to show the pick up message for pickups
       isPickup ? info.getPickupMessage() : null,
-      // and only the drop off message for drop offs
       !isPickup ? info.getDropOffMessage() : null
     );
   }

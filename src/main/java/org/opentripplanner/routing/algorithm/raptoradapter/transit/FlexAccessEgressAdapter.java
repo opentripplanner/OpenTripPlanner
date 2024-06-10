@@ -59,7 +59,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
   }
 
   @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
     return new FlexAccessEgressAdapter(this, penalty);
   }
 

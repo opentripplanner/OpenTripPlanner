@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.timetable.booking;
 
 public enum BookingMethod {
   CALL_DRIVER,

@@ -40,7 +40,7 @@ public class TransportModeSlack {
   static {
     BOARD_SLACK_DESCRIPTION =
       "The boardSlack is the minimum extra time to board a public transport vehicle. This is " +
-      "the same as the 'minimumTransferTime', except that this also apply to to the first " +
+      "the same as the 'minimumTransferTime', except that this also applies to to the first " +
       "transit leg in the trip.";
 
     ALIGHT_SLACK_DESCRIPTION =
