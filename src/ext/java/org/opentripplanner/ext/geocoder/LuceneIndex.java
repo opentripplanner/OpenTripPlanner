@@ -69,6 +69,8 @@ public class LuceneIndex implements Serializable {
     this.transitService = transitService;
     this.stopClusterMapper = new StopClusterMapper(transitService);
 
+    LOG.info("Creating geocoder lucene index");
+
     this.analyzer =
       new PerFieldAnalyzerWrapper(
         new StandardAnalyzer(),

@@ -3,7 +3,6 @@ package org.opentripplanner.ext.geocoder;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
@@ -28,21 +27,7 @@ public class GeocoderResource {
   private final OtpServerRequestContext serverContext;
 
   public GeocoderResource(@Context OtpServerRequestContext requestContext) {
-    serverContext = requestContext;
-  }
-
-  /**
-   * This class is only here for backwards-compatibility. It will be removed in the future.
-   */
-  @Path("/routers/{ignoreRouterId}/geocode")
-  public static class GeocoderResourceOldPath extends GeocoderResource {
-
-    public GeocoderResourceOldPath(
-      @Context OtpServerRequestContext serverContext,
-      @PathParam("ignoreRouterId") String ignore
-    ) {
-      super(serverContext);
-    }
+    luceneIndex = Objects.requireNonNull(requestContext.lucenceIndex());
   }
 
   /**
