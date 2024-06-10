@@ -9,21 +9,29 @@ import graphql.schema.GraphQLScalarType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import javax.annotation.Nullable;
 
 public class DateScalarFactory {
 
-  private static final String DOCUMENTATION =
+  public static final String DESCRIPTION =
     "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private DateScalarFactory() {}
 
-  public static GraphQLScalarType createDateScalar(String scalarName) {
+  /**
+   * @param description Nullable description that allows caller to pass in null which leads to the
+   *                    description from schema.graphqls to be used.
+   */
+  public static GraphQLScalarType createDateScalar(
+    String scalarName,
+    @Nullable String description
+  ) {
     return GraphQLScalarType
       .newScalar()
       .name(scalarName)
-      .description(DOCUMENTATION)
+      .description(description)
       .coercing(
         new Coercing<LocalDate, String>() {
           @Override

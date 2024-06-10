@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class DateScalarFactoryTest {
 
-  private static final GraphQLScalarType SCALAR = DateScalarFactory.createDateScalar("Date");
+  private static final GraphQLScalarType SCALAR = DateScalarFactory.createDateScalar("Date", null);
 
   @ParameterizedTest
   @ValueSource(strings = { "2024-05-23" })

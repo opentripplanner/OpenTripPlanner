@@ -45,7 +45,7 @@ public class GqlUtil {
   public GqlUtil(ZoneId timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
-    this.dateScalar = DateScalarFactory.createDateScalar("Date");
+    this.dateScalar = DateScalarFactory.createDateScalar("Date", DateScalarFactory.DESCRIPTION);
     this.doubleFunctionScalar = DoubleFunctionFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
