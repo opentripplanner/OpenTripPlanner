@@ -169,6 +169,21 @@ public final class TimetableSnapshotManager {
   }
 
   /**
+   * If a previous realtime update has changed which trip pattern is associated with the given trip
+   * on the given service date, this method will dissociate the trip from that pattern and remove
+   * the trip's timetables from that pattern on that particular service date.
+   *
+   * For this service date, the trip will revert to its original trip pattern from the scheduled
+   * data, remaining on that pattern unless it's changed again by a future realtime update.
+   *
+   * @return true if the trip was found to be shifted to a different trip pattern by a realtime
+   * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
+   */
+  public void revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
+  }
+
+  /**
    * Remove realtime data from previous service dates from the snapshot. This is useful so that
    * instances that run for multiple days don't accumulate a lot of realtime data for past
    * dates which would increase memory consumption.
@@ -230,22 +245,6 @@ public final class TimetableSnapshotManager {
     LocalDate serviceDate
   ) {
     return buffer.update(pattern, tripTimes, serviceDate);
-  }
-
-  /**
-   * Removes the latest added trip pattern from the cache. This should be done when removing the
-   * trip times from the timetable the trip has been added to.
-   */
-  public void removeLastAddedTripPattern(FeedScopedId id, LocalDate serviceDate) {
-    buffer.removeLastAddedTripPattern(id, serviceDate);
-  }
-
-  public void removeRealtimeUpdatedTripTimes(
-    TripPattern pattern,
-    FeedScopedId id,
-    LocalDate serviceDate
-  ) {
-    buffer.removeRealtimeUpdatedTripTimes(pattern, id, serviceDate);
   }
 
   /**

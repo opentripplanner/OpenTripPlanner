@@ -285,7 +285,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
-    final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(tripId, serviceDate);
     if (
       !isPreviouslyAddedTrip(tripId, pattern, serviceDate) ||
       (
@@ -296,7 +296,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Remove previous realtime updates for this trip. This is necessary to avoid previous
       // stop pattern modifications from persisting. If a trip was previously added with the ScheduleRelationship
       // ADDED and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
-      this.buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
+      this.snapshotManager.revertTripToScheduledTripPattern(tripId, serviceDate);
     }
   }
 
@@ -308,7 +308,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (pattern == null) {
       return false;
     }
-    var timetable = buffer.resolve(pattern, serviceDate);
+    var timetable = snapshotManager.resolve(pattern, serviceDate);
     if (timetable == null) {
       return false;
     }
