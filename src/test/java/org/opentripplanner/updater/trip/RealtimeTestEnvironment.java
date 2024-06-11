@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -248,7 +251,7 @@ public final class RealtimeTestEnvironment {
       null,
       getEntityResolver(),
       getFeedId(),
-      UpdateIncrementality.DIFFERENTIAL,
+      DIFFERENTIAL,
       updates
     );
   }
@@ -256,22 +259,25 @@ public final class RealtimeTestEnvironment {
   // GTFS-RT updates
 
   public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update) {
-    return applyTripUpdates(List.of(update), false);
+    return applyTripUpdates(List.of(update), FULL_DATASET);
   }
 
-  public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update, boolean differential) {
-    return applyTripUpdates(List.of(update), differential);
+  public UpdateResult applyTripUpdate(
+    GtfsRealtime.TripUpdate update,
+    UpdateIncrementality incrementality
+  ) {
+    return applyTripUpdates(List.of(update), incrementality);
   }
 
   public UpdateResult applyTripUpdates(
     List<GtfsRealtime.TripUpdate> updates,
-    boolean differential
+    UpdateIncrementality incrementality
   ) {
     Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
     return gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      !differential,
+      incrementality,
       updates,
       getFeedId()
     );
@@ -288,7 +294,7 @@ public final class RealtimeTestEnvironment {
       siriFuzzyTripMatcher,
       getEntityResolver(),
       getFeedId(),
-      UpdateIncrementality.DIFFERENTIAL,
+      DIFFERENTIAL,
       updates
     );
   }

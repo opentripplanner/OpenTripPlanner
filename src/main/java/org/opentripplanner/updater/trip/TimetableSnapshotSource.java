@@ -12,6 +12,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VAL
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.common.base.Preconditions;
@@ -194,7 +195,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
         final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
           tripDescriptor
         );
-        if (!fullDataset) {
+        if (updateIncrementality == DIFFERENTIAL) {
           purgePatternModifications(tripScheduleRelationship, tripId, serviceDate);
         }
 
@@ -222,13 +223,13 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
                 tripId,
                 serviceDate,
                 CancelationType.CANCEL,
-                fullDataset
+                updateIncrementality
               );
               case DELETED -> handleCanceledTrip(
                 tripId,
                 serviceDate,
                 CancelationType.DELETE,
-                fullDataset
+                updateIncrementality
               );
               case REPLACEMENT -> validateAndHandleModifiedTrip(
                 tripUpdate,
@@ -1053,11 +1054,11 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     FeedScopedId tripId,
     final LocalDate serviceDate,
     CancelationType cancelationType,
-    boolean fullDataset
+    UpdateIncrementality incrementality
   ) {
-    var canceledPreviouslyAddedTrip = fullDataset
-      ? false
-      : cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
+    var canceledPreviouslyAddedTrip =
+      incrementality != FULL_DATASET &&
+      cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
 
     // if previously an added trip was removed, there can't be a scheduled trip to remove
     if (canceledPreviouslyAddedTrip) {
