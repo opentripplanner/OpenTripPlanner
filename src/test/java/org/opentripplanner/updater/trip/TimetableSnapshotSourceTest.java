@@ -604,7 +604,7 @@ public class TimetableSnapshotSourceTest {
       TimetableSnapshotSource updater
     ) {
       var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-      // Get trip pattern of last (most recently added) outgoing edge
+      // Get the trip pattern of the added trip which goes through stopA
       var snapshot = updater.getTimetableSnapshot();
       var patternsAtA = snapshot.getPatternsForStop(stopA);
 

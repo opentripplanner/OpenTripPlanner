@@ -5,8 +5,6 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -37,6 +35,7 @@ public class TransmodelAPI {
 
   private static GraphQLSchema schema;
   private static Collection<String> tracingHeaderTags;
+  private static int maxNumberOfResultFields;
 
   private final OtpServerRequestContext serverContext;
   private final TransmodelGraph index;
@@ -75,6 +74,7 @@ public class TransmodelAPI {
       TransitIdMapper.setupFixedFeedId(transitModel.getAgencies());
     }
     tracingHeaderTags = config.tracingHeaderTags();
+    maxNumberOfResultFields = config.maxNumberOfResultFields();
     GqlUtil gqlUtil = new GqlUtil(transitModel.getTimeZone());
     schema = TransmodelGraphQLSchema.create(defaultRouteRequest, gqlUtil);
   }
@@ -83,7 +83,6 @@ public class TransmodelAPI {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
-    @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
@@ -116,24 +115,20 @@ public class TransmodelAPI {
       serverContext,
       variables,
       operationName,
-      maxResolves,
+      maxNumberOfResultFields,
       getTagsFromHeaders(headers)
     );
   }
 
   @POST
   @Consumes("application/graphql")
-  public Response getGraphQL(
-    String query,
-    @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
-    @Context HttpHeaders headers
-  ) {
+  public Response getGraphQL(String query, @Context HttpHeaders headers) {
     return index.executeGraphQL(
       query,
       serverContext,
       null,
       null,
-      maxResolves,
+      maxNumberOfResultFields,
       getTagsFromHeaders(headers)
     );
   }

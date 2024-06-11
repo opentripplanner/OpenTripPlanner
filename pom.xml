@@ -674,7 +674,7 @@
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- TESTING -->
@@ -725,7 +725,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.0.0-jre</version>
+            <version>33.2.1-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>

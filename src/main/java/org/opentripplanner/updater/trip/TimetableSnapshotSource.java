@@ -190,15 +190,17 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
           // starts for example at 40:00, yesterday would probably be a better guess.
           serviceDate = localDateNow();
         }
-
-        uIndex += 1;
-        LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
-        LOG.trace("{}", tripUpdate);
-
         // Determine what kind of trip update this is
         final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
           tripDescriptor
         );
+        if (!fullDataset) {
+          purgePatternModifications(tripScheduleRelationship, tripId, serviceDate);
+        }
+
+        uIndex += 1;
+        LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
+        LOG.trace("{}", tripUpdate);
 
         Result<UpdateSuccess, UpdateError> result;
         try {
@@ -216,8 +218,18 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
                 tripId,
                 serviceDate
               );
-              case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
-              case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
+              case CANCELED -> handleCanceledTrip(
+                tripId,
+                serviceDate,
+                CancelationType.CANCEL,
+                fullDataset
+              );
+              case DELETED -> handleCanceledTrip(
+                tripId,
+                serviceDate,
+                CancelationType.DELETE,
+                fullDataset
+              );
               case REPLACEMENT -> validateAndHandleModifiedTrip(
                 tripUpdate,
                 tripDescriptor,
@@ -253,6 +265,51 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       logUpdateResult(feedId, failuresByRelationship, updateResult);
     }
     return updateResult;
+  }
+
+  /**
+   * Remove previous realtime updates for this trip. This is necessary to avoid previous stop
+   * pattern modifications from persisting. If a trip was previously added with the
+   * ScheduleRelationship ADDED and is now cancelled or deleted, we still want to keep the realtime
+   * added trip pattern.
+   */
+  private void purgePatternModifications(
+    TripDescriptor.ScheduleRelationship tripScheduleRelationship,
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
+    final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
+    if (
+      !isPreviouslyAddedTrip(tripId, pattern, serviceDate) ||
+      (
+        tripScheduleRelationship != TripDescriptor.ScheduleRelationship.CANCELED &&
+        tripScheduleRelationship != TripDescriptor.ScheduleRelationship.DELETED
+      )
+    ) {
+      // Remove previous realtime updates for this trip. This is necessary to avoid previous
+      // stop pattern modifications from persisting. If a trip was previously added with the ScheduleRelationship
+      // ADDED and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
+      this.buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
+    }
+  }
+
+  private boolean isPreviouslyAddedTrip(
+    FeedScopedId tripId,
+    TripPattern pattern,
+    LocalDate serviceDate
+  ) {
+    if (pattern == null) {
+      return false;
+    }
+    var timetable = buffer.resolve(pattern, serviceDate);
+    if (timetable == null) {
+      return false;
+    }
+    var tripTimes = timetable.getTripTimes(tripId);
+    if (tripTimes == null) {
+      return false;
+    }
+    return tripTimes.getRealTimeState() == RealTimeState.ADDED;
   }
 
   private static void logUpdateResult(
@@ -326,11 +383,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       );
       return UpdateError.result(tripId, NO_SERVICE_ON_DATE);
     }
-
-    // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the
-    // sequence of stops has changed, and is now changing back to the originally scheduled one),
-    // mark that previously created trip as DELETED.
-    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
 
     // Get new TripTimes based on scheduled timetable
     var result = pattern
@@ -578,10 +630,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
       "number of stop should match the number of stop time updates"
     );
 
-    // Check whether trip id has been used for previously ADDED trip message and mark previously
-    // created trip as DELETED
-    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
-
     Route route = getOrCreateRoute(tripDescriptor, tripId);
 
     // Create new Trip
@@ -827,8 +875,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
   /**
    * Cancel scheduled trip in buffer given trip id  on service date
    *
-   * @param tripId      trip id
-   * @param serviceDate service date
    * @return true if scheduled trip was cancelled
    */
   private boolean cancelScheduledTrip(
@@ -864,14 +910,11 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
 
   /**
    * Cancel previously added trip from buffer if there is a previously added trip with given trip id
-   * (without agency id) on service date. This does not remove the modified/added trip from the
-   * buffer, it just marks it as canceled. This also does not remove the corresponding vertices and
-   * edges from the Graph. Any TripPattern that was created for the added/modified trip continues to
-   * exist, and will be reused if a similar added/modified trip message is received with the same
-   * route and stop sequence.
+   * on service date. This does not remove the added trip from the buffer, it just marks it as
+   * canceled or deleted. Any TripPattern that was created for the added trip continues to exist,
+   * and will be reused if a similar added trip message is received with the same route and stop
+   * sequence.
    *
-   * @param tripId      trip id without agency id
-   * @param serviceDate service date
    * @return true if a previously added trip was cancelled
    */
   private boolean cancelPreviouslyAddedTrip(
@@ -879,10 +922,10 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     final LocalDate serviceDate,
     CancelationType cancelationType
   ) {
-    boolean success = false;
+    boolean cancelledAddedTrip = false;
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
-    if (pattern != null) {
+    if (isPreviouslyAddedTrip(tripId, pattern, serviceDate)) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
@@ -897,11 +940,10 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
           case DELETE -> newTripTimes.deleteTrip();
         }
         buffer.update(pattern, newTripTimes, serviceDate);
-        success = true;
+        cancelledAddedTrip = true;
       }
     }
-
-    return success;
+    return cancelledAddedTrip;
   }
 
   /**
@@ -996,10 +1038,6 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
     var tripId = trip.getId();
     cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
 
-    // Check whether trip id has been used for previously ADDED/REPLACEMENT trip message and mark it
-    // as DELETED
-    cancelPreviouslyAddedTrip(tripId, serviceDate, CancelationType.DELETE);
-
     // Add new trip
     return addTripToGraphAndBuffer(
       trip,
@@ -1014,19 +1052,25 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
   private Result<UpdateSuccess, UpdateError> handleCanceledTrip(
     FeedScopedId tripId,
     final LocalDate serviceDate,
-    CancelationType markAsDeleted
+    CancelationType cancelationType,
+    boolean fullDataset
   ) {
-    // Try to cancel scheduled trip
-    final boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate, markAsDeleted);
+    var canceledPreviouslyAddedTrip = fullDataset
+      ? false
+      : cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
 
-    // Try to cancel previously added trip
-    final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(
+    // if previously an added trip was removed, there can't be a scheduled trip to remove
+    if (canceledPreviouslyAddedTrip) {
+      return Result.success(UpdateSuccess.noWarnings());
+    }
+    // Try to cancel scheduled trip
+    final boolean cancelScheduledSuccess = cancelScheduledTrip(
       tripId,
       serviceDate,
-      markAsDeleted
+      cancelationType
     );
 
-    if (!cancelScheduledSuccess && !cancelPreviouslyAddedSuccess) {
+    if (!cancelScheduledSuccess) {
       debug(tripId, "No pattern found for tripId. Skipping cancellation.");
       return UpdateError.result(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
