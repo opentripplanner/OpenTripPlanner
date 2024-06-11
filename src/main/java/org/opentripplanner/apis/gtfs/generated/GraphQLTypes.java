@@ -3448,6 +3448,7 @@ public class GraphQLTypes {
 
     private List<String> feeds;
     private List<String> ids;
+    private GraphQLServiceDateFilterInput limitByPatternServiceDates;
     private String name;
     private List<GraphQLMode> transportModes;
 
@@ -3455,6 +3456,10 @@ public class GraphQLTypes {
       if (args != null) {
         this.feeds = (List<String>) args.get("feeds");
         this.ids = (List<String>) args.get("ids");
+        this.limitByPatternServiceDates =
+          new GraphQLServiceDateFilterInput(
+            (Map<String, Object>) args.get("limitByPatternServiceDates")
+          );
         this.name = (String) args.get("name");
         if (args.get("transportModes") != null) {
           this.transportModes =
@@ -3474,6 +3479,10 @@ public class GraphQLTypes {
       return this.ids;
     }
 
+    public GraphQLServiceDateFilterInput getGraphQLLimitByPatternServiceDates() {
+      return this.limitByPatternServiceDates;
+    }
+
     public String getGraphQLName() {
       return this.name;
     }
@@ -3488,6 +3497,12 @@ public class GraphQLTypes {
 
     public void setGraphQLIds(List<String> ids) {
       this.ids = ids;
+    }
+
+    public void setGraphQLLimitByPatternServiceDates(
+      GraphQLServiceDateFilterInput limitByPatternServiceDates
+    ) {
+      this.limitByPatternServiceDates = limitByPatternServiceDates;
     }
 
     public void setGraphQLName(String name) {
@@ -3933,6 +3948,26 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLRoutePatternsArgs {
+
+    private GraphQLServiceDateFilterInput serviceDates;
+
+    public GraphQLRoutePatternsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDates =
+          new GraphQLServiceDateFilterInput((Map<String, Object>) args.get("serviceDates"));
+      }
+    }
+
+    public GraphQLServiceDateFilterInput getGraphQLServiceDates() {
+      return this.serviceDates;
+    }
+
+    public void setGraphQLServiceDates(GraphQLServiceDateFilterInput serviceDates) {
+      this.serviceDates = serviceDates;
+    }
+  }
+
   /** Entities that are relevant for routes that can contain alerts */
   public enum GraphQLRouteAlertType {
     AGENCY,
@@ -4091,6 +4126,35 @@ public class GraphQLTypes {
       GraphQLDestinationScooterPolicyInput destinationScooterPolicy
     ) {
       this.destinationScooterPolicy = destinationScooterPolicy;
+    }
+  }
+
+  public static class GraphQLServiceDateFilterInput {
+
+    private java.time.LocalDate end;
+    private java.time.LocalDate start;
+
+    public GraphQLServiceDateFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        this.end = (java.time.LocalDate) args.get("end");
+        this.start = (java.time.LocalDate) args.get("start");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLEnd() {
+      return this.end;
+    }
+
+    public java.time.LocalDate getGraphQLStart() {
+      return this.start;
+    }
+
+    public void setGraphQLEnd(java.time.LocalDate end) {
+      this.end = end;
+    }
+
+    public void setGraphQLStart(java.time.LocalDate start) {
+      this.start = start;
     }
   }
 
