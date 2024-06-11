@@ -216,6 +216,11 @@ class AddedTripBuilder {
       aimedStopTimes,
       transitModel.getDeduplicator()
     );
+    // validate the scheduled trip times
+    // they are in general superseded by real-time trip times
+    // but in case of trip cancellation, OTP will fall back to scheduled trip times
+    // therefore they must be valid
+    tripTimes.validateNonIncreasingTimes();
     tripTimes.setServiceCode(transitModel.getServiceCodes().get(trip.getServiceId()));
     pattern.add(tripTimes);
     RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();

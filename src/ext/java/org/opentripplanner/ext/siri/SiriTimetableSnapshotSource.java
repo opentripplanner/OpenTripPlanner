@@ -277,7 +277,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
     // remove the previously created trip
-    removePreviousRealtimeUpdate(trip, serviceDate);
+    this.buffer.revertTripToScheduledTripPattern(trip.getId(), serviceDate);
 
     return updateResult;
   }
@@ -304,7 +304,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Mark the scheduled trip in the buffer as deleted, given trip on service date
    *
-   * @param serviceDate service date
    * @return true if scheduled trip was marked as deleted
    */
   private boolean markScheduledTripAsDeleted(Trip trip, final LocalDate serviceDate) {
@@ -325,30 +324,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
         success = true;
       }
-    }
-
-    return success;
-  }
-
-  /**
-   * Removes previous trip-update from buffer if there is an update with given trip on service date
-   *
-   * @param serviceDate service date
-   * @return true if a previously added trip was removed
-   */
-  private boolean removePreviousRealtimeUpdate(final Trip trip, final LocalDate serviceDate) {
-    boolean success = false;
-
-    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(
-      trip.getId(),
-      serviceDate
-    );
-    if (pattern != null) {
-      // Remove the previous real-time-added TripPattern from buffer.
-      // Only one version of the real-time-update should exist
-      snapshotManager.removeLastAddedTripPattern(trip.getId(), serviceDate);
-      snapshotManager.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
-      success = true;
     }
 
     return success;

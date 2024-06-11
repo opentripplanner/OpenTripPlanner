@@ -62,6 +62,8 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class GraphQLDataFetchers {
 
@@ -211,9 +213,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> dropOffMessage();
 
-    public DataFetcher<org.opentripplanner.model.BookingTime> earliestBookingTime();
+    public DataFetcher<BookingTime> earliestBookingTime();
 
-    public DataFetcher<org.opentripplanner.model.BookingTime> latestBookingTime();
+    public DataFetcher<BookingTime> latestBookingTime();
 
     public DataFetcher<Long> maximumBookingNoticeSeconds();
 
@@ -449,7 +451,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> distance();
 
-    public DataFetcher<org.opentripplanner.model.BookingInfo> dropOffBookingInfo();
+    public DataFetcher<BookingInfo> dropOffBookingInfo();
 
     public DataFetcher<String> dropoffType();
 
@@ -481,7 +483,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Leg>> nextLegs();
 
-    public DataFetcher<org.opentripplanner.model.BookingInfo> pickupBookingInfo();
+    public DataFetcher<BookingInfo> pickupBookingInfo();
 
     public DataFetcher<String> pickupType();
 

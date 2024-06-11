@@ -8,6 +8,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -170,6 +171,9 @@ public abstract class RoutingResource {
   @Deprecated
   @QueryParam("wheelchair")
   protected Boolean wheelchair;
+
+  @QueryParam("bookingTime")
+  protected String bookingTime;
 
   /**
    * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride
@@ -727,6 +731,10 @@ public abstract class RoutingResource {
         }
       } else {
         request.setDateTime(date, time, tz);
+      }
+
+      if (bookingTime != null) {
+        request.setBookingTime(LocalDateTime.parse(bookingTime).atZone(tz).toInstant());
       }
     }
 

@@ -43,6 +43,15 @@ public class NearbyStop implements Comparable<NearbyStop> {
     return new NearbyStop(stop, effectiveWalkDistance, edges, state);
   }
 
+  /**
+   * Return {@code true} if this instance has a lower weight/cost than the given {@code other}.
+   * If the state is not set, the distance is used for comparison instead. If the
+   * weight/cost/distance is equals (or worse) this method returns {@code false}.
+   */
+  public boolean isBetter(NearbyStop other) {
+    return compareTo(other) < 0;
+  }
+
   @Override
   public int compareTo(NearbyStop that) {
     if ((this.state == null) != (that.state == null)) {

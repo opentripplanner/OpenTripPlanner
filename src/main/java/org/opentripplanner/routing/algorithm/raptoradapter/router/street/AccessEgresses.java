@@ -1,26 +1,26 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 
 public class AccessEgresses {
 
-  private final Collection<DefaultAccessEgress> accesses;
-  private final Collection<DefaultAccessEgress> egresses;
+  private final Collection<? extends RoutingAccessEgress> accesses;
+  private final Collection<? extends RoutingAccessEgress> egresses;
 
   public AccessEgresses(
-    Collection<DefaultAccessEgress> accesses,
-    Collection<DefaultAccessEgress> egresses
+    Collection<? extends RoutingAccessEgress> accesses,
+    Collection<? extends RoutingAccessEgress> egresses
   ) {
     this.accesses = accesses;
     this.egresses = egresses;
   }
 
-  public Collection<DefaultAccessEgress> getAccesses() {
+  public Collection<? extends RoutingAccessEgress> getAccesses() {
     return accesses;
   }
 
-  public Collection<DefaultAccessEgress> getEgresses() {
+  public Collection<? extends RoutingAccessEgress> getEgresses() {
     return egresses;
   }
 }

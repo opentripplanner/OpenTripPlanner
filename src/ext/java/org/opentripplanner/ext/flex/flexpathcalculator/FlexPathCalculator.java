@@ -8,5 +8,10 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public interface FlexPathCalculator {
   @Nullable
-  FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex);
+  FlexPath calculateFlexPath(
+    Vertex fromv,
+    Vertex tov,
+    int boardStopPosition,
+    int alightStopPosition
+  );
 }

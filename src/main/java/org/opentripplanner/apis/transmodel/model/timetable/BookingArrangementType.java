@@ -8,9 +8,9 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class BookingArrangementType {
 
@@ -127,7 +127,8 @@ public class BookingArrangementType {
                 return "other";
               }
             } else if (
-              earliestBookingTime.getDaysPrior() == 0 && latestBookingTime.getDaysPrior() == 0
+              earliestBookingTime.getDaysPrior() == 0 &&
+              (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
             ) {
               return "dayOfTravelOnly";
             } else {

@@ -10,6 +10,12 @@ public class TransitStopVertexBuilder {
   private RegularStop stop;
   private Set<TransitMode> modes;
 
+  /**
+   * Protected access to avoid instantiation, use
+   * {@link org.opentripplanner.street.model.vertex.TransitStopVertex#of()} method instead.
+   */
+  TransitStopVertexBuilder() {}
+
   public TransitStopVertexBuilder withStop(RegularStop stop) {
     this.stop = stop;
     return this;

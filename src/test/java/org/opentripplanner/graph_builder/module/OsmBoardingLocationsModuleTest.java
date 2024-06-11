@@ -19,7 +19,7 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -74,7 +74,7 @@ class OsmBoardingLocationsModuleTest {
 
     var provider = new OsmProvider(file, false);
     var floatingBusVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
+      TransitStopVertex.of().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
     );
     var floatingBoardingLocation = factory.osmBoardingLocation(
       floatingBusVertex.getCoordinate(),
@@ -91,10 +91,10 @@ class OsmBoardingLocationsModuleTest {
     osmModule.buildGraph();
 
     var platformVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(platform).withModes(Set.of(TransitMode.RAIL))
+      TransitStopVertex.of().withStop(platform).withModes(Set.of(TransitMode.RAIL))
     );
     var busVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(busStop).withModes(Set.of(TransitMode.BUS))
+      TransitStopVertex.of().withStop(busStop).withModes(Set.of(TransitMode.BUS))
     );
 
     transitModel.index();

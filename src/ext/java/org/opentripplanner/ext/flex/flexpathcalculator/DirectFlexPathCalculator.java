@@ -22,7 +22,12 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
   }
 
   @Override
-  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
+  public FlexPath calculateFlexPath(
+    Vertex fromv,
+    Vertex tov,
+    int boardStopPosition,
+    int alightStopPosition
+  ) {
     double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
     LineString geometry = GeometryUtils
       .getGeometryFactory()
