@@ -30,7 +30,8 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
-import org.opentripplanner.apis.gtfs.mapping.RouteRequestMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -480,13 +481,17 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
+      RouteRequest request = LegacyRouteRequestMapper.toRouteRequest(environment, context);
+      return getPlanResult(context, request);
+    };
+  }
+
+  @Override
+  public DataFetcher<DataFetcherResult<RoutingResponse>> planConnection() {
+    return environment -> {
+      GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
       RouteRequest request = RouteRequestMapper.toRouteRequest(environment, context);
-      RoutingResponse res = context.routingService().route(request);
-      return DataFetcherResult
-        .<RoutingResponse>newResult()
-        .data(res)
-        .localContext(Map.of("locale", request.locale()))
-        .build();
+      return getPlanResult(context, request);
     };
   }
 
@@ -931,6 +936,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().graphFinder();
+  }
+
+  private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {
+    RoutingResponse res = context.routingService().route(request);
+    return DataFetcherResult
+      .<RoutingResponse>newResult()
+      .data(res)
+      .localContext(Map.of("locale", request.locale()))
+      .build();
   }
 
   protected static List<TransitAlert> filterAlerts(

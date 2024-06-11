@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;

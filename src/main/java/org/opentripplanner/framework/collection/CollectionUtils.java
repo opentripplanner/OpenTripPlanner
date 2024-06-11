@@ -32,4 +32,17 @@ public class CollectionUtils {
     }
     return stream.collect(Collectors.joining(", ", "[", "]"));
   }
+
+  /**
+   * A null-safe version of isEmpty() for a collection.
+   * <p>
+   * If the collection is {@code null} then {@code true} is returned.
+   * <p>
+   * If the collection is empty then {@code true} is returned.
+   * <p>
+   * Otherwise {@code false} is returned.
+   */
+  public static boolean isEmpty(@Nullable Collection<?> c) {
+    return c == null || c.isEmpty();
+  }
 }

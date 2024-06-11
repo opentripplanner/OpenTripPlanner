@@ -1,4 +1,7 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
+
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.parseNotFilters;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.parseSelectFilters;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
@@ -7,10 +10,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -32,7 +33,7 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class RouteRequestMapper {
+public class LegacyRouteRequestMapper {
 
   @Nonnull
   public static RouteRequest toRouteRequest(
@@ -254,33 +255,6 @@ public class RouteRequestMapper {
       (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
     return request;
-  }
-
-  private static Set<String> parseNotFilters(Collection<Map<String, Object>> filters) {
-    return parseFilters(filters, "not");
-  }
-
-  private static Set<String> parseSelectFilters(Collection<Map<String, Object>> filters) {
-    return parseFilters(filters, "select");
-  }
-
-  @Nonnull
-  private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
-    return filters
-      .stream()
-      .flatMap(f ->
-        parseOperation((Collection<Map<String, Collection<String>>>) f.getOrDefault(key, List.of()))
-      )
-      .collect(Collectors.toSet());
-  }
-
-  private static Stream<String> parseOperation(Collection<Map<String, Collection<String>>> map) {
-    return map
-      .stream()
-      .flatMap(f -> {
-        var tags = f.getOrDefault("tags", List.of());
-        return tags.stream();
-      });
   }
 
   private static <T> boolean hasArgument(Map<String, T> m, String name) {
