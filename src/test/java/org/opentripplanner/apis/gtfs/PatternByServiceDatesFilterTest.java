@@ -66,6 +66,7 @@ class PatternByServiceDatesFilterTest {
 
   static List<Arguments> invalidRangeCases() {
     return List.of(
+      Arguments.of(null, null),
       Arguments.of(parse("2024-05-02"), parse("2024-05-01")),
       Arguments.of(parse("2024-05-03"), parse("2024-05-01"))
     );
@@ -85,8 +86,7 @@ class PatternByServiceDatesFilterTest {
       Arguments.of(parse("2024-05-02"), parse("2024-05-02")),
       Arguments.of(parse("2024-05-02"), parse("2024-05-03")),
       Arguments.of(null, parse("2024-05-03")),
-      Arguments.of(parse("2024-05-03"), null),
-      Arguments.of(null, null)
+      Arguments.of(parse("2024-05-03"), null)
     );
   }
 
@@ -100,7 +100,6 @@ class PatternByServiceDatesFilterTest {
 
   static List<Arguments> ranges() {
     return List.of(
-      Arguments.of(null, null, NOT_REMOVED),
       Arguments.of(null, parse("2024-05-03"), NOT_REMOVED),
       Arguments.of(null, parse("2024-05-01"), NOT_REMOVED),
       Arguments.of(parse("2024-05-03"), null, NOT_REMOVED),

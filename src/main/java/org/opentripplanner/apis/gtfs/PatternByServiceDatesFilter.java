@@ -42,7 +42,11 @@ public class PatternByServiceDatesFilter {
     this.startInclusive = startInclusive;
     this.endInclusive = endInclusive;
 
-    if (startInclusive != null && endInclusive != null && startInclusive.isAfter(endInclusive)) {
+    if (startInclusive == null && endInclusive == null) {
+      throw new IllegalArgumentException("startInclusive and endInclusive cannot be both null");
+    } else if (
+      startInclusive != null && endInclusive != null && startInclusive.isAfter(endInclusive)
+    ) {
       throw new IllegalArgumentException("start must be before end");
     }
   }
