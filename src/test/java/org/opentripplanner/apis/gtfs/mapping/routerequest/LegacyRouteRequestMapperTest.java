@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +38,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
-class RouteRequestMapperTest implements PlanTestConstants {
+class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static final GraphQLRequestContext context;
 
@@ -83,7 +83,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
     var env = executionContext(arguments);
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(env, context);
 
     assertNotNull(routeRequest);
 
@@ -118,7 +118,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
   void banning(Map<String, Object> banned, String expectedFilters) {
     Map<String, Object> arguments = Map.of("banned", banned);
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
     assertNotNull(routeRequest);
 
     assertEquals(expectedFilters, routeRequest.journey().transit().filters().toString());
@@ -144,7 +147,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
   void modes(List<Map<String, Object>> modes, String expectedFilters) {
     Map<String, Object> arguments = Map.of("transportModes", modes);
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
     assertNotNull(routeRequest);
 
     assertEquals(expectedFilters, routeRequest.journey().transit().filters().toString());
@@ -157,7 +163,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
   @Test
   void defaultBikeOptimize() {
     Map<String, Object> arguments = Map.of();
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
     assertEquals(SAFE_STREETS, routeRequest.preferences().bike().optimizeType());
   }
 
@@ -170,7 +179,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
       Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
     );
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
 
     assertEquals(TRIANGLE, routeRequest.preferences().bike().optimizeType());
     assertEquals(
@@ -196,7 +208,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
       Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
     );
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
 
     assertEquals(OptimizationTypeMapper.map(bot), routeRequest.preferences().bike().optimizeType());
     assertEquals(
@@ -210,10 +225,16 @@ class RouteRequestMapperTest implements PlanTestConstants {
     var reluctance = 119d;
     Map<String, Object> arguments = Map.of("walkReluctance", reluctance);
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
     assertEquals(reluctance, routeRequest.preferences().walk().reluctance());
 
-    var noParamsRequest = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    var noParamsRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(Map.of()),
+      context
+    );
     assertNotEquals(reluctance, noParamsRequest.preferences().walk().reluctance());
   }
 

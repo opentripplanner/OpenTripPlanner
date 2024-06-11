@@ -17,7 +17,12 @@ public class GraphQLUtils {
   }
 
   public static Locale getLocale(DataFetchingEnvironment environment) {
-    return getLocale(environment, environment.getArgument("language"));
+    var localeString = environment.getArgument("language");
+    if (localeString != null) {
+      return Locale.forLanguageTag((String) localeString);
+    }
+
+    return getLocaleFromEnvironment(environment);
   }
 
   public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
@@ -25,6 +30,18 @@ public class GraphQLUtils {
       return Locale.forLanguageTag(localeString);
     }
 
+    return getLocaleFromEnvironment(environment);
+  }
+
+  public static Locale getLocale(DataFetchingEnvironment environment, Locale locale) {
+    if (locale != null) {
+      return locale;
+    }
+
+    return getLocaleFromEnvironment(environment);
+  }
+
+  public static Locale getLocaleFromEnvironment(DataFetchingEnvironment environment) {
     // This can come from the accept-language header
     var userLocale = environment.getLocale();
     var defaultLocale = getDefaultLocale(environment);

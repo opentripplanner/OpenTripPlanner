@@ -810,10 +810,10 @@
     "@graphql-codegen/visitor-plugin-common" "2.13.1"
     tslib "~2.6.0"
 
-"@graphql-codegen/java@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/java/-/java-4.0.0.tgz#245e4403f19c390d5b6a03956558e34c3c4d7848"
-  integrity sha512-7pxwkgm0eFRDpq6PZx3n2tErBLr1wsG75USvCDnkkoz0145UCErk9GMAEfYgGx1mAm9+oUT+1wjZozjEYWjSow==
+"@graphql-codegen/java@4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/java/-/java-4.0.1.tgz#2f62a7361e702691500c83903c6c6f829496fa5c"
+  integrity sha512-p51hsOgnuJInSNy+X2Vb+Su9U41iK1xU0YeciVx7JSnOyiT5nQRuDzsjDFvUIL9YZTM+KGbsomaRISOPM6Yq/Q==
   dependencies:
     "@graphql-codegen/java-common" "^3.0.0"
     "@graphql-codegen/plugin-helpers" "^3.0.0"

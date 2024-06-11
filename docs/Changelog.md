@@ -29,6 +29,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix parsing of GBFS feeds [#5891](https://github.com/opentripplanner/OpenTripPlanner/pull/5891)
 - Fix SIRI update travel back in time [#5867](https://github.com/opentripplanner/OpenTripPlanner/pull/5867)
 - Limit result size and execution time in TransModel GraphQL API [#5883](https://github.com/opentripplanner/OpenTripPlanner/pull/5883)
+- Fix real-time added patterns persistence with DIFFERENTIAL updates [#5726](https://github.com/opentripplanner/OpenTripPlanner/pull/5726)
+- Add plan query that follows the relay connection specification [#5185](https://github.com/opentripplanner/OpenTripPlanner/pull/5185)
+- Fix debug client after breaking change in dependency graphql-request [#5899](https://github.com/opentripplanner/OpenTripPlanner/pull/5899)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

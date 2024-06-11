@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeLong;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMedium;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeShort;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -122,6 +125,45 @@ public class DurationUtilsTest {
   public void testRequireNonNegative() {
     assertThrows(NullPointerException.class, () -> requireNonNegative(null));
     assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Duration.ofSeconds(-1)));
+  }
+
+  @Test
+  public void testRequireNonNegativeLong() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeLong(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeLong(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeLong(Duration.ofDays(3), "test")
+    );
+  }
+
+  @Test
+  public void testRequireNonNegativeMedium() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMedium(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeMedium(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeMedium(Duration.ofHours(3), "test")
+    );
+  }
+
+  @Test
+  public void testRequireNonNegativeShort() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeShort(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeShort(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeShort(Duration.ofMinutes(31), "test")
+    );
   }
 
   @Test

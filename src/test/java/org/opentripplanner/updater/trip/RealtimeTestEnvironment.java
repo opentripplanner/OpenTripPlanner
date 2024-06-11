@@ -256,15 +256,22 @@ public final class RealtimeTestEnvironment {
   // GTFS-RT updates
 
   public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update) {
-    return applyTripUpdates(List.of(update));
+    return applyTripUpdates(List.of(update), false);
   }
 
-  public UpdateResult applyTripUpdates(List<GtfsRealtime.TripUpdate> updates) {
+  public UpdateResult applyTripUpdate(GtfsRealtime.TripUpdate update, boolean differential) {
+    return applyTripUpdates(List.of(update), differential);
+  }
+
+  public UpdateResult applyTripUpdates(
+    List<GtfsRealtime.TripUpdate> updates,
+    boolean differential
+  ) {
     Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
     return gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-      true,
+      !differential,
       updates,
       getFeedId()
     );
