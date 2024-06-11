@@ -3606,7 +3606,7 @@ type QueryType {
     """Get all routes"""
     routes(
         """Only return routes with these ids"""
-        ids: [String]
+        ids: [String] @deprecated(reason: "Since it is hard to reason about the ID filter being combined with others in this resolver, it will be moved to a separate one.")
 
         """Only return routes with these feedIds"""
         feeds: [String]
@@ -3624,7 +3624,7 @@ type QueryType {
         correspond to a how a passenger thinks of a calendar date. For example, a night bus running
         on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
         """
-        limitByPatternServiceDates: ServiceDateFilterInput
+        serviceDates: ServiceDateFilterInput
     ): [Route]
 
     """

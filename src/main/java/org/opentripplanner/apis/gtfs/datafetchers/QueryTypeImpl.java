@@ -611,15 +611,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           );
       }
 
-      if (
-        PatternByServiceDatesFilter.hasServiceDateFilter(
-          args.getGraphQLLimitByPatternServiceDates()
-        )
-      ) {
-        var filter = new PatternByServiceDatesFilter(
-          args.getGraphQLLimitByPatternServiceDates(),
-          transitService
-        );
+      if (PatternByServiceDatesFilter.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+        var filter = new PatternByServiceDatesFilter(args.getGraphQLServiceDates(), transitService);
         routeStream = filter.filterRoutes(routeStream).stream();
       }
       return routeStream.toList();
