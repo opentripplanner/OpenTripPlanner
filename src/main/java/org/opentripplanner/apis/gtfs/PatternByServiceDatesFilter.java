@@ -3,11 +3,13 @@ package org.opentripplanner.apis.gtfs;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDateFilterInput;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -16,26 +18,26 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class PatternByServiceDatesFilter {
 
-  private final TransitService transitService;
   private final LocalDate startInclusive;
   private final LocalDate endInclusive;
+  private final Function<Route, Collection<TripPattern>> getPatternsForRoute;
+  private final Function<Trip, Collection<LocalDate>> getServiceDatesForTrip;
 
   /**
    *
-   * @param transitService
    * @param startInclusive The inclusive start date to check the patterns for. If null then no start
    *                       date is defined and this will therefore match all dates.
    * @param endInclusive The inclusive end date to check the patterns for. If null then no end date
    *                     is defined this will therefore match all dates.
    */
   PatternByServiceDatesFilter(
-    TransitService transitService,
     @Nullable LocalDate startInclusive,
-    @Nullable LocalDate endInclusive
+    @Nullable LocalDate endInclusive,
+    Function<Route, Collection<TripPattern>> getPatternsForRoute,
+    Function<Trip, Collection<LocalDate>> getServiceDatesForTrip
   ) {
-    Objects.requireNonNull(transitService);
-    this.transitService = transitService;
-
+    this.getPatternsForRoute = Objects.requireNonNull(getPatternsForRoute);
+    this.getServiceDatesForTrip = Objects.requireNonNull(getServiceDatesForTrip);
     // optional
     this.startInclusive = startInclusive;
     this.endInclusive = endInclusive;
@@ -46,10 +48,15 @@ public class PatternByServiceDatesFilter {
   }
 
   public PatternByServiceDatesFilter(
-    TransitService transitService,
-    GraphQLServiceDateFilterInput filterInput
+    GraphQLServiceDateFilterInput filterInput,
+    TransitService transitService
   ) {
-    this(transitService, filterInput.getGraphQLStart(), filterInput.getGraphQLEnd());
+    this(
+      filterInput.getGraphQLStart(),
+      filterInput.getGraphQLEnd(),
+      transitService::getPatternsForRoute,
+      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
+    );
   }
 
   /**
@@ -66,7 +73,7 @@ public class PatternByServiceDatesFilter {
   public Collection<Route> filterRoutes(Stream<Route> routeStream) {
     return routeStream
       .filter(r -> {
-        var patterns = transitService.getPatternsForRoute(r);
+        var patterns = getPatternsForRoute.apply(r);
         return !this.filterPatterns(patterns).isEmpty();
       })
       .toList();
@@ -76,9 +83,7 @@ public class PatternByServiceDatesFilter {
     return pattern
       .scheduledTripsAsStream()
       .anyMatch(trip -> {
-        var dates = transitService
-          .getCalendarService()
-          .getServiceDatesForServiceId(trip.getServiceId());
+        var dates = getServiceDatesForTrip.apply(trip);
 
         return dates
           .stream()

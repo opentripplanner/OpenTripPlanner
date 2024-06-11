@@ -12,17 +12,12 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDateFilterInput;
-import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -31,14 +26,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
 
 class PatternByServiceDatesFilterTest {
 
-  private static final TransitService EMPTY_SERVICE = new DefaultTransitService(new TransitModel());
   private static final Route ROUTE_1 = TransitModelForTest.route("1").build();
   private static final FeedScopedId SERVICE_ID = id("service");
   private static final Trip TRIP = TransitModelForTest
@@ -85,7 +76,7 @@ class PatternByServiceDatesFilterTest {
   void invalidRange(LocalDate start, LocalDate end) {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new PatternByServiceDatesFilter(EMPTY_SERVICE, start, end)
+      () -> new PatternByServiceDatesFilter(start, end, r -> List.of(), d -> List.of())
     );
   }
 
@@ -102,7 +93,9 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("validRangeCases")
   void validRange(LocalDate start, LocalDate end) {
-    assertDoesNotThrow(() -> new PatternByServiceDatesFilter(EMPTY_SERVICE, start, end));
+    assertDoesNotThrow(() ->
+      new PatternByServiceDatesFilter(start, end, r -> List.of(), d -> List.of())
+    );
   }
 
   static List<Arguments> ranges() {
@@ -124,8 +117,7 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("ranges")
   void filterPatterns(LocalDate start, LocalDate end, FilterExpectation expectation) {
-    var service = mockService();
-    var filter = new PatternByServiceDatesFilter(service, start, end);
+    var filter = mockFilter(start, end);
 
     var filterInput = List.of(PATTERN_1);
     var filterOutput = filter.filterPatterns(filterInput);
@@ -140,8 +132,7 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("ranges")
   void filterRoutes(LocalDate start, LocalDate end, FilterExpectation expectation) {
-    var service = mockService();
-    var filter = new PatternByServiceDatesFilter(service, start, end);
+    var filter = mockFilter(start, end);
 
     var filterInput = List.of(ROUTE_1);
     var filterOutput = filter.filterRoutes(filterInput.stream());
@@ -153,21 +144,13 @@ class PatternByServiceDatesFilterTest {
     }
   }
 
-  private static TransitService mockService() {
-    var data = new CalendarServiceData();
-    data.putServiceDatesForServiceId(SERVICE_ID, List.of(parse("2024-05-01"), parse("2024-06-01")));
-    var service = new CalendarServiceImpl(data);
-    return new DefaultTransitService(new TransitModel()) {
-      @Override
-      public Collection<TripPattern> getPatternsForRoute(Route route) {
-        return Set.of(PATTERN_1);
-      }
-
-      @Override
-      public CalendarService getCalendarService() {
-        return service;
-      }
-    };
+  private static PatternByServiceDatesFilter mockFilter(LocalDate start, LocalDate end) {
+    return new PatternByServiceDatesFilter(
+      start,
+      end,
+      route -> List.of(PATTERN_1),
+      trip -> List.of(parse("2024-05-01"), parse("2024-06-01"))
+    );
   }
 
   public static List<GraphQLServiceDateFilterInput> noFilterCases() {
