@@ -172,12 +172,9 @@ public final class TimetableSnapshotManager {
    * If a previous realtime update has changed which trip pattern is associated with the given trip
    * on the given service date, this method will dissociate the trip from that pattern and remove
    * the trip's timetables from that pattern on that particular service date.
-   *
+   * <p>
    * For this service date, the trip will revert to its original trip pattern from the scheduled
    * data, remaining on that pattern unless it's changed again by a future realtime update.
-   *
-   * @return true if the trip was found to be shifted to a different trip pattern by a realtime
-   * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public void revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
@@ -189,6 +186,8 @@ public final class TimetableSnapshotManager {
    * dates which would increase memory consumption.
    * If your OTP instances are restarted throughout the day, this is less useful and can be
    * turned off.
+   *
+   * @return true if any data has been modified and false if no purging has happened.
    */
   private boolean purgeExpiredData() {
     final LocalDate today = localDateNow.get();

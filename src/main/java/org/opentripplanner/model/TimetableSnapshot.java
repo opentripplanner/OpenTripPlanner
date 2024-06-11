@@ -346,6 +346,8 @@ public class TimetableSnapshot {
 
   /**
    * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.
+   *
+   * @return true if any data has been modified and false if no purging has happened.
    */
   public boolean purgeExpiredData(LocalDate serviceDate) {
     if (readOnly) {
