@@ -104,8 +104,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          for (NearbyStop sd : findNearbyStops(
-            nearbyStopFinder,
+          for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
             ts0,
             transferProfile,
             transferProfile.journey().transfer(),
@@ -126,8 +125,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           if (OTPFeature.FlexRouting.isOn()) {
             // This code is for finding transfers from AreaStops to Stops, transfers
             // from Stops to AreaStops and between Stops are already covered above.
-            for (NearbyStop sd : findNearbyStops(
-              nearbyStopFinder,
+            for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
               ts0,
               transferProfile,
               transferProfile.journey().transfer(),
@@ -201,16 +199,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     } else {
       return finder;
     }
-  }
-
-  private static Iterable<NearbyStop> findNearbyStops(
-    NearbyStopFinder nearbyStopFinder,
-    Vertex vertex,
-    RouteRequest request,
-    StreetRequest streetRequest,
-    boolean reverseDirection
-  ) {
-    return nearbyStopFinder.findNearbyStops(vertex, request, streetRequest, reverseDirection);
   }
 
   private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}
