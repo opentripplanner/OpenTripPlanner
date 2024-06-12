@@ -40,22 +40,6 @@ public class SimpleIntersectionTraversalCalculator
     }
   }
 
-  public int getMinRightTurnAngle() {
-    return 45;
-  }
-
-  public int getMaxRightTurnAngle() {
-    return 135;
-  }
-
-  public int getMinLeftTurnAngle() {
-    return 225;
-  }
-
-  public int getMaxLeftTurnAngle() {
-    return 315;
-  }
-
   /**
    * Expected time it takes to make a right at a light.
    */
@@ -212,10 +196,10 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   private boolean isLeftTurn(int turnAngle) {
-    return turnAngle >= getMinLeftTurnAngle() && turnAngle < getMaxLeftTurnAngle();
+    return turnAngle >= 225 && turnAngle < 315;
   }
 
   private boolean isRightTurn(int turnAngle) {
-    return turnAngle >= getMinRightTurnAngle() && turnAngle < getMaxRightTurnAngle();
+    return turnAngle >= 45 && turnAngle < 135;
   }
 }
