@@ -37,7 +37,6 @@ public class DirectFlexRouter {
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
         request,
         temporaryVertices,
-        serverContext.transitService(),
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         false,
@@ -47,7 +46,6 @@ public class DirectFlexRouter {
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
         request,
         temporaryVertices,
-        serverContext.transitService(),
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         true,
