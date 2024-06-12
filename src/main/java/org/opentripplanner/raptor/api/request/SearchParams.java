@@ -26,7 +26,6 @@ public class SearchParams {
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
   private final Collection<RaptorAccessEgress> egressPaths;
-  private final boolean allowEmptyAccessEgressPaths;
 
   /**
    * Default values are defined in the default constructor.
@@ -42,7 +41,6 @@ public class SearchParams {
     constrainedTransfers = false;
     accessPaths = List.of();
     egressPaths = List.of();
-    allowEmptyAccessEgressPaths = false;
   }
 
   SearchParams(SearchParamsBuilder<?> builder) {
@@ -56,7 +54,6 @@ public class SearchParams {
     this.constrainedTransfers = builder.constrainedTransfers();
     this.accessPaths = List.copyOf(builder.accessPaths());
     this.egressPaths = List.copyOf(builder.egressPaths());
-    this.allowEmptyAccessEgressPaths = builder.allowEmptyAccessEgressPaths();
   }
 
   /**
@@ -199,14 +196,6 @@ public class SearchParams {
   }
 
   /**
-   * If enabled, the check for access and egress paths is skipped. This is required when wanting to
-   * eg. run a separate heuristic search, with no pre-defined destinations.
-   */
-  public boolean allowEmptyAccessEgressPaths() {
-    return allowEmptyAccessEgressPaths;
-  }
-
-  /**
    * Get the maximum duration of any access or egress path in seconds.
    */
   public int accessEgressMaxDurationSeconds() {
@@ -279,14 +268,8 @@ public class SearchParams {
       isEarliestDepartureTimeSet() || isLatestArrivalTimeSet(),
       "'earliestDepartureTime' or 'latestArrivalTime' is required."
     );
-    assertProperty(
-      allowEmptyAccessEgressPaths || !accessPaths.isEmpty(),
-      "At least one 'accessPath' is required."
-    );
-    assertProperty(
-      allowEmptyAccessEgressPaths || !egressPaths.isEmpty(),
-      "At least one 'egressPath' is required."
-    );
+    assertProperty(!accessPaths.isEmpty(), "At least one 'accessPath' is required.");
+    assertProperty(!egressPaths.isEmpty(), "At least one 'egressPath' is required.");
     assertProperty(
       !(preferLateArrival && !isLatestArrivalTimeSet()),
       "The 'latestArrivalTime' is required when 'departAsLateAsPossible' is set."
