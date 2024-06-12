@@ -110,7 +110,6 @@ nav:
     - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'
     - Geocoder API: 'sandbox/GeocoderAPI.md'
-    - Travel Time Isochrones: 'sandbox/TravelTime.md'
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'
     - Fares: 'sandbox/Fares.md'
     - Ride Hailing: 'sandbox/RideHailing.md'

@@ -7,19 +7,14 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
 import org.rutebanken.siri20.util.SiriXml;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableRequestStructure;
 import uk.org.siri.siri20.MessageQualifierStructure;
 import uk.org.siri.siri20.RequestorRef;
 import uk.org.siri.siri20.ServiceRequest;
 import uk.org.siri.siri20.Siri;
 import uk.org.siri.siri20.SituationExchangeRequestStructure;
-import uk.org.siri.siri20.VehicleMonitoringRequestStructure;
 
 public class SiriHelper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SiriHelper.class);
 
   public static Siri unmarshal(InputStream is) throws JAXBException, XMLStreamException {
     return SiriXml.parseXml(is);
@@ -27,16 +22,6 @@ public class SiriHelper {
 
   public static String createSXServiceRequestAsXml(String requestorRef) throws JAXBException {
     Siri request = createSXServiceRequest(requestorRef);
-    return SiriXml.toXml(request);
-  }
-
-  public static String createVMServiceRequestAsXml(String requestorRef) throws JAXBException {
-    Siri request = createVMServiceRequest(requestorRef);
-    return SiriXml.toXml(request);
-  }
-
-  public static String createETServiceRequestAsXml(String requestorRef) throws JAXBException {
-    Siri request = createETServiceRequest(requestorRef, null);
     return SiriXml.toXml(request);
   }
 
@@ -101,31 +86,6 @@ public class SiriHelper {
 
     etRequest.setMessageIdentifier(messageIdentifier);
     serviceRequest.getEstimatedTimetableRequests().add(etRequest);
-
-    request.setServiceRequest(serviceRequest);
-
-    return request;
-  }
-
-  private static Siri createVMServiceRequest(String requestorRefValue) {
-    Siri request = createSiriObject();
-
-    ServiceRequest serviceRequest = new ServiceRequest();
-    serviceRequest.setRequestTimestamp(ZonedDateTime.now());
-
-    RequestorRef requestorRef = new RequestorRef();
-    requestorRef.setValue(requestorRefValue);
-    serviceRequest.setRequestorRef(requestorRef);
-
-    VehicleMonitoringRequestStructure vmRequest = new VehicleMonitoringRequestStructure();
-    vmRequest.setRequestTimestamp(ZonedDateTime.now());
-    vmRequest.setVersion("2.0");
-
-    MessageQualifierStructure messageIdentifier = new MessageQualifierStructure();
-    messageIdentifier.setValue(UUID.randomUUID().toString());
-
-    vmRequest.setMessageIdentifier(messageIdentifier);
-    serviceRequest.getVehicleMonitoringRequests().add(vmRequest);
 
     request.setServiceRequest(serviceRequest);
 

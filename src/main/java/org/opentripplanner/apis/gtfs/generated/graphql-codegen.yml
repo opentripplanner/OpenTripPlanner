@@ -26,8 +26,15 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Grams
-    OffsetDateTime: java.time.OffsetDateTime
     Duration: java.time.Duration
+    Cost: org.opentripplanner.framework.model.Cost
+    CoordinateValue: Double
+    Locale: java.util.Locale
+    OffsetDateTime: java.time.OffsetDateTime
+    Speed: Double
+    Reluctance: Double
+    Ratio: Double
+
   mappers:
     AbsoluteDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection#GraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency
@@ -73,6 +80,9 @@ config:
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
+    PlanConnection: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
+    PlanEdge: graphql.relay.DefaultEdge#DefaultEdge<Itinerary>
+    PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: String
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route

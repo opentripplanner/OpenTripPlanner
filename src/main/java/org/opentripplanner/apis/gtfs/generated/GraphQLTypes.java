@@ -19,6 +19,26 @@ public class GraphQLTypes {
     WEST,
   }
 
+  public static class GraphQLAccessibilityPreferencesInput {
+
+    private GraphQLWheelchairPreferencesInput wheelchair;
+
+    public GraphQLAccessibilityPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.wheelchair =
+          new GraphQLWheelchairPreferencesInput((Map<String, Object>) args.get("wheelchair"));
+      }
+    }
+
+    public GraphQLWheelchairPreferencesInput getGraphQLWheelchair() {
+      return this.wheelchair;
+    }
+
+    public void setGraphQLWheelchair(GraphQLWheelchairPreferencesInput wheelchair) {
+      this.wheelchair = wheelchair;
+    }
+  }
+
   public static class GraphQLAgencyAlertsArgs {
 
     private List<GraphQLAgencyAlertType> types;
@@ -94,6 +114,269 @@ public class GraphQLTypes {
     WARNING,
   }
 
+  public static class GraphQLAlightPreferencesInput {
+
+    private java.time.Duration slack;
+
+    public GraphQLAlightPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.slack = (java.time.Duration) args.get("slack");
+      }
+    }
+
+    public java.time.Duration getGraphQLSlack() {
+      return this.slack;
+    }
+
+    public void setGraphQLSlack(java.time.Duration slack) {
+      this.slack = slack;
+    }
+  }
+
+  public static class GraphQLBicycleParkingPreferencesInput {
+
+    private List<GraphQLParkingFilterInput> filters;
+    private List<GraphQLParkingFilterInput> preferred;
+    private org.opentripplanner.framework.model.Cost unpreferredCost;
+
+    public GraphQLBicycleParkingPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("filters") != null) {
+          this.filters = (List<GraphQLParkingFilterInput>) args.get("filters");
+        }
+        if (args.get("preferred") != null) {
+          this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
+        }
+        this.unpreferredCost =
+          (org.opentripplanner.framework.model.Cost) args.get("unpreferredCost");
+      }
+    }
+
+    public List<GraphQLParkingFilterInput> getGraphQLFilters() {
+      return this.filters;
+    }
+
+    public List<GraphQLParkingFilterInput> getGraphQLPreferred() {
+      return this.preferred;
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLUnpreferredCost() {
+      return this.unpreferredCost;
+    }
+
+    public void setGraphQLFilters(List<GraphQLParkingFilterInput> filters) {
+      this.filters = filters;
+    }
+
+    public void setGraphQLPreferred(List<GraphQLParkingFilterInput> preferred) {
+      this.preferred = preferred;
+    }
+
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.framework.model.Cost unpreferredCost
+    ) {
+      this.unpreferredCost = unpreferredCost;
+    }
+  }
+
+  public static class GraphQLBicyclePreferencesInput {
+
+    private org.opentripplanner.framework.model.Cost boardCost;
+    private GraphQLCyclingOptimizationInput optimization;
+    private GraphQLBicycleParkingPreferencesInput parking;
+    private Double reluctance;
+    private GraphQLBicycleRentalPreferencesInput rental;
+    private Double speed;
+    private GraphQLBicycleWalkPreferencesInput walk;
+
+    public GraphQLBicyclePreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.boardCost = (org.opentripplanner.framework.model.Cost) args.get("boardCost");
+        this.optimization =
+          new GraphQLCyclingOptimizationInput((Map<String, Object>) args.get("optimization"));
+        this.parking =
+          new GraphQLBicycleParkingPreferencesInput((Map<String, Object>) args.get("parking"));
+        this.reluctance = (Double) args.get("reluctance");
+        this.rental =
+          new GraphQLBicycleRentalPreferencesInput((Map<String, Object>) args.get("rental"));
+        this.speed = (Double) args.get("speed");
+        this.walk = new GraphQLBicycleWalkPreferencesInput((Map<String, Object>) args.get("walk"));
+      }
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLBoardCost() {
+      return this.boardCost;
+    }
+
+    public GraphQLCyclingOptimizationInput getGraphQLOptimization() {
+      return this.optimization;
+    }
+
+    public GraphQLBicycleParkingPreferencesInput getGraphQLParking() {
+      return this.parking;
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public GraphQLBicycleRentalPreferencesInput getGraphQLRental() {
+      return this.rental;
+    }
+
+    public Double getGraphQLSpeed() {
+      return this.speed;
+    }
+
+    public GraphQLBicycleWalkPreferencesInput getGraphQLWalk() {
+      return this.walk;
+    }
+
+    public void setGraphQLBoardCost(org.opentripplanner.framework.model.Cost boardCost) {
+      this.boardCost = boardCost;
+    }
+
+    public void setGraphQLOptimization(GraphQLCyclingOptimizationInput optimization) {
+      this.optimization = optimization;
+    }
+
+    public void setGraphQLParking(GraphQLBicycleParkingPreferencesInput parking) {
+      this.parking = parking;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+
+    public void setGraphQLRental(GraphQLBicycleRentalPreferencesInput rental) {
+      this.rental = rental;
+    }
+
+    public void setGraphQLSpeed(Double speed) {
+      this.speed = speed;
+    }
+
+    public void setGraphQLWalk(GraphQLBicycleWalkPreferencesInput walk) {
+      this.walk = walk;
+    }
+  }
+
+  public static class GraphQLBicycleRentalPreferencesInput {
+
+    private List<String> allowedNetworks;
+    private List<String> bannedNetworks;
+    private GraphQLDestinationBicyclePolicyInput destinationBicyclePolicy;
+
+    public GraphQLBicycleRentalPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.allowedNetworks = (List<String>) args.get("allowedNetworks");
+        this.bannedNetworks = (List<String>) args.get("bannedNetworks");
+        this.destinationBicyclePolicy =
+          new GraphQLDestinationBicyclePolicyInput(
+            (Map<String, Object>) args.get("destinationBicyclePolicy")
+          );
+      }
+    }
+
+    public List<String> getGraphQLAllowedNetworks() {
+      return this.allowedNetworks;
+    }
+
+    public List<String> getGraphQLBannedNetworks() {
+      return this.bannedNetworks;
+    }
+
+    public GraphQLDestinationBicyclePolicyInput getGraphQLDestinationBicyclePolicy() {
+      return this.destinationBicyclePolicy;
+    }
+
+    public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
+      this.allowedNetworks = allowedNetworks;
+    }
+
+    public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
+      this.bannedNetworks = bannedNetworks;
+    }
+
+    public void setGraphQLDestinationBicyclePolicy(
+      GraphQLDestinationBicyclePolicyInput destinationBicyclePolicy
+    ) {
+      this.destinationBicyclePolicy = destinationBicyclePolicy;
+    }
+  }
+
+  public static class GraphQLBicycleWalkPreferencesCostInput {
+
+    private org.opentripplanner.framework.model.Cost mountDismountCost;
+    private Double reluctance;
+
+    public GraphQLBicycleWalkPreferencesCostInput(Map<String, Object> args) {
+      if (args != null) {
+        this.mountDismountCost =
+          (org.opentripplanner.framework.model.Cost) args.get("mountDismountCost");
+        this.reluctance = (Double) args.get("reluctance");
+      }
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLMountDismountCost() {
+      return this.mountDismountCost;
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public void setGraphQLMountDismountCost(
+      org.opentripplanner.framework.model.Cost mountDismountCost
+    ) {
+      this.mountDismountCost = mountDismountCost;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+  }
+
+  public static class GraphQLBicycleWalkPreferencesInput {
+
+    private GraphQLBicycleWalkPreferencesCostInput cost;
+    private java.time.Duration mountDismountTime;
+    private Double speed;
+
+    public GraphQLBicycleWalkPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.cost =
+          new GraphQLBicycleWalkPreferencesCostInput((Map<String, Object>) args.get("cost"));
+        this.mountDismountTime = (java.time.Duration) args.get("mountDismountTime");
+        this.speed = (Double) args.get("speed");
+      }
+    }
+
+    public GraphQLBicycleWalkPreferencesCostInput getGraphQLCost() {
+      return this.cost;
+    }
+
+    public java.time.Duration getGraphQLMountDismountTime() {
+      return this.mountDismountTime;
+    }
+
+    public Double getGraphQLSpeed() {
+      return this.speed;
+    }
+
+    public void setGraphQLCost(GraphQLBicycleWalkPreferencesCostInput cost) {
+      this.cost = cost;
+    }
+
+    public void setGraphQLMountDismountTime(java.time.Duration mountDismountTime) {
+      this.mountDismountTime = mountDismountTime;
+    }
+
+    public void setGraphQLSpeed(Double speed) {
+      this.speed = speed;
+    }
+  }
+
   public static class GraphQLBikeParkNameArgs {
 
     private String language;
@@ -119,6 +402,35 @@ public class GraphQLTypes {
     NO_INFORMATION,
   }
 
+  public static class GraphQLBoardPreferencesInput {
+
+    private java.time.Duration slack;
+    private Double waitReluctance;
+
+    public GraphQLBoardPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.slack = (java.time.Duration) args.get("slack");
+        this.waitReluctance = (Double) args.get("waitReluctance");
+      }
+    }
+
+    public java.time.Duration getGraphQLSlack() {
+      return this.slack;
+    }
+
+    public Double getGraphQLWaitReluctance() {
+      return this.waitReluctance;
+    }
+
+    public void setGraphQLSlack(java.time.Duration slack) {
+      this.slack = slack;
+    }
+
+    public void setGraphQLWaitReluctance(Double waitReluctance) {
+      this.waitReluctance = waitReluctance;
+    }
+  }
+
   public static class GraphQLCarParkNameArgs {
 
     private String language;
@@ -136,6 +448,167 @@ public class GraphQLTypes {
     public void setGraphQLLanguage(String language) {
       this.language = language;
     }
+  }
+
+  public static class GraphQLCarParkingPreferencesInput {
+
+    private List<GraphQLParkingFilterInput> filters;
+    private List<GraphQLParkingFilterInput> preferred;
+    private org.opentripplanner.framework.model.Cost unpreferredCost;
+
+    public GraphQLCarParkingPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("filters") != null) {
+          this.filters = (List<GraphQLParkingFilterInput>) args.get("filters");
+        }
+        if (args.get("preferred") != null) {
+          this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
+        }
+        this.unpreferredCost =
+          (org.opentripplanner.framework.model.Cost) args.get("unpreferredCost");
+      }
+    }
+
+    public List<GraphQLParkingFilterInput> getGraphQLFilters() {
+      return this.filters;
+    }
+
+    public List<GraphQLParkingFilterInput> getGraphQLPreferred() {
+      return this.preferred;
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLUnpreferredCost() {
+      return this.unpreferredCost;
+    }
+
+    public void setGraphQLFilters(List<GraphQLParkingFilterInput> filters) {
+      this.filters = filters;
+    }
+
+    public void setGraphQLPreferred(List<GraphQLParkingFilterInput> preferred) {
+      this.preferred = preferred;
+    }
+
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.framework.model.Cost unpreferredCost
+    ) {
+      this.unpreferredCost = unpreferredCost;
+    }
+  }
+
+  public static class GraphQLCarPreferencesInput {
+
+    private GraphQLCarParkingPreferencesInput parking;
+    private Double reluctance;
+    private GraphQLCarRentalPreferencesInput rental;
+
+    public GraphQLCarPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.parking =
+          new GraphQLCarParkingPreferencesInput((Map<String, Object>) args.get("parking"));
+        this.reluctance = (Double) args.get("reluctance");
+        this.rental =
+          new GraphQLCarRentalPreferencesInput((Map<String, Object>) args.get("rental"));
+      }
+    }
+
+    public GraphQLCarParkingPreferencesInput getGraphQLParking() {
+      return this.parking;
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public GraphQLCarRentalPreferencesInput getGraphQLRental() {
+      return this.rental;
+    }
+
+    public void setGraphQLParking(GraphQLCarParkingPreferencesInput parking) {
+      this.parking = parking;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+
+    public void setGraphQLRental(GraphQLCarRentalPreferencesInput rental) {
+      this.rental = rental;
+    }
+  }
+
+  public static class GraphQLCarRentalPreferencesInput {
+
+    private List<String> allowedNetworks;
+    private List<String> bannedNetworks;
+
+    public GraphQLCarRentalPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.allowedNetworks = (List<String>) args.get("allowedNetworks");
+        this.bannedNetworks = (List<String>) args.get("bannedNetworks");
+      }
+    }
+
+    public List<String> getGraphQLAllowedNetworks() {
+      return this.allowedNetworks;
+    }
+
+    public List<String> getGraphQLBannedNetworks() {
+      return this.bannedNetworks;
+    }
+
+    public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
+      this.allowedNetworks = allowedNetworks;
+    }
+
+    public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
+      this.bannedNetworks = bannedNetworks;
+    }
+  }
+
+  public static class GraphQLCyclingOptimizationInput {
+
+    private GraphQLTriangleCyclingFactorsInput triangle;
+    private GraphQLCyclingOptimizationType type;
+
+    public GraphQLCyclingOptimizationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.triangle =
+          new GraphQLTriangleCyclingFactorsInput((Map<String, Object>) args.get("triangle"));
+        if (args.get("type") instanceof GraphQLCyclingOptimizationType) {
+          this.type = (GraphQLCyclingOptimizationType) args.get("type");
+        } else if (args.get("type") != null) {
+          this.type = GraphQLCyclingOptimizationType.valueOf((String) args.get("type"));
+        }
+      }
+    }
+
+    public GraphQLTriangleCyclingFactorsInput getGraphQLTriangle() {
+      return this.triangle;
+    }
+
+    public GraphQLCyclingOptimizationType getGraphQLType() {
+      return this.type;
+    }
+
+    public void setGraphQLTriangle(GraphQLTriangleCyclingFactorsInput triangle) {
+      this.triangle = triangle;
+    }
+
+    public void setGraphQLType(GraphQLCyclingOptimizationType type) {
+      this.type = type;
+    }
+  }
+
+  /**
+   * Predefined optimization alternatives for bicycling routing. For more customization,
+   * one can use the triangle factors.
+   */
+  public enum GraphQLCyclingOptimizationType {
+    FLAT_STREETS,
+    SAFEST_STREETS,
+    SAFE_STREETS,
+    SHORTEST_DURATION,
   }
 
   public static class GraphQLDepartureRowStoptimesArgs {
@@ -194,6 +667,64 @@ public class GraphQLTypes {
 
     public void setGraphQLTimeRange(Integer timeRange) {
       this.timeRange = timeRange;
+    }
+  }
+
+  public static class GraphQLDestinationBicyclePolicyInput {
+
+    private Boolean allowKeeping;
+    private org.opentripplanner.framework.model.Cost keepingCost;
+
+    public GraphQLDestinationBicyclePolicyInput(Map<String, Object> args) {
+      if (args != null) {
+        this.allowKeeping = (Boolean) args.get("allowKeeping");
+        this.keepingCost = (org.opentripplanner.framework.model.Cost) args.get("keepingCost");
+      }
+    }
+
+    public Boolean getGraphQLAllowKeeping() {
+      return this.allowKeeping;
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLKeepingCost() {
+      return this.keepingCost;
+    }
+
+    public void setGraphQLAllowKeeping(Boolean allowKeeping) {
+      this.allowKeeping = allowKeeping;
+    }
+
+    public void setGraphQLKeepingCost(org.opentripplanner.framework.model.Cost keepingCost) {
+      this.keepingCost = keepingCost;
+    }
+  }
+
+  public static class GraphQLDestinationScooterPolicyInput {
+
+    private Boolean allowKeeping;
+    private org.opentripplanner.framework.model.Cost keepingCost;
+
+    public GraphQLDestinationScooterPolicyInput(Map<String, Object> args) {
+      if (args != null) {
+        this.allowKeeping = (Boolean) args.get("allowKeeping");
+        this.keepingCost = (org.opentripplanner.framework.model.Cost) args.get("keepingCost");
+      }
+    }
+
+    public Boolean getGraphQLAllowKeeping() {
+      return this.allowKeeping;
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLKeepingCost() {
+      return this.keepingCost;
+    }
+
+    public void setGraphQLAllowKeeping(Boolean allowKeeping) {
+      this.allowKeeping = allowKeeping;
+    }
+
+    public void setGraphQLKeepingCost(org.opentripplanner.framework.model.Cost keepingCost) {
+      this.keepingCost = keepingCost;
     }
   }
 
@@ -663,6 +1194,17 @@ public class GraphQLTypes {
     }
   }
 
+  /**
+   * Enable this to attach a system notice to itineraries instead of removing them. This is very
+   * convenient when tuning the itinerary-filter-chain.
+   */
+  public enum GraphQLItineraryFilterDebugProfile {
+    LIMIT_TO_NUMBER_OF_ITINERARIES,
+    LIMIT_TO_SEARCH_WINDOW,
+    LIST_ALL,
+    OFF,
+  }
+
   public static class GraphQLLegNextLegsArgs {
 
     private List<GraphQLTransitMode> destinationModesWithParentStation;
@@ -914,6 +1456,514 @@ public class GraphQLTypes {
     COORDINATE_WITH_DRIVER,
     NONE,
     SCHEDULED,
+  }
+
+  /** Street modes that can be used for access to the transit network from origin. */
+  public enum GraphQLPlanAccessMode {
+    BICYCLE,
+    BICYCLE_PARKING,
+    BICYCLE_RENTAL,
+    CAR_DROP_OFF,
+    CAR_PARKING,
+    CAR_RENTAL,
+    FLEX,
+    SCOOTER_RENTAL,
+    WALK,
+  }
+
+  public static class GraphQLPlanCoordinateInput {
+
+    private Double latitude;
+    private Double longitude;
+
+    public GraphQLPlanCoordinateInput(Map<String, Object> args) {
+      if (args != null) {
+        this.latitude = (Double) args.get("latitude");
+        this.longitude = (Double) args.get("longitude");
+      }
+    }
+
+    public Double getGraphQLLatitude() {
+      return this.latitude;
+    }
+
+    public Double getGraphQLLongitude() {
+      return this.longitude;
+    }
+
+    public void setGraphQLLatitude(Double latitude) {
+      this.latitude = latitude;
+    }
+
+    public void setGraphQLLongitude(Double longitude) {
+      this.longitude = longitude;
+    }
+  }
+
+  public static class GraphQLPlanDateTimeInput {
+
+    private java.time.OffsetDateTime earliestDeparture;
+    private java.time.OffsetDateTime latestArrival;
+
+    public GraphQLPlanDateTimeInput(Map<String, Object> args) {
+      if (args != null) {
+        this.earliestDeparture = (java.time.OffsetDateTime) args.get("earliestDeparture");
+        this.latestArrival = (java.time.OffsetDateTime) args.get("latestArrival");
+      }
+    }
+
+    public java.time.OffsetDateTime getGraphQLEarliestDeparture() {
+      return this.earliestDeparture;
+    }
+
+    public java.time.OffsetDateTime getGraphQLLatestArrival() {
+      return this.latestArrival;
+    }
+
+    public void setGraphQLEarliestDeparture(java.time.OffsetDateTime earliestDeparture) {
+      this.earliestDeparture = earliestDeparture;
+    }
+
+    public void setGraphQLLatestArrival(java.time.OffsetDateTime latestArrival) {
+      this.latestArrival = latestArrival;
+    }
+  }
+
+  /** Street mode that is used when searching for itineraries that don't use any transit. */
+  public enum GraphQLPlanDirectMode {
+    BICYCLE,
+    BICYCLE_PARKING,
+    BICYCLE_RENTAL,
+    CAR,
+    CAR_PARKING,
+    CAR_RENTAL,
+    FLEX,
+    SCOOTER_RENTAL,
+    WALK,
+  }
+
+  /** Street modes that can be used for egress from the transit network to destination. */
+  public enum GraphQLPlanEgressMode {
+    BICYCLE,
+    BICYCLE_RENTAL,
+    CAR_PICKUP,
+    CAR_RENTAL,
+    FLEX,
+    SCOOTER_RENTAL,
+    WALK,
+  }
+
+  public static class GraphQLPlanItineraryFilterInput {
+
+    private Double groupSimilarityKeepOne;
+    private Double groupSimilarityKeepThree;
+    private Double groupedOtherThanSameLegsMaxCostMultiplier;
+    private GraphQLItineraryFilterDebugProfile itineraryFilterDebugProfile;
+
+    public GraphQLPlanItineraryFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        this.groupSimilarityKeepOne = (Double) args.get("groupSimilarityKeepOne");
+        this.groupSimilarityKeepThree = (Double) args.get("groupSimilarityKeepThree");
+        this.groupedOtherThanSameLegsMaxCostMultiplier =
+          (Double) args.get("groupedOtherThanSameLegsMaxCostMultiplier");
+        if (args.get("itineraryFilterDebugProfile") instanceof GraphQLItineraryFilterDebugProfile) {
+          this.itineraryFilterDebugProfile =
+            (GraphQLItineraryFilterDebugProfile) args.get("itineraryFilterDebugProfile");
+        } else if (args.get("itineraryFilterDebugProfile") != null) {
+          this.itineraryFilterDebugProfile =
+            GraphQLItineraryFilterDebugProfile.valueOf(
+              (String) args.get("itineraryFilterDebugProfile")
+            );
+        }
+      }
+    }
+
+    public Double getGraphQLGroupSimilarityKeepOne() {
+      return this.groupSimilarityKeepOne;
+    }
+
+    public Double getGraphQLGroupSimilarityKeepThree() {
+      return this.groupSimilarityKeepThree;
+    }
+
+    public Double getGraphQLGroupedOtherThanSameLegsMaxCostMultiplier() {
+      return this.groupedOtherThanSameLegsMaxCostMultiplier;
+    }
+
+    public GraphQLItineraryFilterDebugProfile getGraphQLItineraryFilterDebugProfile() {
+      return this.itineraryFilterDebugProfile;
+    }
+
+    public void setGraphQLGroupSimilarityKeepOne(Double groupSimilarityKeepOne) {
+      this.groupSimilarityKeepOne = groupSimilarityKeepOne;
+    }
+
+    public void setGraphQLGroupSimilarityKeepThree(Double groupSimilarityKeepThree) {
+      this.groupSimilarityKeepThree = groupSimilarityKeepThree;
+    }
+
+    public void setGraphQLGroupedOtherThanSameLegsMaxCostMultiplier(
+      Double groupedOtherThanSameLegsMaxCostMultiplier
+    ) {
+      this.groupedOtherThanSameLegsMaxCostMultiplier = groupedOtherThanSameLegsMaxCostMultiplier;
+    }
+
+    public void setGraphQLItineraryFilterDebugProfile(
+      GraphQLItineraryFilterDebugProfile itineraryFilterDebugProfile
+    ) {
+      this.itineraryFilterDebugProfile = itineraryFilterDebugProfile;
+    }
+  }
+
+  public static class GraphQLPlanLabeledLocationInput {
+
+    private String label;
+    private GraphQLPlanLocationInput location;
+
+    public GraphQLPlanLabeledLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.label = (String) args.get("label");
+        this.location = new GraphQLPlanLocationInput((Map<String, Object>) args.get("location"));
+      }
+    }
+
+    public String getGraphQLLabel() {
+      return this.label;
+    }
+
+    public GraphQLPlanLocationInput getGraphQLLocation() {
+      return this.location;
+    }
+
+    public void setGraphQLLabel(String label) {
+      this.label = label;
+    }
+
+    public void setGraphQLLocation(GraphQLPlanLocationInput location) {
+      this.location = location;
+    }
+  }
+
+  public static class GraphQLPlanLocationInput {
+
+    private GraphQLPlanCoordinateInput coordinate;
+    private GraphQLPlanStopLocationInput stopLocation;
+
+    public GraphQLPlanLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.coordinate =
+          new GraphQLPlanCoordinateInput((Map<String, Object>) args.get("coordinate"));
+        this.stopLocation =
+          new GraphQLPlanStopLocationInput((Map<String, Object>) args.get("stopLocation"));
+      }
+    }
+
+    public GraphQLPlanCoordinateInput getGraphQLCoordinate() {
+      return this.coordinate;
+    }
+
+    public GraphQLPlanStopLocationInput getGraphQLStopLocation() {
+      return this.stopLocation;
+    }
+
+    public void setGraphQLCoordinate(GraphQLPlanCoordinateInput coordinate) {
+      this.coordinate = coordinate;
+    }
+
+    public void setGraphQLStopLocation(GraphQLPlanStopLocationInput stopLocation) {
+      this.stopLocation = stopLocation;
+    }
+  }
+
+  public static class GraphQLPlanModesInput {
+
+    private List<GraphQLPlanDirectMode> direct;
+    private Boolean directOnly;
+    private GraphQLPlanTransitModesInput transit;
+    private Boolean transitOnly;
+
+    public GraphQLPlanModesInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("direct") != null) {
+          this.direct =
+            ((List<Object>) args.get("direct")).stream()
+              .map(item ->
+                item instanceof GraphQLPlanDirectMode
+                  ? item
+                  : GraphQLPlanDirectMode.valueOf((String) item)
+              )
+              .map(GraphQLPlanDirectMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.directOnly = (Boolean) args.get("directOnly");
+        this.transit = new GraphQLPlanTransitModesInput((Map<String, Object>) args.get("transit"));
+        this.transitOnly = (Boolean) args.get("transitOnly");
+      }
+    }
+
+    public List<GraphQLPlanDirectMode> getGraphQLDirect() {
+      return this.direct;
+    }
+
+    public Boolean getGraphQLDirectOnly() {
+      return this.directOnly;
+    }
+
+    public GraphQLPlanTransitModesInput getGraphQLTransit() {
+      return this.transit;
+    }
+
+    public Boolean getGraphQLTransitOnly() {
+      return this.transitOnly;
+    }
+
+    public void setGraphQLDirect(List<GraphQLPlanDirectMode> direct) {
+      this.direct = direct;
+    }
+
+    public void setGraphQLDirectOnly(Boolean directOnly) {
+      this.directOnly = directOnly;
+    }
+
+    public void setGraphQLTransit(GraphQLPlanTransitModesInput transit) {
+      this.transit = transit;
+    }
+
+    public void setGraphQLTransitOnly(Boolean transitOnly) {
+      this.transitOnly = transitOnly;
+    }
+  }
+
+  public static class GraphQLPlanPreferencesInput {
+
+    private GraphQLAccessibilityPreferencesInput accessibility;
+    private GraphQLPlanStreetPreferencesInput street;
+    private GraphQLTransitPreferencesInput transit;
+
+    public GraphQLPlanPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.accessibility =
+          new GraphQLAccessibilityPreferencesInput((Map<String, Object>) args.get("accessibility"));
+        this.street =
+          new GraphQLPlanStreetPreferencesInput((Map<String, Object>) args.get("street"));
+        this.transit =
+          new GraphQLTransitPreferencesInput((Map<String, Object>) args.get("transit"));
+      }
+    }
+
+    public GraphQLAccessibilityPreferencesInput getGraphQLAccessibility() {
+      return this.accessibility;
+    }
+
+    public GraphQLPlanStreetPreferencesInput getGraphQLStreet() {
+      return this.street;
+    }
+
+    public GraphQLTransitPreferencesInput getGraphQLTransit() {
+      return this.transit;
+    }
+
+    public void setGraphQLAccessibility(GraphQLAccessibilityPreferencesInput accessibility) {
+      this.accessibility = accessibility;
+    }
+
+    public void setGraphQLStreet(GraphQLPlanStreetPreferencesInput street) {
+      this.street = street;
+    }
+
+    public void setGraphQLTransit(GraphQLTransitPreferencesInput transit) {
+      this.transit = transit;
+    }
+  }
+
+  public static class GraphQLPlanStopLocationInput {
+
+    private String stopLocationId;
+
+    public GraphQLPlanStopLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.stopLocationId = (String) args.get("stopLocationId");
+      }
+    }
+
+    public String getGraphQLStopLocationId() {
+      return this.stopLocationId;
+    }
+
+    public void setGraphQLStopLocationId(String stopLocationId) {
+      this.stopLocationId = stopLocationId;
+    }
+  }
+
+  public static class GraphQLPlanStreetPreferencesInput {
+
+    private GraphQLBicyclePreferencesInput bicycle;
+    private GraphQLCarPreferencesInput car;
+    private GraphQLScooterPreferencesInput scooter;
+    private GraphQLWalkPreferencesInput walk;
+
+    public GraphQLPlanStreetPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.bicycle =
+          new GraphQLBicyclePreferencesInput((Map<String, Object>) args.get("bicycle"));
+        this.car = new GraphQLCarPreferencesInput((Map<String, Object>) args.get("car"));
+        this.scooter =
+          new GraphQLScooterPreferencesInput((Map<String, Object>) args.get("scooter"));
+        this.walk = new GraphQLWalkPreferencesInput((Map<String, Object>) args.get("walk"));
+      }
+    }
+
+    public GraphQLBicyclePreferencesInput getGraphQLBicycle() {
+      return this.bicycle;
+    }
+
+    public GraphQLCarPreferencesInput getGraphQLCar() {
+      return this.car;
+    }
+
+    public GraphQLScooterPreferencesInput getGraphQLScooter() {
+      return this.scooter;
+    }
+
+    public GraphQLWalkPreferencesInput getGraphQLWalk() {
+      return this.walk;
+    }
+
+    public void setGraphQLBicycle(GraphQLBicyclePreferencesInput bicycle) {
+      this.bicycle = bicycle;
+    }
+
+    public void setGraphQLCar(GraphQLCarPreferencesInput car) {
+      this.car = car;
+    }
+
+    public void setGraphQLScooter(GraphQLScooterPreferencesInput scooter) {
+      this.scooter = scooter;
+    }
+
+    public void setGraphQLWalk(GraphQLWalkPreferencesInput walk) {
+      this.walk = walk;
+    }
+  }
+
+  public enum GraphQLPlanTransferMode {
+    BICYCLE,
+    WALK,
+  }
+
+  public static class GraphQLPlanTransitModePreferenceInput {
+
+    private GraphQLTransitModePreferenceCostInput cost;
+    private GraphQLTransitMode mode;
+
+    public GraphQLPlanTransitModePreferenceInput(Map<String, Object> args) {
+      if (args != null) {
+        this.cost =
+          new GraphQLTransitModePreferenceCostInput((Map<String, Object>) args.get("cost"));
+        if (args.get("mode") instanceof GraphQLTransitMode) {
+          this.mode = (GraphQLTransitMode) args.get("mode");
+        } else if (args.get("mode") != null) {
+          this.mode = GraphQLTransitMode.valueOf((String) args.get("mode"));
+        }
+      }
+    }
+
+    public GraphQLTransitModePreferenceCostInput getGraphQLCost() {
+      return this.cost;
+    }
+
+    public GraphQLTransitMode getGraphQLMode() {
+      return this.mode;
+    }
+
+    public void setGraphQLCost(GraphQLTransitModePreferenceCostInput cost) {
+      this.cost = cost;
+    }
+
+    public void setGraphQLMode(GraphQLTransitMode mode) {
+      this.mode = mode;
+    }
+  }
+
+  public static class GraphQLPlanTransitModesInput {
+
+    private List<GraphQLPlanAccessMode> access;
+    private List<GraphQLPlanEgressMode> egress;
+    private List<GraphQLPlanTransferMode> transfer;
+    private List<GraphQLPlanTransitModePreferenceInput> transit;
+
+    public GraphQLPlanTransitModesInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("access") != null) {
+          this.access =
+            ((List<Object>) args.get("access")).stream()
+              .map(item ->
+                item instanceof GraphQLPlanAccessMode
+                  ? item
+                  : GraphQLPlanAccessMode.valueOf((String) item)
+              )
+              .map(GraphQLPlanAccessMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        if (args.get("egress") != null) {
+          this.egress =
+            ((List<Object>) args.get("egress")).stream()
+              .map(item ->
+                item instanceof GraphQLPlanEgressMode
+                  ? item
+                  : GraphQLPlanEgressMode.valueOf((String) item)
+              )
+              .map(GraphQLPlanEgressMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        if (args.get("transfer") != null) {
+          this.transfer =
+            ((List<Object>) args.get("transfer")).stream()
+              .map(item ->
+                item instanceof GraphQLPlanTransferMode
+                  ? item
+                  : GraphQLPlanTransferMode.valueOf((String) item)
+              )
+              .map(GraphQLPlanTransferMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        if (args.get("transit") != null) {
+          this.transit = (List<GraphQLPlanTransitModePreferenceInput>) args.get("transit");
+        }
+      }
+    }
+
+    public List<GraphQLPlanAccessMode> getGraphQLAccess() {
+      return this.access;
+    }
+
+    public List<GraphQLPlanEgressMode> getGraphQLEgress() {
+      return this.egress;
+    }
+
+    public List<GraphQLPlanTransferMode> getGraphQLTransfer() {
+      return this.transfer;
+    }
+
+    public List<GraphQLPlanTransitModePreferenceInput> getGraphQLTransit() {
+      return this.transit;
+    }
+
+    public void setGraphQLAccess(List<GraphQLPlanAccessMode> access) {
+      this.access = access;
+    }
+
+    public void setGraphQLEgress(List<GraphQLPlanEgressMode> egress) {
+      this.egress = egress;
+    }
+
+    public void setGraphQLTransfer(List<GraphQLPlanTransferMode> transfer) {
+      this.transfer = transfer;
+    }
+
+    public void setGraphQLTransit(List<GraphQLPlanTransitModePreferenceInput> transit) {
+      this.transit = transit;
+    }
   }
 
   public enum GraphQLPropulsionType {
@@ -1644,7 +2694,7 @@ public class GraphQLTypes {
         this.omitCanceled = (Boolean) args.get("omitCanceled");
         if (args.get("optimize") instanceof GraphQLOptimizeType) {
           this.optimize = (GraphQLOptimizeType) args.get("optimize");
-        } else {
+        } else if (args.get("optimize") != null) {
           this.optimize = GraphQLOptimizeType.valueOf((String) args.get("optimize"));
         }
         this.pageCursor = (String) args.get("pageCursor");
@@ -2184,6 +3234,138 @@ public class GraphQLTypes {
 
     public void setGraphQLWheelchair(Boolean wheelchair) {
       this.wheelchair = wheelchair;
+    }
+  }
+
+  public static class GraphQLQueryTypePlanConnectionArgs {
+
+    private String after;
+    private String before;
+    private GraphQLPlanDateTimeInput dateTime;
+    private GraphQLPlanLabeledLocationInput destination;
+    private Integer first;
+    private GraphQLPlanItineraryFilterInput itineraryFilter;
+    private Integer last;
+    private java.util.Locale locale;
+    private GraphQLPlanModesInput modes;
+    private GraphQLPlanLabeledLocationInput origin;
+    private GraphQLPlanPreferencesInput preferences;
+    private java.time.Duration searchWindow;
+
+    public GraphQLQueryTypePlanConnectionArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        this.dateTime = new GraphQLPlanDateTimeInput((Map<String, Object>) args.get("dateTime"));
+        this.destination =
+          new GraphQLPlanLabeledLocationInput((Map<String, Object>) args.get("destination"));
+        this.first = (Integer) args.get("first");
+        this.itineraryFilter =
+          new GraphQLPlanItineraryFilterInput((Map<String, Object>) args.get("itineraryFilter"));
+        this.last = (Integer) args.get("last");
+        this.locale = (java.util.Locale) args.get("locale");
+        this.modes = new GraphQLPlanModesInput((Map<String, Object>) args.get("modes"));
+        this.origin = new GraphQLPlanLabeledLocationInput((Map<String, Object>) args.get("origin"));
+        this.preferences =
+          new GraphQLPlanPreferencesInput((Map<String, Object>) args.get("preferences"));
+        this.searchWindow = (java.time.Duration) args.get("searchWindow");
+      }
+    }
+
+    public String getGraphQLAfter() {
+      return this.after;
+    }
+
+    public String getGraphQLBefore() {
+      return this.before;
+    }
+
+    public GraphQLPlanDateTimeInput getGraphQLDateTime() {
+      return this.dateTime;
+    }
+
+    public GraphQLPlanLabeledLocationInput getGraphQLDestination() {
+      return this.destination;
+    }
+
+    public Integer getGraphQLFirst() {
+      return this.first;
+    }
+
+    public GraphQLPlanItineraryFilterInput getGraphQLItineraryFilter() {
+      return this.itineraryFilter;
+    }
+
+    public Integer getGraphQLLast() {
+      return this.last;
+    }
+
+    public java.util.Locale getGraphQLLocale() {
+      return this.locale;
+    }
+
+    public GraphQLPlanModesInput getGraphQLModes() {
+      return this.modes;
+    }
+
+    public GraphQLPlanLabeledLocationInput getGraphQLOrigin() {
+      return this.origin;
+    }
+
+    public GraphQLPlanPreferencesInput getGraphQLPreferences() {
+      return this.preferences;
+    }
+
+    public java.time.Duration getGraphQLSearchWindow() {
+      return this.searchWindow;
+    }
+
+    public void setGraphQLAfter(String after) {
+      this.after = after;
+    }
+
+    public void setGraphQLBefore(String before) {
+      this.before = before;
+    }
+
+    public void setGraphQLDateTime(GraphQLPlanDateTimeInput dateTime) {
+      this.dateTime = dateTime;
+    }
+
+    public void setGraphQLDestination(GraphQLPlanLabeledLocationInput destination) {
+      this.destination = destination;
+    }
+
+    public void setGraphQLFirst(Integer first) {
+      this.first = first;
+    }
+
+    public void setGraphQLItineraryFilter(GraphQLPlanItineraryFilterInput itineraryFilter) {
+      this.itineraryFilter = itineraryFilter;
+    }
+
+    public void setGraphQLLast(Integer last) {
+      this.last = last;
+    }
+
+    public void setGraphQLLocale(java.util.Locale locale) {
+      this.locale = locale;
+    }
+
+    public void setGraphQLModes(GraphQLPlanModesInput modes) {
+      this.modes = modes;
+    }
+
+    public void setGraphQLOrigin(GraphQLPlanLabeledLocationInput origin) {
+      this.origin = origin;
+    }
+
+    public void setGraphQLPreferences(GraphQLPlanPreferencesInput preferences) {
+      this.preferences = preferences;
+    }
+
+    public void setGraphQLSearchWindow(java.time.Duration searchWindow) {
+      this.searchWindow = searchWindow;
     }
   }
 
@@ -2772,6 +3954,146 @@ public class GraphQLTypes {
     WALKING_BETTER_THAN_TRANSIT,
   }
 
+  public static class GraphQLScooterOptimizationInput {
+
+    private GraphQLTriangleScooterFactorsInput triangle;
+    private GraphQLScooterOptimizationType type;
+
+    public GraphQLScooterOptimizationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.triangle =
+          new GraphQLTriangleScooterFactorsInput((Map<String, Object>) args.get("triangle"));
+        if (args.get("type") instanceof GraphQLScooterOptimizationType) {
+          this.type = (GraphQLScooterOptimizationType) args.get("type");
+        } else if (args.get("type") != null) {
+          this.type = GraphQLScooterOptimizationType.valueOf((String) args.get("type"));
+        }
+      }
+    }
+
+    public GraphQLTriangleScooterFactorsInput getGraphQLTriangle() {
+      return this.triangle;
+    }
+
+    public GraphQLScooterOptimizationType getGraphQLType() {
+      return this.type;
+    }
+
+    public void setGraphQLTriangle(GraphQLTriangleScooterFactorsInput triangle) {
+      this.triangle = triangle;
+    }
+
+    public void setGraphQLType(GraphQLScooterOptimizationType type) {
+      this.type = type;
+    }
+  }
+
+  /**
+   * Predefined optimization alternatives for scooter routing. For more customization,
+   * one can use the triangle factors.
+   */
+  public enum GraphQLScooterOptimizationType {
+    FLAT_STREETS,
+    SAFEST_STREETS,
+    SAFE_STREETS,
+    SHORTEST_DURATION,
+  }
+
+  public static class GraphQLScooterPreferencesInput {
+
+    private GraphQLScooterOptimizationInput optimization;
+    private Double reluctance;
+    private GraphQLScooterRentalPreferencesInput rental;
+    private Double speed;
+
+    public GraphQLScooterPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.optimization =
+          new GraphQLScooterOptimizationInput((Map<String, Object>) args.get("optimization"));
+        this.reluctance = (Double) args.get("reluctance");
+        this.rental =
+          new GraphQLScooterRentalPreferencesInput((Map<String, Object>) args.get("rental"));
+        this.speed = (Double) args.get("speed");
+      }
+    }
+
+    public GraphQLScooterOptimizationInput getGraphQLOptimization() {
+      return this.optimization;
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public GraphQLScooterRentalPreferencesInput getGraphQLRental() {
+      return this.rental;
+    }
+
+    public Double getGraphQLSpeed() {
+      return this.speed;
+    }
+
+    public void setGraphQLOptimization(GraphQLScooterOptimizationInput optimization) {
+      this.optimization = optimization;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+
+    public void setGraphQLRental(GraphQLScooterRentalPreferencesInput rental) {
+      this.rental = rental;
+    }
+
+    public void setGraphQLSpeed(Double speed) {
+      this.speed = speed;
+    }
+  }
+
+  public static class GraphQLScooterRentalPreferencesInput {
+
+    private List<String> allowedNetworks;
+    private List<String> bannedNetworks;
+    private GraphQLDestinationScooterPolicyInput destinationScooterPolicy;
+
+    public GraphQLScooterRentalPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.allowedNetworks = (List<String>) args.get("allowedNetworks");
+        this.bannedNetworks = (List<String>) args.get("bannedNetworks");
+        this.destinationScooterPolicy =
+          new GraphQLDestinationScooterPolicyInput(
+            (Map<String, Object>) args.get("destinationScooterPolicy")
+          );
+      }
+    }
+
+    public List<String> getGraphQLAllowedNetworks() {
+      return this.allowedNetworks;
+    }
+
+    public List<String> getGraphQLBannedNetworks() {
+      return this.bannedNetworks;
+    }
+
+    public GraphQLDestinationScooterPolicyInput getGraphQLDestinationScooterPolicy() {
+      return this.destinationScooterPolicy;
+    }
+
+    public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
+      this.allowedNetworks = allowedNetworks;
+    }
+
+    public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
+      this.bannedNetworks = bannedNetworks;
+    }
+
+    public void setGraphQLDestinationScooterPolicy(
+      GraphQLDestinationScooterPolicyInput destinationScooterPolicy
+    ) {
+      this.destinationScooterPolicy = destinationScooterPolicy;
+    }
+  }
+
   public static class GraphQLStopAlertsArgs {
 
     private List<GraphQLStopAlertType> types;
@@ -3133,6 +4455,99 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLTimetablePreferencesInput {
+
+    private Boolean excludeRealTimeUpdates;
+    private Boolean includePlannedCancellations;
+    private Boolean includeRealTimeCancellations;
+
+    public GraphQLTimetablePreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.excludeRealTimeUpdates = (Boolean) args.get("excludeRealTimeUpdates");
+        this.includePlannedCancellations = (Boolean) args.get("includePlannedCancellations");
+        this.includeRealTimeCancellations = (Boolean) args.get("includeRealTimeCancellations");
+      }
+    }
+
+    public Boolean getGraphQLExcludeRealTimeUpdates() {
+      return this.excludeRealTimeUpdates;
+    }
+
+    public Boolean getGraphQLIncludePlannedCancellations() {
+      return this.includePlannedCancellations;
+    }
+
+    public Boolean getGraphQLIncludeRealTimeCancellations() {
+      return this.includeRealTimeCancellations;
+    }
+
+    public void setGraphQLExcludeRealTimeUpdates(Boolean excludeRealTimeUpdates) {
+      this.excludeRealTimeUpdates = excludeRealTimeUpdates;
+    }
+
+    public void setGraphQLIncludePlannedCancellations(Boolean includePlannedCancellations) {
+      this.includePlannedCancellations = includePlannedCancellations;
+    }
+
+    public void setGraphQLIncludeRealTimeCancellations(Boolean includeRealTimeCancellations) {
+      this.includeRealTimeCancellations = includeRealTimeCancellations;
+    }
+  }
+
+  public static class GraphQLTransferPreferencesInput {
+
+    private org.opentripplanner.framework.model.Cost cost;
+    private Integer maximumAdditionalTransfers;
+    private Integer maximumTransfers;
+    private java.time.Duration slack;
+
+    public GraphQLTransferPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.cost = (org.opentripplanner.framework.model.Cost) args.get("cost");
+        this.maximumAdditionalTransfers = (Integer) args.get("maximumAdditionalTransfers");
+        this.maximumTransfers = (Integer) args.get("maximumTransfers");
+        this.slack = (java.time.Duration) args.get("slack");
+      }
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLCost() {
+      return this.cost;
+    }
+
+    public Integer getGraphQLMaximumAdditionalTransfers() {
+      return this.maximumAdditionalTransfers;
+    }
+
+    public Integer getGraphQLMaximumTransfers() {
+      return this.maximumTransfers;
+    }
+
+    public java.time.Duration getGraphQLSlack() {
+      return this.slack;
+    }
+
+    public void setGraphQLCost(org.opentripplanner.framework.model.Cost cost) {
+      this.cost = cost;
+    }
+
+    public void setGraphQLMaximumAdditionalTransfers(Integer maximumAdditionalTransfers) {
+      this.maximumAdditionalTransfers = maximumAdditionalTransfers;
+    }
+
+    public void setGraphQLMaximumTransfers(Integer maximumTransfers) {
+      this.maximumTransfers = maximumTransfers;
+    }
+
+    public void setGraphQLSlack(java.time.Duration slack) {
+      this.slack = slack;
+    }
+  }
+
+  /**
+   * Transit modes include modes that are used within organized transportation networks
+   * run by public transportation authorities, taxi companies etc.
+   * Equivalent to GTFS route_type or to NeTEx TransportMode.
+   */
   public enum GraphQLTransitMode {
     AIRPLANE,
     BUS,
@@ -3150,6 +4565,76 @@ public class GraphQLTypes {
     TROLLEYBUS,
   }
 
+  public static class GraphQLTransitModePreferenceCostInput {
+
+    private Double reluctance;
+
+    public GraphQLTransitModePreferenceCostInput(Map<String, Object> args) {
+      if (args != null) {
+        this.reluctance = (Double) args.get("reluctance");
+      }
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+  }
+
+  public static class GraphQLTransitPreferencesInput {
+
+    private GraphQLAlightPreferencesInput alight;
+    private GraphQLBoardPreferencesInput board;
+    private GraphQLTimetablePreferencesInput timetable;
+    private GraphQLTransferPreferencesInput transfer;
+
+    public GraphQLTransitPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.alight = new GraphQLAlightPreferencesInput((Map<String, Object>) args.get("alight"));
+        this.board = new GraphQLBoardPreferencesInput((Map<String, Object>) args.get("board"));
+        this.timetable =
+          new GraphQLTimetablePreferencesInput((Map<String, Object>) args.get("timetable"));
+        this.transfer =
+          new GraphQLTransferPreferencesInput((Map<String, Object>) args.get("transfer"));
+      }
+    }
+
+    public GraphQLAlightPreferencesInput getGraphQLAlight() {
+      return this.alight;
+    }
+
+    public GraphQLBoardPreferencesInput getGraphQLBoard() {
+      return this.board;
+    }
+
+    public GraphQLTimetablePreferencesInput getGraphQLTimetable() {
+      return this.timetable;
+    }
+
+    public GraphQLTransferPreferencesInput getGraphQLTransfer() {
+      return this.transfer;
+    }
+
+    public void setGraphQLAlight(GraphQLAlightPreferencesInput alight) {
+      this.alight = alight;
+    }
+
+    public void setGraphQLBoard(GraphQLBoardPreferencesInput board) {
+      this.board = board;
+    }
+
+    public void setGraphQLTimetable(GraphQLTimetablePreferencesInput timetable) {
+      this.timetable = timetable;
+    }
+
+    public void setGraphQLTransfer(GraphQLTransferPreferencesInput transfer) {
+      this.transfer = transfer;
+    }
+  }
+
   public static class GraphQLTransportModeInput {
 
     private GraphQLMode mode;
@@ -3159,12 +4644,12 @@ public class GraphQLTypes {
       if (args != null) {
         if (args.get("mode") instanceof GraphQLMode) {
           this.mode = (GraphQLMode) args.get("mode");
-        } else {
+        } else if (args.get("mode") != null) {
           this.mode = GraphQLMode.valueOf((String) args.get("mode"));
         }
         if (args.get("qualifier") instanceof GraphQLQualifier) {
           this.qualifier = (GraphQLQualifier) args.get("qualifier");
-        } else {
+        } else if (args.get("qualifier") != null) {
           this.qualifier = GraphQLQualifier.valueOf((String) args.get("qualifier"));
         }
       }
@@ -3184,6 +4669,84 @@ public class GraphQLTypes {
 
     public void setGraphQLQualifier(GraphQLQualifier qualifier) {
       this.qualifier = qualifier;
+    }
+  }
+
+  public static class GraphQLTriangleCyclingFactorsInput {
+
+    private Double flatness;
+    private Double safety;
+    private Double time;
+
+    public GraphQLTriangleCyclingFactorsInput(Map<String, Object> args) {
+      if (args != null) {
+        this.flatness = (Double) args.get("flatness");
+        this.safety = (Double) args.get("safety");
+        this.time = (Double) args.get("time");
+      }
+    }
+
+    public Double getGraphQLFlatness() {
+      return this.flatness;
+    }
+
+    public Double getGraphQLSafety() {
+      return this.safety;
+    }
+
+    public Double getGraphQLTime() {
+      return this.time;
+    }
+
+    public void setGraphQLFlatness(Double flatness) {
+      this.flatness = flatness;
+    }
+
+    public void setGraphQLSafety(Double safety) {
+      this.safety = safety;
+    }
+
+    public void setGraphQLTime(Double time) {
+      this.time = time;
+    }
+  }
+
+  public static class GraphQLTriangleScooterFactorsInput {
+
+    private Double flatness;
+    private Double safety;
+    private Double time;
+
+    public GraphQLTriangleScooterFactorsInput(Map<String, Object> args) {
+      if (args != null) {
+        this.flatness = (Double) args.get("flatness");
+        this.safety = (Double) args.get("safety");
+        this.time = (Double) args.get("time");
+      }
+    }
+
+    public Double getGraphQLFlatness() {
+      return this.flatness;
+    }
+
+    public Double getGraphQLSafety() {
+      return this.safety;
+    }
+
+    public Double getGraphQLTime() {
+      return this.time;
+    }
+
+    public void setGraphQLFlatness(Double flatness) {
+      this.flatness = flatness;
+    }
+
+    public void setGraphQLSafety(Double safety) {
+      this.safety = safety;
+    }
+
+    public void setGraphQLTime(Double time) {
+      this.time = time;
     }
   }
 
@@ -3408,9 +4971,77 @@ public class GraphQLTypes {
     TRANSIT,
   }
 
+  public static class GraphQLWalkPreferencesInput {
+
+    private org.opentripplanner.framework.model.Cost boardCost;
+    private Double reluctance;
+    private Double safetyFactor;
+    private Double speed;
+
+    public GraphQLWalkPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.boardCost = (org.opentripplanner.framework.model.Cost) args.get("boardCost");
+        this.reluctance = (Double) args.get("reluctance");
+        this.safetyFactor = (Double) args.get("safetyFactor");
+        this.speed = (Double) args.get("speed");
+      }
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLBoardCost() {
+      return this.boardCost;
+    }
+
+    public Double getGraphQLReluctance() {
+      return this.reluctance;
+    }
+
+    public Double getGraphQLSafetyFactor() {
+      return this.safetyFactor;
+    }
+
+    public Double getGraphQLSpeed() {
+      return this.speed;
+    }
+
+    public void setGraphQLBoardCost(org.opentripplanner.framework.model.Cost boardCost) {
+      this.boardCost = boardCost;
+    }
+
+    public void setGraphQLReluctance(Double reluctance) {
+      this.reluctance = reluctance;
+    }
+
+    public void setGraphQLSafetyFactor(Double safetyFactor) {
+      this.safetyFactor = safetyFactor;
+    }
+
+    public void setGraphQLSpeed(Double speed) {
+      this.speed = speed;
+    }
+  }
+
   public enum GraphQLWheelchairBoarding {
     NOT_POSSIBLE,
     NO_INFORMATION,
     POSSIBLE,
+  }
+
+  public static class GraphQLWheelchairPreferencesInput {
+
+    private Boolean enabled;
+
+    public GraphQLWheelchairPreferencesInput(Map<String, Object> args) {
+      if (args != null) {
+        this.enabled = (Boolean) args.get("enabled");
+      }
+    }
+
+    public Boolean getGraphQLEnabled() {
+      return this.enabled;
+    }
+
+    public void setGraphQLEnabled(Boolean enabled) {
+      this.enabled = enabled;
+    }
   }
 }

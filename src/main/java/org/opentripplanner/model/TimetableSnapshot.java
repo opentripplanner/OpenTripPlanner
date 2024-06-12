@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -147,6 +148,7 @@ public class TimetableSnapshot {
    *
    * @return trip pattern created by the updater; null if trip is on the original trip pattern
    */
+  @Nullable
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return realtimeAddedTripPattern.get(tripIdAndServiceDate);
@@ -344,6 +346,8 @@ public class TimetableSnapshot {
 
   /**
    * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.
+   *
+   * @return true if any data has been modified and false if no purging has happened.
    */
   public boolean purgeExpiredData(LocalDate serviceDate) {
     if (readOnly) {
