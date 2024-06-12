@@ -64,6 +64,7 @@ public class StreetEdge
   static final int BICYCLE_NOTHRUTRAFFIC = 7;
   static final int WALK_NOTHRUTRAFFIC = 8;
   static final int CLASS_LINK = 9;
+  static final int HAS_BARRIER_FLAG_INDEX = 10;
 
   private StreetEdgeCostExtension costExtension;
 
@@ -179,11 +180,14 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex bv) {
-      permission = permission.intersection(bv.getBarrierPermissions());
-    }
-    if (tov instanceof BarrierVertex bv) {
-      permission = permission.intersection(bv.getBarrierPermissions());
+
+    if (hasBarrier()) {
+      if (fromv instanceof BarrierVertex bv) {
+        permission = permission.intersection(bv.getBarrierPermissions());
+      }
+      if (tov instanceof BarrierVertex bv) {
+        permission = permission.intersection(bv.getBarrierPermissions());
+      }
     }
 
     return permission.allows(mode);
@@ -589,6 +593,10 @@ public class StreetEdge
    */
   public boolean isLink() {
     return BitSetUtils.get(flags, CLASS_LINK);
+  }
+
+  private boolean hasBarrier() {
+    return BitSetUtils.get(flags, HAS_BARRIER_FLAG_INDEX);
   }
 
   public float getCarSpeed() {

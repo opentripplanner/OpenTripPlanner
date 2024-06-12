@@ -4,6 +4,7 @@ import static org.opentripplanner.street.model.edge.StreetEdge.BACK_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.BICYCLE_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.CLASS_LINK;
 import static org.opentripplanner.street.model.edge.StreetEdge.HASBOGUSNAME_FLAG_INDEX;
+import static org.opentripplanner.street.model.edge.StreetEdge.HAS_BARRIER_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.MOTOR_VEHICLE_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.ROUNDABOUT_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.SLOPEOVERRIDE_FLAG_INDEX;
@@ -11,11 +12,14 @@ import static org.opentripplanner.street.model.edge.StreetEdge.STAIRS_FLAG_INDEX
 import static org.opentripplanner.street.model.edge.StreetEdge.WALK_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.WHEELCHAIR_ACCESSIBLE_FLAG_INDEX;
 
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.BitSetUtils;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 
@@ -71,6 +75,7 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
 
   public B withFromVertex(StreetVertex from) {
     this.from = from;
+    computeHasBarrier();
     return instance();
   }
 
@@ -80,7 +85,16 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
 
   public B withToVertex(StreetVertex to) {
     this.to = to;
+    computeHasBarrier();
     return instance();
+  }
+
+  private void computeHasBarrier() {
+    var hasBarrier = Stream
+      .of(from, to)
+      .filter(Objects::nonNull)
+      .anyMatch(BarrierVertex.class::isInstance);
+    flags = BitSetUtils.set(flags, HAS_BARRIER_FLAG_INDEX, hasBarrier);
   }
 
   public LineString geometry() {
