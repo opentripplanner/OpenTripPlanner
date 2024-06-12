@@ -35,7 +35,7 @@ class StopClusterMapper {
 
   StopClusterMapper(
     TransitService transitService,
-    StopConsolidationService stopConsolidationService
+    @Nullable StopConsolidationService stopConsolidationService
   ) {
     this.transitService = transitService;
     this.stopConsolidationService = stopConsolidationService;
