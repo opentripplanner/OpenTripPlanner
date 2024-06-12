@@ -75,7 +75,11 @@ class StopClusterMapper {
       .stream()
       .map(primary -> {
         var secondaryIds = multiMap.get(primary);
-        var secondaries = secondaryIds.stream().map(transitService::getStopLocation).toList();
+        var secondaries = secondaryIds
+          .stream()
+          .map(transitService::getStopLocation)
+          .filter(Objects::nonNull)
+          .toList();
         var codes = ListUtils.combine(
           ListUtils.ofNullable(primary.getCode()),
           getCodes(secondaries)
