@@ -545,7 +545,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.34.0</version>
+                <version>26.40.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -852,12 +852,12 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>21.5</version>
+            <version>22.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>21.0</version>
+            <version>22.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>

@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { graphql } from '../gql';
 import { request } from 'graphql-request'; // eslint-disable-line import/no-unresolved
 import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
-
-const endpoint = import.meta.env.VITE_API_URL;
+import { getApiUrl } from '../util/getApiUrl.ts';
 
 /**
   General purpose trip query document for debugging trip searches
@@ -96,9 +95,9 @@ export const useTripQuery: TripQueryHook = (variables) => {
         if (variables) {
           setLoading(true);
           if (pageCursor) {
-            setData((await request(endpoint, query, { ...variables, pageCursor })) as QueryType);
+            setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
           } else {
-            setData((await request(endpoint, query, variables)) as QueryType);
+            setData((await request(getApiUrl(), query, variables)) as QueryType);
           }
           setLoading(false);
         } else {

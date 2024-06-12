@@ -104,7 +104,6 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
-  SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
   TransferAnalyzer(false, true, "Analyze transfers during graph build.");
 
   private static final Object TEST_LOCK = new Object();

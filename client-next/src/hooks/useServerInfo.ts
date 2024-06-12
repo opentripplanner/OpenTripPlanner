@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { graphql } from '../gql';
 import { request } from 'graphql-request'; // eslint-disable-line import/no-unresolved
 import { QueryType } from '../gql/graphql.ts';
-
-const endpoint = import.meta.env.VITE_API_URL;
+import { getApiUrl } from '../util/getApiUrl.ts';
 
 const query = graphql(`
   query serverInfo {
@@ -22,7 +21,7 @@ export const useServerInfo = () => {
   const [data, setData] = useState<QueryType | null>(null);
   useEffect(() => {
     const fetchData = async () => {
-      setData((await request(endpoint, query)) as QueryType);
+      setData((await request(getApiUrl(), query)) as QueryType);
     };
     fetchData();
   }, []);

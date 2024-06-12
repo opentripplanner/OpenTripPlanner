@@ -19,4 +19,9 @@ public interface TransmodelAPIParameters {
    * @see MicrometerGraphQLInstrumentation
    */
   Collection<String> tracingHeaderTags();
+
+  /**
+   * The maximum number of fields that can be present in a GraphQL result.
+   */
+  int maxNumberOfResultFields();
 }

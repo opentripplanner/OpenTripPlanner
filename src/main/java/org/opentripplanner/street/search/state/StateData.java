@@ -8,7 +8,6 @@ import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.search.TraverseMode;
@@ -20,8 +19,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  * time and space use during searches.
  */
 public class StateData implements Cloneable {
-
-  // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
   protected boolean vehicleParked;
 
@@ -56,7 +53,7 @@ public class StateData implements Cloneable {
   public Set<String> noRentalDropOffZonesAtStartOfReverseSearch = Set.of();
 
   /** Private constructor, use static methods to get a set of initial states. */
-  protected StateData(StreetMode requestMode) {
+  private StateData(StreetMode requestMode) {
     currentMode =
       switch (requestMode) {
         // when renting or using a flex vehicle, you start on foot until you have found the vehicle
@@ -72,25 +69,13 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RouteRequest
    */
   public static List<StateData> getInitialStateDatas(StreetSearchRequest request) {
-    return getInitialStateDatas(request, StateData::new);
-  }
-
-  /**
-   * Returns a set of initial StateDatas based on the options from the RouteRequest, with a custom
-   * StateData implementation.
-   */
-  public static List<StateData> getInitialStateDatas(
-    StreetSearchRequest request,
-    Function<StreetMode, StateData> stateDataConstructor
-  ) {
     var rentalPreferences = request.preferences().rental(request.mode());
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
       rentalPreferences != null
         ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
-        : false,
-      stateDataConstructor
+        : false
     );
   }
 
@@ -106,8 +91,7 @@ public class StateData implements Cloneable {
       request.arriveBy(),
       rentalPreferences != null
         ? rentalPreferences.allowArrivingInRentedVehicleAtDestination()
-        : false,
-      StateData::new
+        : false
     );
 
     var baseCaseDatas =
@@ -143,11 +127,10 @@ public class StateData implements Cloneable {
   private static List<StateData> getInitialStateDatas(
     StreetMode requestMode,
     boolean arriveBy,
-    boolean allowArrivingInRentedVehicleAtDestination,
-    Function<StreetMode, StateData> stateDataConstructor
+    boolean allowArrivingInRentedVehicleAtDestination
   ) {
     List<StateData> res = new ArrayList<>();
-    var proto = stateDataConstructor.apply(requestMode);
+    var proto = new StateData(requestMode);
 
     // carPickup searches may start and end in two distinct states:
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
@@ -233,7 +216,7 @@ public class StateData implements Cloneable {
     };
   }
 
-  public StateData clone() {
+  protected StateData clone() {
     try {
       return (StateData) super.clone();
     } catch (CloneNotSupportedException e1) {
