@@ -245,10 +245,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var seconds = 119L;
     Map<String, Object> arguments = Map.of("minTransferTime", seconds);
 
-    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
     assertEquals(Duration.ofSeconds(seconds), routeRequest.preferences().transfer().slack());
 
-    var noParamsReq = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
     assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
   }
 

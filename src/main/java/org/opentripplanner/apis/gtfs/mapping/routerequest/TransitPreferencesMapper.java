@@ -73,7 +73,7 @@ public class TransitPreferencesMapper {
       var slack = transfer.getGraphQLSlack();
       if (slack != null) {
         transferPreferences.withSlack(
-          (int) DurationUtils.requireNonNegativeMedium(slack, "transfer slack").toSeconds()
+          DurationUtils.requireNonNegativeMedium(slack, "transfer slack")
         );
       }
       var maxTransfers = transfer.getGraphQLMaximumTransfers();
