@@ -170,7 +170,7 @@ public class StreetEdge
    * This checks if start or end vertex is bollard If it is it creates intersection of street edge
    * permissions and from/to barriers. Then it checks if mode is allowed to traverse the edge.
    * <p>
-   * By default CAR isn't allowed to traverse barrier but foot and bicycle are. This can be changed
+   * By default, CAR isn't allowed to traverse barrier but foot and bicycle are. This can be changed
    * with different tags
    * <p>
    * If start/end isn't bollard it just checks the street permissions.
@@ -179,11 +179,11 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+    if (fromv instanceof BarrierVertex bv) {
+      permission = permission.intersection(bv.getBarrierPermissions());
     }
-    if (tov instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+    if (tov instanceof BarrierVertex bv) {
+      permission = permission.intersection(bv.getBarrierPermissions());
     }
 
     return permission.allows(mode);
