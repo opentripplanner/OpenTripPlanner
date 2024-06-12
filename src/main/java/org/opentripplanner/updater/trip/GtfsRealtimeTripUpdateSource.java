@@ -88,7 +88,7 @@ public class GtfsRealtimeTripUpdateSource {
   }
 
   /**
-   * @return the semantics of the last list with updates, i.e. if all previous updates
+   * @return the incrementality of the last list with updates, i.e. if all previous updates
    * should be disregarded
    */
   public UpdateIncrementality incrementalityOfLastUpdates() {

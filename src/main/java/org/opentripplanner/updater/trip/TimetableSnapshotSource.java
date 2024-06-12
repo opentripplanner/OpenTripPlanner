@@ -127,7 +127,7 @@ public class TimetableSnapshotSource extends AbstractTimetableSnapshotSource {
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
-   * @param updateIncrementality               Determines the semantics of the updates. FULL updates clear the buffer
+   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates clear the buffer
    *                                      of all previous updates for the given feed id.
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */

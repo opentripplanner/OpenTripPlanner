@@ -30,7 +30,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private final String requestorRef;
 
   /**
-   * The update semantics of the last received collection of updates.
+   * The incrementality of the last received collection of updates.
    */
   private UpdateIncrementality updateIncrementality = FULL_DATASET;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);

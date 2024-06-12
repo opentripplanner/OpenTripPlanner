@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip;
 
 /**
- * Describes the semantics of a collection of realtime updates and how they are related to previous
+ * Describes the incrementality of a collection of realtime updates and how they are related to previous
  * ones.
  */
 public enum UpdateIncrementality {

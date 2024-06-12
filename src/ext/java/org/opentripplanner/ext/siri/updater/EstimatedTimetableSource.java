@@ -19,7 +19,7 @@ public interface EstimatedTimetableSource {
   Optional<Siri> getUpdates();
 
   /**
-   * @return The update semantics of the last collection of updates.
+   * @return The incrementality of the last collection of updates.
    * {@link UpdateIncrementality}
    */
   UpdateIncrementality incrementalityOfLastUpdates();
