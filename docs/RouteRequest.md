@@ -199,7 +199,7 @@ The slack is added to the time after leaving the transit vehicle.
 This also influences the time it takes to transfer.
 
 Since some modes, like airplanes and subways, need more time than others, this is also configurable
-per mode with `boardSlackForMode`.
+per mode with `alightSlackForMode`.
 
 
 <h3 id="rd_boardSlack">boardSlack</h3>
