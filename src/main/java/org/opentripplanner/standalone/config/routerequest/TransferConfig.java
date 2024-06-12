@@ -40,16 +40,12 @@ class TransferConfig {
           .summary("The extra time needed to make a safe transfer.")
           .description(
             """
-            An expected transfer time that specifies the amount of time that must pass
-            between exiting one public transport vehicle and boarding another. This time is in
-            addition to time it might take to walk between stops plus `boardSlack` and
+            An extra buffer time that's applied when exiting one public transport vehicle and boarding another. 
+            This time is in addition to time it might take to walk between stops plus `boardSlack` and
             `alightSlack`.
             
-            The total transfer time from one vehicle to another is thus calculated as follows:
-            
-            ```
-            totalTransferDuration = alightSlack + walkDuration + transferSlack + boardSlack
-            ```
+            It is useful to add extra time for passengers with mobility issues, who need extra time
+            when moving between vehicles.
             """
           )
           .asDurationOrSeconds(dft.slack())

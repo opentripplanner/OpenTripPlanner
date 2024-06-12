@@ -194,9 +194,12 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 
 The extra time after exiting a public transport vehicle.
 
-The slack is added to the time when going from the transit vehicle to the stop.
-This also influences the total time it takes to transfer. See `transferSlack` for more details about
-how the total transfer time is calculated.
+The slack is added to the time after leaving the transit vehicle.
+
+This also influences the time it takes to transfer.
+
+Since some modes, like airplanes and subways, need more time than others, this is also configurable
+per mode with `boardSlackForMode`.
 
 
 <h3 id="rd_boardSlack">boardSlack</h3>
@@ -206,17 +209,16 @@ how the total transfer time is calculated.
 
 The extra time before boarding a public transport vehicle.
 
-The slack is added to the time when going from the stop (offboard) to onboard a transit
-vehicle. It is useful for suggesting passengers arrive at the stop a little earlier than they strictly
-need to to allow for unexpected circumstances.
+The extra time is added to the time when entering a public transport vehicle. This is a useful
+tool for agencies wanting to add a general buffer time so that passengers are instructed to be
+a earlier at their stop than is strictly necessary. This is also added when transferring from one
+vehicle to another.
 
-This is similar to `transferSlack`, except that this also applies to the first
-transit leg in the trip.
+It is similar to `transferSlack`, except that this also applies to the first transit leg in the
+trip and `transferSlack` does not.
 
-This also influences the total time it takes to transfer. See `transferSlack` for more details about
-how the total transfer time is calculated.
-
-This is the default value used, if not overridden by the `boardSlackList`.
+Some modes like, airplanes or subway, might need more of a slack than others, so this is also
+configurable per mode with `boardSlackForMode`.
 
 
 <h3 id="rd_drivingDirection">drivingDirection</h3>
@@ -365,16 +367,12 @@ significant time or walking will still be taken.
 
 The extra time needed to make a safe transfer.
 
-An expected transfer time that specifies the amount of time that must pass
-between exiting one public transport vehicle and boarding another. This time is in
-addition to time it might take to walk between stops plus `boardSlack` and
+An extra buffer time that's applied when exiting one public transport vehicle and boarding another.
+This time is in addition to time it might take to walk between stops plus `boardSlack` and
 `alightSlack`.
 
-The total transfer time from one vehicle to another is thus calculated as follows:
-
-```
-totalTransferDuration = alightSlack + walkDuration + transferSlack + boardSlack
-```
+It is useful to add extra time for passengers with mobility issues, who need extra time
+when moving between vehicles.
 
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>
