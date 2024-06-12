@@ -1,13 +1,12 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.siri.EntityResolver;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -38,16 +37,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
    */
   protected WriteToGraphCallback saveResultOnGraph;
 
-  /**
-   * The place where we'll record the incoming real-time timetables to make them available to the
-   * router in a thread safe way.
-   */
-  private final SiriTimetableSnapshotSource snapshotSource;
-
-  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
-  private final EntityResolver entityResolver;
-
-  private final Consumer<UpdateResult> recordMetrics;
+  private final EstimatedTimetableHandler estimatedTimetableHandler;
 
   public SiriETUpdater(
     SiriETUpdaterParameters config,
@@ -60,20 +50,34 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
-    this.snapshotSource = timetableSnapshot;
-
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    TransitService transitService = new DefaultTransitService(transitModel);
-    this.entityResolver = new EntityResolver(transitService, feedId);
-    this.fuzzyTripMatcher =
-      config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
       pollingPeriod(),
       updateSource
     );
-    recordMetrics = TripUpdateMetrics.streaming(config);
+
+    estimatedTimetableHandler =
+      new EstimatedTimetableHandler(
+        this::writeToCallBack,
+        timetableSnapshot,
+        config.fuzzyTripMatching(),
+        new DefaultTransitService(transitModel),
+        updateResultConsumer(config),
+        feedId
+      );
+  }
+
+  private Consumer<UpdateResult> updateResultConsumer(SiriETUpdaterParameters config) {
+    return updateResult -> {
+      ResultLogger.logUpdateResult(feedId, "siri-et", updateResult);
+      TripUpdateMetrics.streaming(config).accept(updateResult);
+    };
+  }
+
+  private Future<?> writeToCallBack(GraphWriterRunnable graphWriterRunnable) {
+    return saveResultOnGraph.execute(graphWriterRunnable);
   }
 
   @Override
@@ -99,20 +103,15 @@ public class SiriETUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          saveResultOnGraph.execute((graph, transitModel) -> {
-            var result = snapshotSource.applyEstimatedTimetable(
-              fuzzyTripMatcher,
-              entityResolver,
-              feedId,
-              fullDataset,
-              etds
-            );
-            ResultLogger.logUpdateResult(feedId, "siri-et", result);
-            recordMetrics.accept(result);
-            if (markPrimed) {
-              primed = true;
+          estimatedTimetableHandler.applyUpdate(
+            etds,
+            fullDataset,
+            () -> {
+              if (markPrimed) {
+                primed = true;
+              }
             }
-          });
+          );
         }
       }
     } while (moreData);
