@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -40,6 +41,7 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -68,9 +70,12 @@ public class LuceneIndex implements Serializable {
   private final SuggestIndexSearcher searcher;
   private final StopClusterMapper stopClusterMapper;
 
-  public LuceneIndex(TransitService transitService) {
+  public LuceneIndex(
+    TransitService transitService,
+    @Nullable StopConsolidationService stopConsolidationService
+  ) {
     this.transitService = transitService;
-    this.stopClusterMapper = new StopClusterMapper(transitService);
+    this.stopClusterMapper = new StopClusterMapper(transitService, stopConsolidationService);
 
     LOG.info("Creating geocoder lucene index");
 

@@ -43,4 +43,6 @@ public interface StopConsolidationService {
    * For a given stop id return the primary stop if it is part of a consolidated stop group.
    */
   Optional<StopLocation> primaryStop(FeedScopedId id);
+
+  boolean isPartOfConsolidatedStop(StopLocation sl);
 }

@@ -179,7 +179,8 @@ public class ConstructApplication {
     }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
-      LOG.info("Creating debug client geocoder lucene index");
+      LOG.info("Initializing geocoder");
+      this.factory.luceneIndex();
     }
   }
 
