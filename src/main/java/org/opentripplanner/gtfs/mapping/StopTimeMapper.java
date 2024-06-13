@@ -19,7 +19,7 @@ class StopTimeMapper {
 
   private final StopMapper stopMapper;
 
-  private final LocationMapper locationMapper;
+  private final AreaStopMapper areaStopMapper;
 
   private final LocationGroupMapper locationGroupMapper;
   private final StopAreaMapper stopAreaMapper;
@@ -33,7 +33,7 @@ class StopTimeMapper {
 
   StopTimeMapper(
     StopMapper stopMapper,
-    LocationMapper locationMapper,
+    AreaStopMapper areaStopMapper,
     LocationGroupMapper locationGroupMapper,
     StopAreaMapper stopAreaMapper,
     TripMapper tripMapper,
@@ -41,7 +41,7 @@ class StopTimeMapper {
     TranslationHelper translationHelper
   ) {
     this.stopMapper = stopMapper;
-    this.locationMapper = locationMapper;
+    this.areaStopMapper = areaStopMapper;
     this.locationGroupMapper = locationGroupMapper;
     this.stopAreaMapper = stopAreaMapper;
     this.tripMapper = tripMapper;
@@ -69,7 +69,7 @@ class StopTimeMapper {
     );
     switch (stopLocation) {
       case Stop stop -> lhs.setStop(stopMapper.map(stop));
-      case Location location -> lhs.setStop(locationMapper.map(location));
+      case Location location -> lhs.setStop(areaStopMapper.map(location));
       case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
       // TODO: only here for backwards compatibility, this will be removed in the future
       case StopArea area -> lhs.setStop(stopAreaMapper.map(area));

@@ -18,18 +18,18 @@ import org.opentripplanner.transit.service.StopModelBuilder;
 public class LocationGroupMapper {
 
   private final StopMapper stopMapper;
-  private final LocationMapper locationMapper;
+  private final AreaStopMapper areaStopMapper;
   private final StopModelBuilder stopModelBuilder;
 
   private final Map<LocationGroup, GroupStop> mappedLocationGroups = new HashMap<>();
 
   public LocationGroupMapper(
     StopMapper stopMapper,
-    LocationMapper locationMapper,
+    AreaStopMapper areaStopMapper,
     StopModelBuilder stopModelBuilder
   ) {
     this.stopMapper = stopMapper;
-    this.locationMapper = locationMapper;
+    this.areaStopMapper = areaStopMapper;
     this.stopModelBuilder = stopModelBuilder;
   }
 
@@ -54,7 +54,7 @@ public class LocationGroupMapper {
       );
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
-        case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
+        case Location loc -> groupStopBuilder.addLocation(areaStopMapper.map(loc));
         case LocationGroup ignored -> throw new RuntimeException(
           "Nested GroupStops are not allowed"
         );

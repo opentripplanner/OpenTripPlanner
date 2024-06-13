@@ -56,10 +56,11 @@ public class AreaStop
     if (!this.geometry.isValid()) {
       var error = new IsValidOp(this.geometry).getValidationError();
       throw new IllegalArgumentException(
-        "Polygon geometry for AreaStop %s is invalid: %s at %s".formatted(
+        "Polygon geometry for AreaStop %s is invalid: %s at (lat: %s, lon: %s)".formatted(
             getId(),
             error.getMessage(),
-            error.getCoordinate()
+            error.getCoordinate().y,
+            error.getCoordinate().x
           )
       );
     }
