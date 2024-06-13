@@ -23,20 +23,31 @@ public class AsyncEstimatedTimetableProcessor {
     this.estimatedTimetableHandler = estimatedTimetableHandler;
   }
 
+  /**
+   * Start consuming from the estimated timetable source.
+   */
   public void run() {
     siriMessageSource.start(this::processSiriData);
   }
 
+  /**
+   * Return true if the estimated timetable source is initialized and the backlog of messages
+   * is processed.
+   */
   public boolean isPrimed() {
-    return this.primed;
+    return primed;
   }
 
+  /**
+   * Apply the estimated timetables to the transit model.
+   * The first successful call to this method sets the primed status to true.
+   */
   private void processSiriData(ServiceDelivery serviceDelivery) {
     var f = estimatedTimetableHandler.applyUpdate(
       serviceDelivery.getEstimatedTimetableDeliveries(),
       false
     );
-    if (!isPrimed()) {
+    if (!primed) {
       try {
         f.get();
         primed = true;

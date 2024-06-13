@@ -136,6 +136,12 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     addShutdownHook();
   }
 
+  /**
+   * Create a PubSub subscription, read the backlog of messages and start listening to the
+   * subscription.
+   * Enter an infinite loop waiting for messages. An interruption sent at server
+   * shutdown will cause the loop to stop.
+   */
   @Override
   public void start(Consumer<ServiceDelivery> serviceDeliveryConsumer) {
     this.serviceDeliveryConsumer = serviceDeliveryConsumer;
@@ -228,18 +234,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     }
   }
 
-  private ByteString fetchInitialData() {
-    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
-      var otpHttpClient = otpHttpClientFactory.create(LOG);
-      return otpHttpClient.getAndMap(
-        dataInitializationUrl,
-        initialGetDataTimeout,
-        Map.of("Content-Type", "application/x-protobuf"),
-        ByteString::readFrom
-      );
-    }
-  }
-
+  /**
+   * Decode the protobuf-encoded message payload into an optional SIRI ServiceDelivery.
+   */
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
     SiriType siriType;
     try {
@@ -251,6 +248,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
+  /**
+   * Fetch the backlog of messages and apply the changes to the transit model.
+   */
   private void initializeData() {
     if (dataInitializationUrl != null) {
       LOG.info("Fetching initial data from {}", dataInitializationUrl);
@@ -274,6 +274,24 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     }
   }
 
+  /**
+   * Fetch the backlog of messages from the configured data initialization URL.
+   */
+  private ByteString fetchInitialData() {
+    try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
+      var otpHttpClient = otpHttpClientFactory.create(LOG);
+      return otpHttpClient.getAndMap(
+        dataInitializationUrl,
+        initialGetDataTimeout,
+        Map.of("Content-Type", "application/x-protobuf"),
+        ByteString::readFrom
+      );
+    }
+  }
+
+  /**
+   * Shut down the PubSub subscriber at server shutdown.
+   */
   private void addShutdownHook() {
     ApplicationShutdownSupport.addShutdownHook(
       "siri-et-google-pubsub-shutdown",
@@ -291,6 +309,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
   }
 
+  /**
+   * Message receiver callback that consumes messages from the PubSub subscription.
+   */
   class EstimatedTimetableMessageReceiver implements MessageReceiver {
 
     @Override

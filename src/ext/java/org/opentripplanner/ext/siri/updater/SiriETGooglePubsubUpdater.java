@@ -17,11 +17,7 @@ import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private final String configRef;
-
   private final AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor;
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
   private WriteToGraphCallback saveResultOnGraph;
 
   public SiriETGooglePubsubUpdater(
@@ -41,7 +37,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     );
 
     EstimatedTimetableHandler estimatedTimetableHandler = new EstimatedTimetableHandler(
-      this::writeToCallBack,
+      this::writeToGraphCallBack,
       timetableSnapshot,
       config.fuzzyTripMatching(),
       new DefaultTransitService(transitModel),
@@ -53,7 +49,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       new AsyncEstimatedTimetableProcessor(asyncSiriMessageSource, estimatedTimetableHandler);
   }
 
-  private Future<?> writeToCallBack(GraphWriterRunnable graphWriterRunnable) {
+  private Future<?> writeToGraphCallBack(GraphWriterRunnable graphWriterRunnable) {
     return saveResultOnGraph.execute(graphWriterRunnable);
   }
 
