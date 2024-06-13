@@ -5508,7 +5508,7 @@ input BicycleWalkPreferencesInput {
     """
     cost: BicycleWalkPreferencesCostInput
 
-    """"
+    """
     How long it takes to hop on or off a bicycle when switching to walking the bicycle
     or when getting on the bicycle again. However, this is not applied when getting
     on a rented bicycle for the first time or off the bicycle when returning the bicycle.
