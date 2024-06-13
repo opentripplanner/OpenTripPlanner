@@ -40,8 +40,8 @@ class TransferConfig {
           .summary("The extra time needed to make a safe transfer.")
           .description(
             """
-            An extra buffer time that's applied when exiting one public transport vehicle and boarding another. 
-            This time is in addition to time it might take to walk between stops plus `boardSlack` and
+            An extra buffer time that's applied when exiting one public transport vehicle and boarding another.
+            This time is in addition to how long it might take to walk between stops plus `boardSlack` and
             `alightSlack`.
             
             It is useful to add extra time for passengers with mobility issues, who need extra time

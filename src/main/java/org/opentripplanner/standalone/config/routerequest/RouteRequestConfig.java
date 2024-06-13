@@ -246,7 +246,7 @@ vehicle to another.
 It is similar to `transferSlack`, except that this also applies to the first transit leg in the
 trip and `transferSlack` does not.
 
-Some modes like, airplanes or subway, might need more of a slack than others, so this is also
+Some modes, like airplanes or subway, might need more of a slack than others, so this is also
 configurable per mode with `boardSlackForMode`.
 """
               )

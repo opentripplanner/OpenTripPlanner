@@ -217,7 +217,7 @@ vehicle to another.
 It is similar to `transferSlack`, except that this also applies to the first transit leg in the
 trip and `transferSlack` does not.
 
-Some modes like, airplanes or subway, might need more of a slack than others, so this is also
+Some modes, like airplanes or subway, might need more of a slack than others, so this is also
 configurable per mode with `boardSlackForMode`.
 
 
@@ -368,7 +368,7 @@ significant time or walking will still be taken.
 The extra time needed to make a safe transfer.
 
 An extra buffer time that's applied when exiting one public transport vehicle and boarding another.
-This time is in addition to time it might take to walk between stops plus `boardSlack` and
+This time is in addition to how long it might take to walk between stops plus `boardSlack` and
 `alightSlack`.
 
 It is useful to add extra time for passengers with mobility issues, who need extra time
