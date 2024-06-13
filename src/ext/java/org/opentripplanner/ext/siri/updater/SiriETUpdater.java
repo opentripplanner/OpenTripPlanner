@@ -91,7 +91,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     do {
       var updates = updateSource.getUpdates();
       if (updates.isPresent()) {
-        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+        var incrementality = updateSource.incrementalityOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
@@ -104,7 +104,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
               fuzzyTripMatcher,
               entityResolver,
               feedId,
-              fullDataset,
+              incrementality,
               etds
             );
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
