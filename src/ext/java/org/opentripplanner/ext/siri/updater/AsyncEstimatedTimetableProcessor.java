@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.ServiceDelivery;
 
@@ -13,8 +13,6 @@ public class AsyncEstimatedTimetableProcessor {
 
   private final AsyncEstimatedTimetableSource siriMessageSource;
   private final EstimatedTimetableHandler estimatedTimetableHandler;
-
-  private volatile boolean primed;
 
   public AsyncEstimatedTimetableProcessor(
     AsyncEstimatedTimetableSource siriMessageSource,
@@ -32,32 +30,14 @@ public class AsyncEstimatedTimetableProcessor {
   }
 
   /**
-   * Return true if the estimated timetable source is initialized and the backlog of messages
-   * is processed.
-   */
-  public boolean isPrimed() {
-    return primed;
-  }
-
-  /**
    * Apply the estimated timetables to the transit model.
-   * The first successful call to this method sets the primed status to true.
+   * This method is non-blocking and applies the changes asynchronosly.
+   * @return a future indicating when the changes are applied.
    */
-  private void processSiriData(ServiceDelivery serviceDelivery) {
-    var f = estimatedTimetableHandler.applyUpdate(
+  private Future<?> processSiriData(ServiceDelivery serviceDelivery) {
+    return estimatedTimetableHandler.applyUpdate(
       serviceDelivery.getEstimatedTimetableDeliveries(),
       UpdateIncrementality.DIFFERENTIAL
     );
-    if (!primed) {
-      try {
-        f.get();
-        primed = true;
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new RuntimeException(e);
-      } catch (ExecutionException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 }

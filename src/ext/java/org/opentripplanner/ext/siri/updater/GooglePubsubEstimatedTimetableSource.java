@@ -20,8 +20,10 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -99,7 +101,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   private final OtpRetry retry;
 
-  private Consumer<ServiceDelivery> serviceDeliveryConsumer;
+  private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
+  private volatile boolean primed;
 
   public GooglePubsubEstimatedTimetableSource(
     String dataInitializationUrl,
@@ -143,7 +146,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    * shutdown will cause the loop to stop.
    */
   @Override
-  public void start(Consumer<ServiceDelivery> serviceDeliveryConsumer) {
+  public void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
     this.serviceDeliveryConsumer = serviceDeliveryConsumer;
 
     try {
@@ -157,6 +160,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       while (true) {
         try {
           subscriber.startAsync().awaitRunning();
+          primed = true;
           subscriber.awaitTerminated();
         } catch (IllegalStateException e) {
           subscriber.stopAsync();
@@ -167,6 +171,11 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       Thread.currentThread().interrupt();
       LOG.info("OTP is shutting down, stopping the SIRI ET Google PubSub Updater.");
     }
+  }
+
+  @Override
+  public boolean isPrimed() {
+    return primed;
   }
 
   /**
@@ -250,6 +259,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   /**
    * Fetch the backlog of messages and apply the changes to the transit model.
+   * Block until the backlog is applied.
    */
   private void initializeData() {
     if (dataInitializationUrl != null) {
@@ -262,7 +272,19 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         (t2 - t1),
         FileSizeToTextConverter.fileSizeToString(value.size())
       );
-      serviceDelivery(value).ifPresent(serviceDeliveryConsumer);
+      serviceDelivery(value)
+        .map(serviceDeliveryConsumer)
+        .ifPresent(future -> {
+          try {
+            future.get();
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+          } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+          }
+        });
+
       LOG.info(
         "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
         (System.currentTimeMillis() - t2),
@@ -275,7 +297,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Fetch the backlog of messages from the configured data initialization URL.
+   * Fetch the backlog of messages over HTTP from the configured data initialization URL.
    */
   private ByteString fetchInitialData() {
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
@@ -319,7 +341,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       Optional<ServiceDelivery> serviceDelivery = serviceDelivery(message.getData());
       serviceDelivery.ifPresent(sd -> {
         logPubsubMessage(sd);
-        serviceDeliveryConsumer.accept(sd);
+        serviceDeliveryConsumer.apply(sd);
       });
 
       // Ack only after all work for the message is complete.

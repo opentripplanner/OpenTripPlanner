@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
-import java.util.function.Consumer;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 import uk.org.siri.siri20.ServiceDelivery;
 
 /**
@@ -15,8 +16,13 @@ public interface AsyncEstimatedTimetableSource {
    * backlog, that is the recent history of SIRI-ET messages produced by this feed and made
    * available by a message cache.
    *
-   * @param serviceDeliveryConsumer a consumer of estimated timetable responsible for applying the
-   *                                update to the transit model.
+   * @param serviceDeliveryConsumer apply asynchronously the updates to the transit model. Return a
+   *                                future indicating when the updates are applied.
    */
-  void start(Consumer<ServiceDelivery> serviceDeliveryConsumer);
+  void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer);
+
+  /**
+   * Return true if the message backlog is processed and the source is ready to listen to the feed.
+   */
+  boolean isPrimed();
 }

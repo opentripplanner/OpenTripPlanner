@@ -18,6 +18,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private final String configRef;
   private final AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor;
+  private final AsyncEstimatedTimetableSource asyncSiriMessageSource;
   private WriteToGraphCallback saveResultOnGraph;
 
   public SiriETGooglePubsubUpdater(
@@ -27,14 +28,15 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   ) {
     this.configRef = config.configRef();
 
-    AsyncEstimatedTimetableSource asyncSiriMessageSource = new GooglePubsubEstimatedTimetableSource(
-      config.dataInitializationUrl(),
-      config.reconnectPeriod(),
-      config.initialGetDataTimeout(),
-      config.subscriptionProjectName(),
-      config.topicProjectName(),
-      config.topicName()
-    );
+    asyncSiriMessageSource =
+      new GooglePubsubEstimatedTimetableSource(
+        config.dataInitializationUrl(),
+        config.reconnectPeriod(),
+        config.initialGetDataTimeout(),
+        config.subscriptionProjectName(),
+        config.topicProjectName(),
+        config.topicName()
+      );
 
     EstimatedTimetableHandler estimatedTimetableHandler = new EstimatedTimetableHandler(
       this::writeToGraphCallBack,
@@ -65,7 +67,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public boolean isPrimed() {
-    return asyncEstimatedTimetableProcessor.isPrimed();
+    return asyncSiriMessageSource.isPrimed();
   }
 
   @Override
