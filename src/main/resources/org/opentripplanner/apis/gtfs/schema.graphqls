@@ -3546,7 +3546,9 @@ type QueryType {
         """
         filterByModes: [Mode]
 
-        """Only include places that match one of the given network names."""
+        """
+        Only include places that match one of the given network names.
+        """
         filterByNetworkNames: [String]
 
         """Only include places that match one of the given GTFS ids."""
