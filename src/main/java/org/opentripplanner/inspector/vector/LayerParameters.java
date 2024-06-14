@@ -57,6 +57,9 @@ public interface LayerParameters<T extends Enum<T>> {
     return EXPANSION_FACTOR;
   }
 
+  /**
+   * A list of networks to hide from the results.
+   */
   default List<String> hideNetworks() {
     return HIDE_NETWORKS;
   }
