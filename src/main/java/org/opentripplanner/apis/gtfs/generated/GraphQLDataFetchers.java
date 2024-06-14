@@ -857,6 +857,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> vehicleId();
 
     public DataFetcher<RentalVehicleType> vehicleType();
+
+    DataFetcher<String> systemUrl();
   }
 
   public interface GraphQLRentalVehicleEntityCounts {

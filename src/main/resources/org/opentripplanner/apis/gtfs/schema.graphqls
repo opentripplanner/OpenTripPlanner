@@ -742,6 +742,9 @@ type RentalVehicle implements Node & PlaceInterface {
 
     """The type of the rental vehicle (scooter, bicycle, car...)"""
     vehicleType: RentalVehicleType
+
+    """The rental vehicle operator's system URL."""
+    systemUrl: String!
 }
 
 type BikeRentalStationUris {
@@ -3542,6 +3545,9 @@ type QueryType {
         nearest places related to bicycling.
         """
         filterByModes: [Mode]
+
+        """Only include places that match one of the given network names."""
+        filterByNetworkNames: [String]
 
         """Only include places that match one of the given GTFS ids."""
         filterByIds: InputFilters @deprecated(reason: "Not actively maintained")

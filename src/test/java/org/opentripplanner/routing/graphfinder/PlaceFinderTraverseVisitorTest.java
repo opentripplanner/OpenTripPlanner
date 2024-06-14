@@ -96,6 +96,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -124,6 +125,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -148,6 +150,7 @@ public class PlaceFinderTraverseVisitorTest {
       transitService,
       List.of(TransitMode.BUS),
       List.of(PlaceType.STOP, PlaceType.STATION),
+      null,
       null,
       null,
       null,
@@ -181,6 +184,7 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(PlaceType.STOP, PlaceType.STATION),
       List.of(STOP2.getId(), STOP3.getId()),
       List.of(STATION1.getId()),
+      null,
       null,
       null,
       1,
@@ -217,6 +221,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -248,6 +253,7 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(PlaceType.STOP, PlaceType.STATION),
       List.of(STOP4.getId()),
       List.of(STATION1.getId()),
+      null,
       null,
       null,
       1,

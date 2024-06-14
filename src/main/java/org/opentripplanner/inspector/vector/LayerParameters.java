@@ -1,5 +1,7 @@
 package org.opentripplanner.inspector.vector;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 
 /**
@@ -10,7 +12,7 @@ public interface LayerParameters<T extends Enum<T>> {
   int MAX_ZOOM = 20;
   int CACHE_MAX_SECONDS = -1;
   double EXPANSION_FACTOR = 0.25d;
-
+  List<String> HIDE_NETWORKS = new ArrayList<>();
   /**
    * User-visible name of the layer
    */
@@ -53,5 +55,9 @@ public interface LayerParameters<T extends Enum<T>> {
    */
   default double expansionFactor() {
     return EXPANSION_FACTOR;
+  }
+
+  default List<String> hideNetworks() {
+    return HIDE_NETWORKS;
   }
 }

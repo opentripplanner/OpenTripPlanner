@@ -18,6 +18,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends LayerBuilder<T> {
 
   private final VehicleRentalService service;
+  private final List<String> hideNetworks;
 
   public VehicleRentalLayerBuilder(
     VehicleRentalService service,
@@ -30,6 +31,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
       layerParameters.expansionFactor()
     );
     this.service = service;
+    this.hideNetworks = layerParameters.hideNetworks();
   }
 
   @Override
@@ -39,6 +41,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
     }
     return getVehicleRentalPlaces(service)
       .stream()
+      .filter(rental -> !hideNetworks.contains(rental.getNetwork()))
       .map(rental -> {
         Coordinate coordinate = new Coordinate(rental.getLongitude(), rental.getLatitude());
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
