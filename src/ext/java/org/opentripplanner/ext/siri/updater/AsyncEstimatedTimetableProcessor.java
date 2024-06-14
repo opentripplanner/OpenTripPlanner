@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.concurrent.ExecutionException;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.ServiceDelivery;
 
 /**
@@ -45,7 +46,7 @@ public class AsyncEstimatedTimetableProcessor {
   private void processSiriData(ServiceDelivery serviceDelivery) {
     var f = estimatedTimetableHandler.applyUpdate(
       serviceDelivery.getEstimatedTimetableDeliveries(),
-      false
+      UpdateIncrementality.DIFFERENTIAL
     );
     if (!primed) {
       try {

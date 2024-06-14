@@ -95,7 +95,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
     do {
       var updates = updateSource.getUpdates();
       if (updates.isPresent()) {
-        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
@@ -105,7 +104,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (etds != null) {
           estimatedTimetableHandler.applyUpdate(
             etds,
-            fullDataset,
+            updateSource.incrementalityOfLastUpdates(),
             () -> {
               if (markPrimed) {
                 primed = true;

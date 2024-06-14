@@ -10,6 +10,7 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 /**
@@ -49,14 +50,14 @@ public class EstimatedTimetableHandler {
 
   public Future<?> applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
-    boolean fullDataset
+    UpdateIncrementality updateMode
   ) {
-    return applyUpdate(estimatedTimetableDeliveries, fullDataset, () -> {});
+    return applyUpdate(estimatedTimetableDeliveries, updateMode, () -> {});
   }
 
   public Future<?> applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
-    boolean fullDataset,
+    UpdateIncrementality updateMode,
     @Nonnull Runnable onUpdateComplete
   ) {
     return saveResultOnGraph.execute((graph, transitModel) -> {
@@ -64,7 +65,7 @@ public class EstimatedTimetableHandler {
         fuzzyTripMatcher,
         entityResolver,
         feedId,
-        fullDataset,
+        updateMode,
         estimatedTimetableDeliveries
       );
 
