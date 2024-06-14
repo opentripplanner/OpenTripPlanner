@@ -31,7 +31,7 @@ public class AsyncEstimatedTimetableProcessor {
 
   /**
    * Apply the estimated timetables to the transit model.
-   * This method is non-blocking and applies the changes asynchronosly.
+   * This method is non-blocking and applies the changes asynchronously.
    * @return a future indicating when the changes are applied.
    */
   private Future<?> processSiriData(ServiceDelivery serviceDelivery) {

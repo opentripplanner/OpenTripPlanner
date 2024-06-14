@@ -78,12 +78,15 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private static final int RETRY_BACKOFF = 2;
 
   /**
-   * The URL used to fetch all initial updates
+   * The URL used to fetch all initial updates.
+   * The URL responds to HTTP GET and returns all initial data in protobuf-format. It will be
+   * called once to initialize real-time-data.
+   * All subsequent updates will be received from Google Cloud Pubsub.
    */
   private final URI dataInitializationUrl;
 
   /**
-   * The number of seconds to wait before reconnecting after a failed connection.
+   * The time to wait before reconnecting after a failed connection.
    */
   private final Duration reconnectPeriod;
 
@@ -112,14 +115,11 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     String topicProjectName,
     String topicName
   ) {
-    // URL that responds to HTTP GET which returns all initial data in protobuf-format. Will be
-    // called once to initialize real-time-data. All updates will be received from Google Cloud
-    // Pubsub
+    //
     this.dataInitializationUrl = URI.create(dataInitializationUrl);
     this.reconnectPeriod = reconnectPeriod;
     this.initialGetDataTimeout = initialGetDataTimeout;
 
-    // set subscriber
     String subscriptionId = buildSubscriptionId();
     subscriptionName =
       ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId).toString();

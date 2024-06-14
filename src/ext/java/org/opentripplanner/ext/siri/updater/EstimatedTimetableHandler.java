@@ -18,9 +18,6 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  */
 public class EstimatedTimetableHandler {
 
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
   private final WriteToGraphCallback saveResultOnGraph;
 
   private final SiriTimetableSnapshotSource snapshotSource;
@@ -48,6 +45,10 @@ public class EstimatedTimetableHandler {
     this.feedId = feedId;
   }
 
+  /**
+   * Apply the update to the transit model.
+   * @return a future indicating when the changes are applied.
+   */
   public Future<?> applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
     UpdateIncrementality updateMode
@@ -55,6 +56,11 @@ public class EstimatedTimetableHandler {
     return applyUpdate(estimatedTimetableDeliveries, updateMode, () -> {});
   }
 
+  /**
+   * Apply the update to the transit model.
+   * @param onUpdateComplete callback called after the update has been applied.
+   * @return a future indicating when the changes are applied.
+   */
   public Future<?> applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
     UpdateIncrementality updateMode,
