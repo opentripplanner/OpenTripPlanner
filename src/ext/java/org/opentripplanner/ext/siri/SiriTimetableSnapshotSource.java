@@ -7,6 +7,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_STA
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -83,15 +85,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
    *              same internal model.
    *
-   * @param fullDataset  true iff the list with updates represent all updates that are active right
-   *                     now, i.e. all previous updates should be disregarded
-   * @param updates      SIRI EstimatedTimetable deliveries that should be applied atomically.
+   * @param incrementality  the incrementality of the update, for example if updates represent all
+   *                        updates that are active right now, i.e. all previous updates should be
+   *                        disregarded
+   * @param updates    SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     String feedId,
-    boolean fullDataset,
+    UpdateIncrementality incrementality,
     List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
@@ -102,7 +105,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     snapshotManager.withLock(() -> {
-      if (fullDataset) {
+      if (incrementality == FULL_DATASET) {
         // Remove all updates from the buffer
         snapshotManager.clearBuffer(feedId);
       }
