@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel;
 import static graphql.execution.instrumentation.SimpleInstrumentationContext.noOp;
 
 import graphql.ExecutionResult;
-import graphql.execution.AbortExecutionException;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.instrumentation.InstrumentationContext;
 import graphql.execution.instrumentation.InstrumentationState;
@@ -47,7 +46,7 @@ public class MaxFieldsInResultInstrumentation implements Instrumentation {
     if (fetched % 10000 == 0) {
       LOG.debug("Fetched {} fields", fetched);
       if (fetched > maxFieldFetch) {
-        throw new AbortExecutionException(
+        throw new ResponseTooLargeException(
           "The number of fields in the GraphQL result exceeds the maximum allowed: " + maxFieldFetch
         );
       }
