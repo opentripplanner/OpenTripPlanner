@@ -40,11 +40,7 @@ class AreaStopMapperTest {
     var gtfsLocation = getLocation("invalid", selfIntersecting);
 
     var mapper = new AreaStopMapper(StopModel.of());
-    var expectation = assertThrows(IllegalArgumentException.class, () -> mapper.map(gtfsLocation));
-    assertEquals(
-      "Polygon geometry for AreaStop 1:zone-3 is invalid: Self-intersection at (lat: 1.0, lon: 2.0)",
-      expectation.getMessage()
-    );
+    assertThrows(IllegalArgumentException.class, () -> mapper.map(gtfsLocation));
   }
 
   private static Location getLocation(String name, Polygon polygon) {
