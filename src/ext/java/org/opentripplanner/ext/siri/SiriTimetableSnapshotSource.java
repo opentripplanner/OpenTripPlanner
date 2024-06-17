@@ -7,6 +7,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_STA
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -28,7 +30,8 @@ import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
-import org.opentripplanner.updater.trip.AbstractTimetableSnapshotSource;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -39,7 +42,7 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
  * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
-public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource {
+public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
@@ -57,15 +60,18 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
   private final TransitService transitService;
 
+  private final TimetableSnapshotManager snapshotManager;
+
   public SiriTimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    super(
-      transitModel.getTransitLayerUpdater(),
-      parameters,
-      () -> LocalDate.now(transitModel.getTimeZone())
-    );
+    this.snapshotManager =
+      new TimetableSnapshotManager(
+        transitModel.getTransitLayerUpdater(),
+        parameters,
+        () -> LocalDate.now(transitModel.getTimeZone())
+      );
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.tripPatternCache =
@@ -79,15 +85,16 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
    * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
    *              same internal model.
    *
-   * @param fullDataset  true iff the list with updates represent all updates that are active right
-   *                     now, i.e. all previous updates should be disregarded
-   * @param updates      SIRI EstimatedTimetable deliveries that should be applied atomically.
+   * @param incrementality  the incrementality of the update, for example if updates represent all
+   *                        updates that are active right now, i.e. all previous updates should be
+   *                        disregarded
+   * @param updates    SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     String feedId,
-    boolean fullDataset,
+    UpdateIncrementality incrementality,
     List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
@@ -97,10 +104,10 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    withLock(() -> {
-      if (fullDataset) {
+    snapshotManager.withLock(() -> {
+      if (incrementality == FULL_DATASET) {
         // Remove all updates from the buffer
-        buffer.clear(feedId);
+        snapshotManager.clearBuffer(feedId);
       }
 
       for (var etDelivery : updates) {
@@ -115,10 +122,15 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
       LOG.debug("message contains {} trip updates", updates.size());
 
-      purgeAndCommit();
+      snapshotManager.purgeAndCommit();
     });
 
     return UpdateResult.ofResults(results);
+  }
+
+  @Override
+  public TimetableSnapshot getTimetableSnapshot() {
+    return snapshotManager.getTimetableSnapshot();
   }
 
   private Result<UpdateSuccess, UpdateError> apply(
@@ -225,7 +237,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
         estimatedVehicleJourney,
         entityResolver,
         this::getCurrentTimetable,
-        buffer::getRealtimeAddedTripPattern
+        snapshotManager::getRealtimeAddedTripPattern
       );
 
       if (tripAndPattern == null) {
@@ -268,7 +280,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
 
     // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
     // remove the previously created trip
-    this.buffer.revertTripToScheduledTripPattern(trip.getId(), serviceDate);
+    this.snapshotManager.revertTripToScheduledTripPattern(trip.getId(), serviceDate);
 
     return updateResult;
   }
@@ -287,7 +299,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
       serviceDate
     );
     // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
-    var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
+    var result = snapshotManager.updateBuffer(pattern, tripUpdate.tripTimes(), serviceDate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;
   }
@@ -312,7 +324,7 @@ public class SiriTimetableSnapshotSource extends AbstractTimetableSnapshotSource
       } else {
         final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
-        buffer.update(pattern, newTripTimes, serviceDate);
+        snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
         success = true;
       }
     }

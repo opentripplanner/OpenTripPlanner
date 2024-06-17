@@ -39,6 +39,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -372,7 +373,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
           fuzzyTripMatcher,
           entityResolver,
           feedId,
-          false,
+          UpdateIncrementality.DIFFERENTIAL,
           estimatedTimetableDeliveries
         );
 
