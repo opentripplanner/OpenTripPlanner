@@ -394,7 +394,7 @@ public class ParameterBuilder {
    * In the documentation it will claim that it only accepts durations as the number is only for
    * backwards compatibility.
    */
-  public Duration asDurationOrSeconds(Duration dflt) {
+  public Duration asDurationOrSeconds(Duration defaultValue) {
     info.withType(DURATION);
     setInfoOptional(dflt.toString());
     var node = build();
