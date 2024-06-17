@@ -13,18 +13,29 @@ import javax.annotation.Nullable;
 
 public class DateScalarFactory {
 
-  public static final String DESCRIPTION =
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+  public static final String TRANSMODEL_DESCRIPTION =
     "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+  private static final String TRANSMODEL_NAME = "Date";
+  private static final String GTFS_NAME = "LocalDate";
 
   private DateScalarFactory() {}
+
+  public static GraphQLScalarType createTransmodelDateScalar() {
+    return createDateScalar(TRANSMODEL_NAME, TRANSMODEL_DESCRIPTION);
+  }
+
+  public static GraphQLScalarType createGtfsDateScalar() {
+    // description comes from schema.graphqls
+    return createDateScalar(GTFS_NAME, null);
+  }
 
   /**
    * @param description Nullable description that allows caller to pass in null which leads to the
    *                    description from schema.graphqls to be used.
    */
-  public static GraphQLScalarType createDateScalar(
+  private static GraphQLScalarType createDateScalar(
     String scalarName,
     @Nullable String description
   ) {

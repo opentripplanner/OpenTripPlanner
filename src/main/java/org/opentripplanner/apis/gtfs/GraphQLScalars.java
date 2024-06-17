@@ -236,10 +236,7 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static final GraphQLScalarType LOCAL_DATE_SCALAR = DateScalarFactory.createDateScalar(
-    "LocalDate",
-    null
-  );
+  public static final GraphQLScalarType LOCAL_DATE_SCALAR = DateScalarFactory.createGtfsDateScalar();
 
   public static final GraphQLScalarType GEOJSON_SCALAR = GraphQLScalarType
     .newScalar()
