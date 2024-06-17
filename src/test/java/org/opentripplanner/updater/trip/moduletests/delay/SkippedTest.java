@@ -33,12 +33,7 @@ public class SkippedTest {
     var env = RealtimeTestEnvironment.gtfs();
     String scheduledTripId = env.trip2.getId().getId();
 
-    var tripUpdate = new TripUpdateBuilder(
-      scheduledTripId,
-      RealtimeTestEnvironment.SERVICE_DATE,
-      SCHEDULED,
-      env.timeZone
-    )
+    var tripUpdate = new TripUpdateBuilder(scheduledTripId, SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -59,7 +54,7 @@ public class SkippedTest {
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        RealtimeTestEnvironment.SERVICE_DATE
+        SERVICE_DATE
       );
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
@@ -81,13 +76,10 @@ public class SkippedTest {
     {
       final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         env.trip2.getId(),
-        RealtimeTestEnvironment.SERVICE_DATE
+        SERVICE_DATE
       );
 
-      final Timetable newTimetableForToday = snapshot.resolve(
-        newTripPattern,
-        RealtimeTestEnvironment.SERVICE_DATE
-      );
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
       final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
@@ -135,12 +127,7 @@ public class SkippedTest {
     var env = RealtimeTestEnvironment.gtfs();
     var tripId = env.trip2.getId();
 
-    var tripUpdate = new TripUpdateBuilder(
-      tripId.getId(),
-      RealtimeTestEnvironment.SERVICE_DATE,
-      SCHEDULED,
-      env.timeZone
-    )
+    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -151,7 +138,7 @@ public class SkippedTest {
     // Create update to the same trip but now the skipped stop is no longer skipped
     var scheduledBuilder = new TripUpdateBuilder(
       tripId.getId(),
-      RealtimeTestEnvironment.SERVICE_DATE,
+      SERVICE_DATE,
       SCHEDULED,
       env.timeZone
     )
@@ -170,10 +157,7 @@ public class SkippedTest {
     var snapshot = env.getTimetableSnapshot();
 
     {
-      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
-        env.trip2.getId(),
-        RealtimeTestEnvironment.SERVICE_DATE
-      );
+      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(tripId, SERVICE_DATE);
       assertNull(newTripPattern);
       final Trip trip = env.transitModel.getTransitModelIndex().getTripForId().get(tripId);
 
@@ -183,7 +167,7 @@ public class SkippedTest {
         .get(trip);
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,
-        RealtimeTestEnvironment.SERVICE_DATE
+        SERVICE_DATE
       );
 
       final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -213,13 +197,15 @@ public class SkippedTest {
       final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
         originalTripIndexForToday
       );
-      assertEquals(RealTimeState.UPDATED, originalTripTimesForToday.getRealTimeState());
-      assertEquals(0, originalTripTimesForToday.getArrivalDelay(0));
-      assertEquals(0, originalTripTimesForToday.getDepartureDelay(0));
-      assertEquals(50, originalTripTimesForToday.getArrivalDelay(1));
-      assertEquals(50, originalTripTimesForToday.getDepartureDelay(1));
-      assertEquals(90, originalTripTimesForToday.getArrivalDelay(2));
-      assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
+
+      assertEquals(
+        "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
+        env.getScheduledTimetable(tripId)
+      );
+      assertEquals(
+        "UPDATED | A1 0:01 0:01:01 | B1 0:02 0:02:01 | C1 0:02:50 0:02:51",
+        env.getRealtimeTimetable(tripId, SERVICE_DATE)
+      );
     }
   }
 
@@ -317,7 +303,7 @@ public class SkippedTest {
         "New trip should be found in time table for service date"
       );
 
-      var newTripTimes = newTimetableForToday.getTripTimes(newTimetableForTodayModifiedTripIndex);
+      var newTripTimes = newTimetableForToday.getTripTimes(tripId);
       assertEquals(RealTimeState.UPDATED, newTripTimes.getRealTimeState());
 
       assertEquals(

@@ -43,7 +43,6 @@ public class AddedTest {
     assertAddedTrip(this.ADDED_TRIP_ID, env);
   }
 
-
   @Test
   public void addedTripWithNewRoute() {
     var env = RealtimeTestEnvironment.gtfs();
@@ -174,6 +173,7 @@ public class AddedTest {
     assertSame(firstRoute, secondRoute);
     assertNotNull(env.transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
   }
+
   private TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
     var snapshot = env.getTimetableSnapshot();
     var stopA = env.transitModel.getStopModel().getRegularStop(env.stopA1.getId());
@@ -203,5 +203,4 @@ public class AddedTest {
     assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
     return tripPattern;
   }
-
 }
