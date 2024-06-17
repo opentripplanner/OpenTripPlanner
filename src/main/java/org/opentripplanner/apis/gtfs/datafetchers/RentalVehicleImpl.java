@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
 public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehicle {
@@ -62,8 +63,8 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   }
 
   @Override
-  public DataFetcher<String> systemUrl() {
-    return environment -> getSource(environment).system.url;
+  public DataFetcher<VehicleRentalSystem> vehicleRentalSystem() {
+    return environment -> getSource(environment).system;
   }
 
   private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {

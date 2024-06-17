@@ -58,6 +58,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
@@ -858,7 +859,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<RentalVehicleType> vehicleType();
 
-    DataFetcher<String> systemUrl();
+    DataFetcher<VehicleRentalSystem> vehicleRentalSystem();
   }
 
   public interface GraphQLRentalVehicleEntityCounts {

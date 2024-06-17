@@ -743,8 +743,8 @@ type RentalVehicle implements Node & PlaceInterface {
     """The type of the rental vehicle (scooter, bicycle, car...)"""
     vehicleType: RentalVehicleType
 
-    """The rental vehicle operator's system URL."""
-    systemUrl: String!
+    """The vehicle rental system information."""
+    vehicleRentalSystem: VehicleRentalSystemType
 }
 
 type BikeRentalStationUris {
@@ -796,6 +796,11 @@ type RentalVehicleType {
 
     """The primary propulsion type of the vehicle"""
     propulsionType: PropulsionType
+}
+
+type VehicleRentalSystemType {
+    """The rental vehicle operator's system URL."""
+    url: String
 }
 
 enum FormFactor {
