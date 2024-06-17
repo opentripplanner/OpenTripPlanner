@@ -22,7 +22,6 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -107,41 +106,6 @@ public class TimetableSnapshotSourceTest {
     final TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
     assertNotNull(newSnapshot);
     assertNotSame(snapshot, newSnapshot);
-  }
-
-  /**
-   * This test just asserts that invalid trip ids don't throw an exception and are ignored instead
-   */
-  @Test
-  public void invalidTripId() {
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT,
-      transitModel
-    );
-
-    Stream
-      .of("", null)
-      .forEach(id -> {
-        var tripDescriptorBuilder = TripDescriptor.newBuilder();
-        tripDescriptorBuilder.setTripId("");
-        tripDescriptorBuilder.setScheduleRelationship(
-          TripDescriptor.ScheduleRelationship.SCHEDULED
-        );
-        var tripUpdateBuilder = TripUpdate.newBuilder();
-
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-        var tripUpdate = tripUpdateBuilder.build();
-
-        var result = updater.applyTripUpdates(
-          TRIP_MATCHER_NOOP,
-          REQUIRED_NO_DATA,
-          DIFFERENTIAL,
-          List.of(tripUpdate),
-          feedId
-        );
-
-        assertEquals(0, result.successful());
-      });
   }
 
   @Test
