@@ -1,14 +1,14 @@
 package org.opentripplanner.ext.siri.updater.google;
 
-import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableProcessor;
 import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 
@@ -20,8 +20,9 @@ import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private final String configRef;
-  private final AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor;
-  private final AsyncEstimatedTimetableSource asyncSiriMessageSource;
+  private final AsyncEstimatedTimetableSource asyncEstimatedTimetableSource;
+  private final EstimatedTimetableHandler estimatedTimetableHandler;
+  private final Consumer<UpdateResult> updateResultConsumer;
   private WriteToGraphCallback saveResultOnGraph;
 
   public SiriETGooglePubsubUpdater(
@@ -29,9 +30,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     TransitModel transitModel,
     SiriTimetableSnapshotSource timetableSnapshotSource
   ) {
-    this.configRef = config.configRef();
+    configRef = config.configRef();
 
-    asyncSiriMessageSource =
+    asyncEstimatedTimetableSource =
       new GooglePubsubEstimatedTimetableSource(
         config.dataInitializationUrl(),
         config.reconnectPeriod(),
@@ -41,20 +42,15 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         config.topicName()
       );
 
-    EstimatedTimetableHandler estimatedTimetableHandler = new EstimatedTimetableHandler(
-      timetableSnapshotSource,
-      config.fuzzyTripMatching(),
-      new DefaultTransitService(transitModel),
-      config.feedId()
-    );
-
-    asyncEstimatedTimetableProcessor =
-      new AsyncEstimatedTimetableProcessor(
-        asyncSiriMessageSource,
-        estimatedTimetableHandler,
-        this::writeToGraphCallBack,
-        TripUpdateMetrics.streaming(config)
+    estimatedTimetableHandler =
+      new EstimatedTimetableHandler(
+        timetableSnapshotSource,
+        config.fuzzyTripMatching(),
+        new DefaultTransitService(transitModel),
+        config.feedId()
       );
+
+    updateResultConsumer = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -64,24 +60,21 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-    asyncEstimatedTimetableProcessor.run();
+    AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor = new AsyncEstimatedTimetableProcessor(
+      estimatedTimetableHandler,
+      saveResultOnGraph,
+      updateResultConsumer
+    );
+    asyncEstimatedTimetableSource.start(asyncEstimatedTimetableProcessor::processSiriData);
   }
 
   @Override
   public boolean isPrimed() {
-    return asyncSiriMessageSource.isPrimed();
+    return asyncEstimatedTimetableSource.isPrimed();
   }
 
   @Override
   public String getConfigRef() {
     return configRef;
-  }
-
-  /**
-   * Defer the invocation of {@link #saveResultOnGraph} since it is null at construction time and
-   * initialized when {@link #setup(WriteToGraphCallback)} is called.
-   */
-  private Future<?> writeToGraphCallBack(GraphWriterRunnable graphWriterRunnable) {
-    return saveResultOnGraph.execute(graphWriterRunnable);
   }
 }
