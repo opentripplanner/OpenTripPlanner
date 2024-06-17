@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.siri.EntityResolver;
@@ -9,7 +8,6 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
@@ -17,8 +15,6 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  * A consumer of estimated timetables that applies the real-time updates to the transit model.
  */
 public class EstimatedTimetableHandler {
-
-  private final WriteToGraphCallback saveResultOnGraph;
 
   private final SiriTimetableSnapshotSource snapshotSource;
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
@@ -30,14 +26,12 @@ public class EstimatedTimetableHandler {
   private final String feedId;
 
   public EstimatedTimetableHandler(
-    WriteToGraphCallback saveResultOnGraph,
     SiriTimetableSnapshotSource snapshotSource,
     boolean fuzzyMatching,
     TransitService transitService,
     Consumer<UpdateResult> updateResultConsumer,
     String feedId
   ) {
-    this.saveResultOnGraph = saveResultOnGraph;
     this.snapshotSource = snapshotSource;
     this.fuzzyTripMatcher = fuzzyMatching ? SiriFuzzyTripMatcher.of(transitService) : null;
     this.entityResolver = new EntityResolver(transitService, feedId);
@@ -49,11 +43,11 @@ public class EstimatedTimetableHandler {
    * Apply the update to the transit model.
    * @return a future indicating when the changes are applied.
    */
-  public Future<?> applyUpdate(
+  public void applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
     UpdateIncrementality updateMode
   ) {
-    return applyUpdate(estimatedTimetableDeliveries, updateMode, () -> {});
+    applyUpdate(estimatedTimetableDeliveries, updateMode, () -> {});
   }
 
   /**
@@ -61,22 +55,20 @@ public class EstimatedTimetableHandler {
    * @param onUpdateComplete callback called after the update has been applied.
    * @return a future indicating when the changes are applied.
    */
-  public Future<?> applyUpdate(
+  public void applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
     UpdateIncrementality updateMode,
     @Nonnull Runnable onUpdateComplete
   ) {
-    return saveResultOnGraph.execute((graph, transitModel) -> {
-      var results = snapshotSource.applyEstimatedTimetable(
-        fuzzyTripMatcher,
-        entityResolver,
-        feedId,
-        updateMode,
-        estimatedTimetableDeliveries
-      );
+    var results = snapshotSource.applyEstimatedTimetable(
+      fuzzyTripMatcher,
+      entityResolver,
+      feedId,
+      updateMode,
+      estimatedTimetableDeliveries
+    );
 
-      updateResultConsumer.accept(results);
-      onUpdateComplete.run();
-    });
+    updateResultConsumer.accept(results);
+    onUpdateComplete.run();
   }
 }

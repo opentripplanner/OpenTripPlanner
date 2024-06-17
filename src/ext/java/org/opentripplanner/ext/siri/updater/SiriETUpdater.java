@@ -60,7 +60,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     estimatedTimetableHandler =
       new EstimatedTimetableHandler(
-        this::writeToCallBack,
         timetableSnapshot,
         config.fuzzyTripMatching(),
         new DefaultTransitService(transitModel),
@@ -102,14 +101,16 @@ public class SiriETUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          estimatedTimetableHandler.applyUpdate(
-            etds,
-            updateSource.incrementalityOfLastUpdates(),
-            () -> {
-              if (markPrimed) {
-                primed = true;
+          saveResultOnGraph.execute((graph, transitModel) ->
+            estimatedTimetableHandler.applyUpdate(
+              etds,
+              updateSource.incrementalityOfLastUpdates(),
+              () -> {
+                if (markPrimed) {
+                  primed = true;
+                }
               }
-            }
+            )
           );
         }
       }

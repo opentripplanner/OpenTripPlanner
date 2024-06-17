@@ -42,7 +42,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       );
 
     EstimatedTimetableHandler estimatedTimetableHandler = new EstimatedTimetableHandler(
-      this::writeToGraphCallBack,
       timetableSnapshot,
       config.fuzzyTripMatching(),
       new DefaultTransitService(transitModel),
@@ -51,7 +50,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     );
 
     this.asyncEstimatedTimetableProcessor =
-      new AsyncEstimatedTimetableProcessor(asyncSiriMessageSource, estimatedTimetableHandler);
+      new AsyncEstimatedTimetableProcessor(
+        asyncSiriMessageSource,
+        estimatedTimetableHandler,
+        this::writeToGraphCallBack
+      );
   }
 
   private Future<?> writeToGraphCallBack(GraphWriterRunnable graphWriterRunnable) {

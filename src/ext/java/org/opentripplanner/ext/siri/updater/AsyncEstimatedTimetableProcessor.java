@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.concurrent.Future;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.ServiceDelivery;
 
@@ -13,13 +14,16 @@ public class AsyncEstimatedTimetableProcessor {
 
   private final AsyncEstimatedTimetableSource siriMessageSource;
   private final EstimatedTimetableHandler estimatedTimetableHandler;
+  private final WriteToGraphCallback saveResultOnGraph;
 
   public AsyncEstimatedTimetableProcessor(
     AsyncEstimatedTimetableSource siriMessageSource,
-    EstimatedTimetableHandler estimatedTimetableHandler
+    EstimatedTimetableHandler estimatedTimetableHandler,
+    WriteToGraphCallback saveResultOnGraph
   ) {
     this.siriMessageSource = siriMessageSource;
     this.estimatedTimetableHandler = estimatedTimetableHandler;
+    this.saveResultOnGraph = saveResultOnGraph;
   }
 
   /**
@@ -35,9 +39,11 @@ public class AsyncEstimatedTimetableProcessor {
    * @return a future indicating when the changes are applied.
    */
   private Future<?> processSiriData(ServiceDelivery serviceDelivery) {
-    return estimatedTimetableHandler.applyUpdate(
-      serviceDelivery.getEstimatedTimetableDeliveries(),
-      UpdateIncrementality.DIFFERENTIAL
+    return saveResultOnGraph.execute((graph, transitModel) ->
+      estimatedTimetableHandler.applyUpdate(
+        serviceDelivery.getEstimatedTimetableDeliveries(),
+        UpdateIncrementality.DIFFERENTIAL
+      )
     );
   }
 }
