@@ -1,7 +1,10 @@
-package org.opentripplanner.ext.siri.updater;
+package org.opentripplanner.ext.siri.updater.google;
 
 import java.util.concurrent.Future;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableProcessor;
+import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableSource;
+import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;

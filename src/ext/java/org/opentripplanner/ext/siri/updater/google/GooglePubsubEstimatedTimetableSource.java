@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri.updater;
+package org.opentripplanner.ext.siri.updater.google;
 
 import com.google.api.gax.rpc.NotFoundException;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import org.entur.protobuf.mapper.SiriMapper;
+import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
