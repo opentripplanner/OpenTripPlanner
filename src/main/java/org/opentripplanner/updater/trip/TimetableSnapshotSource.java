@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
@@ -19,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions;
@@ -150,7 +152,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateResult.empty();
     }
 
-    Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
+    Map<ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     snapshotManager.withLock(() -> {
@@ -199,11 +201,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           serviceDate = localDateNow.get();
         }
         // Determine what kind of trip update this is
-        final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
-          tripDescriptor
+        var scheduleRelationship = Objects.requireNonNullElse(
+          tripDescriptor.getScheduleRelationship(),
+          SCHEDULED
         );
         if (updateIncrementality == DIFFERENTIAL) {
-          purgePatternModifications(tripScheduleRelationship, tripId, serviceDate);
+          purgePatternModifications(scheduleRelationship, tripId, serviceDate);
         }
 
         uIndex += 1;
@@ -213,7 +216,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         Result<UpdateSuccess, UpdateError> result;
         try {
           result =
-            switch (tripScheduleRelationship) {
+            switch (scheduleRelationship) {
               case SCHEDULED -> handleScheduledTrip(
                 tripUpdate,
                 tripId,
@@ -255,11 +258,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         if (result.isFailure()) {
           debug(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
-          if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
-            var c = failuresByRelationship.get(tripScheduleRelationship);
-            failuresByRelationship.put(tripScheduleRelationship, ++c);
+          if (failuresByRelationship.containsKey(scheduleRelationship)) {
+            var c = failuresByRelationship.get(scheduleRelationship);
+            failuresByRelationship.put(scheduleRelationship, ++c);
           } else {
-            failuresByRelationship.put(tripScheduleRelationship, 1);
+            failuresByRelationship.put(scheduleRelationship, 1);
           }
         }
       }
@@ -282,7 +285,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * added trip pattern.
    */
   private void purgePatternModifications(
-    TripDescriptor.ScheduleRelationship tripScheduleRelationship,
+    ScheduleRelationship tripScheduleRelationship,
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
@@ -290,8 +293,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (
       !isPreviouslyAddedTrip(tripId, pattern, serviceDate) ||
       (
-        tripScheduleRelationship != TripDescriptor.ScheduleRelationship.CANCELED &&
-        tripScheduleRelationship != TripDescriptor.ScheduleRelationship.DELETED
+        tripScheduleRelationship != ScheduleRelationship.CANCELED &&
+        tripScheduleRelationship != ScheduleRelationship.DELETED
       )
     ) {
       // Remove previous realtime updates for this trip. This is necessary to avoid previous
@@ -327,7 +330,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static void logUpdateResult(
     String feedId,
-    Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
+    Map<ScheduleRelationship, Integer> failuresByRelationship,
     UpdateResult updateResult
   ) {
     ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
@@ -343,27 +346,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         var count = warnings.get(key).size();
         LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
       });
-  }
-
-  /**
-   * Determine how the trip update should be handled.
-   *
-   * @param tripDescriptor trip descriptor
-   * @return TripDescriptor.ScheduleRelationship indicating how the trip update should be handled
-   */
-  private TripDescriptor.ScheduleRelationship determineTripScheduleRelationship(
-    final TripDescriptor tripDescriptor
-  ) {
-    // Assume default value
-    TripDescriptor.ScheduleRelationship tripScheduleRelationship =
-      TripDescriptor.ScheduleRelationship.SCHEDULED;
-
-    // If trip update contains schedule relationship, use it
-    if (tripDescriptor.hasScheduleRelationship()) {
-      tripScheduleRelationship = tripDescriptor.getScheduleRelationship();
-    }
-
-    return tripScheduleRelationship;
   }
 
   private Result<UpdateSuccess, UpdateError> handleScheduledTrip(

@@ -194,9 +194,6 @@ public class SkippedTest {
         originalTripIndexForToday > -1,
         "Original trip should be found in time table for service date"
       );
-      final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
-        originalTripIndexForToday
-      );
 
       assertEquals(
         "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
