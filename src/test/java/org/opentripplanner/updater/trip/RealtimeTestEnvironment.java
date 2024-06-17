@@ -56,16 +56,19 @@ public final class RealtimeTestEnvironment {
   );
   public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
   public static final FeedScopedId SERVICE_ID = TransitModelForTest.id("CAL_1");
+  public static final String STOP_A1_ID = "A1";
+  public static final String STOP_B1_ID = "B1";
+  public static final String STOP_C1_ID = "C1";
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
   public final Station stationB = testModel.station("B").build();
   public final Station stationC = testModel.station("C").build();
   public final Station stationD = testModel.station("D").build();
-  public final RegularStop stopA1 = testModel.stop("A1").withParentStation(stationA).build();
-  public final RegularStop stopB1 = testModel.stop("B1").withParentStation(stationB).build();
+  public final RegularStop stopA1 = testModel.stop(STOP_A1_ID).withParentStation(stationA).build();
+  public final RegularStop stopB1 = testModel.stop(STOP_B1_ID).withParentStation(stationB).build();
   public final RegularStop stopB2 = testModel.stop("B2").withParentStation(stationB).build();
-  public final RegularStop stopC1 = testModel.stop("C1").withParentStation(stationC).build();
+  public final RegularStop stopC1 = testModel.stop(STOP_C1_ID).withParentStation(stationC).build();
   public final RegularStop stopD1 = testModel.stop("D1").withParentStation(stationD).build();
   public final StopModel stopModel = testModel
     .stopModelBuilder()

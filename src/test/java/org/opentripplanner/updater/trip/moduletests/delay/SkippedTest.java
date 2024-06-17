@@ -46,7 +46,6 @@ public class SkippedTest {
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
 
-
     final TimetableSnapshot snapshot = env.getTimetableSnapshot();
 
     // Original trip pattern

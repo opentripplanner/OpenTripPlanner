@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,22 +16,18 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -41,7 +36,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.spi.UpdateSuccess.WarningType;
 
 public class TimetableSnapshotSourceTest {
 
@@ -305,217 +299,6 @@ public class TimetableSnapshotSourceTest {
         newTimetableScheduled.getTripIndex(modifiedTripId),
         "New trip should not be found in scheduled time table"
       );
-    }
-  }
-
-  @Nested
-  class Added {
-
-    final String addedTripId = "added_trip";
-
-    @Test
-    public void addedTrip() {
-      var builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
-
-      builder.addStopTime("A", 30).addStopTime("C", 40).addStopTime("E", 55);
-
-      var tripUpdate = builder.build();
-
-      var updater = defaultUpdater();
-
-      // WHEN
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        DIFFERENTIAL,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      // THEN
-      assertAddedTrip(SERVICE_DATE, this.addedTripId, updater);
-    }
-
-    private TripPattern assertAddedTrip(
-      LocalDate serviceDate,
-      String tripId,
-      TimetableSnapshotSource updater
-    ) {
-      var stopA = transitModel.getStopModel().getRegularStop(new FeedScopedId(feedId, "A"));
-      // Get the trip pattern of the added trip which goes through stopA
-      var snapshot = updater.getTimetableSnapshot();
-      var patternsAtA = snapshot.getPatternsForStop(stopA);
-
-      assertNotNull(patternsAtA, "Added trip pattern should be found");
-      assertEquals(1, patternsAtA.size());
-      var tripPattern = patternsAtA.stream().findFirst().get();
-
-      final Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
-      final Timetable schedule = snapshot.resolve(tripPattern, null);
-
-      assertNotSame(forToday, schedule);
-
-      final int forTodayAddedTripIndex = forToday.getTripIndex(tripId);
-      assertTrue(
-        forTodayAddedTripIndex > -1,
-        "Added trip should be found in time table for service date"
-      );
-      assertEquals(
-        RealTimeState.ADDED,
-        forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-      );
-
-      final int scheduleTripIndex = schedule.getTripIndex(tripId);
-      assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
-      return tripPattern;
-    }
-
-    @Test
-    public void addedTripWithNewRoute() {
-      // GIVEN
-
-      final var builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
-      // add extension to set route name, url, mode
-      builder.addTripExtension();
-
-      builder
-        .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
-        .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-        .addStopTime("E", 55, DropOffPickupType.NONE);
-
-      var tripUpdate = builder.build();
-
-      var updater = defaultUpdater();
-
-      // WHEN
-      var result = updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        DIFFERENTIAL,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      // THEN
-
-      assertTrue(result.warnings().isEmpty());
-
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
-
-      var route = pattern.getRoute();
-      assertEquals(TripUpdateBuilder.ROUTE_URL, route.getUrl());
-      assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
-      assertEquals(TransitMode.RAIL, route.getMode());
-
-      var fromTransitModel = transitModel.getTransitModelIndex().getRouteForId(route.getId());
-      assertEquals(fromTransitModel, route);
-
-      assertEquals(PickDrop.CALL_AGENCY, pattern.getBoardType(0));
-      assertEquals(PickDrop.CALL_AGENCY, pattern.getAlightType(0));
-
-      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, pattern.getBoardType(1));
-      assertEquals(PickDrop.COORDINATE_WITH_DRIVER, pattern.getAlightType(1));
-    }
-
-    @Test
-    public void addedWithUnknownStop() {
-      // GIVEN
-      final var builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
-      // add extension to set route name, url, mode
-      builder.addTripExtension();
-
-      builder
-        .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
-        .addStopTime("UNKNOWN_STOP_ID", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-        .addStopTime("E", 55, DropOffPickupType.NONE);
-
-      var tripUpdate = builder.build();
-
-      var updater = defaultUpdater();
-
-      // WHEN
-      var result = updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        DIFFERENTIAL,
-        List.of(tripUpdate),
-        feedId
-      );
-
-      // THEN
-
-      assertFalse(result.warnings().isEmpty());
-
-      assertEquals(List.of(WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP), result.warnings());
-
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
-
-      assertEquals(2, pattern.getStops().size());
-    }
-
-    @Test
-    public void repeatedlyAddedTripWithNewRoute() {
-      // GIVEN
-
-      final var builder = new TripUpdateBuilder(
-        addedTripId,
-        SERVICE_DATE,
-        ADDED,
-        transitModel.getTimeZone()
-      );
-      // add extension to set route name, url, mode
-      builder.addTripExtension();
-
-      builder
-        .addStopTime("A", 30, DropOffPickupType.PHONE_AGENCY)
-        .addStopTime("C", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-        .addStopTime("E", 55, DropOffPickupType.NONE);
-
-      var tripUpdate = builder.build();
-
-      var updater = defaultUpdater();
-
-      // WHEN
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        DIFFERENTIAL,
-        List.of(tripUpdate),
-        feedId
-      );
-      var pattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
-      var firstRoute = pattern.getRoute();
-
-      // apply the update a second time to check that no new route instance is created but the old one is reused
-      updater.applyTripUpdates(
-        TRIP_MATCHER_NOOP,
-        REQUIRED_NO_DATA,
-        DIFFERENTIAL,
-        List.of(tripUpdate),
-        feedId
-      );
-      var secondPattern = assertAddedTrip(SERVICE_DATE, addedTripId, updater);
-      var secondRoute = secondPattern.getRoute();
-
-      // THEN
-
-      assertSame(firstRoute, secondRoute);
-      assertNotNull(transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
     }
   }
 
