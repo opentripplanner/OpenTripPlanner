@@ -334,10 +334,6 @@ public final class TripPattern
   // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
   // and would avoid mistakes where real-time updates are accidentally not taken into account.
 
-  public boolean stopPatternIsEqual(TripPattern other) {
-    return stopPattern.equals(other.stopPattern);
-  }
-
   public Trip getTrip(int tripIndex) {
     return scheduledTimetable.getTripTimes(tripIndex).getTrip();
   }
