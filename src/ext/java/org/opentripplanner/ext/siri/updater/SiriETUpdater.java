@@ -1,12 +1,10 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -39,10 +37,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   private final EstimatedTimetableHandler estimatedTimetableHandler;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public SiriETUpdater(
     SiriETUpdaterParameters config,
     TransitModel transitModel,
-    SiriTimetableSnapshotSource timetableSnapshot
+    SiriTimetableSnapshotSource timetableSnapshotSource
   ) {
     super(config);
     // Create update streamer from preferences
@@ -60,23 +60,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     estimatedTimetableHandler =
       new EstimatedTimetableHandler(
-        timetableSnapshot,
+        timetableSnapshotSource,
         config.fuzzyTripMatching(),
         new DefaultTransitService(transitModel),
-        updateResultConsumer(config),
         feedId
       );
-  }
 
-  private Consumer<UpdateResult> updateResultConsumer(SiriETUpdaterParameters config) {
-    return updateResult -> {
-      ResultLogger.logUpdateResult(feedId, "siri-et", updateResult);
-      TripUpdateMetrics.streaming(config).accept(updateResult);
-    };
-  }
-
-  private Future<?> writeToCallBack(GraphWriterRunnable graphWriterRunnable) {
-    return saveResultOnGraph.execute(graphWriterRunnable);
+    recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -94,6 +84,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     do {
       var updates = updateSource.getUpdates();
       if (updates.isPresent()) {
+        var incrementality = updateSource.incrementalityOfLastUpdates();
         ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
@@ -101,17 +92,14 @@ public class SiriETUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          saveResultOnGraph.execute((graph, transitModel) ->
-            estimatedTimetableHandler.applyUpdate(
-              etds,
-              updateSource.incrementalityOfLastUpdates(),
-              () -> {
-                if (markPrimed) {
-                  primed = true;
-                }
-              }
-            )
-          );
+          saveResultOnGraph.execute((graph, transitModel) -> {
+            var result = estimatedTimetableHandler.applyUpdate(etds, incrementality);
+            ResultLogger.logUpdateResult(feedId, "siri-et", result);
+            recordMetrics.accept(result);
+            if (markPrimed) {
+              primed = true;
+            }
+          });
         }
       }
     } while (moreData);

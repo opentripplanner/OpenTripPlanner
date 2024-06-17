@@ -27,7 +27,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
     TransitModel transitModel,
-    SiriTimetableSnapshotSource timetableSnapshot
+    SiriTimetableSnapshotSource timetableSnapshotSource
   ) {
     this.configRef = config.configRef();
 
@@ -42,23 +42,19 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       );
 
     EstimatedTimetableHandler estimatedTimetableHandler = new EstimatedTimetableHandler(
-      timetableSnapshot,
+      timetableSnapshotSource,
       config.fuzzyTripMatching(),
       new DefaultTransitService(transitModel),
-      TripUpdateMetrics.streaming(config),
       config.feedId()
     );
 
-    this.asyncEstimatedTimetableProcessor =
+    asyncEstimatedTimetableProcessor =
       new AsyncEstimatedTimetableProcessor(
         asyncSiriMessageSource,
         estimatedTimetableHandler,
-        this::writeToGraphCallBack
+        this::writeToGraphCallBack,
+        TripUpdateMetrics.streaming(config)
       );
-  }
-
-  private Future<?> writeToGraphCallBack(GraphWriterRunnable graphWriterRunnable) {
-    return saveResultOnGraph.execute(graphWriterRunnable);
   }
 
   @Override
@@ -79,5 +75,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   @Override
   public String getConfigRef() {
     return configRef;
+  }
+
+  /**
+   * Defer the invocation of {@link #saveResultOnGraph} since it is null at construction time and
+   * initialized when {@link #setup(WriteToGraphCallback)} is called.
+   */
+  private Future<?> writeToGraphCallBack(GraphWriterRunnable graphWriterRunnable) {
+    return saveResultOnGraph.execute(graphWriterRunnable);
   }
 }
