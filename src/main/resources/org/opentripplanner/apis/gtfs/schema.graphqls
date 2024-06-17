@@ -3552,7 +3552,7 @@ type QueryType {
         filterByModes: [Mode]
 
         """
-        Only include places that match one of the given network names.
+        Only include vehicle rental networks that match one of the given network names.
         """
         filterByNetwork: [String]
 

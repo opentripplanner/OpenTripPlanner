@@ -851,7 +851,9 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("filterByNetwork")
-              .description("Only include places that match one of the given network names.")
+              .description(
+                "Only include vehicle rental networks that match one of the given network names."
+              )
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
