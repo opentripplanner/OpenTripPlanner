@@ -97,11 +97,4 @@ public class PatternByServiceDatesFilter {
           );
       });
   }
-
-  public static boolean hasServiceDateFilter(GraphQLServiceDateFilterInput serviceDays) {
-    return (
-      serviceDays != null &&
-      (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
-    );
-  }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import java.time.Instant;
 import java.util.Locale;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFilterPlaceType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
@@ -108,5 +109,18 @@ public class GraphQLUtils {
 
   public static boolean startsWith(I18NString str, String name, Locale locale) {
     return str != null && str.toString(locale).toLowerCase(locale).startsWith(name);
+  }
+
+  /**
+   * Checks if a service date filter input has at least one filter set. If both start and end are
+   * null then no filtering is necessary and this method returns null.
+   */
+  public static boolean hasServiceDateFilter(
+    GraphQLTypes.GraphQLServiceDateFilterInput serviceDays
+  ) {
+    return (
+      serviceDays != null &&
+      (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
+    );
   }
 }
