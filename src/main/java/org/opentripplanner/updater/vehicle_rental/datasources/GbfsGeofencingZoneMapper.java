@@ -51,8 +51,10 @@ class GbfsGeofencingZoneMapper {
       LOG.error("Could not convert geofencing zone", e);
       return null;
     }
-    var nameFromData = f.getProperties().getName().isEmpty() ? null : f.getProperties().getName();
-    var name = Objects.requireNonNullElseGet(nameFromData, () -> fallbackId(g));
+    var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
+    if (name.isEmpty()) {
+      name = fallbackId(g);
+    }
     var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
     var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
     return new GeofencingZone(
