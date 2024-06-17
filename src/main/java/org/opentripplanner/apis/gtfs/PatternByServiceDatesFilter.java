@@ -24,11 +24,9 @@ public class PatternByServiceDatesFilter {
   private final Function<Trip, Collection<LocalDate>> getServiceDatesForTrip;
 
   /**
-   *
-   * @param startInclusive The inclusive start date to check the patterns for. If null then no start
-   *                       date is defined and this will therefore match all dates.
-   * @param endInclusive The inclusive end date to check the patterns for. If null then no end date
-   *                     is defined this will therefore match all dates.
+   * This method is not private to enable unit testing.
+   * <p>
+   * See the API documentation for a discussion of {@code startInclusive} and {@code endInclusive}.
    */
   PatternByServiceDatesFilter(
     @Nullable LocalDate startInclusive,
@@ -38,7 +36,7 @@ public class PatternByServiceDatesFilter {
   ) {
     this.getPatternsForRoute = Objects.requireNonNull(getPatternsForRoute);
     this.getServiceDatesForTrip = Objects.requireNonNull(getServiceDatesForTrip);
-    // optional
+    // optional, but one must be defined
     this.startInclusive = startInclusive;
     this.endInclusive = endInclusive;
 
