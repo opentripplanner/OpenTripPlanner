@@ -198,7 +198,7 @@ The slack is added to the time after leaving the transit vehicle.
 
 This also influences the time it takes to transfer.
 
-Since some modes, like airplanes and subways, need more time than others, this is also configurable
+Since some modes, like airplane and subway, need more time than others, this is also configurable
 per mode with `alightSlackForMode`.
 
 
@@ -217,7 +217,7 @@ vehicle to another.
 It is similar to `transferSlack`, except that this also applies to the first transit leg in the
 trip and `transferSlack` does not.
 
-Some modes, like airplanes or subway, might need more of a slack than others, so this is also
+Some modes, like airplane or subway, might need more of a slack than others, so this is also
 configurable per mode with `boardSlackForMode`.
 
 

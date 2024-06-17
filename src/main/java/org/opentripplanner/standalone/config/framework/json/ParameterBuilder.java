@@ -396,12 +396,12 @@ public class ParameterBuilder {
    */
   public Duration asDurationOrSeconds(Duration defaultValue) {
     info.withType(DURATION);
-    setInfoOptional(dflt.toString());
+    setInfoOptional(defaultValue.toString());
     var node = build();
     if (node.isTextual()) {
-      return asDuration(dflt);
+      return asDuration(defaultValue);
     } else {
-      return Duration.ofSeconds((long) asDouble(dflt.toSeconds()));
+      return Duration.ofSeconds((long) asDouble(defaultValue.toSeconds()));
     }
   }
 
