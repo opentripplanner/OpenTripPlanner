@@ -32,7 +32,7 @@ public class CancellationDeletionTest {
 
   @ParameterizedTest
   @MethodSource("cases")
-  public void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
+  void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = RealtimeTestEnvironment.gtfs();
     var pattern1 = env.getPatternForTrip(env.trip1);
 
@@ -73,7 +73,7 @@ public class CancellationDeletionTest {
    */
   @ParameterizedTest
   @MethodSource("cases")
-  public void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
+  void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = RealtimeTestEnvironment.gtfs();
     var addedTripId = "added-trip";
     // First add ADDED trip

@@ -25,12 +25,12 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class AddedTest {
+class AddedTest {
 
   final String ADDED_TRIP_ID = "added_trip";
 
   @Test
-  public void addedTrip() {
+  void addedTrip() {
     var env = RealtimeTestEnvironment.gtfs();
 
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
@@ -44,7 +44,7 @@ public class AddedTest {
   }
 
   @Test
-  public void addedTripWithNewRoute() {
+  void addedTripWithNewRoute() {
     var env = RealtimeTestEnvironment.gtfs();
     final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
     // add extension to set route name, url, mode
@@ -94,7 +94,7 @@ public class AddedTest {
   }
 
   @Test
-  public void addedWithUnknownStop() {
+  void addedWithUnknownStop() {
     var env = RealtimeTestEnvironment.gtfs();
     final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
     // add extension to set route name, url, mode
@@ -134,7 +134,7 @@ public class AddedTest {
   }
 
   @Test
-  public void repeatedlyAddedTripWithNewRoute() {
+  void repeatedlyAddedTripWithNewRoute() {
     var env = RealtimeTestEnvironment.gtfs();
     final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
     // add extension to set route name, url, mode

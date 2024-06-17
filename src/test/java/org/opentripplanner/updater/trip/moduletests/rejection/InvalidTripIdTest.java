@@ -8,7 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 
-public class InvalidTripIdTest {
+class InvalidTripIdTest {
 
   static Stream<String> invalidCases() {
     return Stream.of(null, "", "  ");

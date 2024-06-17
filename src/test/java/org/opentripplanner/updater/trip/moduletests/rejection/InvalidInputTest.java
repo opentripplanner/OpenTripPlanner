@@ -17,7 +17,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * A trip with start date that is outside the service period shouldn't throw an exception and is
  * ignored instead.
  */
-public class InvalidInputTest {
+class InvalidInputTest {
 
   public static List<LocalDate> cases() {
     return List.of(SERVICE_DATE.minusYears(10), SERVICE_DATE.plusYears(10));
@@ -25,7 +25,7 @@ public class InvalidInputTest {
 
   @ParameterizedTest
   @MethodSource("cases")
-  public void invalidTripDate(LocalDate date) {
+  void invalidTripDate(LocalDate date) {
     var env = RealtimeTestEnvironment.gtfs();
 
     var update = new TripUpdateBuilder(env.trip1.getId().getId(), date, SCHEDULED, env.timeZone)

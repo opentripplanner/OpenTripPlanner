@@ -29,7 +29,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 public class SkippedTest {
 
   @Test
-  public void scheduledTripWithSkippedAndScheduled() {
+  void scheduledTripWithSkippedAndScheduled() {
     var env = RealtimeTestEnvironment.gtfs();
     String scheduledTripId = env.trip2.getId().getId();
 
@@ -123,7 +123,7 @@ public class SkippedTest {
    * the new stop-skipping trip pattern should also be removed.
    */
   @Test
-  public void scheduledTripWithPreviouslySkipped() {
+  void scheduledTripWithPreviouslySkipped() {
     var env = RealtimeTestEnvironment.gtfs();
     var tripId = env.trip2.getId();
 
@@ -210,7 +210,7 @@ public class SkippedTest {
    * Tests a mixture of SKIPPED and NO_DATA.
    */
   @Test
-  public void skippedNoData() {
+  void skippedNoData() {
     var env = RealtimeTestEnvironment.gtfs();
 
     final FeedScopedId tripId = env.trip2.getId();
