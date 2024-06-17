@@ -202,10 +202,10 @@ travel time `x` (in seconds).
             c
               .of("alightSlack")
               .since(V2_0)
-              .summary("The extra time after exiting a public transport vehicle.")
+              .summary("The extra time to exit a public transport vehicle.")
               .description(
                 """
-The slack is added to the time after leaving the transit vehicle.
+The slack is added to arrival time of the transit vehicle.
 
 This also influences the time it takes to transfer.
 
@@ -235,7 +235,7 @@ per mode with `alightSlackForMode`.
             c
               .of("boardSlack")
               .since(V2_0)
-              .summary("The extra time before boarding a public transport vehicle.")
+              .summary("The extra time to board a public transport vehicle.")
               .description(
                 """
 The extra time is added to the time when entering a public transport vehicle. This is a useful

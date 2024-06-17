@@ -15,9 +15,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 
 | Config Parameter                                                                                             |          Type          | Summary                                                                                                                                        |  Req./Opt. | Default Value    | Since |
 |--------------------------------------------------------------------------------------------------------------|:----------------------:|------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|------------------|:-----:|
-| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The extra time after exiting a public transport vehicle.                                                                                       | *Optional* | `"PT0S"`         |  2.0  |
+| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The extra time to exit a public transport vehicle.                                                                                             | *Optional* | `"PT0S"`         |  2.0  |
 | arriveBy                                                                                                     |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                                       | *Optional* | `false`          |  2.0  |
-| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The extra time before boarding a public transport vehicle.                                                                                     | *Optional* | `"PT0S"`         |  2.0  |
+| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The extra time to board a public transport vehicle.                                                                                            | *Optional* | `"PT0S"`         |  2.0  |
 | [drivingDirection](#rd_drivingDirection)                                                                     |         `enum`         | The driving direction to use in the intersection traversal calculation                                                                         | *Optional* | `"right"`        |  2.2  |
 | elevatorBoardCost                                                                                            |        `integer`       | What is the cost of boarding a elevator?                                                                                                       | *Optional* | `90`             |  2.0  |
 | elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`             |  2.0  |
@@ -192,9 +192,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The extra time after exiting a public transport vehicle.
+The extra time to exit a public transport vehicle.
 
-The slack is added to the time after leaving the transit vehicle.
+The slack is added to arrival time of the transit vehicle.
 
 This also influences the time it takes to transfer.
 
@@ -207,7 +207,7 @@ per mode with `alightSlackForMode`.
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The extra time before boarding a public transport vehicle.
+The extra time to board a public transport vehicle.
 
 The extra time is added to the time when entering a public transport vehicle. This is a useful
 tool for agencies wanting to add a general buffer time so that passengers are instructed to be
