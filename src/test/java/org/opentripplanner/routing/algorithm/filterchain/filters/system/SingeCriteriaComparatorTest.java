@@ -1,0 +1,162 @@
+package org.opentripplanner.routing.algorithm.filterchain.filters.system;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.collection.CompositeComparator;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+
+class SingeCriteriaComparatorTest {
+
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final Place A = TEST_MODEL.place("A", 10, 11);
+  private static final Place B = TEST_MODEL.place("B", 10, 13);
+  private static final Place C = TEST_MODEL.place("C", 10, 14);
+  private static final Place D = TEST_MODEL.place("D", 10, 15);
+
+  private static final int START = 1000;
+  private static final int TX_AT = 1500;
+  private static final int END_LOW = 2000;
+
+  // [Tx, Cost] => [0, 1240]
+  private static final Itinerary zeroTransferLowCost = newItinerary(A)
+    .bus(1, START, END_LOW, B)
+    .walk(60, C)
+    .build();
+  // [Tx, Cost] => [0, 1360]
+  private static final Itinerary zeroTransferHighCost = newItinerary(A)
+    .bus(1, START, END_LOW, B)
+    .walk(120, C)
+    .build();
+  // [Tx, Cost] => [1, 1240]
+  private static final Itinerary oneTransferLowCost = newItinerary(A)
+    .bus(1, START, TX_AT, B)
+    .bus(2, TX_AT, END_LOW, C)
+    .build();
+
+  @BeforeAll
+  static void setUp() {
+    assertEquals(0, zeroTransferLowCost.getNumberOfTransfers());
+    assertEquals(0, zeroTransferHighCost.getNumberOfTransfers());
+    assertEquals(1, oneTransferLowCost.getNumberOfTransfers());
+
+    int expectedCost = zeroTransferLowCost.getGeneralizedCost();
+    assertTrue(expectedCost < zeroTransferHighCost.getGeneralizedCost());
+    assertEquals(expectedCost, oneTransferLowCost.getGeneralizedCost());
+  }
+
+  @Test
+  void compare() {
+    var l = new ArrayList<Itinerary>();
+    l.add(zeroTransferHighCost);
+    l.add(zeroTransferLowCost);
+    l.add(oneTransferLowCost);
+
+    l.sort(
+      new CompositeComparator<>(
+        SingeCriteriaComparator.compareGeneralizedCost(),
+        SingeCriteriaComparator.compareNumTransfers()
+      )
+    );
+
+    assertEquals(List.of(zeroTransferLowCost, oneTransferLowCost, zeroTransferHighCost), l);
+  }
+
+  @Test
+  void compareThrowsExceptionIfNotStrictOrder() {
+    assertThrows(
+      IllegalStateException.class,
+      () ->
+        SingeCriteriaComparator
+          .compareTransitPriorityGroups()
+          .compare(zeroTransferLowCost, zeroTransferHighCost)
+    );
+  }
+
+  @Test
+  void strictOrder() {
+    assertTrue(SingeCriteriaComparator.compareNumTransfers().strictOrder());
+    assertTrue(SingeCriteriaComparator.compareGeneralizedCost().strictOrder());
+    assertFalse(SingeCriteriaComparator.compareTransitPriorityGroups().strictOrder());
+  }
+
+  @Test
+  void compareNumTransfers() {
+    var subject = SingeCriteriaComparator.compareNumTransfers();
+
+    // leftDominanceExist
+    assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
+    Assertions.assertTrue(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
+    assertFalse(subject.leftDominanceExist(oneTransferLowCost, zeroTransferLowCost));
+
+    // strict order expected
+    assertTrue(subject.strictOrder());
+
+    // Compare
+    assertEquals(0, subject.compare(zeroTransferHighCost, zeroTransferLowCost));
+    assertEquals(-1, subject.compare(zeroTransferLowCost, oneTransferLowCost));
+    assertEquals(1, subject.compare(oneTransferLowCost, zeroTransferLowCost));
+  }
+
+  @Test
+  void compareGeneralizedCost() {
+    var subject = SingeCriteriaComparator.compareGeneralizedCost();
+
+    System.out.println(zeroTransferLowCost.getGeneralizedCost());
+    System.out.println(zeroTransferHighCost.getGeneralizedCost());
+    System.out.println(oneTransferLowCost.getGeneralizedCost());
+
+    // leftDominanceExist
+    assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
+    assertTrue(subject.leftDominanceExist(zeroTransferLowCost, zeroTransferHighCost));
+    assertFalse(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
+
+    // strict order expected
+    assertTrue(subject.strictOrder());
+
+    // Compare
+    assertTrue(0 < subject.compare(zeroTransferHighCost, zeroTransferLowCost));
+    assertTrue(0 > subject.compare(zeroTransferLowCost, zeroTransferHighCost));
+    assertEquals(0, subject.compare(zeroTransferLowCost, oneTransferLowCost));
+  }
+
+  @Test
+  void compareTransitPriorityGroups() {
+    var group1 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .withGeneralizedCost2(1)
+      .build();
+    var group2 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .withGeneralizedCost2(2)
+      .build();
+    var group1And2 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .withGeneralizedCost2(TransitGroupPriority32n.mergeInGroupId(1, 2))
+      .build();
+
+    var subject = SingeCriteriaComparator.compareTransitPriorityGroups();
+
+    assertTrue(subject.leftDominanceExist(group1, group2));
+    assertTrue(subject.leftDominanceExist(group2, group1));
+    assertTrue(subject.leftDominanceExist(group1, group1And2));
+    assertTrue(subject.leftDominanceExist(group2, group1And2));
+    assertFalse(subject.leftDominanceExist(group1And2, group1));
+    assertFalse(subject.leftDominanceExist(group1And2, group1));
+
+    // Cannot be ordered => compare will fail
+    assertFalse(subject.strictOrder());
+  }
+}

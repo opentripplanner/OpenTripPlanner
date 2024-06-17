@@ -55,6 +55,8 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
  */
 public class TestItineraryBuilder implements PlanTestConstants {
 
+  private static final int NOT_SET = -1_999_999;
+
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
   public static final Route BUS_ROUTE = route("1").withMode(TransitMode.BUS).build();
   public static final Route RAIL_ROUTE = route("2").withMode(TransitMode.RAIL).build();
@@ -69,7 +71,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private final List<Leg> legs = new ArrayList<>();
   private Place lastPlace;
   private int lastEndTime;
-  private int cost = 0;
+  private int c1 = 0;
+  private int c2 = NOT_SET;
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -241,7 +244,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = end;
@@ -330,17 +333,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
   }
 
-  public Itinerary egress(int walkDuration) {
-    walk(walkDuration, null);
-    return build();
-  }
-
-  public Itinerary build() {
-    Itinerary itinerary = new Itinerary(legs);
-    itinerary.setGeneralizedCost(cost);
-    return itinerary;
-  }
-
   public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
@@ -400,6 +392,26 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     return this;
   }
+
+  public TestItineraryBuilder withGeneralizedCost2(int c2) {
+    this.c2  = c2;
+    return this;
+  }
+
+  public Itinerary egress(int walkDuration) {
+    walk(walkDuration, null);
+    return build();
+  }
+
+  public Itinerary build() {
+    Itinerary itinerary = new Itinerary(legs);
+    itinerary.setGeneralizedCost(c1);
+    if(c2 != NOT_SET) {
+      itinerary.setGeneralizedCost2(c2);
+    }
+    return itinerary;
+  }
+
 
   /* private methods */
 
@@ -506,7 +518,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = end;
@@ -536,7 +548,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .build();
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = endTime;
