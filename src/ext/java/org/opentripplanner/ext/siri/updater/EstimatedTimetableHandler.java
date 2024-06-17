@@ -28,8 +28,25 @@ public class EstimatedTimetableHandler {
     TransitService transitService,
     String feedId
   ) {
+    this(
+      snapshotSource,
+      fuzzyMatching ? SiriFuzzyTripMatcher.of(transitService) : null,
+      transitService,
+      feedId
+    );
+  }
+
+  /**
+   * Constructor for tests only.
+   */
+  public EstimatedTimetableHandler(
+    SiriTimetableSnapshotSource snapshotSource,
+    SiriFuzzyTripMatcher siriFuzzyTripMatcher,
+    TransitService transitService,
+    String feedId
+  ) {
     this.snapshotSource = snapshotSource;
-    this.fuzzyTripMatcher = fuzzyMatching ? SiriFuzzyTripMatcher.of(transitService) : null;
+    this.fuzzyTripMatcher = siriFuzzyTripMatcher;
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.feedId = feedId;
   }

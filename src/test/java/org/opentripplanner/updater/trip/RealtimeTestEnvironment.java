@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -169,7 +170,7 @@ public final class RealtimeTestEnvironment {
   public EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
     return new EstimatedTimetableHandler(
       siriSource,
-      fuzzyMatching,
+      fuzzyMatching ? new SiriFuzzyTripMatcher(getTransitService()) : null,
       getTransitService(),
       getFeedId()
     );
