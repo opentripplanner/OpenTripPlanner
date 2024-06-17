@@ -56,7 +56,7 @@ public class StreetGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    List<String> filterByNetworkNames,
+    List<String> filterByNetwork,
     TransitService transitService
   ) {
     PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
@@ -67,7 +67,7 @@ public class StreetGraphFinder implements GraphFinder {
       filterByStations,
       filterByRoutes,
       filterByBikeRentalStations,
-      filterByNetworkNames,
+      filterByNetwork,
       maxResults,
       radiusMeters
     );

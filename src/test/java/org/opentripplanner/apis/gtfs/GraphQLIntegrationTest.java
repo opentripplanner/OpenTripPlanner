@@ -448,7 +448,7 @@ class GraphQLIntegrationTest {
       List<FeedScopedId> filterByStations,
       List<FeedScopedId> filterByRoutes,
       List<String> filterByBikeRentalStations,
-      List<String> filterByNetworkNames,
+      List<String> filterByNetwork,
       TransitService transitService
     ) {
       return List

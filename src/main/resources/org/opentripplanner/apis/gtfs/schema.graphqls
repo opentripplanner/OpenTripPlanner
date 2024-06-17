@@ -3554,7 +3554,7 @@ type QueryType {
         """
         Only include places that match one of the given network names.
         """
-        filterByNetworkNames: [String]
+        filterByNetwork: [String]
 
         """Only include places that match one of the given GTFS ids."""
         filterByIds: InputFilters @deprecated(reason: "Not actively maintained")

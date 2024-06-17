@@ -2416,7 +2416,7 @@ public class GraphQLTypes {
     private Double lon;
     private Integer maxDistance;
     private Integer maxResults;
-    private List<String> filterByNetworkNames;
+    private List<String> filterByNetwork;
 
     public GraphQLQueryTypeNearestArgs(Map<String, Object> args) {
       if (args != null) {
@@ -2448,7 +2448,7 @@ public class GraphQLTypes {
         this.lon = (Double) args.get("lon");
         this.maxDistance = (Integer) args.get("maxDistance");
         this.maxResults = (Integer) args.get("maxResults");
-        this.filterByNetworkNames = (List<String>) args.get("filterByNetworkNames");
+        this.filterByNetwork = (List<String>) args.get("filterByNetwork");
       }
     }
 
@@ -2540,12 +2540,12 @@ public class GraphQLTypes {
       this.maxResults = maxResults;
     }
 
-    public List<String> getGraphQLFilterByNetworkNames() {
-      return this.filterByNetworkNames;
+    public List<String> getGraphQLFilterByNetwork() {
+      return this.filterByNetwork;
     }
 
-    public void setGraphQLFilterByNetworkNames(List<String> networkNames) {
-      this.filterByNetworkNames = networkNames;
+    public void setGraphQLFilterByNetwork(List<String> networks) {
+      this.filterByNetwork = networks;
     }
   }
 

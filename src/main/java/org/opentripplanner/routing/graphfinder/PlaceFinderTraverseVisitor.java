@@ -44,7 +44,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final boolean includeStations;
   private final int maxResults;
   private final double radiusMeters;
-  private final Set<String> filterByNetworkNames;
+  private final Set<String> filterByNetwork;
 
   /**
    * @param transitService             A TransitService used in finding information about the
@@ -70,7 +70,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    List<String> filterByNetworkNames,
+    List<String> filterByNetwork,
     int maxResults,
     double radiusMeters
   ) {
@@ -84,7 +84,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     this.filterByStations = toSet(filterByStations);
     this.filterByRoutes = toSet(filterByRoutes);
     this.filterByVehicleRental = toSet(filterByBikeRentalStations);
-    this.filterByNetworkNames = toSet(filterByNetworkNames);
+    this.filterByNetwork = toSet(filterByNetwork);
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
 
     includePatternAtStops = shouldInclude(filterByPlaceTypes, PlaceType.PATTERN_AT_STOP);
@@ -267,7 +267,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     if (seenVehicleRentalPlaces.contains(station.getId())) {
       return;
     }
-    if (!filterByNetworkNames.isEmpty() && !filterByNetworkNames.contains(station.getNetwork())) {
+    if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.getNetwork())) {
       return;
     }
     seenVehicleRentalPlaces.add(station.getId());

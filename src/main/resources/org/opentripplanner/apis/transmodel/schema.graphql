@@ -676,7 +676,7 @@ type QueryType {
     "Only include places that include this mode. Only checked for places with mode i.e. quays, departures."
     filterByModes: [TransportMode],
     "Only include places that match one of the given network names."
-    filterByNetworkNames: [String],
+    filterByNetwork: [String],
     "Only include places of given types if set. Default accepts all types"
     filterByPlaceTypes: [FilterPlaceType] = [quay, stopPlace, bicycleRent, bikePark, carPark],
     "fetching only the first certain number of nodes"

@@ -850,7 +850,7 @@ public class TransmodelGraphQLSchema {
           .argument(
             GraphQLArgument
               .newArgument()
-              .name("filterByNetworkNames")
+              .name("filterByNetwork")
               .description("Only include places that match one of the given network names.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
@@ -945,7 +945,7 @@ public class TransmodelGraphQLSchema {
             if (placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
               maxResults *= 5;
             }
-            List<String> filterByNetworkNames = environment.getArgument("filterByNetworkNames");
+            List<String> filterByNetwork = environment.getArgument("filterByNetwork");
 
             List<PlaceAtDistance> places;
             places =
@@ -962,7 +962,7 @@ public class TransmodelGraphQLSchema {
                   filterByStations,
                   filterByRoutes,
                   filterByBikeRentalStations,
-                  filterByNetworkNames,
+                  filterByNetwork,
                   GqlUtil.getTransitService(environment)
                 );
 
