@@ -15,6 +15,7 @@ import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -300,7 +301,12 @@ public final class RealtimeTestEnvironment {
   }
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {
-    var trip = Trip.of(id(id)).withRoute(route).withServiceId(SERVICE_ID).build();
+    var trip = Trip
+      .of(id(id))
+      .withRoute(route)
+      .withHeadsign(I18NString.of("Headsign of %s".formatted(id)))
+      .withServiceId(SERVICE_ID)
+      .build();
 
     var tripOnServiceDate = TripOnServiceDate
       .of(trip.getId())

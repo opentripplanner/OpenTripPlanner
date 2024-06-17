@@ -3,12 +3,16 @@ package org.opentripplanner.updater.trip.moduletests.delay;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.test.support.UpdateResultAssertions.assertSuccess;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -40,9 +44,8 @@ public class SkippedTest {
       .addDelayedStopTime(2, 90)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate);
+    assertSuccess(env.applyTripUpdate(tripUpdate));
 
-    assertEquals(1, result.successful());
 
     final TimetableSnapshot snapshot = env.getTimetableSnapshot();
 
@@ -144,9 +147,7 @@ public class SkippedTest {
       .addDelayedStopTime(2, 90)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate, DIFFERENTIAL);
-
-    assertEquals(1, result.successful());
+    var result = assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Create update to the same trip but now the skipped stop is no longer skipped
     var scheduledBuilder = new TripUpdateBuilder(
@@ -162,7 +163,7 @@ public class SkippedTest {
     tripUpdate = scheduledBuilder.build();
 
     // apply the update with the previously skipped stop now scheduled
-    result = env.applyTripUpdate(tripUpdate, DIFFERENTIAL);
+    result = assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     assertEquals(1, result.successful());
     // Check that the there is no longer a realtime added trip pattern for the trip and that the
@@ -220,6 +221,121 @@ public class SkippedTest {
       assertEquals(50, originalTripTimesForToday.getDepartureDelay(1));
       assertEquals(90, originalTripTimesForToday.getArrivalDelay(2));
       assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
+    }
+  }
+
+  /**
+   * Tests a mixture of SKIPPED and NO_DATA.
+   */
+  @Test
+  public void skippedNoData() {
+    var env = RealtimeTestEnvironment.gtfs();
+
+    final FeedScopedId tripId = env.trip2.getId();
+    var builder = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
+      .addNoDataStop(0)
+      .addSkippedStop(1)
+      .addNoDataStop(2);
+
+    var tripUpdate = builder.build();
+
+    assertSuccess(env.applyTripUpdate(tripUpdate));
+
+    // THEN
+    var snapshot = env.getTimetableSnapshot();
+
+    // Original trip pattern
+    {
+      final TripPattern originalTripPattern = env.transitModel
+        .getTransitModelIndex()
+        .getPatternForTrip()
+        .get(env.trip2);
+
+      final Timetable originalTimetableForToday = snapshot.resolve(
+        originalTripPattern,
+        SERVICE_DATE
+      );
+      final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+
+      assertNotSame(originalTimetableForToday, originalTimetableScheduled);
+
+      final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(tripId);
+      assertTrue(
+        originalTripIndexScheduled > -1,
+        "Original trip should be found in scheduled time table"
+      );
+      final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
+        originalTripIndexScheduled
+      );
+      assertFalse(
+        originalTripTimesScheduled.isCanceledOrDeleted(),
+        "Original trip times should not be canceled in scheduled time table"
+      );
+      assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
+
+      final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(tripId);
+      assertTrue(
+        originalTripIndexForToday > -1,
+        "Original trip should be found in time table for service date"
+      );
+      final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
+        originalTripIndexForToday
+      );
+      assertTrue(
+        originalTripTimesForToday.isDeleted(),
+        "Original trip times should be deleted in time table for service date"
+      );
+      // original trip should be deleted
+      assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
+    }
+
+    // New trip pattern
+    {
+      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(tripId, SERVICE_DATE);
+      assertNotNull(newTripPattern, "New trip pattern should be found");
+
+      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
+      final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
+
+      assertNotSame(newTimetableForToday, newTimetableScheduled);
+
+      assertTrue(newTripPattern.canBoard(0));
+      assertFalse(newTripPattern.canBoard(1));
+      assertTrue(newTripPattern.canBoard(2));
+
+      assertEquals(
+        new NonLocalizedString("Headsign of TestTrip2"),
+        newTripPattern.getTripHeadsign()
+      );
+      assertEquals(
+        newTripPattern.getOriginalTripPattern().getTripHeadsign(),
+        newTripPattern.getTripHeadsign()
+      );
+
+      final int newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(tripId);
+      assertTrue(
+        newTimetableForTodayModifiedTripIndex > -1,
+        "New trip should be found in time table for service date"
+      );
+
+      var newTripTimes = newTimetableForToday.getTripTimes(newTimetableForTodayModifiedTripIndex);
+      assertEquals(RealTimeState.UPDATED, newTripTimes.getRealTimeState());
+
+      assertEquals(
+        -1,
+        newTimetableScheduled.getTripIndex(tripId),
+        "New trip should not be found in scheduled time table"
+      );
+
+      assertEquals(0, newTripTimes.getArrivalDelay(0));
+      assertEquals(0, newTripTimes.getDepartureDelay(0));
+      assertEquals(0, newTripTimes.getArrivalDelay(1));
+      assertEquals(0, newTripTimes.getDepartureDelay(1));
+      assertEquals(0, newTripTimes.getArrivalDelay(2));
+      assertEquals(0, newTripTimes.getDepartureDelay(2));
+      assertTrue(newTripTimes.isNoDataStop(0));
+      assertTrue(newTripTimes.isCancelledStop(1));
+      assertTrue(newTripTimes.isNoDataStop(2));
     }
   }
 }
