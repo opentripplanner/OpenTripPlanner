@@ -125,9 +125,8 @@ class InterlineProcessorTest implements PlanTestConstants {
   void staySeatedNotAllowed() {
     var transferService = new DefaultTransferService();
 
-    var fromTrip = patterns.get(0).getTrip(0);
-    var toTrip = patterns.get(1).getTrip(0);
-
+    var fromTrip = patterns.get(0).getScheduledTimetable().getTripTimes().get(0).getTrip();
+    var toTrip = patterns.get(1).getScheduledTimetable().getTripTimes().get(0).getTrip();
     var notAllowed = new StaySeatedNotAllowed(fromTrip, toTrip);
 
     var calendarService = new CalendarServiceData();
