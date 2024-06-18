@@ -76,10 +76,9 @@ public class StreetVehicleRentalLink extends Edge {
   }
 
   public Optional<Double> getCurrentRangeMeters() {
-    if(vehicleRentalPlaceVertex.getStation() instanceof VehicleRentalVehicle) {
+    if (vehicleRentalPlaceVertex.getStation() instanceof VehicleRentalVehicle) {
       return ((VehicleRentalVehicle) vehicleRentalPlaceVertex.getStation()).getCurrentRangeMeters();
     }
     return Optional.empty();
   }
-
 }

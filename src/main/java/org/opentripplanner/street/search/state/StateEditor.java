@@ -399,7 +399,7 @@ public class StateEditor {
       child.stateData.clone();
   }
 
-  public boolean isVehicleRentable(){
+  public boolean isVehicleRentable() {
     return child.isRentingVehicle();
   }
 }

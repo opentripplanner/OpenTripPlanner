@@ -89,9 +89,14 @@ public class GraphPathFinder {
     StreetSearchBuilder aStar = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
-      .setSkipEdgeStrategy(new ComposingSkipEdgeStrategy<>(new DurationSkipEdgeStrategy(
-        preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
-      ), new BatteryDistanceSkipEdgeStrategy()))
+      .setSkipEdgeStrategy(
+        new ComposingSkipEdgeStrategy<>(
+          new DurationSkipEdgeStrategy(
+            preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+          ),
+          new BatteryDistanceSkipEdgeStrategy()
+        )
+      )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)

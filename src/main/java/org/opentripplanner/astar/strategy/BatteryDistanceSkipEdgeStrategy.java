@@ -12,18 +12,20 @@ import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
  */
 public class BatteryDistanceSkipEdgeStrategy<
   State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
-  >
+>
   implements SkipEdgeStrategy<State, Edge> {
 
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
     if (edge instanceof StreetVehicleRentalLink) {
-      Optional<Double> currentRangeMeters = ((StreetVehicleRentalLink) edge).getCurrentRangeMeters();
+      Optional<Double> currentRangeMeters =
+        ((StreetVehicleRentalLink) edge).getCurrentRangeMeters();
 
       if (currentRangeMeters.isEmpty()) {
         return false;
       }
-      double batteryDistance = ((org.opentripplanner.street.search.state.State) current).batteryDistance;
+      double batteryDistance =
+        ((org.opentripplanner.street.search.state.State) current).batteryDistance;
       return currentRangeMeters.get() < batteryDistance;
     }
     return false;
