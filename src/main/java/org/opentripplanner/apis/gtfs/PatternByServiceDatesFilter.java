@@ -22,18 +22,18 @@ import org.opentripplanner.transit.service.TransitService;
 public class PatternByServiceDatesFilter {
 
   private final LocalDate startInclusive;
-  private final LocalDate endInclusive;
+  private final LocalDate endExclusive;
   private final Function<Route, Collection<TripPattern>> getPatternsForRoute;
   private final Function<Trip, Collection<LocalDate>> getServiceDatesForTrip;
 
   /**
    * This method is not private to enable unit testing.
    * <p>
-   * See the API documentation for a discussion of {@code startInclusive} and {@code endInclusive}.
+   * See the API documentation for a discussion of {@code startInclusive} and {@code endExclusive}.
    */
   PatternByServiceDatesFilter(
     @Nullable LocalDate startInclusive,
-    @Nullable LocalDate endInclusive,
+    @Nullable LocalDate endExclusive,
     Function<Route, Collection<TripPattern>> getPatternsForRoute,
     Function<Trip, Collection<LocalDate>> getServiceDatesForTrip
   ) {
@@ -41,12 +41,12 @@ public class PatternByServiceDatesFilter {
     this.getServiceDatesForTrip = Objects.requireNonNull(getServiceDatesForTrip);
     // optional, but one must be defined
     this.startInclusive = startInclusive;
-    this.endInclusive = endInclusive;
+    this.endExclusive = endExclusive;
 
-    if (startInclusive == null && endInclusive == null) {
-      throw new IllegalArgumentException("startInclusive and endInclusive cannot be both null");
+    if (startInclusive == null && endExclusive == null) {
+      throw new IllegalArgumentException("startInclusive and endExclusive cannot be both null");
     } else if (
-      startInclusive != null && endInclusive != null && startInclusive.isAfter(endInclusive)
+      startInclusive != null && endExclusive != null && startInclusive.isAfter(endExclusive)
     ) {
       throw new IllegalArgumentException("start must be before end");
     }
@@ -96,7 +96,7 @@ public class PatternByServiceDatesFilter {
             (
               startInclusive == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)
             ) &&
-            (endInclusive == null || date.isEqual(endInclusive) || date.isBefore(endInclusive))
+            (endExclusive == null || date.isBefore(endExclusive))
           );
       });
   }

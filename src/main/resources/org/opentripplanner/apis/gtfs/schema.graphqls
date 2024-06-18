@@ -3447,13 +3447,16 @@ on Sunday morning at 1am to 3am, might have the previous Saturday's service date
 """
 input ServiceDateFilterInput {
     """
-    Inclusive start date of the filter. If `null` this means that no `start` filter is applied and all
-    dates that are before or on `end` are selected.
+    **Inclusive** start date of the filter. If `null` this means that no `start` filter is applied and all
+    dates that are before `end` are selected.
     """
     start: LocalDate
     """
-    Inclusive end date of the filter. If `null` this means that no end filter is applied and all
-    entities that are after or on `start` are selected.
+    **Exclusive** end date of the filter. This means that if you want a time window from Sunday to
+    Sunday, `end` must be on Monday.
+
+    If `null` this means that no end filter is applied and all entities that are after or on `start`
+    are selected.
     """
     end: LocalDate
 }

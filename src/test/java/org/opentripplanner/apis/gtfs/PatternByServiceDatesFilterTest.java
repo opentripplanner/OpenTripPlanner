@@ -95,11 +95,13 @@ class PatternByServiceDatesFilterTest {
   static List<Arguments> ranges() {
     return List.of(
       Arguments.of(null, parse("2024-05-03"), NOT_REMOVED),
-      Arguments.of(null, parse("2024-05-01"), NOT_REMOVED),
       Arguments.of(parse("2024-05-03"), null, NOT_REMOVED),
       Arguments.of(parse("2024-05-01"), null, NOT_REMOVED),
+      Arguments.of(null, parse("2024-04-30"), REMOVED),
+      Arguments.of(null, parse("2024-05-01"), REMOVED),
       Arguments.of(parse("2024-05-02"), parse("2024-05-02"), REMOVED),
       Arguments.of(parse("2024-05-02"), parse("2024-05-03"), REMOVED),
+      Arguments.of(parse("2024-05-02"), parse("2024-06-01"), REMOVED),
       Arguments.of(parse("2025-01-01"), null, REMOVED),
       Arguments.of(parse("2025-01-01"), parse("2025-01-02"), REMOVED),
       Arguments.of(null, parse("2023-12-31"), REMOVED),
