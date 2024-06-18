@@ -29,9 +29,7 @@ class InvalidInputTest {
     var env = RealtimeTestEnvironment.gtfs();
 
     var update = new TripUpdateBuilder(env.trip1.getId().getId(), date, SCHEDULED, env.timeZone)
-      .addDelayedStopTime(1, 0)
       .addDelayedStopTime(2, 60, 80)
-      .addDelayedStopTime(3, 90, 90)
       .build();
 
     var result = env.applyTripUpdate(update);

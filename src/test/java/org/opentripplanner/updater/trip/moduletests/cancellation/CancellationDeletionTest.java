@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.test.support.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -45,11 +46,9 @@ public class CancellationDeletionTest {
       env.timeZone
     )
       .build();
-    var result = env.applyTripUpdate(update);
+    assertSuccess(env.applyTripUpdate(update));
 
-    assertEquals(1, result.successful());
-
-    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    var snapshot = env.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
     final Timetable schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
@@ -88,9 +87,7 @@ public class CancellationDeletionTest {
       .addStopTime(env.stopC1.getId().getId(), 55)
       .build();
 
-    var result = env.applyTripUpdate(update, DIFFERENTIAL);
-
-    assertEquals(1, result.successful());
+    assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     // Cancel or delete the added trip
     update =
@@ -101,9 +98,7 @@ public class CancellationDeletionTest {
         env.timeZone
       )
         .build();
-    result = env.applyTripUpdate(update, DIFFERENTIAL);
-
-    assertEquals(1, result.successful());
+    assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     final TimetableSnapshot snapshot = env.getTimetableSnapshot();
     // Get the trip pattern of the added trip which goes through stopA

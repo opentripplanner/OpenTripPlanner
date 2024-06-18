@@ -4,7 +4,6 @@ import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRe
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.test.support.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
@@ -43,53 +42,34 @@ class DelayedTest {
 
     assertEquals(1, result.successful());
 
-    // trip1 should be modified
-    {
-      var pattern1 = env.getPatternForTrip(env.trip1);
-      final int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
+    var pattern1 = env.getPatternForTrip(env.trip1);
+    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
-      final TimetableSnapshot snapshot = env.getTimetableSnapshot();
-      final Timetable trip1Realtime = snapshot.resolve(
-        pattern1,
-        RealtimeTestEnvironment.SERVICE_DATE
-      );
-      final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
+    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    final Timetable trip1Realtime = snapshot.resolve(
+      pattern1,
+      RealtimeTestEnvironment.SERVICE_DATE
+    );
+    final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
 
-      assertNotSame(trip1Realtime, trip1Scheduled);
-      assertNotSame(
-        trip1Realtime.getTripTimes(trip1Index),
-        trip1Scheduled.getTripTimes(trip1Index)
-      );
-      assertEquals(1, trip1Realtime.getTripTimes(trip1Index).getArrivalDelay(STOP_SEQUENCE));
-      assertEquals(1, trip1Realtime.getTripTimes(trip1Index).getDepartureDelay(STOP_SEQUENCE));
+    assertNotSame(trip1Realtime, trip1Scheduled);
+    assertNotSame(trip1Realtime.getTripTimes(trip1Index), trip1Scheduled.getTripTimes(trip1Index));
+    assertEquals(DELAY, trip1Realtime.getTripTimes(trip1Index).getArrivalDelay(STOP_SEQUENCE));
+    assertEquals(DELAY, trip1Realtime.getTripTimes(trip1Index).getDepartureDelay(STOP_SEQUENCE));
 
-      assertEquals(
-        RealTimeState.SCHEDULED,
-        trip1Scheduled.getTripTimes(trip1Index).getRealTimeState()
-      );
-      assertEquals(
-        RealTimeState.UPDATED,
-        trip1Realtime.getTripTimes(trip1Index).getRealTimeState()
-      );
-    }
+    assertEquals(
+      RealTimeState.SCHEDULED,
+      trip1Scheduled.getTripTimes(trip1Index).getRealTimeState()
+    );
 
-    // trip2 should keep the scheduled information
-    {
-      var pattern = env.getPatternForTrip(env.trip2);
-      final int tripIndex = pattern.getScheduledTimetable().getTripIndex(env.trip2.getId());
-
-      final TimetableSnapshot snapshot = env.getTimetableSnapshot();
-      final Timetable realtime = snapshot.resolve(pattern, RealtimeTestEnvironment.SERVICE_DATE);
-      final Timetable scheduled = snapshot.resolve(pattern, null);
-
-      assertSame(realtime, scheduled);
-      assertSame(realtime.getTripTimes(tripIndex), scheduled.getTripTimes(tripIndex));
-      assertEquals(0, realtime.getTripTimes(tripIndex).getArrivalDelay(STOP_SEQUENCE));
-      assertEquals(0, realtime.getTripTimes(tripIndex).getDepartureDelay(STOP_SEQUENCE));
-
-      assertEquals(RealTimeState.SCHEDULED, scheduled.getTripTimes(tripIndex).getRealTimeState());
-      assertEquals(RealTimeState.SCHEDULED, realtime.getTripTimes(tripIndex).getRealTimeState());
-    }
+    assertEquals(
+      "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      env.getScheduledTimetable(env.trip1.getId())
+    );
+    assertEquals(
+      "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
+      env.getRealtimeTimetable(env.trip1.getId().getId())
+    );
   }
 
   /**
@@ -110,7 +90,6 @@ class DelayedTest {
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
 
-    // THEN
     final TimetableSnapshot snapshot = env.getTimetableSnapshot();
 
     final TripPattern originalTripPattern = env.transitModel

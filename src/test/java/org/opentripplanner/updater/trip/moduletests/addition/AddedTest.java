@@ -13,7 +13,7 @@ import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_A1_I
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_B1_ID;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_C1_ID;
 
-import de.mfdz.MfdzRealtimeExtensions;
+import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
@@ -51,21 +51,9 @@ class AddedTest {
     builder.addTripExtension();
 
     builder
-      .addStopTime(
-        STOP_A1_ID,
-        30,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.PHONE_AGENCY
-      )
-      .addStopTime(
-        STOP_B1_ID,
-        40,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.COORDINATE_WITH_DRIVER
-      )
-      .addStopTime(
-        STOP_B1_ID,
-        55,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.NONE
-      );
+      .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(STOP_B1_ID, 55, DropOffPickupType.NONE);
 
     var tripUpdate = builder.build();
 
@@ -101,21 +89,9 @@ class AddedTest {
     builder.addTripExtension();
 
     builder
-      .addStopTime(
-        STOP_A1_ID,
-        30,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.PHONE_AGENCY
-      )
-      .addStopTime(
-        "UNKNOWN_STOP_ID",
-        40,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.COORDINATE_WITH_DRIVER
-      )
-      .addStopTime(
-        STOP_C1_ID,
-        55,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.NONE
-      );
+      .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime("UNKNOWN_STOP_ID", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE);
 
     var tripUpdate = builder.build();
 
@@ -141,21 +117,9 @@ class AddedTest {
     builder.addTripExtension();
 
     builder
-      .addStopTime(
-        STOP_A1_ID,
-        30,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.PHONE_AGENCY
-      )
-      .addStopTime(
-        STOP_B1_ID,
-        40,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.COORDINATE_WITH_DRIVER
-      )
-      .addStopTime(
-        STOP_C1_ID,
-        55,
-        MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType.NONE
-      );
+      .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE);
 
     var tripUpdate = builder.build();
 
