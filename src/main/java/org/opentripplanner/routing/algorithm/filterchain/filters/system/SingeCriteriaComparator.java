@@ -20,24 +20,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppri
  * can be sorted, if so the {@link #strictOrder()} should return false (this is the default).
  */
 @FunctionalInterface
-public interface SingeCriteriaComparator extends Comparator<Itinerary> {
+public interface SingeCriteriaComparator {
   /**
    * The left criteria dominates the right criteria. Note! The right criteria my dominate
    * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
    * there is no dominance.
    */
   boolean leftDominanceExist(Itinerary left, Itinerary right);
-
-  /**
-   * The compare function can be used to order elements based on the criteria for this instance.
-   * Note! This method should not be used if there is no {@link #strictOrder()}.
-   */
-  @Override
-  default int compare(Itinerary left, Itinerary right) {
-    throw new IllegalStateException(
-      "This criteria can not be used to sort elements, there is no deterministic defined order."
-    );
-  }
 
   /**
    * Return true if the criteria can be deterministically sorted.
@@ -56,20 +45,18 @@ public interface SingeCriteriaComparator extends Comparator<Itinerary> {
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   static SingeCriteriaComparator compareTransitPriorityGroups() {
-    return (left, right) -> TransitGroupPriority32n.dominate(left.getGeneralizedCost2().get(), right.getGeneralizedCost2().get());
+    return (left, right) ->
+      TransitGroupPriority32n.dominate(
+        left.getGeneralizedCost2().get(),
+        right.getGeneralizedCost2().get()
+      );
   }
-
 
   static SingeCriteriaComparator compareLessThan(final ToIntFunction<Itinerary> op) {
     return new SingeCriteriaComparator() {
       @Override
       public boolean leftDominanceExist(Itinerary left, Itinerary right) {
         return op.applyAsInt(left) < op.applyAsInt(right);
-      }
-
-      @Override
-      public int compare(Itinerary left, Itinerary right) {
-        return op.applyAsInt(left) - op.applyAsInt(right);
       }
 
       @Override

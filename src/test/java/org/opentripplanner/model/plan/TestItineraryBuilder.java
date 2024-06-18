@@ -394,7 +394,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public TestItineraryBuilder withGeneralizedCost2(int c2) {
-    this.c2  = c2;
+    this.c2 = c2;
     return this;
   }
 
@@ -403,15 +403,23 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return build();
   }
 
+  /**
+   * Override any value set for c1. The given value will be assigned to the itinerary
+   * independent of any values set on the legs.
+   */
+  public Itinerary build(int c1) {
+    this.c1 = c1;
+    return build();
+  }
+
   public Itinerary build() {
     Itinerary itinerary = new Itinerary(legs);
     itinerary.setGeneralizedCost(c1);
-    if(c2 != NOT_SET) {
+    if (c2 != NOT_SET) {
       itinerary.setGeneralizedCost2(c2);
     }
     return itinerary;
   }
-
 
   /* private methods */
 

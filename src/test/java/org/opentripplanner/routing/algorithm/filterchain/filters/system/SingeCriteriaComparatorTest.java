@@ -2,16 +2,12 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.collection.CompositeComparator;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
@@ -58,34 +54,6 @@ class SingeCriteriaComparatorTest {
   }
 
   @Test
-  void compare() {
-    var l = new ArrayList<Itinerary>();
-    l.add(zeroTransferHighCost);
-    l.add(zeroTransferLowCost);
-    l.add(oneTransferLowCost);
-
-    l.sort(
-      new CompositeComparator<>(
-        SingeCriteriaComparator.compareGeneralizedCost(),
-        SingeCriteriaComparator.compareNumTransfers()
-      )
-    );
-
-    assertEquals(List.of(zeroTransferLowCost, oneTransferLowCost, zeroTransferHighCost), l);
-  }
-
-  @Test
-  void compareThrowsExceptionIfNotStrictOrder() {
-    assertThrows(
-      IllegalStateException.class,
-      () ->
-        SingeCriteriaComparator
-          .compareTransitPriorityGroups()
-          .compare(zeroTransferLowCost, zeroTransferHighCost)
-    );
-  }
-
-  @Test
   void strictOrder() {
     assertTrue(SingeCriteriaComparator.compareNumTransfers().strictOrder());
     assertTrue(SingeCriteriaComparator.compareGeneralizedCost().strictOrder());
@@ -103,11 +71,6 @@ class SingeCriteriaComparatorTest {
 
     // strict order expected
     assertTrue(subject.strictOrder());
-
-    // Compare
-    assertEquals(0, subject.compare(zeroTransferHighCost, zeroTransferLowCost));
-    assertEquals(-1, subject.compare(zeroTransferLowCost, oneTransferLowCost));
-    assertEquals(1, subject.compare(oneTransferLowCost, zeroTransferLowCost));
   }
 
   @Test
@@ -125,23 +88,12 @@ class SingeCriteriaComparatorTest {
 
     // strict order expected
     assertTrue(subject.strictOrder());
-
-    // Compare
-    assertTrue(0 < subject.compare(zeroTransferHighCost, zeroTransferLowCost));
-    assertTrue(0 > subject.compare(zeroTransferLowCost, zeroTransferHighCost));
-    assertEquals(0, subject.compare(zeroTransferLowCost, oneTransferLowCost));
   }
 
   @Test
   void compareTransitPriorityGroups() {
-    var group1 = newItinerary(A)
-      .bus(1, START, END_LOW, C)
-      .withGeneralizedCost2(1)
-      .build();
-    var group2 = newItinerary(A)
-      .bus(1, START, END_LOW, C)
-      .withGeneralizedCost2(2)
-      .build();
+    var group1 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(1).build();
+    var group2 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(2).build();
     var group1And2 = newItinerary(A)
       .bus(1, START, END_LOW, C)
       .withGeneralizedCost2(TransitGroupPriority32n.mergeInGroupId(1, 2))
