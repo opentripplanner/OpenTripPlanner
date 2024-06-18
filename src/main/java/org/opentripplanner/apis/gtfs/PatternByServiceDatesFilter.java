@@ -15,6 +15,9 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * Encapsulates the logic to filter patterns by the service dates that they operate on. It also
  * has a method to filter routes by checking if their patterns operate on the required days
+ * <p>
+ * Once a more complete filtering engine is in place in the core data model, this code should be
+ * there rather than a separate class in the API package.
  */
 public class PatternByServiceDatesFilter {
 
