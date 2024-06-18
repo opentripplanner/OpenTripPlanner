@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.moduletests.rejection;
 
+import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.opentripplanner.test.support.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 
@@ -26,16 +27,12 @@ class InvalidTripIdTest {
     if (tripId != null) {
       tripDescriptorBuilder.setTripId(tripId);
     }
-    tripDescriptorBuilder.setScheduleRelationship(
-      GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED
-    );
+    tripDescriptorBuilder.setScheduleRelationship(SCHEDULED);
     var tripUpdateBuilder = GtfsRealtime.TripUpdate.newBuilder();
 
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
     var tripUpdate = tripUpdateBuilder.build();
 
-    var result = env.applyTripUpdate(tripUpdate);
-
-    assertFailure(INVALID_INPUT_STRUCTURE, result);
+    assertFailure(INVALID_INPUT_STRUCTURE, env.applyTripUpdate(tripUpdate));
   }
 }

@@ -9,8 +9,6 @@ import static org.opentripplanner.test.support.UpdateResultAssertions.assertSucc
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -45,12 +43,9 @@ class DelayedTest {
     var pattern1 = env.getPatternForTrip(env.trip1);
     int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
 
-    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
-    final Timetable trip1Realtime = snapshot.resolve(
-      pattern1,
-      RealtimeTestEnvironment.SERVICE_DATE
-    );
-    final Timetable trip1Scheduled = snapshot.resolve(pattern1, null);
+    var snapshot = env.getTimetableSnapshot();
+    var trip1Realtime = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
+    var trip1Scheduled = snapshot.resolve(pattern1, null);
 
     assertNotSame(trip1Realtime, trip1Scheduled);
     assertNotSame(trip1Realtime.getTripTimes(trip1Index), trip1Scheduled.getTripTimes(trip1Index));
@@ -79,26 +74,25 @@ class DelayedTest {
   void complexDelay() {
     var env = RealtimeTestEnvironment.gtfs();
 
-    String tripId = env.trip2.getId().getId();
+    var tripId = env.trip2.getId().getId();
 
-    var builder = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60, 80)
-      .addDelayedStopTime(2, 90, 90);
-
-    var tripUpdate = builder.build();
+      .addDelayedStopTime(2, 90, 90)
+      .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
 
-    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    var snapshot = env.getTimetableSnapshot();
 
     final TripPattern originalTripPattern = env.transitModel
       .getTransitModelIndex()
       .getPatternForTrip()
       .get(env.trip2);
 
-    final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
-    final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+    var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+    var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 

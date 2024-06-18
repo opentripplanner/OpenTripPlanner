@@ -17,7 +17,6 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -148,8 +147,8 @@ class AddedTest {
     assertEquals(1, patternsAtA.size());
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
-    final Timetable schedule = snapshot.resolve(tripPattern, null);
+    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);
 
