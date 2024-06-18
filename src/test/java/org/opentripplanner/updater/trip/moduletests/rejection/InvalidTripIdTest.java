@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.moduletests.rejection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.test.support.UpdateResultAssertions.assertFailure;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.util.stream.Stream;
@@ -35,6 +36,6 @@ class InvalidTripIdTest {
 
     var result = env.applyTripUpdate(tripUpdate);
 
-    assertEquals(0, result.successful());
+    assertFailure(INVALID_INPUT_STRUCTURE, result);
   }
 }

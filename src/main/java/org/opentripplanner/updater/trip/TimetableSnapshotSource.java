@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
@@ -178,6 +179,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
           debug(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
+          results.add(Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE)));
           continue;
         }
 
