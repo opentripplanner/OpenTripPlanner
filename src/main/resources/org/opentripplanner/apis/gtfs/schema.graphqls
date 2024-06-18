@@ -687,6 +687,9 @@ type VehicleRentalStation implements Node & PlaceInterface {
     If true, station is on and in service.
     """
     operative: Boolean
+
+    """The vehicle rental system information."""
+    vehicleRentalSystem: VehicleRentalSystem
 }
 
 type RentalVehicleEntityCounts {
@@ -744,7 +747,7 @@ type RentalVehicle implements Node & PlaceInterface {
     vehicleType: RentalVehicleType
 
     """The vehicle rental system information."""
-    vehicleRentalSystem: VehicleRentalSystemType
+    vehicleRentalSystem: VehicleRentalSystem
 }
 
 type BikeRentalStationUris {
@@ -798,7 +801,7 @@ type RentalVehicleType {
     propulsionType: PropulsionType
 }
 
-type VehicleRentalSystemType {
+type VehicleRentalSystem {
     """The rental vehicle operator's system URL."""
     url: String
 }

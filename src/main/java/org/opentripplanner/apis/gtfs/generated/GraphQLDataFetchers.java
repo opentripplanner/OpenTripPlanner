@@ -1303,6 +1303,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleRentalStationUris> rentalUris();
 
+    public DataFetcher<VehicleRentalSystem> vehicleRentalSystem();
+
     public DataFetcher<Integer> spacesAvailable();
 
     public DataFetcher<String> stationId();
