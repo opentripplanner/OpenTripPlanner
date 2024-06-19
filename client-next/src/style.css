@@ -72,6 +72,21 @@
   --bs-accordion-active-bg: pink;
 }
 
+.itinerary-leg-details {
+  border: 1px dotted grey;
+  padding: 5px;
+}
+
+.itinerary-leg-details .times {
+  margin-top: 3px;
+  float: right;
+  font-size: 11px;
+}
+
+.itinerary-leg-details .mode {
+  margin-top: 10px;
+}
+
 .itinerary-header-itinerary-number {
   position: absolute;
 }

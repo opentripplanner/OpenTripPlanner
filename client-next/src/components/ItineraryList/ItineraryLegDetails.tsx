@@ -5,20 +5,27 @@ import { formatDuration } from '../../util/formatDuration.ts';
 
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
   return (
-    <div style={{ border: '1px dotted grey' }}>
-      <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} />-{' '}
-      <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />{' '}
-      <b>{leg.mode}</b>{' '}
-      {leg.line && (
-        <>
-          <u>
-            {leg.line.publicCode} {leg.toEstimatedCall?.destinationDisplay?.frontText}
-          </u>
-          , {leg.authority?.name}
-        </>
-      )}{' '}
-      {formatDistance(leg.distance)}, {formatDuration(leg.duration)}
-      {leg.mode !== Mode.Foot && <u>from {leg.fromPlace.name}</u>} {!isLast && <u>to {leg.toPlace.name}</u>}
+    <div className="itinerary-leg-details">
+      <div className="times">
+        {formatDistance(leg.distance)}, {formatDuration(leg.duration)}
+      </div>
+      <div>
+        <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} /> -{' '}
+        <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
+      </div>
+      <div className="mode">
+        <b>{leg.mode}</b>{' '}
+        {leg.line && (
+          <>
+            <u>
+              {leg.line.publicCode} {leg.toEstimatedCall?.destinationDisplay?.frontText}
+            </u>
+            , {leg.authority?.name}
+          </>
+        )}{' '}
+        <div></div>
+        {leg.mode !== Mode.Foot && <u>{leg.fromPlace.name}</u>} {!isLast && <u>→ {leg.toPlace.name}</u>}
+      </div>
     </div>
   );
 }

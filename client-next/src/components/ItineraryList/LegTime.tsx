@@ -16,7 +16,7 @@ export function LegTime({
     </>
   ) : (
     <span>
-      {formatTime(expectedTime)}
+      {formatTime(expectedTime, 'short')}
       {hasRealtime && <span> (on time)</span>}
     </span>
   );
