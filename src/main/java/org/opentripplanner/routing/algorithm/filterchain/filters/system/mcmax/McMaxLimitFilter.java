@@ -8,15 +8,15 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 
 /**
  * This filter is used to reduce a set of itineraries down to the specified limit, if possible.
- * The filter is guaranteed to keep at least the given {@code minNumItineraries} and also
- * the best itinerary for each criterion. The criterion is defined using the list of
- * {@code comparators}.
+ * The filter is guaranteed to keep at least the given {@code minNumItineraries} and/or the best
+ * itinerary for each criterion. The criterion is defined using the list of {@code comparators}.
  * <p>
- * The main usage of this filter is to combine it with a grouping filter and for each group
+ * The main usage of this filter is to combine it with a transit grouping filter and for each group
  * make sure there is at least {@code minNumItineraries} and that the best itinerary with respect
  * to each criterion is kept. So, if the grouping is based on time and riding common trips, then
  * this filter will use the reminding criterion (transfers, generalized-cost,
- * [transit-group-priority]) to filter the grouped set of itineraries.
+ * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA
+ * USED TO GROUP THE ITINERARIES, ONLY THE REMINDING CRITERION USED IN THE RAPTOR SEARCH.
  * <p>
  * <b>IMPLEMENTATION DETAILS</b>
  * <p>
@@ -31,11 +31,14 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * <p>
  * Note! For a criteria like num-of-transfers or generalized-cost, there is only one set of "best"
  * itineraries, and usually there are only one or a few itineraries. In case there is more than one,
- * picking just one is fine. But, for transit-group-priority there might be more than on set of
- * itineraries. For each set, we need to pick one itinerary for the final result. Each of these
- * sets may or may not have more than one itinerary.
+ * picking just one is fine. But, for transit-group-priority there might be more than one optimal
+ * set of itineraries. For each set, we need to pick one itinerary for the final result. Each of
+ * these sets may or may not have more than one itinerary. If you group by agency, then there will
+ * be at least one itinerary for each agency present in the result (simplified, an itinerary may
+ * consist of legs with different agencies). The transit-group-priority pareto-function used by
+ * Raptor is reused, so we do not need to worry about the logic here.
  * <p>
- * Let's discuss an example:
+ * Let's discuss an example (this example also exists as a unit-test case):
  * <pre>
  *   minNumItineraries = 4
  *   comparators = [ generalized-cost, min-num-transfers, transit-group-priority ]
@@ -63,13 +66,13 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * The `minNumItineraries` limit is not met, so we need to pick another itinerary, we use the
  * sort-order again and add itinerary #0. The result returned is: [#0, #2, #4, #5]
  */
-public class McMinimumNumberItineraryFilter implements RemoveItineraryFlagger {
+public class McMaxLimitFilter implements RemoveItineraryFlagger {
 
   private final String name;
   private final int minNumItineraries;
   private final List<SingeCriteriaComparator> comparators;
 
-  public McMinimumNumberItineraryFilter(
+  public McMaxLimitFilter(
     String name,
     int minNumItineraries,
     List<SingeCriteriaComparator> comparators

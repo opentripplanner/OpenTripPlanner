@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCri
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-class McMinimumNumberItineraryFilterTest {
+class McMaxLimitFilterTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
@@ -44,7 +44,7 @@ class McMinimumNumberItineraryFilterTest {
   private static final int TX_1 = 1;
   private static final int TX_2 = 2;
 
-  private final McMinimumNumberItineraryFilter subject = new McMinimumNumberItineraryFilter(
+  private final McMaxLimitFilter subject = new McMaxLimitFilter(
     "test",
     2,
     List.of(
@@ -91,7 +91,7 @@ class McMinimumNumberItineraryFilterTest {
         row(EXP_KEEP, COST_MED, TX_0, GROUP_BC, "Best: num-of-transfers")
       ),
       /**
-       * This is the example explained in JavaDoc {@link McMinimumNumberItineraryFilter}
+       * This is the example explained in JavaDoc {@link McMaxLimitFilter}
        */
       List.of(
         row(EXP_DROP, COST_LOW, TX_1, GROUP_A, ""),
