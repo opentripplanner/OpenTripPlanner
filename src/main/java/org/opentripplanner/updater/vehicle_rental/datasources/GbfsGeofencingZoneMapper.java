@@ -52,7 +52,7 @@ class GbfsGeofencingZoneMapper {
       return null;
     }
     var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
-    if (name.isEmpty()) {
+    if (StringUtils.hasValue(name)) {
       name = fallbackId(g);
     }
     var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
