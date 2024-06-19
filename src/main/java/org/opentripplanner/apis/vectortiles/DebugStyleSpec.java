@@ -85,7 +85,7 @@ public class DebugStyleSpec {
           .lineColor(MAGENTA)
           .edgeFilter(EDGES_TO_DISPLAY)
           .lineWidth(LINE_WIDTH)
-          .minZoom(13)
+          .minZoom(6)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder
