@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -80,18 +79,6 @@ class AreaStopTest {
     assertFalse(subject.sameAs(subject.copy().withZoneId("X").build()));
     assertFalse(
       subject.sameAs(subject.copy().withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2)).build())
-    );
-  }
-
-  @Test
-  void invalidGeometry() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> areaStopBuilder().withGeometry(Polygons.SELF_INTERSECTING).build()
-    );
-    assertEquals(
-      "Polygon geometry for AreaStop F:1 is invalid: Self-intersection at (lat: 1.0, lon: 2.0)",
-      ex.getMessage()
     );
   }
 }

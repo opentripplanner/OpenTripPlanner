@@ -6,7 +6,6 @@ import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.operation.valid.IsValidOp;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -53,17 +52,7 @@ public class AreaStop
     this.url = builder.url();
     this.zoneId = builder.zoneId();
     this.geometry = builder.geometry();
-    if (!this.geometry.isValid()) {
-      var error = new IsValidOp(this.geometry).getValidationError();
-      throw new IllegalArgumentException(
-        "Polygon geometry for AreaStop %s is invalid: %s at (lat: %s, lon: %s)".formatted(
-            getId(),
-            error.getMessage(),
-            error.getCoordinate().y,
-            error.getCoordinate().x
-          )
-      );
-    }
+
     this.centroid = Objects.requireNonNull(builder.centroid());
   }
 

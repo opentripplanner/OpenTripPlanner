@@ -76,7 +76,10 @@ public class StopTimeMapperTest {
     stopModelBuilder
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final AreaStopMapper areaStopMapper = new AreaStopMapper(stopModelBuilder);
+  private final AreaStopMapper areaStopMapper = new AreaStopMapper(
+    stopModelBuilder,
+    DataImportIssueStore.NOOP
+  );
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
     stopMapper,
     areaStopMapper,
