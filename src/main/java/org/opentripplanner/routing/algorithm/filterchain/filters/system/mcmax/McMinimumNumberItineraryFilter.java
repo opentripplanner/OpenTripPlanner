@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmin;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 
 import java.util.List;
 import java.util.function.Predicate;

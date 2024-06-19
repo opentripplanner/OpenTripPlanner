@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmin;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCri
  * simple bookkeeping for the state of the filter.
  */
 class State {
+
   private final List<Item> items;
   private final List<Group> groups;
   private final List<Item> result = new ArrayList<>();
@@ -86,7 +87,6 @@ class State {
     groups.removeIf(Group::isEmpty);
   }
 
-
   /**
    * The best item is the one witch exists in most groups, and in case of a tie, the sort order/
    * itinerary index is used.
@@ -108,7 +108,12 @@ class State {
    */
   @Nullable
   private static Item findItemInFirstSingleItemGroup(List<Group> groups) {
-    return groups.stream().filter(Group::isSingleItemGroup).findFirst().map(Group::first).orElse(null);
+    return groups
+      .stream()
+      .filter(Group::isSingleItemGroup)
+      .findFirst()
+      .map(Group::first)
+      .orElse(null);
   }
 
   private static ArrayList<Item> createListOfItems(List<Itinerary> itineraries) {
@@ -119,7 +124,10 @@ class State {
     return items;
   }
 
-  private static List<Group> createGroups(Collection<Item> items, List<SingeCriteriaComparator> comparators) {
+  private static List<Group> createGroups(
+    Collection<Item> items,
+    List<SingeCriteriaComparator> comparators
+  ) {
     List<Group> groups = new ArrayList<>();
     for (SingeCriteriaComparator comparator : comparators) {
       if (comparator.strictOrder()) {
@@ -135,7 +143,10 @@ class State {
    * In a strict ordered group only one optimal value exist for the criteria defined by the given
    * {@code comparator}. All items that have this value should be included in the group created.
    */
-  private static Group createOrderedGroup(Collection<Item> items, SingeCriteriaComparator comparator) {
+  private static Group createOrderedGroup(
+    Collection<Item> items,
+    SingeCriteriaComparator comparator
+  ) {
     Group group = null;
     for (Item item : items) {
       if (group == null) {

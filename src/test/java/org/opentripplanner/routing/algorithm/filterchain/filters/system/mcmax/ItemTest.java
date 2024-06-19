@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmin;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

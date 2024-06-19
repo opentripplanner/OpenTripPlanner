@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmin;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -153,10 +153,10 @@ class McMinimumNumberItineraryFilterTest {
       .stream()
       .map(i ->
         "[ %d %d %s ]".formatted(
-          i.getGeneralizedCost(),
-          i.getNumberOfTransfers(),
-          groupsToString(i.getGeneralizedCost2().orElse(-1))
-        )
+            i.getGeneralizedCost(),
+            i.getNumberOfTransfers(),
+            groupsToString(i.getGeneralizedCost2().orElse(-1))
+          )
       )
       .collect(Collectors.joining(", "));
   }
@@ -182,11 +182,11 @@ class McMinimumNumberItineraryFilterTest {
     public String toString() {
       // The red-x is a unicode character(U+274C) and should be visible in most IDEs.
       return "%s %d %d %s".formatted(
-        expected ? "" : "❌",
-        c1,
-        nTransfers,
-        groupsToString(transitGroupIds)
-      );
+          expected ? "" : "❌",
+          c1,
+          nTransfers,
+          groupsToString(transitGroupIds)
+        );
     }
   }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmin;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,7 +24,6 @@ class Group implements Iterable<Item> {
   boolean isEmpty() {
     return items.isEmpty();
   }
-
 
   boolean isSingleItemGroup() {
     return items.size() == 1;
