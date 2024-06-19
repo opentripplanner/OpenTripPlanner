@@ -73,8 +73,10 @@
 }
 
 .itinerary-leg-details {
-  border: 1px dotted grey;
-  padding: 5px;
+  border: 1px solid #80808063;
+  padding: 10px;
+  border-radius: 3px;
+  margin-bottom: 3px;
 }
 
 .itinerary-leg-details .times {
