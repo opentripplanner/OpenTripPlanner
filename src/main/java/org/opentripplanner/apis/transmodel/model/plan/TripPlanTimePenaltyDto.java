@@ -20,9 +20,9 @@ public record TripPlanTimePenaltyDto(String appliesTo, TimeAndCost penalty) {
       .toList();
   }
 
-   /**
-    * Package local to be unit-testable.
-    */
+  /**
+   * Package local to be unit-testable.
+   */
   @Nullable
   static TripPlanTimePenaltyDto of(String appliedTo, TimeAndCost penalty) {
     return penalty == null || penalty.isZero()
