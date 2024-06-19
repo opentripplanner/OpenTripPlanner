@@ -23,7 +23,7 @@ class LocationGroupMapperTest {
     var builder = StopModel.of();
     var mapper = new LocationGroupMapper(
       new StopMapper(new TranslationHelper(), id -> null, builder),
-      new AreaStopMapper(builder, DataImportIssueStore.NOOP),
+      new LocationMapper(builder, DataImportIssueStore.NOOP),
       builder
     );
 

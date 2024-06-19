@@ -24,7 +24,7 @@ class StopAreaMapperTest {
   void map() {
     var stopModel = StopModel.of();
     var stopMapper = new StopMapper(new TranslationHelper(), ignored -> null, stopModel);
-    var locationMapper = new AreaStopMapper(stopModel, NOOP);
+    var locationMapper = new LocationMapper(stopModel, NOOP);
     var mapper = new StopAreaMapper(stopMapper, locationMapper, stopModel);
 
     var area = new Area();

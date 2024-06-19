@@ -18,13 +18,13 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.StopModelBuilder;
 
 /** Responsible for mapping GTFS Location into the OTP model. */
-public class AreaStopMapper {
+public class LocationMapper {
 
   private final Map<Location, AreaStop> mappedLocations = new HashMap<>();
   private final StopModelBuilder stopModelBuilder;
   private final DataImportIssueStore issueStore;
 
-  public AreaStopMapper(StopModelBuilder stopModelBuilder, DataImportIssueStore issueStore) {
+  public LocationMapper(StopModelBuilder stopModelBuilder, DataImportIssueStore issueStore) {
     this.stopModelBuilder = stopModelBuilder;
     this.issueStore = issueStore;
   }

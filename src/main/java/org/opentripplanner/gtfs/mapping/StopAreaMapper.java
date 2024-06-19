@@ -25,18 +25,18 @@ public class StopAreaMapper {
 
   private final StopMapper stopMapper;
 
-  private final AreaStopMapper areaStopMapper;
+  private final LocationMapper locationMapper;
 
   private final Map<org.onebusaway.gtfs.model.StopArea, GroupStop> mappedStopAreas = new HashMap<>();
   private final StopModelBuilder stopModel;
 
   public StopAreaMapper(
     StopMapper stopMapper,
-    AreaStopMapper areaStopMapper,
+    LocationMapper locationMapper,
     StopModelBuilder stopModel
   ) {
     this.stopMapper = stopMapper;
-    this.areaStopMapper = areaStopMapper;
+    this.locationMapper = locationMapper;
     this.stopModel = stopModel;
   }
 
@@ -57,7 +57,7 @@ public class StopAreaMapper {
     for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
-        case Location loc -> groupStopBuilder.addLocation(areaStopMapper.map(loc));
+        case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
         case org.onebusaway.gtfs.model.StopArea ignored -> throw new RuntimeException(
           "Nested GroupStops are not allowed"
         );

@@ -52,7 +52,6 @@ public class AreaStop
     this.url = builder.url();
     this.zoneId = builder.zoneId();
     this.geometry = builder.geometry();
-
     this.centroid = Objects.requireNonNull(builder.centroid());
   }
 

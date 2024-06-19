@@ -38,7 +38,7 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final BoardingAreaMapper boardingAreaMapper;
 
-  private final AreaStopMapper areaStopMapper;
+  private final LocationMapper locationMapper;
 
   private final LocationGroupMapper locationGroupMapper;
 
@@ -110,11 +110,11 @@ public class GTFSToOtpTransitServiceMapper {
     entranceMapper = new EntranceMapper(translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
-    areaStopMapper = new AreaStopMapper(builder.stopModel(), issueStore);
-    locationGroupMapper = new LocationGroupMapper(stopMapper, areaStopMapper, builder.stopModel());
+    locationMapper = new LocationMapper(builder.stopModel(), issueStore);
+    locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper, builder.stopModel());
     // the use of stop areas were reverted in the spec
     // this code will go away, please migrate now!
-    stopAreaMapper = new StopAreaMapper(stopMapper, areaStopMapper, builder.stopModel());
+    stopAreaMapper = new StopAreaMapper(stopMapper, locationMapper, builder.stopModel());
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
@@ -124,7 +124,7 @@ public class GTFSToOtpTransitServiceMapper {
     stopTimeMapper =
       new StopTimeMapper(
         stopMapper,
-        areaStopMapper,
+        locationMapper,
         locationGroupMapper,
         stopAreaMapper,
         tripMapper,
@@ -164,7 +164,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     if (OTPFeature.FlexRouting.isOn()) {
       // Stop areas and Stop groups are only used in FLEX routes
-      builder.stopModel().withAreaStops(areaStopMapper.map(data.getAllLocations()));
+      builder.stopModel().withAreaStops(locationMapper.map(data.getAllLocations()));
       builder.stopModel().withGroupStops(locationGroupMapper.map(data.getAllLocationGroups()));
       builder.stopModel().withGroupStops(stopAreaMapper.map(data.getAllStopAreas()));
     }

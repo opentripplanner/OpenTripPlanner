@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.service.StopModel;
 
-class AreaStopMapperTest {
+class LocationMapperTest {
 
   static Stream<Arguments> testCases() {
     return Stream.of(Arguments.of(null, true), Arguments.of("a name", false));
@@ -29,7 +29,7 @@ class AreaStopMapperTest {
   void testMapping(String name, boolean isBogusName) {
     var gtfsLocation = getLocation(name, Polygons.OSLO);
 
-    var mapper = new AreaStopMapper(StopModel.of(), DataImportIssueStore.NOOP);
+    var mapper = new LocationMapper(StopModel.of(), DataImportIssueStore.NOOP);
     var flexLocation = mapper.map(gtfsLocation);
 
     assertEquals(isBogusName, flexLocation.hasFallbackName());
@@ -43,7 +43,7 @@ class AreaStopMapperTest {
     var gtfsLocation = getLocation("invalid", selfIntersecting);
 
     var issueStore = new DefaultDataImportIssueStore();
-    var mapper = new AreaStopMapper(StopModel.of(), issueStore);
+    var mapper = new LocationMapper(StopModel.of(), issueStore);
 
     mapper.map(gtfsLocation);
 
