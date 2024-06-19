@@ -10,7 +10,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * This module builds the lucene geocoder based on the whether the feature flag is
+ * This module builds the Lucene geocoder based on whether the feature flag is on or off.
  */
 @Module
 public class GeocoderModule {
