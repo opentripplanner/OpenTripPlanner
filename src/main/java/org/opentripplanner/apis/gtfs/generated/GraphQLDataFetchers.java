@@ -1312,6 +1312,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> vehiclesAvailable();
   }
 
+  public interface GraphQLVehicleRentalSystem {
+    public DataFetcher<String> url();
+  }
+
   public interface GraphQLVehicleRentalUris {
     public DataFetcher<String> android();
 
