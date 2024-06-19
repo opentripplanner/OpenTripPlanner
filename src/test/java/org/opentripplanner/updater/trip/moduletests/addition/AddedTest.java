@@ -2,7 +2,6 @@ package org.opentripplanner.updater.trip.moduletests.addition;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -45,21 +44,14 @@ class AddedTest {
   @Test
   void addedTripWithNewRoute() {
     var env = RealtimeTestEnvironment.gtfs();
-    final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
-    // add extension to set route name, url, mode
-    builder.addTripExtension();
-
-    builder
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+      .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_B1_ID, 55, DropOffPickupType.NONE);
+      .addStopTime(STOP_B1_ID, 55, DropOffPickupType.NONE)
+      .build();
 
-    var tripUpdate = builder.build();
-
-    // WHEN
     var result = assertSuccess(env.applyTripUpdate(tripUpdate));
-
-    // THEN
 
     assertTrue(result.warnings().isEmpty());
 
@@ -83,20 +75,15 @@ class AddedTest {
   @Test
   void addedWithUnknownStop() {
     var env = RealtimeTestEnvironment.gtfs();
-    final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
-    // add extension to set route name, url, mode
-    builder.addTripExtension();
-
-    builder
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+      // add extension to set route name, url, mode
+      .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime("UNKNOWN_STOP_ID", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE);
-
-    var tripUpdate = builder.build();
+      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE)
+      .build();
 
     var result = assertSuccess(env.applyTripUpdate(tripUpdate));
-
-    assertFalse(result.warnings().isEmpty());
 
     assertEquals(
       List.of(UpdateSuccess.WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP),
@@ -111,16 +98,13 @@ class AddedTest {
   @Test
   void repeatedlyAddedTripWithNewRoute() {
     var env = RealtimeTestEnvironment.gtfs();
-    final var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
-    // add extension to set route name, url, mode
-    builder.addTripExtension();
-
-    builder
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+      // add extension to set route name, url, mode
+      .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE);
-
-    var tripUpdate = builder.build();
+      .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE)
+      .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
@@ -130,8 +114,6 @@ class AddedTest {
     env.applyTripUpdate(tripUpdate);
     var secondPattern = assertAddedTrip(ADDED_TRIP_ID, env);
     var secondRoute = secondPattern.getRoute();
-
-    // THEN
 
     assertSame(firstRoute, secondRoute);
     assertNotNull(env.transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
