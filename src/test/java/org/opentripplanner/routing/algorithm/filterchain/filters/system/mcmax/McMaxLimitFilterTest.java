@@ -50,7 +50,7 @@ class McMaxLimitFilterTest {
     List.of(
       SingeCriteriaComparator.compareGeneralizedCost(),
       SingeCriteriaComparator.compareNumTransfers(),
-      SingeCriteriaComparator.compareTransitPriorityGroups()
+      SingeCriteriaComparator.compareTransitGroupsPriority()
     )
   );
 

@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
@@ -27,6 +28,8 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWa
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCriteriaComparator;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax.McMaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
@@ -64,7 +67,6 @@ public class ItineraryListFilterChainBuilder {
   private static final int NOT_SET = -1;
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
-
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCropSection = ListSection.TAIL;
@@ -86,6 +88,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
+  private boolean transitGroupPriorityUsed = false;
 
   /**
    * Sandbox filters which decorate the itineraries with extra information.
@@ -289,6 +292,15 @@ public class ItineraryListFilterChainBuilder {
     ItinerarySortKey itineraryPageCut
   ) {
     this.itineraryPageCut = itineraryPageCut;
+    return this;
+  }
+
+  /**
+   * Adjust filters to include multi-criteria parameter c2 and treat it as the
+   * transit-group.
+   */
+  public ItineraryListFilterChainBuilder withTransitGroupPriority() {
+    this.transitGroupPriorityUsed = true;
     return this;
   }
 
@@ -531,7 +543,7 @@ public class ItineraryListFilterChainBuilder {
       GroupBySameRoutesAndStops::new,
       List.of(
         new SortingFilter(SortOrderComparator.comparator(sortOrder)),
-        new RemoveFilter(new MaxLimit(GroupBySameRoutesAndStops.TAG, 1))
+        new RemoveFilter(createMaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
       )
     );
   }
@@ -574,7 +586,7 @@ public class ItineraryListFilterChainBuilder {
             GroupByAllSameStations::new,
             List.of(
               new SortingFilter(generalizedCostComparator()),
-              new RemoveFilter(new MaxLimit(innerGroupName, 1))
+              new RemoveFilter(createMaxLimitFilter(innerGroupName, 1))
             )
           )
         );
@@ -587,7 +599,7 @@ public class ItineraryListFilterChainBuilder {
       }
 
       addSort(nested, generalizedCostComparator());
-      addRemoveFilter(nested, new MaxLimit(tag, group.maxNumOfItinerariesPerGroup));
+      addRemoveFilter(nested, createMaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup));
 
       nested.add(new KeepItinerariesWithFewestTransfers(sysTags));
 
@@ -619,5 +631,21 @@ public class ItineraryListFilterChainBuilder {
     ItineraryDecorator decorator
   ) {
     filters.add(new DecorateFilter(decorator));
+  }
+
+  private RemoveItineraryFlagger createMaxLimitFilter(String filterName, int maxLimit) {
+    if (OTPFeature.MultiCriteriaGroupMaxFilter.isOn()) {
+      List<SingeCriteriaComparator> comparators = new ArrayList<>();
+      comparators.add(SingeCriteriaComparator.compareGeneralizedCost());
+      comparators.add(SingeCriteriaComparator.compareNumTransfers());
+      if (transitGroupPriorityUsed) {
+        comparators.add(SingeCriteriaComparator.compareTransitGroupsPriority());
+      }
+      return new McMaxLimitFilter(filterName, maxLimit, comparators);
+    }
+    // Default is to just use a "hard" max limit
+    else {
+      return new MaxLimit(filterName, maxLimit);
+    }
   }
 }

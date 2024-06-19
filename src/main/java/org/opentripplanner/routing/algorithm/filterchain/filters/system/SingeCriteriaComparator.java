@@ -44,7 +44,7 @@ public interface SingeCriteriaComparator {
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
-  static SingeCriteriaComparator compareTransitPriorityGroups() {
+  static SingeCriteriaComparator compareTransitGroupsPriority() {
     return (left, right) ->
       TransitGroupPriority32n.dominate(
         left.getGeneralizedCost2().get(),

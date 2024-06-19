@@ -57,7 +57,7 @@ class SingeCriteriaComparatorTest {
   void strictOrder() {
     assertTrue(SingeCriteriaComparator.compareNumTransfers().strictOrder());
     assertTrue(SingeCriteriaComparator.compareGeneralizedCost().strictOrder());
-    assertFalse(SingeCriteriaComparator.compareTransitPriorityGroups().strictOrder());
+    assertFalse(SingeCriteriaComparator.compareTransitGroupsPriority().strictOrder());
   }
 
   @Test
@@ -99,7 +99,7 @@ class SingeCriteriaComparatorTest {
       .withGeneralizedCost2(TransitGroupPriority32n.mergeInGroupId(1, 2))
       .build();
 
-    var subject = SingeCriteriaComparator.compareTransitPriorityGroups();
+    var subject = SingeCriteriaComparator.compareTransitGroupsPriority();
 
     assertTrue(subject.leftDominanceExist(group1, group2));
     assertTrue(subject.leftDominanceExist(group2, group1));

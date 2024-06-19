@@ -94,6 +94,10 @@ public class RouteRequestToFilterChainMapper {
       .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
+    if (!request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
+      builder.withTransitGroupPriority();
+    }
+
     var fareService = context.graph().getFareService();
     if (fareService != null) {
       builder.withFareDecorator(new DecorateWithFare(fareService));
