@@ -515,11 +515,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public void setTransitLayer(TransitLayer transitLayer) {
-    this.transitModel.setTransitLayer(transitLayer);
-  }
-
-  @Override
   public CalendarService getCalendarService() {
     return this.transitModel.getCalendarService();
   }
