@@ -32,6 +32,9 @@ class LayerControl implements IControl {
         .getLayersOrder()
         .map((l) => map.getLayer(l))
         .filter((s) => s?.type !== 'raster')
+        // the polylines of the routing result are put in map layers called jsx-1, jsx-2...
+        // we don't want them to show up in the debug layer selector
+        .filter((s) => !s?.id.startsWith('jsx'))
         .reverse()
         .forEach((layer) => {
           if (layer) {
