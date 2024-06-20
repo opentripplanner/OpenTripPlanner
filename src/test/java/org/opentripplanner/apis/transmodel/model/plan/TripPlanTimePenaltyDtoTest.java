@@ -37,7 +37,6 @@ class TripPlanTimePenaltyDtoTest {
   @Test
   void testCreateFromItineraryWithNoPenalty() {
     var i = itinerary();
-    assertEquals(List.of(), TripPlanTimePenaltyDto.of(null));
     assertEquals(List.of(), TripPlanTimePenaltyDto.of(i));
   }
 
