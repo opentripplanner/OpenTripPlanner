@@ -7,11 +7,18 @@ import { TripQueryVariables } from '../gql/graphql.ts';
 import { useTripQuery } from '../hooks/useTripQuery.ts';
 import { useServerInfo } from '../hooks/useServerInfo.ts';
 
-const INITIAL_VARIABLES: TripQueryVariables = {
+const urlParams = new URLSearchParams(window.location.search);
+const variablesJson = urlParams.get('variables');
+
+let INITIAL_VARIABLES: TripQueryVariables = {
   from: {},
   to: {},
   dateTime: new Date().toISOString(),
 };
+
+if (variablesJson) {
+  INITIAL_VARIABLES = JSON.parse(variablesJson);
+}
 
 export function App() {
   const [tripQueryVariables, setTripQueryVariables] = useState<TripQueryVariables>(INITIAL_VARIABLES);
