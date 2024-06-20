@@ -3,25 +3,12 @@ import { MapView } from '../components/MapView/MapView.tsx';
 import { SearchBar } from '../components/SearchBar/SearchBar.tsx';
 import { ItineraryListContainer } from '../components/ItineraryList/ItineraryListContainer.tsx';
 import { useState } from 'react';
-import { TripQueryVariables } from '../gql/graphql.ts';
 import { useTripQuery } from '../hooks/useTripQuery.ts';
 import { useServerInfo } from '../hooks/useServerInfo.ts';
-
-const urlParams = new URLSearchParams(window.location.search);
-const variablesJson = urlParams.get('variables');
-
-let INITIAL_VARIABLES: TripQueryVariables = {
-  from: {},
-  to: {},
-  dateTime: new Date().toISOString(),
-};
-
-if (variablesJson) {
-  INITIAL_VARIABLES = JSON.parse(variablesJson);
-}
+import { useTripQueryVariables } from '../hooks/useTripQueryVariables.ts';
 
 export function App() {
-  const [tripQueryVariables, setTripQueryVariables] = useState<TripQueryVariables>(INITIAL_VARIABLES);
+  const { tripQueryVariables, setTripQueryVariables } = useTripQueryVariables();
   const [tripQueryResult, loading, callback] = useTripQuery(tripQueryVariables);
   const serverInfo = useServerInfo();
   const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
