@@ -7,8 +7,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
- * This class contains code for finding nearby stops from a given vertex. It is being used by access
- * and egress searches as well as transfer generation.
+ * Interface for finding nearby stops from a given vertex. It is used by access
+ * and egress searches, and in transfer generation.
  */
 public interface NearbyStopFinder {
   /**
