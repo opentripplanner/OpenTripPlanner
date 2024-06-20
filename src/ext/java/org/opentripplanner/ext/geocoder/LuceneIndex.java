@@ -47,13 +47,11 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LuceneIndex implements Serializable {
-
-  private static final Logger LOG = LoggerFactory.getLogger(LuceneIndex.class);
 
   private static final String TYPE = "type";
   private static final String ID = "id";
@@ -70,7 +68,14 @@ public class LuceneIndex implements Serializable {
   private final SuggestIndexSearcher searcher;
   private final StopClusterMapper stopClusterMapper;
 
-  public LuceneIndex(
+  public LuceneIndex(TransitModel transitModel, StopConsolidationService stopConsolidationService) {
+    this(new DefaultTransitService(transitModel), stopConsolidationService);
+  }
+
+  /**
+   * This method is only visible for testing.
+   */
+  LuceneIndex(
     TransitService transitService,
     @Nullable StopConsolidationService stopConsolidationService
   ) {
