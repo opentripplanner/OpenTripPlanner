@@ -180,6 +180,7 @@ public class ConstructApplication {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Initializing geocoder");
+      // eagerly initialize the geocoder
       this.factory.luceneIndex();
     }
   }
