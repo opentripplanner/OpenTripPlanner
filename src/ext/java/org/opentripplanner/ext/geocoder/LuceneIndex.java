@@ -253,6 +253,7 @@ public class LuceneIndex implements Serializable {
     String searchTerms,
     boolean autocomplete
   ) {
+    searchTerms = searchTerms.strip();
     try {
       if (autocomplete) {
         var completionQuery = new FuzzyCompletionQuery(
