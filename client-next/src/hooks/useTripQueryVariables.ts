@@ -16,7 +16,7 @@ const getInitialVariables = () => {
 const updateUrlWithVariables = (variables: TripQueryVariables) => {
   const urlParams = new URLSearchParams(window.location.search);
   urlParams.set('variables', encodeURIComponent(JSON.stringify(variables)));
-  history.pushState({}, '', '?' + urlParams.toString());
+  history.pushState({}, '', '?' + urlParams.toString() + window.location.hash);
 };
 
 export const useTripQueryVariables = () => {
