@@ -87,6 +87,7 @@ type TripQueryHook = (
 export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<QueryType | null>(null);
   const [loading, setLoading] = useState(false);
+
   const callback = useCallback(
     async (pageCursor?: string) => {
       if (loading) {
