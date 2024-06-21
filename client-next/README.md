@@ -34,7 +34,7 @@ Then
 
     npm run dev
 
-The debug client will now be available at `http://localhost:5173/debug-client-preview`. It has
+The debug client will now be available at `http://localhost:5173/`. It has
 hot reloading enabled, so you don't have to restart it when you save files.
 
 If you change graphql code during development you can issue the following command:
