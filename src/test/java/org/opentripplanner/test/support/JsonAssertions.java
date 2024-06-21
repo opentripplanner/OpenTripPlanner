@@ -32,11 +32,10 @@ public class JsonAssertions {
       assertEquals(
         exp,
         actualNode,
-        () ->
-          "Expected '%s' but actual was '%s'".formatted(
-              JsonSupport.prettyPrint(exp),
-              JsonSupport.prettyPrint(actualNode)
-            )
+        "Expected '%s' but actual was '%s'".formatted(
+            JsonSupport.prettyPrint(exp),
+            JsonSupport.prettyPrint(actualNode)
+          )
       );
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
