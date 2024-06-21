@@ -76,8 +76,8 @@ jobs:
           git checkout dev-2.x
           git pull --rebase
           
-          CLIENT_HTML_OUTPUT=src/client/debug-client-preview/index.html
-          mkdir -p src/client/debug-client-preview/
+          CLIENT_HTML_OUTPUT=src/client/index.html
+          mkdir -p src/client/
           cp client-next/output/index.html ${CLIENT_HTML_OUTPUT}
           
           # just to debug
