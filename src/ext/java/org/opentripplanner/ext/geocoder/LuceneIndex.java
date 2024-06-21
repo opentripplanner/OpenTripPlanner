@@ -68,6 +68,11 @@ public class LuceneIndex implements Serializable {
   private final SuggestIndexSearcher searcher;
   private final StopClusterMapper stopClusterMapper;
 
+  /**
+   * Since the {@link TransitService} is request scoped, we don't inject it into this class.
+   * However, we do need some methods in the service and that's why we instantiate it manually in this
+   * constructor.
+   */
   public LuceneIndex(TransitModel transitModel, StopConsolidationService stopConsolidationService) {
     this(new DefaultTransitService(transitModel), stopConsolidationService);
   }
