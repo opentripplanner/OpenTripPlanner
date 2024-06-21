@@ -26,7 +26,7 @@ The dev and production builds require graphql schema to be present at
 
 ## Getting started (development)
 
-Change directory to `client-next` (current) if you haven't already.
+Change directory to `client` (current) if you haven't already.
 
     npm install
 
@@ -45,7 +45,7 @@ You don't have to restart the development server for the changes to take effect.
 
 ## Build for production
 
-Change directory to `client-next` (current) if you haven't already.
+Change directory to `client` (current) if you haven't already.
 
     npm install
 

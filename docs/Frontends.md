@@ -18,7 +18,7 @@ On the other hand, **production frontends** are intended to be a component of la
 
 The main OpenTripPlanner repository currently contains two debug web frontends: 
 
-- new one currently under development at [`/client-next`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client-next).
+- new one currently under development at [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
 - the original one in [`/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/client/classic-debug) 
 
 The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
@@ -86,5 +86,5 @@ The history of the more widely used OpenTripPlanner interfaces is roughly as fol
 - In the late 2010s people started developing a new React-based UI as a more modular, modern interface for public consumption. This project is located at https://github.com/opentripplanner/otp-react-redux under the OpenTripPlanner Github organization, and is developed and maintainted by Arcadis IBI.
 - Some React components were factored out of that UI project, allowing them to be integrated in different ways with different OTP deployments. This component library is in a separate repository at https://github.com/opentripplanner/otp-ui. Likewise, it is developed and maintained by Arcadis IBI.
 - Meanwhile, starting in 2014, HSL (the Helsinki Regional Transport Authority) and Finntrafic (the Finnish national transportation authority) began the Digitransit project, a set of open-source microservices to replace their existing national and regional scale trip planners. This includes a Javascript web UI module. In addition to Finland, the Digitransit system has been deployed in various places around the world including Germany.
-- As of 2024, a completely new debug UI (again, intended for developer use rather than public consumption) is being developed in the main OpenTripPlanner repository under `src/client-next`. This new UI follows a more conventional contemporary Javascript development style, and uses the most recent OpenTripPlanner GraphQL API which is expected to fully replace the older REST API. 
+- As of 2024, a completely new debug UI (again, intended for developer use rather than public consumption) is being developed in the main OpenTripPlanner repository under `src/client`. This new UI follows a more conventional contemporary Javascript development style, and uses the most recent OpenTripPlanner GraphQL API which is expected to fully replace the older REST API. 
 - In June 2024, the default was swapped and the new GraphQL-based one is now the default with the old one being available at `http://localhost:8080/classic-debug/`
