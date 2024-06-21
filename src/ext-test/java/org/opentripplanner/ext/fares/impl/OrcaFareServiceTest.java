@@ -161,11 +161,7 @@ public class OrcaFareServiceTest {
       FareType.electronicSpecial,
       DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1.25f))
     );
-    calculateFare(
-      rides,
-      FareType.electronicRegular,
-      DEFAULT_TEST_RIDE_PRICE.times(2)
-    );
+    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.electronicSenior, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1.25f)));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
