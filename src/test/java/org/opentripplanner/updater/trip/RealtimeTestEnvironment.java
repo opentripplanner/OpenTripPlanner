@@ -167,7 +167,7 @@ public final class RealtimeTestEnvironment {
     return TransitModelForTest.FEED_ID;
   }
 
-  public EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
+  private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
     return new EstimatedTimetableHandler(
       siriSource,
       fuzzyMatching ? new SiriFuzzyTripMatcher(getTransitService()) : null,

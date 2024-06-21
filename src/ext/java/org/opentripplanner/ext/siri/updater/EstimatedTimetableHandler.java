@@ -18,7 +18,7 @@ public class EstimatedTimetableHandler {
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final EntityResolver entityResolver;
   /**
-   * The ID for the static feed to which these TripUpdates are applied
+   * The ID for the static feed to which these real time updates are applied
    */
   private final String feedId;
 
