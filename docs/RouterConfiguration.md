@@ -860,6 +860,17 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "siri-et-google-pubsub-updater",
+      "feedId" : "feed_id",
+      "reconnectPeriod" : "5s",
+      "initialGetDataTimeout" : "1m20s",
+      "topicProjectName" : "google_pubsub_topic_project_name",
+      "subscriptionProjectName" : "google_pubsub_subscription_project_name",
+      "topicName" : "estimated_timetables",
+      "dataInitializationUrl" : "https://example.com/some/path",
+      "fuzzyTripMatching" : true
+    },
+    {
       "type" : "vehicle-parking",
       "feedId" : "bikeep",
       "sourceType" : "bikeep",
