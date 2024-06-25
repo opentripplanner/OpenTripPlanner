@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters.INITIAL_GET_DATA_TIMEOUT;
 import static org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters.RECONNECT_PERIOD;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -14,12 +14,12 @@ public class SiriETGooglePubsubUpdaterConfig {
       configRef,
       c
         .of("feedId")
-        .since(NA)
+        .since(V2_1)
         .summary("The ID of the feed to apply the updates to.")
         .asString(null),
       c
         .of("subscriptionProjectName")
-        .since(NA)
+        .since(V2_1)
         .summary("The Google Cloud project that hosts the PubSub subscription.")
         .description(
           """
@@ -32,17 +32,17 @@ public class SiriETGooglePubsubUpdaterConfig {
         .asString(),
       c
         .of("topicProjectName")
-        .since(NA)
+        .since(V2_1)
         .summary("The Google Cloud project that hosts the PubSub topic that publishes the updates.")
         .asString(),
       c
         .of("topicName")
-        .since(NA)
+        .since(V2_1)
         .summary("The name of the PubSub topic that publishes the updates.")
         .asString(),
       c
         .of("dataInitializationUrl")
-        .since(NA)
+        .since(V2_1)
         .summary("URL used to download over HTTP the recent history of SIRI-ET messages.")
         .description(
           """
@@ -54,7 +54,7 @@ public class SiriETGooglePubsubUpdaterConfig {
         .asString(null),
       c
         .of("reconnectPeriod")
-        .since(NA)
+        .since(V2_1)
         .summary("Wait this amount of time before trying to reconnect to the PubSub subscription.")
         .description(
           """
@@ -65,7 +65,7 @@ public class SiriETGooglePubsubUpdaterConfig {
         .asDuration(RECONNECT_PERIOD),
       c
         .of("initialGetDataTimeout")
-        .since(NA)
+        .since(V2_1)
         .summary("Timeout for retrieving the recent history of SIRI-ET messages.")
         .description(
           """
@@ -77,7 +77,7 @@ public class SiriETGooglePubsubUpdaterConfig {
         .asDuration(INITIAL_GET_DATA_TIMEOUT),
       c
         .of("fuzzyTripMatching")
-        .since(NA)
+        .since(V2_1)
         .summary("If the trips should be matched fuzzily.")
         .asBoolean(false)
     );

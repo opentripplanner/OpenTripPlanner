@@ -31,21 +31,21 @@ of the `router-config.json`.
 | Config Parameter                                           |    Type    | Summary                                                                          |  Req./Opt. | Default Value | Since |
 |------------------------------------------------------------|:----------:|----------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "siri-et-google-pubsub-updater"                     |   `enum`   | The type of the updater.                                                         | *Required* |               |  1.5  |
-| [dataInitializationUrl](#u__13__dataInitializationUrl)     |  `string`  | URL used to download over HTTP the recent history of SIRI-ET messages.           | *Optional* |               |   na  |
-| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                                      | *Optional* |               |   na  |
-| fuzzyTripMatching                                          |  `boolean` | If the trips should be matched fuzzily.                                          | *Optional* | `false`       |   na  |
-| [initialGetDataTimeout](#u__13__initialGetDataTimeout)     | `duration` | Timeout for retrieving the recent history of SIRI-ET messages.                   | *Optional* | `"PT30S"`     |   na  |
-| [reconnectPeriod](#u__13__reconnectPeriod)                 | `duration` | Wait this amount of time before trying to reconnect to the PubSub subscription.  | *Optional* | `"PT30S"`     |   na  |
-| [subscriptionProjectName](#u__13__subscriptionProjectName) |  `string`  | The Google Cloud project that hosts the PubSub subscription.                     | *Required* |               |   na  |
-| topicName                                                  |  `string`  | The name of the PubSub topic that publishes the updates.                         | *Required* |               |   na  |
-| topicProjectName                                           |  `string`  | The Google Cloud project that hosts the PubSub topic that publishes the updates. | *Required* |               |   na  |
+| [dataInitializationUrl](#u__13__dataInitializationUrl)     |  `string`  | URL used to download over HTTP the recent history of SIRI-ET messages.           | *Optional* |               |  2.1  |
+| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                                      | *Optional* |               |  2.1  |
+| fuzzyTripMatching                                          |  `boolean` | If the trips should be matched fuzzily.                                          | *Optional* | `false`       |  2.1  |
+| [initialGetDataTimeout](#u__13__initialGetDataTimeout)     | `duration` | Timeout for retrieving the recent history of SIRI-ET messages.                   | *Optional* | `"PT30S"`     |  2.1  |
+| [reconnectPeriod](#u__13__reconnectPeriod)                 | `duration` | Wait this amount of time before trying to reconnect to the PubSub subscription.  | *Optional* | `"PT30S"`     |  2.1  |
+| [subscriptionProjectName](#u__13__subscriptionProjectName) |  `string`  | The Google Cloud project that hosts the PubSub subscription.                     | *Required* |               |  2.1  |
+| topicName                                                  |  `string`  | The name of the PubSub topic that publishes the updates.                         | *Required* |               |  2.1  |
+| topicProjectName                                           |  `string`  | The Google Cloud project that hosts the PubSub topic that publishes the updates. | *Required* |               |  2.1  |
 
 
 ##### Parameter details
 
 <h4 id="u__13__dataInitializationUrl">dataInitializationUrl</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[13] 
 
 URL used to download over HTTP the recent history of SIRI-ET messages.
@@ -57,7 +57,7 @@ the message history is fully downloaded and applied.
 
 <h4 id="u__13__initialGetDataTimeout">initialGetDataTimeout</h4>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT30S"`   
+**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT30S"`   
 **Path:** /updaters/[13] 
 
 Timeout for retrieving the recent history of SIRI-ET messages.
@@ -69,7 +69,7 @@ If the connection times out, the updater will retry indefinitely with exponentia
 
 <h4 id="u__13__reconnectPeriod">reconnectPeriod</h4>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT30S"`   
+**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT30S"`   
 **Path:** /updaters/[13] 
 
 Wait this amount of time before trying to reconnect to the PubSub subscription.
@@ -80,7 +80,7 @@ Google PubSub subscription.
 
 <h4 id="u__13__subscriptionProjectName">subscriptionProjectName</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[13] 
 
 The Google Cloud project that hosts the PubSub subscription.
