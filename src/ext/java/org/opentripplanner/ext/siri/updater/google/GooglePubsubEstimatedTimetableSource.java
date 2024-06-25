@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri.updater;
+package org.opentripplanner.ext.siri.updater.google;
 
 import com.google.api.gax.rpc.NotFoundException;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
@@ -17,42 +17,36 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import org.entur.protobuf.mapper.SiriMapper;
-import org.opentripplanner.ext.siri.EntityResolver;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.spi.GraphUpdater;
-import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.UpdateIncrementality;
-import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 import uk.org.siri.www.siri.SiriType;
 
 /**
- * This class starts a Google PubSub subscription
+ * A source of estimated timetables that reads SIRI-ET messages from a Google PubSub subscription.
+ * <p>
+ *   This class starts a Google PubSub subscription
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
  * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
- * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access to
+ * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access
+ * to
  * create subscription ("editor")</a>
  * <p>
  * <p>
@@ -69,9 +63,11 @@ import uk.org.siri.www.siri.SiriType;
  *   "dataInitializationUrl": "http://server/realtime/protobuf/et"  // Optional URL used to initialize OTP with all existing data
  * </pre>
  */
-public class SiriETGooglePubsubUpdater implements GraphUpdater {
+public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriETGooglePubsubUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+    GooglePubsubEstimatedTimetableSource.class
+  );
 
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
   private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
@@ -83,80 +79,56 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private static final int RETRY_BACKOFF = 2;
 
   /**
-   * The URL used to fetch all initial updates
+   * The URL used to fetch all initial updates.
+   * The URL responds to HTTP GET and returns all initial data in protobuf-format. It will be
+   * called once to initialize real-time-data.
+   * All subsequent updates will be received from Google Cloud Pubsub.
    */
   private final URI dataInitializationUrl;
+
   /**
-   * The ID for the static feed to which these TripUpdates are applied
+   * The time to wait before reconnecting after a failed connection.
    */
-  private final String feedId;
-  /**
-   * The number of seconds to wait before reconnecting after a failed connection.
-   */
-  private final java.time.Duration reconnectPeriod;
+  private final Duration reconnectPeriod;
 
   /**
    * For larger deployments it sometimes takes more than the default 30 seconds to fetch data, if so
    * this parameter can be increased.
    */
-  private final java.time.Duration initialGetDataTimeout;
+  private final Duration initialGetDataTimeout;
 
   private final String subscriptionName;
   private final ProjectTopicName topic;
   private final Subscriber subscriber;
   private final PushConfig pushConfig;
-  private final String configRef;
-  private final SiriTimetableSnapshotSource snapshotSource;
-  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final Instant startTime = Instant.now();
-  private final Consumer<UpdateResult> recordMetrics;
-  private final EntityResolver entityResolver;
 
   private final OtpRetry retry;
 
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-
+  private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
   private volatile boolean primed;
 
-  public SiriETGooglePubsubUpdater(
-    SiriETGooglePubsubUpdaterParameters config,
-    TransitModel transitModel,
-    SiriTimetableSnapshotSource timetableSnapshot
+  public GooglePubsubEstimatedTimetableSource(
+    String dataInitializationUrl,
+    Duration reconnectPeriod,
+    Duration initialGetDataTimeout,
+    String subscriptionProjectName,
+    String topicProjectName,
+    String topicName
   ) {
-    this.configRef = config.configRef();
+    //
+    this.dataInitializationUrl = URI.create(dataInitializationUrl);
+    this.reconnectPeriod = reconnectPeriod;
+    this.initialGetDataTimeout = initialGetDataTimeout;
 
-    // URL that responds to HTTP GET which returns all initial data in protobuf-format. Will be
-    // called once to initialize real-time-data. All updates will be received from Google Cloud
-    // Pubsub
-    this.dataInitializationUrl = URI.create(config.dataInitializationUrl());
-    this.feedId = config.feedId();
-    this.reconnectPeriod = config.reconnectPeriod();
-    this.initialGetDataTimeout = config.initialGetDataTimeout();
-    this.snapshotSource = timetableSnapshot;
-
-    // set subscriber
     String subscriptionId = buildSubscriptionId();
-    String subscriptionProjectName = config.subscriptionProjectName();
-    String topicProjectName = config.topicProjectName();
-
-    String topicName = config.topicName();
-
     subscriptionName =
       ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId).toString();
     subscriber =
       Subscriber.newBuilder(subscriptionName, new EstimatedTimetableMessageReceiver()).build();
     this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
-    TransitService transitService = new DefaultTransitService(transitModel);
-    this.entityResolver = new EntityResolver(transitService, feedId);
-    this.fuzzyTripMatcher =
-      config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
-    recordMetrics = TripUpdateMetrics.streaming(config);
 
-    addShutdownHook();
     retry =
       new OtpRetryBuilder()
         .withName("SIRI-ET Google PubSub Updater setup")
@@ -164,15 +136,20 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         .withInitialRetryInterval(RETRY_INITIAL_DELAY)
         .withBackoffMultiplier(RETRY_BACKOFF)
         .build();
+
+    addShutdownHook();
   }
 
+  /**
+   * Create a PubSub subscription, read the backlog of messages and start listening to the
+   * subscription.
+   * Enter an infinite loop waiting for messages. An interruption sent at server
+   * shutdown will cause the loop to stop.
+   */
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
+  public void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
+    this.serviceDeliveryConsumer = serviceDeliveryConsumer;
 
-  @Override
-  public void run() {
     try {
       LOG.info("Creating subscription {}", subscriptionName);
       retry.execute(this::createSubscription);
@@ -184,6 +161,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       while (true) {
         try {
           subscriber.startAsync().awaitRunning();
+          primed = true;
           subscriber.awaitTerminated();
         } catch (IllegalStateException e) {
           subscriber.stopAsync();
@@ -198,25 +176,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public boolean isPrimed() {
-    return this.primed;
-  }
-
-  @Override
-  public String getConfigRef() {
-    return configRef;
-  }
-
-  private void addShutdownHook() {
-    ApplicationShutdownSupport.addShutdownHook(
-      "siri-et-google-pubsub-shutdown",
-      () -> {
-        if (subscriber != null) {
-          LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
-          subscriber.stopAsync();
-        }
-        deleteSubscription();
-      }
-    );
+    return primed;
   }
 
   /**
@@ -284,10 +244,24 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
-  private String getTimeSinceStartupString() {
-    return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
+  /**
+   * Decode the protobuf-encoded message payload into an optional SIRI ServiceDelivery.
+   */
+  private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
+    SiriType siriType;
+    try {
+      siriType = SiriType.parseFrom(data);
+    } catch (InvalidProtocolBufferException e) {
+      throw new RuntimeException(e);
+    }
+    Siri siri = SiriMapper.mapToJaxb(siriType);
+    return Optional.ofNullable(siri.getServiceDelivery());
   }
 
+  /**
+   * Fetch the backlog of messages and apply the changes to the transit model.
+   * Block until the backlog is applied.
+   */
   private void initializeData() {
     if (dataInitializationUrl != null) {
       LOG.info("Fetching initial data from {}", dataInitializationUrl);
@@ -299,8 +273,19 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         (t2 - t1),
         FileSizeToTextConverter.fileSizeToString(value.size())
       );
-      processSiriData(value);
-      primed = true;
+      serviceDelivery(value)
+        .map(serviceDeliveryConsumer)
+        .ifPresent(future -> {
+          try {
+            future.get();
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+          } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+          }
+        });
+
       LOG.info(
         "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
         (System.currentTimeMillis() - t2),
@@ -312,6 +297,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
+  /**
+   * Fetch the backlog of messages over HTTP from the configured data initialization URL.
+   */
   private ByteString fetchInitialData() {
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
       var otpHttpClient = otpHttpClientFactory.create(LOG);
@@ -324,82 +312,72 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
-  private void processSiriData(ByteString data) {
-    Siri siri;
-    try {
-      SIZE_COUNTER.addAndGet(data.size());
-      final SiriType siriType = SiriType.parseFrom(data);
-      siri = SiriMapper.mapToJaxb(siriType);
-    } catch (InvalidProtocolBufferException e) {
-      throw new RuntimeException(e);
-    }
-
-    if (siri.getServiceDelivery() != null) {
-      // Handle trip updates via graph writer runnable
-      List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries = siri
-        .getServiceDelivery()
-        .getEstimatedTimetableDeliveries();
-
-      int numberOfUpdatedTrips = 0;
-      try {
-        numberOfUpdatedTrips =
-          estimatedTimetableDeliveries
-            .get(0)
-            .getEstimatedJourneyVersionFrames()
-            .get(0)
-            .getEstimatedVehicleJourneies()
-            .size();
-      } catch (Exception e) {
-        //ignore
-      }
-      long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
-      long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
-
-      if (numberOfMessages % 1000 == 0) {
-        LOG.info(
-          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
-          numberOfMessages,
-          numberOfUpdates,
-          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-          Duration
-            .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
-            .toMillis(),
-          getTimeSinceStartupString()
-        );
-      }
-
-      var f = saveResultOnGraph.execute((graph, transitModel) -> {
-        var results = snapshotSource.applyEstimatedTimetable(
-          fuzzyTripMatcher,
-          entityResolver,
-          feedId,
-          UpdateIncrementality.DIFFERENTIAL,
-          estimatedTimetableDeliveries
-        );
-
-        recordMetrics.accept(results);
-      });
-
-      if (!isPrimed()) {
-        try {
-          f.get();
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-          throw new RuntimeException(e);
+  /**
+   * Shut down the PubSub subscriber at server shutdown.
+   */
+  private void addShutdownHook() {
+    ApplicationShutdownSupport.addShutdownHook(
+      "siri-et-google-pubsub-shutdown",
+      () -> {
+        if (subscriber != null) {
+          LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
+          subscriber.stopAsync();
         }
+        deleteSubscription();
       }
-    }
+    );
   }
 
+  private String getTimeSinceStartupString() {
+    return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
+  }
+
+  /**
+   * Message receiver callback that consumes messages from the PubSub subscription.
+   */
   class EstimatedTimetableMessageReceiver implements MessageReceiver {
 
     @Override
     public void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
-      processSiriData(message.getData());
+      Optional<ServiceDelivery> serviceDelivery = serviceDelivery(message.getData());
+      serviceDelivery.ifPresent(sd -> {
+        logPubsubMessage(sd);
+        serviceDeliveryConsumer.apply(sd);
+      });
+
       // Ack only after all work for the message is complete.
       consumer.ack();
+    }
+  }
+
+  private void logPubsubMessage(ServiceDelivery serviceDelivery) {
+    int numberOfUpdatedTrips = 0;
+    try {
+      numberOfUpdatedTrips =
+        serviceDelivery
+          .getEstimatedTimetableDeliveries()
+          .getFirst()
+          .getEstimatedJourneyVersionFrames()
+          .getFirst()
+          .getEstimatedVehicleJourneies()
+          .size();
+    } catch (Exception e) {
+      //ignore
+    }
+    long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
+    long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
+
+    if (numberOfMessages % 1000 == 0) {
+      LOG.info(
+        "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
+        numberOfMessages,
+        numberOfUpdates,
+        FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+        Duration
+          .between(serviceDelivery.getResponseTimestamp().toInstant(), Instant.now())
+          .toMillis(),
+        getTimeSinceStartupString()
+      );
     }
   }
 }

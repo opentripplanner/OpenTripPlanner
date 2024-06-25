@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.siri.updater;
+package org.opentripplanner.ext.siri.updater.google;
 
 import java.time.Duration;
 import java.util.Objects;
