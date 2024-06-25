@@ -121,7 +121,7 @@ jobs:
 
       - name: Build GTFS GraphQL API documentation
         run: |
-          npm install -g @magidoc/cli@5.0.3
+          npm install -g @magidoc/cli@6.0.0
           cat src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls
           magidoc generate --stacktrace
 
