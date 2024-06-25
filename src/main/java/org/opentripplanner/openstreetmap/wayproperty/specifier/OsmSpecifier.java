@@ -42,6 +42,8 @@ public interface OsmSpecifier {
    */
   int matchScore(OSMWithTags way);
 
+  String toMarkdown();
+
   record Scores(int forward, int backward) {
     public static Scores of(int s) {
       return new Scores(s, s);

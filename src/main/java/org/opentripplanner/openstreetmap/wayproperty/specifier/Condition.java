@@ -112,6 +112,11 @@ public sealed interface Condition {
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return way.hasTag(exKey) && way.isTag(exKey, value);
     }
+
+    @Override
+    public String toString() {
+      return "%s=%s".formatted(key, value);
+    }
   }
 
   record Present(String key) implements Condition {
@@ -123,12 +128,22 @@ public sealed interface Condition {
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return way.hasTag(exKey);
     }
+
+    @Override
+    public String toString() {
+      return "present(%s)".formatted(key);
+    }
   }
 
   record Absent(String key) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return !way.hasTag(exKey);
+    }
+
+    @Override
+    public String toString() {
+      return "!%s".formatted(key);
     }
   }
 
@@ -138,6 +153,11 @@ public sealed interface Condition {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() > value;
     }
+
+    @Override
+    public String toString() {
+      return "%s > %s".formatted(key, value);
+    }
   }
 
   record LessThan(String key, int value) implements Condition {
@@ -145,6 +165,11 @@ public sealed interface Condition {
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() < value;
+    }
+
+    @Override
+    public String toString() {
+      return "%s < %s".formatted(key, value);
     }
   }
 
@@ -160,18 +185,28 @@ public sealed interface Condition {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() >= lower && maybeInt.getAsInt() <= upper;
     }
+
+    @Override
+    public String toString() {
+      return "%s > %s < %s".formatted(lower, key, upper);
+    }
   }
 
-  record EqualsAnyIn(String key, String... values) implements Condition {
+  record OneOf(String key, String... values) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value));
     }
+
+    @Override
+    public String toString() {
+      return "%s one of [%s]".formatted(key, String.join(", ", values));
+    }
   }
 
-  record EqualsAnyInOrAbsent(String key, String... values) implements Condition {
+  record OneOfOrAbsent(String key, String... values) implements Condition {
     /* A use case for this is to detect the absence of a sidewalk, cycle lane or verge*/
-    public EqualsAnyInOrAbsent(String key) {
+    public OneOfOrAbsent(String key) {
       this(key, "no", "none");
     }
 
@@ -180,6 +215,11 @@ public sealed interface Condition {
       return (
         !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value))
       );
+    }
+
+    @Override
+    public String toString() {
+      return "%s not one of [%s] or absent".formatted(key, String.join(", ", values));
     }
   }
 }

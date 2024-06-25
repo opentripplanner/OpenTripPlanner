@@ -73,6 +73,15 @@ nav:
 - Configuration:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
+    - OSM Tag Mapping:
+        - Default: 'osm/Default.md'
+        - Norway: 'osm/Norway.md'
+        - Germany: 'osm/Germany.md'
+        - Finland: 'osm/Finland.md'
+        - UK: 'osm/Finland.md'
+        - Atlanta: 'osm/Atlanta.md'
+        - Portland: 'osm/Portland.md'
+        - Houston: 'osm/Houston.md'
     - Router: 'RouterConfiguration.md'
     - "Route Request": 'RouteRequest.md'
     - "Realtime Updaters": 'UpdaterConfig.md'

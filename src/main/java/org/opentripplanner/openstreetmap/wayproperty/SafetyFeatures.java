@@ -5,4 +5,8 @@ package org.opentripplanner.openstreetmap.wayproperty;
  */
 public record SafetyFeatures(double forward, double back) {
   public static final SafetyFeatures DEFAULT = new SafetyFeatures(1, 1);
+
+  public boolean modifies() {
+    return !(forward == 1 && back == 1);
+  }
 }
