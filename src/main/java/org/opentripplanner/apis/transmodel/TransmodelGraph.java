@@ -130,6 +130,7 @@ class TransmodelGraph {
       .newGraphQL(indexSchema)
       .instrumentation(instrumentation)
       .queryExecutionStrategy(executionStrategy)
+      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
       .build();
   }
 
