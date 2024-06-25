@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
 import org.opentripplanner.apis.transmodel.support.ExecutionResultMapper;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;

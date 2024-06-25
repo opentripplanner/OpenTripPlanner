@@ -94,10 +94,10 @@
   <!-- Suppress info logs from azure packages -->
   <logger name="com.azure" level="warn" />
 
-  <!--Log errors in GraphQL data fetchers for the TransModel API. This is disabled by default
+  <!--Log errors in GraphQL data fetchers. This is disabled by default.
      Set it to "warn" to log these errors.
   -->
-  <logger name="org.opentripplanner.apis.transmodel.LoggingDataFetcherExceptionHandler" level="off" />
+  <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
   <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />

@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel;
+package org.opentripplanner.apis.support.graphql;
 
 import graphql.ExceptionWhileDataFetching;
 import graphql.execution.SimpleDataFetcherExceptionHandler;

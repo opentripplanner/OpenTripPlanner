@@ -5,7 +5,7 @@ import graphql.execution.ExecutionStrategyParameters;
 import graphql.schema.DataFetchingEnvironment;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
-import org.opentripplanner.apis.transmodel.LoggingDataFetcherExceptionHandler;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.apis.transmodel.ResponseTooLargeException;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.logging.ProgressTracker;
