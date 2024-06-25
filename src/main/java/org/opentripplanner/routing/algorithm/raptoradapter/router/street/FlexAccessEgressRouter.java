@@ -37,7 +37,6 @@ public class FlexAccessEgressRouter {
       ? AccessEgressRouter.streetSearch(
         request,
         verticesContainer,
-        transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         false,
@@ -50,7 +49,6 @@ public class FlexAccessEgressRouter {
       ? AccessEgressRouter.streetSearch(
         request,
         verticesContainer,
-        transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         true,

@@ -29,7 +29,7 @@
       "type" : "line",
       "source" : "vectorSource",
       "source-layer" : "edges",
-      "minzoom" : 13,
+      "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
         "line-color" : "#f21d52",

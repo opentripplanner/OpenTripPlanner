@@ -12,9 +12,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
-import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -171,8 +171,13 @@ public final class RealtimeTestEnvironment {
     return TransitModelForTest.FEED_ID;
   }
 
-  public EntityResolver getEntityResolver() {
-    return new EntityResolver(getTransitService(), getFeedId());
+  private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
+    return new EstimatedTimetableHandler(
+      siriSource,
+      fuzzyMatching ? new SiriFuzzyTripMatcher(getTransitService()) : null,
+      getTransitService(),
+      getFeedId()
+    );
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
@@ -246,18 +251,11 @@ public final class RealtimeTestEnvironment {
   public UpdateResult applyEstimatedTimetableWithFuzzyMatcher(
     List<EstimatedTimetableDeliveryStructure> updates
   ) {
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(getTransitService());
-    return applyEstimatedTimetable(updates, siriFuzzyTripMatcher);
+    return applyEstimatedTimetable(updates, true);
   }
 
   public UpdateResult applyEstimatedTimetable(List<EstimatedTimetableDeliveryStructure> updates) {
-    return siriSource.applyEstimatedTimetable(
-      null,
-      getEntityResolver(),
-      getFeedId(),
-      DIFFERENTIAL,
-      updates
-    );
+    return applyEstimatedTimetable(updates, false);
   }
 
   // GTFS-RT updates
@@ -291,16 +289,10 @@ public final class RealtimeTestEnvironment {
 
   private UpdateResult applyEstimatedTimetable(
     List<EstimatedTimetableDeliveryStructure> updates,
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher
+    boolean fuzzyMatching
   ) {
     Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
-    return siriSource.applyEstimatedTimetable(
-      siriFuzzyTripMatcher,
-      getEntityResolver(),
-      getFeedId(),
-      DIFFERENTIAL,
-      updates
-    );
+    return getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(updates, DIFFERENTIAL);
   }
 
   private Trip createTrip(String id, Route route, List<Stop> stops) {

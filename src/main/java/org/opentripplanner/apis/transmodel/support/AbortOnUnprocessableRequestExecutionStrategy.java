@@ -5,22 +5,28 @@ import graphql.execution.ExecutionStrategyParameters;
 import graphql.schema.DataFetchingEnvironment;
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
+import org.opentripplanner.apis.transmodel.ResponseTooLargeException;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * To abort fetching data when a timeout occurs we have to rethrow the time-out-exception.
+ * To abort fetching data when a request is unprocessable (either because the execution times
+ * out or because the response is too large) we have to rethrow the exception.
  * This will prevent unresolved data-fetchers to be called. The exception is not handled
  * gracefully.
  */
-public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy implements Closeable {
+public class AbortOnUnprocessableRequestExecutionStrategy
+  extends AsyncExecutionStrategy
+  implements Closeable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbortOnTimeoutExecutionStrategy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+    AbortOnUnprocessableRequestExecutionStrategy.class
+  );
   public static final int LOG_STEPS = 25_000;
   private final ProgressTracker timeoutProgressTracker = ProgressTracker.track(
-    "TIMEOUT! Abort GraphQL query",
+    "Unprocessable request. Abort GraphQL query",
     LOG_STEPS,
     -1
   );
@@ -31,15 +37,15 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy impl
     ExecutionStrategyParameters params,
     Throwable e
   ) {
-    if (e instanceof OTPRequestTimeoutException te) {
-      logTimeoutProgress();
-      throw te;
+    if (e instanceof OTPRequestTimeoutException || e instanceof ResponseTooLargeException) {
+      logCancellationProgress();
+      throw (RuntimeException) e;
     }
     return super.handleFetchingException(environment, params, e);
   }
 
   @SuppressWarnings("Convert2MethodRef")
-  private void logTimeoutProgress() {
+  private void logCancellationProgress() {
     timeoutProgressTracker.startOrStep(m -> LOG.info(m));
   }
 

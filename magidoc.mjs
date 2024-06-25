@@ -36,7 +36,15 @@ To learn how to deactivate it, read the
       queryGenerationFactories: {
         'Polyline': '<>',
         'GeoJson': '<>',
-        'OffsetDateTime': '2024-02-05T18:04:23+01:00'
+        'OffsetDateTime': '2024-02-05T18:04:23+01:00',
+        'Duration': 'PT10M',
+        'CoordinateValue': 19.24,
+        'Reluctance': 3.1,
+        'Speed': 3.4,
+        'Cost': 100,
+        'Ratio': 0.25,
+        'Locale': 'en'
+
       },
     }
   },

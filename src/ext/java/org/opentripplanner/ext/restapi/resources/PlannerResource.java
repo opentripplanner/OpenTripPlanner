@@ -12,6 +12,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.error.PlannerError;
 import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
+import org.opentripplanner.apis.transmodel.ResponseTooLargeException;
 import org.opentripplanner.ext.restapi.mapping.TripPlanMapper;
 import org.opentripplanner.ext.restapi.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.ext.restapi.model.ElevationMetadata;
@@ -104,8 +105,8 @@ public class PlannerResource extends RoutingResource {
         LOG.error("System error - unhandled error case?", e);
         response.setError(new PlannerError(Message.SYSTEM_ERROR));
       }
-    } catch (OTPRequestTimeoutException e) {
-      response.setError(new PlannerError(Message.PROCESSING_TIMEOUT));
+    } catch (OTPRequestTimeoutException | ResponseTooLargeException e) {
+      response.setError(new PlannerError(Message.UNPROCESSABLE_REQUEST));
     } catch (Exception e) {
       LOG.error("System error", e);
       response.setError(new PlannerError(Message.SYSTEM_ERROR));

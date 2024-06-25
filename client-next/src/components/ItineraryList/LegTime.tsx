@@ -11,12 +11,12 @@ export function LegTime({
 }) {
   return aimedTime !== expectedTime ? (
     <>
-      <span style={{ color: 'red' }}>{formatTime(expectedTime)}</span>
-      <span style={{ textDecoration: 'line-through' }}>{formatTime(aimedTime)}</span>
+      <span style={{ color: 'red' }}>{formatTime(expectedTime, 'short')}</span>
+      <span style={{ textDecoration: 'line-through' }}>{formatTime(aimedTime, 'short')}</span>
     </>
   ) : (
     <span>
-      {formatTime(expectedTime)}
+      {formatTime(expectedTime, 'short')}
       {hasRealtime && <span> (on time)</span>}
     </span>
   );

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.opentripplanner.apis.transmodel.support.AbortOnTimeoutExecutionStrategy;
+import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
 import org.opentripplanner.apis.transmodel.support.ExecutionResultMapper;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -50,7 +50,7 @@ class TransmodelGraph {
     int maxNumberOfResultFields,
     Iterable<Tag> tracingTags
   ) {
-    try (var executionStrategy = new AbortOnTimeoutExecutionStrategy()) {
+    try (var executionStrategy = new AbortOnUnprocessableRequestExecutionStrategy()) {
       variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
       var instrumentation = createInstrumentation(maxNumberOfResultFields, tracingTags);
       var transmodelRequestContext = createRequestContext(serverContext);
@@ -69,6 +69,8 @@ class TransmodelGraph {
       return ExecutionResultMapper.okResponse(result);
     } catch (OTPRequestTimeoutException te) {
       return ExecutionResultMapper.timeoutResponse();
+    } catch (ResponseTooLargeException rtle) {
+      return ExecutionResultMapper.tooLargeResponse(rtle.getMessage());
     } catch (CoercingParseValueException | UnknownOperationException e) {
       return ExecutionResultMapper.badRequestResponse(e.getMessage());
     } catch (Exception systemError) {
