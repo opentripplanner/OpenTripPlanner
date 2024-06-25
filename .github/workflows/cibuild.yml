@@ -117,12 +117,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Build GTFS GraphQL API documentation
         run: |
-          npm install -g @magidoc/cli@4.1.4
-          magidoc generate
+          npm install -g @magidoc/cli@6.0.0
+          magidoc generate --stacktrace
 
       - name: Deploy compiled HTML to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')

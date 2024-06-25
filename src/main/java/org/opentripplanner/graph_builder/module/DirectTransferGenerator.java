@@ -12,6 +12,10 @@ import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.nearbystops.NearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -68,20 +72,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
-    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-      new DefaultTransitService(transitModel),
-      radiusByDuration,
-      0,
-      null,
-      graph.hasStreets
-    );
-    if (nearbyStopFinder.useStreets) {
-      LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-    } else {
-      LOG.info(
-        "Creating direct transfer edges between stops using straight line distance (not streets)..."
-      );
-    }
+    NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
 
@@ -189,6 +180,31 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     );
   }
 
+  /**
+   * Factory method for creating a NearbyStopFinder. Will create different finders depending on
+   * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
+   * enabled.
+   */
+  private NearbyStopFinder createNearbyStopFinder() {
+    var transitService = new DefaultTransitService(transitModel);
+    NearbyStopFinder finder;
+    if (!graph.hasStreets) {
+      LOG.info(
+        "Creating direct transfer edges between stops using straight line distance (not streets)..."
+      );
+      finder = new StraightLineNearbyStopFinder(transitService, radiusByDuration);
+    } else {
+      LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
+      finder = new StreetNearbyStopFinder(radiusByDuration, 0, null);
+    }
+
+    if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
+      return new PatternConsideringNearbyStopFinder(transitService, finder);
+    } else {
+      return finder;
+    }
+  }
+
   private static Iterable<NearbyStop> findNearbyStops(
     NearbyStopFinder nearbyStopFinder,
     Vertex vertex,
@@ -196,14 +212,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     StreetRequest streetRequest,
     boolean reverseDirection
   ) {
-    return OTPFeature.ConsiderPatternsForDirectTransfers.isOn()
-      ? nearbyStopFinder.findNearbyStopsConsideringPatterns(
-        vertex,
-        request,
-        streetRequest,
-        reverseDirection
-      )
-      : nearbyStopFinder.findNearbyStops(vertex, request, streetRequest, reverseDirection);
+    return nearbyStopFinder.findNearbyStops(vertex, request, streetRequest, reverseDirection);
   }
 
   private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}

@@ -56,9 +56,9 @@
 
 
     <properties>
-        <otp.serialization.version.id>150</otp.serialization.version.id>
+        <otp.serialization.version.id>151</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>31.1</geotools.version>
+        <geotools.version>31.2</geotools.version>
         <google.dagger.version>2.51.1</google.dagger.version>
         <jackson.version>2.17.1</jackson.version>
         <jersey.version>3.1.7</jersey.version>
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -321,7 +321,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>8.0.2</version>
+                <version>9.0.0</version>
                 <executions>
                     <execution>
                         <goals>

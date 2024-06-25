@@ -352,10 +352,10 @@ public class OrcaFareService extends DefaultFareService {
     var regularFare = getRegularFare(fareType, rideType, defaultFare, leg);
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> usesOrca(fareType) ? optionalUSD(1.25f) : regularFare;
-      case COMM_TRANS_COMMUTER_EXPRESS -> usesOrca(fareType) ? optionalUSD(2f) : regularFare;
+      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
+      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
-      case EVERETT_TRANSIT -> usesOrca(fareType) ? optionalUSD(0.5f) : regularFare;
+      case EVERETT_TRANSIT -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
@@ -365,14 +365,10 @@ public class OrcaFareService extends DefaultFareService {
         KC_METRO,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
-        KITSAP_TRANSIT -> fareType.equals(FareType.electronicSenior)
-        ? optionalUSD(1f)
-        : regularFare;
-      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(3f) : regularFare;
-      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType) ? optionalUSD(2.5f) : regularFare;
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
-        ? optionalUSD(5f)
-        : regularFare;
+        KITSAP_TRANSIT -> optionalUSD(1f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD(5f);
       // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> Optional.of(
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
