@@ -7,8 +7,11 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.bold;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.ATLANTA;
 import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.CONSTANT_SPEED_FINLAND;
 import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.HAMBURG;
+import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.HOUSTON;
+import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.PORTLAND;
 
 import java.io.File;
 import java.util.Arrays;
@@ -23,7 +26,6 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertyPicker;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 @GeneratesDocumentation
@@ -31,11 +33,18 @@ public class OsmMapperDocTest {
 
   private static final String FILE_NAME = "OsmMapper.md";
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, FILE_NAME);
+  private static final Set<OsmTagMapperSource> SKIP_MAPPERS = Set.of(
+    ATLANTA,
+    HOUSTON,
+    PORTLAND,
+    HAMBURG,
+    CONSTANT_SPEED_FINLAND
+  );
 
   public static List<OsmTagMapperSource> mappers() {
     return Arrays
       .stream(OsmTagMapperSource.values())
-      .filter(m -> !Set.of(HAMBURG, CONSTANT_SPEED_FINLAND).contains(m))
+      .filter(m -> !SKIP_MAPPERS.contains(m))
       .toList();
   }
 
@@ -108,10 +117,6 @@ public class OsmMapperDocTest {
       docBuilder.endParagraph();
     }
     return docBuilder.toString();
-  }
-
-  private static String hash(WayPropertyPicker prop) {
-    return prop.specifier().toMarkdown().replaceAll(" ", "").toLowerCase();
   }
 
   private static Table mixinTable(WayPropertySet wps) {
