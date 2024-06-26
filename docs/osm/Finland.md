@@ -1571,37 +1571,31 @@ permission of an OSM way. Multiple mixins can apply to the same way and their ef
 <!-- mixins BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| matcher                                                    | modifications |
-|------------------------------------------------------------|---------------|
-| `bicycle=use_sidepath`                                     | 🚶            |
-| `lcn=yes¦rcn=yes¦ncn=yes¦bicycle_road=yes¦cyclestreet=yes` | 🚴            |
-| `surface=unpaved`                                          | 🚴            |
-| `surface=compacted`                                        | 🚴            |
-| `surface=wood`                                             | 🚴            |
-| `surface=cobblestone`                                      | 🚴            |
-| `surface=sett`                                             | 🚴            |
-| `surface=unhewn_cobblestone`                               | 🚴            |
-| `surface=grass_paver`                                      | 🚴            |
-| `surface=pebblestone`                                      | 🚴            |
-| `surface=metal`                                            | 🚴            |
-| `surface=ground`                                           | 🚴            |
-| `surface=dirt`                                             | 🚴            |
-| `surface=earth`                                            | 🚴            |
-| `surface=grass`                                            | 🚴            |
-| `surface=mud`                                              | 🚴            |
-| `surface=woodchip`                                         | 🚴            |
-| `surface=gravel`                                           | 🚴            |
-| `surface=artifical_turf`                                   | 🚴            |
-| `surface=sand`                                             | 🚴            |
-| `rlis:bicycle=caution_area`                                | 🚴            |
-| `rlis:bicycle:right=caution_area`                          | 🚴            |
-| `rlis:bicycle:left=caution_area`                           | 🚴            |
-| `ccgis:bicycle=caution_area`                               | 🚴            |
-| `ccgis:bicycle:right=caution_area`                         | 🚴            |
-| `ccgis:bicycle:left=caution_area`                          | 🚴            |
-| `foot=discouraged`                                         | 🚶            |
-| `bicycle=discouraged`                                      | 🚴            |
-| `foot=use_sidepath`                                        | 🚶            |
-| `bicycle=use_sidepath`                                     | 🚴            |
+| matcher                                                    | bicycle safety | walk safety |
+|------------------------------------------------------------|----------------|-------------|
+| `bicycle=use_sidepath`                                     |                | 5.0         |
+| `lcn=yes¦rcn=yes¦ncn=yes¦bicycle_road=yes¦cyclestreet=yes` | 0.7            |             |
+| `surface=unpaved`                                          | 1.18           |             |
+| `surface=compacted`                                        | 1.18           |             |
+| `surface=wood`                                             | 1.18           |             |
+| `surface=cobblestone`                                      | 1.3            |             |
+| `surface=sett`                                             | 1.3            |             |
+| `surface=unhewn_cobblestone`                               | 1.5            |             |
+| `surface=grass_paver`                                      | 1.3            |             |
+| `surface=pebblestone`                                      | 1.3            |             |
+| `surface=metal`                                            | 1.3            |             |
+| `surface=ground`                                           | 1.5            |             |
+| `surface=dirt`                                             | 1.5            |             |
+| `surface=earth`                                            | 1.5            |             |
+| `surface=grass`                                            | 1.5            |             |
+| `surface=mud`                                              | 1.5            |             |
+| `surface=woodchip`                                         | 1.5            |             |
+| `surface=gravel`                                           | 1.5            |             |
+| `surface=artifical_turf`                                   | 1.5            |             |
+| `surface=sand`                                             | 100.0          |             |
+| `foot=discouraged`                                         |                | 3.0         |
+| `bicycle=discouraged`                                      | 3.0            |             |
+| `foot=use_sidepath`                                        |                | 5.0         |
+| `bicycle=use_sidepath`                                     | 5.0            |             |
 
 <!-- mixins END -->

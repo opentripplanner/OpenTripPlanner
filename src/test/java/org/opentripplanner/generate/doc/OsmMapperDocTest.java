@@ -121,15 +121,28 @@ public class OsmMapperDocTest {
 
   private static Table mixinTable(WayPropertySet wps) {
     var propTable = new TableBuilder();
-    propTable.withHeaders("matcher", "modifications");
+    propTable.withHeaders("matcher", "bicycle safety", "walk safety");
 
     for (var prop : wps.getMixins()) {
       propTable.addRow(
         "`%s`".formatted(prop.specifier().toMarkdown()),
-        emojiModifications(prop.bicycleSafety(), prop.walkSafety())
+        tableValues(prop.bicycleSafety()),
+        tableValues(prop.walkSafety())
       );
     }
     return propTable.build();
+  }
+
+  private static String tableValues(SafetyFeatures safety) {
+    if (!safety.modifies()) {
+      return "";
+    }
+    else if(safety.isSymetric()){
+      return Double.toString(safety.forward());
+    }
+    else {
+      return "forward: %s <br> back: %s".formatted(safety.forward(), safety.back());
+    }
   }
 
   private static String emojiModifications(SafetyFeatures bicycle, SafetyFeatures walk) {

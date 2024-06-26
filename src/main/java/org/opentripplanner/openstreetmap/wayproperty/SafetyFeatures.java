@@ -9,4 +9,8 @@ public record SafetyFeatures(double forward, double back) {
   public boolean modifies() {
     return !(forward == 1 && back == 1);
   }
+
+  public boolean isSymetric() {
+    return forward == back;
+  }
 }
