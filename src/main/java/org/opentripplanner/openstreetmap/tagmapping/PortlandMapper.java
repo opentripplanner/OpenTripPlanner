@@ -42,21 +42,14 @@ class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties(exact("sidewalk=no;maxspeed=35 mph"), ofWalkSafety(2));
     props.setMixinProperties(exact("sidewalk=no;maxspeed=30 mph"), ofWalkSafety(1.5));
 
-    /*
-     * the RLIS/CCGIS:bicycle=designated mixins are coded out as they are no longer neccessary because of of the bicycle=designated block of code
-     * above. This switch makes our weighting system less reliant on tags that aren't generally used by the OSM community, and prevents the double
-     * counting that was occuring on streets with both bicycle infrastructure and an RLIS:bicycle=designated tag
-     */
+    // rarely used tags that are specific to counties near Portland
+    // https://taginfo.openstreetmap.org/keys/RLIS:bicycle#overview
 
-    /*
-     * props.setProperties("RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
-     */
     props.setMixinProperties("RLIS:bicycle=caution_area", ofBicycleSafety(1.45));
     props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
     props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
-    /*
-     * props.setProperties("CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
-     */
+
+    // https://taginfo.openstreetmap.org/keys/CCGIS:bicycle#overview
     props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
     props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
     props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));

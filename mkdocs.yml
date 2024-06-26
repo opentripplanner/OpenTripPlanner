@@ -78,7 +78,7 @@ nav:
         - Norway: 'osm/Norway.md'
         - Germany: 'osm/Germany.md'
         - Finland: 'osm/Finland.md'
-        - UK: 'osm/Finland.md'
+        - UK: 'osm/UK.md'
     - Router: 'RouterConfiguration.md'
     - "Route Request": 'RouteRequest.md'
     - "Realtime Updaters": 'UpdaterConfig.md'

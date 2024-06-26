@@ -1,388 +1,70 @@
-## OSM tag mapping
+# OSM tag mapping
 
 ### Way properties
 
 Way properties set a way's permission and optionally influences its walk and bicycle safety factors.
+
 These factors determine how desirable an OSM way is when routing for cyclists and pedestrians.
+Lower safety values make an OSM way more desirable and higher values less desirable.
 
 <!-- props BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| specifier                                                                                                                                                  | permission             | safety |
-|------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------|--------|
-| `highway one of [motorway, motorway_link]`                                                                                                                 | CAR                    |        |
-| `highway one of [trunk, trunk_link, primary, primary_link]; motorroad=yes`                                                                                 | CAR                    |        |
-| `highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]`                 | ALL                    |        |
-| `cycleway=track; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]` | ALL                    |        |
-| `cycleway=lane; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`                             | ALL                    | 🚴     |
-| `cycleway=lane; maxspeed < 50; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`              | ALL                    | 🚴     |
-| `cycleway=lane; highway one of [unclassified, residential]`                                                                                                | ALL                    | 🚴     |
-| `highway=service`                                                                                                                                          | ALL                    |        |
-| `highway=service; service=parking_aisle`                                                                                                                   | ALL                    | 🚴     |
-| `highway=service; service=drive-through`                                                                                                                   | ALL                    | 🚴     |
-| `highway=living_street`                                                                                                                                    | ALL                    | 🚴     |
-| `highway=pedestrian`                                                                                                                                       | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=busway`                                                                                                                                           | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=service; bus one of [yes, designated]`                                                                                                            | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=footway`                                                                                                                                          | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=cycleway`                                                                                                                                         | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=cycleway; lanes > 1`                                                                                                                              | PEDESTRIAN_AND_BICYCLE | 🚶     |
-| `highway=cycleway; oneway=yes`                                                                                                                             | PEDESTRIAN_AND_BICYCLE | 🚶     |
-| `highway=cycleway; sidewalk one of [yes, left, right, both]`                                                                                               | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=cycleway; lanes > 1; sidewalk one of [yes, left, right, both]`                                                                                    | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=cycleway; oneway=yes; sidewalk one of [yes, left, right, both]`                                                                                   | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=cycleway; foot=designated; segregated=no`                                                                                                         | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=path; foot=designated; bicycle=designated; segregated=no`                                                                                         | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=cycleway; foot=designated; segregated=yes`                                                                                                        | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=path; foot=designated; bicycle=designated; segregated=yes`                                                                                        | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=cycleway; foot=designated; segregated=yes; lanes > 1`                                                                                             | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=cycleway; foot=designated; present(segregated); motor_vehicle=destination`                                                                        | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=path; foot=designated; bicycle=designated; present(segregated); motor_vehicle=destination`                                                        | PEDESTRIAN_AND_BICYCLE | 🚴     |
-| `highway=footway; footway=sidewalk`                                                                                                                        | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=footway; footway=crossing`                                                                                                                        | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=cycleway; cycleway=crossing`                                                                                                                      | PEDESTRIAN_AND_BICYCLE | 🚴 🚶  |
-| `highway=track`                                                                                                                                            | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=bridleway`                                                                                                                                        | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=path`                                                                                                                                             | PEDESTRIAN_AND_BICYCLE |        |
-| `highway=steps`                                                                                                                                            | PEDESTRIAN             |        |
-| `highway=corridor`                                                                                                                                         | PEDESTRIAN             |        |
-| `highway=footway; indoor=yes`                                                                                                                              | PEDESTRIAN             |        |
-| `highway=platform`                                                                                                                                         | PEDESTRIAN             |        |
-| `public_transport=platform`                                                                                                                                | PEDESTRIAN             |        |
-| `trail_visibility one of [bad, low, poor, horrible, no]; highway=path`                                                                                     | NONE                   |        |
-| `sac_scale one of [demanding_mountain_hiking, alpine_hiking, demanding_alpine_hiking, difficult_alpine_hiking]; highway one of [path, steps]`              | NONE                   |        |
-| `smoothness one of [horrible, very_horrible]; highway one of [path, bridleway, track]`                                                                     | PEDESTRIAN             | 🚶     |
-| `smoothness=impassable; highway one of [path, bridleway, track]`                                                                                           | NONE                   |        |
-| `1 > mtb:scale < 2; highway one of [path, bridleway, track]`                                                                                               | PEDESTRIAN             | 🚶     |
-| `mtb:scale > 2; highway one of [path, bridleway, track]`                                                                                                   | NONE                   |        |
+| specifier                                                                                                                                                  | permission               | bike safety | walk safety |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|-------------|-------------|
+| `highway one of [motorway, motorway_link]`                                                                                                                 | `CAR`                    |             |             |
+| `highway one of [trunk, trunk_link, primary, primary_link]; motorroad=yes`                                                                                 | `CAR`                    |             |             |
+| `highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]`                 | `ALL`                    |             |             |
+| `cycleway=track; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]` | `ALL`                    |             |             |
+| `cycleway=lane; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`                             | `ALL`                    | 1.27        |             |
+| `cycleway=lane; maxspeed < 50; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`              | `ALL`                    | 1.1         |             |
+| `cycleway=lane; highway one of [unclassified, residential]`                                                                                                | `ALL`                    | 1.1         |             |
+| `highway=service`                                                                                                                                          | `ALL`                    |             |             |
+| `highway=service; service=parking_aisle`                                                                                                                   | `ALL`                    | 2.5         |             |
+| `highway=service; service=drive-through`                                                                                                                   | `ALL`                    | 2.5         |             |
+| `highway=living_street`                                                                                                                                    | `ALL`                    | 1.83        |             |
+| `highway=pedestrian`                                                                                                                                       | `PEDESTRIAN_AND_BICYCLE` | 1.2         |             |
+| `highway=busway`                                                                                                                                           | `PEDESTRIAN_AND_BICYCLE` | 2.37        | 1.9         |
+| `highway=service; bus one of [yes, designated]`                                                                                                            | `PEDESTRIAN_AND_BICYCLE` | 2.37        | 1.9         |
+| `highway=footway`                                                                                                                                          | `PEDESTRIAN_AND_BICYCLE` | 1.42        |             |
+| `highway=cycleway`                                                                                                                                         | `PEDESTRIAN_AND_BICYCLE` | 1.05        | 1.4         |
+| `highway=cycleway; lanes > 1`                                                                                                                              | `PEDESTRIAN_AND_BICYCLE` |             | 1.4         |
+| `highway=cycleway; oneway=yes`                                                                                                                             | `PEDESTRIAN_AND_BICYCLE` |             | 1.4         |
+| `highway=cycleway; sidewalk one of [yes, left, right, both]`                                                                                               | `PEDESTRIAN_AND_BICYCLE` | 1.05        |             |
+| `highway=cycleway; lanes > 1; sidewalk one of [yes, left, right, both]`                                                                                    | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=cycleway; oneway=yes; sidewalk one of [yes, left, right, both]`                                                                                   | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=cycleway; foot=designated; segregated=no`                                                                                                         | `PEDESTRIAN_AND_BICYCLE` | 1.05        | 1.15        |
+| `highway=path; foot=designated; bicycle=designated; segregated=no`                                                                                         | `PEDESTRIAN_AND_BICYCLE` | 1.05        | 1.15        |
+| `highway=cycleway; foot=designated; segregated=yes`                                                                                                        | `PEDESTRIAN_AND_BICYCLE` | 1.05        |             |
+| `highway=path; foot=designated; bicycle=designated; segregated=yes`                                                                                        | `PEDESTRIAN_AND_BICYCLE` | 1.05        |             |
+| `highway=cycleway; foot=designated; segregated=yes; lanes > 1`                                                                                             | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=cycleway; foot=designated; present(segregated); motor_vehicle=destination`                                                                        | `PEDESTRIAN_AND_BICYCLE` | 1.57        |             |
+| `highway=path; foot=designated; bicycle=designated; present(segregated); motor_vehicle=destination`                                                        | `PEDESTRIAN_AND_BICYCLE` | 1.57        |             |
+| `highway=footway; footway=sidewalk`                                                                                                                        | `PEDESTRIAN_AND_BICYCLE` | 1.93        | 1.1         |
+| `highway=footway; footway=crossing`                                                                                                                        | `PEDESTRIAN_AND_BICYCLE` | 2.33        | 1.35        |
+| `highway=cycleway; cycleway=crossing`                                                                                                                      | `PEDESTRIAN_AND_BICYCLE` | 2.33        | 1.35        |
+| `highway=track`                                                                                                                                            | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=bridleway`                                                                                                                                        | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=path`                                                                                                                                             | `PEDESTRIAN_AND_BICYCLE` |             |             |
+| `highway=steps`                                                                                                                                            | `PEDESTRIAN`             |             |             |
+| `highway=corridor`                                                                                                                                         | `PEDESTRIAN`             |             |             |
+| `highway=footway; indoor=yes`                                                                                                                              | `PEDESTRIAN`             |             |             |
+| `highway=platform`                                                                                                                                         | `PEDESTRIAN`             |             |             |
+| `public_transport=platform`                                                                                                                                | `PEDESTRIAN`             |             |             |
+| `trail_visibility one of [bad, low, poor, horrible, no]; highway=path`                                                                                     | `NONE`                   |             |             |
+| `sac_scale one of [demanding_mountain_hiking, alpine_hiking, demanding_alpine_hiking, difficult_alpine_hiking]; highway one of [path, steps]`              | `NONE`                   |             |             |
+| `smoothness one of [horrible, very_horrible]; highway one of [path, bridleway, track]`                                                                     | `PEDESTRIAN`             |             | 1.15        |
+| `smoothness=impassable; highway one of [path, bridleway, track]`                                                                                           | `NONE`                   |             |             |
+| `1 > mtb:scale < 2; highway one of [path, bridleway, track]`                                                                                               | `PEDESTRIAN`             |             | 1.15        |
+| `mtb:scale > 2; highway one of [path, bridleway, track]`                                                                                                   | `NONE`                   |             |             |
 
 <!-- props END -->
 
-<!-- prop-details BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-<h3 id="0">Rule #0</h3>
-
-**Specifier:** `highway one of [motorway, motorway_link]`   
-**Permission:** CAR   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="1">Rule #1</h3>
-
-**Specifier:** `highway one of [trunk, trunk_link, primary, primary_link]; motorroad=yes`   
-**Permission:** CAR   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="2">Rule #2</h3>
-
-**Specifier:** `highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="3">Rule #3</h3>
-
-**Specifier:** `cycleway=track; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential]`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="4">Rule #4</h3>
-
-**Specifier:** `cycleway=lane; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.27, back: 1.27   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="5">Rule #5</h3>
-
-**Specifier:** `cycleway=lane; maxspeed < 50; highway one of [trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link]`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.1, back: 1.1   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="6">Rule #6</h3>
-
-**Specifier:** `cycleway=lane; highway one of [unclassified, residential]`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.1, back: 1.1   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="7">Rule #7</h3>
-
-**Specifier:** `highway=service`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="8">Rule #8</h3>
-
-**Specifier:** `highway=service; service=parking_aisle`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 2.5, back: 2.5   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="9">Rule #9</h3>
-
-**Specifier:** `highway=service; service=drive-through`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 2.5, back: 2.5   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="10">Rule #10</h3>
-
-**Specifier:** `highway=living_street`   
-**Permission:** ALL   
-**Bike safety factor:** forward: 1.83, back: 1.83   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="11">Rule #11</h3>
-
-**Specifier:** `highway=pedestrian`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.2, back: 1.2   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="12">Rule #12</h3>
-
-**Specifier:** `highway=busway`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 2.37, back: 2.37   
-**Walk safety factor:** forward: 1.9, back: 1.9 
-
-<h3 id="13">Rule #13</h3>
-
-**Specifier:** `highway=service; bus one of [yes, designated]`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 2.37, back: 2.37   
-**Walk safety factor:** forward: 1.9, back: 1.9 
-
-<h3 id="14">Rule #14</h3>
-
-**Specifier:** `highway=footway`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.42, back: 1.42   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="15">Rule #15</h3>
-
-**Specifier:** `highway=cycleway`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.4, back: 1.4 
-
-<h3 id="16">Rule #16</h3>
-
-**Specifier:** `highway=cycleway; lanes > 1`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.4, back: 1.4 
-
-<h3 id="17">Rule #17</h3>
-
-**Specifier:** `highway=cycleway; oneway=yes`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.4, back: 1.4 
-
-<h3 id="18">Rule #18</h3>
-
-**Specifier:** `highway=cycleway; sidewalk one of [yes, left, right, both]`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="19">Rule #19</h3>
-
-**Specifier:** `highway=cycleway; lanes > 1; sidewalk one of [yes, left, right, both]`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="20">Rule #20</h3>
-
-**Specifier:** `highway=cycleway; oneway=yes; sidewalk one of [yes, left, right, both]`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="21">Rule #21</h3>
-
-**Specifier:** `highway=cycleway; foot=designated; segregated=no`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.15, back: 1.15 
-
-<h3 id="22">Rule #22</h3>
-
-**Specifier:** `highway=path; foot=designated; bicycle=designated; segregated=no`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.15, back: 1.15 
-
-<h3 id="23">Rule #23</h3>
-
-**Specifier:** `highway=cycleway; foot=designated; segregated=yes`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="24">Rule #24</h3>
-
-**Specifier:** `highway=path; foot=designated; bicycle=designated; segregated=yes`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.05, back: 1.05   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="25">Rule #25</h3>
-
-**Specifier:** `highway=cycleway; foot=designated; segregated=yes; lanes > 1`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="26">Rule #26</h3>
-
-**Specifier:** `highway=cycleway; foot=designated; present(segregated); motor_vehicle=destination`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.57, back: 1.57   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="27">Rule #27</h3>
-
-**Specifier:** `highway=path; foot=designated; bicycle=designated; present(segregated); motor_vehicle=destination`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.57, back: 1.57   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="28">Rule #28</h3>
-
-**Specifier:** `highway=footway; footway=sidewalk`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.93, back: 1.93   
-**Walk safety factor:** forward: 1.1, back: 1.1 
-
-<h3 id="29">Rule #29</h3>
-
-**Specifier:** `highway=footway; footway=crossing`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 2.33, back: 2.33   
-**Walk safety factor:** forward: 1.35, back: 1.35 
-
-<h3 id="30">Rule #30</h3>
-
-**Specifier:** `highway=cycleway; cycleway=crossing`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 2.33, back: 2.33   
-**Walk safety factor:** forward: 1.35, back: 1.35 
-
-<h3 id="31">Rule #31</h3>
-
-**Specifier:** `highway=track`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="32">Rule #32</h3>
-
-**Specifier:** `highway=bridleway`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="33">Rule #33</h3>
-
-**Specifier:** `highway=path`   
-**Permission:** PEDESTRIAN_AND_BICYCLE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="34">Rule #34</h3>
-
-**Specifier:** `highway=steps`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="35">Rule #35</h3>
-
-**Specifier:** `highway=corridor`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="36">Rule #36</h3>
-
-**Specifier:** `highway=footway; indoor=yes`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="37">Rule #37</h3>
-
-**Specifier:** `highway=platform`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="38">Rule #38</h3>
-
-**Specifier:** `public_transport=platform`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="39">Rule #39</h3>
-
-**Specifier:** `trail_visibility one of [bad, low, poor, horrible, no]; highway=path`   
-**Permission:** NONE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="40">Rule #40</h3>
-
-**Specifier:** `sac_scale one of [demanding_mountain_hiking, alpine_hiking, demanding_alpine_hiking, difficult_alpine_hiking]; highway one of [path, steps]`   
-**Permission:** NONE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="41">Rule #41</h3>
-
-**Specifier:** `smoothness one of [horrible, very_horrible]; highway one of [path, bridleway, track]`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.15, back: 1.15 
-
-<h3 id="42">Rule #42</h3>
-
-**Specifier:** `smoothness=impassable; highway one of [path, bridleway, track]`   
-**Permission:** NONE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-<h3 id="43">Rule #43</h3>
-
-**Specifier:** `1 > mtb:scale < 2; highway one of [path, bridleway, track]`   
-**Permission:** PEDESTRIAN   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.15, back: 1.15 
-
-<h3 id="44">Rule #44</h3>
-
-**Specifier:** `mtb:scale > 2; highway one of [path, bridleway, track]`   
-**Permission:** NONE   
-**Bike safety factor:** forward: 1.0, back: 1.0   
-**Walk safety factor:** forward: 1.0, back: 1.0 
-
-
-<!-- prop-details END -->
-
-### Bicycle and walking safety mixins
+### Safety mixins
 
 Mixins are selectors that have only an effect on the bicycle and walk safety factors but not on the
-permission of an OSM way. Multiple mixins can apply to the same way and their effects compound.
+permission of an OSM way. Their safety values are multiplied with the base values from the selected
+way properties. Multiple mixins can apply to the same way and their effects compound.
 
 <!-- mixins BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
