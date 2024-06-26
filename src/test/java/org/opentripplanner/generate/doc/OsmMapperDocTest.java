@@ -90,11 +90,7 @@ public class OsmMapperDocTest {
 
   private static Table mixinTable(WayPropertySet wps) {
     var propTable = new TableBuilder();
-    propTable.withHeaders(
-      "matcher",
-      "bicycle safety",
-      "walk safety"
-    );
+    propTable.withHeaders("matcher", "bicycle safety", "walk safety");
 
     for (var prop : wps.getMixins()) {
       propTable.addRow(
@@ -109,13 +105,10 @@ public class OsmMapperDocTest {
   private static String tableValues(SafetyFeatures safety) {
     if (!safety.modifies()) {
       return "";
-    }
-    else if(safety.isSymetric()){
+    } else if (safety.isSymetric()) {
       return Double.toString(safety.forward());
-    }
-    else {
+    } else {
       return "forward: %s <br> back: %s".formatted(safety.forward(), safety.back());
     }
   }
-
 }

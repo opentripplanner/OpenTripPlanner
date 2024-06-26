@@ -54,7 +54,6 @@ class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
     props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
 
-
     // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
     props.maxPossibleCarSpeed = 31.4f;
 

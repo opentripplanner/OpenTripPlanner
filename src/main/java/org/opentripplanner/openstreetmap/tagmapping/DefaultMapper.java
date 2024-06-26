@@ -602,7 +602,6 @@ class DefaultMapper implements OsmTagMapper {
 
     /* Portland-local mixins */
 
-
     props.setMixinProperties("foot=discouraged", ofWalkSafety(3));
     props.setMixinProperties("bicycle=discouraged", ofBicycleSafety(3));
 
