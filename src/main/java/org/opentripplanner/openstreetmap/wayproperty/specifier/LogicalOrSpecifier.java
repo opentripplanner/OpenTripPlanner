@@ -46,7 +46,7 @@ public class LogicalOrSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public String toMarkdown() {
-    return subSpecs.stream().map(ExactMatchSpecifier::toMarkdown).collect(Collectors.joining("|"));
+  public String toDocString() {
+    return subSpecs.stream().map(ExactMatchSpecifier::toDocString).collect(Collectors.joining("|"));
   }
 }

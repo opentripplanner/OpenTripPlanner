@@ -42,7 +42,11 @@ public interface OsmSpecifier {
    */
   int matchScore(OSMWithTags way);
 
-  String toMarkdown();
+  /**
+   * Convert this specifier to a human-readable identifier that represents this in (generated)
+   * documentation.
+   */
+  String toDocString();
 
   record Scores(int forward, int backward) {
     public static Scores of(int s) {

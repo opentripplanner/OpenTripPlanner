@@ -75,7 +75,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public String toMarkdown() {
+  public String toDocString() {
     return Arrays.stream(conditions).map(Object::toString).collect(Collectors.joining("; "));
   }
 

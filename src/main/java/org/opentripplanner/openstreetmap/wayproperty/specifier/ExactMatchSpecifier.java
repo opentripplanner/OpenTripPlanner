@@ -56,7 +56,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public String toMarkdown() {
+  public String toDocString() {
     return conditions.stream().map(Object::toString).collect(Collectors.joining("; "));
   }
 

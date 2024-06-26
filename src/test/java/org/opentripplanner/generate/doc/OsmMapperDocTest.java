@@ -79,7 +79,7 @@ public class OsmMapperDocTest {
 
     for (var prop : wps.getWayProperties()) {
       propTable.addRow(
-        "`%s`".formatted(prop.specifier().toMarkdown()),
+        "`%s`".formatted(prop.specifier().toDocString()),
         "`%s`".formatted(prop.properties().getPermission()),
         tableValues(prop.properties().bicycleSafety()),
         tableValues(prop.properties().walkSafety())
@@ -94,7 +94,7 @@ public class OsmMapperDocTest {
 
     for (var prop : wps.getMixins()) {
       propTable.addRow(
-        "`%s`".formatted(prop.specifier().toMarkdown()),
+        "`%s`".formatted(prop.specifier().toDocString()),
         tableValues(prop.bicycleSafety()),
         tableValues(prop.walkSafety())
       );
