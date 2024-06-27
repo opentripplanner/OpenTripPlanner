@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-class SingeCriteriaComparatorTest {
+class SingleCriteriaComparatorTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
@@ -66,7 +66,7 @@ class SingeCriteriaComparatorTest {
 
     // leftDominanceExist
     assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
-    Assertions.assertTrue(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
+    assertTrue(subject.leftDominanceExist(zeroTransferLowCost, oneTransferLowCost));
     assertFalse(subject.leftDominanceExist(oneTransferLowCost, zeroTransferLowCost));
 
     // strict order expected

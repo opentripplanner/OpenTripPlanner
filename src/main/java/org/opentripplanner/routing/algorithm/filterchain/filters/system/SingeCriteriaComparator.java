@@ -6,11 +6,11 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 
 /**
- * Comparator used to compare a SINGE criteria for dominance. The difference between this and the
+ * Comparator used to compare a SINGLE criteria for dominance. The difference between this and the
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoComparator} is that:
  * <ol>
  *   <li>This applies to one criteria, not multiple.</li>
- *   <li>This interface apply to itineraries; It is not generic.</li>
+ *   <li>This interface applies to itineraries; It is not generic.</li>
  * </ol>
  * A set of instances of this interface can be used to create a pareto-set. See
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoSet} and
@@ -22,7 +22,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppri
 @FunctionalInterface
 public interface SingeCriteriaComparator {
   /**
-   * The left criteria dominates the right criteria. Note! The right criteria my dominate
+   * The left criteria dominates the right criteria. Note! The right criteria may dominate
    * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
    * there is no dominance.
    */

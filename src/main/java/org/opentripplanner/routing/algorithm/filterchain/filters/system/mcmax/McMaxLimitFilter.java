@@ -16,20 +16,20 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * to each criterion is kept. So, if the grouping is based on time and riding common trips, then
  * this filter will use the reminding criterion (transfers, generalized-cost,
  * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA
- * USED TO GROUP THE ITINERARIES, ONLY THE REMINDING CRITERION USED IN THE RAPTOR SEARCH.
+ * USED TO GROUP THE ITINERARIES, ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
  * <p>
  * <b>IMPLEMENTATION DETAILS</b>
  * <p>
  * This is not a trivial problem. In most cases, the best itinerary for a given criteria is unique,
  * but there might be ties - same number of transfers, same cost, and/or different priority groups.
  * In case of a tie, we will look if an itinerary is "best-in-group" for more than one criterion,
- * if so we pick the one witch is best in the highest number of groups. Again, if there is a tie
+ * if so we pick the one which is best in the highest number of groups. Again, if there is a tie
  * (best in the same number of groups), then we fall back to the given itinerary sorting order.
  * <p>
  * This filter will use the order of the input itineraries to break ties. So, make sure to call the
  * appropriate sort function before this filter is invoked.
  * <p>
- * Note! For a criteria like num-of-transfers or generalized-cost, there is only one set of "best"
+ * Note! For criteria like num-of-transfers or generalized-cost, there is only one set of "best"
  * itineraries, and usually there are only one or a few itineraries. In case there is more than one,
  * picking just one is fine. But, for transit-group-priority there might be more than one optimal
  * set of itineraries. For each set, we need to pick one itinerary for the final result. Each of

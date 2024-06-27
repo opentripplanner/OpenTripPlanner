@@ -46,7 +46,7 @@ class State {
   /**
    * Find the items with the highest group count and the lowest index. Theoretically, there might be
    * a smaller set of itineraries that TOGETHER represent all groups than what we achieve here, but
-   * it is fare more complicated to compute - so this is probably good enough.
+   * it is far more complicated to compute - so this is probably good enough.
    */
   void findTheBestItemsUntilAllGroupsAreRepresentedInTheResult() {
     while (!groups.isEmpty()) {
@@ -88,7 +88,7 @@ class State {
   }
 
   /**
-   * The best item is the one witch exists in most groups, and in case of a tie, the sort order/
+   * The best item is the one which exists in most groups, and in case of a tie, the sort order/
    * itinerary index is used.
    */
   private static Item findBestItem(List<Group> groups) {
