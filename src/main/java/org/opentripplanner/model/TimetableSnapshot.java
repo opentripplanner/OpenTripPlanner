@@ -92,7 +92,7 @@ public class TimetableSnapshot {
    * The compound key approach better reflects the fact that there should be only one Timetable per
    * TripPattern and date.
    */
-  private Map<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
+  private Map<TripPattern, SortedSet<Timetable>> timetables = new HashMap<>();
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
@@ -266,7 +266,7 @@ public class TimetableSnapshot {
     this.dirtyTimetables.clear();
     this.dirty = false;
 
-    ret.setPatternsForStop(ImmutableSetMultimap.copyOf(patternsForStop));
+    ret.patternsForStop = ImmutableSetMultimap.copyOf(patternsForStop);
 
     ret.readOnly = true; // mark the snapshot as henceforth immutable
     return ret;
@@ -303,6 +303,10 @@ public class TimetableSnapshot {
    * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    if (readOnly) {
+      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+    }
+
     boolean success = false;
 
     final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);
@@ -406,10 +410,6 @@ public class TimetableSnapshot {
     return patternsForStop.get(stop);
   }
 
-  public void setPatternsForStop(SetMultimap<StopLocation, TripPattern> patternsForStop) {
-    this.patternsForStop = patternsForStop;
-  }
-
   /**
    * Does this snapshot contain any realtime data or is it completely empty?
    */
@@ -423,7 +423,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear out
    * @return true if the timetable changed as a result of the call
    */
-  protected boolean clearTimetable(String feedId) {
+  private boolean clearTimetable(String feedId) {
     return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
   }
 
@@ -433,7 +433,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear out
    * @return true if the realtimeAddedTripPattern changed as a result of the call
    */
-  protected boolean clearRealtimeAddedTripPattern(String feedId) {
+  private boolean clearRealtimeAddedTripPattern(String feedId) {
     return realtimeAddedTripPattern
       .keySet()
       .removeIf(realtimeAddedTripPattern ->
