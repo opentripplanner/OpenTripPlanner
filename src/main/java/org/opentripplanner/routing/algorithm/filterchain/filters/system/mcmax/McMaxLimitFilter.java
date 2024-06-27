@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * The main usage of this filter is to combine it with a transit grouping filter and for each group
  * make sure there is at least {@code minNumItineraries} and that the best itinerary with respect
  * to each criterion is kept. So, if the grouping is based on time and riding common trips, then
- * this filter will use the reminding criterion (transfers, generalized-cost,
+ * this filter will use the remaining criterion (transfers, generalized-cost,
  * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA
  * USED TO GROUP THE ITINERARIES, ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
  * <p>
