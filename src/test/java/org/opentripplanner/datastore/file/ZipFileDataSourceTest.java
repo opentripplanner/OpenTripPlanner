@@ -74,7 +74,6 @@ public class ZipFileDataSourceTest {
     Collection<DataSource> content = subject.content();
     Collection<String> names = content.stream().map(DataSource::name).toList();
 
-    //System.out.println(names);
     assertTrue(
       names.containsAll(List.of("agency.txt", "stops.txt", "trips.txt")),
       names.toString()

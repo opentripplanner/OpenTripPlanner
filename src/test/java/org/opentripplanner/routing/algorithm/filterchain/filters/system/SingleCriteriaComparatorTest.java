@@ -76,10 +76,6 @@ class SingleCriteriaComparatorTest {
   void compareGeneralizedCost() {
     var subject = SingleCriteriaComparator.compareGeneralizedCost();
 
-    System.out.println(zeroTransferLowCost.getGeneralizedCost());
-    System.out.println(zeroTransferHighCost.getGeneralizedCost());
-    System.out.println(oneTransferLowCost.getGeneralizedCost());
-
     // leftDominanceExist
     assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
     assertTrue(subject.leftDominanceExist(zeroTransferLowCost, zeroTransferHighCost));
