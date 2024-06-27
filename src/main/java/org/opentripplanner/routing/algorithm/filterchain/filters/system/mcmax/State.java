@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCriteriaComparator;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 
 /**
  * Keep a list of items, groups and the result in progress. This is just a class for
@@ -23,7 +23,7 @@ class State {
    * cost). There should be at least one itinerary from each group surviving the filtering process.
    * The same itinerary can exist in multiple groups.
    */
-  State(List<Itinerary> itineraries, List<SingeCriteriaComparator> comparators) {
+  State(List<Itinerary> itineraries, List<SingleCriteriaComparator> comparators) {
     this.items = createListOfItems(itineraries);
     this.groups = createGroups(items, comparators);
   }
@@ -126,10 +126,10 @@ class State {
 
   private static List<Group> createGroups(
     Collection<Item> items,
-    List<SingeCriteriaComparator> comparators
+    List<SingleCriteriaComparator> comparators
   ) {
     List<Group> groups = new ArrayList<>();
-    for (SingeCriteriaComparator comparator : comparators) {
+    for (SingleCriteriaComparator comparator : comparators) {
       if (comparator.strictOrder()) {
         groups.add(createOrderedGroup(items, comparator));
       } else {
@@ -145,7 +145,7 @@ class State {
    */
   private static Group createOrderedGroup(
     Collection<Item> items,
-    SingeCriteriaComparator comparator
+    SingleCriteriaComparator comparator
   ) {
     Group group = null;
     for (Item item : items) {
@@ -168,11 +168,11 @@ class State {
    * the given {@code comparator}. This method will create a group for each optimal value found in
    * the given set of items.
    *
-   * @see #createOrderedGroup(Collection, SingeCriteriaComparator)
+   * @see #createOrderedGroup(Collection, SingleCriteriaComparator)
    */
   private static Collection<? extends Group> createUnorderedGroups(
     Collection<Item> items,
-    SingeCriteriaComparator comparator
+    SingleCriteriaComparator comparator
   ) {
     List<Group> result = new ArrayList<>();
 

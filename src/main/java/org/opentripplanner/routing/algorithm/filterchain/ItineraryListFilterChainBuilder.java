@@ -28,7 +28,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWa
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCriteriaComparator;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax.McMaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.DecorateTransitAlert;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
@@ -635,11 +635,11 @@ public class ItineraryListFilterChainBuilder {
 
   private RemoveItineraryFlagger createMaxLimitFilter(String filterName, int maxLimit) {
     if (OTPFeature.MultiCriteriaGroupMaxFilter.isOn()) {
-      List<SingeCriteriaComparator> comparators = new ArrayList<>();
-      comparators.add(SingeCriteriaComparator.compareGeneralizedCost());
-      comparators.add(SingeCriteriaComparator.compareNumTransfers());
+      List<SingleCriteriaComparator> comparators = new ArrayList<>();
+      comparators.add(SingleCriteriaComparator.compareGeneralizedCost());
+      comparators.add(SingleCriteriaComparator.compareNumTransfers());
       if (transitGroupPriorityUsed) {
-        comparators.add(SingeCriteriaComparator.compareTransitGroupsPriority());
+        comparators.add(SingleCriteriaComparator.compareTransitGroupsPriority());
       }
       return new McMaxLimitFilter(filterName, maxLimit, comparators);
     }

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -55,14 +54,14 @@ class SingleCriteriaComparatorTest {
 
   @Test
   void strictOrder() {
-    assertTrue(SingeCriteriaComparator.compareNumTransfers().strictOrder());
-    assertTrue(SingeCriteriaComparator.compareGeneralizedCost().strictOrder());
-    assertFalse(SingeCriteriaComparator.compareTransitGroupsPriority().strictOrder());
+    assertTrue(SingleCriteriaComparator.compareNumTransfers().strictOrder());
+    assertTrue(SingleCriteriaComparator.compareGeneralizedCost().strictOrder());
+    assertFalse(SingleCriteriaComparator.compareTransitGroupsPriority().strictOrder());
   }
 
   @Test
   void compareNumTransfers() {
-    var subject = SingeCriteriaComparator.compareNumTransfers();
+    var subject = SingleCriteriaComparator.compareNumTransfers();
 
     // leftDominanceExist
     assertFalse(subject.leftDominanceExist(zeroTransferHighCost, zeroTransferLowCost));
@@ -75,7 +74,7 @@ class SingleCriteriaComparatorTest {
 
   @Test
   void compareGeneralizedCost() {
-    var subject = SingeCriteriaComparator.compareGeneralizedCost();
+    var subject = SingleCriteriaComparator.compareGeneralizedCost();
 
     System.out.println(zeroTransferLowCost.getGeneralizedCost());
     System.out.println(zeroTransferHighCost.getGeneralizedCost());
@@ -99,7 +98,7 @@ class SingleCriteriaComparatorTest {
       .withGeneralizedCost2(TransitGroupPriority32n.mergeInGroupId(1, 2))
       .build();
 
-    var subject = SingeCriteriaComparator.compareTransitGroupsPriority();
+    var subject = SingleCriteriaComparator.compareTransitGroupsPriority();
 
     assertTrue(subject.leftDominanceExist(group1, group2));
     assertTrue(subject.leftDominanceExist(group2, group1));

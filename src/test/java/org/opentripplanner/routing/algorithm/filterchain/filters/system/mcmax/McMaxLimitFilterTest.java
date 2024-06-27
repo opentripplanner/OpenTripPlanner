@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCriteriaComparator;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -48,9 +48,9 @@ class McMaxLimitFilterTest {
     "test",
     2,
     List.of(
-      SingeCriteriaComparator.compareGeneralizedCost(),
-      SingeCriteriaComparator.compareNumTransfers(),
-      SingeCriteriaComparator.compareTransitGroupsPriority()
+      SingleCriteriaComparator.compareGeneralizedCost(),
+      SingleCriteriaComparator.compareNumTransfers(),
+      SingleCriteriaComparator.compareTransitGroupsPriority()
     )
   );
 

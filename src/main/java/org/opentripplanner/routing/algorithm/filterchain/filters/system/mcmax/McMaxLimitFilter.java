@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system.mcmax;
 import java.util.List;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingeCriteriaComparator;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
@@ -70,12 +70,12 @@ public class McMaxLimitFilter implements RemoveItineraryFlagger {
 
   private final String name;
   private final int minNumItineraries;
-  private final List<SingeCriteriaComparator> comparators;
+  private final List<SingleCriteriaComparator> comparators;
 
   public McMaxLimitFilter(
     String name,
     int minNumItineraries,
-    List<SingeCriteriaComparator> comparators
+    List<SingleCriteriaComparator> comparators
   ) {
     this.name = name;
     this.minNumItineraries = minNumItineraries;

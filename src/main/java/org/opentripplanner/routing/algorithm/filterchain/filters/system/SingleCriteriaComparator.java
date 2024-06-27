@@ -20,7 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppri
  * can be sorted, if so the {@link #strictOrder()} should return false (this is the default).
  */
 @FunctionalInterface
-public interface SingeCriteriaComparator {
+public interface SingleCriteriaComparator {
   /**
    * The left criteria dominates the right criteria. Note! The right criteria may dominate
    * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
@@ -35,16 +35,16 @@ public interface SingeCriteriaComparator {
     return false;
   }
 
-  static SingeCriteriaComparator compareNumTransfers() {
+  static SingleCriteriaComparator compareNumTransfers() {
     return compareLessThan(Itinerary::getNumberOfTransfers);
   }
 
-  static SingeCriteriaComparator compareGeneralizedCost() {
+  static SingleCriteriaComparator compareGeneralizedCost() {
     return compareLessThan(Itinerary::getGeneralizedCost);
   }
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
-  static SingeCriteriaComparator compareTransitGroupsPriority() {
+  static SingleCriteriaComparator compareTransitGroupsPriority() {
     return (left, right) ->
       TransitGroupPriority32n.dominate(
         left.getGeneralizedCost2().get(),
@@ -52,8 +52,8 @@ public interface SingeCriteriaComparator {
       );
   }
 
-  static SingeCriteriaComparator compareLessThan(final ToIntFunction<Itinerary> op) {
-    return new SingeCriteriaComparator() {
+  static SingleCriteriaComparator compareLessThan(final ToIntFunction<Itinerary> op) {
+    return new SingleCriteriaComparator() {
       @Override
       public boolean leftDominanceExist(Itinerary left, Itinerary right) {
         return op.applyAsInt(left) < op.applyAsInt(right);
