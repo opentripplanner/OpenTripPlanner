@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -80,8 +82,7 @@ public class TimetableSnapshot {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and
    * tracked by the TripPatternCache. <p>
    * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update. The type of the field is specifically HashMap (rather than the more general
-   * Map interface) because we need to efficiently clone it. <p>
+   * least one update.<p>
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
@@ -91,16 +92,15 @@ public class TimetableSnapshot {
    * The compound key approach better reflects the fact that there should be only one Timetable per
    * TripPattern and date.
    */
-  private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
+  private Map<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
    * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
-   * trip ID and the service date. The type of this field is HashMap rather than the more general
-   * Map interface because we need to efficiently clone it whenever we start building up a new
-   * snapshot. TODO RT_AB: clarify if this is an index or the original source of truth.
+   * trip ID and the service date.
+   * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
-  private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
+  private Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
 
   /**
    * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
@@ -256,9 +256,8 @@ public class TimetableSnapshot {
     if (!force && !this.isDirty()) {
       return null;
     }
-    ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
-    ret.realtimeAddedTripPattern =
-      (HashMap<TripIdAndServiceDate, TripPattern>) this.realtimeAddedTripPattern.clone();
+    ret.timetables = Map.copyOf(timetables);
+    ret.realtimeAddedTripPattern = Map.copyOf(realtimeAddedTripPattern);
 
     if (transitLayerUpdater != null) {
       transitLayerUpdater.update(dirtyTimetables, timetables);
@@ -267,7 +266,7 @@ public class TimetableSnapshot {
     this.dirtyTimetables.clear();
     this.dirty = false;
 
-    ret.setPatternsForStop(HashMultimap.create(this.patternsForStop));
+    ret.setPatternsForStop(ImmutableSetMultimap.copyOf(patternsForStop));
 
     ret.readOnly = true; // mark the snapshot as henceforth immutable
     return ret;
