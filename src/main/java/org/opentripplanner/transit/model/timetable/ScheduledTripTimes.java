@@ -40,8 +40,8 @@ public final class ScheduledTripTimes implements TripTimes {
   private static final int MAX_TIME = DurationUtils.durationInSeconds("20d");
 
   /**
-   * Implementation notes: This allows re-using the same scheduled arrival and departure time
-   * arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
+   * Implementation notes: This timeShift allows re-using the same scheduled arrival and departure
+   * time arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
    * ScheduledTripTimes.
    */
   private final int timeShift;
@@ -53,18 +53,28 @@ public final class ScheduledTripTimes implements TripTimes {
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
 
+  /**
+   * The headsign displayed by the vehicle at each stop along this trip. The array index is the
+   * stop index within this trip's TripPattern. Any number of array elements may point to the same
+   * I18NString instance if the headsign remains unchanged between stops.
+   */
   @Nullable
   private final I18NString[] headsigns;
 
   /**
-   * Implementation notes: This is 2D array since there can be more than one via name/stop per each
-   * record in stop sequence). Outer array may be null if there are no vias in stop sequence. Inner
-   * array may be null if there are no vias for particular stop. This is done in order to save
-   * space.
+   * A 2D array of String containing zero or more Via messages displayed at each stop in the
+   * stop sequence. A Via is an additional intermediate destination that is displayed alongside the
+   * terminus headsign, but will usually change or only be displayed at certain stops along the way.
+   * While the concept of Headsigns exists in both GTFS (Headsign) and Netex (DestinationDisplay),
+   * the Via concept is only present in Transmodel. This reference be null if no stop in the entire
+   * sequence of stops has any via strings. Any subarray may also be null or empty if no Via strings
+   * are displayed at that particular stop. These nulls are allowed to conserve memory in the common
+   * case where there are few or no via messages.
    */
   @Nullable
   private final String[][] headsignVias;
 
+  /** TODO RT_AB: document, what is this for? */
   private final int[] originalGtfsStopSequence;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
