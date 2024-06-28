@@ -1,7 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority;
-
-import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 /**
  * This is a "BitSet" implementation for groupId. It can store upto 32 groups,
@@ -12,25 +9,6 @@ public class TransitGroupPriority32n {
   private static final int GROUP_ZERO = 0;
   private static final int MIN_SEQ_NO = 0;
   private static final int MAX_SEQ_NO = 32;
-
-  public static RaptorTransitGroupCalculator priorityCalculator() {
-    return new RaptorTransitGroupCalculator() {
-      @Override
-      public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
-        return mergeInGroupId(currentGroupIds, boardingGroupId);
-      }
-
-      @Override
-      public DominanceFunction dominanceFunction() {
-        return TransitGroupPriority32n::dominate;
-      }
-
-      @Override
-      public String toString() {
-        return "TransitGroupPriority32nCalculator{}";
-      }
-    };
-  }
 
   /**
    * Left dominate right, if right contains a group which does not exist in left. Left
@@ -47,7 +25,7 @@ public class TransitGroupPriority32n {
 
   /**
    * Use this method to map from a continuous group index [0..32) to the groupId used
-   * during routing. The ID is implementation specific and optimized for performance.
+   * during routing. The ID is implementation-specific and optimized for performance.
    */
   public static int groupId(final int priorityGroupIndex) {
     assertValidGroupSeqNo(priorityGroupIndex);

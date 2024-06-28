@@ -30,6 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalc
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.PriorityGroupConfigurator;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,

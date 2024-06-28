@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.AND;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.OR;
+import static org.opentripplanner.transit.model.network.grouppriority.BinarySetOperator.AND;
+import static org.opentripplanner.transit.model.network.grouppriority.BinarySetOperator.OR;
 
 import java.util.ArrayList;
 import java.util.Arrays;

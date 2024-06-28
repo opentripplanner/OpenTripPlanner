@@ -19,6 +19,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.PriorityGroupConfigurator;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

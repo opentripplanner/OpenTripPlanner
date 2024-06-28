@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 import gnu.trove.impl.Constants;
 import gnu.trove.map.TObjectIntMap;
@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.lang.ArrayUtils;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;

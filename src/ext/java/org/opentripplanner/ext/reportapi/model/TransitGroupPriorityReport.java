@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.PriorityGroupConfigurator;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.PriorityGroupConfigurator;
 
 /**
  * This class is used to report all transit-groups used for transit-group-priority. The report is

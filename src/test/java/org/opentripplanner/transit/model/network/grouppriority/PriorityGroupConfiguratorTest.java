@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_A;
@@ -7,6 +7,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
