@@ -28,7 +28,7 @@ In OTP's internal transit model, realtime data is currently stored separately fr
 
 The following is a sequence diagram showing how threads are intended to communicate. Unlike some common forms of sequence diagrams, time is on the horizontal axis here. Each horizontal line represents either a thread of execution (handling incoming realtime messages or routing requests) or a queue or buffer data structure. Dotted lines represent object references being handed off, and solid lines represent data being copied.
 
-![Realtime sequence diagram](images/updater-threads-queues.svg)
+![Realtime Sequence Diagram](images/updater-threads-queues.svg)
 
 At the top of the diagram are the GraphUpdater implementations. These fall broadly into two categories: polling updaters and streaming updaters. Polling updaters periodically send a request to server (often just a simple HTTP server) which returns a file containing the latest version of the updates. Streaming updaters are generally built around libraries implementing message-oriented protocols such as MQTT or AMQP, which fire a callback each time a new message is received. Polling updaters tend to return a full dataset describing the entire system state on each polling operation, while streaming updaters tend to receive incremental messages targeting individual transit trips. As such, polling updaters execute relatively infrequently (perhaps every minute or two) and process large responses, while streaming updaters execute very frequently (often many times per second) and operate on small messages in short bursts. Polling updaters are simpler in many ways and make use of common HTTP server components, but they introduce significant latency and redundant communication. Streaming updaters require more purpose-built or custom-configured components including message brokers, but bandwidth consumption and latency are lower, allowing routing results to reflect vehicle delays and positions immediately after they're reported.
 
@@ -51,6 +51,16 @@ This is essentially a multi-version snapshot concurrency control system, inspire
 An important characteristic of this approach is that _no locking is necessary_. However, some form of synchronization is used during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.
 
 Arguably the process of creating an immutable live snapshot (and a corresponding new writable buffer) should be handled by a GraphWriterRunnable on the single graph updater thread. This would serve to defer any queued modifications until the new buffer is in place, without introducing any further locking mechanisms.
+
+## Copy on Write Strategy in Timetable Snapshots
+
+This is a high-level diagram of how the timetable snapshots are used to look up both scheduled and realtime arrival and departure times for a particular TripPattern:
+![Timetable Lookup Diagram](images/timetable-lookup.svg)
+
+The following is a step-by-step diagram of how successive timetable snapshots are built up in a buffer, using a copy-on-write strategy to reuse as many object instances as possible (minimizing time and memory spent on copies) while ensuring that existing snapshots visible to routing or API threads are unchanging. Each blue box represents a shallow-copied object, maintaining a protective copy of the minimal subtree at and above any leaf nodes that are changed by incoming realtime messages. Eventually this snapshot is frozen ("committed" in database terms) and handed off to routing and API services. At that point, the process begins anew with green boxes representing the minimal subtree of shallow protective copies. Once no threads are using a snapshot anymore the snapshot can be garbage collected, transitively releasing any objects that are no longer used. The final section of this diagram illustrates that without any further active steps by OTP or the JVM, simply rearranging elements of the drawing after garbage collection occurs reveals that our routing thread is seeing a full coherent snapshot composed of objects created over the course of several subsequent snapshots.
+
+![Snapshot Copy-on-Write Diagram](images/snapshot-manager.svg)
+
 
 ## Design Considerations
 
