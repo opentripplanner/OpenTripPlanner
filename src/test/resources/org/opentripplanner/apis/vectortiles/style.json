@@ -226,13 +226,25 @@
       "maxzoom" : 23,
       "paint" : {
         "circle-stroke-color" : "#140d0e",
-        "circle-stroke-width" : 2,
+        "circle-stroke-width" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              11,
+              0.5
+            ],
+            [
+              23,
+              5.0
+            ]
+          ]
+        },
         "circle-radius" : {
           "base" : 1.0,
           "stops" : [
             [
               11,
-              1.0
+              0.5
             ],
             [
               23,
@@ -244,6 +256,6 @@
       }
     }
   ],
-  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf",
-  "version" : 8
+  "version" : 8,
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
 }

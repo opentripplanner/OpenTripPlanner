@@ -1,5 +1,5 @@
 {
-  "name": "otp-debug-client-next",
+  "name": "otp-debug-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
