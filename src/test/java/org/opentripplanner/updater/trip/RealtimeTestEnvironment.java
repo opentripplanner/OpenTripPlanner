@@ -114,12 +114,20 @@ public final class RealtimeTestEnvironment {
     Route route1 = TransitModelForTest.route(route1Id).build();
 
     trip1 =
-      createTrip("TestTrip1", route1, List.of(new Stop(stopA1, 10, 11), new Stop(stopB1, 20, 21)));
+      createTrip(
+        "TestTrip1",
+        route1,
+        List.of(new StopCall(stopA1, 10, 11), new StopCall(stopB1, 20, 21))
+      );
     trip2 =
       createTrip(
         "TestTrip2",
         route1,
-        List.of(new Stop(stopA1, 60, 61), new Stop(stopB1, 70, 71), new Stop(stopC1, 80, 81))
+        List.of(
+          new StopCall(stopA1, 60, 61),
+          new StopCall(stopB1, 70, 71),
+          new StopCall(stopC1, 80, 81)
+        )
       );
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -295,7 +303,7 @@ public final class RealtimeTestEnvironment {
     return getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(updates, DIFFERENTIAL);
   }
 
-  private Trip createTrip(String id, Route route, List<Stop> stops) {
+  private Trip createTrip(String id, Route route, List<StopCall> stops) {
     var trip = Trip
       .of(id(id))
       .withRoute(route)
@@ -323,7 +331,7 @@ public final class RealtimeTestEnvironment {
 
     final TripPattern pattern = TransitModelForTest
       .tripPattern(id + "Pattern", route)
-      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(Stop::stop).toList()))
+      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(StopCall::stop).toList()))
       .build();
     pattern.add(tripTimes);
 
@@ -348,5 +356,5 @@ public final class RealtimeTestEnvironment {
     return st;
   }
 
-  protected record Stop(RegularStop stop, int arrivalTime, int departureTime) {}
+  protected record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
 }
