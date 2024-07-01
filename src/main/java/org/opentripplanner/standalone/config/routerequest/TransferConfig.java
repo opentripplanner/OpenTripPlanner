@@ -40,12 +40,12 @@ class TransferConfig {
           .summary("The extra time needed to make a safe transfer.")
           .description(
             """
-            An extra buffer time that's applied when exiting one public transport vehicle and boarding another.
-            This time is in addition to how long it might take to walk between stops plus `boardSlack` and
-            `alightSlack`.
+            The extra buffer time/safety margin added to transfers to make sure the connection is safe, time
+            wise. We recommend allowing the end-user to set this, and use `board-/alight-slack` to enforce
+            agency policies. This time is in addition to how long it might take to walk, board and alight.
             
-            It is useful to add extra time for passengers with mobility issues, who need extra time
-            when moving between vehicles.
+            It is useful for passengers on long distance travel, and people with mobility issues, but can be set
+            close to zero for everyday commuters and short distance searches in high transit frequency areas.
             """
           )
           .asDurationOrSeconds(dft.slack())
