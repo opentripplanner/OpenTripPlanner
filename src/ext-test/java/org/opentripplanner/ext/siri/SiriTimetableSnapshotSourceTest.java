@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.test.support.UpdateResultAssertions.assertFailure;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

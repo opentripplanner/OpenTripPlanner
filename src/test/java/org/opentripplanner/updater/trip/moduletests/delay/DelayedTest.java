@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.test.support.UpdateResultAssertions.assertSuccess;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 
 import org.junit.jupiter.api.Test;

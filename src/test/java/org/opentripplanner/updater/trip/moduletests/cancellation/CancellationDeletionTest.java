@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.test.support.UpdateResultAssertions.assertSuccess;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;

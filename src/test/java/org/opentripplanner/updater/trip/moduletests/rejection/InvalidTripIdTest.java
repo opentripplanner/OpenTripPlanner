@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.trip.moduletests.rejection;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
-import static org.opentripplanner.test.support.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.util.stream.Stream;

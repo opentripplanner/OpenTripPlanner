@@ -1,11 +1,9 @@
-package org.opentripplanner.test.support;
+package org.opentripplanner.updater.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
-import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.spi.UpdateResult;
 
 public class UpdateResultAssertions {
 
