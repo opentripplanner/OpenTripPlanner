@@ -31,14 +31,14 @@
       "enabled": false
     },
     {
-      "matchFiles": ["client-next/package.json"],
+      "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
       "schedule": ["on the first day of the week"],
       "reviewers": ["testower"]
     },
     {
-      "matchFiles": ["client-next/package.json"],
+      "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["major"],
       "reviewers": ["testower"]
     },

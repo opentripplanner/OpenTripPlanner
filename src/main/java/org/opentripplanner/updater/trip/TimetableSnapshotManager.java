@@ -38,13 +38,6 @@ public final class TimetableSnapshotManager {
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
-   * might modify this buffer will correctly acquire the lock.
-   */
-  private final TimetableSnapshot buffer = new TimetableSnapshot();
-
-  /**
-   * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
-   * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock. By design, only one thread should
    * ever be writing to this buffer.
    * TODO RT_AB: research and document why this lock is needed since only one thread should ever be
@@ -52,6 +45,12 @@ public final class TimetableSnapshotManager {
    *   and swapping out the buffer. But the original idea was to make a new copy of the buffer
    *   before re-indexing it. While refactoring or rewriting parts of this system, we could throw
    *   an exception if a writing section is entered by more than one thread.
+   */
+  private final TimetableSnapshot buffer = new TimetableSnapshot();
+
+  /**
+   * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
+   * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
   private volatile TimetableSnapshot snapshot = null;
 

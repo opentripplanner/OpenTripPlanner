@@ -26,7 +26,7 @@ The dev and production builds require graphql schema to be present at
 
 ## Getting started (development)
 
-Change directory to `client-next` (current) if you haven't already.
+Change directory to `client` (current) if you haven't already.
 
     npm install
 
@@ -34,7 +34,7 @@ Then
 
     npm run dev
 
-The debug client will now be available at `http://localhost:5173/debug-client-preview`. It has
+The debug client will now be available at `http://localhost:5173/`. It has
 hot reloading enabled, so you don't have to restart it when you save files.
 
 If you change graphql code during development you can issue the following command:
@@ -45,7 +45,7 @@ You don't have to restart the development server for the changes to take effect.
 
 ## Build for production
 
-Change directory to `client-next` (current) if you haven't already.
+Change directory to `client` (current) if you haven't already.
 
     npm install
 

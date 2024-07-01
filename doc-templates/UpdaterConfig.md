@@ -83,6 +83,7 @@ GBFS form factors:
 
 - [Vehicle parking](sandbox/VehicleParking.md)
 - [Siri over HTTP](sandbox/siri/SiriUpdater.md)
+- [Siri over Google Cloud PubSub](sandbox/siri/SiriGooglePubSubUpdater.md)
 - [Siri over Azure Message Bus](sandbox/siri/SiriAzureUpdater.md)
 - [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 
