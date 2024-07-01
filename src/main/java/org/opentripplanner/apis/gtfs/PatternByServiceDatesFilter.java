@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -21,33 +21,26 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class PatternByServiceDatesFilter {
 
-  private final LocalDate startInclusive;
-  private final LocalDate endExclusive;
   private final Function<Route, Collection<TripPattern>> getPatternsForRoute;
   private final Function<Trip, Collection<LocalDate>> getServiceDatesForTrip;
+  private final LocalDateRange range;
 
   /**
    * This method is not private to enable unit testing.
    * <p>
-   * See the API documentation for a discussion of {@code startInclusive} and {@code endExclusive}.
    */
   PatternByServiceDatesFilter(
-    @Nullable LocalDate startInclusive,
-    @Nullable LocalDate endExclusive,
+    LocalDateRange range,
     Function<Route, Collection<TripPattern>> getPatternsForRoute,
     Function<Trip, Collection<LocalDate>> getServiceDatesForTrip
   ) {
     this.getPatternsForRoute = Objects.requireNonNull(getPatternsForRoute);
     this.getServiceDatesForTrip = Objects.requireNonNull(getServiceDatesForTrip);
-    // optional, but one must be defined
-    this.startInclusive = startInclusive;
-    this.endExclusive = endExclusive;
+    this.range = range;
 
-    if (startInclusive == null && endExclusive == null) {
+    if (range.unlimited()) {
       throw new IllegalArgumentException("startInclusive and endExclusive cannot be both null");
-    } else if (
-      startInclusive != null && endExclusive != null && startInclusive.isAfter(endExclusive)
-    ) {
+    } else if (range.startBeforeEnd()) {
       throw new IllegalArgumentException("start must be before end");
     }
   }
@@ -57,8 +50,7 @@ public class PatternByServiceDatesFilter {
     TransitService transitService
   ) {
     this(
-      filterInput.getGraphQLStart(),
-      filterInput.getGraphQLEnd(),
+      new LocalDateRange(filterInput.getGraphQLStart(), filterInput.getGraphQLEnd()),
       transitService::getPatternsForRoute,
       trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
     );
@@ -94,9 +86,11 @@ public class PatternByServiceDatesFilter {
           .stream()
           .anyMatch(date ->
             (
-              startInclusive == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)
+              range.startInclusive() == null ||
+              date.isEqual(range.startInclusive()) ||
+              date.isAfter(range.startInclusive())
             ) &&
-            (endExclusive == null || date.isBefore(endExclusive))
+            (range.endExclusive() == null || date.isBefore(range.endExclusive()))
           );
       });
   }

@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -71,7 +72,12 @@ class PatternByServiceDatesFilterTest {
   void invalidRange(LocalDate start, LocalDate end) {
     assertThrows(
       IllegalArgumentException.class,
-      () -> new PatternByServiceDatesFilter(start, end, r -> List.of(), d -> List.of())
+      () ->
+        new PatternByServiceDatesFilter(
+          new LocalDateRange(start, end),
+          r -> List.of(),
+          d -> List.of()
+        )
     );
   }
 
@@ -88,7 +94,11 @@ class PatternByServiceDatesFilterTest {
   @MethodSource("validRangeCases")
   void validRange(LocalDate start, LocalDate end) {
     assertDoesNotThrow(() ->
-      new PatternByServiceDatesFilter(start, end, r -> List.of(), d -> List.of())
+      new PatternByServiceDatesFilter(
+        new LocalDateRange(start, end),
+        r -> List.of(),
+        d -> List.of()
+      )
     );
   }
 
@@ -141,8 +151,7 @@ class PatternByServiceDatesFilterTest {
 
   private static PatternByServiceDatesFilter mockFilter(LocalDate start, LocalDate end) {
     return new PatternByServiceDatesFilter(
-      start,
-      end,
+      new LocalDateRange(start, end),
       route -> List.of(PATTERN_1),
       trip -> List.of(parse("2024-05-01"), parse("2024-06-01"))
     );

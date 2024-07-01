@@ -31,6 +31,7 @@ import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.LocalDateRangeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
@@ -611,7 +612,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           );
       }
 
-      if (GraphQLUtils.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+      if (LocalDateRangeMapper.hasServiceDateFilter(args.getGraphQLServiceDates())) {
         var filter = new PatternByServiceDatesFilter(args.getGraphQLServiceDates(), transitService);
         routeStream = filter.filterRoutes(routeStream).stream();
       }
