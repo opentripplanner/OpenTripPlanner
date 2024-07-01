@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLServiceDateFilterInput;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -53,7 +53,7 @@ public class PatternByServiceDatesFilter {
   }
 
   public PatternByServiceDatesFilter(
-    GraphQLServiceDateFilterInput filterInput,
+    GraphQLTypes.GraphQLLocalDateRangeInput filterInput,
     TransitService transitService
   ) {
     this(

@@ -133,16 +133,16 @@ class GraphQLUtilsTest {
     assertEquals(frenchLocale, locale);
   }
 
-  public static List<GraphQLTypes.GraphQLServiceDateFilterInput> noFilterCases() {
-    var list = new ArrayList<GraphQLTypes.GraphQLServiceDateFilterInput>();
+  public static List<GraphQLTypes.GraphQLLocalDateRangeInput> noFilterCases() {
+    var list = new ArrayList<GraphQLTypes.GraphQLLocalDateRangeInput>();
     list.add(null);
-    list.add(new GraphQLTypes.GraphQLServiceDateFilterInput(Map.of()));
+    list.add(new GraphQLTypes.GraphQLLocalDateRangeInput(Map.of()));
     return list;
   }
 
   @ParameterizedTest
   @MethodSource("noFilterCases")
-  void hasNoServiceDateFilter(GraphQLTypes.GraphQLServiceDateFilterInput input) {
+  void hasNoServiceDateFilter(GraphQLTypes.GraphQLLocalDateRangeInput input) {
     assertFalse(org.opentripplanner.apis.gtfs.GraphQLUtils.hasServiceDateFilter(input));
   }
 
@@ -153,7 +153,7 @@ class GraphQLUtilsTest {
   @ParameterizedTest
   @MethodSource("hasFilterCases")
   void hasServiceDateFilter(Map<String, Object> params) {
-    var input = new GraphQLTypes.GraphQLServiceDateFilterInput(params);
+    var input = new GraphQLTypes.GraphQLLocalDateRangeInput(params);
     assertTrue(org.opentripplanner.apis.gtfs.GraphQLUtils.hasServiceDateFilter(input));
   }
 }

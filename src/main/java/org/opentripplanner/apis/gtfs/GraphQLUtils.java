@@ -115,12 +115,10 @@ public class GraphQLUtils {
    * Checks if a service date filter input has at least one filter set. If both start and end are
    * null then no filtering is necessary and this method returns null.
    */
-  public static boolean hasServiceDateFilter(
-    GraphQLTypes.GraphQLServiceDateFilterInput serviceDays
-  ) {
+  public static boolean hasServiceDateFilter(GraphQLTypes.GraphQLLocalDateRangeInput dateRange) {
     return (
-      serviceDays != null &&
-      (serviceDays.getGraphQLStart() != null || serviceDays.getGraphQLEnd() != null)
+      dateRange != null &&
+      (dateRange.getGraphQLStart() != null || dateRange.getGraphQLEnd() != null)
     );
   }
 }

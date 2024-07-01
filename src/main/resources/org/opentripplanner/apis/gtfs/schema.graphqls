@@ -3439,13 +3439,9 @@ enum Qualifier {
 
 
 """
-Filters entity by their service dates.
-
-**Note**: A service date is a technical term useful for transit planning purposes and might not
-correspond to a how a passenger thinks of a calendar date. For example, a night bus running
-on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+Filters an entity by a date range.
 """
-input ServiceDateFilterInput {
+input LocalDateRangeInput {
     """
     **Inclusive** start date of the filter. If `null` this means that no `start` filter is applied and all
     dates that are before `end` are selected.
@@ -3627,7 +3623,7 @@ type QueryType {
         correspond to a how a passenger thinks of a calendar date. For example, a night bus running
         on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
         """
-        serviceDates: ServiceDateFilterInput
+        serviceDates: LocalDateRangeInput
     ): [Route]
 
     """
@@ -4525,7 +4521,7 @@ type Route implements Node {
         correspond to a how a passenger thinks of a calendar date. For example, a night bus running
         on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
         """
-        serviceDates: ServiceDateFilterInput
+        serviceDates: LocalDateRangeInput
     ): [Pattern]
 
     """List of stops on this route"""
