@@ -11,7 +11,7 @@ public class UpdateResultAssertions {
     assertEquals(Set.of(expectedError), result.failures().keySet());
   }
 
-  public static UpdateResult assertSuccess(UpdateResult updateResult) {
+  public static void assertSuccess(UpdateResult updateResult) {
     var errorCodes = updateResult.failures().keySet();
     assertEquals(
       Set.of(),
@@ -19,6 +19,5 @@ public class UpdateResultAssertions {
       "Update result should have no error codes but had %s".formatted(errorCodes)
     );
     assertTrue(updateResult.successful() > 0);
-    return updateResult;
   }
 }

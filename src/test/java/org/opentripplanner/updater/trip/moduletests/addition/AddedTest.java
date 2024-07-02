@@ -51,8 +51,8 @@ class AddedTest {
       .addStopTime(STOP_B1_ID, 55, DropOffPickupType.NONE)
       .build();
 
-    var result = assertSuccess(env.applyTripUpdate(tripUpdate));
-
+    var result = env.applyTripUpdate(tripUpdate);
+    assertSuccess(result);
     assertTrue(result.warnings().isEmpty());
 
     var pattern = assertAddedTrip(ADDED_TRIP_ID, env);
@@ -83,7 +83,8 @@ class AddedTest {
       .addStopTime(STOP_C1_ID, 55, DropOffPickupType.NONE)
       .build();
 
-    var result = assertSuccess(env.applyTripUpdate(tripUpdate));
+    var result = env.applyTripUpdate(tripUpdate);
+    assertSuccess(result);
 
     assertEquals(
       List.of(UpdateSuccess.WarningType.UNKNOWN_STOPS_REMOVED_FROM_ADDED_TRIP),
