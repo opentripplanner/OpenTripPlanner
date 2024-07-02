@@ -1167,6 +1167,8 @@ type StopPlace implements PlaceInterface {
   ): [Quay] @timingData
   "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
   situations: [PtSituationElement!]!
+  "Specify the priority of interchanges at this stop"
+  stopInterchangePriority: StopInterchangePriority
   tariffZones: [TariffZone]!
   timeZone: String
   "The transport modes of quays under this stop place."
@@ -1174,7 +1176,7 @@ type StopPlace implements PlaceInterface {
   "The transport submode serviced by this stop place."
   transportSubmode: [TransportSubmode]
   "Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED"
-  weighting: InterchangeWeighting
+  weighting: InterchangeWeighting @deprecated(reason : "Not implemented. Use stopInterchangePriority")
 }
 
 "List of coordinates between two stops as a polyline"
@@ -1531,6 +1533,7 @@ enum InterchangePriority {
   recommended
 }
 
+"Deprecated. Use STOP_INTERCHANGE_PRIORITY"
 enum InterchangeWeighting {
   "Third highest priority interchange."
   interchangeAllowed
@@ -1744,6 +1747,15 @@ enum StopCondition {
   requestStop
   "Situation applies when stop is the startpoint of the leg."
   startPoint
+}
+
+enum StopInterchangePriority {
+  allowed
+  "This maps to 'interchangeNotAllowed' in NeTEx."
+  discouraged
+  "Highest interchange priority."
+  preferred
+  recommended
 }
 
 enum StreetMode {

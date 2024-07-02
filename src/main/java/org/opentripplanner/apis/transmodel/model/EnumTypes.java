@@ -22,6 +22,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -133,11 +134,25 @@ public class EnumTypes {
 
   public static final GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType
     .newEnum()
+    .description("Deprecated. Use STOP_INTERCHANGE_PRIORITY")
     .name("InterchangeWeighting")
     .value("preferredInterchange", 2, "Highest priority interchange.")
     .value("recommendedInterchange", 1, "Second highest priority interchange.")
     .value("interchangeAllowed", 0, "Third highest priority interchange.")
     .value("noInterchange", -1, "Interchange not allowed.")
+    .build();
+
+  public static final GraphQLEnumType STOP_INTERCHANGE_PRIORITY = GraphQLEnumType
+    .newEnum()
+    .name("StopInterchangePriority")
+    .value("preferred", StopTransferPriority.PREFERRED, "Highest interchange priority.")
+    .value("recommended", StopTransferPriority.RECOMMENDED)
+    .value("allowed", StopTransferPriority.ALLOWED)
+    .value(
+      "discouraged",
+      StopTransferPriority.DISCOURAGED,
+      "This maps to 'interchangeNotAllowed' in NeTEx."
+    )
     .build();
 
   public static final GraphQLEnumType ITINERARY_FILTER_DEBUG_PROFILE = createFromDocumentedEnum(
