@@ -39,7 +39,7 @@ public class PatternByServiceDatesFilter {
     this.range = range;
 
     if (range.unlimited()) {
-      throw new IllegalArgumentException("startInclusive and endExclusive cannot be both null");
+      throw new IllegalArgumentException("start and end cannot be both null");
     } else if (range.startBeforeEnd()) {
       throw new IllegalArgumentException("start must be before end");
     }
