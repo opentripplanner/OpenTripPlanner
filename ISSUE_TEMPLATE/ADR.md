@@ -1,7 +1,7 @@
 
 
 ### Description
-*One or two sentences which goes into the [Architectural Decision Records](../ADRs.md) document
+*One or two sentences which go into the [Architectural Decision Records](../ADRs.md) document
 later*
 
 ### Context and Problem Statement
@@ -26,7 +26,7 @@ Describes the effects of the change. What becomes easier? What will be more diff
 #### Checklist
 - [ ] Tag issue with `ADR`.
 - [ ] Give it a meaningful title that quickly lets the reader understand what this ADR is all about.
-- [ ] Approved in a developer meeting with 3 votes in favor (3 organisations)
-- [ ] This issue description is up-to-date with the discussion below.
-- [ ] The name and description is added to the 
+- [ ] Get it approved in a developer meeting with 3 votes in favor (3 organisations).
+- [ ] Update the issue description is up-to-date with the discussion below.
+- [ ] Add name and description to the 
       [Architectural Decision Records](../ADRs.md) document and the ADR is linked this issue.
