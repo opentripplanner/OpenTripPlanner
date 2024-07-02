@@ -30,8 +30,4 @@ public enum OsmTagMapperSource {
       case CONSTANT_SPEED_FINLAND -> new ConstantSpeedFinlandMapper();
     };
   }
-
-  public boolean needsDocumentation() {
-    return this != CONSTANT_SPEED_FINLAND;
-  }
 }

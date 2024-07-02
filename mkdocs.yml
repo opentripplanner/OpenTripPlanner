@@ -75,9 +75,9 @@ nav:
     - Build: 'BuildConfiguration.md'
     - OSM Tag Mapping:
         - Default: 'osm/Default.md'
-        - Norway: 'osm/Norway.md'
-        - Germany: 'osm/Germany.md'
         - Finland: 'osm/Finland.md'
+        - Germany: 'osm/Germany.md'
+        - Norway: 'osm/Norway.md'
         - UK: 'osm/UK.md'
     - Router: 'RouterConfiguration.md'
     - "Route Request": 'RouteRequest.md'
