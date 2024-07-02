@@ -15,9 +15,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 
 | Config Parameter                                                                                             |          Type          | Summary                                                                                                                                        |  Req./Opt. | Default Value    | Since |
 |--------------------------------------------------------------------------------------------------------------|:----------------------:|------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|------------------|:-----:|
-| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The extra time to exit a public transport vehicle.                                                                                             | *Optional* | `"PT0S"`         |  2.0  |
+| [alightSlack](#rd_alightSlack)                                                                               |       `duration`       | The time safety margin when alighting from a vehicle.                                                                                          | *Optional* | `"PT0S"`         |  2.0  |
 | arriveBy                                                                                                     |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                                       | *Optional* | `false`          |  2.0  |
-| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The extra time to board a public transport vehicle.                                                                                            | *Optional* | `"PT0S"`         |  2.0  |
+| [boardSlack](#rd_boardSlack)                                                                                 |       `duration`       | The time safety margin when boarding a vehicle.                                                                                                | *Optional* | `"PT0S"`         |  2.0  |
 | [drivingDirection](#rd_drivingDirection)                                                                     |         `enum`         | The driving direction to use in the intersection traversal calculation                                                                         | *Optional* | `"right"`        |  2.2  |
 | elevatorBoardCost                                                                                            |        `integer`       | What is the cost of boarding a elevator?                                                                                                       | *Optional* | `90`             |  2.0  |
 | elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`             |  2.0  |
@@ -192,14 +192,14 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The extra time to exit a public transport vehicle.
+The time safety margin when alighting from a vehicle.
 
-The slack is added to arrival time of the transit vehicle.
+This time slack is added to arrival time of the vehicle before any transfer or onward travel.
 
-This also influences the time it takes to transfer.
-
-Since some modes, like airplane and subway, need more time than others, this is also configurable
-per mode with `alightSlackForMode`.
+The sole reason for this is to avoid missed connections when there are minor schedule variations. This
+parameter is intended to be set by agencies not individual users. In general it is better to use
+`boardSlack` - see its documentation for details. However, for specific modes, like airplane and
+subway, that need more time than others, this is also configurable per mode with `alightSlackForMode`.
 
 
 <h3 id="rd_boardSlack">boardSlack</h3>
@@ -207,18 +207,19 @@ per mode with `alightSlackForMode`.
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults 
 
-The extra time to board a public transport vehicle.
+The time safety margin when boarding a vehicle.
 
-The extra time is added to the time when entering a public transport vehicle. This is a useful
-tool for agencies wanting to add a general buffer time so that passengers are instructed to be
-a earlier at their stop than is strictly necessary. This is also added when transferring from one
-vehicle to another.
+The board slack is added to the passenger's arrival time at a stop before boarding evaluating which
+vehicles can be boarded.
 
-It is similar to `transferSlack`, except that this also applies to the first transit leg in the
-trip and `transferSlack` does not.
+The sole reason for this is to avoid missed connections when there are minor schedule variations. This
+parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
+subway, that need more time than others, this is also configurable per mode with `boardSlackForMode`.
 
-Some modes, like airplane or subway, might need more of a slack than others, so this is also
-configurable per mode with `boardSlackForMode`.
+Agencies can use this parameter to ensure that the trip planner does not instruct passengers to arrive
+at the last second.
+This slack is added at every boarding including the first vehicle and transfers except for in-seat
+transfers and guaranteed transfers.
 
 
 <h3 id="rd_drivingDirection">drivingDirection</h3>

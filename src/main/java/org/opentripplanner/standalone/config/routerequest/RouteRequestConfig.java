@@ -202,15 +202,15 @@ travel time `x` (in seconds).
             c
               .of("alightSlack")
               .since(V2_0)
-              .summary("The extra time to exit a public transport vehicle.")
+              .summary("The time safety margin when alighting from a vehicle.")
               .description(
                 """
-The slack is added to arrival time of the transit vehicle.
+This time slack is added to arrival time of the vehicle before any transfer or onward travel.
 
-This also influences the time it takes to transfer.
-
-Since some modes, like airplane and subway, need more time than others, this is also configurable
-per mode with `alightSlackForMode`.
+The sole reason for this is to avoid missed connections when there are minor schedule variations. This
+parameter is intended to be set by agencies not individual users. In general it is better to use
+`boardSlack` - see its documentation for details. However, for specific modes, like airplane and
+subway, that need more time than others, this is also configurable per mode with `alightSlackForMode`.
 """
               )
               .asDuration(dft.alightSlack().defaultValue())
@@ -235,19 +235,20 @@ per mode with `alightSlackForMode`.
             c
               .of("boardSlack")
               .since(V2_0)
-              .summary("The extra time to board a public transport vehicle.")
+              .summary("The time safety margin when boarding a vehicle.")
               .description(
                 """
-The extra time is added to the time when entering a public transport vehicle. This is a useful
-tool for agencies wanting to add a general buffer time so that passengers are instructed to be
-a earlier at their stop than is strictly necessary. This is also added when transferring from one
-vehicle to another.
+The board slack is added to the passenger's arrival time at a stop before boarding evaluating which
+vehicles can be boarded.
 
-It is similar to `transferSlack`, except that this also applies to the first transit leg in the
-trip and `transferSlack` does not.
+The sole reason for this is to avoid missed connections when there are minor schedule variations. This
+parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
+subway, that need more time than others, this is also configurable per mode with `boardSlackForMode`.
 
-Some modes, like airplane or subway, might need more of a slack than others, so this is also
-configurable per mode with `boardSlackForMode`.
+Agencies can use this parameter to ensure that the trip planner does not instruct passengers to arrive 
+at the last second.
+This slack is added at every boarding including the first vehicle and transfers except for in-seat 
+transfers and guaranteed transfers. 
 """
               )
               .asDuration(dft.boardSlack().defaultValue())
