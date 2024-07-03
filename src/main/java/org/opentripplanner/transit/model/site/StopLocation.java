@@ -142,7 +142,7 @@ public interface StopLocation extends LogInfo {
 
   @Nonnull
   default StopTransferPriority getPriority() {
-    return StopTransferPriority.ALLOWED;
+    return StopTransferPriority.defaultValue();
   }
 
   boolean isPartOfSameStationAs(StopLocation alternativeStop);

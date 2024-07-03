@@ -24,9 +24,6 @@ public record GtfsFeedParameters(
   implements DataSourceConfig {
   public static final boolean DEFAULT_REMOVE_REPEATED_STOPS = true;
 
-  public static final StopTransferPriority DEFAULT_STATION_TRANSFER_PREFERENCE =
-    StopTransferPriority.ALLOWED;
-
   public static final boolean DEFAULT_DISCARD_MIN_TRANSFER_TIMES = false;
 
   public static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;

@@ -191,7 +191,7 @@ public class TransitLayerMapper {
       return null;
     }
     int defaultCost = RaptorCostConverter.toRaptorCost(
-      tuningParams.stopBoardAlightDuringTransferCost(StopTransferPriority.ALLOWED)
+      tuningParams.stopBoardAlightDuringTransferCost(StopTransferPriority.defaultValue())
     );
     int[] stopBoardAlightTransferCosts = new int[stops.stopIndexSize()];
 

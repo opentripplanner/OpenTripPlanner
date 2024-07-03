@@ -30,8 +30,6 @@ public class Station
   extends AbstractTransitEntity<Station, StationBuilder>
   implements StopLocationsGroup, LogInfo {
 
-  public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
-
   private final I18NString name;
   private final String code;
   private final I18NString description;
@@ -52,7 +50,8 @@ public class Station
     // Required fields
     this.name = Objects.requireNonNull(builder.getName());
     this.coordinate = Objects.requireNonNull(builder.getCoordinate());
-    this.priority = Objects.requireNonNullElse(builder.getPriority(), DEFAULT_PRIORITY);
+    this.priority =
+      Objects.requireNonNullElse(builder.getPriority(), StopTransferPriority.defaultValue());
     this.transfersNotAllowed = builder.isTransfersNotAllowed();
 
     // Optional fields

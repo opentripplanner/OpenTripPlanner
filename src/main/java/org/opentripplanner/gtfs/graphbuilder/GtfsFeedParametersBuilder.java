@@ -18,7 +18,7 @@ public class GtfsFeedParametersBuilder {
 
   public GtfsFeedParametersBuilder() {
     this.removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
-    this.stationTransferPreference = GtfsFeedParameters.DEFAULT_STATION_TRANSFER_PREFERENCE;
+    this.stationTransferPreference = StopTransferPriority.defaultValue();
     this.discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
     this.blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
     this.maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
