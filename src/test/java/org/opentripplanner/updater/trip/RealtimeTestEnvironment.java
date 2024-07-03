@@ -356,5 +356,5 @@ public final class RealtimeTestEnvironment {
     return st;
   }
 
-  protected record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
+  private record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
 }
