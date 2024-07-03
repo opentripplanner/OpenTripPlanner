@@ -3,7 +3,11 @@ package org.opentripplanner.transit.model.network.grouppriority;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 
-public class DefaultTransitGroupPriorityCalculator implements RaptorTransitGroupPriorityCalculator {
+/**
+ * Implement {@link RaptorTransitGroupPriorityCalculator}.
+ */
+public final class DefaultTransitGroupPriorityCalculator
+  implements RaptorTransitGroupPriorityCalculator {
 
   @Override
   public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {

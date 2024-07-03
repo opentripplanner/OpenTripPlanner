@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class DefaultTransitGroupCalculatorTest {
+class DefaultTransitGroupPriorityCalculatorTest {
 
   private final DefaultTransitGroupPriorityCalculator subject = new DefaultTransitGroupPriorityCalculator();
 
