@@ -200,6 +200,8 @@ public class NetexMapper {
     mapNoticeAssignments();
 
     addEntriesToGroupMapperForPostProcessingLater();
+
+    mapParkings();
   }
 
   /* PRIVATE METHODS */
@@ -509,6 +511,12 @@ public class NetexMapper {
       noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
       transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
     }
+  }
+
+  private void mapParkings() {
+    var mapper = new VehicleParkingMapper(idFactory);
+    var parkingLots = mapper.map(currentNetexIndex.getParkings());
+    System.out.print(parkingLots);
   }
 
   private void addEntriesToGroupMapperForPostProcessingLater() {

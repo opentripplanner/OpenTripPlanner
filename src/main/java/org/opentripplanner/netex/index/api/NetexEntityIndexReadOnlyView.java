@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.index.api;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Branding;
@@ -19,6 +20,7 @@ import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.Operator;
+import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -79,6 +81,8 @@ public interface NetexEntityIndexReadOnlyView {
   ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
 
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
+
+  ImmutableSet<Parking> getParkings();
 
   ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
 
