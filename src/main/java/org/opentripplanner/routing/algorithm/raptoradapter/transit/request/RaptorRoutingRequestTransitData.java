@@ -34,7 +34,7 @@ import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPrior
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
- * but filters it by dates and modes per request. Transfers durations are pre-calculated per request
+ * but filters it by dates and modes per request. Transfer durations are pre-calculated per request
  * based on walk speed.
  */
 public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvider<TripSchedule> {
@@ -72,6 +72,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   public RaptorRoutingRequestTransitData(
     TransitLayer transitLayer,
+    TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
@@ -83,7 +84,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.transitSearchTimeZero = transitSearchTimeZero;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
-    // it is nice to NOT have it in the class. It isolate this code to only be available at
+    // it is nice to NOT have it in the class. It isolates this code to only be available at
     // the time of construction
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
       transitLayer,
@@ -93,7 +94,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       additionalPastSearchDays,
       additionalFutureSearchDays,
       filter,
-      createTransitGroupPriorityConfigurator(request)
+      transitGroupPriorityService
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
@@ -242,17 +243,5 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
-  }
-
-  private TransitGroupPriorityService createTransitGroupPriorityConfigurator(RouteRequest request) {
-    if (request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
-      return TransitGroupPriorityService.empty();
-    }
-    var transitRequest = request.journey().transit();
-    return TransitGroupPriorityService.of(
-      request.preferences().transit().relaxTransitGroupPriority(),
-      transitRequest.priorityGroupsByAgency(),
-      transitRequest.priorityGroupsGlobal()
-    );
   }
 }

@@ -41,14 +41,15 @@ import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
- * contains both flex zones but also scheduled stops. Inside the zone passengers can get on or off
- * anywhere so there it works more like a taxi.
+ * contains both flex zones but also scheduled stops. Inside the zone, passengers can get on or off
+ * anywhere, so there it works more like a taxi.
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
@@ -212,6 +213,7 @@ class ScheduledDeviatedTripTest {
     var result = TransitRouter.route(
       request,
       serverContext,
+      TransitGroupPriorityService.empty(),
       transitStartOfTime,
       additionalSearchDays,
       new DebugTimingAggregator()

@@ -41,6 +41,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 
 public class TransitRouter {
 
@@ -48,6 +49,7 @@ public class TransitRouter {
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
+  private final TransitGroupPriorityService transitGroupPriorityService;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
@@ -56,12 +58,14 @@ public class TransitRouter {
   private TransitRouter(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
   ) {
     this.request = request;
     this.serverContext = serverContext;
+    this.transitGroupPriorityService = transitGroupPriorityService;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
@@ -71,6 +75,7 @@ public class TransitRouter {
   public static TransitRouterResult route(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitGroupPriorityService priorityGroupConfigurator,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
@@ -78,6 +83,7 @@ public class TransitRouter {
     TransitRouter transitRouter = new TransitRouter(
       request,
       serverContext,
+      priorityGroupConfigurator,
       transitSearchTimeZero,
       additionalSearchDays,
       debugTimingAggregator
@@ -309,6 +315,7 @@ public class TransitRouter {
   ) {
     return new RaptorRoutingRequestTransitData(
       transitLayer,
+      transitGroupPriorityService,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
