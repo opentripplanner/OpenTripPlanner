@@ -44,6 +44,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
@@ -218,7 +219,6 @@ public abstract class GtfsTest {
     alertsUpdateHandler.setFeedId(feedId.getId());
 
     try {
-      final boolean fullDataset = false;
       InputStream inputStream = new FileInputStream(gtfsRealTime);
       FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
       List<FeedEntity> feedEntityList = feedMessage.getEntityList();
@@ -229,7 +229,7 @@ public abstract class GtfsTest {
       timetableSnapshotSource.applyTripUpdates(
         null,
         REQUIRED_NO_DATA,
-        fullDataset,
+        UpdateIncrementality.DIFFERENTIAL,
         updates,
         feedId.getId()
       );

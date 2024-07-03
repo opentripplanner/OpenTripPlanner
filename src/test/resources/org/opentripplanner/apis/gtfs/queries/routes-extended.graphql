@@ -1,14 +1,14 @@
 {
-    routes {
-        longName
-        shortName
-        gtfsId
-        agency {
-            gtfsId
-            name
-        }
-        mode
-        sortOrder
-        bikesAllowed
+  routes {
+    longName
+    shortName
+    gtfsId
+    agency {
+      gtfsId
+      name
     }
+    mode
+    sortOrder
+    bikesAllowed
+  }
 }

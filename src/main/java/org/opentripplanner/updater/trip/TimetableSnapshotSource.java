@@ -12,6 +12,8 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VAL
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -132,15 +134,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
-   * @param fullDataset                   true if the list with updates represent all updates that
-   *                                      are active right now, i.e. all previous updates should be
-   *                                      disregarded
+   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates clear the buffer
+   *                                      of all previous updates for the given feed id.
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
-    boolean fullDataset,
+    UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
     String feedId
   ) {
@@ -153,7 +154,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
     snapshotManager.withLock(() -> {
-      if (fullDataset) {
+      if (updateIncrementality == FULL_DATASET) {
         // Remove all updates from the buffer
         snapshotManager.clearBuffer(feedId);
       }
@@ -201,7 +202,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
           tripDescriptor
         );
-        if (!fullDataset) {
+        if (updateIncrementality == DIFFERENTIAL) {
           purgePatternModifications(tripScheduleRelationship, tripId, serviceDate);
         }
 
@@ -229,13 +230,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 tripId,
                 serviceDate,
                 CancelationType.CANCEL,
-                fullDataset
+                updateIncrementality
               );
               case DELETED -> handleCanceledTrip(
                 tripId,
                 serviceDate,
                 CancelationType.DELETE,
-                fullDataset
+                updateIncrementality
               );
               case REPLACEMENT -> validateAndHandleModifiedTrip(
                 tripUpdate,
@@ -268,7 +269,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var updateResult = UpdateResult.ofResults(results);
 
-    if (fullDataset) {
+    if (updateIncrementality == FULL_DATASET) {
       logUpdateResult(feedId, failuresByRelationship, updateResult);
     }
     return updateResult;
@@ -1065,11 +1066,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId tripId,
     final LocalDate serviceDate,
     CancelationType cancelationType,
-    boolean fullDataset
+    UpdateIncrementality incrementality
   ) {
-    var canceledPreviouslyAddedTrip = fullDataset
-      ? false
-      : cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
+    var canceledPreviouslyAddedTrip =
+      incrementality != FULL_DATASET &&
+      cancelPreviouslyAddedTrip(tripId, serviceDate, cancelationType);
 
     // if previously an added trip was removed, there can't be a scheduled trip to remove
     if (canceledPreviouslyAddedTrip) {

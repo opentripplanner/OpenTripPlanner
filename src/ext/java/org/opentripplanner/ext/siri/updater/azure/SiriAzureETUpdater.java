@@ -19,6 +19,7 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         fuzzyTripMatcher(),
         entityResolver(),
         feedId,
-        false,
+        UpdateIncrementality.DIFFERENTIAL,
         updates
       );
       ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);

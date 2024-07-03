@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
@@ -143,7 +144,7 @@ public class SkippedTest {
       .addDelayedStopTime(2, 90)
       .build();
 
-    var result = env.applyTripUpdate(tripUpdate, true);
+    var result = env.applyTripUpdate(tripUpdate, DIFFERENTIAL);
 
     assertEquals(1, result.successful());
 
@@ -161,7 +162,7 @@ public class SkippedTest {
     tripUpdate = scheduledBuilder.build();
 
     // apply the update with the previously skipped stop now scheduled
-    result = env.applyTripUpdate(tripUpdate, true);
+    result = env.applyTripUpdate(tripUpdate, DIFFERENTIAL);
 
     assertEquals(1, result.successful());
     // Check that the there is no longer a realtime added trip pattern for the trip and that the

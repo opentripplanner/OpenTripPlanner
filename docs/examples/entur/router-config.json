@@ -123,8 +123,9 @@
     {
       "type": "siri-et-google-pubsub-updater",
       "feedId": "EN",
-      "projectName": "entur-ror",
+      "topicProjectName": "entur-anshar",
       "topicName": "estimated_timetables",
+      "subscriptionProjectName": "entur-otp2",
       "dataInitializationUrl": "https://example.com"
     },
     // SIRI ET updater

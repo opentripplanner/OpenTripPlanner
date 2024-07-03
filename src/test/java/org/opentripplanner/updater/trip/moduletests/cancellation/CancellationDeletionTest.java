@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import java.util.List;
@@ -87,7 +88,7 @@ public class CancellationDeletionTest {
       .addStopTime(env.stopC1.getId().getId(), 55)
       .build();
 
-    var result = env.applyTripUpdate(update, true);
+    var result = env.applyTripUpdate(update, DIFFERENTIAL);
 
     assertEquals(1, result.successful());
 
@@ -100,7 +101,7 @@ public class CancellationDeletionTest {
         env.timeZone
       )
         .build();
-    result = env.applyTripUpdate(update, true);
+    result = env.applyTripUpdate(update, DIFFERENTIAL);
 
     assertEquals(1, result.successful());
 
