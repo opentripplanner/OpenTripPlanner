@@ -11,9 +11,9 @@ This document is far from complete - hopefully it can evolve over time and becom
 introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
 detailed discussions on many design decisions.
 
-We document Architectural Decision in a log. Make sure you as a developer is familiar with the
-decisions and follow them. Reviewers should use them actively when reviewing code and may use them
-to ask for changes.
+We document [Architectural Decision](ADRs.md) in a log. Make sure you as a developer are familiar 
+with the decisions and follow them. Reviewers should use them actively when reviewing code and may
+use them to ask for changes.
 
 Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 
