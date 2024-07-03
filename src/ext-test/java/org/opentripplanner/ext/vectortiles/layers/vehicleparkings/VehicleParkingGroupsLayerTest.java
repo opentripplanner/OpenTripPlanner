@@ -125,8 +125,8 @@ public class VehicleParkingGroupsLayerTest {
 
     assertEquals("[POINT (1.1 1.9)]", geometries.toString());
     assertEquals(
-      "VehicleParkingAndGroup[vehicleParkingGroup=VehicleParkingGroup{name: 'groupName', coordinate: (1.9, 1.1)}, vehicleParking=[VehicleParking{name: 'name', coordinate: (2.0, 1.0)}]]",
-      geometries.get(0).getUserData().toString()
+      "VehicleParkingAndGroup[vehicleParkingGroup=VehicleParkingGroup{name: 'groupName', coordinate: (1.9, 1.1)}, vehicleParking=[VehicleParking{id: 'F:id', name: 'name', coordinate: (2.0, 1.0)}]]",
+      geometries.getFirst().getUserData().toString()
     );
   }
 

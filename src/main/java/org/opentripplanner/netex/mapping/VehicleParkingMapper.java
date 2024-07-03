@@ -42,6 +42,8 @@ class VehicleParkingMapper {
       .name(NonLocalizedString.ofNullable(parking.getName().getValue()))
       .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
       .capacity(mapCapacity(parking))
+      .bicyclePlaces(hasBikes(parking))
+      .carPlaces(!hasBikes(parking))
       .entrance(mapEntrance(parking))
       .build();
   }
@@ -57,13 +59,12 @@ class VehicleParkingMapper {
 
   private static VehicleParkingSpaces mapCapacity(Parking parking) {
     var builder = VehicleParkingSpaces.builder();
-
-    // we assume that if we have bicycle in vehicle types it's a bicycle parking lot
-    // it's not possible in NeTEx to split the spaces between the types
-    var hasBikes = hasBikes(parking);
     int capacity = parking.getTotalCapacity().intValue();
 
-    if (hasBikes) {
+    // we assume that if we have bicycle in vehicle types it's a bicycle parking lot
+    // it's not possible in NeTEx to split the spaces between the types, so if you want that
+    // you have to define two parking lots with the same coordinates
+    if (hasBikes(parking)) {
       builder.bicycleSpaces(capacity);
     } else {
       builder.carSpaces(capacity);

@@ -17,6 +17,7 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public class NetexBundle implements Closeable {
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
   private final boolean ignoreFareFrame;
+  private final VehicleParkingService parkingService;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -59,6 +61,7 @@ public class NetexBundle implements Closeable {
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
     OtpTransitServiceBuilder transitBuilder,
+    VehicleParkingService parkingService,
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops,
@@ -68,6 +71,7 @@ public class NetexBundle implements Closeable {
     this.source = source;
     this.hierarchy = hierarchy;
     this.transitBuilder = transitBuilder;
+    this.parkingService = parkingService;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
@@ -93,7 +97,8 @@ public class NetexBundle implements Closeable {
         issueStore,
         ferryIdsNotAllowedForBicycle,
         maxStopToShapeSnapDistance,
-        noTransfersOnIsolatedStops
+        noTransfersOnIsolatedStops,
+        parkingService
       );
 
     // Load data
