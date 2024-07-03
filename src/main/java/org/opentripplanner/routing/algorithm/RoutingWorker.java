@@ -16,6 +16,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
@@ -129,6 +130,9 @@ public class RoutingWorker {
       // Transit routing
       routeTransit(itineraries, routingErrors);
     }
+
+    // Set C2 value for Street and FLEX if transit-group-priority is used
+    new TransitGroupPriorityItineraryDecorator(transitGroupPriorityService).decorate(itineraries);
 
     debugTimingAggregator.finishedRouting();
 

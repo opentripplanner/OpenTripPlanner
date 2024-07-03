@@ -12,6 +12,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class dynamically builds an index of transit-group-ids from the provided
@@ -106,6 +107,15 @@ public class TransitGroupPriorityService {
     return tripPattern == null
       ? baseGroupId
       : lookupTransitGroupPriorityId(new TripPatternAdapter(tripPattern));
+  }
+
+  /**
+   * Fetch/lookup the transit-group-id for the given trip.
+   * <p>
+   * @throws IllegalArgumentException if more than 32 group-ids are requested.
+   */
+  public int lookupTransitGroupPriorityId(Trip trip) {
+    return trip == null ? baseGroupId : lookupTransitGroupPriorityId(new TripAdapter(trip));
   }
 
   /**
