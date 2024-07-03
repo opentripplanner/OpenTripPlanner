@@ -19,6 +19,11 @@ class TransfersMapper {
 
     for (int i = 0; i < stopModel.stopIndexSize(); ++i) {
       var stop = stopModel.stopByIndex(i);
+
+      if (stop == null) {
+        continue;
+      }
+
       ArrayList<Transfer> list = new ArrayList<>();
 
       for (PathTransfer pathTransfer : transitModel.getTransfersByStop(stop)) {
