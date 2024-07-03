@@ -145,13 +145,26 @@ public class EnumTypes {
   public static final GraphQLEnumType STOP_INTERCHANGE_PRIORITY = GraphQLEnumType
     .newEnum()
     .name("StopInterchangePriority")
-    .value("preferred", StopTransferPriority.PREFERRED, "Highest interchange priority.")
-    .value("recommended", StopTransferPriority.RECOMMENDED)
-    .value("allowed", StopTransferPriority.ALLOWED)
+    .value(
+      "preferred",
+      StopTransferPriority.PREFERRED,
+      "Preferred place to transfer, strongly recommended. NeTEx equivalent is PREFERRED_INTERCHANGE."
+    )
+    .value(
+      "recommended",
+      StopTransferPriority.RECOMMENDED,
+      "Recommended stop place. NeTEx equivalent is RECOMMENDED_INTERCHANGE."
+    )
+    .value(
+      "allowed",
+      StopTransferPriority.ALLOWED,
+      "Allow transfers from/to this stop. This is the default. NeTEx equivalent is INTERCHANGE_ALLOWED."
+    )
     .value(
       "discouraged",
       StopTransferPriority.DISCOURAGED,
-      "This maps to 'interchangeNotAllowed' in NeTEx."
+      "Block transfers from/to this stop. In OTP this is not a definitive block," +
+      " just a huge penalty is added to the cost function. NeTEx equivalent is NO_INTERCHANGE."
     )
     .build();
 

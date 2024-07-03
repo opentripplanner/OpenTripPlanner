@@ -1750,11 +1750,13 @@ enum StopCondition {
 }
 
 enum StopInterchangePriority {
+  "Allow transfers from/to this stop. This is the default. NeTEx equivalent is INTERCHANGE_ALLOWED."
   allowed
-  "This maps to 'interchangeNotAllowed' in NeTEx."
+  "Block transfers from/to this stop. In OTP this is not a definitive block, just a huge penalty is added to the cost function. NeTEx equivalent is NO_INTERCHANGE."
   discouraged
-  "Highest interchange priority."
+  "Preferred place to transfer, strongly recommended. NeTEx equivalent is PREFERRED_INTERCHANGE."
   preferred
+  "Recommended stop place. NeTEx equivalent is RECOMMENDED_INTERCHANGE."
   recommended
 }
 
