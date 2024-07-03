@@ -7,3 +7,5 @@
 # graphql test and documentation reformatting with prettier
 12c51f44f204db31d34a1eeb0d59204226e0fa5d
 
+# reorder and reformat GTFS GraphQL API schema file with graphql-java
+14051fab312a67cae9a460aaf0bbc77223bec624
