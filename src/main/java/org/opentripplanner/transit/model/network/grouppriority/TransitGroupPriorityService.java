@@ -65,8 +65,8 @@ public class TransitGroupPriorityService {
     Collection<TransitGroupSelect> byAgency,
     Collection<TransitGroupSelect> global
   ) {
-    this.agencyMatchers = PriorityGroupMatcher.of(byAgency);
-    this.globalMatchers = PriorityGroupMatcher.of(global);
+    this.agencyMatchers = Matchers.of(byAgency);
+    this.globalMatchers = Matchers.of(global);
     this.enabled = Stream.of(agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
     this.globalMatchersIds =
       Arrays.stream(globalMatchers).map(m -> new MatcherAndId(m, nextGroupId())).toList();

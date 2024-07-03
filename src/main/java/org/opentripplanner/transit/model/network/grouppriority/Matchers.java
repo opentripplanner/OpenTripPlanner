@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * a `CompositeMatcher`. So, a new matcher is only created if the field in the
  * select is present.
  */
-public final class PriorityGroupMatcher {
+public final class Matchers {
 
   private static final Matcher NOOP = new Matcher() {
     @Override
@@ -68,7 +68,7 @@ public final class PriorityGroupMatcher {
   static Matcher[] of(Collection<TransitGroupSelect> selectors) {
     return selectors
       .stream()
-      .map(PriorityGroupMatcher::of)
+      .map(Matchers::of)
       .filter(Predicate.not(Matcher::isEmpty))
       .toArray(Matcher[]::new);
   }
