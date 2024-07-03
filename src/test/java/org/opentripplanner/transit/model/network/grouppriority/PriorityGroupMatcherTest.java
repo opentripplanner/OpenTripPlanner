@@ -58,7 +58,7 @@ class PriorityGroupMatcherTest {
     assertEquals("AgencyId(F:A1)", m1.toString());
     assertEquals("AgencyId(F:A1 | F:ANY)", m2.toString());
 
-    for (PriorityGroupMatcher m : matchers) {
+    for (Matcher m : matchers) {
       assertFalse(m.isEmpty());
       assertTrue(m.match(rail1));
       assertTrue(m.match(ferry));
@@ -79,7 +79,7 @@ class PriorityGroupMatcherTest {
     assertEquals("RouteId(F:R1)", m1.toString());
     assertEquals("RouteId(F:R1 | F:ANY)", m2.toString());
 
-    for (PriorityGroupMatcher m : matchers) {
+    for (Matcher m : matchers) {
       assertFalse(m.isEmpty());
       assertTrue(m.match(rail1));
       assertFalse(m.match(ferry));

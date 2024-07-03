@@ -28,25 +28,25 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * a `CompositeMatcher`. So, a new matcher is only created if the field in the
  * select is present.
  */
-public abstract class PriorityGroupMatcher {
+public final class PriorityGroupMatcher {
 
-  private static final PriorityGroupMatcher NOOP = new PriorityGroupMatcher() {
+  private static final Matcher NOOP = new Matcher() {
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(TripPattern pattern) {
       return false;
     }
 
     @Override
-    boolean isEmpty() {
+    public boolean isEmpty() {
       return true;
     }
   };
 
-  public static PriorityGroupMatcher of(TransitGroupSelect select) {
+  public static Matcher of(TransitGroupSelect select) {
     if (select.isEmpty()) {
       return NOOP;
     }
-    List<PriorityGroupMatcher> list = new ArrayList<>();
+    List<Matcher> list = new ArrayList<>();
 
     if (!select.modes().isEmpty()) {
       list.add(new ModeMatcher(select.modes()));
@@ -65,12 +65,12 @@ public abstract class PriorityGroupMatcher {
     return andOf(list);
   }
 
-  static PriorityGroupMatcher[] of(Collection<TransitGroupSelect> selectors) {
+  static Matcher[] of(Collection<TransitGroupSelect> selectors) {
     return selectors
       .stream()
       .map(PriorityGroupMatcher::of)
-      .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
-      .toArray(PriorityGroupMatcher[]::new);
+      .filter(Predicate.not(Matcher::isEmpty))
+      .toArray(Matcher[]::new);
   }
 
   private static <T> String arrayToString(BinarySetOperator op, T[] values) {
@@ -81,9 +81,9 @@ public abstract class PriorityGroupMatcher {
     return values.stream().map(Objects::toString).collect(Collectors.joining(" " + op + " "));
   }
 
-  private static PriorityGroupMatcher andOf(List<PriorityGroupMatcher> list) {
+  private static Matcher andOf(List<Matcher> list) {
     // Remove empty/noop matchers
-    list = list.stream().filter(Predicate.not(PriorityGroupMatcher::isEmpty)).toList();
+    list = list.stream().filter(Predicate.not(Matcher::isEmpty)).toList();
 
     if (list.isEmpty()) {
       return NOOP;
@@ -94,13 +94,7 @@ public abstract class PriorityGroupMatcher {
     return new AndMatcher(list);
   }
 
-  abstract boolean match(TripPattern pattern);
-
-  boolean isEmpty() {
-    return false;
-  }
-
-  private static final class ModeMatcher extends PriorityGroupMatcher {
+  private static final class ModeMatcher implements Matcher {
 
     private final Set<TransitMode> modes;
 
@@ -109,7 +103,7 @@ public abstract class PriorityGroupMatcher {
     }
 
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(TripPattern pattern) {
       return modes.contains(pattern.getMode());
     }
 
@@ -119,7 +113,7 @@ public abstract class PriorityGroupMatcher {
     }
   }
 
-  private static final class RegExpMatcher extends PriorityGroupMatcher {
+  private static final class RegExpMatcher implements Matcher {
 
     private final String typeName;
     private final Pattern[] subModeRegexp;
@@ -136,7 +130,7 @@ public abstract class PriorityGroupMatcher {
     }
 
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(TripPattern pattern) {
       var value = toValue.apply(pattern);
       for (Pattern p : subModeRegexp) {
         if (p.matcher(value).matches()) {
@@ -152,7 +146,7 @@ public abstract class PriorityGroupMatcher {
     }
   }
 
-  private static final class IdMatcher extends PriorityGroupMatcher {
+  private static final class IdMatcher implements Matcher {
 
     private final String typeName;
     private final Set<FeedScopedId> ids;
@@ -169,7 +163,7 @@ public abstract class PriorityGroupMatcher {
     }
 
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(TripPattern pattern) {
       return ids.contains(idProvider.apply(pattern));
     }
 
@@ -183,16 +177,16 @@ public abstract class PriorityGroupMatcher {
    * Takes a list of matchers and provide a single interface. All matchers in the list must match
    * for the composite matcher to return a match.
    */
-  private static final class AndMatcher extends PriorityGroupMatcher {
+  private static final class AndMatcher implements Matcher {
 
-    private final PriorityGroupMatcher[] matchers;
+    private final Matcher[] matchers;
 
-    public AndMatcher(List<PriorityGroupMatcher> matchers) {
-      this.matchers = matchers.toArray(PriorityGroupMatcher[]::new);
+    public AndMatcher(List<Matcher> matchers) {
+      this.matchers = matchers.toArray(Matcher[]::new);
     }
 
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(TripPattern pattern) {
       for (var m : matchers) {
         if (!m.match(pattern)) {
           return false;

@@ -46,8 +46,8 @@ public class TransitGroupPriorityService {
   private final int baseGroupId = TransitGroupPriority32n.groupId(GROUP_INDEX_COUNTER_START);
   private int groupIndexCounter = GROUP_INDEX_COUNTER_START;
   private final boolean enabled;
-  private final PriorityGroupMatcher[] agencyMatchers;
-  private final PriorityGroupMatcher[] globalMatchers;
+  private final Matcher[] agencyMatchers;
+  private final Matcher[] globalMatchers;
 
   // Index matchers and ids
   private final List<MatcherAgencyAndIds> agencyMatchersIds;
@@ -129,11 +129,11 @@ public class TransitGroupPriorityService {
   }
 
   /** Pair of matcher and groupId. Used only inside this class. */
-  record MatcherAndId(PriorityGroupMatcher matcher, int groupId) {}
+  record MatcherAndId(Matcher matcher, int groupId) {}
 
   /** Matcher with map of ids by agency. */
-  record MatcherAgencyAndIds(PriorityGroupMatcher matcher, TObjectIntMap<FeedScopedId> ids) {
-    MatcherAgencyAndIds(PriorityGroupMatcher matcher) {
+  record MatcherAgencyAndIds(Matcher matcher, TObjectIntMap<FeedScopedId> ids) {
+    MatcherAgencyAndIds(Matcher matcher) {
       this(
         matcher,
         new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1)
