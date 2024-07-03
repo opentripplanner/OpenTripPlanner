@@ -29,19 +29,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 final class Matchers {
 
-  private static final Matcher NOOP = new Matcher() {
-    @Override
-    public boolean match(EntityAdapter entity) {
-      return false;
-    }
+  private static final Matcher NOOP = new EmptyMatcher();
 
-    @Override
-    public boolean isEmpty() {
-      return true;
-    }
-  };
-
-  public static Matcher of(TransitGroupSelect select) {
+  static Matcher of(TransitGroupSelect select) {
     if (select.isEmpty()) {
       return NOOP;
     }
@@ -90,6 +80,24 @@ final class Matchers {
       return list.get(0);
     }
     return new AndMatcher(list);
+  }
+
+  private static final class EmptyMatcher implements Matcher {
+
+    @Override
+    public boolean match(EntityAdapter entity) {
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return "Empty";
+    }
   }
 
   private static final class ModeMatcher implements Matcher {

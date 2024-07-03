@@ -33,6 +33,14 @@ class MatchersTest {
   private final FeedScopedId anyId = new FeedScopedId("F", "ANY");
 
   @Test
+  void testEmptySelect() {
+    var m = Matchers.of(TransitGroupSelect.of().build());
+    assertEquals("Empty", m.toString());
+    assertTrue(m.isEmpty());
+    assertFalse(m.match(bus));
+  }
+
+  @Test
   void testMode() {
     var m = Matchers.of(
       TransitGroupSelect.of().addModes(List.of(TransitMode.BUS, TransitMode.TRAM)).build()
