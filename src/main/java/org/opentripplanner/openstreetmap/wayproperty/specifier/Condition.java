@@ -226,7 +226,9 @@ public sealed interface Condition {
   }
 
   /**
-   * Selects a tag which has one of a set of given values or the tag is absent.
+   * Selects a tag where one of the following conditions is true:
+   *  - one of a set of given values matches
+   *  - the tag is absent
    */
   record OneOfOrAbsent(String key, String... values) implements Condition {
     /* A use case for this is to detect the absence of a sidewalk, cycle lane or verge*/
