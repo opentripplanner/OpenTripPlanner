@@ -1,8 +1,7 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
-import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriority32n;
 
 public class DefaultTransitGroupPriorityCalculator implements RaptorTransitGroupPriorityCalculator {
 

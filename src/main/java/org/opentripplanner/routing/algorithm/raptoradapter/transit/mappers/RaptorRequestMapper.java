@@ -20,11 +20,11 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTransitGroupPriorityCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
