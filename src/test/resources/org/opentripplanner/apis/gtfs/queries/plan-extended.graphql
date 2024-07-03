@@ -1,161 +1,157 @@
 {
-    plan(
-        from: { lat: 52.3092, lon: 13.0291 }
-        to: { lat: 52.5147, lon: 13.3927 }
-        date: "2023-02-15",
-        time: "11:37",
-        parking: {
-            unpreferredCost: 555,
-            preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
-            filters: [{ select: [{tags:["e"]}] }]
-        },
-        transportModes: [
-            {
-                mode: CAR,
-                qualifier: HAIL
-            }
-        ]) {
-        itineraries {
-            start
-            end
-            # next two are deprecated
-            startTime
-            endTime
-            generalizedCost
-            accessibilityScore
-            emissionsPerPerson {
-                co2
-            }
-            numberOfTransfers
-            walkDistance
-            walkTime
-            legs {
-                mode
-                start {
-                    scheduledTime
-                    estimated {
-                        time
-                        delay
-                    }
-                }
-                end {
-                    scheduledTime
-                    estimated {
-                        time
-                        delay
-                    }
-                }
-                from {
-                    name
-                    lat
-                    lon
-                    arrival {
-                        scheduledTime
-                        estimated {
-                            delay
-                            time
-                        }
-                    }
-                    departure {
-                        scheduledTime
-                        estimated {
-                            delay
-                            time
-                        }
-                    }
-                    departureTime
-                    arrivalTime
-                }
-                to {
-                    name
-                    lat
-                    lon
-                    arrival {
-                        scheduledTime
-                        estimated {
-                            delay
-                            time
-                        }
-                    }
-                    departure {
-                        scheduledTime
-                        estimated {
-                            delay
-                            time
-                        }
-                    }
-                    departureTime
-                    arrivalTime
-                }
-                startTime
-                endTime
-                mode
-                generalizedCost
-                headsign
-                trip {
-                    tripHeadsign
-                }
-                intermediatePlaces {
-                    arrival {
-                        scheduledTime
-                        estimated {
-                            time
-                            delay
-                        }
-                    }
-                    departure {
-                        scheduledTime
-                        estimated {
-                            time
-                            delay
-                        }
-                    }
-                    stop {
-                        name
-                    }
-                }
-                alerts {
-                    id
-                    alertHeaderText
-                    alertDescriptionText
-                    alertEffect
-                    alertCause
-                    alertSeverityLevel
-                    alertUrl
-                    effectiveStartDate
-                    effectiveEndDate
-                    entities {
-                        ... on Stop {
-                            name
-                            gtfsId
-                            lat
-                            lon
-                        }
-                    }
-                }
-                rideHailingEstimate {
-                    provider {
-                        id
-                    }
-                    productName
-                    minPrice {
-                        currency {
-                            code
-                            digits
-                        }
-                        amount
-                    }
-                    maxPrice {
-                        currency {
-                            code
-                            digits
-                        }
-                        amount
-                    }
-                    arrival
-                }
-                accessibilityScore
-            }
-        }
+  plan(
+    from: { lat: 52.3092, lon: 13.0291 }
+    to: { lat: 52.5147, lon: 13.3927 }
+    date: "2023-02-15"
+    time: "11:37"
+    parking: {
+      unpreferredCost: 555
+      preferred: [{ not: [{ tags: ["a", "b", "c"] }] }]
+      filters: [{ select: [{ tags: ["e"] }] }]
     }
+    transportModes: [{ mode: CAR, qualifier: HAIL }]
+  ) {
+    itineraries {
+      start
+      end
+      # next two are deprecated
+      startTime
+      endTime
+      generalizedCost
+      accessibilityScore
+      emissionsPerPerson {
+        co2
+      }
+      numberOfTransfers
+      walkDistance
+      walkTime
+      legs {
+        mode
+        start {
+          scheduledTime
+          estimated {
+            time
+            delay
+          }
+        }
+        end {
+          scheduledTime
+          estimated {
+            time
+            delay
+          }
+        }
+        from {
+          name
+          lat
+          lon
+          arrival {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+          departure {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+          departureTime
+          arrivalTime
+        }
+        to {
+          name
+          lat
+          lon
+          arrival {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+          departure {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+          departureTime
+          arrivalTime
+        }
+        startTime
+        endTime
+        mode
+        generalizedCost
+        headsign
+        trip {
+          tripHeadsign
+        }
+        intermediatePlaces {
+          arrival {
+            scheduledTime
+            estimated {
+              time
+              delay
+            }
+          }
+          departure {
+            scheduledTime
+            estimated {
+              time
+              delay
+            }
+          }
+          stop {
+            name
+          }
+        }
+        alerts {
+          id
+          alertHeaderText
+          alertDescriptionText
+          alertEffect
+          alertCause
+          alertSeverityLevel
+          alertUrl
+          effectiveStartDate
+          effectiveEndDate
+          entities {
+            ... on Stop {
+              name
+              gtfsId
+              lat
+              lon
+            }
+          }
+        }
+        rideHailingEstimate {
+          provider {
+            id
+          }
+          productName
+          minPrice {
+            currency {
+              code
+              digits
+            }
+            amount
+          }
+          maxPrice {
+            currency {
+              code
+              digits
+            }
+            amount
+          }
+          arrival
+        }
+        accessibilityScore
+      }
+    }
+  }
 }

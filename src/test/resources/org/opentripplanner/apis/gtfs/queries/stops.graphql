@@ -1,9 +1,9 @@
 {
-    stops {
-        gtfsId
-        lat
-        lon
-        name
-        vehicleMode
-    }
+  stops {
+    gtfsId
+    lat
+    lon
+    name
+    vehicleMode
+  }
 }

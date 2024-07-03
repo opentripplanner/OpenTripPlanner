@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
@@ -22,7 +23,7 @@ class LocationGroupMapperTest {
     var builder = StopModel.of();
     var mapper = new LocationGroupMapper(
       new StopMapper(new TranslationHelper(), id -> null, builder),
-      new LocationMapper(builder),
+      new LocationMapper(builder, DataImportIssueStore.NOOP),
       builder
     );
 
