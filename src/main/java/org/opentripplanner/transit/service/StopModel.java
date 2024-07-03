@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Repository for Stop entities.
- *
- * ARCHITECTURAL_DECISION_RECORDS.md
  */
 public class StopModel implements Serializable {
 
