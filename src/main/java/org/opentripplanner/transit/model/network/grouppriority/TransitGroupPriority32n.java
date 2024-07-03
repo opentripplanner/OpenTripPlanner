@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.network.grouppriority;
 
 /**
- * This is a "BitSet" implementation for groupId. It can store upto 32 groups,
+ * This is a "BitSet" implementation for groupId. It can store up to 31 groups,
  * a set with few elements does NOT dominate a set with more elements.
  */
 class TransitGroupPriority32n {
@@ -11,8 +11,11 @@ class TransitGroupPriority32n {
   private static final int MAX_SEQ_NO = 32;
 
   /**
-   * Left dominate right, if right contains a group which does not exist in left. Left
-   * do NOT dominate right if they are equals or left is a super set of right.
+   * Left dominates right:
+   *   - if right contains a group which does not exist in the left.
+   * Left do NOT dominate right:
+   *   - if they are equals or
+   *   - left is a superset of right.
    */
   static boolean dominate(int left, int right) {
     return ((left ^ right) & right) != 0;

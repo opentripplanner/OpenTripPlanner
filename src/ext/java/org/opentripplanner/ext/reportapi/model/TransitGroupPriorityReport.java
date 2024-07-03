@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPrior
 public class TransitGroupPriorityReport {
 
   public static String build(Collection<TripPattern> patterns, TransitRequest request) {
-    var service = TransitGroupPriorityService.of(
+    var service = new TransitGroupPriorityService(
       request.priorityGroupsByAgency(),
       request.priorityGroupsGlobal()
     );

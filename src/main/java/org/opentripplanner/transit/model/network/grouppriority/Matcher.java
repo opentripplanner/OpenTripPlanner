@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.model.network.grouppriority;
 
-import org.opentripplanner.transit.model.network.TripPattern;
-
 interface Matcher {
-  boolean match(TripPattern pattern);
+  boolean match(EntityAdapter entity);
 
   default boolean isEmpty() {
     return false;

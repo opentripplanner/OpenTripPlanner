@@ -8,38 +8,35 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.lang.ArrayUtils;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * This class dynamically builds an index of transit-group-ids from the
- * provided {@link TransitGroupSelect}s while serving the caller with
- * group-ids for each requested pattern. It is made for optimal
- * performance, since it is used in request scope.
+ * This class dynamically builds an index of transit-group-ids from the provided
+ * {@link TransitGroupSelect}s while serving the caller with group-ids for each requested
+ * trip/pattern. It is made for optimal performance, since it is used in request scope.
  * <p>
  * THIS CLASS IS NOT THREAD-SAFE.
  */
 public class TransitGroupPriorityService {
 
   /**
+   * IMPLEMENTATION DETAILS
+   *
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
-   *   <li> We can assign group id 1 (one) to the base group and it will be treated as any other group.
-   *   <li> We can assign group id 0 (zero) to the base and it will not be added to the set of groups
-   *   a given path has.
+   *   <li>
+   *     We can assign group id 1 (one) to the base group and it will be treated as any other group.
+   *   </li>
+   *   <li>
+   *     We can assign group id 0 (zero) to the base and it will not be added to the set of groups
+   *     a given path has.
+   *   </li>
    * </ol>
-   * When we compare paths we compare sets of group ids. A set is dominating another set if it is
+   * When we compare paths, we compare sets of group ids. A set is dominating another set if it is
    * a smaller subset or different from the other set.
-   * <p>
-   * <b>Example - base-group-id = 0 (zero)</b>
-   * <p>
-   * Let B be the base and G be concrete group. Then: (B) dominates (G), (G) dominates (B), (B)
-   * dominates (BG), but (G) does not dominate (BG). In other words, paths with only agency
-   * X (group G) is not given an advantage in the routing over paths with a combination of agency
-   * X (group G) and local traffic (group B).
-   * <p>
-   * TODO: Experiment with base-group-id=0 and make it configurable.
    */
   private static final int GROUP_INDEX_COUNTER_START = 1;
 
@@ -61,7 +58,7 @@ public class TransitGroupPriorityService {
     this.globalMatchersIds = List.of();
   }
 
-  private TransitGroupPriorityService(
+  public TransitGroupPriorityService(
     Collection<TransitGroupSelect> byAgency,
     Collection<TransitGroupSelect> global
   ) {
@@ -79,13 +76,25 @@ public class TransitGroupPriorityService {
   }
 
   public static TransitGroupPriorityService of(
-    Collection<TransitGroupSelect> byAgency,
-    Collection<TransitGroupSelect> global
+    CostLinearFunction relaxTransitGroupPriority,
+    List<TransitGroupSelect> groupByAgency,
+    List<TransitGroupSelect> groupGlobal
   ) {
-    if (Stream.of(byAgency, global).allMatch(Collection::isEmpty)) {
-      return empty();
+    if (relaxTransitGroupPriority.isNormal()) {
+      return TransitGroupPriorityService.empty();
+    } else if (Stream.of(groupByAgency, groupGlobal).allMatch(Collection::isEmpty)) {
+      return TransitGroupPriorityService.empty();
+    } else {
+      return new TransitGroupPriorityService(groupByAgency, groupGlobal);
     }
-    return new TransitGroupPriorityService(byAgency, global);
+  }
+
+  /**
+   * Return true is the feature is configured and the request a {@code relaxTransitGroupPriority}
+   * function.
+   */
+  public boolean isEnabled() {
+    return enabled;
   }
 
   /**
@@ -94,13 +103,23 @@ public class TransitGroupPriorityService {
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
-    if (!enabled || tripPattern == null) {
+    return tripPattern == null
+      ? baseGroupId
+      : lookupTransitGroupPriorityId(new TripPatternAdapter(tripPattern));
+  }
+
+  /**
+   * Fetch/lookup the transit-group-id for the given entity.
+   * <p>
+   * @throws IllegalArgumentException if more than 32 group-ids are requested.
+   */
+  private int lookupTransitGroupPriorityId(EntityAdapter entity) {
+    if (!enabled) {
       return baseGroupId;
     }
-
     for (var it : agencyMatchersIds) {
-      if (it.matcher().match(tripPattern)) {
-        var agencyId = tripPattern.getRoute().getAgency().getId();
+      if (it.matcher().match(entity)) {
+        var agencyId = entity.agencyId();
         int groupId = it.ids().get(agencyId);
 
         if (groupId < 0) {
@@ -112,7 +131,7 @@ public class TransitGroupPriorityService {
     }
 
     for (var it : globalMatchersIds) {
-      if (it.matcher.match(tripPattern)) {
+      if (it.matcher.match(entity)) {
         return it.groupId();
       }
     }
@@ -120,6 +139,10 @@ public class TransitGroupPriorityService {
     return baseGroupId;
   }
 
+  /**
+   * This is the group-id assigned to all transit trips/patterns witch does not match a
+   * specific group.
+   */
   public int baseGroupId() {
     return baseGroupId;
   }
@@ -129,10 +152,10 @@ public class TransitGroupPriorityService {
   }
 
   /** Pair of matcher and groupId. Used only inside this class. */
-  record MatcherAndId(Matcher matcher, int groupId) {}
+  private record MatcherAndId(Matcher matcher, int groupId) {}
 
-  /** Matcher with map of ids by agency. */
-  record MatcherAgencyAndIds(Matcher matcher, TObjectIntMap<FeedScopedId> ids) {
+  /** Matcher with a map of ids by agency. */
+  private record MatcherAgencyAndIds(Matcher matcher, TObjectIntMap<FeedScopedId> ids) {
     MatcherAgencyAndIds(Matcher matcher) {
       this(
         matcher,

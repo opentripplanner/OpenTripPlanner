@@ -66,13 +66,14 @@ class TransitGroupPriorityServiceTest {
   private final TripPattern railR3 = routeR3.getTripPattern();
   private final TripPattern ferryF3 = routeF3.getTripPattern();
   private final TripPattern busB3 = routeB3.getTripPattern();
+  private final TripPattern nullValue = null;
 
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
-    var subject = TransitGroupPriorityService.of(List.of(), List.of());
+    var subject = new TransitGroupPriorityService(List.of(), List.of());
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(busB2));
-    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(null));
+    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(nullValue));
   }
 
   @Test
@@ -83,10 +84,10 @@ class TransitGroupPriorityServiceTest {
       .build();
 
     // Add matcher `byAgency` for bus and real
-    var subject = TransitGroupPriorityService.of(List.of(select), List.of());
+    var subject = new TransitGroupPriorityService(List.of(select), List.of());
 
     // Agency groups are indexed (group-id set) at request time
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullValue));
     assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));
     assertEquals(EXP_GROUP_3, subject.lookupTransitGroupPriorityId(railR1));
@@ -97,7 +98,7 @@ class TransitGroupPriorityServiceTest {
   @Test
   void lookupTransitPriorityGroupIdByGlobalMode() {
     // Global groups are indexed (group-id set) at construction time
-    var subject = TransitGroupPriorityService.of(
+    var subject = new TransitGroupPriorityService(
       List.of(),
       List.of(
         TransitGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),
@@ -105,7 +106,7 @@ class TransitGroupPriorityServiceTest {
       )
     );
 
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullValue));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));

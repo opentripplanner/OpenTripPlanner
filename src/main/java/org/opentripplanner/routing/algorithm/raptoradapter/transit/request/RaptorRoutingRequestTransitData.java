@@ -250,6 +250,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     }
     var transitRequest = request.journey().transit();
     return TransitGroupPriorityService.of(
+      request.preferences().transit().relaxTransitGroupPriority(),
       transitRequest.priorityGroupsByAgency(),
       transitRequest.priorityGroupsGlobal()
     );

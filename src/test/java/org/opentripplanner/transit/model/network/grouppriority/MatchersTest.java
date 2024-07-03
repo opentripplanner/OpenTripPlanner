@@ -10,7 +10,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestR
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
 
 class MatchersTest {
 
@@ -26,11 +25,11 @@ class MatchersTest {
     .withSubmode("localFerry")
     .build();
 
-  private final TripPattern rail1 = r1.getTripPattern();
-  private final TripPattern bus = b1.getTripPattern();
-  private final TripPattern ferry = f1.getTripPattern();
-  private final FeedScopedId r1agencyId = rail1.getRoute().getAgency().getId();
-  private final FeedScopedId r1routeId = rail1.getRoute().getId();
+  private final EntityAdapter rail1 = new TripPatternAdapter(r1.getTripPattern());
+  private final EntityAdapter bus = new TripPatternAdapter(b1.getTripPattern());
+  private final EntityAdapter ferry = new TripPatternAdapter(f1.getTripPattern());
+  private final FeedScopedId r1agencyId = rail1.agencyId();
+  private final FeedScopedId r1routeId = rail1.routeId();
   private final FeedScopedId anyId = new FeedScopedId("F", "ANY");
 
   @Test
