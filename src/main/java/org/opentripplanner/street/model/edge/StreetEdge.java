@@ -1184,7 +1184,7 @@ public class StreetEdge
     }
 
     if (traverseMode.isCyclingIsh() && s1.isVehicleRentable()) {
-      s1.incrementBatteryDistance(getDistanceWithElevation());
+      s1.incrementDrivenBatteryMeters(getDistanceWithElevation());
     }
 
     if (costExtension != null) {

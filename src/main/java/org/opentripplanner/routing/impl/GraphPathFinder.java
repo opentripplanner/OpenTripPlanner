@@ -94,7 +94,7 @@ public class GraphPathFinder {
           new DurationSkipEdgeStrategy(
             preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
           ),
-          new BatteryDistanceSkipEdgeStrategy()
+          new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut)
         )
       )
       // FORCING the dominance function to weight only

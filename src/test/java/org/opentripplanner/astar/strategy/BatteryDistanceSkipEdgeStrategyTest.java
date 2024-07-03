@@ -3,15 +3,10 @@ package org.opentripplanner.astar.strategy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
-import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
-import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
-import org.opentripplanner.street.model.edge.FreeEdge;
-import org.opentripplanner.street.model.vertex.SimpleVertex;
-import org.opentripplanner.street.model.vertex.StreetLocation;
+import org.opentripplanner.routing.impl.BatteryValidator;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -23,15 +18,13 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
    */
   @Test
   void batteryIsNotEnough() {
-    var vertex = new SimpleVertex(null, -74.01, 40.01);
-
-    var edge = getStreetVehicleRentalLink(0.0, vertex);
-
     var state = getState(100.0);
 
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
+    state.currentRangeMeters = Optional.of(0.0);
 
-    assertTrue(strategy.shouldSkipEdge(state, edge));
+    var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
+
+    assertTrue(strategy.shouldSkipEdge(state, null));
   }
 
   /**
@@ -40,14 +33,11 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
    */
   @Test
   void batteryIsEnough() {
-    var vertex = new SimpleVertex(null, -74.01, 40.01);
-
-    var edge = getStreetVehicleRentalLink(4000.0, vertex);
-
     var state = getState(100.0);
+    state.currentRangeMeters = Optional.of(4000.0);
 
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
-    assertFalse(strategy.shouldSkipEdge(state, edge));
+    var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
+    assertFalse(strategy.shouldSkipEdge(state, null));
   }
 
   /**
@@ -56,14 +46,12 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
    */
   @Test
   void batteryDiesAtFinalLocation() {
-    var vertex = new SimpleVertex(null, -74.01, 40.01);
-
-    var edge = getStreetVehicleRentalLink(100.0, vertex);
-
     var state = getState(100.0);
 
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
-    assertFalse(strategy.shouldSkipEdge(state, edge));
+    state.currentRangeMeters = Optional.of(100.0);
+
+    var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
+    assertFalse(strategy.shouldSkipEdge(state, null));
   }
 
   /**
@@ -72,28 +60,11 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
    */
   @Test
   void noDrivenMeters() {
-    var vertex = new SimpleVertex(null, -74.01, 40.01);
-
-    var edge = getStreetVehicleRentalLink(100.0, vertex);
-
     var state = getState(0.0);
+    state.currentRangeMeters = Optional.of(100.0);
 
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
-    assertFalse(strategy.shouldSkipEdge(state, edge));
-  }
-
-  /**
-   * Edge is of wrong Type (not StreetVehicleLink) -> does not skip Edge
-   * edge is no StreetVehicleRentalLink => false
-   */
-  @Test
-  void edgeIsOfWrongType() {
-    var from = new StreetLocation(null, new Coordinate(0.0, 0.0), null);
-    var to = new StreetLocation(null, new Coordinate(1.0, 1.0), null);
-    var edge = FreeEdge.createFreeEdge(from, to);
-    var state = TestStateBuilder.ofScooterRental().build();
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
-    assertFalse(strategy.shouldSkipEdge(state, edge));
+    var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
+    assertFalse(strategy.shouldSkipEdge(state, null));
   }
 
   /**
@@ -102,35 +73,16 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
    */
   @Test
   void batteryHasNoValue() {
-    var vertex = new SimpleVertex(null, -74.01, 40.01);
-
-    var vehicle = new VehicleRentalVehicle();
-    vehicle.currentRangeMeters = null;
-
-    var rentalVertex = new VehicleRentalPlaceVertex(vehicle);
-
-    var edge = StreetVehicleRentalLink.createStreetVehicleRentalLink(vertex, rentalVertex);
-
     var state = TestStateBuilder.ofScooterRental().build();
+    state.currentRangeMeters = Optional.empty();
 
-    var strategy = new BatteryDistanceSkipEdgeStrategy();
-    assertFalse(strategy.shouldSkipEdge(state, edge));
+    var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
+    assertFalse(strategy.shouldSkipEdge(state, null));
   }
 
-  private static StreetVehicleRentalLink getStreetVehicleRentalLink(
-    double currentRangeMeters,
-    SimpleVertex vertex
-  ) {
-    var vehicle = new VehicleRentalVehicle();
-    vehicle.currentRangeMeters = currentRangeMeters;
-    var rentalVertex = new VehicleRentalPlaceVertex(vehicle);
-    var edge = StreetVehicleRentalLink.createStreetVehicleRentalLink(vertex, rentalVertex);
-    return edge;
-  }
-
-  private static State getState(double batteryDistance) {
+  private static State getState(double drivenBatteryMeters) {
     var state = TestStateBuilder.ofScooterRental().build();
-    state.batteryDistance = batteryDistance;
+    state.drivenBatteryMeters = drivenBatteryMeters;
     return state;
   }
 }

@@ -1,10 +1,9 @@
 package org.opentripplanner.astar.strategy;
 
-import java.util.Optional;
+import java.util.function.Predicate;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 
 /**
  * Skips Edges when the available battery distance of a vehicle is less than the accumulated driving
@@ -15,19 +14,14 @@ public class BatteryDistanceSkipEdgeStrategy<
 >
   implements SkipEdgeStrategy<State, Edge> {
 
+  private final Predicate<State> shouldSkip;
+
+  public BatteryDistanceSkipEdgeStrategy(Predicate<State> shouldSkip) {
+    this.shouldSkip = shouldSkip;
+  }
+
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    if (edge instanceof StreetVehicleRentalLink) {
-      Optional<Double> currentRangeMeters =
-        ((StreetVehicleRentalLink) edge).getCurrentRangeMeters();
-
-      if (currentRangeMeters.isEmpty()) {
-        return false;
-      }
-      double batteryDistance =
-        ((org.opentripplanner.street.search.state.State) current).batteryDistance;
-      return currentRangeMeters.get() < batteryDistance;
-    }
-    return false;
+    return shouldSkip.test(current);
   }
 }

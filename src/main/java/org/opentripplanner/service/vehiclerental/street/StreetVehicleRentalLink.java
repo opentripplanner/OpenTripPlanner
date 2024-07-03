@@ -1,14 +1,11 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This represents the connection between a street vertex and a bike rental station vertex.
@@ -73,12 +70,5 @@ public class StreetVehicleRentalLink extends Edge {
   @Override
   public I18NString getName() {
     return vehicleRentalPlaceVertex.getName();
-  }
-
-  public Optional<Double> getCurrentRangeMeters() {
-    if (vehicleRentalPlaceVertex.getStation() instanceof VehicleRentalVehicle) {
-      return ((VehicleRentalVehicle) vehicleRentalPlaceVertex.getStation()).getCurrentRangeMeters();
-    }
-    return Optional.empty();
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.state;
 
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -196,13 +197,17 @@ public class StateEditor {
     child.walkDistance += length;
   }
 
-  public void incrementBatteryDistance(double length) {
+  public void incrementDrivenBatteryMeters(double length) {
     if (length < 0) {
       LOG.warn("A state's battery distance is being incremented by a negative amount.");
       defectiveTraversal = true;
       return;
     }
-    child.batteryDistance += length;
+    child.drivenBatteryMeters += length;
+  }
+
+  public void setCurrentRangeMeters(Optional<Double> currentRangeMeters) {
+    child.currentRangeMeters = currentRangeMeters;
   }
 
   /* Basic Setters */
