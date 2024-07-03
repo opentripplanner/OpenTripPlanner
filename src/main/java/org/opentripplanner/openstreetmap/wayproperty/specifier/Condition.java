@@ -123,7 +123,7 @@ public sealed interface Condition {
   }
 
   /**
-   * Selects tags with a give key.
+   * Selects tags with a given key.
    */
   record Present(String key) implements Condition {
     @Override
