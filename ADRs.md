@@ -36,7 +36,7 @@ tests. Expect to include some code cleanup as part of all PRs.
 [Follow naming conventions](CODE_CONVENTIONS.md#naming-conventions) . Make sure the 
 code is easy to read and understand.
 
-### ADR-2 Code documentation - JavaDoc
+### ADR-2 Code Documentation - JavaDoc
 Document the business intention and decisions in the relevant code. Do not repeat the logic
 expressed in the code. The prefered way is to use JavaDoc, you may have to refactor part of your
 code to encapsulate the business logic into a method or class to do this. 
@@ -59,11 +59,11 @@ Respect Object-Oriented principals
     to share data/functionality. 
   - Use polymorphism and not `instanceof`.
 
-### ADR-5 Dependency injection
+### ADR-5 Dependency Injection
 Use dependency injection to wire components. You can use manual DI or Dagger. Put the 
 wiring code in `<module-name>/configure/<Module-name>Module.java`.
 
-### ADR-6 Module encapsulation
+### ADR-6 Module Encapsulation
 Keep modules clean. Consider adding an `api`, `spi` and mapping code to
 isolate the module from the rest of the code. Avoid circular dependencies between modules.
 
@@ -77,17 +77,17 @@ Document API and configuration parameters.
 Keep the code [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) - Do not 
 repeat yourself. Avoid implementing the same business rule in two places -> refactor.
 
-### ADR-10 Feature envy
+### ADR-10 Avoid Feature Envy
 [Feature envy](https://refactoring.guru/smells/feature-envy)
 
-### ADR-11 Test coverage
+### ADR-11 Test Coverage
 All _business_ logic should have unit tests. Keep integration/system tests to a minimum. Add test at
 the lowest level practical to test the business feature. Prefer unit tests on a method over a class,
 over a module, over the system. On all non-trivial code full _branch_ test coverage is preferable. 
 Tests should be designed to genuinely demonstrate correctness or adherence to specifications, not 
 simply inflate line coverage numbers.
 
-### ADR-12 Immutable types
+### ADR-12 Immutable Types
 Prefer immutable types over mutable. Use builders where appropriate. See 
 [Records, POJOs and Builders](CODE_CONVENTIONS.md#records-pojos-and-builders)
 
