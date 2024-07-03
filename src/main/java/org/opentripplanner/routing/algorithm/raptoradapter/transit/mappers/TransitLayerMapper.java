@@ -196,7 +196,7 @@ public class TransitLayerMapper {
     int[] stopBoardAlightTransferCosts = new int[stops.stopIndexSize()];
 
     for (int i = 0; i < stops.stopIndexSize(); ++i) {
-      // There can be wholes in the stop index, so we need to account for 'null' here.
+      // There can be holes in the stop index, so we need to account for 'null' here.
       var stop = stops.stopByIndex(i);
       if (stop == null) {
         stopBoardAlightTransferCosts[i] = defaultCost;
