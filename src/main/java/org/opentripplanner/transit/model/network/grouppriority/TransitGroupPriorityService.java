@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * <p>
  * THIS CLASS IS NOT THREAD-SAFE.
  */
-public class PriorityGroupConfigurator {
+public class TransitGroupPriorityService {
 
   /**
    * There are two ways we can treat the base (local-traffic) transit priority group:
@@ -53,7 +53,7 @@ public class PriorityGroupConfigurator {
   private final List<MatcherAgencyAndIds> agencyMatchersIds;
   private final List<MatcherAndId> globalMatchersIds;
 
-  private PriorityGroupConfigurator() {
+  private TransitGroupPriorityService() {
     this.enabled = false;
     this.agencyMatchers = null;
     this.globalMatchers = null;
@@ -61,7 +61,7 @@ public class PriorityGroupConfigurator {
     this.globalMatchersIds = List.of();
   }
 
-  private PriorityGroupConfigurator(
+  private TransitGroupPriorityService(
     Collection<TransitGroupSelect> byAgency,
     Collection<TransitGroupSelect> global
   ) {
@@ -74,18 +74,18 @@ public class PriorityGroupConfigurator {
     this.agencyMatchersIds = Arrays.stream(agencyMatchers).map(MatcherAgencyAndIds::new).toList();
   }
 
-  public static PriorityGroupConfigurator empty() {
-    return new PriorityGroupConfigurator();
+  public static TransitGroupPriorityService empty() {
+    return new TransitGroupPriorityService();
   }
 
-  public static PriorityGroupConfigurator of(
+  public static TransitGroupPriorityService of(
     Collection<TransitGroupSelect> byAgency,
     Collection<TransitGroupSelect> global
   ) {
     if (Stream.of(byAgency, global).allMatch(Collection::isEmpty)) {
       return empty();
     }
-    return new PriorityGroupConfigurator(byAgency, global);
+    return new TransitGroupPriorityService(byAgency, global);
   }
 
   /**

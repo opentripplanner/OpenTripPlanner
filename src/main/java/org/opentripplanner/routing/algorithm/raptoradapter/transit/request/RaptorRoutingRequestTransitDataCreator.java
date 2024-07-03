@@ -19,7 +19,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.model.network.grouppriority.PriorityGroupConfigurator;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +94,7 @@ class RaptorRoutingRequestTransitDataCreator {
     ZonedDateTime transitSearchTimeZero,
     List<TripPatternForDate> patternForDateList,
     TransitDataProviderFilter filter,
-    PriorityGroupConfigurator priorityGroupConfigurator
+    TransitGroupPriorityService transitGroupPriorityService
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
@@ -148,7 +148,7 @@ class RaptorRoutingRequestTransitDataCreator {
             tripPattern.getAlightingPossible(),
             BoardAlight.ALIGHT
           ),
-          priorityGroupConfigurator.lookupTransitGroupPriorityId(tripPattern.getPattern())
+          transitGroupPriorityService.lookupTransitGroupPriorityId(tripPattern.getPattern())
         )
       );
     }
@@ -160,7 +160,7 @@ class RaptorRoutingRequestTransitDataCreator {
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     TransitDataProviderFilter filter,
-    PriorityGroupConfigurator priorityGroupConfigurator
+    TransitGroupPriorityService transitGroupPriorityService
   ) {
     List<TripPatternForDate> tripPatternForDates = getTripPatternsForDateRange(
       additionalPastSearchDays,
@@ -168,7 +168,7 @@ class RaptorRoutingRequestTransitDataCreator {
       filter
     );
 
-    return merge(transitSearchTimeZero, tripPatternForDates, filter, priorityGroupConfigurator);
+    return merge(transitSearchTimeZero, tripPatternForDates, filter, transitGroupPriorityService);
   }
 
   private static List<TripPatternForDate> filterActiveTripPatterns(

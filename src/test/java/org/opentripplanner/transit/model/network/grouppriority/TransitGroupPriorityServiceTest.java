@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-class PriorityGroupConfiguratorTest {
+class TransitGroupPriorityServiceTest {
 
   private static final String AGENCY_A1 = "A1";
   private static final String AGENCY_A2 = "A2";
@@ -69,7 +69,7 @@ class PriorityGroupConfiguratorTest {
 
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
-    var subject = PriorityGroupConfigurator.of(List.of(), List.of());
+    var subject = TransitGroupPriorityService.of(List.of(), List.of());
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(busB2));
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(null));
@@ -83,7 +83,7 @@ class PriorityGroupConfiguratorTest {
       .build();
 
     // Add matcher `byAgency` for bus and real
-    var subject = PriorityGroupConfigurator.of(List.of(select), List.of());
+    var subject = TransitGroupPriorityService.of(List.of(select), List.of());
 
     // Agency groups are indexed (group-id set) at request time
     assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
@@ -97,7 +97,7 @@ class PriorityGroupConfiguratorTest {
   @Test
   void lookupTransitPriorityGroupIdByGlobalMode() {
     // Global groups are indexed (group-id set) at construction time
-    var subject = PriorityGroupConfigurator.of(
+    var subject = TransitGroupPriorityService.of(
       List.of(),
       List.of(
         TransitGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),

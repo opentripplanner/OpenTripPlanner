@@ -30,7 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalc
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.model.network.grouppriority.PriorityGroupConfigurator;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
@@ -244,12 +244,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
   }
 
-  private PriorityGroupConfigurator createTransitGroupPriorityConfigurator(RouteRequest request) {
+  private TransitGroupPriorityService createTransitGroupPriorityConfigurator(RouteRequest request) {
     if (request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
-      return PriorityGroupConfigurator.empty();
+      return TransitGroupPriorityService.empty();
     }
     var transitRequest = request.journey().transit();
-    return PriorityGroupConfigurator.of(
+    return TransitGroupPriorityService.of(
       transitRequest.priorityGroupsByAgency(),
       transitRequest.priorityGroupsGlobal()
     );
