@@ -34,6 +34,7 @@ public class UpdaterConfigDocTest {
     "siri-azure-et-updater",
     "vehicle-parking",
     "siri-et-updater",
+    "siri-et-google-pubsub-updater",
     "siri-sx-updater"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();

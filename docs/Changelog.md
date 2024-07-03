@@ -33,6 +33,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add plan query that follows the relay connection specification [#5185](https://github.com/opentripplanner/OpenTripPlanner/pull/5185)
 - Fix debug client after breaking change in dependency graphql-request [#5899](https://github.com/opentripplanner/OpenTripPlanner/pull/5899)
 - Remove TravelTime API [#5890](https://github.com/opentripplanner/OpenTripPlanner/pull/5890)
+- Improve cancellation of large response in TransModel API [#5908](https://github.com/opentripplanner/OpenTripPlanner/pull/5908)
+- Refactor SIRI-ET updaters [#5904](https://github.com/opentripplanner/OpenTripPlanner/pull/5904)
+- Update Google Pubsub updater configuration [#5927](https://github.com/opentripplanner/OpenTripPlanner/pull/5927)
+- Make new debug client the default, move old one to `classic-debug` [#5924](https://github.com/opentripplanner/OpenTripPlanner/pull/5924)
+- Require valid polygons for AreaStop [#5915](https://github.com/opentripplanner/OpenTripPlanner/pull/5915)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

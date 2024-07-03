@@ -85,7 +85,7 @@ public class DebugStyleSpec {
           .lineColor(MAGENTA)
           .edgeFilter(EDGES_TO_DISPLAY)
           .lineWidth(LINE_WIDTH)
-          .minZoom(13)
+          .minZoom(6)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder
@@ -147,9 +147,12 @@ public class DebugStyleSpec {
           .ofId("regular-stop")
           .typeCircle()
           .vectorSourceLayer(regularStops)
-          .circleStroke(BLACK, 2)
+          .circleStroke(
+            BLACK,
+            new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
+          )
           .circleRadius(
-            new ZoomDependentNumber(1, List.of(new ZoomStop(11, 1), new ZoomStop(MAX_ZOOM, 10)))
+            new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10)))
           )
           .circleColor("#fcf9fa")
           .minZoom(10)

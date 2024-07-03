@@ -56,17 +56,17 @@
 
 
     <properties>
-        <otp.serialization.version.id>150</otp.serialization.version.id>
+        <otp.serialization.version.id>152</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>31.1</geotools.version>
+        <geotools.version>31.2</geotools.version>
         <google.dagger.version>2.51.1</google.dagger.version>
         <jackson.version>2.17.1</jackson.version>
         <jersey.version>3.1.7</jersey.version>
-        <junit.version>5.10.2</junit.version>
+        <junit.version>5.10.3</junit.version>
         <micrometer.version>1.13.0</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.5.6</logback.version>
-        <lucene.version>9.10.0</lucene.version>
+        <lucene.version>9.11.1</lucene.version>
         <slf4j.version>2.0.13</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.27</siri-java-model.version>
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -242,7 +242,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>3.3.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -321,7 +321,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>8.0.2</version>
+                <version>9.0.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -429,6 +429,7 @@
                         <inputGlob>src/test/java/**/*.java</inputGlob>
                         <inputGlob>src/ext/java/**/*.java</inputGlob>
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>
@@ -852,7 +853,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>22.0</version>
+            <version>22.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>

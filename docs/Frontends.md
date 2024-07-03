@@ -16,17 +16,30 @@ On the other hand, **production frontends** are intended to be a component of la
 
 ## Debug Frontends
 
-The main OpenTripPlanner repository currently contains two debug web frontends: the original one in [`/src/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/client) and a newer one currently under development at [`/client-next`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client-next).
+The main OpenTripPlanner repository currently contains two debug web frontends: 
 
-The **original debug client** is a jQuery and Backbone based UI whose history can be traced back over a decade to the first days of the OTP project. It connects to the OTP Java backend via a REST API using the GTFS vocabulary. Historically this was the default OTP interface, and it continues to be available by default on any running OTP instance at the root URL.
+- new one currently under development at [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
+- the classic one in [`/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/client/classic-debug) 
 
-The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. It is currently under development, but expected to replace the original debug client once it reaches effective feature parity.
+The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
+Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).
 
-There is a third piece of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the street network, providing some insight into the internals of the routing algorithms that are not otherwise visible.
+The **classic debug client** is a jQuery and Backbone based UI whose history can be traced back over a decade to the first days of the OTP project. 
+It connects to the OTP Java backend via a REST API using the GTFS vocabulary. Historically this was the default OTP interface available at the root URL.
+It is still available, but has been moved to `http://localhost:8080/classic-debug/` .
+
+There is a third piece of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
+located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
+While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric 
+UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the 
+street network, providing some insight into the internals of the routing algorithms that are not otherwise visible.
 
 ## Working with Debug Frontends
 
-While the "classic" (i.e. old) debug frontend is enabled by default as of this writing, it may not be in the future, or you may wish to disable it if you've chosen to use a different frontend. Also, to get full use of the existing debug frontends you may want to enable OTP's built-in simple testing geocoder which performs fuzzy searches for transit stops by name, supplying their coordinates to the routing engine. Without it, you will be limited to origins and destinations selected on a map or specified in terms of latitude and longitude coordinates. The debug frontend and the geocoder can be toggled in `otp-config.json`:
+While the two debug frontends are enabled by default as of this writing, they may not be in the future, and you may wish to disable them if you've chosen to use a different frontend. 
+Also, to get full use of the existing debug frontends you may want to enable OTP's built-in simple testing geocoder which performs fuzzy searches for 
+transit stops by name, supplying their coordinates to the routing engine. Without it, you will be limited to origins and destinations selected on a map or 
+specified in terms of latitude and longitude coordinates. The debug frontend and the geocoder can be toggled in `otp-config.json`:
 
 ```json5
 // otp-config.json
@@ -73,4 +86,5 @@ The history of the more widely used OpenTripPlanner interfaces is roughly as fol
 - In the late 2010s people started developing a new React-based UI as a more modular, modern interface for public consumption. This project is located at https://github.com/opentripplanner/otp-react-redux under the OpenTripPlanner Github organization, and is developed and maintainted by Arcadis IBI.
 - Some React components were factored out of that UI project, allowing them to be integrated in different ways with different OTP deployments. This component library is in a separate repository at https://github.com/opentripplanner/otp-ui. Likewise, it is developed and maintained by Arcadis IBI.
 - Meanwhile, starting in 2014, HSL (the Helsinki Regional Transport Authority) and Finntrafic (the Finnish national transportation authority) began the Digitransit project, a set of open-source microservices to replace their existing national and regional scale trip planners. This includes a Javascript web UI module. In addition to Finland, the Digitransit system has been deployed in various places around the world including Germany.
-- As of 2024, a completely new debug UI (again, intended for developer use rather than public consumption) is being developed in the main OpenTripPlanner repository under `src/debug-client-preview`. This new UI follows a more conventional contemporary Javascript development style, and uses the most recent OpenTripPlanner GraphQL API which is expected to fully replace the older REST API. 
+- As of 2024, a completely new debug UI (again, intended for developer use rather than public consumption) is being developed in the main OpenTripPlanner repository under `src/client`. This new UI follows a more conventional contemporary Javascript development style, and uses the most recent OpenTripPlanner GraphQL API which is expected to fully replace the older REST API. 
+- In June 2024, the default was swapped and the new GraphQL-based one is now the default with the old one being available at `http://localhost:8080/classic-debug/`

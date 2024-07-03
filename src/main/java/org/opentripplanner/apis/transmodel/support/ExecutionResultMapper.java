@@ -16,6 +16,11 @@ public class ExecutionResultMapper {
   private static final ErrorClassification API_PROCESSING_TIMEOUT = ErrorClassification.errorClassification(
     "ApiProcessingTimeout"
   );
+
+  private static final ErrorClassification RESPONSE_TOO_LARGE = ErrorClassification.errorClassification(
+    "ResponseTooLarge"
+  );
+
   private static final ErrorClassification BAD_REQUEST_ERROR = ErrorClassification.errorClassification(
     "BadRequestError"
   );
@@ -29,13 +34,11 @@ public class ExecutionResultMapper {
   }
 
   public static Response timeoutResponse() {
-    var error = GraphQLError
-      .newError()
-      .errorType(API_PROCESSING_TIMEOUT)
-      .message(OTPRequestTimeoutException.MESSAGE)
-      .build();
-    var result = ExecutionResult.newExecutionResult().addError(error).build();
-    return response(result, OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY);
+    return unprocessableResponse(API_PROCESSING_TIMEOUT, OTPRequestTimeoutException.MESSAGE);
+  }
+
+  public static Response tooLargeResponse(String message) {
+    return unprocessableResponse(RESPONSE_TOO_LARGE, message);
   }
 
   public static Response badRequestResponse(String message) {
@@ -55,5 +58,14 @@ public class ExecutionResultMapper {
       .status(status.getStatusCode())
       .entity(GraphQLResponseSerializer.serialize(result))
       .build();
+  }
+
+  private static Response unprocessableResponse(
+    ErrorClassification errorClassification,
+    String message
+  ) {
+    var error = GraphQLError.newError().errorType(errorClassification).message(message).build();
+    var result = ExecutionResult.newExecutionResult().addError(error).build();
+    return response(result, OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY);
   }
 }
