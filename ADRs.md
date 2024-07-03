@@ -81,9 +81,11 @@ repeat yourself. Avoid implementing the same business rule in two places -> refa
 [Feature envy](https://refactoring.guru/smells/feature-envy)
 
 ### ADR-11 Test coverage
-All business logic should have unit tests. Keep integration/system tests to a
-minimum. Add test at the lowest level practical to test the business feature. Prefer unit tests on
-a method over a class, over a module, over the system.
+All _business_ logic should have unit tests. Keep integration/system tests to a minimum. Add test at
+the lowest level practical to test the business feature. Prefer unit tests on a method over a class,
+over a module, over the system. On all non-trivial code full _branch_ test coverage is preferable. 
+Tests should be designed to genuinely demonstrate correctness or adherence to specifications, not 
+simply inflate line coverage numbers.
 
 ### ADR-12 Immutable types
 Prefer immutable types over mutable. Use builders where appropriate. See 
