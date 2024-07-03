@@ -95,14 +95,14 @@ class StopModelIndex {
   }
 
   /**
-   * A small number of wholes in the stop-index is ok, but if there are many, it will affect
+   * A small number of holes in the stop-index is ok, but if there are many, it will affect
    * the Raptor performance.
    */
   private void logHolesInIndex() {
     int c = (int) Arrays.stream(stopsByIndex).filter(Objects::isNull).count();
     if (c > 0) {
       double p = (100.0 * c) / stopsByIndex.length;
-      // Log this as warning is more than 5% of the space is null
+      // Log this as warning if more than 5% of the space is null
       LOG
         .atLevel(p >= 5.0 ? Level.WARN : Level.INFO)
         .log("The stop index contains holes in it. {} of {} is null.", c, stopsByIndex.length);
