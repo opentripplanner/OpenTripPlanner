@@ -184,6 +184,7 @@ public interface Leg {
   /**
    * For transit legs, the trip. For non-transit legs, null.
    */
+  @Nullable
   default Trip getTrip() {
     return null;
   }
