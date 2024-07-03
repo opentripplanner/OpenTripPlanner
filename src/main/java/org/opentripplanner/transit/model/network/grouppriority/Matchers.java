@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * a `CompositeMatcher`. So, a new matcher is only created if the field in the
  * select is present.
  */
-public final class Matchers {
+final class Matchers {
 
   private static final Matcher NOOP = new Matcher() {
     @Override
@@ -42,7 +42,7 @@ public final class Matchers {
     }
   };
 
-  public static Matcher of(TransitGroupSelect select) {
+  static Matcher of(TransitGroupSelect select) {
     if (select.isEmpty()) {
       return NOOP;
     }
@@ -119,7 +119,7 @@ public final class Matchers {
     private final Pattern[] subModeRegexp;
     private final Function<TripPattern, String> toValue;
 
-    public RegExpMatcher(
+    RegExpMatcher(
       String typeName,
       List<String> subModeRegexp,
       Function<TripPattern, String> toValue
@@ -152,7 +152,7 @@ public final class Matchers {
     private final Set<FeedScopedId> ids;
     private final Function<TripPattern, FeedScopedId> idProvider;
 
-    public IdMatcher(
+    IdMatcher(
       String typeName,
       List<FeedScopedId> ids,
       Function<TripPattern, FeedScopedId> idProvider
@@ -181,7 +181,7 @@ public final class Matchers {
 
     private final Matcher[] matchers;
 
-    public AndMatcher(List<Matcher> matchers) {
+    AndMatcher(List<Matcher> matchers) {
       this.matchers = matchers.toArray(Matcher[]::new);
     }
 
