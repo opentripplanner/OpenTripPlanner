@@ -1356,7 +1356,7 @@ type QueryType {
     A global minimum transfer time (in seconds) that specifies the minimum
     amount of time that must pass between exiting one transit vehicle and
     boarding another. This time is in addition to time it might take to walk
-    between transit stops. Default value: 0
+    between transit stops. Default value: 120
     """
     minTransferTime: Int,
     "The weight multipliers for transit modes. WALK, BICYCLE, CAR, TRANSIT and LEG_SWITCH are not included."
