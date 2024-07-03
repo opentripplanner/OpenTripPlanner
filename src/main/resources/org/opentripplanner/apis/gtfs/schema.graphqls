@@ -469,18 +469,18 @@ type FareProductUse {
   **Illustration**
   ```yaml
   itinerary:
-  leg1:
-  fareProducts:
-  id: "AAA" // id of a FareProductUse instance
-  product:
-  id: "day-pass" // product id
-  name: "Day Pass"
-  leg2:
-  fareProducts:
-  id: "AAA" // identical to leg1. the passenger needs to buy ONE pass, not two.
-  product:
-  id: "day-pass"  // product id
-  name: "Day Pass"
+    leg1:
+      fareProducts:
+        id: "AAA" // id of a FareProductUse instance
+        product:
+          id: "day-pass" // product id
+          name: "Day Pass"
+    leg2:
+      fareProducts:
+        id: "AAA" // identical to leg1. the passenger needs to buy ONE pass, not two.
+        product:
+          id: "day-pass"  // product id
+          name: "Day Pass"
   ```
     
   **It is the responsibility of the API consumers to display the day pass as a product for the
@@ -494,18 +494,18 @@ type FareProductUse {
   **Illustration**
   ```yaml
   itinerary:
-  leg1:
-  fareProducts:
-  id: "AAA" // id of a FareProductUse instance, not product id
-  product:
-  id: "single-ticket" // product id
-  name: "Single Ticket"
-  leg2:
-  fareProducts:
-  id: "BBB" // different to leg1. the passenger needs to buy two single tickets.
-  product:
-  id: "single-ticket"  // product id
-  name: "Single Ticket"
+    leg1:
+      fareProducts:
+        id: "AAA" // id of a FareProductUse instance, not product id
+        product:
+          id: "single-ticket" // product id
+          name: "Single Ticket"
+    leg2:
+      fareProducts:
+        id: "BBB" // different to leg1. the passenger needs to buy two single tickets.
+        product:
+          id: "single-ticket"  // product id
+          name: "Single Ticket"
   ```
   """
   id: String!
@@ -588,8 +588,8 @@ type Itinerary {
   How many transfers are part of this itinerary.
     
   Notes:
-  - Interlined/stay-seated transfers do not increase this count.
-  - Transferring from a flex to a fixed schedule trip and vice versa increases this count.
+   - Interlined/stay-seated transfers do not increase this count.
+   - Transferring from a flex to a fixed schedule trip and vice versa increases this count.
   """
   numberOfTransfers: Int!
   "Time when the user leaves from the origin."
@@ -1906,8 +1906,8 @@ type RouteType {
   """
   GTFS Route type.
   For the list of possible values, see:
-  https://developers.google.com/transit/gtfs/reference/#routestxt and
-  https://developers.google.com/transit/gtfs/reference/extended-route-types
+      https://developers.google.com/transit/gtfs/reference/#routestxt and
+      https://developers.google.com/transit/gtfs/reference/extended-route-types
   """
   routeType: Int!
   """
@@ -3639,7 +3639,6 @@ input BicycleWalkPreferencesInput {
   "Costs related to walking a bicycle."
   cost: BicycleWalkPreferencesCostInput
   """
-  "
   How long it takes to hop on or off a bicycle when switching to walking the bicycle
   or when getting on the bicycle again. However, this is not applied when getting
   on a rented bicycle for the first time or off the bicycle when returning the bicycle.
@@ -3885,11 +3884,11 @@ Logically, the filter algorithm work as follows:
 
 - The starting point is the set of all facilities, lets call it `A`.
 - Then all `select` filters are applied to `A`, potentially reducing the number of facilities used.
-Let's call the result of this `B`.
-An empty `select` will lead to `A` being equal to `B`.
+  Let's call the result of this `B`.
+  An empty `select` will lead to `A` being equal to `B`.
 - Lastly, the `not` filters are applied to `B`, reducing the set further.
-Lets call this final set `C`.
-An empty `not` will lead to `B` being equal to `C`.
+  Lets call this final set `C`.
+  An empty `not` will lead to `B` being equal to `C`.
 - The remaining parking facilities in `C` are used for routing.
 """
 input ParkingFilter {
