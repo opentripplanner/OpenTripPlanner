@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.sandbox;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.util.List;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.NetworkParameters;
@@ -79,6 +80,11 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
             .of("geofencingZones")
             .since(V2_4)
             .summary("Enables geofencingZones for the given network")
+            .asBoolean(false),
+          c
+            .of("allowKeepingVehicleAtDestination")
+            .since(V2_5)
+            .summary("Enables `allowKeepingVehicleAtDestination` for the given network")
             .asBoolean(false)
         )
       );

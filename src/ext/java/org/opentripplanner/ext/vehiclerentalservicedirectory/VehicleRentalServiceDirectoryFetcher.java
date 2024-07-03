@@ -105,8 +105,7 @@ public class VehicleRentalServiceDirectoryFetcher {
             new GbfsVehicleRentalDataSourceParameters(
               updaterUrl.get(),
               parameters.getLanguage(),
-              // allowKeepingRentedVehicleAtDestination - not part of GBFS, not supported here
-              false,
+              networkParams.allowKeepingAtDestination(),
               parameters.getHeaders(),
               networkName,
               networkParams.geofencingZones(),

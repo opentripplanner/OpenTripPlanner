@@ -38,6 +38,7 @@ the `router-config.json`
 | url                                                 |      `uri`      | Endpoint for the VehicleRentalServiceDirectory                                  | *Required* |               |  2.1  |
 | [headers](#vehicleRentalServiceDirectory_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  2.1  |
 | [networks](#vehicleRentalServiceDirectory_networks) |    `object[]`   | List all networks to include. Use "network": "default-network" to set defaults. | *Optional* |               |  2.4  |
+|       allowKeepingVehicleAtDestination              |    `boolean`    | Enables `allowKeepingVehicleAtDestination` for the given network                | *Optional* | `false`       |  2.5  |
 |       geofencingZones                               |    `boolean`    | Enables geofencingZones for the given network                                   | *Optional* | `false`       |  2.4  |
 |       network                                       |     `string`    | The network name                                                                | *Required* |               |  2.4  |
 
