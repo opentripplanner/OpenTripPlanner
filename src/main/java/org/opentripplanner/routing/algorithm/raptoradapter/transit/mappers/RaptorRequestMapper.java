@@ -20,7 +20,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTransitGroupCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTransitGroupPriorityCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -119,7 +119,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
-        mcBuilder.withTransitPriorityCalculator(new DefaultTransitGroupCalculator());
+        mcBuilder.withTransitPriorityCalculator(new DefaultTransitGroupPriorityCalculator());
         mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
       }
     });
