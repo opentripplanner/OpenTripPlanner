@@ -70,7 +70,7 @@ class VehicleParkingMapper {
       builder.carSpaces(capacity);
     }
 
-    return builder.carSpaces(capacity).build();
+    return builder.build();
   }
 
   private static boolean hasBikes(Parking parking) {
