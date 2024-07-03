@@ -258,16 +258,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkVehicleParks(Graph graph, DataImportIssueStore issueStore) {
-    if (graph.hasLinkedBikeParks) {
-      LOG.info("Already linked vehicle parks to graph...");
-      return;
-    }
     LOG.info("Linking vehicle parks to graph...");
     List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
       VehicleParkingEntranceVertex.class
     )) {
-      if (vehicleParkingEntranceHasLinks(vehicleParkingEntranceVertex)) {
+      if (vehicleParkingEntranceVertex.isLinkedToGraph()) {
         continue;
       }
 
@@ -296,22 +292,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
       var vehicleParkingService = graph.getVehicleParkingService();
       vehicleParkingService.updateVehicleParking(List.of(), vehicleParkingToRemove);
     }
-    graph.hasLinkedBikeParks = true;
-  }
-
-  private boolean vehicleParkingEntranceHasLinks(
-    VehicleParkingEntranceVertex vehicleParkingEntranceVertex
-  ) {
-    return !(
-      vehicleParkingEntranceVertex
-        .getIncoming()
-        .stream()
-        .allMatch(VehicleParkingEdge.class::isInstance) &&
-      vehicleParkingEntranceVertex
-        .getOutgoing()
-        .stream()
-        .allMatch(VehicleParkingEdge.class::isInstance)
-    );
   }
 
   /**

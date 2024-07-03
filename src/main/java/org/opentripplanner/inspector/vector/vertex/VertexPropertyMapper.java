@@ -9,6 +9,7 @@ import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 public class VertexPropertyMapper extends PropertyMapper<Vertex> {
@@ -23,6 +24,11 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
       switch (input) {
         case BarrierVertex v -> List.of(kv("permission", v.getBarrierPermissions().toString()));
         case VehicleRentalPlaceVertex v -> List.of(kv("rentalId", v.getStation().getId()));
+        case VehicleParkingEntranceVertex v -> List.of(
+          kv("rentalId", v.getVehicleParking().getId()),
+          kv("walkAccessible", Boolean.toString(v.isWalkAccessible())),
+          kv("carAccessible", Boolean.toString(v.isCarAccessible()))
+          );
         default -> List.of();
       };
     return ListUtils.combine(baseProps, properties);

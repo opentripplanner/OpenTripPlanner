@@ -27,7 +27,7 @@ class VehicleParkingMapper {
     CYCLE
   );
 
-  public VehicleParkingMapper(FeedScopedIdFactory idFactory) {
+  VehicleParkingMapper(FeedScopedIdFactory idFactory) {
     this.idFactory = idFactory;
   }
 
