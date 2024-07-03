@@ -11,7 +11,6 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -47,7 +46,7 @@ public class NetexConfigure {
         transitModel.getStopModel(),
         issueStore
       );
-      netexBundles.add(netexBundle(transitServiceBuilder, it, graph.getVehicleParkingService()));
+      netexBundles.add(netexBundle(transitServiceBuilder, it));
     }
 
     return new NetexModule(
@@ -63,8 +62,7 @@ public class NetexConfigure {
   /** public to enable testing */
   public NetexBundle netexBundle(
     OtpTransitServiceBuilder transitServiceBuilder,
-    ConfiguredDataSource<NetexFeedParameters> configuredDataSource,
-    VehicleParkingService parkingService
+    ConfiguredDataSource<NetexFeedParameters> configuredDataSource
   ) {
     var source = (CompositeDataSource) configuredDataSource.dataSource();
     var config = configuredDataSource.config();
@@ -74,7 +72,6 @@ public class NetexConfigure {
       source,
       hierarchy(source, config),
       transitServiceBuilder,
-      parkingService,
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance,
       config.noTransfersOnIsolatedStops(),

@@ -19,7 +19,7 @@ import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -69,7 +69,6 @@ public class NetexMapper {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
-  private final VehicleParkingService parkingService;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
   private GroupNetexMapper groupMapper;
@@ -96,8 +95,7 @@ public class NetexMapper {
     DataImportIssueStore issueStore,
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance,
-    boolean noTransfersOnIsolatedStops,
-    VehicleParkingService parkingService
+    boolean noTransfersOnIsolatedStops
   ) {
     this.transitBuilder = transitBuilder;
     this.deduplicator = deduplicator;
@@ -106,7 +104,6 @@ public class NetexMapper {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
-    this.parkingService = parkingService;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
   }
@@ -204,8 +201,11 @@ public class NetexMapper {
     mapNoticeAssignments();
 
     addEntriesToGroupMapperForPostProcessingLater();
+  }
 
-    mapParkings();
+  public Collection<VehicleParking> mapVehicleParkings() {
+    var mapper = new VehicleParkingMapper(idFactory);
+    return mapper.map(currentNetexIndex.getParkings());
   }
 
   /* PRIVATE METHODS */
@@ -515,12 +515,6 @@ public class NetexMapper {
       noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
       transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
     }
-  }
-
-  private void mapParkings() {
-    var mapper = new VehicleParkingMapper(idFactory);
-    var parkingLots = mapper.map(currentNetexIndex.getParkings());
-    parkingService.updateVehicleParking(parkingLots, List.of());
   }
 
   private void addEntriesToGroupMapperForPostProcessingLater() {

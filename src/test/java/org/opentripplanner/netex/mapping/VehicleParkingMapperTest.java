@@ -38,7 +38,6 @@ class VehicleParkingMapperTest {
   @MethodSource("carCases")
   void mapCarLot(Set<ParkingVehicleEnumeration> vehicleTypes) {
     var vp = MAPPER.map(parking(vehicleTypes));
-    assertEquals("A name", vp.getName().toString());
     assertCommonProperties(vp);
     assertTrue(vp.hasAnyCarPlaces());
     assertEquals(VehicleParkingSpaces.builder().carSpaces(10).build(), vp.getCapacity());
@@ -52,13 +51,13 @@ class VehicleParkingMapperTest {
   @MethodSource("bicycleCases")
   void mapBicycleLot(Set<ParkingVehicleEnumeration> vehicleTypes) {
     var vp = MAPPER.map(parking(vehicleTypes));
-    assertEquals("A name", vp.getName().toString());
     assertCommonProperties(vp);
     assertTrue(vp.hasBicyclePlaces());
     assertEquals(VehicleParkingSpaces.builder().bicycleSpaces(10).build(), vp.getCapacity());
   }
 
   private static void assertCommonProperties(VehicleParking vp) {
+    assertEquals("A name", vp.getName().toString());
     assertEquals(new WgsCoordinate(10, 20), vp.getCoordinate());
     assertEquals(
       "[VehicleParkingEntrance{entranceId: parking:LOT1/entrance, coordinate: (10.0, 20.0), carAccessible: true, walkAccessible: true}]",
