@@ -207,10 +207,10 @@ travel time `x` (in seconds).
                 """
 This time slack is added to arrival time of the vehicle before any transfer or onward travel.
 
-The sole reason for this is to avoid missed connections when there are minor schedule variations. This
-parameter is intended to be set by agencies not individual users. In general it is better to use
-`boardSlack` - see its documentation for details. However, for specific modes, like airplane and
+This time slack helps model potential delays or procedures a passenger experiences during the process of passing through the alighting location. This
+parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
 subway, that need more time than others, this is also configurable per mode with `alightSlackForMode`.
+A related parameter (transferSlack) exists to help avoid missed connections when there are minor schedule variations.
 """
               )
               .asDuration(dft.alightSlack().defaultValue())
@@ -238,10 +238,10 @@ subway, that need more time than others, this is also configurable per mode with
               .summary("The time safety margin when boarding a vehicle.")
               .description(
                 """
-The board slack is added to the passenger's arrival time at a stop before boarding evaluating which
+The board slack is added to the passenger's arrival time at a stop, before evaluating which
 vehicles can be boarded.
-
-The sole reason for this is to avoid missed connections when there are minor schedule variations. This
+This time slack helps model potential delays or procedures a passenger experiences during the process of passing through the boarding location, as well as some minor schedule variation.
+A related parameter (transferSlack) also helps avoid missed connections when there are minor schedule variations. This
 parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
 subway, that need more time than others, this is also configurable per mode with `boardSlackForMode`.
 
