@@ -31,6 +31,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final Set<FeedScopedId> filterByStops;
   private final Set<FeedScopedId> filterByStations;
   private final Set<FeedScopedId> filterByRoutes;
+  private final Set<String> filterByNetwork;
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
@@ -44,7 +45,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final boolean includeStations;
   private final int maxResults;
   private final double radiusMeters;
-  private final Set<String> filterByNetwork;
 
   /**
    * @param transitService             A TransitService used in finding information about the
