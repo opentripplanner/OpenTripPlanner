@@ -18,6 +18,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -74,9 +75,29 @@ class StreetVehicleParkingLinkTest {
   }
 
   @Test
-  void isLinkedToGraph() {
+  void notLinkedToGraph() {
     var vertex = buildVertex(Set.of());
     assertFalse(vertex.isLinkedToGraph());
+  }
+
+  @Test
+  void linkedToGraphWithIncoming() {
+    var vertex = buildVertex(Set.of());
+    var streetVertex = StreetModelForTest.intersectionVertex(1, 1);
+    vertex.addIncoming(
+      StreetVehicleParkingLink.createStreetVehicleParkingLink(streetVertex, vertex)
+    );
+    assertTrue(vertex.isLinkedToGraph());
+  }
+
+  @Test
+  void linkedToGraphWithOutgoing() {
+    var vertex = buildVertex(Set.of());
+    var streetVertex = StreetModelForTest.intersectionVertex(1, 1);
+    vertex.addOutgoing(
+      StreetVehicleParkingLink.createStreetVehicleParkingLink(streetVertex, vertex)
+    );
+    assertTrue(vertex.isLinkedToGraph());
   }
 
   private static VehicleParkingEntranceVertex buildVertex(Set<String> parkingTags) {
