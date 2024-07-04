@@ -38,6 +38,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update Google Pubsub updater configuration [#5927](https://github.com/opentripplanner/OpenTripPlanner/pull/5927)
 - Make new debug client the default, move old one to `classic-debug` [#5924](https://github.com/opentripplanner/OpenTripPlanner/pull/5924)
 - Require valid polygons for AreaStop [#5915](https://github.com/opentripplanner/OpenTripPlanner/pull/5915)
+- Fix NullPointerException in stop transfer priority cost vector generation [#5943](https://github.com/opentripplanner/OpenTripPlanner/pull/5943)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
