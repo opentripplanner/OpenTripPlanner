@@ -1,9 +1,9 @@
-package org.opentripplanner.apis.gtfs.mapping;
+package org.opentripplanner.apis.gtfs.support.time;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 
-public class LocalDateRangeMapper {
+public class LocalDateRangeUtil {
 
   /**
    * Checks if a service date filter input has at least one filter set. If both start and end are

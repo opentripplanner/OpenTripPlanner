@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 
 class LocalDateRangeMapperTest {
 
@@ -25,7 +26,7 @@ class LocalDateRangeMapperTest {
   @ParameterizedTest
   @MethodSource("noFilterCases")
   void hasNoServiceDateFilter(GraphQLTypes.GraphQLLocalDateRangeInput input) {
-    assertFalse(LocalDateRangeMapper.hasServiceDateFilter(input));
+    assertFalse(LocalDateRangeUtil.hasServiceDateFilter(input));
   }
 
   public static List<Map<String, Object>> hasFilterCases() {
@@ -36,6 +37,6 @@ class LocalDateRangeMapperTest {
   @MethodSource("hasFilterCases")
   void hasServiceDateFilter(Map<String, Object> params) {
     var input = new GraphQLTypes.GraphQLLocalDateRangeInput(params);
-    assertTrue(LocalDateRangeMapper.hasServiceDateFilter(input));
+    assertTrue(LocalDateRangeUtil.hasServiceDateFilter(input));
   }
 }
