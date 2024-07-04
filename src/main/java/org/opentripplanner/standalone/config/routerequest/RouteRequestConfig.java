@@ -240,15 +240,20 @@ A related parameter (transferSlack) exists to help avoid missed connections when
                 """
 The board slack is added to the passenger's arrival time at a stop, before evaluating which
 vehicles can be boarded.
-This time slack helps model potential delays or procedures a passenger experiences during the process of passing through the boarding location, as well as some minor schedule variation.
-A related parameter (transferSlack) also helps avoid missed connections when there are minor schedule variations. This
-parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
-subway, that need more time than others, this is also configurable per mode with `boardSlackForMode`.
 
-Agencies can use this parameter to ensure that the trip planner does not instruct passengers to arrive 
-at the last second.
-This slack is added at every boarding including the first vehicle and transfers except for in-seat 
-transfers and guaranteed transfers. 
+This time slack helps model potential delays or procedures a passenger experiences during the process
+of passing through the boarding location, as well as some minor schedule variation. This parameter is
+intended to be set by agencies not individual users.
+
+Agencies can use this parameter to ensure that the trip planner does not instruct passengers to arrive
+at the last second. This slack is added at every boarding including the first vehicle and transfers
+except for in-seat transfers and guaranteed transfers.
+
+For specific modes, like airplane and subway, that need more time than others, this is also
+configurable per mode with `boardSlackForMode`.
+
+A related parameter (transferSlack) also helps avoid missed connections when there are minor schedule
+variations.
 """
               )
               .asDuration(dft.boardSlack().defaultValue())

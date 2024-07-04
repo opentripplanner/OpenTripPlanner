@@ -196,10 +196,10 @@ The time safety margin when alighting from a vehicle.
 
 This time slack is added to arrival time of the vehicle before any transfer or onward travel.
 
-The sole reason for this is to avoid missed connections when there are minor schedule variations. This
-parameter is intended to be set by agencies not individual users. In general it is better to use
-`boardSlack` - see its documentation for details. However, for specific modes, like airplane and
+This time slack helps model potential delays or procedures a passenger experiences during the process of passing through the alighting location. This
+parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
 subway, that need more time than others, this is also configurable per mode with `alightSlackForMode`.
+A related parameter (transferSlack) exists to help avoid missed connections when there are minor schedule variations.
 
 
 <h3 id="rd_boardSlack">boardSlack</h3>
@@ -209,17 +209,22 @@ subway, that need more time than others, this is also configurable per mode with
 
 The time safety margin when boarding a vehicle.
 
-The board slack is added to the passenger's arrival time at a stop before boarding evaluating which
+The board slack is added to the passenger's arrival time at a stop, before evaluating which
 vehicles can be boarded.
 
-The sole reason for this is to avoid missed connections when there are minor schedule variations. This
-parameter is intended to be set by agencies not individual users. For specific modes, like airplane and
-subway, that need more time than others, this is also configurable per mode with `boardSlackForMode`.
+This time slack helps model potential delays or procedures a passenger experiences during the process
+of passing through the boarding location, as well as some minor schedule variation. This parameter is
+intended to be set by agencies not individual users.
 
 Agencies can use this parameter to ensure that the trip planner does not instruct passengers to arrive
-at the last second.
-This slack is added at every boarding including the first vehicle and transfers except for in-seat
-transfers and guaranteed transfers.
+at the last second. This slack is added at every boarding including the first vehicle and transfers
+except for in-seat transfers and guaranteed transfers.
+
+For specific modes, like airplane and subway, that need more time than others, this is also
+configurable per mode with `boardSlackForMode`.
+
+A related parameter (transferSlack) also helps avoid missed connections when there are minor schedule
+variations.
 
 
 <h3 id="rd_drivingDirection">drivingDirection</h3>
@@ -373,7 +378,7 @@ wise. We recommend allowing the end-user to set this, and use `board-/alight-sla
 agency policies. This time is in addition to how long it might take to walk, board and alight.
 
 It is useful for passengers on long distance travel, and people with mobility issues, but can be set
-close to zero for everyday commuters and short distance searches in high transit frequency areas.
+close to zero for everyday commuters and short distance searches in high-frequency transit areas.
 
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>

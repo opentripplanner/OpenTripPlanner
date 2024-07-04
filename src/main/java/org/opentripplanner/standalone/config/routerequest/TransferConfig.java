@@ -45,7 +45,7 @@ class TransferConfig {
             agency policies. This time is in addition to how long it might take to walk, board and alight.
             
             It is useful for passengers on long distance travel, and people with mobility issues, but can be set
-            close to zero for everyday commuters and short distance searches in high transit frequency areas.
+            close to zero for everyday commuters and short distance searches in high-frequency transit areas.
             """
           )
           .asDurationOrSeconds(dft.slack())
