@@ -102,8 +102,7 @@ public class ConstantsForTests {
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
     var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
 
-    return new NetexConfigure(buildConfig)
-      .netexBundle(transitService, configuredDataSource);
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   public static NetexBundle createMinimalNetexEpipBundle() {
@@ -115,8 +114,7 @@ public class ConstantsForTests {
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
     var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
 
-    return new NetexConfigure(buildConfig)
-      .netexBundle(transitService, configuredDataSource);
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   /**
