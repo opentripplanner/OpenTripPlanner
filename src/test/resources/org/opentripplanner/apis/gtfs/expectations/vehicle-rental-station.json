@@ -53,7 +53,10 @@
       "capacity" : null,
       "allowOverloading" : false,
       "rentalUris" : null,
-      "operative" : false
+      "operative" : false,
+      "vehicleRentalSystem" : {
+        "url" : "https://foo.bar"
+      }
     }
   }
 }

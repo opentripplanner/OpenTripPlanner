@@ -39,5 +39,8 @@
       web
     }
     operative
+    vehicleRentalSystem {
+      url
+    }
   }
 }

@@ -1,0 +1,21 @@
+{
+  "data": {
+    "rentalVehicle": {
+      "vehicleId":"Network-1:free-floating-bicycle",
+      "name":"free-floating-bicycle",
+      "allowPickupNow":true,
+      "network":"Network-1",
+      "lon":19.01,
+      "lat":47.52,
+      "rentalUris":null,
+      "operative":true,
+      "vehicleType": {
+        "formFactor":"BICYCLE",
+        "propulsionType":"HUMAN"
+      },
+      "vehicleRentalSystem": {
+        "url":"https://foo.bar"
+      }
+    }
+  }
+}

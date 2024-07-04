@@ -19,6 +19,7 @@ public class TestVehicleRentalStationBuilder {
   private int spaces = 10;
   private boolean overloadingAllowed = false;
   private boolean stationOn = false;
+  private VehicleRentalSystem system = null;
   private final Map<RentalVehicleType, Integer> vehicleTypesAvailable = new HashMap<>();
   private final Map<RentalVehicleType, Integer> vehicleSpacesAvailable = new HashMap<>();
 
@@ -49,6 +50,28 @@ public class TestVehicleRentalStationBuilder {
 
   public TestVehicleRentalStationBuilder withStationOn(boolean stationOn) {
     this.stationOn = stationOn;
+    return this;
+  }
+
+  public TestVehicleRentalStationBuilder withSystem(String id, String url) {
+    this.system =
+      new VehicleRentalSystem(
+        id,
+        null,
+        null,
+        null,
+        null,
+        url,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      );
     return this;
   }
 
@@ -127,6 +150,7 @@ public class TestVehicleRentalStationBuilder {
     station.isRenting = stationOn;
     station.isReturning = stationOn;
     station.realTimeData = true;
+    station.system = system;
     return station;
   }
 }
