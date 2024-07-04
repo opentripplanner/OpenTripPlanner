@@ -84,6 +84,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
@@ -212,7 +213,11 @@ class GtfsGraphQLIndex {
         );
     }
 
-    GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
+    GraphQL graphQL = GraphQL
+      .newGraphQL(indexSchema)
+      .instrumentation(instrumentation)
+      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
+      .build();
 
     if (variables == null) {
       variables = new HashMap<>();

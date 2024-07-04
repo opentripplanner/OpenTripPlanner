@@ -1,26 +1,14 @@
 {
   planConnection(
-    dateTime: {
-      earliestDeparture: "2023-06-13T14:30+03:00"
-    }
+    dateTime: { earliestDeparture: "2023-06-13T14:30+03:00" }
     searchWindow: "PT2H30M"
     first: 5
     origin: {
-      location: {
-        coordinate: {
-          latitude: 45.5552
-          longitude: -122.6534
-        }
-      }
+      location: { coordinate: { latitude: 45.5552, longitude: -122.6534 } }
       label: "Home"
     }
     destination: {
-      location: {
-        coordinate: {
-          latitude: 45.4908
-          longitude: -122.5519
-        }
-      }
+      location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
       label: "Work"
     }
     modes: {
@@ -31,25 +19,11 @@
         access: [BICYCLE_RENTAL, WALK]
         transfer: [WALK]
         egress: [BICYCLE_RENTAL, WALK]
-        transit: [
-          {
-            mode: TRAM
-            cost: {
-              reluctance: 1.3
-            }
-          },
-          {
-            mode: BUS
-          }
-        ]
+        transit: [{ mode: TRAM, cost: { reluctance: 1.3 } }, { mode: BUS }]
       }
     }
     preferences: {
-      accessibility: {
-        wheelchair: {
-          enabled: true
-        }
-      }
+      accessibility: { wheelchair: { enabled: true } }
       street: {
         car: {
           reluctance: 6.5
@@ -59,70 +33,36 @@
           }
           parking: {
             unpreferredCost: 200
-            preferred: [{
-              select: [{
-                tags: ["best-park"]
-              }]
-            }]
-            filters: [{
-              not: [{
-                tags: ["worst-park"]
-              }]
-            }]
+            preferred: [{ select: [{ tags: ["best-park"] }] }]
+            filters: [{ not: [{ tags: ["worst-park"] }] }]
           }
         }
         bicycle: {
           reluctance: 3.0
           speed: 7.4
-          optimization: {
-            type: SAFEST_STREETS
-          }
+          optimization: { type: SAFEST_STREETS }
           boardCost: 200
           walk: {
             speed: 1.3
-            cost: {
-              mountDismountCost: 100
-              reluctance: 3.5
-            }
+            cost: { mountDismountCost: 100, reluctance: 3.5 }
             mountDismountTime: "PT5S"
           }
           rental: {
-            destinationBicyclePolicy: {
-              allowKeeping: true
-              keepingCost: 300
-            }
+            destinationBicyclePolicy: { allowKeeping: true, keepingCost: 300 }
             allowedNetworks: ["foo", "bar"]
             bannedNetworks: ["foobar"]
           }
           parking: {
             unpreferredCost: 200
-            preferred: [{
-              select: [{
-                tags: ["best-park"]
-              }]
-            }]
-            filters: [{
-              not: [{
-                tags: ["worst-park"]
-              }]
-            }]
+            preferred: [{ select: [{ tags: ["best-park"] }] }]
+            filters: [{ not: [{ tags: ["worst-park"] }] }]
           }
         }
-        walk: {
-          speed: 2.4
-          reluctance: 1.5
-          safetyFactor: 0.5
-          boardCost: 200
-        }
+        walk: { speed: 2.4, reluctance: 1.5, safetyFactor: 0.5, boardCost: 200 }
       }
       transit: {
-        board: {
-          waitReluctance: 3.2
-          slack: "PT1M30S"
-        }
-        alight: {
-          slack: "PT0S"
-        }
+        board: { waitReluctance: 3.2, slack: "PT1M30S" }
+        alight: { slack: "PT0S" }
         transfer: {
           cost: 200
           slack: "PT2M"

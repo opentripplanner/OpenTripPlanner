@@ -3,9 +3,9 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>OTP Leaflet Client</display-name>
+  <display-name>OTP Client</display-name>
   <mime-mapping>
     <extension>js</extension>
-    <mime-type>application/x-javascript</mime-type>
+    <mime-type>application/javascript</mime-type>
   </mime-mapping>
 </web-app>

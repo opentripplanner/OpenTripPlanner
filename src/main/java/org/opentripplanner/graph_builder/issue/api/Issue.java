@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.issue.api;
 
+import org.opentripplanner.framework.tostring.ToStringBuilder;
+
 /**
  * Generic issue type, which can be used to create issues.
  */
@@ -31,5 +33,14 @@ public class Issue implements DataImportIssue {
   @Override
   public String getMessage() {
     return String.format(message, arguments);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(this.getClass())
+      .addStr("type", type)
+      .addStr("message", getMessage())
+      .toString();
   }
 }
