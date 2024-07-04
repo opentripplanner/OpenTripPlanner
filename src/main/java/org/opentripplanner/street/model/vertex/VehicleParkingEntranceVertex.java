@@ -53,10 +53,10 @@ public class VehicleParkingEntranceVertex extends Vertex {
   }
 
   public boolean isLinkedToGraph() {
-    return !(hasLinks(getIncoming()) && hasLinks(getOutgoing()));
+    return !(hasNoLinkEdges(getIncoming()) && hasNoLinkEdges(getOutgoing()));
   }
 
-  private boolean hasLinks(Collection<Edge> incoming) {
+  private boolean hasNoLinkEdges(Collection<Edge> incoming) {
     return incoming.stream().allMatch(VehicleParkingEdge.class::isInstance);
   }
 }
