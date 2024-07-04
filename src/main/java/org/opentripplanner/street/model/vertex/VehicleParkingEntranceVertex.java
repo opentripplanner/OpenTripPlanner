@@ -52,17 +52,11 @@ public class VehicleParkingEntranceVertex extends Vertex {
     return parkingEntrance.isWalkAccessible();
   }
 
-  public boolean isLinkedToGraph(
-  ) {
-    return !(
-      hasLinks(getIncoming()) &&
-        hasLinks(getOutgoing())
-    );
+  public boolean isLinkedToGraph() {
+    return !(hasLinks(getIncoming()) && hasLinks(getOutgoing()));
   }
 
   private boolean hasLinks(Collection<Edge> incoming) {
-    return incoming
-      .stream()
-      .allMatch(VehicleParkingEdge.class::isInstance);
+    return incoming.stream().allMatch(VehicleParkingEdge.class::isInstance);
   }
 }

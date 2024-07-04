@@ -106,7 +106,6 @@ public class NetexModule implements GraphBuilderModule {
         graph.getVehicleParkingService().updateVehicleParking(lots, List.of());
         var linker = new VehicleParkingHelper(graph);
         lots.forEach(linker::linkVehicleParkingToGraph);
-
       }
 
       transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);

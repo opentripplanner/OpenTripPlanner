@@ -38,8 +38,6 @@ public class StyleBuilder {
     return sourceLayer(source.vectorLayer());
   }
 
-
-
   public enum LayerType {
     Circle,
     Line,
@@ -197,8 +195,6 @@ public class StyleBuilder {
   public final StyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
     return filterClasses(classToFilter);
   }
-
-
 
   /**
    * Only apply the style to the given vertices.

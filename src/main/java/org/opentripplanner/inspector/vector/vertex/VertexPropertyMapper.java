@@ -28,7 +28,7 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
           kv("rentalId", v.getVehicleParking().getId()),
           kv("walkAccessible", Boolean.toString(v.isWalkAccessible())),
           kv("carAccessible", Boolean.toString(v.isCarAccessible()))
-          );
+        );
         default -> List.of();
       };
     return ListUtils.combine(baseProps, properties);
