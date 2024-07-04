@@ -52,11 +52,14 @@ public class VehicleParkingEntranceVertex extends Vertex {
     return parkingEntrance.isWalkAccessible();
   }
 
+  /**
+   * Is this vertex already linked to the graph with a {@link StreetVehicleParkingLink}?
+   */
   public boolean isLinkedToGraph() {
-    return !(hasNoLinkEdges(getIncoming()) && hasNoLinkEdges(getOutgoing()));
+    return hasLink(getIncoming()) || hasLink(getOutgoing());
   }
 
-  private boolean hasNoLinkEdges(Collection<Edge> incoming) {
-    return incoming.stream().allMatch(VehicleParkingEdge.class::isInstance);
+  private boolean hasLink(Collection<Edge> incoming) {
+    return incoming.stream().anyMatch(StreetVehicleParkingLink.class::isInstance);
   }
 }
