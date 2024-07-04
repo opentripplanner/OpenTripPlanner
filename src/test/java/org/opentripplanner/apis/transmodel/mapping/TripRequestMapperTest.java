@@ -402,9 +402,14 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertEquals(StreetMode.WALK, req.journey().transfer().mode());
   }
 
+  /**
+   * This tests that both the new parameter name 'transferSlack` and the deprecated one
+   * 'minimumTransferTime' (for backwards compatibility) are correctly mapped to the internal
+   * transfer slack as a duration.
+   */
   @ParameterizedTest
   @ValueSource(strings = { "transferSlack", "minimumTransferTime" })
-  public void testTransferSlack(String name) {
+  public void testBackwardsCompatibleTransferSlack(String name) {
     Map<String, Object> arguments = Map.of(name, 101);
     var req = TripRequestMapper.createRequest(executionContext(arguments));
     assertEquals(Duration.ofSeconds(101), req.preferences().transfer().slack());
