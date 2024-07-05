@@ -4,7 +4,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * This is the keys used to group transit trips and trip-patterns. This is used to calculate a
+ * These are the keys used to group transit trips and trip-patterns. This is used to calculate a
  * unique groupId based on the request config. We use the adapter pattern to be able to generate
  * the groupId based on different input types (TripPattern and Trip).
  */
