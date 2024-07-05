@@ -122,7 +122,7 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("ranges")
   void filterPatterns(LocalDate start, LocalDate end, FilterExpectation expectation) {
-    var filter = mockFilter(start, end);
+    var filter = defaultFilter(start, end);
 
     var filterInput = List.of(PATTERN_1);
     var filterOutput = filter.filterPatterns(filterInput);
@@ -137,7 +137,7 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("ranges")
   void filterRoutes(LocalDate start, LocalDate end, FilterExpectation expectation) {
-    var filter = mockFilter(start, end);
+    var filter = defaultFilter(start, end);
 
     var filterInput = List.of(ROUTE_1);
     var filterOutput = filter.filterRoutes(filterInput.stream());
@@ -149,7 +149,7 @@ class PatternByServiceDatesFilterTest {
     }
   }
 
-  private static PatternByServiceDatesFilter mockFilter(LocalDate start, LocalDate end) {
+  private static PatternByServiceDatesFilter defaultFilter(LocalDate start, LocalDate end) {
     return new PatternByServiceDatesFilter(
       new LocalDateRange(start, end),
       route -> List.of(PATTERN_1),
