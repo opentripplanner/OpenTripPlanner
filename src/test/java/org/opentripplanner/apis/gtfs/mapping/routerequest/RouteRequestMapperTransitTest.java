@@ -87,7 +87,7 @@ class RouteRequestMapperTransitTest {
     var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var transferPreferences = routeRequest.preferences().transfer();
     assertEquals(cost.toSeconds(), transferPreferences.cost());
-    assertEquals(slack.toSeconds(), transferPreferences.slack());
+    assertEquals(slack, transferPreferences.slack());
     assertEquals(maximumAdditionalTransfers, transferPreferences.maxAdditionalTransfers());
     assertEquals(maximumTransfers + 1, transferPreferences.maxTransfers());
   }

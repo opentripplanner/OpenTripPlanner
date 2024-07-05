@@ -151,7 +151,7 @@ class RequestToPreferencesMapper {
             "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
           );
         }
-        transfer.withSlack(req.minTransferTime - boardAndAlightSlack.value);
+        transfer.withSlackSec(req.minTransferTime - boardAndAlightSlack.value);
       }
 
       setIfNotNull(req.nonpreferredTransferPenalty, transfer::withNonpreferredCost);
