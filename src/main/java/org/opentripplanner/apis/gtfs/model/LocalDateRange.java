@@ -15,9 +15,21 @@ public record LocalDateRange(@Nullable LocalDate startInclusive, @Nullable Local
   }
 
   /**
-   * Is the start date before the end (
+   * Is the start date before the end?
    */
   public boolean startBeforeEnd() {
     return startInclusive != null && endExclusive != null && startInclusive.isAfter(endExclusive);
+  }
+
+  /**
+   * Is the given LocalDate instance inside of this date range?
+   */
+  public boolean contains(LocalDate date) {
+    return (
+      (
+        startInclusive() == null || date.isEqual(startInclusive()) || date.isAfter(startInclusive())
+      ) &&
+      (endExclusive() == null || date.isBefore(endExclusive()))
+    );
   }
 }

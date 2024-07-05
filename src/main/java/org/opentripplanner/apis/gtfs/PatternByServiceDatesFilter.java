@@ -82,16 +82,7 @@ public class PatternByServiceDatesFilter {
       .anyMatch(trip -> {
         var dates = getServiceDatesForTrip.apply(trip);
 
-        return dates
-          .stream()
-          .anyMatch(date ->
-            (
-              range.startInclusive() == null ||
-              date.isEqual(range.startInclusive()) ||
-              date.isAfter(range.startInclusive())
-            ) &&
-            (range.endExclusive() == null || date.isBefore(range.endExclusive()))
-          );
+        return dates.stream().anyMatch(range::contains);
       });
   }
 }
