@@ -50,6 +50,8 @@ public class SmooveBikeRentalDataSource
     system =
       new VehicleRentalSystem(
         networkName,
+        "fi",
+        "Helsinki/Espoo",
         null,
         null,
         null,
@@ -58,9 +60,7 @@ public class SmooveBikeRentalDataSource
         null,
         null,
         null,
-        null,
-        null,
-        null,
+        "Europe/Helsinki",
         null,
         null,
         null
