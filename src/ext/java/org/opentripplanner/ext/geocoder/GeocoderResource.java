@@ -14,30 +14,35 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.ext.restapi.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * OTP simple built-in geocoder used by the debug client.
  */
-@Path("/routers/{ignoreRouterId}/geocode")
+@Path("/geocode")
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
   private final OtpServerRequestContext serverContext;
 
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated
-  @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
-
   public GeocoderResource(@Context OtpServerRequestContext requestContext) {
     serverContext = requestContext;
+  }
+
+  /**
+   * This class is only here for backwards-compatibility. It will be removed in the future.
+   */
+  @Path("/routers/{ignoreRouterId}/geocode")
+  public static class GeocoderResourceOldPath extends GeocoderResource {
+
+    public GeocoderResourceOldPath(
+      @Context OtpServerRequestContext serverContext,
+      @PathParam("ignoreRouterId") String ignore
+    ) {
+      super(serverContext);
+    }
   }
 
   /**
@@ -47,7 +52,6 @@ public class GeocoderResource {
    * @param autocomplete Whether we should use the query string to do a prefix match
    * @param stops        Search for stops, either by name or stop code
    * @param clusters     Search for clusters by their name
-   * @param corners      Search for street corners using at least one of the street names
    * @return list of results in the format expected by GeocoderBuiltin.js in the OTP Leaflet
    * client
    */
@@ -56,12 +60,11 @@ public class GeocoderResource {
     @QueryParam("query") String query,
     @QueryParam("autocomplete") @DefaultValue("false") boolean autocomplete,
     @QueryParam("stops") @DefaultValue("true") boolean stops,
-    @QueryParam("clusters") @DefaultValue("false") boolean clusters,
-    @QueryParam("corners") @DefaultValue("true") boolean corners
+    @QueryParam("clusters") @DefaultValue("false") boolean clusters
   ) {
     return Response
       .status(Response.Status.OK)
-      .entity(query(query, autocomplete, stops, clusters, corners))
+      .entity(query(query, autocomplete, stops, clusters))
       .build();
   }
 
@@ -77,8 +80,7 @@ public class GeocoderResource {
     String query,
     boolean autocomplete,
     boolean stops,
-    boolean clusters,
-    boolean corners
+    boolean clusters
   ) {
     List<SearchResult> results = new ArrayList<>();
 
@@ -88,10 +90,6 @@ public class GeocoderResource {
 
     if (clusters) {
       results.addAll(queryStations(query, autocomplete));
-    }
-
-    if (corners) {
-      results.addAll(queryCorners(query, autocomplete));
     }
 
     return results;
@@ -125,20 +123,6 @@ public class GeocoderResource {
         )
       )
       .collect(Collectors.toList());
-  }
-
-  private Collection<? extends SearchResult> queryCorners(String query, boolean autocomplete) {
-    return LuceneIndex
-      .forServer(serverContext)
-      .queryStreetVertices(query, autocomplete)
-      .map(v ->
-        new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabelString())
-      )
-      .collect(Collectors.toList());
-  }
-
-  private String stringifyStreetVertex(StreetVertex v) {
-    return String.format("%s (%s)", v.getIntersectionName(), v.getLabel());
   }
 
   private String stringifyStopLocation(StopLocation sl) {

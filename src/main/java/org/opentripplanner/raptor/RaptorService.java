@@ -31,7 +31,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorRequest<T> request,
     RaptorTransitDataProvider<T> transitData
   ) {
-    LOG.debug("Original request: {}", request);
+    logRequest(request);
     RaptorResponse<T> response;
 
     if (request.isDynamicSearch()) {
@@ -39,14 +39,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     } else {
       response = routeUsingStdWorker(transitData, request);
     }
-    if (LOG.isDebugEnabled()) {
-      var pathsAsText = response
-        .paths()
-        .stream()
-        .map(p -> "\t\n" + p.toString(transitData.stopNameResolver()))
-        .collect(Collectors.joining());
-      LOG.debug("Result: {}", pathsAsText);
-    }
+    logResponse(transitData, response);
     return response;
   }
 
@@ -78,6 +71,24 @@ public class RaptorService<T extends RaptorTripSchedule> {
     var worker = config.createStdWorker(transitData, request);
     var result = worker.route();
     var arrivals = new DefaultStopArrivals(result);
-    return new RaptorResponse<>(result.extractPaths(), arrivals, request, request);
+    return new RaptorResponse<>(result.extractPaths(), arrivals, request, false);
+  }
+
+  private static <T extends RaptorTripSchedule> void logRequest(RaptorRequest<T> request) {
+    LOG.debug("Original request: {}", request);
+  }
+
+  private static <T extends RaptorTripSchedule> void logResponse(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorResponse<T> response
+  ) {
+    if (LOG.isDebugEnabled()) {
+      var pathsAsText = response
+        .paths()
+        .stream()
+        .map(p -> "\t\n" + p.toString(transitData.stopNameResolver()))
+        .collect(Collectors.joining());
+      LOG.debug("Result: {}", pathsAsText);
+    }
   }
 }

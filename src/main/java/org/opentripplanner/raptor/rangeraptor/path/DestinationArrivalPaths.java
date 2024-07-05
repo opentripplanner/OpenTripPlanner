@@ -2,9 +2,11 @@ package org.opentripplanner.raptor.rangeraptor.path;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -40,13 +42,16 @@ import org.slf4j.LoggerFactory;
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(DestinationArrivalPaths.class);
-  private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
+  private static final Throttle THROTTLE_MISS_MATCH = Throttle.ofOneSecond();
 
   private final ParetoSet<RaptorPath<T>> paths;
   private final RaptorTransitCalculator<T> transitCalculator;
 
   @Nullable
   private final RaptorCostCalculator<T> costCalculator;
+
+  @Nullable
+  private final IntPredicate acceptC2AtDestination;
 
   private final SlackProvider slackProvider;
   private final PathMapper<T> pathMapper;
@@ -59,6 +64,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     ParetoComparator<RaptorPath<T>> paretoComparator,
     RaptorTransitCalculator<T> transitCalculator,
     @Nullable RaptorCostCalculator<T> costCalculator,
+    @Nullable IntPredicate acceptC2AtDestination,
     SlackProvider slackProvider,
     PathMapper<T> pathMapper,
     DebugHandlerFactory<T> debugHandlerFactory,
@@ -71,6 +77,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.pathMapper = pathMapper;
+    this.acceptC2AtDestination = acceptC2AtDestination;
     this.debugPathHandler = debugHandlerFactory.debugPathArrival();
     this.stopNameResolver = stopNameResolver;
     lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
@@ -84,18 +91,26 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       return;
     }
 
-    var errors = transitCalculator.rejectDestinationArrival(destArrival);
-    if (!errors.isEmpty()) {
-      debugReject(destArrival, String.join(" ", errors));
+    var errors = new ArrayList<String>();
+
+    rejectArrivalIfItExceedsTimeLimit(destArrival).ifPresent(errors::add);
+    rejectArrivalIfC2CheckFails(destArrival).ifPresent(errors::add);
+
+    if (errors.isEmpty()) {
+      addDestinationArrivalToPaths(destArrival);
     } else {
-      RaptorPath<T> path = pathMapper.mapToPath(destArrival);
+      debugReject(destArrival, String.join(" ", errors));
+    }
+  }
 
-      assertGeneralizedCostIsCalculatedCorrectByMapper(destArrival, path);
+  private void addDestinationArrivalToPaths(DestinationArrival<T> destArrival) {
+    RaptorPath<T> path = pathMapper.mapToPath(destArrival);
 
-      boolean added = paths.add(path);
-      if (added) {
-        reachedCurrentRound = true;
-      }
+    assertGeneralizedCostIsCalculatedCorrectByMapper(destArrival, path);
+
+    boolean added = paths.add(path);
+    if (added) {
+      reachedCurrentRound = true;
     }
   }
 
@@ -188,7 +203,13 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       additionalCost += costCalculator.costEgress(egressPath);
     }
 
-    return new DestinationArrival<>(egressPath, stopArrival, arrivalTime, additionalCost);
+    return new DestinationArrival<>(
+      egressPath,
+      stopArrival,
+      arrivalTime,
+      additionalCost,
+      stopArrival.c2()
+    );
   }
 
   /**
@@ -207,11 +228,14 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   ) {
     if (path.c1() != destArrival.c1()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
-      LOG_MISS_MATCH.warn(
-        "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
-        OtpNumberFormat.formatCostCenti(path.c1()),
-        raptorCostsAsString(destArrival),
-        path.toStringDetailed(stopNameResolver)
+      THROTTLE_MISS_MATCH.throttle(() ->
+        LOG.warn(
+          "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}  {}",
+          OtpNumberFormat.formatCostCenti(path.c1()),
+          raptorCostsAsString(destArrival),
+          path.toStringDetailed(stopNameResolver),
+          THROTTLE_MISS_MATCH.setupInfo()
+        )
       );
     }
   }
@@ -230,5 +254,24 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     }
     // Remove decimals if zero
     return String.join(" ", arrivalCosts).replaceAll("\\.00", "");
+  }
+
+  private Optional<String> rejectArrivalIfItExceedsTimeLimit(ArrivalView<T> destArrival) {
+    var egress = destArrival.egressPath().egress();
+    int arrivalTime = transitCalculator.timeMinusPenalty(destArrival.arrivalTime(), egress);
+    if (transitCalculator.exceedsTimeLimit(arrivalTime)) {
+      return Optional.of(transitCalculator.exceedsTimeLimitReason());
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Test if the c2 value is acceptable, or should be rejected. If ok return nothing, if rejected
+   * returns the reason for the debug event log.
+   */
+  private Optional<String> rejectArrivalIfC2CheckFails(ArrivalView<T> destArrival) {
+    return acceptC2AtDestination == null || acceptC2AtDestination.test(destArrival.c2())
+      ? Optional.empty()
+      : Optional.of("C2 value rejected: " + destArrival.c2() + ".");
   }
 }

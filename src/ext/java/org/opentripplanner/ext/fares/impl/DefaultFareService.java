@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -12,15 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;
@@ -60,11 +64,10 @@ class FareSearch {
 record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
- * This fare service module handles the cases that GTFS handles within a single feed. It cannot
- * necessarily handle multi-feed graphs, because a rule-less fare attribute might be applied to
- * rides on routes in another feed, for example. For more interesting fare structures like New
- * York's MTA, or cities with multiple feeds and inter-feed transfer rules, you get to implement
- * your own FareService. See this thread on gtfs-changes explaining the proper interpretation of
+ * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
+ * is only applicable for legs that operated by an agency within the same feed. Interfeed transfer rules
+ * are not considered in this fare service and for those situations you get to implement your own Fare Service
+ * See this thread on gtfs-changes explaining the proper interpretation of
  * fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
@@ -87,6 +90,15 @@ public class DefaultFareService implements FareService {
     return fareRulesPerType;
   }
 
+  /**
+   * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
+   */
+  protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
+    return fareLegs
+      .stream()
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+  }
+
   @Override
   public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
@@ -102,21 +114,49 @@ public class DefaultFareService implements FareService {
     if (fareLegs.isEmpty()) {
       return null;
     }
+    var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
     ItineraryFares fare = ItineraryFares.empty();
-    boolean hasFare = false;
-    for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
-      FareType fareType = kv.getKey();
-      Collection<FareRuleSet> fareRules = kv.getValue();
-      // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-      if (fareRules.size() > 0) {
-        Currency currency = Currency.getInstance(
-          fareRules.iterator().next().getFareAttribute().getCurrencyType()
-        );
-        hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
+    for (FareType fareType : fareRulesPerType.keySet()) {
+      for (String feedId : fareLegsByFeed.keySet()) {
+        var fareRules = fareRulesForFeed(fareType, feedId);
+
+        // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
+        if (fareRules != null && !fareRules.isEmpty()) {
+          Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
+          ItineraryFares computedFaresForType = calculateFaresForType(
+            currency,
+            fareType,
+            fareLegsByFeed.get(feedId),
+            fareRules
+          );
+
+          fare.add(computedFaresForType);
+        }
       }
     }
-    return hasFare ? fare : null;
+    return fare;
+  }
+
+  /**
+   * For a given fareType and feedId return the applicable fare rule sets.
+   */
+  @Nullable
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    var fareRulesByTypeAndFeed = fareRulesPerType
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules ->
+            rules
+              .getValue()
+              .stream()
+              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        )
+      );
+    return fareRulesByTypeAndFeed.get(fareType).get(feedId);
   }
 
   /**
@@ -135,8 +175,7 @@ public class DefaultFareService implements FareService {
    * If our only rule were A-B with a fare of 10, we would have no lowest fare, but we will still
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
-  protected boolean populateFare(
-    ItineraryFares fare,
+  protected ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -144,8 +183,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    List<FareComponent> components = new ArrayList<>();
-    int count = 0;
+    Multimap<Leg, FareProductUse> fareProductUses = LinkedHashMultimap.create();
     int start = 0;
     int end = legs.size() - 1;
     while (start <= end) {
@@ -161,22 +199,41 @@ public class DefaultFareService implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
+      var product = FareProduct
+        .of(fareId, fareType.name(), Money.ofFractionalAmount(currency, cost))
+        .build();
 
-      var componentLegs = new ArrayList<Leg>();
+      List<Leg> applicableLegs = new ArrayList<>();
       for (int i = start; i <= via; ++i) {
-        componentLegs.add(legs.get(i));
+        final var leg = legs.get(i);
+        // if we have a leg that is combined for the purpose of fare calculation we need to
+        // retrieve the original legs so that the fare products are assigned back to the original
+        // legs that the combined one originally consisted of.
+        // (remember that the combined leg only exists during fare calculation and is thrown away
+        // afterwards to associating fare products with it will result in the API not showing any.)
+        if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
+          applicableLegs.addAll(combinedLeg.originalLegs());
+        } else {
+          applicableLegs.add(leg);
+        }
       }
-      components.add(
-        new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
-      );
-      ++count;
+
+      if (!applicableLegs.isEmpty()) {
+        final var use = new FareProductUse(
+          product.uniqueInstanceId(applicableLegs.getFirst().getStartTime()),
+          product
+        );
+        applicableLegs.forEach(leg -> {
+          fareProductUses.put(leg, use);
+        });
+      }
+
       start = via + 1;
     }
 
-    var amount = r.resultTable[0][legs.size() - 1];
-    fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
-    fare.addFareComponent(fareType, components);
-    return count > 0;
+    var fare = ItineraryFares.empty();
+    fare.addFareProductUses(fareProductUses);
+    return fare;
   }
 
   protected Optional<Money> calculateCost(
@@ -202,11 +259,11 @@ public class DefaultFareService implements FareService {
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getTrip().getId().getFeedId();
+    String feedId = firstRide.getAgency().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
+      if (!leg.getAgency().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
         return Optional.empty();
       }
@@ -247,7 +304,7 @@ public class DefaultFareService implements FareService {
           journeyTime
         )
       ) {
-        Money newFare = getFarePrice(attribute, fareType);
+        Money newFare = attribute.getPrice();
         if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
@@ -261,30 +318,15 @@ public class DefaultFareService implements FareService {
       .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
-  protected Money getFarePrice(FareAttribute fare, FareType type) {
-    var currency = Currency.getInstance(fare.getCurrencyType());
-    return switch (type) {
-      case senior:
-        if (fare.getSeniorPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getSeniorPrice());
-        }
-      case youth:
-        if (fare.getYouthPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getYouthPrice());
-        }
-      default:
-        yield Money.ofFractionalAmount(currency, fare.getPrice());
-    };
-  }
-
   /**
    * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
-   * treated as a single leg.
+   * treated as a single leg for the purposes of fare calculation.
    * <p>
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
    * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
     ScheduledTransitLeg previousLeg,

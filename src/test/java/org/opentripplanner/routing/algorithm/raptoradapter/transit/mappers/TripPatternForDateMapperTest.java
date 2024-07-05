@@ -19,8 +19,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class TripPatternForDateMapperTest {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
   private static final int SERVICE_CODE = 555;
@@ -32,12 +35,12 @@ public class TripPatternForDateMapperTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    var pattern = TransitModelForTest.pattern(BUS).build();
+    var pattern = TEST_MODEL.pattern(BUS).build();
     timetable = new Timetable(pattern);
     var trip = TransitModelForTest.trip("1").build();
-    var tripTimes = new TripTimes(
+    var tripTimes = TripTimesFactory.tripTimes(
       trip,
-      TransitModelForTest.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
+      TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);

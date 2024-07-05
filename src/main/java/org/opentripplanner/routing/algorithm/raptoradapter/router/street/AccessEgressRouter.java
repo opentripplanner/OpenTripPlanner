@@ -2,10 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.graph_builder.module.NearbyStopFinder;
+import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -31,7 +30,6 @@ public class AccessEgressRouter {
   public static Collection<NearbyStop> streetSearch(
     RouteRequest request,
     TemporaryVerticesContainer verticesContainer,
-    TransitService transitService,
     StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
     boolean fromTarget,
@@ -39,14 +37,12 @@ public class AccessEgressRouter {
     int maxStopCount
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-      transitService,
+    var nearbyStopFinder = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,
-      dataOverlayContext,
-      true
+      dataOverlayContext
     );
-    List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
+    Collection<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStops(
       fromTarget ? verticesContainer.getToVertices() : verticesContainer.getFromVertices(),
       fromTarget,
       request,

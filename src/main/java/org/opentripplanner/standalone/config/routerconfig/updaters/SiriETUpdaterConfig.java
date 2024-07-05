@@ -20,7 +20,12 @@ public class SiriETUpdaterConfig {
           "Whether catching up with the updates should block the readiness check from returning a 'ready' result."
         )
         .asBoolean(false),
-      c.of("url").since(V2_0).summary("The URL to send the HTTP requests to.").asString(),
+      c
+        .of("url")
+        .since(V2_0)
+        .summary("The URL to send the HTTP requests to.")
+        .description(SiriSXUpdaterConfig.URL_DESCRIPTION)
+        .asString(),
       c
         .of("frequency")
         .since(V2_0)

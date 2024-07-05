@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -29,7 +30,7 @@ final class Access<T extends RaptorTripSchedule>
 
   @Override
   public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+    return RaptorConstants.NOT_SET;
   }
 
   @Override

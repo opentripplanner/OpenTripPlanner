@@ -73,9 +73,7 @@ public class BinHeapTest {
     // First determine the expected results using a plain old PriorityQueue
     expected = new ArrayList<>(N);
     PriorityQueue<Integer> q = new PriorityQueue<>(N);
-    for (Integer j : input) {
-      q.add(j);
-    }
+    q.addAll(input);
     while (!q.isEmpty()) {
       expected.add(q.remove());
     }

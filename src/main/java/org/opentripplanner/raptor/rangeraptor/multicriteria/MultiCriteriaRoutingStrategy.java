@@ -32,7 +32,7 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
   private final PatternRideFactory<T, R> patternRideFactory;
   private final ParetoSet<R> patternRides;
   private final PassThroughPointsService passThroughPointsService;
-  private final RaptorCostCalculator<T> generalizedCostCalculator;
+  private final RaptorCostCalculator<T> c1Calculator;
   private final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
@@ -40,7 +40,7 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     TimeBasedBoardingSupport<T> boardingSupport,
     PatternRideFactory<T, R> patternRideFactory,
     PassThroughPointsService passThroughPointsService,
-    RaptorCostCalculator<T> generalizedCostCalculator,
+    RaptorCostCalculator<T> c1Calculator,
     SlackProvider slackProvider,
     ParetoSet<R> patternRides
   ) {
@@ -48,7 +48,7 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     this.boardingSupport = Objects.requireNonNull(boardingSupport);
     this.patternRideFactory = Objects.requireNonNull(patternRideFactory);
     this.passThroughPointsService = Objects.requireNonNull(passThroughPointsService);
-    this.generalizedCostCalculator = Objects.requireNonNull(generalizedCostCalculator);
+    this.c1Calculator = Objects.requireNonNull(c1Calculator);
     this.slackProvider = Objects.requireNonNull(slackProvider);
     this.patternRides = Objects.requireNonNull(patternRides);
   }
@@ -195,7 +195,7 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
   ) {
     return (
       prevArrival.c1() +
-      generalizedCostCalculator.boardingCost(
+      c1Calculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
         boardEvent.boardStopIndex(),
@@ -214,6 +214,6 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
    * origin in the same iteration, having used the same number-of-rounds to board the same trip.
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
-    return generalizedCostCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
+    return c1Calculator.onTripRelativeRidingCost(boardTime, tripSchedule);
   }
 }

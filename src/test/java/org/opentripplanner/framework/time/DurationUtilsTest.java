@@ -2,7 +2,11 @@ package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeLong;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMedium;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeShort;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -13,6 +17,9 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class DurationUtilsTest {
 
@@ -121,6 +128,45 @@ public class DurationUtilsTest {
   }
 
   @Test
+  public void testRequireNonNegativeLong() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeLong(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeLong(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeLong(Duration.ofDays(3), "test")
+    );
+  }
+
+  @Test
+  public void testRequireNonNegativeMedium() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMedium(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeMedium(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeMedium(Duration.ofHours(3), "test")
+    );
+  }
+
+  @Test
+  public void testRequireNonNegativeShort() {
+    assertThrows(NullPointerException.class, () -> requireNonNegativeShort(null, "test"));
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeShort(Duration.ofSeconds(-1), "test")
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegativeShort(Duration.ofMinutes(31), "test")
+    );
+  }
+
+  @Test
   public void testToIntMilliseconds() {
     assertEquals(20, toIntMilliseconds(null, 20));
     assertEquals(0, toIntMilliseconds(Duration.ZERO, 20));
@@ -149,6 +195,29 @@ public class DurationUtilsTest {
     } finally {
       Locale.setDefault(defaultLocale);
     }
+  }
+
+  static List<Arguments> durationCases() {
+    return List.of(
+      of(Duration.ofSeconds(30), "PT30S"),
+      of(Duration.ofMinutes(30), "PT30M"),
+      of(Duration.ofHours(23), "PT23H"),
+      of(Duration.ofSeconds(-30), "-PT30S"),
+      of(Duration.ofMinutes(-10), "-PT10M"),
+      of(Duration.ofMinutes(-90), "-PT1H30M"),
+      of(Duration.ofMinutes(-184), "-PT3H4M")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("durationCases")
+  void formatDuration(Duration duration, String expected) {
+    var string = DurationUtils.formatDurationWithLeadingMinus(duration);
+
+    assertEquals(expected, string);
+
+    var parsed = Duration.parse(expected);
+    assertEquals(parsed, duration);
   }
 
   private static int durationSec(int hour, int min, int sec) {

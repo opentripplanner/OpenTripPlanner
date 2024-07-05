@@ -1,221 +1,221 @@
 org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 253,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "endTime": "2009-10-21T23:14:13.000+00:00",
-      "fare": {
-        "details": { },
-        "fare": { }
+      "arrivedAtDestinationWithRentedBicycle" : false,
+      "duration" : 253,
+      "elevationGained" : 0.0,
+      "elevationLost" : 0.0,
+      "endTime" : "2009-10-21T23:14:13.000+00:00",
+      "fare" : {
+        "details" : { },
+        "fare" : { }
       },
-      "generalizedCost": 467,
-      "legs": [
+      "generalizedCost" : 467,
+      "legs" : [
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 181.36,
-          "endTime": "2009-10-21T23:10:44.000+00:00",
-          "from": {
-            "departure": "2009-10-21T23:10:00.000+00:00",
-            "lat": 45.53261,
-            "lon": -122.70075,
-            "name": "NW Pettygrove Ave. & NW 24th Ave. (P1)",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 181.36,
+          "endTime" : "2009-10-21T23:10:44.000+00:00",
+          "from" : {
+            "departure" : "2009-10-21T23:10:00.000+00:00",
+            "lat" : 45.53261,
+            "lon" : -122.70075,
+            "name" : "NW Pettygrove Ave. & NW 24th Ave. (P1)",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 61,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 5,
-            "points": "ya|tGv~{kV??nCEB|Dn@@"
+          "generalizedCost" : 61,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 5,
+            "points" : "ya|tGv~{kV??nCEB|Dn@@"
           },
-          "mode": "CAR",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:10:00.000+00:00",
-          "steps": [
+          "mode" : "CAR",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:10:00.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 0.72,
-              "elevation": "",
-              "lat": 45.5326129,
-              "lon": -122.7007501,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "Northwest Pettygrove Street",
-              "walkingBike": false
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 0.72,
+              "elevation" : "",
+              "lat" : 45.5326129,
+              "lon" : -122.7007501,
+              "relativeDirection" : "DEPART",
+              "stayOn" : false,
+              "streetName" : "Northwest Pettygrove Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 80.22,
-              "elevation": "",
-              "lat": 45.5326127,
-              "lon": -122.7007593,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest 24th Avenue",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 80.22,
+              "elevation" : "",
+              "lat" : 45.5326127,
+              "lon" : -122.7007593,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "Northwest 24th Avenue",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 74.04,
-              "elevation": "",
-              "lat": 45.5318916,
-              "lon": -122.7007283,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Northwest Overton Street",
-              "walkingBike": false
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 74.04,
+              "elevation" : "",
+              "lat" : 45.5318916,
+              "lon" : -122.7007283,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "Northwest Overton Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": true,
-              "distance": 26.38,
-              "elevation": "",
-              "lat": 45.5318763,
-              "lon": -122.7016786,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "service road",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 26.38,
+              "elevation" : "",
+              "lat" : 45.5318763,
+              "lon" : -122.7016786,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "service road",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:10:44.000+00:00",
-            "departure": "2009-10-21T23:10:44.000+00:00",
-            "lat": 45.5316391,
-            "lon": -122.7016859,
-            "name": "P+R (#2)",
-            "vehicleParking": {
-              "entranceId": "OSM:OSMWay/-102488/osm:node:-102438",
-              "entranceName": "P+R (#2)",
-              "hasAnyCarPlaces": true,
-              "hasBicyclePlaces": false,
-              "hasCarPlaces": true,
-              "hasWheelchairAccessibleCarPlaces": false,
-              "id": "OSM:OSMWay/-102488",
-              "name": "P+R",
-              "realtime": false,
-              "tags": [
+          "to" : {
+            "arrival" : "2009-10-21T23:10:44.000+00:00",
+            "departure" : "2009-10-21T23:10:44.000+00:00",
+            "lat" : 45.5316391,
+            "lon" : -122.7016859,
+            "name" : "P+R (#2)",
+            "vehicleParking" : {
+              "entranceId" : "OSM:OSMWay/-102488/osm:node:-102438",
+              "entranceName" : "P+R (#2)",
+              "hasAnyCarPlaces" : true,
+              "hasBicyclePlaces" : false,
+              "hasCarPlaces" : true,
+              "hasWheelchairAccessibleCarPlaces" : false,
+              "id" : "OSM:OSMWay/-102488",
+              "name" : "P+R",
+              "realtime" : false,
+              "tags" : [
                 "osm:amenity=parking"
               ]
             },
-            "vertexType": "BIKEPARK"
+            "vertexType" : "BIKEPARK"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         },
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 184.06,
-          "endTime": "2009-10-21T23:14:13.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:10:44.000+00:00",
-            "departure": "2009-10-21T23:10:44.000+00:00",
-            "lat": 45.5314019,
-            "lon": -122.7016931,
-            "name": "P+R (#1)",
-            "vehicleParking": {
-              "entranceId": "OSM:OSMWay/-102488/osm:node:-102437",
-              "entranceName": "P+R (#1)",
-              "hasAnyCarPlaces": true,
-              "hasBicyclePlaces": false,
-              "hasCarPlaces": true,
-              "hasWheelchairAccessibleCarPlaces": false,
-              "id": "OSM:OSMWay/-102488",
-              "name": "P+R",
-              "realtime": false,
-              "tags": [
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 184.06,
+          "endTime" : "2009-10-21T23:14:13.000+00:00",
+          "from" : {
+            "arrival" : "2009-10-21T23:10:44.000+00:00",
+            "departure" : "2009-10-21T23:10:44.000+00:00",
+            "lat" : 45.5314019,
+            "lon" : -122.7016931,
+            "name" : "P+R (#1)",
+            "vehicleParking" : {
+              "entranceId" : "OSM:OSMWay/-102488/osm:node:-102437",
+              "entranceName" : "P+R (#1)",
+              "hasAnyCarPlaces" : true,
+              "hasBicyclePlaces" : false,
+              "hasCarPlaces" : true,
+              "hasWheelchairAccessibleCarPlaces" : false,
+              "id" : "OSM:OSMWay/-102488",
+              "name" : "P+R",
+              "realtime" : false,
+              "tags" : [
                 "osm:amenity=parking"
               ]
             },
-            "vertexType": "BIKEPARK"
+            "vertexType" : "BIKEPARK"
           },
-          "generalizedCost": 285,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 5,
-            "points": "gz{tGrd|kVn@@CgElCEB?"
+          "generalizedCost" : 285,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 5,
+            "points" : "gz{tGrd|kVn@@CgElCEB?"
           },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:10:44.000+00:00",
-          "steps": [
+          "mode" : "WALK",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:10:44.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": true,
-              "distance": 26.38,
-              "elevation": "",
-              "lat": 45.5314019,
-              "lon": -122.7016931,
-              "relativeDirection": "CONTINUE",
-              "stayOn": false,
-              "streetName": "path",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 26.38,
+              "elevation" : "",
+              "lat" : 45.5314019,
+              "lon" : -122.7016931,
+              "relativeDirection" : "CONTINUE",
+              "stayOn" : false,
+              "streetName" : "path",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "EAST",
-              "area": false,
-              "bogusName": false,
-              "distance": 77.46,
-              "elevation": "",
-              "lat": 45.5311647,
-              "lon": -122.7017004,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Northrup Street",
-              "walkingBike": false
+              "absoluteDirection" : "EAST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 77.46,
+              "elevation" : "",
+              "lat" : 45.5311647,
+              "lon" : -122.7017004,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "Northwest Northrup Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 80.22,
-              "elevation": "",
-              "lat": 45.531181,
-              "lon": -122.7007063,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Northwest 24th Avenue",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 80.22,
+              "elevation" : "",
+              "lat" : 45.531181,
+              "lon" : -122.7007063,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "Northwest 24th Avenue",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:14:13.000+00:00",
-            "lat": 45.53046,
-            "lon": -122.70067,
-            "name": "NW Marshall St. & NW 24th Ave. (P2)",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:14:13.000+00:00",
+            "lat" : 45.53046,
+            "lon" : -122.70067,
+            "name" : "NW Marshall St. & NW 24th Ave. (P2)",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         }
       ],
-      "startTime": "2009-10-21T23:10:00.000+00:00",
-      "tooSloped": false,
-      "transfers": 0,
-      "transitTime": 0,
-      "waitingTime": 0,
-      "walkDistance": 365.42,
-      "walkLimitExceeded": false,
-      "walkTime": 253
+      "startTime" : "2009-10-21T23:10:00.000+00:00",
+      "tooSloped" : false,
+      "transfers" : 0,
+      "transitTime" : 0,
+      "waitingTime" : 0,
+      "walkDistance" : 365.42,
+      "walkLimitExceeded" : false,
+      "walkTime" : 253
     }
   ]
 ]
@@ -224,193 +224,193 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
 org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWithWalking=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 379,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "endTime": "2009-10-21T23:16:19.000+00:00",
-      "fare": {
-        "details": { },
-        "fare": { }
+      "arrivedAtDestinationWithRentedBicycle" : false,
+      "duration" : 379,
+      "elevationGained" : 0.0,
+      "elevationLost" : 0.0,
+      "endTime" : "2009-10-21T23:16:19.000+00:00",
+      "fare" : {
+        "details" : { },
+        "fare" : { }
       },
-      "generalizedCost": 713,
-      "legs": [
+      "generalizedCost" : 713,
+      "legs" : [
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 108.24,
-          "endTime": "2009-10-21T23:11:30.000+00:00",
-          "from": {
-            "departure": "2009-10-21T23:10:00.000+00:00",
-            "lat": 45.53335,
-            "lon": -122.70517,
-            "name": "Chapman Elementary School (P3)",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 108.24,
+          "endTime" : "2009-10-21T23:11:30.000+00:00",
+          "from" : {
+            "departure" : "2009-10-21T23:10:00.000+00:00",
+            "lat" : 45.53335,
+            "lon" : -122.70517,
+            "name" : "Chapman Elementary School (P3)",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 169,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 10,
-            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
+          "generalizedCost" : 169,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 10,
+            "points" : "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
           },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:10:00.000+00:00",
-          "steps": [
+          "mode" : "WALK",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:10:00.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": true,
-              "distance": 108.24,
-              "elevation": "",
-              "lat": 45.5333498,
-              "lon": -122.7051771,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "path",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 108.24,
+              "elevation" : "",
+              "lat" : 45.5333498,
+              "lon" : -122.7051771,
+              "relativeDirection" : "DEPART",
+              "stayOn" : false,
+              "streetName" : "path",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:11:30.000+00:00",
-            "departure": "2009-10-21T23:11:30.000+00:00",
-            "lat": 45.5325089,
-            "lon": -122.7048383,
-            "name": "corner of path and Northwest Pettygrove Street",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:11:30.000+00:00",
+            "departure" : "2009-10-21T23:11:30.000+00:00",
+            "lat" : 45.5325089,
+            "lon" : -122.7048383,
+            "name" : "corner of path and Northwest Pettygrove Street",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         },
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 864.7,
-          "endTime": "2009-10-21T23:14:08.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:11:30.000+00:00",
-            "departure": "2009-10-21T23:11:30.000+00:00",
-            "lat": 45.5325089,
-            "lon": -122.7048383,
-            "name": "corner of path and Northwest Pettygrove Street",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 864.7,
+          "endTime" : "2009-10-21T23:14:08.000+00:00",
+          "from" : {
+            "arrival" : "2009-10-21T23:11:30.000+00:00",
+            "departure" : "2009-10-21T23:11:30.000+00:00",
+            "lat" : 45.5325089,
+            "lon" : -122.7048383,
+            "name" : "corner of path and Northwest Pettygrove Street",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 290,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 14,
-            "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
+          "generalizedCost" : 290,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 14,
+            "points" : "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
           },
-          "mode": "CAR",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:11:30.000+00:00",
-          "steps": [
+          "mode" : "CAR",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:11:30.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "EAST",
-              "area": false,
-              "bogusName": false,
-              "distance": 635.27,
-              "elevation": "",
-              "lat": 45.5325089,
-              "lon": -122.7048383,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Pettygrove Street",
-              "walkingBike": false
+              "absoluteDirection" : "EAST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 635.27,
+              "elevation" : "",
+              "lat" : 45.5325089,
+              "lon" : -122.7048383,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "Northwest Pettygrove Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 229.42,
-              "elevation": "",
-              "lat": 45.5326803,
-              "lon": -122.6966911,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Northwest 22nd Avenue",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 229.42,
+              "elevation" : "",
+              "lat" : 45.5326803,
+              "lon" : -122.6966911,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "Northwest 22nd Avenue",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:14:08.000+00:00",
-            "departure": "2009-10-21T23:14:08.000+00:00",
-            "lat": 45.5306177,
-            "lon": -122.6966188,
-            "name": "corner of Northwest 22nd Avenue and path",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:14:08.000+00:00",
+            "departure" : "2009-10-21T23:14:08.000+00:00",
+            "lat" : 45.5306177,
+            "lon" : -122.6966188,
+            "name" : "corner of Northwest 22nd Avenue and path",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         },
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 85.65,
-          "endTime": "2009-10-21T23:16:19.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:14:08.000+00:00",
-            "departure": "2009-10-21T23:14:08.000+00:00",
-            "lat": 45.5306177,
-            "lon": -122.6966188,
-            "name": "corner of Northwest 22nd Avenue and path",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 85.65,
+          "endTime" : "2009-10-21T23:16:19.000+00:00",
+          "from" : {
+            "arrival" : "2009-10-21T23:14:08.000+00:00",
+            "departure" : "2009-10-21T23:14:08.000+00:00",
+            "lat" : 45.5306177,
+            "lon" : -122.6966188,
+            "name" : "corner of Northwest 22nd Avenue and path",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 253,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 12,
-            "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
+          "generalizedCost" : 253,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 12,
+            "points" : "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
           },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:14:08.000+00:00",
-          "steps": [
+          "mode" : "WALK",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:14:08.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 85.65,
-              "elevation": "",
-              "lat": 45.5306177,
-              "lon": -122.6966188,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "path",
-              "walkingBike": false
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 85.65,
+              "elevation" : "",
+              "lat" : 45.5306177,
+              "lon" : -122.6966188,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "path",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:16:19.000+00:00",
-            "lat": 45.5306,
-            "lon": -122.69771,
-            "name": "Legacy Good Samaritan Medical Center (P4)",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:16:19.000+00:00",
+            "lat" : 45.5306,
+            "lon" : -122.69771,
+            "name" : "Legacy Good Samaritan Medical Center (P4)",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         }
       ],
-      "startTime": "2009-10-21T23:10:00.000+00:00",
-      "tooSloped": false,
-      "transfers": 0,
-      "transitTime": 0,
-      "waitingTime": 0,
-      "walkDistance": 1058.59,
-      "walkLimitExceeded": false,
-      "walkTime": 379
+      "startTime" : "2009-10-21T23:10:00.000+00:00",
+      "tooSloped" : false,
+      "transfers" : 0,
+      "transitTime" : 0,
+      "waitingTime" : 0,
+      "walkDistance" : 1058.59,
+      "walkLimitExceeded" : false,
+      "walkTime" : 379
     }
   ]
 ]
@@ -419,193 +419,193 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
 org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWithWalkingArriveBy=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 379,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "endTime": "2009-10-21T23:16:54.000+00:00",
-      "fare": {
-        "details": { },
-        "fare": { }
+      "arrivedAtDestinationWithRentedBicycle" : false,
+      "duration" : 379,
+      "elevationGained" : 0.0,
+      "elevationLost" : 0.0,
+      "endTime" : "2009-10-21T23:16:54.000+00:00",
+      "fare" : {
+        "details" : { },
+        "fare" : { }
       },
-      "generalizedCost": 713,
-      "legs": [
+      "generalizedCost" : 713,
+      "legs" : [
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 108.24,
-          "endTime": "2009-10-21T23:13:13.000+00:00",
-          "from": {
-            "departure": "2009-10-21T23:10:35.000+00:00",
-            "lat": 45.53335,
-            "lon": -122.70517,
-            "name": "Chapman Elementary School (P3)",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 108.24,
+          "endTime" : "2009-10-21T23:13:13.000+00:00",
+          "from" : {
+            "departure" : "2009-10-21T23:10:35.000+00:00",
+            "lat" : 45.53335,
+            "lon" : -122.70517,
+            "name" : "Chapman Elementary School (P3)",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 297,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 10,
-            "points": "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
+          "generalizedCost" : 297,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 10,
+            "points" : "kf|tGjz|kVR?p@AB@@D@BTAr@_A@ILA"
           },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:10:35.000+00:00",
-          "steps": [
+          "mode" : "WALK",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:10:35.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": true,
-              "distance": 108.24,
-              "elevation": "",
-              "lat": 45.5333498,
-              "lon": -122.7051771,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "path",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 108.24,
+              "elevation" : "",
+              "lat" : 45.5333498,
+              "lon" : -122.7051771,
+              "relativeDirection" : "DEPART",
+              "stayOn" : false,
+              "streetName" : "path",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:13:13.000+00:00",
-            "departure": "2009-10-21T23:13:13.000+00:00",
-            "lat": 45.5325089,
-            "lon": -122.7048383,
-            "name": "corner of path and Northwest Pettygrove Street",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:13:13.000+00:00",
+            "departure" : "2009-10-21T23:13:13.000+00:00",
+            "lat" : 45.5325089,
+            "lon" : -122.7048383,
+            "name" : "corner of path and Northwest Pettygrove Street",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         },
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 864.7,
-          "endTime": "2009-10-21T23:15:47.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:13:13.000+00:00",
-            "departure": "2009-10-21T23:13:13.000+00:00",
-            "lat": 45.5325089,
-            "lon": -122.7048383,
-            "name": "corner of path and Northwest Pettygrove Street",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 864.7,
+          "endTime" : "2009-10-21T23:15:47.000+00:00",
+          "from" : {
+            "arrival" : "2009-10-21T23:13:13.000+00:00",
+            "departure" : "2009-10-21T23:13:13.000+00:00",
+            "lat" : 45.5325089,
+            "lon" : -122.7048383,
+            "name" : "corner of path and Northwest Pettygrove Street",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 286,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 14,
-            "points": "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
+          "generalizedCost" : 286,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 14,
+            "points" : "ca|tGfx|kVASCQAcAAiEAmBImKEwKGsKlCEbCCHA@?~BC"
           },
-          "mode": "CAR",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:13:13.000+00:00",
-          "steps": [
+          "mode" : "CAR",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:13:13.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "EAST",
-              "area": false,
-              "bogusName": false,
-              "distance": 635.27,
-              "elevation": "",
-              "lat": 45.5325089,
-              "lon": -122.7048383,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Pettygrove Street",
-              "walkingBike": false
+              "absoluteDirection" : "EAST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 635.27,
+              "elevation" : "",
+              "lat" : 45.5325089,
+              "lon" : -122.7048383,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "Northwest Pettygrove Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 229.42,
-              "elevation": "",
-              "lat": 45.5326803,
-              "lon": -122.6966911,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Northwest 22nd Avenue",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 229.42,
+              "elevation" : "",
+              "lat" : 45.5326803,
+              "lon" : -122.6966911,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "Northwest 22nd Avenue",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:15:47.000+00:00",
-            "departure": "2009-10-21T23:15:47.000+00:00",
-            "lat": 45.5306177,
-            "lon": -122.6966188,
-            "name": "corner of Northwest 22nd Avenue and path",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:15:47.000+00:00",
+            "departure" : "2009-10-21T23:15:47.000+00:00",
+            "lat" : 45.5306177,
+            "lon" : -122.6966188,
+            "name" : "corner of Northwest 22nd Avenue and path",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         },
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 85.65,
-          "endTime": "2009-10-21T23:16:54.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:15:47.000+00:00",
-            "departure": "2009-10-21T23:15:47.000+00:00",
-            "lat": 45.5306177,
-            "lon": -122.6966188,
-            "name": "corner of Northwest 22nd Avenue and path",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 85.65,
+          "endTime" : "2009-10-21T23:16:54.000+00:00",
+          "from" : {
+            "arrival" : "2009-10-21T23:15:47.000+00:00",
+            "departure" : "2009-10-21T23:15:47.000+00:00",
+            "lat" : 45.5306177,
+            "lon" : -122.6966188,
+            "name" : "corner of Northwest 22nd Avenue and path",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 129,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 12,
-            "points": "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
+          "generalizedCost" : 129,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 12,
+            "points" : "iu{tGzd{kV?LAFAJ?RBX?N@^?\\B\\AX?B"
           },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:15:47.000+00:00",
-          "steps": [
+          "mode" : "WALK",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:15:47.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 85.65,
-              "elevation": "",
-              "lat": 45.5306177,
-              "lon": -122.6966188,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "path",
-              "walkingBike": false
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : true,
+              "distance" : 85.65,
+              "elevation" : "",
+              "lat" : 45.5306177,
+              "lon" : -122.6966188,
+              "relativeDirection" : "RIGHT",
+              "stayOn" : false,
+              "streetName" : "path",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:16:54.000+00:00",
-            "lat": 45.5306,
-            "lon": -122.69771,
-            "name": "Legacy Good Samaritan Medical Center (P4)",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:16:54.000+00:00",
+            "lat" : 45.5306,
+            "lon" : -122.69771,
+            "name" : "Legacy Good Samaritan Medical Center (P4)",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         }
       ],
-      "startTime": "2009-10-21T23:10:35.000+00:00",
-      "tooSloped": false,
-      "transfers": 0,
-      "transitTime": 0,
-      "waitingTime": 0,
-      "walkDistance": 1058.59,
-      "walkLimitExceeded": false,
-      "walkTime": 379
+      "startTime" : "2009-10-21T23:10:35.000+00:00",
+      "tooSloped" : false,
+      "transfers" : 0,
+      "transitTime" : 0,
+      "waitingTime" : 0,
+      "walkDistance" : 1058.59,
+      "walkLimitExceeded" : false,
+      "walkTime" : 379
     }
   ]
 ]
@@ -614,89 +614,89 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWit
 org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPickupWithoutWalking=[
   [
     {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 34,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "endTime": "2009-10-21T23:10:34.000+00:00",
-      "fare": {
-        "details": { },
-        "fare": { }
+      "arrivedAtDestinationWithRentedBicycle" : false,
+      "duration" : 34,
+      "elevationGained" : 0.0,
+      "elevationLost" : 0.0,
+      "endTime" : "2009-10-21T23:10:34.000+00:00",
+      "fare" : {
+        "details" : { },
+        "fare" : { }
       },
-      "generalizedCost": 52,
-      "legs": [
+      "generalizedCost" : 52,
+      "legs" : [
         {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 240.19,
-          "endTime": "2009-10-21T23:10:34.000+00:00",
-          "from": {
-            "departure": "2009-10-21T23:10:00.000+00:00",
-            "lat": 45.53261,
-            "lon": -122.70075,
-            "name": "NW Pettygrove Ave. & NW 24th Ave. (P1)",
-            "vertexType": "NORMAL"
+          "agencyTimeZoneOffset" : -25200000,
+          "arrivalDelay" : 0,
+          "departureDelay" : 0,
+          "distance" : 240.19,
+          "endTime" : "2009-10-21T23:10:34.000+00:00",
+          "from" : {
+            "departure" : "2009-10-21T23:10:00.000+00:00",
+            "lat" : 45.53261,
+            "lon" : -122.70075,
+            "name" : "NW Pettygrove Ave. & NW 24th Ave. (P1)",
+            "vertexType" : "NORMAL"
           },
-          "generalizedCost": 52,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 6,
-            "points": "ya|tGv~{kV??nCElCClCEB?"
+          "generalizedCost" : 52,
+          "interlineWithPreviousLeg" : false,
+          "legGeometry" : {
+            "length" : 6,
+            "points" : "ya|tGv~{kV??nCElCClCEB?"
           },
-          "mode": "CAR",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:10:00.000+00:00",
-          "steps": [
+          "mode" : "CAR",
+          "pathway" : false,
+          "realTime" : false,
+          "rentedBike" : false,
+          "route" : "",
+          "startTime" : "2009-10-21T23:10:00.000+00:00",
+          "steps" : [
             {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 0.72,
-              "elevation": "",
-              "lat": 45.5326129,
-              "lon": -122.7007501,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "Northwest Pettygrove Street",
-              "walkingBike": false
+              "absoluteDirection" : "WEST",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 0.72,
+              "elevation" : "",
+              "lat" : 45.5326129,
+              "lon" : -122.7007501,
+              "relativeDirection" : "DEPART",
+              "stayOn" : false,
+              "streetName" : "Northwest Pettygrove Street",
+              "walkingBike" : false
             },
             {
-              "absoluteDirection": "SOUTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 239.47,
-              "elevation": "",
-              "lat": 45.5326127,
-              "lon": -122.7007593,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest 24th Avenue",
-              "walkingBike": false
+              "absoluteDirection" : "SOUTH",
+              "area" : false,
+              "bogusName" : false,
+              "distance" : 239.47,
+              "elevation" : "",
+              "lat" : 45.5326127,
+              "lon" : -122.7007593,
+              "relativeDirection" : "LEFT",
+              "stayOn" : false,
+              "streetName" : "Northwest 24th Avenue",
+              "walkingBike" : false
             }
           ],
-          "to": {
-            "arrival": "2009-10-21T23:10:34.000+00:00",
-            "lat": 45.53046,
-            "lon": -122.70067,
-            "name": "NW Marshall St. & NW 24th Ave. (P2)",
-            "vertexType": "NORMAL"
+          "to" : {
+            "arrival" : "2009-10-21T23:10:34.000+00:00",
+            "lat" : 45.53046,
+            "lon" : -122.70067,
+            "name" : "NW Marshall St. & NW 24th Ave. (P2)",
+            "vertexType" : "NORMAL"
           },
-          "transitLeg": false,
-          "walkingBike": false
+          "transitLeg" : false,
+          "walkingBike" : false
         }
       ],
-      "startTime": "2009-10-21T23:10:00.000+00:00",
-      "tooSloped": false,
-      "transfers": 0,
-      "transitTime": 0,
-      "waitingTime": 0,
-      "walkDistance": 240.19,
-      "walkLimitExceeded": false,
-      "walkTime": 34
+      "startTime" : "2009-10-21T23:10:00.000+00:00",
+      "tooSloped" : false,
+      "transfers" : 0,
+      "transitTime" : 0,
+      "waitingTime" : 0,
+      "walkDistance" : 240.19,
+      "walkLimitExceeded" : false,
+      "walkTime" : 34
     }
   ]
 ]

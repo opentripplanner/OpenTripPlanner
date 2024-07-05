@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -18,7 +18,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -40,23 +39,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     String testCaseName, // used to create parameterized test name
     FareService fareService,
     Itinerary i,
-    float expectedFare
+    Money expectedFare
   ) {
     var fares = fareService.calculateFares(i);
-    final Money expected = Money.usDollars(expectedFare);
-    assertEquals(expected, fares.getFare(FareType.regular));
+    assertFalse(fares.getItineraryProducts().isEmpty());
 
-    for (var type : fares.getFareTypes()) {
-      assertTrue(fares.getComponents(type).isEmpty());
-
-      var prices = fares
-        .getItineraryProducts()
-        .stream()
-        .filter(fp -> fp.name().equals(type.name()))
-        .map(FareProduct::price)
-        .toList();
-      assertEquals(List.of(expected), prices);
-    }
+    var prices = fares.getItineraryProducts().stream().map(FareProduct::price).toList();
+    assertEquals(List.of(expectedFare), prices);
   }
 
   private static List<Arguments> createTestCases() {
@@ -71,10 +60,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     List<FareRuleSet> defaultFareRules = new LinkedList<>();
 
     // $1 fares
-    float oneDollar = 1.0f;
+    var oneDollar = Money.usDollars(1.0f);
     FareAttribute oneDollarFareAttribute = FareAttribute
       .of(new FeedScopedId(FEED_ID, "oneDollarAttribute"))
-      .setCurrencyType("USD")
       .setPrice(oneDollar)
       .build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
@@ -83,10 +71,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     defaultFareRules.add(oneDollarRouteBasedFares);
 
     // $2 fares
-    float twoDollars = 2.0f;
+    var twoDollars = Money.usDollars(2.0f);
     FareAttribute twoDollarFareAttribute = FareAttribute
       .of(new FeedScopedId(FEED_ID, "twoDollarAttribute"))
-      .setCurrencyType("USD")
       .setPrice(twoDollars)
       .build();
 
@@ -166,7 +153,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Two transit legs, second leg starts outside free transfer window",
         defaultFareService,
         twoTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
-        oneDollar + oneDollar
+        oneDollar.plus(oneDollar)
       )
     );
 
@@ -182,7 +169,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Three transit legs, second leg starts outside free transfer window, third leg within second free transfer window",
         defaultFareService,
         threeTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
-        oneDollar + oneDollar
+        oneDollar.plus(oneDollar)
       )
     );
 
@@ -198,7 +185,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Three transit legs, all starting outside free transfer window",
         defaultFareService,
         threeTransitLegAllOutsideFreeTransferWindowPath,
-        oneDollar + oneDollar + oneDollar
+        oneDollar.plus(oneDollar).plus(oneDollar)
       )
     );
 

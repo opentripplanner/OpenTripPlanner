@@ -2,11 +2,9 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
+import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.tx;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
 
-import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
 
 public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
@@ -75,6 +74,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var original = pathBuilder()
       .access(ITERATION_START_TIME, STOP_B, D1m)
       .bus(trip1, STOP_C)
+      .c2(345)
       .egress(D1m);
 
     var subject = subject(transfers, null);
@@ -85,9 +85,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Then expect a set containing the original path
     assertEquals(
       original.toStringDetailed(this::stopIndexToName),
-      first(result).toStringDetailed(this::stopIndexToName)
+      PathUtils.pathsToStringDetailed(result)
     );
-    assertEquals(1, result.size());
   }
 
   /**
@@ -112,7 +111,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       .times("10:12 10:22 10:50")
       .build();
 
-    var transfers = dummyTransferGenerator(List.of(tx(trip1, STOP_C, D30s, STOP_F, trip2)));
+    var transfers = dummyTransferGenerator(
+      List.of(tx(trip1, STOP_C, trip2, STOP_F).walk(D30s).build())
+    );
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
     var original = pathBuilder()
@@ -130,10 +131,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Insert wait-time cost summary info
     var expected = original
       .toStringDetailed(this::stopIndexToName)
-      .replace("$2770]", "$2770 $33pri $3103.81wtc]");
+      .replace("C₁2_770]", "C₁2_770 Tₚ3_300 wtC₁3_103.81]");
 
-    assertEquals(expected, first(result).toStringDetailed(this::stopIndexToName));
-    assertEquals(1, result.size());
+    assertEquals(expected, PathUtils.pathsToStringDetailed(result));
   }
 
   /**
@@ -168,11 +168,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_B, trip2),
-        tx(trip1, STOP_B, D30s, STOP_C, trip2),
-        tx(trip1, STOP_D, trip2)
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D30s).build(),
+        tx(trip1, STOP_D, trip2).build()
       ),
-      List.of(tx(trip2, STOP_D, D30s, STOP_E, trip3), tx(trip2, STOP_F, trip3))
+      List.of(tx(trip2, STOP_D, trip3, STOP_E).walk(D30s).build(), tx(trip2, STOP_F, trip3).build())
     );
 
     var original = pathBuilder()
@@ -194,7 +194,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m 2tx $2950 $66pri]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2_950 Tₚ6_600]",
       PathUtils.pathsToString(result)
     );
 
@@ -211,7 +211,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
       "~ BUS T2 10:15 10:35 ~ F " +
       "~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m 2tx $2980 $66pri $3294.05wtc]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2_980 Tₚ6_600 wtC₁3_294.05]",
       PathUtils.pathsToString(result)
     );
   }
@@ -243,8 +243,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_B, trip2),
-        tx(txConstrained(trip1, STOP_C, trip2, STOP_C).guaranteed())
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_C, trip2, STOP_C).guaranteed().build()
       )
     );
 
@@ -264,13 +264,68 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m 1tx $1750 $23pri]",
+      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₓ1 C₁1_750 Tₚ2_300]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid
     assertEquals(
       "ConstrainedTransfer{from: TripTP{F:BUS T1:10:02, stopPos 2}, to: TripTP{F:BUS T2:10:13, stopPos 1}, constraint: {guaranteed}}",
       it.accessLeg().nextLeg().asTransitLeg().getConstrainedTransferAfterLeg().toString()
+    );
+  }
+
+  /**
+   * <pre>
+   * DEPARTURE TIMES
+   * Stop        A      B      C      D
+   * Trip 1    10:10  10:10  10:15
+   * Trip 2           10:13  10:13  10:30
+   * </pre>
+   * Case: A trip may have the exact same times for more than one stop. This is a regression test
+   *       see https://github.com/opentripplanner/OpenTripPlanner/issues/5444.
+   *       The following transfers exist: A-B, A-C, B-B, B-C, C-B and C-C.
+   * Expect: Transfer B-B, the earliest transfer with the lowest transfer time and cost.
+   */
+  @Test
+  public void testSameStopTimesInPattern() {
+    // Given
+    var trip1 = TestTripSchedule
+      .schedule()
+      .pattern("T1", STOP_A, STOP_B, STOP_C)
+      .times("10:10 10:10 10:15")
+      .build();
+
+    var trip2 = TestTripSchedule
+      .schedule()
+      .pattern("T2", STOP_B, STOP_C, STOP_D)
+      .times("10:13 10:13 10:30")
+      .build();
+
+    var transfers = dummyTransferGenerator(
+      List.of(
+        tx(trip1, STOP_A, trip2, STOP_B).walk(D10s).build(),
+        tx(trip1, STOP_A, trip2, STOP_C).walk(D10s).build(),
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D10s).build(),
+        tx(trip1, STOP_C, trip2, STOP_B).walk(D10s).build(),
+        tx(trip1, STOP_C, trip2).build()
+      )
+    );
+
+    var original = pathBuilder()
+      .access(ITERATION_START_TIME, STOP_A)
+      .bus(trip1, STOP_B)
+      .bus(trip2, STOP_D)
+      .egress(D0s);
+
+    var subject = subject(transfers, null);
+
+    // Find the path with the lowest cost
+    var result = subject.findBestTransitPath(original);
+
+    assertEquals(
+      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₓ1 C₁1_300 Tₚ3_300]",
+      PathUtils.pathsToString(result)
     );
   }
 
@@ -287,6 +342,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     TransferGenerator<TestTripSchedule> generator,
     @Nullable TransferWaitTimeCostCalculator waitTimeCalculator
   ) {
+    var filter = new MinCostPathTailFilterFactory<TestTripSchedule>(
+      true,
+      waitTimeCalculator != null
+    )
+      .createFilter();
     return new OptimizePathDomainService<>(
       generator,
       COST_CALCULATOR,
@@ -294,12 +354,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       waitTimeCalculator,
       null,
       0.0,
-      TransferOptimizedFilterFactory.filter(true, waitTimeCalculator != null),
+      filter,
       (new RaptorTestConstants() {})::stopIndexToName
     );
-  }
-
-  static <T> T first(Collection<T> c) {
-    return c.stream().findFirst().orElseThrow();
   }
 }

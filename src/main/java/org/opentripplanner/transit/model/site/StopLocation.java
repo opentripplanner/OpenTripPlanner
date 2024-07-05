@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -22,8 +22,6 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  * transit. StopLocations are referred to in stop times.
  */
 public interface StopLocation extends LogInfo {
-  AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
-
   /** The ID for the StopLocation */
   FeedScopedId getId();
 
@@ -45,6 +43,9 @@ public interface StopLocation extends LogInfo {
 
   @Nullable
   I18NString getUrl();
+
+  @Nonnull
+  StopType getStopType();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in
@@ -124,6 +125,14 @@ public interface StopLocation extends LogInfo {
   @Nullable
   Geometry getGeometry();
 
+  /**
+   * The geometry of the area that encompasses the bounds of the stop area. If the stop is defined
+   * as a point, this is null.
+   */
+  default Optional<? extends Geometry> getEncompassingAreaGeometry() {
+    return Optional.empty();
+  }
+
   @Nullable
   default ZoneId getTimeZone() {
     return null;
@@ -133,10 +142,18 @@ public interface StopLocation extends LogInfo {
 
   @Nonnull
   default StopTransferPriority getPriority() {
-    return StopTransferPriority.ALLOWED;
+    return StopTransferPriority.defaultValue();
   }
 
   boolean isPartOfSameStationAs(StopLocation alternativeStop);
+
+  /**
+   * Returns the child locations of this location, for example StopLocations within a GroupStop.
+   */
+  @Nullable
+  default List<StopLocation> getChildLocations() {
+    return null;
+  }
 
   @Override
   default String logName() {
@@ -158,16 +175,5 @@ public interface StopLocation extends LogInfo {
    */
   default boolean transfersNotAllowed() {
     return false;
-  }
-
-  static int indexCounter() {
-    return INDEX_COUNTER.get();
-  }
-
-  /**
-   * Use this ONLY when deserializing the graph. Sets the counter value to the highest recorded value
-   */
-  static void initIndexCounter(int indexCounter) {
-    INDEX_COUNTER.set(indexCounter);
   }
 }

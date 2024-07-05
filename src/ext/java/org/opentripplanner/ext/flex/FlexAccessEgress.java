@@ -2,45 +2,47 @@ package org.opentripplanner.ext.flex;
 
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
+import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public final class FlexAccessEgress {
 
   private final RegularStop stop;
   private final FlexPathDurations pathDurations;
-  private final int fromStopIndex;
-  private final int toStopIndex;
-  private final FlexTrip trip;
+  private final int boardStopPosition;
+  private final int alightStopPosition;
+  private final FlexTrip<?, ?> trip;
   private final State lastState;
   private final boolean stopReachedOnBoard;
+  private final RoutingBookingInfo routingBookingInfo;
 
   public FlexAccessEgress(
     RegularStop stop,
     FlexPathDurations pathDurations,
-    int fromStopIndex,
-    int toStopIndex,
-    FlexTrip trip,
+    int boardStopPosition,
+    int alightStopPosition,
+    FlexTrip<?, ?> trip,
     State lastState,
-    boolean stopReachedOnBoard
+    boolean stopReachedOnBoard,
+    int requestedBookingTime
   ) {
     this.stop = stop;
     this.pathDurations = pathDurations;
-    this.fromStopIndex = fromStopIndex;
-    this.toStopIndex = toStopIndex;
-    this.trip = trip;
+    this.boardStopPosition = boardStopPosition;
+    this.alightStopPosition = alightStopPosition;
+    this.trip = Objects.requireNonNull(trip);
     this.lastState = lastState;
     this.stopReachedOnBoard = stopReachedOnBoard;
+    this.routingBookingInfo =
+      RoutingBookingInfo.of(requestedBookingTime, trip.getPickupBookingInfo(boardStopPosition));
   }
 
   public RegularStop stop() {
     return stop;
-  }
-
-  public FlexTrip trip() {
-    return trip;
   }
 
   public State lastState() {
@@ -52,11 +54,15 @@ public final class FlexAccessEgress {
   }
 
   public int earliestDepartureTime(int departureTime) {
-    int requestedDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
+    int tripDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
+
+    // Apply minimum-booking-notice
+    tripDepartureTime = routingBookingInfo.earliestDepartureTime(tripDepartureTime);
+
     int earliestDepartureTime = trip.earliestDepartureTime(
-      requestedDepartureTime,
-      fromStopIndex,
-      toStopIndex,
+      tripDepartureTime,
+      boardStopPosition,
+      alightStopPosition,
       pathDurations.trip()
     );
     if (earliestDepartureTime == MISSING_VALUE) {
@@ -66,14 +72,17 @@ public final class FlexAccessEgress {
   }
 
   public int latestArrivalTime(int arrivalTime) {
-    int requestedArrivalTime = pathDurations.mapToFlexTripArrivalTime(arrivalTime);
+    int tripArrivalTime = pathDurations.mapToFlexTripArrivalTime(arrivalTime);
     int latestArrivalTime = trip.latestArrivalTime(
-      requestedArrivalTime,
-      fromStopIndex,
-      toStopIndex,
+      tripArrivalTime,
+      boardStopPosition,
+      alightStopPosition,
       pathDurations.trip()
     );
     if (latestArrivalTime == MISSING_VALUE) {
+      return MISSING_VALUE;
+    }
+    if (routingBookingInfo.exceedsMinimumBookingNotice(latestArrivalTime - pathDurations.trip())) {
       return MISSING_VALUE;
     }
     return pathDurations.mapToRouterArrivalTime(latestArrivalTime);
@@ -83,11 +92,11 @@ public final class FlexAccessEgress {
   public String toString() {
     return ToStringBuilder
       .of(FlexAccessEgress.class)
-      .addNum("fromStopIndex", fromStopIndex)
-      .addNum("toStopIndex", toStopIndex)
+      .addNum("boardStopPosition", boardStopPosition)
+      .addNum("alightStopPosition", alightStopPosition)
       .addObj("durations", pathDurations)
       .addObj("stop", stop)
-      .addObj("trip", trip)
+      .addObj("trip", trip.getId())
       .addObj("lastState", lastState)
       .addBoolIfTrue("stopReachedOnBoard", stopReachedOnBoard)
       .toString();

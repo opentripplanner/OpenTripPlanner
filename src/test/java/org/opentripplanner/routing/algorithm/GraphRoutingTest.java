@@ -40,7 +40,6 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
@@ -80,9 +79,8 @@ public abstract class GraphRoutingTest {
 
     protected Builder() {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
       graph = new Graph(deduplicator);
-      transitModel = new TransitModel(stopModel, deduplicator);
+      transitModel = new TransitModel(new StopModel(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -222,13 +220,11 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    public RegularStop stopEntity(
-      String id,
-      double latitude,
-      double longitude,
-      boolean noTransfers
-    ) {
-      var stopBuilder = TransitModelForTest.stop(id).withCoordinate(latitude, longitude);
+    RegularStop stopEntity(String id, double latitude, double longitude, boolean noTransfers) {
+      var stopModelBuilder = transitModel.getStopModel().withContext();
+      var testModel = new TransitModelForTest(stopModelBuilder);
+
+      var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (noTransfers) {
         stopBuilder.withParentStation(
           Station
@@ -241,7 +237,7 @@ public abstract class GraphRoutingTest {
       }
 
       var stop = stopBuilder.build();
-      transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
+      transitModel.mergeStopModels(stopModelBuilder.withRegularStop(stop).build());
       return stop;
     }
 
@@ -256,7 +252,7 @@ public abstract class GraphRoutingTest {
       boolean noTransfers
     ) {
       return vertexFactory.transitStop(
-        new TransitStopVertexBuilder().withStop(stopEntity(id, latitude, longitude, noTransfers))
+        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, noTransfers))
       );
     }
 

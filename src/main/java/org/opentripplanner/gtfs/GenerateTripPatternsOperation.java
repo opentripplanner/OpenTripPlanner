@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
@@ -16,6 +17,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -25,6 +27,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +44,11 @@ public class GenerateTripPatternsOperation {
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
-  private GeometryProcessor geometryProcessor;
+  private final GeometryProcessor geometryProcessor;
 
   private final Multimap<StopPattern, TripPattern> tripPatterns;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
-  private int tripCount = 0;
   private int freqCount = 0;
   private int scheduledCount = 0;
 
@@ -69,17 +71,21 @@ public class GenerateTripPatternsOperation {
     collectFrequencyByTrip();
 
     final Collection<Trip> trips = transitDaoBuilder.getTripsById().values();
-    final int tripsSize = trips.size();
+    var progressLogger = ProgressTracker.track("build trip patterns", 50_000, trips.size());
+    LOG.info(progressLogger.startMessage());
 
     /* Loop over all trips, handling each one as a frequency-based or scheduled trip. */
     for (Trip trip : trips) {
-      if (++tripCount % 100000 == 0) {
-        LOG.debug("build trip patterns {}/{}", tripCount, tripsSize);
+      try {
+        buildTripPatternForTrip(trip);
+        //noinspection Convert2MethodRef
+        progressLogger.step(m -> LOG.info(m));
+      } catch (DataValidationException e) {
+        issueStore.add(e.error());
       }
-
-      buildTripPatternForTrip(trip);
     }
 
+    LOG.info(progressLogger.completeMessage());
     LOG.info(
       "Added {} frequency-based and {} single-trip timetable entries.",
       freqCount,
@@ -132,7 +138,7 @@ public class GenerateTripPatternsOperation {
     TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip, direction);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
-    TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
+    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
 
     // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);

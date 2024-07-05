@@ -1,11 +1,15 @@
 package org.opentripplanner.netex;
 
 import jakarta.xml.bind.JAXBElement;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayOfWeekEnumeration;
 import org.rutebanken.netex.model.DayType;
@@ -13,16 +17,40 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.JourneyRefStructure;
+import org.rutebanken.netex.model.LocationStructure;
+import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriodRefStructure;
 import org.rutebanken.netex.model.PropertiesOfDay_RelStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.SimplePoint_VersionStructure;
+import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.UicOperatingPeriod;
 
 public final class NetexTestDataSupport {
+
+  public static final String QUAY_ID = "TEST_QUAY_ID";
+  public static final String QUAY_NAME = "TEST_QUAY_NAME";
+  public static final String QUAY_VERSION = "TEST_QUAY_VERSION";
+  public static final double QUAY_LAT = 0.1;
+  public static final double QUAY_LON = 0.2;
+  public static final String QUAY_PLATFORM_CODE = "TEST_QUAY_PLATFORM_CODE";
+
+  public static final String STOP_PLACE_ID = "TEST_STOP_PLACE_ID";
+  public static final String STOP_PLACE_NAME = "TEST_STOP_PLACE_NAME";
+  public static final String STOP_PLACE_VERSION = "TEST_STOP_PLACE_VERSION";
+  public static final double STOP_PLACE_LAT = 0.11;
+  public static final double STOP_PLACE_LON = 0.22;
+  public static final AllVehicleModesOfTransportEnumeration STOP_PLACE_TRANSPORT_MODE =
+    AllVehicleModesOfTransportEnumeration.BUS;
+
+  private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
   /** Utility class, prevent instantiation. */
   private NetexTestDataSupport() {}
@@ -89,7 +117,10 @@ public final class NetexTestDataSupport {
     Boolean isAvailable
   ) {
     return createDayTypeAssignment(dayTypeId, isAvailable)
-      .withOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId));
+      .withOperatingPeriodRef(
+        new ObjectFactory()
+          .createOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId))
+      );
   }
 
   public static DayTypeAssignment createDayTypeAssignmentWithOpDay(
@@ -166,5 +197,90 @@ public final class NetexTestDataSupport {
 
   public static OperatingDayRefStructure operatingDayRef(String id) {
     return new OperatingDayRefStructure().withRef(id);
+  }
+
+  public static StopPlace createStopPlace(
+    String id,
+    String name,
+    String version,
+    Double lat,
+    Double lon,
+    AllVehicleModesOfTransportEnumeration transportMode,
+    Quay quay
+  ) {
+    StopPlace stopPlace = new StopPlace()
+      .withName(createMLString(name))
+      .withVersion(version)
+      .withId(id)
+      .withCentroid(createSimplePoint(lat, lon))
+      .withTransportMode(transportMode);
+
+    if (quay != null) {
+      Collection<JAXBElement<?>> jaxbQuays = List.of(OBJECT_FACTORY.createQuay(quay));
+      Quays_RelStructure quays = OBJECT_FACTORY
+        .createQuays_RelStructure()
+        .withQuayRefOrQuay(jaxbQuays);
+      stopPlace.withQuays(quays);
+    }
+
+    return stopPlace;
+  }
+
+  public static StopPlace createStopPlace(
+    String id,
+    String name,
+    String version,
+    Double lat,
+    Double lon,
+    AllVehicleModesOfTransportEnumeration transportMode
+  ) {
+    return createStopPlace(id, name, version, lat, lon, transportMode, null);
+  }
+
+  public static StopPlace createStopPlace(Quay quay) {
+    return createStopPlace(
+      STOP_PLACE_ID,
+      STOP_PLACE_NAME,
+      STOP_PLACE_VERSION,
+      STOP_PLACE_LAT,
+      STOP_PLACE_LON,
+      STOP_PLACE_TRANSPORT_MODE,
+      quay
+    );
+  }
+
+  public static StopPlace createStopPlace() {
+    return createStopPlace(null);
+  }
+
+  public static Quay createQuay(
+    String id,
+    String name,
+    String version,
+    Double lat,
+    Double lon,
+    String platformCode
+  ) {
+    return new Quay()
+      .withName(createMLString(name))
+      .withId(id)
+      .withVersion(version)
+      .withPublicCode(platformCode)
+      .withCentroid(createSimplePoint(lat, lon));
+  }
+
+  public static Quay createQuay() {
+    return createQuay(QUAY_ID, QUAY_NAME, QUAY_VERSION, QUAY_LAT, QUAY_LON, QUAY_PLATFORM_CODE);
+  }
+
+  private static MultilingualString createMLString(String name) {
+    return new MultilingualString().withValue(name);
+  }
+
+  private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {
+    return new SimplePoint_VersionStructure()
+      .withLocation(
+        new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
+      );
   }
 }

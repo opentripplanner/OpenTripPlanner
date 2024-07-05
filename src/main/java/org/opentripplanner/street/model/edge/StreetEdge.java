@@ -51,7 +51,7 @@ public class StreetEdge
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-  private static final double GREENWAY_SAFETY_FACTOR = 0.1;
+  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
 
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
@@ -231,9 +231,12 @@ public class StreetEdge
 
     final double speed =
       switch (traverseMode) {
-        case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
-        case BICYCLE, SCOOTER -> preferences.bike().speed();
+        case WALK -> walkingBike
+          ? preferences.bike().walking().speed()
+          : preferences.walk().speed();
+        case BICYCLE -> preferences.bike().speed();
         case CAR -> getCarSpeed();
+        case SCOOTER -> preferences.scooter().speed();
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
       };
 
@@ -1096,7 +1099,7 @@ public class StreetEdge
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE, SCOOTER -> bicycleTraversalCost(preferences, speed);
+        case BICYCLE, SCOOTER -> bicycleOrScooterTraversalCost(preferences, traverseMode, speed);
         case WALK -> walkingTraversalCosts(
           preferences,
           traverseMode,
@@ -1211,39 +1214,43 @@ public class StreetEdge
   }
 
   @Nonnull
-  private TraversalCosts bicycleTraversalCost(RoutingPreferences pref, double speed) {
+  private TraversalCosts bicycleOrScooterTraversalCost(
+    RoutingPreferences pref,
+    TraverseMode mode,
+    double speed
+  ) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
-    switch (pref.bike().optimizeType()) {
-      case GREENWAYS -> {
+    var optimizeType = mode == TraverseMode.BICYCLE
+      ? pref.bike().optimizeType()
+      : pref.scooter().optimizeType();
+    switch (optimizeType) {
+      case SAFEST_STREETS -> {
         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
-        if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
-          // greenways are treated as even safer than they really are
+        if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
+          // safest streets are treated as even safer than they really are
           weight *= 0.66;
         }
       }
-      case SAFE -> weight = getEffectiveBicycleSafetyDistance() / speed;
-      case FLAT -> /* see notes in StreetVertex on speed overhead */weight =
+      case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
+      case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */weight =
         getEffectiveBikeDistanceForWorkCost() / speed;
-      case QUICK -> weight = getEffectiveBikeDistance() / speed;
+      case SHORTEST_DURATION -> weight = getEffectiveBikeDistance() / speed;
       case TRIANGLE -> {
         double quick = getEffectiveBikeDistance();
         double safety = getEffectiveBicycleSafetyDistance();
         double slope = getEffectiveBikeDistanceForWorkCost();
-        weight =
-          quick *
-          pref.bike().optimizeTriangle().time() +
-          slope *
-          pref.bike().optimizeTriangle().slope() +
-          safety *
-          pref.bike().optimizeTriangle().safety();
+        var triangle = mode == TraverseMode.BICYCLE
+          ? pref.bike().optimizeTriangle()
+          : pref.scooter().optimizeTriangle();
+        weight = quick * triangle.time() + slope * triangle.slope() + safety * triangle.safety();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;
     }
     var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
       pref,
-      TraverseMode.BICYCLE,
+      mode,
       false,
       isStairs()
     );
@@ -1276,7 +1283,7 @@ public class StreetEdge
         time = weight = (getEffectiveBikeDistance() / speed);
         if (isStairs()) {
           // we do allow walking the bike across a stairs but there is a very high default penalty
-          weight *= preferences.bike().stairsReluctance();
+          weight *= preferences.bike().walking().stairsReluctance();
         }
       } else {
         // take slopes into account when walking

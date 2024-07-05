@@ -3,6 +3,8 @@ package org.opentripplanner.openstreetmap.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
+import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWay extends OSMWithTags {
 
@@ -52,20 +54,16 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
-   * Returns true if bicycle dismounts are forced.
-   */
-  public boolean isBicycleDismountForced() {
-    String bicycle = getTag("bicycle");
-    return isTag("cycleway", "dismount") || "dismount".equals(bicycle);
-  }
-
-  /**
    * Returns true if these are steps.
    */
   public boolean isSteps() {
     return isTag("highway", "steps");
   }
 
+  /**
+   * Checks the wheelchair-accessibility of this way. Stairs are by default inaccessible but
+   * can be made accessible if they explicitly set wheelchair=true.
+   */
   public boolean isWheelchairAccessible() {
     if (isSteps()) {
       return isTagTrue("wheelchair");
@@ -112,20 +110,6 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
-   * Returns true if bikes must use sidepath in forward direction
-   */
-  public boolean isForwardDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:forward"));
-  }
-
-  /**
-   * Returns true if bikes must use sidepath in reverse direction
-   */
-  public boolean isReverseDirectionSidepath() {
-    return "use_sidepath".equals(getTag("bicycle:backward"));
-  }
-
-  /**
    * Some cycleways allow contraflow biking.
    */
   public boolean isOpposableCycleway() {
@@ -153,12 +137,51 @@ public class OSMWay extends OSMWithTags {
     return isEscalator() && "backward".equals(this.getTag("conveying"));
   }
 
-  @Override
-  public String getOpenStreetMapLink() {
-    return String.format("https://www.openstreetmap.org/way/%d", getId());
-  }
-
   public boolean isArea() {
     return isTag("area", "yes");
+  }
+
+  /**
+   * Given a set of {@code permissions} check if it can really be applied to both directions
+   * of the way and return the permissions for both cases.
+   */
+  public StreetTraversalPermissionPair splitPermissions(StreetTraversalPermission permissions) {
+    StreetTraversalPermission permissionsFront = permissions;
+    StreetTraversalPermission permissionsBack = permissions;
+
+    // Check driving direction restrictions.
+    if (isOneWayForwardDriving() || isRoundabout()) {
+      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+    if (isOneWayReverseDriving()) {
+      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+
+    // Check bike direction restrictions.
+    if (isOneWayForwardBicycle()) {
+      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+    }
+    if (isOneWayReverseBicycle()) {
+      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+    }
+
+    // TODO(flamholz): figure out what this is for.
+    String oneWayBicycle = getTag("oneway:bicycle");
+    if (isFalse(oneWayBicycle) || isTagTrue("bicycle:backwards")) {
+      if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+        permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
+        permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+      }
+    }
+
+    if (isOpposableCycleway()) {
+      permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+    }
+    return new StreetTraversalPermissionPair(permissionsFront, permissionsBack);
+  }
+
+  @Override
+  public String url() {
+    return String.format("https://www.openstreetmap.org/way/%d", getId());
   }
 }

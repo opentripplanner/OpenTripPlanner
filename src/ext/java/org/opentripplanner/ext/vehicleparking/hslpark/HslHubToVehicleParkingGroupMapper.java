@@ -46,7 +46,7 @@ public class HslHubToVehicleParkingGroupMapper {
         .fieldNames()
         .forEachRemaining(lang -> {
           String name = nameNode.path(lang).asText();
-          if (!name.equals("")) {
+          if (!name.isEmpty()) {
             translations.put(lang, nameNode.path(lang).asText());
           }
         });

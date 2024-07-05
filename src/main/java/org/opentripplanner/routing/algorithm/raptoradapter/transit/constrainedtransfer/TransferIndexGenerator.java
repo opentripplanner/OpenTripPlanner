@@ -57,7 +57,7 @@ public class TransferIndexGenerator {
 
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
-      // Only add transfers witch have an effect on the Raptor routing here.
+      // Only add transfers which have an effect on the Raptor routing here.
       // Some transfers only have the priority set, and that is used in optimized-
       // transfers, but not in Raptor.
       if (!c.includeInRaptorRouting()) {

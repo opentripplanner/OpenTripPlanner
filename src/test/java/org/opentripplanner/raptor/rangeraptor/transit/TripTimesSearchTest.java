@@ -3,6 +3,8 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
@@ -13,9 +15,8 @@ import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.fin
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.stoparrival.Access;
-import org.opentripplanner.raptor._data.stoparrival.Bus;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 
 public class TripTimesSearchTest implements RaptorTestConstants {
@@ -37,12 +38,12 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     BoardAndAlightTime r;
 
     // Search AFTER EDT
-    r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE));
+    r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
 
     // Search BEFORE LAT
-    r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_EARLY));
+    r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_EARLY, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
   }
@@ -52,12 +53,12 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     BoardAndAlightTime r;
 
     // Search AFTER EDT
-    r = findTripForwardSearchApproximateTime(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE));
+    r = findTripForwardSearchApproximateTime(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
 
     // Search BEFORE LAT
-    r = findTripReverseSearchApproximateTime(busRev(STOP_C, STOP_A, A_BOARD_EARLY));
+    r = findTripReverseSearchApproximateTime(busRev(STOP_C, STOP_A, A_BOARD_EARLY, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
   }
@@ -67,12 +68,12 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     BoardAndAlightTime r;
 
     // Search AFTER EDT
-    r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME));
+    r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
 
     // Search BEFORE LAT
-    r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME));
+    r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME, schedule));
 
     assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
   }
@@ -117,7 +118,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenArrivalIsToEarly() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME - 1)),
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME - 1, schedule)),
       "No stops matching 'toStop'."
     );
   }
@@ -126,7 +127,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenReverseArrivalIsToLate() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME + 1)),
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME + 1, schedule)),
       "No stops matching 'fromStop'."
     );
   }
@@ -135,7 +136,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenArrivalIsWayTooEarly() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, 0)),
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, 0, schedule)),
       "No stops matching 'toStop'."
     );
   }
@@ -144,7 +145,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenReverseArrivalIsWayTooEarly() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, 10_000)),
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, 10_000, schedule)),
       "No stops matching 'fromStop'."
     );
   }
@@ -153,7 +154,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenFromStopIsMissing() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripForwardSearch(busFwd(STOP_A, STOP_A, C_ALIGHT_LATE)),
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_A, C_ALIGHT_LATE, schedule)),
       "No stops matching 'fromStop'."
     );
   }
@@ -162,7 +163,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   public void noTripFoundWhenToStopIsMissingInReverseSearch() {
     assertThrows(
       IllegalStateException.class,
-      () -> findTripReverseSearch(busRev(STOP_C, STOP_C, A_BOARD_EARLY)),
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_C, A_BOARD_EARLY, schedule)),
       "No stops matching 'toStop'"
     );
   }
@@ -189,17 +190,17 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     // TEST FORWARD SEARCH
     {
       // Board in the 2nd loop at stop 2 and get off at stop 3
-      r = findTripForwardSearch(busFwd(122, 133, 800));
+      r = findTripForwardSearch(busFwd(122, 133, 800, schedule));
       assertEquals(710, r.boardTime());
       assertEquals(800, r.alightTime());
 
       // Board in the 1st loop at stop 4 and get off at stop 3
-      r = findTripForwardSearch(busFwd(144, 133, 800));
+      r = findTripForwardSearch(busFwd(144, 133, 800, schedule));
       assertEquals(410, r.boardTime());
       assertEquals(800, r.alightTime());
 
       // Board in the 1st stop, ride the loop twice, alight at the last stop
-      r = findTripForwardSearch(busFwd(1, 1155, 1100));
+      r = findTripForwardSearch(busFwd(1, 1155, 1100, schedule));
       assertEquals(10, r.boardTime());
       assertEquals(1100, r.alightTime());
     }
@@ -207,40 +208,40 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     // TEST REVERSE SEARCH
     {
       // Board in the 2nd loop at stop 2 and get off at stop 3
-      r = findTripReverseSearch(busRev(133, 122, 710));
+      r = findTripReverseSearch(busRev(133, 122, 710, schedule));
       assertEquals(710, r.boardTime());
       assertEquals(800, r.alightTime());
 
       // Board in the 1st loop at stop 4 and get off at stop 3
-      r = findTripReverseSearch(busRev(133, 144, 410));
+      r = findTripReverseSearch(busRev(133, 144, 410, schedule));
       assertEquals(410, r.boardTime());
       assertEquals(800, r.alightTime());
 
       // Board in the 1st stop, ride the loop twice, alight at the last stop
-      r = findTripReverseSearch(busRev(1155, 1, 10));
+      r = findTripReverseSearch(busRev(1155, 1, 10, schedule));
       assertEquals(10, r.boardTime());
       assertEquals(1100, r.alightTime());
     }
   }
 
-  private static Bus busFwd(
+  private static ArrivalView<TestTripSchedule> busFwd(
     int accessStop,
     int transitToStop,
     int arrivalTime,
     TestTripSchedule trip
   ) {
-    Access access = new Access(accessStop, -9999, free(accessStop));
-    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
+    var access = access(accessStop, -9999, free(accessStop));
+    return bus(1, transitToStop, arrivalTime, -9999, -9999, trip, access);
   }
 
-  private static Bus busRev(
+  private static ArrivalView<TestTripSchedule> busRev(
     int accessStop,
     int transitToStop,
     int arrivalTime,
     TestTripSchedule trip
   ) {
-    Access access = new Access(accessStop, -9999, free(accessStop));
-    return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
+    var access = access(accessStop, -9999, free(accessStop));
+    return bus(1, transitToStop, arrivalTime, -9999, -9999, trip, access);
   }
 
   private void assertForwardAppxTime(
@@ -278,13 +279,5 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   private void assertTimes(BoardAndAlightTime r, int expBoardTime, int expAlightTime) {
     assertEquals(timeToStrLong(expBoardTime), timeToStrLong(r.boardTime()));
     assertEquals(timeToStrLong(expAlightTime), timeToStrLong(r.alightTime()));
-  }
-
-  private Bus busFwd(int accessToStop, int transitToStop, int arrivalTime) {
-    return busFwd(accessToStop, transitToStop, arrivalTime, schedule);
-  }
-
-  private Bus busRev(int accessToStop, int transitToStop, int arrivalTime) {
-    return busRev(accessToStop, transitToStop, arrivalTime, schedule);
   }
 }

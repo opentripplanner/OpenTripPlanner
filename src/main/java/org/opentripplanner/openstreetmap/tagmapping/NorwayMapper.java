@@ -4,7 +4,6 @@ import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuild
 import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -609,17 +608,18 @@ class NorwayMapper implements OsmTagMapper {
       13.89f // 50 km/t
     );
 
-    props.setCarSpeed("highway=residential", 13.89f); // 50 km/t
-    props.setCarSpeed("highway=service", 13.89f); // 50 km/t
+    props.setCarSpeed("highway=residential", 13.89f); // 50 km/h
+    props.setCarSpeed("highway=service", 13.89f); // 50 km/h
 
-    props.setCarSpeed("highway=service;service=driveway", 8.33f); // 30 km/t
+    props.setCarSpeed("highway=service;service=driveway", 8.33f); // 30 km/h
     props.setCarSpeed("highway=service;service=parking_aisle", 8.33f);
     props.setCarSpeed("highway=track", 8.33f);
 
-    props.setCarSpeed("highway=living_street", 1.94f); // 7 km/t
-    props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/t
+    props.setCarSpeed("highway=living_street", 1.94f); // 7 km/h
+    props.setCarSpeed("highway=pedestrian", 1.94f); // 7 km/h
 
-    props.defaultSpeed = 22.22f; // 80 km/t
+    props.defaultCarSpeed = 22.22f; // 80 km/h
+    props.maxPossibleCarSpeed = 30.56f; // 110 km/h
 
     new DefaultMapper().populateNotesAndNames(props);
 

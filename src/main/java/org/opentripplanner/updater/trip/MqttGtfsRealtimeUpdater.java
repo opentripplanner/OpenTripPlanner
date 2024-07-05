@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import java.net.URI;
@@ -13,6 +16,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -78,11 +82,12 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
+    LOG.info("Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url);
   }
 
   @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   @Override
@@ -137,7 +142,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void messageArrived(String topic, MqttMessage message) {
       List<GtfsRealtime.TripUpdate> updates = null;
-      boolean fullDataset = true;
+      UpdateIncrementality updateIncrementality = FULL_DATASET;
       try {
         // Decode message
         GtfsRealtime.FeedMessage feedMessage = GtfsRealtime.FeedMessage.PARSER.parseFrom(
@@ -154,7 +159,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             .getIncrementality()
             .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
         ) {
-          fullDataset = false;
+          updateIncrementality = DIFFERENTIAL;
         }
 
         // Create List of TripUpdates
@@ -175,7 +180,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             snapshotSource,
             fuzzyTripMatcher,
             backwardsDelayPropagationType,
-            fullDataset,
+            updateIncrementality,
             updates,
             feedId,
             recordMetrics
@@ -186,5 +191,15 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {}
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(MqttGtfsRealtimeUpdater.class)
+      .addStr("url", url)
+      .addStr("topic", topic)
+      .addStr("feedId", feedId)
+      .toString();
   }
 }

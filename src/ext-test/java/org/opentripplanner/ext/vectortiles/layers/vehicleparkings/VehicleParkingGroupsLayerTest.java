@@ -97,21 +97,23 @@ public class VehicleParkingGroupsLayerTest {
     var config =
       """
       {
-        "vectorTileLayers": [
-          {
-            "name": "vehicleParkingGroups",
-            "type": "VehicleParkingGroup",
-            "mapper": "Digitransit",
-            "maxZoom": 20,
-            "minZoom": 14,
-            "cacheMaxSeconds": 600,
-            "expansionFactor": 0
-          }
-        ]
+        "vectorTiles": {
+          "layers" :[
+            {
+              "name": "vehicleParkingGroups",
+              "type": "VehicleParkingGroup",
+              "mapper": "Digitransit",
+              "maxZoom": 20,
+              "minZoom": 14,
+              "cacheMaxSeconds": 600,
+              "expansionFactor": 0
+            }
+          ]
+        }
       }
       """;
     var nodeAdapter = newNodeAdapterForTest(config);
-    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
+    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
     var builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       graph,
@@ -142,7 +144,7 @@ public class VehicleParkingGroupsLayerTest {
     assertEquals("groupName", map.get("name").toString());
 
     assertEquals(
-      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"name\",\"id\":\"F:id\"}]",
+      "[{\"carPlaces\":true,\"bicyclePlaces\":false,\"id\":\"F:id\",\"name\":\"name\"}]",
       map.get("vehicleParking")
     );
   }
@@ -160,7 +162,7 @@ public class VehicleParkingGroupsLayerTest {
     assertEquals("groupDE", map.get("name").toString());
 
     assertEquals(
-      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"DE\",\"id\":\"F:id\"}]",
+      "[{\"carPlaces\":true,\"bicyclePlaces\":false,\"id\":\"F:id\",\"name\":\"DE\"}]",
       map.get("vehicleParking")
     );
   }

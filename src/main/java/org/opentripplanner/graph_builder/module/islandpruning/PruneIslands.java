@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
@@ -25,10 +24,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.ElevatorEdge;
-import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -36,7 +32,6 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +114,7 @@ public class PruneIslands implements GraphBuilderModule {
       areas.add(ae.getArea());
     }
     for (AreaEdgeList a : areas) {
-      for (Vertex v : a.visibilityVertices()) {
-        visibilityVertices.add(v);
-      }
+      visibilityVertices.addAll(a.visibilityVertices());
     }
 
     int removed = 0;
@@ -257,16 +250,7 @@ public class PruneIslands implements GraphBuilderModule {
       if (island.stopSize() > 0) {
         //for islands with stops
         islandsWithStops++;
-        boolean onlyFerry = true;
-        for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
-          TransitStopVertex v = (TransitStopVertex) vIter.next();
-          Set<TransitMode> modes = v.getModes();
-          // test if stop has other transit modes than FERRY
-          if (!modes.isEmpty() && !modes.contains(TransitMode.FERRY)) {
-            onlyFerry = false;
-            break;
-          }
-        }
+        boolean onlyFerry = island.hasOnlyFerryStops();
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
@@ -340,16 +324,6 @@ public class PruneIslands implements GraphBuilderModule {
       }
       State s0 = new State(gv, request);
       for (Edge e : gv.getOutgoing()) {
-        if (
-          !(
-            e instanceof StreetEdge ||
-            e instanceof ElevatorEdge ||
-            e instanceof FreeEdge ||
-            e instanceof StreetTransitEntityLink
-          )
-        ) {
-          continue;
-        }
         if (
           e instanceof StreetEdge &&
           shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
@@ -502,8 +476,8 @@ public class PruneIslands implements GraphBuilderModule {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
       List<VertexLabel> stopLabels = new ArrayList<>();
-      for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
-        Vertex v = vIter.next();
+      for (Iterator<TransitStopVertex> vIter = island.stopIterator(); vIter.hasNext();) {
+        TransitStopVertex v = vIter.next();
         stopLabels.add(v.getLabel());
         Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
         edges.addAll(v.getIncoming());

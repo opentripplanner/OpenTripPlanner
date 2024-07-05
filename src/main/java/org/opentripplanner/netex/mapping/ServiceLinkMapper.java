@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -36,7 +36,7 @@ class ServiceLinkMapper {
   private final FeedScopedIdFactory idFactory;
   private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
-  private final EntityById<RegularStop> stopById;
+  private final ImmutableEntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
 
@@ -44,7 +44,7 @@ class ServiceLinkMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    EntityById<RegularStop> stopById,
+    ImmutableEntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
     double maxStopToShapeSnapDistance
   ) {

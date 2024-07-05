@@ -29,7 +29,6 @@ public class CommandLineParameters {
 
   private static final String TIP = " Use --help to see available options.";
   private static final int DEFAULT_PORT = 8080;
-  private static final int DEFAULT_SECURE_PORT = 8081;
   private static final String DEFAULT_CACHE_PATH = "/var/otp/cache";
   private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
@@ -129,17 +128,16 @@ public class CommandLineParameters {
   public Integer port = DEFAULT_PORT;
 
   @Parameter(
-    names = { "--securePort" },
-    validateWith = PositiveInteger.class,
-    description = "Server port for HTTPS."
-  )
-  public Integer securePort = DEFAULT_SECURE_PORT;
-
-  @Parameter(
     names = { "--visualize" },
     description = "Open a graph visualizer window for debugging."
   )
   public boolean visualize;
+
+  @Parameter(
+    names = { "--abortOnUnknownConfig" },
+    description = "Abort the startup if configuration files are found to contain unknown parameters."
+  )
+  public boolean abortOnUnknownConfig = false;
 
   /**
    * The remaining single parameter after the switches is the directory with the configuration
@@ -240,7 +238,6 @@ public class CommandLineParameters {
   private void validatePortsAvailable() {
     if (doServe()) {
       checkPortAvailable(port);
-      checkPortAvailable(securePort);
     }
   }
 
@@ -327,7 +324,7 @@ public class CommandLineParameters {
 
     @Override
     public void validate(String name, String value) throws ParameterException {
-      Integer i = Integer.parseInt(value);
+      int i = Integer.parseInt(value);
       if (i <= 0) {
         String msg = String.format("%s must be a positive integer.", name);
         throw new ParameterException(msg);

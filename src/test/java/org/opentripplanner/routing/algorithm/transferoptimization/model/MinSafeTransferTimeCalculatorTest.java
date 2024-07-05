@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator.bound;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 
   private static final int D2m = DurationUtils.durationInSeconds("2m");
   private static final int TRANSIT_TIME = 2000 - (BOARD_SLACK + ALIGHT_SLACK);
-  private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(COST_CALCULATOR);
+  private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(C1_CALCULATOR);
 
   private final MinSafeTransferTimeCalculator<TestTripSchedule> subject = new MinSafeTransferTimeCalculator<>(
     SLACK_PROVIDER

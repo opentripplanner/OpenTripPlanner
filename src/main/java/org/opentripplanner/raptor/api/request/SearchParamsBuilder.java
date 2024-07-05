@@ -24,20 +24,17 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private int earliestDepartureTime;
   private int latestArrivalTime;
   private int searchWindowInSeconds;
-  private int searchWindowAccessSlackInSeconds;
   private boolean preferLateArrival;
   private int numberOfAdditionalTransfers;
   private int maxNumberOfTransfers;
   private boolean timetable;
   private boolean constrainedTransfers;
-  private boolean allowEmptyAccessEgressPaths;
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
     this.earliestDepartureTime = defaults.earliestDepartureTime();
     this.latestArrivalTime = defaults.latestArrivalTime();
     this.searchWindowInSeconds = defaults.searchWindowInSeconds();
-    this.searchWindowAccessSlackInSeconds = defaults.searchWindowAccessSlackInSeconds();
     this.preferLateArrival = defaults.preferLateArrival();
     this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
@@ -45,7 +42,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
-    this.allowEmptyAccessEgressPaths = defaults.allowEmptyAccessEgressPaths();
   }
 
   public int earliestDepartureTime() {
@@ -164,23 +160,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
-  public SearchParamsBuilder<T> allowEmptyAccessEgressPaths(boolean allowEmptyEgressPaths) {
-    this.allowEmptyAccessEgressPaths = allowEmptyEgressPaths;
-    return this;
-  }
-
-  public int searchWindowAccessSlackInSeconds() {
-    return searchWindowAccessSlackInSeconds;
-  }
-
-  public void searchWindowAccessSlack(Duration searchWindowAccessSlack) {
-    this.searchWindowAccessSlackInSeconds = (int) searchWindowAccessSlack.toSeconds();
-  }
-
-  public boolean allowEmptyAccessEgressPaths() {
-    return allowEmptyAccessEgressPaths;
-  }
-
   public RaptorRequest<T> build() {
     return parent.build();
   }
@@ -197,7 +176,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
       .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)
-      .addDurationSec("searchWindowAccessSlack", searchWindowAccessSlackInSeconds, 0)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
       .addCollection("accessPaths", accessPaths, 5)

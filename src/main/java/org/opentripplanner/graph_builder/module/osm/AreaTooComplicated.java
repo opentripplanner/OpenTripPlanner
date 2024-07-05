@@ -17,13 +17,7 @@ public record AreaTooComplicated(AreaGroup areaGroup, int nbNodes, int maxAreaNo
   @Override
   public String getHTMLMessage() {
     OSMWithTags entity = areaGroup.getSomeOSMObject();
-    return String.format(
-      HTMLFMT,
-      entity.getOpenStreetMapLink(),
-      entity.getId(),
-      nbNodes,
-      maxAreaNodes
-    );
+    return String.format(HTMLFMT, entity.url(), entity.getId(), nbNodes, maxAreaNodes);
   }
 
   @Override

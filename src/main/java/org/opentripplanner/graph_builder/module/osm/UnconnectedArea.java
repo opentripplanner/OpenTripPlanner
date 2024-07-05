@@ -16,7 +16,7 @@ public record UnconnectedArea(AreaGroup areaGroup) implements DataImportIssue {
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, areaGroup.getSomeOSMObject().getOpenStreetMapLink(), idList());
+    return String.format(HTMLFMT, areaGroup.getSomeOSMObject().url(), idList());
   }
 
   @Override

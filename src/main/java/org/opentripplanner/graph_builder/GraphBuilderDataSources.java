@@ -12,6 +12,7 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -179,6 +180,13 @@ public class GraphBuilderDataSources {
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
+  }
+
+  /**
+   * Returns the optional data source for the stop consolidation configuration.
+   */
+  public Optional<DataSource> stopConsolidation() {
+    return store.stopConsolidation();
   }
 
   /**

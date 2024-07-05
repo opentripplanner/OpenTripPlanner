@@ -66,9 +66,7 @@ class AreaGroup {
       }
     }
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    Geometry allPolygons = geometryFactory.createMultiPolygon(
-      allRings.toArray(new Polygon[allRings.size()])
-    );
+    Geometry allPolygons = geometryFactory.createMultiPolygon(allRings.toArray(new Polygon[0]));
     this.union = allPolygons.union();
 
     if (this.union instanceof GeometryCollection coll) {

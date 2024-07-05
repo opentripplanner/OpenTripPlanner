@@ -63,7 +63,7 @@ public class TestBanning {
     Route route2 = TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build();
     Route route3 = TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build();
 
-    final StopPattern stopPattern = TransitModelForTest.stopPattern(2);
+    final StopPattern stopPattern = TransitModelForTest.of().stopPattern(2);
     return List.of(
       TransitModelForTest
         .tripPattern("RUT:JourneyPattern:1", route1)

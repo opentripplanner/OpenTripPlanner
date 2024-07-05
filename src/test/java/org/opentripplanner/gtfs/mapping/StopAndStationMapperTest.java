@@ -14,6 +14,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.StopModel;
 
 public class StopAndStationMapperTest {
 
@@ -43,13 +44,15 @@ public class StopAndStationMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final Accessibility WHEELCHAIR_BOARDING_ENUM = Accessibility.POSSIBLE;
-
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
 
-  private final StopMapper subject = new StopMapper(new TranslationHelper(), stationId -> null);
+  private final StopMapper subject = new StopMapper(
+    new TranslationHelper(),
+    stationId -> null,
+    new StopModel().withContext()
+  );
 
   static {
     STOP.setId(AGENCY_AND_ID);
@@ -69,14 +72,14 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testMapCollection() {
+  void testMapCollection() {
     assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
 
   @Test
-  public void testMap() {
+  void testMap() {
     RegularStop result = subject.map(STOP);
 
     assertEquals("A:1", result.getId().toString());
@@ -91,7 +94,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testMapWithNulls() {
+  void testMapWithNulls() {
     Stop input = new Stop();
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
@@ -111,7 +114,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void verifyMissingCoordinateThrowsException() {
+  void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
@@ -125,7 +128,7 @@ public class StopAndStationMapperTest {
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
-  public void testMapCache() {
+  void testMapCache() {
     RegularStop result1 = subject.map(STOP);
     RegularStop result2 = subject.map(STOP);
 

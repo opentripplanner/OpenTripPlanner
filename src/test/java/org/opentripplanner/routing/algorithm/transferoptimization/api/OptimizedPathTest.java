@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 
 class OptimizedPathTest implements RaptorTestConstants {
 
@@ -15,20 +16,20 @@ class OptimizedPathTest implements RaptorTestConstants {
     var path = new OptimizedPath<>(BasicPathTestCase.basicTripAsPath());
 
     // Verify all costs
-    assertEquals(BasicPathTestCase.TOTAL_COST, path.c1());
+    assertEquals(BasicPathTestCase.TOTAL_C1, path.c1());
     assertEquals(0, path.breakTieCost());
-    assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCostWaitTimeOptimized());
+    assertEquals(BasicPathTestCase.TOTAL_C1, path.generalizedCostWaitTimeOptimized());
     assertEquals(66_00, path.transferPriorityCost());
 
     // And toString is the same (transfer priority cost added)
     assertEquals(
-      BasicPathTestCase.BASIC_PATH_AS_STRING.replace("]", " $66pri]"),
+      BasicPathTestCase.BASIC_PATH_AS_STRING.replace("]", " Tₚ6_600]"),
       path.toString(this::stopIndexToName)
     );
 
     // Verify details
     assertEquals(
-      BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING.replace("]", " $66pri]"),
+      BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING.replace("]", " Tₚ6_600]"),
       path.toStringDetailed(this::stopIndexToName)
     );
 
@@ -43,6 +44,7 @@ class OptimizedPathTest implements RaptorTestConstants {
 
     // Define some constants
     final int generalizedCost = 881100;
+    final int c2 = 7;
     final int transferPriorityCost = 120100;
     final int waitTimeOptimizedCost = 130200;
     final int generalizedCostWaitTimeOptimized = generalizedCost + waitTimeOptimizedCost;
@@ -52,6 +54,7 @@ class OptimizedPathTest implements RaptorTestConstants {
       accessLeg,
       orgPath.rangeRaptorIterationDepartureTime(),
       generalizedCost,
+      c2,
       transferPriorityCost,
       waitTimeOptimizedCost,
       breakTieCost
@@ -63,8 +66,15 @@ class OptimizedPathTest implements RaptorTestConstants {
     assertEquals(transferPriorityCost, path.transferPriorityCost());
 
     var exp = BasicPathTestCase.BASIC_PATH_AS_STRING.replace(
-      "$8154]",
-      "$8811 $1201pri " + "$" + (generalizedCostWaitTimeOptimized / 100) + "wtc]"
+      "C₁8_154 C₂7]",
+      RaptorValueFormatter.formatC1(generalizedCost) +
+      " " +
+      RaptorValueFormatter.formatC2(c2) +
+      " " +
+      RaptorValueFormatter.formatTransferPriority(transferPriorityCost) +
+      " " +
+      RaptorValueFormatter.formatWaitTimeCost(generalizedCostWaitTimeOptimized) +
+      "]"
     );
 
     assertEquals(exp, path.toString(this::stopIndexToName));

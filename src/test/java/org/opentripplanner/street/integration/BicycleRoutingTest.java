@@ -16,11 +16,12 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class BicycleRoutingTest {
 
@@ -28,7 +29,9 @@ public class BicycleRoutingTest {
   private final Graph herrenbergGraph;
 
   {
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(
+      ResourceLoader.of(BicycleRoutingTest.class).file("herrenberg-minimal.osm.pbf")
+    );
     herrenbergGraph = model.graph();
 
     model.transitModel().index();
@@ -72,7 +75,9 @@ public class BicycleRoutingTest {
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
-    request.withPreferences(p -> p.withBike(it -> it.withOptimizeType(BicycleOptimizeType.QUICK)));
+    request.withPreferences(p ->
+      p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
+    );
 
     request.journey().direct().setMode(StreetMode.BIKE);
     var temporaryVertices = new TemporaryVerticesContainer(

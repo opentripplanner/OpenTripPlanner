@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 
-public class SearchParamsTest {
+class SearchParamsTest {
 
   @Test
   public void earliestDepartureTimeOrLatestArrivalTimeIsRequired() {

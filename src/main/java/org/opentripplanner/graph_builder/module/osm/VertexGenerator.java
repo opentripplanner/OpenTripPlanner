@@ -91,9 +91,7 @@ class VertexGenerator {
 
       if (node.isBarrier()) {
         BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
-        bv.setBarrierPermissions(
-          OsmFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
-        );
+        bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
         iv = bv;
       }
 

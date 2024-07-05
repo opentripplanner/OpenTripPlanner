@@ -12,15 +12,16 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,8 @@ import uk.org.siri.siri20.OccupancyEnumeration;
  */
 public class ModifiedTripBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ModifiedTripBuilder.class);
+
   private final TripTimes existingTripTimes;
   private final TripPattern pattern;
   private final LocalDate serviceDate;
@@ -94,9 +96,9 @@ public class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
-    TripTimes newTimes = new TripTimes(existingTripTimes);
+    RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
-    StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
+    var stopPattern = createStopPattern(pattern, calls, entityResolver);
 
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       LOG.debug("Trip is cancelled");
@@ -114,16 +116,16 @@ public class ModifiedTripBuilder {
       newTimes.setRealTimeState(RealTimeState.MODIFIED);
     }
 
-    var error = newTimes.validateNonIncreasingTimes();
-    final FeedScopedId id = newTimes.getTrip().getId();
-    if (error.isPresent()) {
-      var updateError = error.get();
+    // TODO - Handle DataValidationException at the outemost level(pr trip)
+    try {
+      newTimes.validateNonIncreasingTimes();
+    } catch (DataValidationException e) {
       LOG.info(
-        "Invalid SIRI-ET data for trip {} - TripTimes are non-increasing after applying SIRI delay propagation at stop index {}",
-        id,
-        updateError.stopIndex()
+        "Invalid SIRI-ET data for trip {} - TripTimes failed to validate after applying SIRI delay propagation. {}",
+        newTimes.getTrip().getId(),
+        e.getMessage()
       );
-      return TripTimesValidationMapper.toResult(id, updateError);
+      return DataValidationExceptionMapper.toResult(e);
     }
 
     int numStopsInUpdate = newTimes.getNumStops();
@@ -131,7 +133,7 @@ public class ModifiedTripBuilder {
     if (numStopsInUpdate != numStopsInPattern) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - Inconsistent number of updated stops ({}) and stops in pattern ({})",
-        id,
+        newTimes.getTrip().getId(),
         numStopsInUpdate,
         numStopsInPattern
       );
@@ -145,7 +147,7 @@ public class ModifiedTripBuilder {
   /**
    * Applies real-time updates from the calls into newTimes.
    */
-  private void applyUpdates(TripTimes newTimes) {
+  private void applyUpdates(RealTimeTripTimes newTimes) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
@@ -218,15 +220,12 @@ public class ModifiedTripBuilder {
     EntityResolver entityResolver
   ) {
     int numberOfStops = pattern.numberOfStops();
-    var builder = pattern.getStopPattern().mutate();
+    var builder = pattern.copyPlannedStopPattern();
 
     Set<CallWrapper> alreadyVisited = new HashSet<>();
     // modify updated stop-times
     for (int i = 0; i < numberOfStops; i++) {
-      StopLocation stop = pattern.getStop(i);
-      builder.stops[i] = stop;
-      builder.dropoffs[i] = pattern.getAlightType(i);
-      builder.pickups[i] = pattern.getBoardType(i);
+      StopLocation stop = builder.stops.original(i);
 
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
@@ -239,22 +238,25 @@ public class ModifiedTripBuilder {
           continue;
         }
 
-        int stopIndex = i;
-        builder.stops[stopIndex] = callStop;
+        // Used in lambda
+        final int stopIndex = i;
+        builder.stops.with(stopIndex, callStop);
 
         PickDropMapper
-          .mapPickUpType(call, builder.pickups[stopIndex])
-          .ifPresent(value -> builder.pickups[stopIndex] = value);
+          .mapPickUpType(call, builder.pickups.original(stopIndex))
+          .ifPresent(value -> builder.pickups.with(stopIndex, value));
 
         PickDropMapper
-          .mapDropOffType(call, builder.dropoffs[stopIndex])
-          .ifPresent(value -> builder.dropoffs[stopIndex] = value);
+          .mapDropOffType(call, builder.dropoffs.original(stopIndex))
+          .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
 
         alreadyVisited.add(call);
         break;
       }
     }
-
-    return builder.build();
+    var newStopPattern = builder.build();
+    return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
+      ? pattern.getStopPattern()
+      : newStopPattern;
   }
 }

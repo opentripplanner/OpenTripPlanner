@@ -6,26 +6,80 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner._support.geometry.Coordinates;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.service.StopModel;
 
 class GroupStopTest {
+
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
-    "1:stop",
-    1d,
-    1d
-  );
-  private static final GroupStop subject = GroupStop
-    .of(TransitModelForTest.id(ID))
+  private static final StopLocation STOP_LOCATION = TEST_MODEL
+    .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
+    .build();
+  private static final GroupStop subject = StopModel
+    .of()
+    .groupStop(TransitModelForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)
     .build();
+
+  @Test
+  void testGroupStopGeometry() {
+    StopLocation stopLocation1 = TEST_MODEL
+      .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
+      .build();
+    StopLocation stopLocation2 = TEST_MODEL
+      .stop("2:stop", Coordinates.HAMBURG.getX(), Coordinates.HAMBURG.getY())
+      .build();
+
+    GroupStop groupStop = StopModel
+      .of()
+      .groupStop(TransitModelForTest.id(ID))
+      .withName(NAME)
+      .addLocation(stopLocation1)
+      .addLocation(stopLocation2)
+      .build();
+
+    Geometry groupStopGeometry1 = Objects.requireNonNull(groupStop.getGeometry()).getGeometryN(0);
+    assertEquals(stopLocation1.getGeometry(), groupStopGeometry1);
+
+    Geometry groupStopGeometry2 = Objects.requireNonNull(groupStop.getGeometry()).getGeometryN(1);
+    assertEquals(stopLocation2.getGeometry(), groupStopGeometry2);
+  }
+
+  @Test
+  void testGroupStopEncompassingAreaGeometry() {
+    StopLocation stopLocation = TEST_MODEL
+      .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
+      .build();
+
+    GroupStop groupStop = StopModel
+      .of()
+      .groupStop(TransitModelForTest.id(ID))
+      .withName(NAME)
+      .addLocation(stopLocation)
+      .withEncompassingAreaGeometries(List.of(Polygons.BERLIN))
+      .build();
+
+    Geometry groupStopGeometry = Objects.requireNonNull(groupStop.getGeometry()).getGeometryN(0);
+    assertEquals(stopLocation.getGeometry(), groupStopGeometry);
+
+    assertEquals(
+      Polygons.BERLIN,
+      groupStop.getEncompassingAreaGeometry().orElseThrow().getGeometryN(0)
+    );
+  }
 
   @Test
   void copy() {
@@ -44,7 +98,7 @@ class GroupStopTest {
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
-    assertEquals(STOP_LOCATION, copy.getLocations().iterator().next());
+    assertEquals(STOP_LOCATION, copy.getChildLocations().iterator().next());
     assertEquals("v2", copy.getName().toString());
   }
 
@@ -55,7 +109,7 @@ class GroupStopTest {
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addLocation(TransitModelForTest.stopForTest("2:stop", 1d, 2d)).build()
+        subject.copy().addLocation(TransitModelForTest.of().stop("2:stop", 1d, 2d).build()).build()
       )
     );
   }

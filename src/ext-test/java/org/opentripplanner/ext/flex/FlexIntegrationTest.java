@@ -3,13 +3,11 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -19,13 +17,12 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.GenericLocation;
@@ -34,6 +31,7 @@ import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
@@ -58,16 +56,19 @@ public class FlexIntegrationTest {
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
-    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
-    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
-    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
-
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath);
+    TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     transitModel = model.transitModel();
 
-    addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    addGtfsToGraph(
+      graph,
+      transitModel,
+      List.of(
+        FlexIntegrationTestData.COBB_BUS_30_GTFS,
+        FlexIntegrationTestData.MARTA_BUS_856_GTFS,
+        FlexIntegrationTestData.COBB_FLEX_GTFS
+      )
+    );
     service = TestServerContext.createServerContext(graph, transitModel).routingService();
   }
 
@@ -176,21 +177,9 @@ public class FlexIntegrationTest {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
 
-  private static String getAbsolutePath(String cobbOsm) {
-    try {
-      return getFileForResource(cobbOsm).getAbsolutePath();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static void addGtfsToGraph(
-    Graph graph,
-    TransitModel transitModel,
-    List<String> gtfsFiles
-  ) {
+  private static void addGtfsToGraph(Graph graph, TransitModel transitModel, List<File> gtfsFiles) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(f -> new GtfsBundle(new File(f))).toList();
+    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::new).toList();
     GtfsModule gtfsModule = new GtfsModule(
       gtfsBundles,
       transitModel,
@@ -200,7 +189,7 @@ public class FlexIntegrationTest {
     gtfsModule.buildGraph();
 
     // link stations to streets
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     // link flex locations to streets
     new AreaStopsToVerticesMapper(graph, transitModel).buildGraph();
@@ -239,6 +228,11 @@ public class FlexIntegrationTest {
     request.setTo(to);
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
+    request.withPreferences(p ->
+      p.withStreet(s ->
+        s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+      )
+    );
 
     var modes = request.journey().modes().copyOf();
     modes.withEgressMode(FLEXIBLE);

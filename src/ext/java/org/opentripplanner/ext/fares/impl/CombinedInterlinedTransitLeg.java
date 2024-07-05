@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -53,6 +55,16 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   @Override
   public Trip getTrip() {
     return first.getTrip();
+  }
+
+  @Override
+  public LegTime start() {
+    return first.start();
+  }
+
+  @Override
+  public LegTime end() {
+    return second.end();
   }
 
   @Override
@@ -115,5 +127,12 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   @Override
   public List<FareProductUse> fareProducts() {
     return List.of();
+  }
+
+  /**
+   * The two legs that this combined leg originally consisted of.
+   */
+  public List<Leg> originalLegs() {
+    return List.of(first, second);
   }
 }

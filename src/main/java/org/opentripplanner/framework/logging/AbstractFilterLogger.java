@@ -15,15 +15,17 @@ import org.slf4j.Marker;
  * The primary use-case for this class is to prevent a spamming the log with the same kind
  * of events. There are two concrete implementations:
  * <ul>
- *     <li>{@link ThrottleLogger} - Prevent more than one log event within the same second. This is
- *     nice for the journey planner operation.</li>
  *     <li>{@link MaxCountLogger} - Log N events, then mute. This is suitable for data import.</li>
  * </ul>
  *
  * <p>
  * This class wrap the original logger and forward some log events, based on the
  * implementation of the {@link #mute()} method.
+ * <p>
+ * @deprecated This hide the actual logger in the log, the AbstractFilterLogger becomes thelogger -
+               this make it difficult to find the log statement in the code when  investigating.
  */
+@Deprecated
 public abstract class AbstractFilterLogger implements Logger {
 
   private final Logger delegate;

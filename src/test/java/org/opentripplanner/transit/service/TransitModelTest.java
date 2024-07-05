@@ -11,6 +11,7 @@ import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -19,6 +20,7 @@ class TransitModelTest {
 
   public static final String FAKE_FEED_ID = "FAKE";
   public static final FeedScopedId SAMPLE_TRIP_ID = new FeedScopedId(FAKE_FEED_ID, "1.2");
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(TransitModelTest.class);
 
   @Test
   void validateTimeZones() {
@@ -30,7 +32,7 @@ class TransitModelTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitModel,
-      ConstantsForTests.FAKE_GTFS,
+      ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
     );
@@ -51,7 +53,7 @@ class TransitModelTest {
         ConstantsForTests.addGtfsToGraph(
           graph,
           transitModel,
-          ConstantsForTests.KCM_GTFS,
+          RESOURCE_LOADER.file("kcm_gtfs.zip"),
           new DefaultFareServiceFactory(),
           null
         ),
@@ -77,7 +79,7 @@ class TransitModelTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitModel,
-      ConstantsForTests.FAKE_GTFS,
+      ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
     );
@@ -86,7 +88,7 @@ class TransitModelTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitModel,
-      ConstantsForTests.KCM_GTFS,
+      RESOURCE_LOADER.file("kcm_gtfs.zip"),
       new DefaultFareServiceFactory(),
       null
     );

@@ -11,6 +11,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.netex.support.JourneyPatternHelper;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -40,7 +41,7 @@ class TripMapper {
   private final Map<String, FeedScopedId> serviceIds;
   private final EntityById<Operator> operatorsById;
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();
-  private final EntityById<Trip> mappedTrips = new EntityById<>();
+  private final EntityById<Trip> mappedTrips = new DefaultEntityById<>();
 
   TripMapper(
     FeedScopedIdFactory idFactory,

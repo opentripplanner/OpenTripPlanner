@@ -34,6 +34,7 @@ public class BuildConfigurationDocTest {
     .skip("dataOverlay", "sandbox/DataOverlay.md")
     .skip("fares", "sandbox/Fares.md")
     .skip("transferRequests", "RouteRequest.md")
+    .skip("emissions", "sandbox/Emissions.md")
     .build();
 
   /**
@@ -48,7 +49,7 @@ public class BuildConfigurationDocTest {
   public void updateBuildConfigurationDoc() {
     NodeAdapter node = readBuildConfig();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

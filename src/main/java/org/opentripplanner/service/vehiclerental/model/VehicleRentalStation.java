@@ -3,6 +3,7 @@ package org.opentripplanner.service.vehiclerental.model;
 import static java.util.Locale.ROOT;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -187,5 +188,36 @@ public class VehicleRentalStation implements VehicleRentalPlace {
       getAvailableDropoffFormFactors(false),
       getAvailablePickupFormFactors(false)
     );
+  }
+
+  /**
+   * @return Counts of available vehicles by type as well as the total number of available vehicles.
+   */
+  public RentalVehicleEntityCounts getVehicleTypeCounts() {
+    return new RentalVehicleEntityCounts(
+      vehiclesAvailable,
+      vehicleRentalTypeMapToList(vehicleTypesAvailable)
+    );
+  }
+
+  /**
+   * @return Counts of available vehicle spaces by type as well as the total number of available
+   * vehicle spaces.
+   */
+  public RentalVehicleEntityCounts getVehicleSpaceCounts() {
+    return new RentalVehicleEntityCounts(
+      spacesAvailable,
+      vehicleRentalTypeMapToList(vehicleSpacesAvailable)
+    );
+  }
+
+  private List<RentalVehicleTypeCount> vehicleRentalTypeMapToList(
+    Map<RentalVehicleType, Integer> vehicleTypeMap
+  ) {
+    return vehicleTypeMap
+      .entrySet()
+      .stream()
+      .map(vtc -> new RentalVehicleTypeCount(vtc.getKey(), vtc.getValue()))
+      .toList();
   }
 }

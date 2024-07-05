@@ -14,7 +14,6 @@ import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_PARKING;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_POSITIONS;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_RENTAL;
-import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.WEBSOCKET_GTFS_RT_UPDATER;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -22,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -39,7 +38,6 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdater
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRentalUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureSXUpdaterConfig;
 import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
@@ -48,7 +46,6 @@ import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
-import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
@@ -125,7 +122,7 @@ public class UpdatersConfig implements UpdatersParameters {
         .of("purgeExpiredData")
         .since(V2_2)
         .summary(
-          "Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates."
+          "Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates."
         )
         .asBoolean(dflt.purgeExpiredData())
     );
@@ -186,11 +183,6 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters() {
-    return getParameters(WEBSOCKET_GTFS_RT_UPDATER);
-  }
-
-  @Override
   public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
     return getParameters(MQTT_GTFS_RT_UPDATER);
   }
@@ -222,7 +214,6 @@ public class UpdatersConfig implements UpdatersParameters {
     BIKE_RENTAL(VehicleRentalUpdaterConfig::create),
     VEHICLE_RENTAL(VehicleRentalUpdaterConfig::create),
     STOP_TIME_UPDATER(PollingTripUpdaterConfig::create),
-    WEBSOCKET_GTFS_RT_UPDATER(WebsocketGtfsRealtimeUpdaterConfig::create),
     MQTT_GTFS_RT_UPDATER(MqttGtfsRealtimeUpdaterConfig::create),
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),

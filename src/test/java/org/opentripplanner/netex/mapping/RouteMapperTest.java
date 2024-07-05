@@ -16,12 +16,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.BrandingRefStructure;
@@ -29,10 +30,10 @@ import org.rutebanken.netex.model.GroupOfLinesRefStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.TransportOrganisationRefStructure;
 
-public class RouteMapperTest {
+class RouteMapperTest {
 
   private static final String NETWORK_ID = "RUT:Network:1";
   private static final String GOL_ID_1 = "RUT:GroupOfLines:1";
@@ -47,18 +48,18 @@ public class RouteMapperTest {
   private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
   @Test
-  public void mapRouteWithDefaultAgency() {
+  void mapRouteWithDefaultAgency() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -72,16 +73,17 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithAgencySpecified() {
+  void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 
     Network network = new Network()
       .withId(NETWORK_ID)
       .withTransportOrganisationRef(
-        createJaxbElement(new OrganisationRefStructure().withRef(AUTHORITY_ID))
+        createJaxbElement(new TransportOrganisationRefStructure().withRef(AUTHORITY_ID))
       );
 
     netexIndex.networkById.add(network);
@@ -110,7 +112,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithColor() {
+  void mapRouteWithColor() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
     byte[] color = new byte[] { 127, 0, 0 };
@@ -120,11 +122,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -132,12 +134,12 @@ public class RouteMapperTest {
 
     Route route = routeMapper.mapRoute(line);
 
-    assertEquals(route.getColor(), "7F0000");
-    assertEquals(route.getTextColor(), "007F00");
+    assertEquals("7F0000", route.getColor());
+    assertEquals("007F00", route.getTextColor());
   }
 
   @Test
-  public void allowBicyclesOnFerries() {
+  void allowBicyclesOnFerries() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line lineWithBicycles = createExampleFerry(LINE_ID);
     Line lineWithOutBicycles = createExampleFerry(FERRY_WITHOUT_BICYCLES_ID);
@@ -145,11 +147,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       Set.of(FERRY_WITHOUT_BICYCLES_ID)
@@ -163,18 +165,18 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithoutBranding() {
+  void mapRouteWithoutBranding() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -186,9 +188,10 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithBranding() {
+  void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 
@@ -205,7 +208,7 @@ public class RouteMapperTest {
       transitBuilder.getOperatorsById(),
       transitBuilder.getBrandingsById(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexIndex.readOnlyView(),
       TransitModelForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -219,9 +222,10 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithGroupOfRoutes() {
+  void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 

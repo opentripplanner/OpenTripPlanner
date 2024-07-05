@@ -31,8 +31,10 @@ public class UpdaterConfigDocTest {
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> SKIP_UPDATERS = Set.of(
     "siri-azure-sx-updater",
+    "siri-azure-et-updater",
     "vehicle-parking",
     "siri-et-updater",
+    "siri-et-google-pubsub-updater",
     "siri-sx-updater"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
@@ -50,7 +52,7 @@ public class UpdaterConfigDocTest {
   public void updateRouterConfigurationDoc() {
     NodeAdapter node = readBuildConfig();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

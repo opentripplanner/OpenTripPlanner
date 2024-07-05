@@ -1,10 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
@@ -12,9 +15,10 @@ class TripMapper {
 
   private final RouteMapper routeMapper;
   private final DirectionMapper directionMapper;
-  private TranslationHelper translationHelper;
+  private final TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Trip, Trip> mappedTrips = new HashMap<>();
+  private final Map<Trip, TimePenalty> flexSafeTimePenalties = new HashMap<>();
 
   TripMapper(
     RouteMapper routeMapper,
@@ -36,6 +40,13 @@ class TripMapper {
 
   Collection<Trip> getMappedTrips() {
     return mappedTrips.values();
+  }
+
+  /**
+   * The map of flex duration factors per flex trip.
+   */
+  Map<Trip, TimePenalty> flexSafeTimePenalties() {
+    return flexSafeTimePenalties;
   }
 
   private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
@@ -60,8 +71,18 @@ class TripMapper {
     lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
     lhs.withWheelchairBoarding(WheelchairAccessibilityMapper.map(rhs.getWheelchairAccessible()));
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
-    lhs.withGtfsFareId(rhs.getFareId());
 
-    return lhs.build();
+    var trip = lhs.build();
+    mapSafeTimePenalty(rhs).ifPresent(f -> flexSafeTimePenalties.put(trip, f));
+    return trip;
+  }
+
+  private Optional<TimePenalty> mapSafeTimePenalty(org.onebusaway.gtfs.model.Trip rhs) {
+    if (rhs.getSafeDurationFactor() == null && rhs.getSafeDurationOffset() == null) {
+      return Optional.empty();
+    } else {
+      var offset = Duration.ofSeconds(rhs.getSafeDurationOffset().longValue());
+      return Optional.of(TimePenalty.of(offset, rhs.getSafeDurationFactor().doubleValue()));
+    }
   }
 }

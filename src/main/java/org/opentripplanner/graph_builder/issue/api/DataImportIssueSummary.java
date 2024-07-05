@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class DataImportIssueSummary implements Serializable {
 
   private static final Logger ISSUE_LOG = LoggerFactory.getLogger(ISSUES_LOG_NAME);
-  private Map<String, Long> summary;
+  private final Map<String, Long> summary;
 
   public DataImportIssueSummary(List<DataImportIssue> issues) {
     this(

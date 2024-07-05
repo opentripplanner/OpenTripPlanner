@@ -4,8 +4,9 @@ import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
+import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,35 +20,33 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
 
-public class StopAndStationMapperTest {
+class StopAndStationMapperTest {
 
   public static final ZoneId DEFAULT_TIME_ZONE = ZoneIds.OSLO;
+  private final ObjectFactory objectFactory = new ObjectFactory();
 
   @Test
-  public void testWheelChairBoarding() {
+  void testWheelChairBoarding() {
     var stopPlace = createStopPlace(
       "ST:StopPlace:1",
       "Lunce C",
       "1",
       55.707005,
       13.186816,
-      VehicleModeEnumeration.BUS
+      AllVehicleModesOfTransportEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
@@ -68,9 +67,9 @@ public class StopAndStationMapperTest {
 
     stopPlace.setQuays(
       new Quays_RelStructure()
-        .withQuayRefOrQuay(quay1)
-        .withQuayRefOrQuay(quay2)
-        .withQuayRefOrQuay(quay3)
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay2))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
 
     var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
@@ -94,7 +93,7 @@ public class StopAndStationMapperTest {
     );
 
     // Add quay with no AccessibilityAssessment, then it should take default from stopPlace
-    stopPlace.getQuays().withQuayRefOrQuay(quay4);
+    stopPlace.getQuays().withQuayRefOrQuay(objectFactory.createQuay(quay4));
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
@@ -103,7 +102,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void mapStopPlaceAndQuays() {
+  void mapStopPlaceAndQuays() {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
 
     StopPlace stopPlaceNew = createStopPlace(
@@ -112,7 +111,7 @@ public class StopAndStationMapperTest {
       "2",
       59.909584,
       10.755165,
-      VehicleModeEnumeration.TRAM
+      AllVehicleModesOfTransportEnumeration.TRAM
     );
 
     StopPlace stopPlaceOld = createStopPlace(
@@ -121,7 +120,7 @@ public class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      VehicleModeEnumeration.TRAM
+      AllVehicleModesOfTransportEnumeration.TRAM
     );
 
     stopPlaces.add(stopPlaceNew);
@@ -136,11 +135,15 @@ public class StopAndStationMapperTest {
     Quay quay3 = createQuay("NSR:Quay:3", "", "1", 59.909911, 10.753008, "C");
 
     stopPlaceNew.setQuays(
-      new Quays_RelStructure().withQuayRefOrQuay(quay1b).withQuayRefOrQuay(quay2)
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1b))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay2))
     );
 
     stopPlaceOld.setQuays(
-      new Quays_RelStructure().withQuayRefOrQuay(quay1a).withQuayRefOrQuay(quay3)
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1a))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
 
     HierarchicalVersionMapById<Quay> quaysById = new HierarchicalVersionMapById<>();
@@ -203,7 +206,7 @@ public class StopAndStationMapperTest {
 
   @ParameterizedTest
   @CsvSource(value = { "true", "false" })
-  public void testMapIsolatedStopPlace(boolean isolated) {
+  void testMapIsolatedStopPlace(boolean isolated) {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
     StopPlace stopPlace;
     stopPlace =
@@ -213,7 +216,7 @@ public class StopAndStationMapperTest {
         "1",
         59.909584,
         10.755165,
-        VehicleModeEnumeration.TRAM
+        AllVehicleModesOfTransportEnumeration.TRAM
       );
 
     stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
@@ -241,31 +244,30 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testDuplicateStopIndices() {
-    StopLocation.initIndexCounter(0);
+  void testDuplicateStopIndices() {
     var stopPlace = createStopPlace(
       "ST:StopPlace:1",
       "Lunce C",
       "1",
       55.707005,
       13.186816,
-      VehicleModeEnumeration.BUS
+      AllVehicleModesOfTransportEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
     var quay1 = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
 
-    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(quay1));
+    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1)));
 
     StopModelBuilder stopModelBuilder = StopModel.of();
 
     StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(stopModelBuilder);
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper.resultStops);
+    stopModelBuilder.withRegularStops(stopAndStationMapper.resultStops);
 
     StopAndStationMapper stopAndStationMapper2 = createStopAndStationMapper(stopModelBuilder);
     stopAndStationMapper2.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper2.resultStops);
+    stopModelBuilder.withRegularStops(stopAndStationMapper2.resultStops);
 
     assertEquals(1, stopModelBuilder.regularStopsById().size());
     assertEquals(
@@ -289,49 +291,6 @@ public class StopAndStationMapperTest {
       DataImportIssueStore.NOOP,
       false
     );
-  }
-
-  private static StopPlace createStopPlace(
-    String id,
-    String name,
-    String version,
-    Double lat,
-    Double lon,
-    VehicleModeEnumeration transportMode
-  ) {
-    return new StopPlace()
-      .withName(createMLString(name))
-      .withVersion(version)
-      .withId(id)
-      .withCentroid(createSimplePoint(lat, lon))
-      .withTransportMode(transportMode);
-  }
-
-  private static Quay createQuay(
-    String id,
-    String name,
-    String version,
-    Double lat,
-    Double lon,
-    String platformCode
-  ) {
-    return new Quay()
-      .withName(createMLString(name))
-      .withId(id)
-      .withVersion(version)
-      .withPublicCode(platformCode)
-      .withCentroid(createSimplePoint(lat, lon));
-  }
-
-  private static MultilingualString createMLString(String name) {
-    return new MultilingualString().withValue(name);
-  }
-
-  private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {
-    return new SimplePoint_VersionStructure()
-      .withLocation(
-        new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
-      );
   }
 
   /**

@@ -13,14 +13,15 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
@@ -43,18 +44,20 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
   static Money tenDollars = Money.usDollars(10);
   static Money twentyDollars = Money.usDollars(20);
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(ALWAYS, interlinedWithSameRoute, tenDollars, "same routes"),
-    Arguments.of(ALWAYS, interlinedWithDifferentRoute, tenDollars, "different routes"),
-    Arguments.of(SAME_ROUTE, interlinedWithSameRoute, tenDollars, "same routes"),
-    Arguments.of(SAME_ROUTE, interlinedWithDifferentRoute, twentyDollars, "different routes")
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      Arguments.of(ALWAYS, interlinedWithSameRoute, tenDollars, "same routes"),
+      Arguments.of(ALWAYS, interlinedWithDifferentRoute, tenDollars, "different routes"),
+      Arguments.of(SAME_ROUTE, interlinedWithSameRoute, tenDollars, "same routes"),
+      Arguments.of(SAME_ROUTE, interlinedWithDifferentRoute, twentyDollars, "different routes")
+    );
+  }
 
   @ParameterizedTest(
     name = "Itinerary with {3} and combination mode {0} should lead to a fare of {2}"
   )
-  @VariableSource("testCases")
-  void modeAlways(CombinationMode mode, Itinerary itinerary, Money expectedPrice, String hint) {
+  @MethodSource("testCases")
+  void modes(CombinationMode mode, Itinerary itinerary, Money totalPrice, String hint) {
     var service = new CombinedInterlinedLegsFareService(mode);
     service.addFareRules(
       FareType.regular,
@@ -64,8 +67,50 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
-    var price = fare.getFare(FareType.regular);
+    var firstLeg = itinerary.getTransitLeg(0);
+    var uses = fare.getLegProducts().get(firstLeg);
+    assertEquals(1, uses.size());
 
-    assertEquals(expectedPrice, price);
+    var secondLeg = itinerary.getTransitLeg(1);
+    uses = fare.getLegProducts().get(secondLeg);
+    assertEquals(1, uses.size());
+
+    var sum = fare
+      .getLegProducts()
+      .values()
+      .stream()
+      .distinct()
+      .map(p -> p.product().price())
+      .reduce(Money.ZERO_USD, Money::plus);
+    assertEquals(totalPrice, sum);
+  }
+
+  @Test
+  void legFares() {
+    var itinerary = interlinedWithSameRoute;
+    var service = new CombinedInterlinedLegsFareService(ALWAYS);
+    service.addFareRules(
+      FareType.regular,
+      List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
+    );
+
+    var fare = service.calculateFares(itinerary);
+
+    var firstLeg = itinerary.getTransitLeg(0);
+    var uses = List.copyOf(fare.getLegProducts().get(firstLeg));
+    assertEquals(1, uses.size());
+
+    var firstLegUse = uses.getFirst();
+    assertEquals(tenDollars, firstLegUse.product().price());
+
+    var secondLeg = itinerary.getTransitLeg(1);
+    uses = List.copyOf(fare.getLegProducts().get(secondLeg));
+    assertEquals(1, uses.size());
+
+    var secondLegUse = uses.getFirst();
+    assertEquals(tenDollars, secondLegUse.product().price());
+
+    // the same far product is used for both legs as you only need to buy one
+    assertEquals(secondLegUse, firstLegUse);
   }
 }

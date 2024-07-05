@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
 
 /**
- * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This is
+ * A debug logger which can be plugged into Raptor to do debug logging to standard error. This is
  * used by the REST API, SpeedTest and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.
@@ -43,14 +43,14 @@ public class SystemErrDebugLogger implements DebugLogger {
   private final Table arrivalTable = Table
     .of()
     .withAlights(Center, Center, Right, Right, Right, Right, Left, Left)
-    .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "COST", "TRIP", "DETAILS")
+    .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "C₁", "TRIP", "DETAILS")
     .withMinWidths(9, 7, 3, 5, 8, 9, 24, 0)
     .build();
   private final Table pathTable = Table
     .of()
     .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
-    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "COST", "DETAILS")
-    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 6, 0)
+    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "C₁", "DETAILS")
+    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 9, 0)
     .build();
   private boolean forwardSearch = true;
   private int lastIterationTime = NOT_SET;
@@ -112,6 +112,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     RaptorPath<?> p = e.element();
     var aLeg = p.accessLeg();
     var eLeg = p.egressLeg();
+
     println(
       pathTable.rowAsText(
         e.action().toString(),
@@ -219,7 +220,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null)).summary(a.c1()).toString();
+    return path(a, new PathStringBuilder(null)).summary(a.c1(), a.c2()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {

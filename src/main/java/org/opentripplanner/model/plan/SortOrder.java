@@ -36,10 +36,10 @@ public enum SortOrder {
    * paging we need to know which end of the list of itineraries we should crop. This method is used
    * to decide that together with the current page type (next/previous).
    * <p>
-   * This return {@code true} for the default depart-after search, and {@code false} for an
+   * This returns {@code true} for the default depart-after search, and {@code false} for an
    * arrive-by search.
    */
-  public boolean isSortedByArrivalTimeAcceding() {
+  public boolean isSortedByAscendingArrivalTime() {
     return this == STREET_AND_ARRIVAL_TIME;
   }
 }

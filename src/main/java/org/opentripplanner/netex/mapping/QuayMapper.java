@@ -3,16 +3,16 @@ package org.opentripplanner.netex.mapping;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
@@ -22,24 +22,16 @@ class QuayMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final EntityById<RegularStop> regularStopIndex;
-
-  private record MappingParameters(
-    Quay quay,
-    Station parentStation,
-    Collection<FareZone> fareZones,
-    NetexMainAndSubMode transitMode,
-    Accessibility wheelchair
-  ) {}
+  private final StopModelBuilder stopModelBuilder;
 
   QuayMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    EntityById<RegularStop> regularStopIndex
+    StopModelBuilder stopModelBuilder
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
-    this.regularStopIndex = regularStopIndex;
+    this.stopModelBuilder = stopModelBuilder;
   }
 
   /**
@@ -53,48 +45,46 @@ class QuayMapper {
     NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
-    MappingParameters parameters = new MappingParameters(
-      quay,
-      parentStation,
-      fareZones,
-      transitMode,
-      wheelchair
-    );
-    return regularStopIndex.computeIfAbsent(
-      idFactory.createId(quay.getId()),
-      ignored -> map(parameters)
+    var id = idFactory.createId(quay.getId());
+    return stopModelBuilder.computeRegularStopIfAbsent(
+      id,
+      it -> map(it, quay, parentStation, fareZones, transitMode, wheelchair)
     );
   }
 
-  private RegularStop map(MappingParameters parameters) {
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parameters.quay.getCentroid());
+  private RegularStop map(
+    FeedScopedId id,
+    @Nonnull Quay quay,
+    Station parentStation,
+    Collection<FareZone> fareZones,
+    NetexMainAndSubMode transitMode,
+    Accessibility wheelchair
+  ) {
+    var coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
       issueStore.add(
         "QuayWithoutCoordinates",
         "Quay %s does not contain any coordinates.",
-        parameters.quay.getId()
+        quay.getId()
       );
       return null;
     }
 
-    var builder = RegularStop
-      .of(idFactory.createId(parameters.quay.getId()))
-      .withParentStation(parameters.parentStation)
-      .withName(parameters.parentStation.getName())
-      .withPlatformCode(parameters.quay.getPublicCode())
+    var builder = stopModelBuilder
+      .regularStop(id)
+      .withParentStation(parentStation)
+      .withName(parentStation.getName())
+      .withPlatformCode(quay.getPublicCode())
       .withDescription(
-        NonLocalizedString.ofNullable(
-          parameters.quay.getDescription(),
-          MultilingualString::getValue
-        )
+        NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
       )
-      .withCoordinate(WgsCoordinateMapper.mapToDomain(parameters.quay.getCentroid()))
-      .withWheelchairAccessibility(parameters.wheelchair)
-      .withVehicleType(parameters.transitMode.mainMode())
-      .withNetexVehicleSubmode(parameters.transitMode.subMode());
+      .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
+      .withWheelchairAccessibility(wheelchair)
+      .withVehicleType(transitMode.mainMode())
+      .withNetexVehicleSubmode(transitMode.subMode());
 
-    builder.fareZones().addAll(parameters.fareZones);
+    builder.fareZones().addAll(fareZones);
 
     return builder.build();
   }

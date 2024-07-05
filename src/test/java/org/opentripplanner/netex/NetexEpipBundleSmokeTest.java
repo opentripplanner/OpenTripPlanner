@@ -28,7 +28,6 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -49,8 +48,6 @@ class NetexEpipBundleSmokeTest {
     // Given
     OtpTransitServiceBuilder transitBuilder;
     try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
-      // Ensure that the smoke test runs independently
-      StopLocation.initIndexCounter(0);
       // Run the check to make sure it does not throw an exception
       netexBundle.checkInputs();
 

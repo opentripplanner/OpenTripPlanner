@@ -25,7 +25,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -46,9 +47,10 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
   private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
-  private static final RegularStop STOP_1 = TransitModelForTest.stop("Stop-1").build();
-  private static final RegularStop STOP_2 = TransitModelForTest.stop("Stop-2").build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final RegularStop STOP_1 = TEST_MODEL.stop("Stop-1").build();
+  private static final RegularStop STOP_2 = TEST_MODEL.stop("Stop-2").build();
   private static final List<StopTime> STOP_TIMES = List.of(
     createStopTime(STOP_1, 0),
     createStopTime(STOP_2, 300)
@@ -66,7 +68,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   @BeforeEach
   public void setUp() {
-    subject = new OtpTransitServiceBuilder(DataImportIssueStore.NOOP);
+    subject = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
 
     // Add a service calendar that overlap with the period limit
     subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));
@@ -81,8 +83,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_OUT, D1, 1));
 
     // Add 2 stops
-    subject.getStops().add(STOP_1);
-    subject.getStops().add(STOP_2);
+    subject.stopModel().withRegularStop(STOP_1);
+    subject.stopModel().withRegularStop(STOP_2);
 
     // Add Route
     subject.getRoutes().add(route);
@@ -191,7 +193,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
       .build();
 
     for (Trip trip : trips) {
-      p.add(new TripTimes(trip, STOP_TIMES, DEDUPLICATOR));
+      p.add(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR));
     }
     return p;
   }

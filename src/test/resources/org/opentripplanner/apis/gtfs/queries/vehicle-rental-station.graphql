@@ -1,0 +1,43 @@
+{
+  vehicleRentalStation(id: "Network-1:FooStation") {
+    stationId
+    name
+    vehiclesAvailable
+    availableVehicles {
+      byType {
+        vehicleType {
+          formFactor
+          propulsionType
+        }
+        count
+      }
+      total
+    }
+    spacesAvailable
+    availableSpaces {
+      byType {
+        vehicleType {
+          formFactor
+          propulsionType
+        }
+        count
+      }
+      total
+    }
+    allowDropoff
+    allowPickup
+    allowDropoffNow
+    allowPickupNow
+    network
+    lon
+    lat
+    capacity
+    allowOverloading
+    rentalUris {
+      android
+      ios
+      web
+    }
+    operative
+  }
+}

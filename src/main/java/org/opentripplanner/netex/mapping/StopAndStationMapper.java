@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.JAXBElement;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,9 +78,9 @@ class StopAndStationMapper {
         idFactory,
         defaultTimeZone,
         noTransfersOnIsolatedStops,
-        stopModelBuilder.stationById()
+        stopModelBuilder
       );
-    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder.regularStopsById());
+    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
@@ -129,9 +130,9 @@ class StopAndStationMapper {
 
     return stopPlace
       .getTariffZones()
-      .getTariffZoneRef()
+      .getTariffZoneRef_()
       .stream()
-      .map(ref -> findTariffZone(stopPlace, ref))
+      .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }
@@ -209,9 +210,9 @@ class StopAndStationMapper {
 
     List<Quay> result = new ArrayList<>();
 
-    for (Object it : quays.getQuayRefOrQuay()) {
-      if (it instanceof Quay) {
-        result.add((Quay) it);
+    for (JAXBElement<?> it : quays.getQuayRefOrQuay()) {
+      if (it.getValue() instanceof Quay quay) {
+        result.add(quay);
       } else {
         issueStore.add(
           Issue.issue(
@@ -229,7 +230,7 @@ class StopAndStationMapper {
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
-   * @param quay      NeTEx quay could contain information about accessability
+   * @param quay      NeTEx quay could contain information about accessibility
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */

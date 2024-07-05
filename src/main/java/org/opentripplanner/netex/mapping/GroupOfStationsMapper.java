@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -7,8 +8,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupOfStationsBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -24,15 +25,15 @@ class GroupOfStationsMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final EntityById<MultiModalStation> multiModalStations;
+  private final ImmutableEntityById<MultiModalStation> multiModalStations;
 
-  private final EntityById<Station> stations;
+  private final ImmutableEntityById<Station> stations;
 
   GroupOfStationsMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
-    EntityById<MultiModalStation> multiModalStations,
-    EntityById<Station> stations
+    ImmutableEntityById<MultiModalStation> multiModalStations,
+    ImmutableEntityById<Station> stations
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
@@ -51,7 +52,11 @@ class GroupOfStationsMapper {
         "GroupOfStopPlaces {} does not contain a name.",
         groupOfStopPlaces.getId()
       );
-      StopPlaceRefStructure ref = groupOfStopPlaces.getMembers().getStopPlaceRef().get(0);
+      StopPlaceRefStructure ref = groupOfStopPlaces
+        .getMembers()
+        .getStopPlaceRef()
+        .get(0)
+        .getValue();
       name = stations.get(idFactory.createId(ref.getRef())).getName();
     }
     GroupOfStationsBuilder groupOfStations = GroupOfStations
@@ -83,9 +88,9 @@ class GroupOfStationsMapper {
   ) {
     StopPlaceRefs_RelStructure members = groupOfStopPlaces.getMembers();
     if (members != null) {
-      List<StopPlaceRefStructure> memberList = members.getStopPlaceRef();
-      for (StopPlaceRefStructure stopPlaceRefStructure : memberList) {
-        FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getRef());
+      List<JAXBElement<? extends StopPlaceRefStructure>> memberList = members.getStopPlaceRef();
+      for (JAXBElement<? extends StopPlaceRefStructure> stopPlaceRefStructure : memberList) {
+        FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getValue().getRef());
         StopLocationsGroup station = lookupStation(stationId);
         if (station != null) {
           groupOfStations.addChildStation(station);

@@ -26,7 +26,6 @@ class TripTest {
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
   private static final String BLOCK_ID = "blockId";
-  private static final String FARE_ID = "fareId";
   private static final TripAlteration TRIP_ALTERATION = TripAlteration.CANCELLATION;
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
@@ -46,7 +45,6 @@ class TripTest {
     .withBikesAllowed(BIKE_ACCESS)
     .withMode(TRANSIT_MODE)
     .withGtfsBlockId(BLOCK_ID)
-    .withGtfsFareId(FARE_ID)
     .withNetexAlteration(TRIP_ALTERATION)
     .withNetexSubmode(NETEX_SUBMODE_NAME)
     .withNetexInternalPlanningCode(NETEX_INTERNAL_PLANNING_CODE)
@@ -88,7 +86,6 @@ class TripTest {
     assertEquals(BIKE_ACCESS, copy.getBikesAllowed());
     assertEquals(TRANSIT_MODE, copy.getMode());
     assertEquals(BLOCK_ID, copy.getGtfsBlockId());
-    assertEquals(FARE_ID, copy.getGtfsFareId());
     assertEquals(TRIP_ALTERATION, copy.getNetexAlteration());
     assertEquals(NETEX_SUBMODE, copy.getNetexSubMode());
     assertEquals(NETEX_INTERNAL_PLANNING_CODE, copy.getNetexInternalPlanningCode());
@@ -115,7 +112,6 @@ class TripTest {
     assertFalse(subject.sameAs(subject.copy().withBikesAllowed(BikeAccess.NOT_ALLOWED).build()));
     assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
     assertFalse(subject.sameAs(subject.copy().withGtfsBlockId("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withGtfsFareId("X").build()));
     assertFalse(
       subject.sameAs(subject.copy().withNetexAlteration(TripAlteration.REPLACED).build())
     );

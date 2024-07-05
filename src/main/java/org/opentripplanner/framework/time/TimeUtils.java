@@ -2,10 +2,12 @@ package org.opentripplanner.framework.time;
 
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
@@ -169,6 +171,35 @@ public class TimeUtils {
   }
 
   /**
+   * Convert system time in milliseconds to a sting:
+   * <pre>
+   * -1100 -> -1.1s
+   *     0 -> 0s
+   *  1000 -> 1s
+   *  1001 -> 1.001s
+   *  1010 -> 1.01s
+   *  1100 -> 1.1s
+   * 23456 -> 23.456s
+   * </pre>
+   */
+  public static String msToString(long milliseconds) {
+    long seconds = milliseconds / 1000L;
+    int decimals = Math.abs((int) (milliseconds % 1000));
+    if (decimals == 0) {
+      return seconds + "s";
+    }
+    if (decimals % 10 == 0) {
+      decimals = decimals / 10;
+      if (decimals % 10 == 0) {
+        decimals = decimals / 10;
+        return seconds + "." + decimals + "s";
+      }
+      return seconds + "." + String.format("%02d", decimals) + "s";
+    }
+    return seconds + "." + String.format("%03d", decimals) + "s";
+  }
+
+  /**
    * Wait (compute) until the given {@code waitMs} is past. The returned long is a very random
    * number. If this method is called twice a grace period of 5 times the wait-time is set. All
    * calls within the grace period will return immediately. This ensures only ONE wait is applied
@@ -176,7 +207,7 @@ public class TimeUtils {
    * busy-wait again.
    * <p>
    * This method does a "busy" wait - it is not affected by a thread interrupt like
-   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
+   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic which uses the interrupt
    * flag.
    * <p>
    * THIS CODE IS NOT MEANT FOR PRODUCTION!
@@ -197,7 +228,7 @@ public class TimeUtils {
    * number.
    * <p>
    * This method does a "busy" wait - it is not affected by a thread interrupt like
-   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
+   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic which uses the interrupt
    * flag.
    * <p>
    * THIS CODE IS NOT MEANT FOR PRODUCTION!
@@ -216,5 +247,15 @@ public class TimeUtils {
       value |= rnd.nextLong();
     }
     return value;
+  }
+
+  /**
+   * Calculate the relative time in seconds with the given {@code transitSearchTimeZero} as the
+   * base. There is no restriction on the returned time, it can be in the past(negative) and
+   * many days ahead of the base. This method can be used to translate an API instance of time
+   * into the OTP internal transit model time, when the search zero-point-in-time is known.
+   */
+  public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
+    return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
   }
 }

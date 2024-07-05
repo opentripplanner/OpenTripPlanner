@@ -12,10 +12,10 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -27,6 +27,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -85,6 +86,16 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
+  public LegTime start() {
+    return LegTime.ofStatic(startTime);
+  }
+
+  @Override
+  public LegTime end() {
+    return LegTime.ofStatic(endTime);
+  }
+
+  @Override
   @Nonnull
   public TransitMode getMode() {
     return getTrip().getMode();
@@ -122,17 +133,17 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public LocalDate getServiceDate() {
-    return edge.flexTemplate.serviceDate;
+    return edge.serviceDate();
   }
 
   @Override
   public Place getFrom() {
-    return Place.forFlexStop(edge.s1, edge.getFromVertex());
+    return Place.forFlexStop(edge.s1(), edge.getFromVertex());
   }
 
   @Override
   public Place getTo() {
-    return Place.forFlexStop(edge.s2, edge.getToVertex());
+    return Place.forFlexStop(edge.s2(), edge.getToVertex());
   }
 
   @Override
@@ -162,22 +173,22 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public BookingInfo getDropOffBookingInfo() {
-    return edge.getFlexTrip().getDropOffBookingInfo(getBoardStopPosInPattern());
+    return edge.getFlexTrip().getDropOffBookingInfo(getAlightStopPosInPattern());
   }
 
   @Override
   public BookingInfo getPickupBookingInfo() {
-    return edge.getFlexTrip().getPickupBookingInfo(getAlightStopPosInPattern());
+    return edge.getFlexTrip().getPickupBookingInfo(getBoardStopPosInPattern());
   }
 
   @Override
   public Integer getBoardStopPosInPattern() {
-    return edge.flexTemplate.fromStopIndex;
+    return edge.boardStopPosInPattern();
   }
 
   @Override
   public Integer getAlightStopPosInPattern() {
-    return edge.flexTemplate.toStopIndex;
+    return edge.alightStopPosInPattern();
   }
 
   @Override
@@ -185,6 +196,7 @@ public class FlexibleTransitLeg implements TransitLeg {
     return generalizedCost;
   }
 
+  @Override
   public void addAlert(TransitAlert alert) {
     transitAlerts.add(alert);
   }

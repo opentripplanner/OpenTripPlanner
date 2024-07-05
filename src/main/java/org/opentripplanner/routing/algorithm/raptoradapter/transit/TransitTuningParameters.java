@@ -13,7 +13,7 @@ public interface TransitTuningParameters {
    * These tuning parameters are typically used in unit tests. The values are:
    * <pre>
    * enableStopTransferPriority : true
-   * stopTransferCost : {
+   * stopBoardAlightDuringTransferCost : {
    *   DISCOURAGED:  3600  (equivalent of 1 hour penalty)
    *   ALLOWED:        60  (60 seconds penalty)
    *   RECOMMENDED:    20  (20 seconds penalty)
@@ -28,7 +28,7 @@ public interface TransitTuningParameters {
     }
 
     @Override
-    public Integer stopTransferCost(StopTransferPriority key) {
+    public Integer stopBoardAlightDuringTransferCost(StopTransferPriority key) {
       switch (key) {
         case DISCOURAGED:
           return 3600;
@@ -45,6 +45,11 @@ public interface TransitTuningParameters {
     @Override
     public int transferCacheMaxSize() {
       return 5;
+    }
+
+    @Override
+    public Duration maxSearchWindow() {
+      return Duration.ofHours(24);
     }
 
     @Override
@@ -65,10 +70,11 @@ public interface TransitTuningParameters {
   boolean enableStopTransferPriority();
 
   /**
-   * The stop transfer cost for the given {@link StopTransferPriority}. The cost applied to boarding
-   * and alighting all stops with the given priority.
+   * The stop board alight transfer cost for the given {@link StopTransferPriority}. The cost
+   * applied during transfers to <b>both boarding and alighting</b> of stops with the given
+   * priority.
    */
-  Integer stopTransferCost(StopTransferPriority key);
+  Integer stopBoardAlightDuringTransferCost(StopTransferPriority key);
 
   /**
    * The maximum number of transfer RouteRequests for which the pre-calculated transfers should be
@@ -76,6 +82,16 @@ public interface TransitTuningParameters {
    * too large, more memory may be used than needed.
    */
   int transferCacheMaxSize();
+
+  /**
+   * The maximum search window that can be set through the searchWindow API parameter. Due to the
+   * way timetable data are collected before a Raptor trip search, using a search window larger than
+   * 24 hours may lead to inconsistent search results. Limiting the search window prevents also
+   * potential performance issues. The recommended maximum value is 24 hours.
+   * This parameter does not restrict the maximum duration of a dynamic search window (use
+   * the parameter transit.dynamicSearchWindow.maxWindow to specify such a restriction).
+   */
+  Duration maxSearchWindow();
 
   /**
    * This parameter is used to reduce the number of pages a client have to step through for a

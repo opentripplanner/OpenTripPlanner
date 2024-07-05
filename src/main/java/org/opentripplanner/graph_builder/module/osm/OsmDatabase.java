@@ -246,12 +246,7 @@ public class OsmDatabase {
 
     /* filter out ways that are not relevant for routing */
     if (
-      !(
-        OsmFilter.isWayRoutable(way) ||
-        way.isParkAndRide() ||
-        way.isBikeParking() ||
-        way.isBoardingLocation()
-      )
+      !(way.isRoutable() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingLocation())
     ) {
       return;
     }
@@ -296,9 +291,7 @@ public class OsmDatabase {
       // without reference to the ways that compose them. Accordingly, we will merely
       // mark the ways for preservation here, and deal with the details once we have
       // the ways loaded.
-      if (
-        !OsmFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()
-      ) {
+      if (!relation.isRoutable() && !relation.isParkAndRide() && !relation.isBikeParking()) {
         return;
       }
       for (OSMRelationMember member : relation.getMembers()) {
@@ -755,7 +748,7 @@ public class OsmDatabase {
         } else if (member.hasRoleOuter()) {
           outerWays.add(way);
         } else {
-          LOG.warn("Unexpected role {} in multipolygon", member.getRole());
+          LOG.warn("Unexpected role '{}' in multipolygon", member.getRole());
         }
       }
       processedAreas.add(relation);
@@ -796,8 +789,7 @@ public class OsmDatabase {
    * Handler for a new Area (single way area or multipolygon relations)
    */
   private void newArea(Area area) {
-    StreetTraversalPermission permissions = OsmFilter.getPermissionsForEntity(
-      area.parent,
+    StreetTraversalPermission permissions = area.parent.overridePermissions(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
@@ -1052,8 +1044,8 @@ public class OsmDatabase {
    * <p>
    * This goes through all public_transport=stop_area relations and adds the parent (either an area
    * or multipolygon relation) as the key and a Set of transit stop nodes that should be included in
-   * the parent area as the value into stopsInAreas. This improves TransitToTaggedStopsGraphBuilder
-   * by enabling us to have unconnected stop nodes within the areas by creating relations .
+   * the parent area as the value into stopsInAreas. This improves {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule}
+   * by enabling us to have unconnected stop nodes within the areas by creating relations.
    *
    * @author hannesj
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
@@ -1070,7 +1062,7 @@ public class OsmDatabase {
           }
         }
         case WAY -> {
-          if (member.hasRolePlatform() && areaWayIds.contains(member.getRef())) {
+          if (member.hasRolePlatform() && areaWaysById.containsKey(member.getRef())) {
             platformAreas.add(areaWaysById.get(member.getRef()));
           }
         }
@@ -1083,6 +1075,14 @@ public class OsmDatabase {
     }
 
     for (OSMWithTags area : platformAreas) {
+      if (area == null) {
+        throw new RuntimeException(
+          "Could not process public transport relation '%s' (%s)".formatted(
+              relation,
+              relation.url()
+            )
+        );
+      }
       // single platform area presumably contains only one level in most cases
       // a node inside it may specify several levels if it is an elevator
       // make sure each node has access to the current platform level

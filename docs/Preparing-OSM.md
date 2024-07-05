@@ -16,14 +16,11 @@ package. [Osmium-Tool](https://wiki.openstreetmap.org/wiki/Osmium) is a personal
 extremely fast but only straightforward to install on Linux and MacOS platforms. Below are some
 example crop commands for these different tools:
 
-**
-Osmosis:** `osmosis --rb input.osm.pbf --bounding-box left=4.34 right=5.84 bottom=43.10 top=43.97 --wb cropped.osm.pbf`
+**Osmosis:** `osmosis --rb input.osm.pbf --bounding-box left=4.34 right=5.84 bottom=43.10 top=43.97 --wb cropped.osm.pbf`
 
-**
-OsmConvert:** `osmconvert input.osm.pbf -b=-77.255859375,38.77764022307335,-76.81365966796875,39.02345139405933 --complete-ways -o=cropped.osm.pbf`
+**OsmConvert:** `osmconvert input.osm.pbf -b=-77.255859375,38.77764022307335,-76.81365966796875,39.02345139405933 --complete-ways -o=cropped.osm.pbf`
 
-**
-Osmium:** `osmium extract --strategy complete_ways --bbox 2.25,48.81,2.42,48.91 input.osm.pbf -o cropped.osm.pbf`
+**Osmium:** `osmium extract --strategy complete_ways --bbox 2.25,48.81,2.42,48.91 input.osm.pbf -o cropped.osm.pbf`
 
 The latter two commands expect bounding boxes to be specified in the
 format `min_lon,min_lat,max_lon,max_lat`. We frequently find bounding boxes using the
@@ -50,8 +47,6 @@ will also work on Windows as it's a multi-platform Java application. OSMFilter c
 format files so we rarely use it. Below are some example commands for retaining only OSM data useful
 for accessibility analysis. Here are some example commands:
 
-**
-Osmosis:** `osmosis --rb input.osm.pbf --tf reject-ways building=* --tf reject-ways waterway=* --tf reject-ways landuse=* --tf reject-ways natural=* --used-node --wb filtered.osm.pbf`
+**Osmosis:** `osmosis --rb input.osm.pbf --tf reject-ways building=* --tf reject-ways waterway=* --tf reject-ways landuse=* --tf reject-ways natural=* --used-node --wb filtered.osm.pbf`
 
-**
-Osmium-Tool:** `osmium tags-filter input.osm.pbf w/highway wa/public_transport=platform wa/railway=platform w/park_ride=yes r/type=restriction r/type=route -o filtered.osm.pbf -f pbf,add_metadata=false`
+**Osmium-Tool:** `osmium tags-filter input.osm.pbf w/highway wa/public_transport=platform wa/railway=platform w/park_ride=yes r/type=restriction r/type=route -o filtered.osm.pbf -f pbf,add_metadata=false`

@@ -12,7 +12,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  */
 public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   /**
-   * The cost is zero(0) it it is not calculated or if the cost "element" have no cost associated
+   * The cost is zero (0) if it's not calculated or if the cost "element" have no cost associated.
    * with it.
    */
   int ZERO_COST = 0;
@@ -52,18 +52,18 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
 
   /**
    * Used for estimating the remaining value for a criteria at a given stop arrival. The calculated
-   * value should be a an optimistic estimate for the heuristics to work properly. So, to calculate
-   * the generalized cost for given the {@code minTravelTime} and {@code minNumTransfers} retuning
+   * value should be an optimistic estimate for the heuristics to work properly. So, to calculate
+   * the generalized cost for given the {@code minTravelTime} and {@code minNumTransfers} returning
    * the greatest value, which is guaranteed to be less than the
-   * <em>real value</em> would be correct and a good choose.
+   * <em>real value</em> would be correct and a good choice.
    */
-  int calculateMinCost(int minTravelTime, int minNumTransfers);
+  int calculateRemainingMinCost(int minTravelTime, int minNumTransfers, int fromStop);
 
   /**
    * This method allows the cost calculator to add cost in addition to the generalized-cost of the
    * given egress itself. For example you might want to add a transfer cost to FLEX egress.
    *
-   * @return the {@link RaptorTransfer#generalizedCost()} plus any additional board or transfer
+   * @return the {@link RaptorTransfer#c1()} plus any additional board or transfer
    * cost.
    */
   int costEgress(RaptorAccessEgress egress);

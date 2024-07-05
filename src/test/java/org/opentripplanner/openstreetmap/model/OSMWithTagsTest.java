@@ -136,7 +136,7 @@ public class OSMWithTagsTest {
       assertFalse(tags.isBicycleExplicitlyDenied(), "bicycle=" + allowedValue);
     }
 
-    for (var deniedValue : List.of("no", "dismount", "license", "use_sidepath")) {
+    for (var deniedValue : List.of("no", "dismount", "license")) {
       tags.addTag("bicycle", deniedValue);
       assertTrue(tags.isBicycleExplicitlyDenied(), "bicycle=" + deniedValue);
     }
@@ -215,6 +215,11 @@ public class OSMWithTagsTest {
   }
 
   @Test
+  void isPlatform() {
+    assertFalse(WayTestData.zooPlatform().isPlatform());
+  }
+
+  @Test
   void testGenerateI18NForPattern() {
     OSMWithTags osmTags = new OSMWithTags();
     osmTags.addTag("note", "Note EN");
@@ -256,5 +261,14 @@ public class OSMWithTagsTest {
       expected,
       osmTags.generateI18NForPattern("Note: {note}, {wheelchair:description}, {foobar:description}")
     );
+  }
+
+  @Test
+  void fallbackName() {
+    var nameless = WayTestData.cycleway();
+    assertTrue(nameless.hasNoName());
+
+    var namedTunnel = WayTestData.carTunnel();
+    assertFalse(namedTunnel.hasNoName());
   }
 }

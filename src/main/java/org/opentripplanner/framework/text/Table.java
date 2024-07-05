@@ -48,7 +48,7 @@ public class Table {
   }
 
   /**
-   * Static method witch format a given table as valid Markdown table like:
+   * Static method which format a given table as valid Markdown table like:
    * <pre>
    * | A | B |
    * |---|---|

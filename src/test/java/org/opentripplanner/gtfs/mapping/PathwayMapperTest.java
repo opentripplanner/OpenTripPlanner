@@ -13,6 +13,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.site.PathwayMode;
+import org.opentripplanner.transit.service.StopModel;
 
 public class PathwayMapperTest {
 
@@ -29,7 +30,7 @@ public class PathwayMapperTest {
   private static final Stop TO_STOP = new Stop();
 
   private final PathwayMapper subject = new PathwayMapper(
-    new StopMapper(TRANSLATION_HELPER, stationId -> null),
+    new StopMapper(TRANSLATION_HELPER, stationId -> null, new StopModel().withContext()),
     new EntranceMapper(TRANSLATION_HELPER, stationId -> null),
     new PathwayNodeMapper(TRANSLATION_HELPER, stationId -> null),
     new BoardingAreaMapper(TRANSLATION_HELPER, stationId -> null)

@@ -79,7 +79,7 @@ public class C02_OnStreetTransfersTest implements RaptorTestConstants {
       "Walk 30s ~ D ~ " +
       "BUS R2 0:04 0:05 ~ E ~ " +
       "Walk 20s " +
-      "[0:01:30 0:05:20 3m50s 1tx $1510]";
+      "[0:01:30 0:05:20 3m50s Tₓ1 C₁1_510]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("3m50s", TX_1, T00_00, T00_30)

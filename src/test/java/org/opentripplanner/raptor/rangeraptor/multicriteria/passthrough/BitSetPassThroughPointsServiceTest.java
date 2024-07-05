@@ -13,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 
 class BitSetPassThroughPointsServiceTest {
@@ -32,7 +31,7 @@ class BitSetPassThroughPointsServiceTest {
   private static final int STOP_31 = 6;
 
   private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.of(
-    new PassThroughPoints(List.of(new PassThroughPoint(STOPS_1), new PassThroughPoint(STOPS_2)))
+    List.of(new PassThroughPoint("PT1", STOPS_1), new PassThroughPoint("PT2", STOPS_2))
   );
   /**
    * We expect the c2 value at the destination to be the same as the number of pass-through

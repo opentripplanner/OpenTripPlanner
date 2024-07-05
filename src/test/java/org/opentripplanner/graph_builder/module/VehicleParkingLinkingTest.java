@@ -9,10 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -47,15 +45,15 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithVertexLinkingTest() {
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
       )
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
 
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     assertEquals(1, parkingVertex.getOutgoing().size());
     parkingVertex.getOutgoing().forEach(e -> assertEquals(e.getToVertex(), A));
@@ -66,8 +64,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithoutVertexLinkingTest() {
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -78,7 +76,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(2, streetLinks.size());
@@ -96,12 +94,12 @@ public class VehicleParkingLinkingTest {
     graph.addVertex(C);
     graph.addVertex(D);
 
-    VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
+    StreetModelForTest.streetEdge(C, D, StreetTraversalPermission.CAR);
 
-    VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);
+    StreetModelForTest.streetEdge(A, C, StreetTraversalPermission.NONE);
 
-    var parking = VehicleParking
-      .builder()
+    var parking = StreetModelForTest
+      .vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -112,7 +110,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(4, streetLinks.size());
@@ -124,9 +122,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeEntranceWithNonExistingVertexTest() {
-    var vehicleParking = VehicleParking
-      .builder()
-      .id(id("VP"))
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder
@@ -148,7 +145,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
@@ -160,9 +157,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
-    var vehicleParking = VehicleParking
-      .builder()
-      .id(id("VP"))
+    var vehicleParking = StreetModelForTest
+      .vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder
@@ -179,7 +175,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 

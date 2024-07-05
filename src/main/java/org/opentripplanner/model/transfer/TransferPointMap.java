@@ -73,7 +73,7 @@ class TransferPointMap<E> {
   }
 
   /**
-   * List all elements witch matches any of the transfer points added to the map.
+   * List all elements which matches any of the transfer points added to the map.
    */
   List<E> get(Trip trip, StopLocation stop, int stopPointInPattern) {
     return Stream

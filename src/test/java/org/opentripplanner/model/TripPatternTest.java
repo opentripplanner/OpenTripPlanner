@@ -28,19 +28,20 @@ public class TripPatternTest {
    */
   @Test
   public void testSetHopGeometriesFromPattern() {
-    var stationOrigin = TransitModelForTest.station("S1").withCoordinate(0.0, 0.0).build();
-    var stationDestination = TransitModelForTest.station("S2").withCoordinate(1.0, 1.0).build();
-    var stopOrigin = TransitModelForTest
+    var testModel = TransitModelForTest.of();
+    var stationOrigin = testModel.station("S1").withCoordinate(0.0, 0.0).build();
+    var stationDestination = testModel.station("S2").withCoordinate(1.0, 1.0).build();
+    var stopOrigin = testModel
       .stop("A1")
       .withCoordinate(0.1, 0.1)
       .withParentStation(stationOrigin)
       .build();
-    var stopNewOrigin = TransitModelForTest
+    var stopNewOrigin = testModel
       .stop("A2")
       .withCoordinate(0.2, 0.2)
       .withParentStation(stationOrigin)
       .build();
-    var stopDestination = TransitModelForTest
+    var stopDestination = testModel
       .stop("C")
       .withCoordinate(0.9, 0.9)
       .withParentStation(stationDestination)
@@ -94,11 +95,11 @@ public class TripPatternTest {
     List<LineString> geometry
   ) {
     var builder = StopPattern.create(2);
-    builder.stops[0] = origin;
-    builder.stops[1] = destination;
+    builder.stops.with(0, origin);
+    builder.stops.with(1, destination);
     for (int i = 0; i < 2; i++) {
-      builder.pickups[i] = PickDrop.SCHEDULED;
-      builder.dropoffs[i] = PickDrop.SCHEDULED;
+      builder.pickups.with(i, PickDrop.SCHEDULED);
+      builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
 
     var stopPattern = builder.build();

@@ -66,6 +66,9 @@ public abstract class StreetVertex extends Vertex {
       );
   }
 
+  /**
+   * Does the vertex have an outgoing edge that allows driving.
+   */
   public boolean isConnectedToDriveableEdge() {
     return this.getOutgoing()
       .stream()

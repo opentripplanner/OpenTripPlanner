@@ -2,7 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
 import java.util.Collection;
@@ -31,8 +32,12 @@ public class EgressPaths {
    * This method is static and package local to enable unit-testing.
    */
   public static EgressPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
-    if (!MULTI_CRITERIA.is(profile)) {
-      paths = removeNoneOptimalPathsForStandardRaptor(paths);
+    paths = decorateWithTimePenaltyLogic(paths);
+
+    if (MULTI_CRITERIA.is(profile)) {
+      paths = removeNonOptimalPathsForMcRaptor(paths);
+    } else {
+      paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
     return new EgressPaths(groupByStop(paths));
   }
@@ -54,7 +59,7 @@ public class EgressPaths {
   }
 
   /**
-   * List all stops with an egress path witch start by walking. These egress paths can only be used
+   * List all stops with an egress path which start by walking. These egress paths can only be used
    * if arriving at the stop by transit.
    */
   public int[] egressesWitchStartByWalking() {
@@ -62,11 +67,22 @@ public class EgressPaths {
   }
 
   /**
-   * List all stops with an egress path witch start on-board a "transit" ride. These
+   * List all stops with an egress path which start on-board a "transit" ride. These
    * egress paths can be used when arriving at the stop with both transfer or transit.
    */
   public int[] egressesWitchStartByARide() {
     return filterPathsAndGetStops(RaptorAccessEgress::stopReachedOnBoard);
+  }
+
+  /**
+   * Decorate egress to implement time-penalty. This decoration will do the necessary
+   * adjustments to apply the penalty in the raptor algorithm. See the decorator class for more
+   * info. The original egress object is returned if it does not have a time-penalty set.
+   */
+  private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
+    Collection<RaptorAccessEgress> paths
+  ) {
+    return paths.stream().map(it -> it.hasTimePenalty() ? new EgressWithPenalty(it) : it).toList();
   }
 
   private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {

@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -41,7 +42,11 @@ public class NetexConfigure {
     List<NetexBundle> netexBundles = new ArrayList<>();
 
     for (ConfiguredDataSource<NetexFeedParameters> it : netexSources) {
-      netexBundles.add(netexBundle(it));
+      var transitServiceBuilder = new OtpTransitServiceBuilder(
+        transitModel.getStopModel(),
+        issueStore
+      );
+      netexBundles.add(netexBundle(transitServiceBuilder, it));
     }
 
     return new NetexModule(
@@ -55,7 +60,10 @@ public class NetexConfigure {
   }
 
   /** public to enable testing */
-  public NetexBundle netexBundle(ConfiguredDataSource<NetexFeedParameters> configuredDataSource) {
+  public NetexBundle netexBundle(
+    OtpTransitServiceBuilder transitServiceBuilder,
+    ConfiguredDataSource<NetexFeedParameters> configuredDataSource
+  ) {
     var source = (CompositeDataSource) configuredDataSource.dataSource();
     var config = configuredDataSource.config();
 
@@ -63,6 +71,7 @@ public class NetexConfigure {
       config.feedId(),
       source,
       hierarchy(source, config),
+      transitServiceBuilder,
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance,
       config.noTransfersOnIsolatedStops(),

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Equals;
@@ -34,7 +35,6 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Inclusi
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.LessThan;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Present;
-import org.opentripplanner.test.support.VariableSource;
 
 class ConditionTest {
 
@@ -56,18 +56,20 @@ class ConditionTest {
   );
   static Condition noSidewalk = new Condition.EqualsAnyInOrAbsent("sidewalk");
 
-  static Stream<Arguments> equalsCases = Stream.of(
-    Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
-    Arguments.of(cyclewayLaneTrack(), cyclewayLane, EXACT, NONE),
-    Arguments.of(cyclewayBoth(), cyclewayLane, EXACT, EXACT),
-    Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT),
-    Arguments.of(tramsForward(), embeddedTrams, NONE, EXACT)
-  );
+  static Stream<Arguments> equalsCases() {
+    return Stream.of(
+      Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
+      Arguments.of(cyclewayLaneTrack(), cyclewayLane, EXACT, NONE),
+      Arguments.of(cyclewayBoth(), cyclewayLane, EXACT, EXACT),
+      Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT),
+      Arguments.of(tramsForward(), embeddedTrams, NONE, EXACT)
+    );
+  }
 
   @ParameterizedTest(
     name = "way {0} with op {1} should have a backward result {2}, forward result {3}"
   )
-  @VariableSource("equalsCases")
+  @MethodSource("equalsCases")
   void leftRight(
     OSMWithTags way,
     Condition op,
@@ -78,32 +80,34 @@ class ConditionTest {
     assertEquals(forwardExpectation, op.matchForward(way));
   }
 
-  static Stream<Arguments> otherCases = Stream.of(
-    Arguments.of(cycleway(), cyclewayPresent, WILDCARD),
-    Arguments.of(carTunnel(), cyclewayPresent, NONE),
-    Arguments.of(carTunnel(), cyclewayAbsent, EXACT),
-    Arguments.of(cobblestones(), cyclewayAbsent, EXACT),
-    Arguments.of(cycleway(), cyclewayAbsent, NONE),
-    Arguments.of(cycleway(), moreThanFourLanes, NONE),
-    Arguments.of(carTunnel(), moreThanFourLanes, NONE),
-    Arguments.of(pedestrianTunnel(), moreThanFourLanes, NONE),
-    Arguments.of(fiveLanes(), moreThanFourLanes, EXACT),
-    Arguments.of(fiveLanes(), lessThanFourLanes, NONE),
-    Arguments.of(threeLanes(), lessThanFourLanes, EXACT),
-    Arguments.of(carTunnel(), lessThanFourLanes, NONE),
-    Arguments.of(cycleway(), lessThanFourLanes, NONE),
-    Arguments.of(fiveLanes(), betweenFiveAndThreeLanes, EXACT),
-    Arguments.of(threeLanes(), betweenFiveAndThreeLanes, EXACT),
-    Arguments.of(veryBadSmoothness(), smoothnessBadAndWorseThanBad, EXACT),
-    Arguments.of(cobblestones(), smoothnessBadAndWorseThanBad, NONE),
-    Arguments.of(excellentSmoothness(), smoothnessBadAndWorseThanBad, NONE),
-    Arguments.of(noSidewalk(), noSidewalk, EXACT),
-    Arguments.of(highwayTertiary(), noSidewalk, EXACT),
-    Arguments.of(sidewalkBoth(), noSidewalk, NONE)
-  );
+  static Stream<Arguments> otherCases() {
+    return Stream.of(
+      Arguments.of(cycleway(), cyclewayPresent, WILDCARD),
+      Arguments.of(carTunnel(), cyclewayPresent, NONE),
+      Arguments.of(carTunnel(), cyclewayAbsent, EXACT),
+      Arguments.of(cobblestones(), cyclewayAbsent, EXACT),
+      Arguments.of(cycleway(), cyclewayAbsent, NONE),
+      Arguments.of(cycleway(), moreThanFourLanes, NONE),
+      Arguments.of(carTunnel(), moreThanFourLanes, NONE),
+      Arguments.of(pedestrianTunnel(), moreThanFourLanes, NONE),
+      Arguments.of(fiveLanes(), moreThanFourLanes, EXACT),
+      Arguments.of(fiveLanes(), lessThanFourLanes, NONE),
+      Arguments.of(threeLanes(), lessThanFourLanes, EXACT),
+      Arguments.of(carTunnel(), lessThanFourLanes, NONE),
+      Arguments.of(cycleway(), lessThanFourLanes, NONE),
+      Arguments.of(fiveLanes(), betweenFiveAndThreeLanes, EXACT),
+      Arguments.of(threeLanes(), betweenFiveAndThreeLanes, EXACT),
+      Arguments.of(veryBadSmoothness(), smoothnessBadAndWorseThanBad, EXACT),
+      Arguments.of(cobblestones(), smoothnessBadAndWorseThanBad, NONE),
+      Arguments.of(excellentSmoothness(), smoothnessBadAndWorseThanBad, NONE),
+      Arguments.of(noSidewalk(), noSidewalk, EXACT),
+      Arguments.of(highwayTertiary(), noSidewalk, EXACT),
+      Arguments.of(sidewalkBoth(), noSidewalk, NONE)
+    );
+  }
 
   @ParameterizedTest(name = "way {0} with op {1} should have a result {2}")
-  @VariableSource("otherCases")
+  @MethodSource("otherCases")
   void otherTests(OSMWithTags way, Condition op, MatchResult expectation) {
     assertEquals(expectation, op.match(way));
   }

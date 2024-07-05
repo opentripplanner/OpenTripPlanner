@@ -73,7 +73,7 @@ public class MarkdownFormatter {
     return text.replace("|", "¦");
   }
 
-  /** Return whitespace witch can be used to indent inside a table cell. */
+  /** Return whitespace which can be used to indent inside a table cell. */
   public static String indentInTable(int level) {
     return level <= 0 ? "" : NBSP.repeat(3 * level);
   }

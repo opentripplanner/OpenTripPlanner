@@ -16,6 +16,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -48,7 +49,7 @@ public class TripMapperTest {
     var limitations = new AccessibilityLimitations_RelStructure();
     var access = new AccessibilityAssessment();
 
-    var transitBuilder = new OtpTransitServiceBuilder(issueStore);
+    var transitBuilder = new OtpTransitServiceBuilder(new StopModel(), issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -77,7 +78,10 @@ public class TripMapperTest {
 
   @Test
   public void mapTrip() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
+      issueStore
+    );
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -101,7 +105,10 @@ public class TripMapperTest {
 
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
+      issueStore
+    );
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);

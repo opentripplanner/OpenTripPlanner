@@ -49,7 +49,10 @@ public final class TripPatternBuilder
     this.hopGeometries =
       original.getGeometry() == null
         ? null
-        : IntStream.range(0, original.numberOfStops()).mapToObj(original::getHopGeometry).toList();
+        : IntStream
+          .range(0, original.numberOfStops() - 1)
+          .mapToObj(original::getHopGeometry)
+          .toList();
   }
 
   public TripPatternBuilder withName(String name) {

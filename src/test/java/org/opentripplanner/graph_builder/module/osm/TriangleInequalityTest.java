@@ -8,8 +8,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +30,7 @@ import org.opentripplanner.street.search.intersection_model.IntersectionTraversa
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {
@@ -49,12 +48,7 @@ public class TriangleInequalityTest {
   public static void onlyOnce() {
     graph = new Graph(new Deduplicator());
 
-    File file = new File(
-      URLDecoder.decode(
-        TriangleInequalityTest.class.getResource("NYC_small.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule.of(provider, graph).withAreaVisibility(true).build();
     osmModule.buildGraph();
@@ -186,8 +180,9 @@ public class TriangleInequalityTest {
       preferences
         .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
         .withStreet(street -> street.withTurnReluctance(1.0))
-        .withCar(car -> car.withSpeed(1.0).withReluctance(1.0))
+        .withCar(car -> car.withReluctance(1.0))
         .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+        .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
     );
 
     if (modes != null) {

@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
-
-// TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
 
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.
@@ -17,8 +16,9 @@ import org.opentripplanner.street.search.state.State;
 public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   private final double radiusMeters;
+
   /** A list of closest stops found while walking the graph */
-  public final List<NearbyStop> stopsFound = new ArrayList<>();
+  private final List<NearbyStop> stopsFound = new ArrayList<>();
 
   public StopFinderTraverseVisitor(double radiusMeters) {
     this.radiusMeters = radiusMeters;
@@ -27,17 +27,23 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   @Override
   public void visitEdge(Edge edge) {}
 
-  // Accumulate stops into ret as the search runs.
   @Override
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
-    if (vertex instanceof TransitStopVertex) {
-      stopsFound.add(NearbyStop.nearbyStopForState(state, ((TransitStopVertex) vertex).getStop()));
+    if (vertex instanceof TransitStopVertex tsv) {
+      stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
     }
   }
 
   @Override
   public void visitEnqueue() {}
+
+  /**
+   * @return A de-duplicated list of nearby stops found by this visitor.
+   */
+  public List<NearbyStop> stopsFound() {
+    return ListUtils.distinctByKey(stopsFound, ns -> ns.stop);
+  }
 
   /**
    * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been

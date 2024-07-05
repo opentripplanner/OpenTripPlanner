@@ -183,10 +183,10 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
       .of(RaptorRequest.class)
       .addEnum("profile", profile)
       .addBoolIfTrue("reverse", searchDirection.isInReverse())
-      .addCol("optimizations", optimizations)
+      .addCol("optimizations", optimizations, defaults.optimizations())
+      .addObj("searchParams", searchParams)
       .addObj("multiCriteria", multiCriteria, defaults.multiCriteria())
       .addObj("debug", debug, defaults.debug())
-      .addObj("searchParams", searchParams)
       .addBoolIfTrue("withPerformanceTimers", performanceTimers != RaptorTimers.NOOP)
       .toString();
   }

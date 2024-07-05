@@ -1,0 +1,6 @@
+{
+  vehicleParkings {
+    name
+    vehicleParkingId
+  }
+}

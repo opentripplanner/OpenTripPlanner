@@ -20,7 +20,6 @@ public class CommandLineParametersTest {
   public void setUp() {
     subject = CommandLineParameters.createCliForTest(BASE_DIR);
     subject.port = 13524;
-    subject.securePort = 13525;
   }
 
   @Test

@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -12,13 +12,13 @@ public class MqttGtfsRealtimeUpdaterConfig {
   public static MqttGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
     return new MqttGtfsRealtimeUpdaterParameters(
       configRef,
-      c.of("feedId").since(NA).summary("The feed id to apply the updates to.").asString(null),
-      c.of("url").since(NA).summary("URL of the MQTT broker.").asString(),
-      c.of("topic").since(NA).summary("The topic to subscribe to.").asString(),
-      c.of("qos").since(NA).summary("QOS level.").asInt(0),
+      c.of("feedId").since(V2_0).summary("The feed id to apply the updates to.").asString(),
+      c.of("url").since(V2_0).summary("URL of the MQTT broker.").asString(),
+      c.of("topic").since(V2_0).summary("The topic to subscribe to.").asString(),
+      c.of("qos").since(V2_0).summary("QOS level.").asInt(0),
       c
         .of("fuzzyTripMatching")
-        .since(NA)
+        .since(V2_0)
         .summary("Whether to match trips fuzzily.")
         .asBoolean(false),
       c

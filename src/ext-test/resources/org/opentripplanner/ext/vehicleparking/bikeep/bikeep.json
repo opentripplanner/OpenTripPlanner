@@ -1,0 +1,303 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.996344,
+          60.405932
+        ]
+      },
+      "properties": {
+        "code": "224121",
+        "label": "Ågotnes Terminal",
+        "name": "#224121 Ågotnes Terminal",
+        "address": "Ågotnes",
+        "tags": [
+          "FREE",
+          "BIKE",
+          "PRIVATE",
+          "BOOKABLE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 10,
+          "online": 10,
+          "total": 10
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.666802,
+          59.436443
+        ]
+      },
+      "properties": {
+        "code": "226261",
+        "label": "Gågata Østre",
+        "name": "#226261 Gågata Østre",
+        "address": "Dronningens gate, Moss",
+        "tags": [
+          "FREE",
+          "PRIVATE",
+          "BOOKABLE",
+          "BIKE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 7,
+          "online": 10,
+          "total": 10
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.661444,
+          59.435401
+        ]
+      },
+      "properties": {
+        "code": "226259",
+        "label": "Gågata Vestre",
+        "name": "#226259 Gågata Vestre",
+        "address": "Dronningens gate, Moss",
+        "tags": [
+          "BIKE",
+          "FREE",
+          "PRIVATE",
+          "BOOKABLE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 5,
+          "online": 5,
+          "total": 5
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.774958,
+          59.946535
+        ]
+      },
+      "properties": {
+        "code": "223443",
+        "label": "Storo Storsenter",
+        "name": "#223443 Storo Storsenter",
+        "address": "Norway",
+        "tags": [
+          "BIKE",
+          "PRIVATE",
+          "BOOKABLE",
+          "FREE"
+        ],
+        "icon": {
+          "png": "https://assets.bikeep.com/locations/icons/bikeep.png",
+          "png2x": "https://assets.bikeep.com/locations/icons/bikeep@2x.png",
+          "svg": ""
+        },
+        "parking": {
+          "available": 17,
+          "online": 20,
+          "total": 20
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.501222,
+          59.914578
+        ]
+      },
+      "properties": {
+        "code": "224519",
+        "label": "Kolsås Sykkelhotell",
+        "name": "#224519 Kolsås Sykkelhotell",
+        "address": "Norway",
+        "tags": [
+          "PRIVATE",
+          "FREE",
+          "BOOKABLE",
+          "BIKE_HOUSE",
+          "BIKE"
+        ],
+        "icon": {
+          "png": "https://assets.bikeep.com/locations/icons/bikeep.png",
+          "png2x": "https://assets.bikeep.com/locations/icons/bikeep@2x.png",
+          "svg": ""
+        },
+        "parking": {
+          "available": 13,
+          "online": 22,
+          "total": 22
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.663716,
+          59.435539
+        ]
+      },
+      "properties": {
+        "code": "226260",
+        "label": "Gågata Midtre",
+        "name": "#226260 Gågata Midtre",
+        "address": "Dronningens gate, Moss",
+        "tags": [
+          "FREE",
+          "BOOKABLE",
+          "PRIVATE",
+          "BIKE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 5,
+          "online": 5,
+          "total": 5
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.320344,
+          60.463246
+        ]
+      },
+      "properties": {
+        "code": "226266",
+        "label": "Åsane Sykkelhus",
+        "name": "#226266 Åsane Sykkelhus",
+        "address": "Åsane terminal",
+        "tags": [
+          "BOOKABLE",
+          "BIKE",
+          "FREE",
+          "PRIVATE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 11,
+          "online": 12,
+          "total": 12
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.521137,
+          59.889181
+        ]
+      },
+      "properties": {
+        "code": "224112",
+        "label": "Sandvika Storsenter Kjørbokollen",
+        "name": "#224112 Sandvika Storsenter Kjørbokollen",
+        "address": "Brodtkorbsgate 7, Sandvika",
+        "tags": [
+          "PRIVATE",
+          "FREE",
+          "BIKE",
+          "BOOKABLE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 5,
+          "online": 5,
+          "total": 5
+        },
+        "renting": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.520496,
+          59.887412
+        ]
+      },
+      "properties": {
+        "code": "224111",
+        "label": "Sandvika Storsenter Nytorget",
+        "name": "#224111 Sandvika Storsenter Nytorget",
+        "address": "Sandviksveien 176, Sandvika",
+        "tags": [
+          "BIKE",
+          "BOOKABLE",
+          "PRIVATE",
+          "FREE"
+        ],
+        "icon": {
+          "png": "",
+          "png2x": "",
+          "svg": ""
+        },
+        "parking": {
+          "available": 13,
+          "online": 15,
+          "total": 15
+        },
+        "renting": null
+      }
+    }
+  ]
+}

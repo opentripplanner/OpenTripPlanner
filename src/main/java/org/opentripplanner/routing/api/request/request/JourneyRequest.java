@@ -6,22 +6,11 @@ import org.opentripplanner.routing.api.request.RequestModes;
 // TODO VIA: Javadoc
 public class JourneyRequest implements Cloneable, Serializable {
 
-  // TODO VIA (Hannes): Move the fields below into StreetRequest
-  private VehicleRentalRequest rental = new VehicleRentalRequest();
-  private VehicleParkingRequest parking = new VehicleParkingRequest();
   private TransitRequest transit = new TransitRequest();
   private StreetRequest access = new StreetRequest();
   private StreetRequest egress = new StreetRequest();
   private StreetRequest transfer = new StreetRequest();
   private StreetRequest direct = new StreetRequest();
-
-  public VehicleRentalRequest rental() {
-    return rental;
-  }
-
-  public VehicleParkingRequest parking() {
-    return parking;
-  }
 
   public TransitRequest transit() {
     return transit;
@@ -63,8 +52,6 @@ public class JourneyRequest implements Cloneable, Serializable {
   public JourneyRequest clone() {
     try {
       var clone = (JourneyRequest) super.clone();
-      clone.rental = this.rental.clone();
-      clone.parking = this.parking.clone();
       clone.transit = this.transit.clone();
       clone.access = this.access.clone();
       clone.egress = this.egress.clone();

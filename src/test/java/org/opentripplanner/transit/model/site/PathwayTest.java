@@ -20,7 +20,7 @@ class PathwayTest {
     .of(TransitModelForTest.id("1:node"))
     .withCoordinate(new WgsCoordinate(20, 30))
     .build();
-  private static final RegularStop TO = TransitModelForTest.stop("1:stop").build();
+  private static final RegularStop TO = TransitModelForTest.of().stop("1:stop").build();
   public static final int TRAVERSAL_TIME = 120;
 
   private final Pathway subject = Pathway

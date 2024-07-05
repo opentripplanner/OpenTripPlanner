@@ -7,12 +7,12 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 
 /**
  * Preferences for access/egress routing on street network
@@ -21,14 +21,31 @@ import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEn
  */
 public final class AccessEgressPreferences implements Serializable {
 
+  private static final TimeAndCostPenalty DEFAULT_PENALTY = TimeAndCostPenalty.of(
+    TimePenalty.of(ofMinutes(20), 2f),
+    1.5
+  );
+  private static final TimeAndCostPenalty FLEX_DEFAULT_PENALTY = TimeAndCostPenalty.of(
+    TimePenalty.of(ofMinutes(10), 1.3f),
+    1.3
+  );
+  private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = TimeAndCostPenaltyForEnum
+    .of(StreetMode.class)
+    .with(StreetMode.CAR_TO_PARK, DEFAULT_PENALTY)
+    .with(StreetMode.CAR_HAILING, DEFAULT_PENALTY)
+    .with(StreetMode.CAR_RENTAL, DEFAULT_PENALTY)
+    .with(StreetMode.FLEXIBLE, FLEX_DEFAULT_PENALTY)
+    .build();
+
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();
+
   private final TimeAndCostPenaltyForEnum<StreetMode> penalty;
   private final DurationForEnum<StreetMode> maxDuration;
   private final int maxStopCount;
 
   private AccessEgressPreferences() {
     this.maxDuration = durationForStreetModeOf(ofMinutes(45));
-    this.penalty = TimeAndCostPenaltyForEnum.ofDefault(StreetMode.class);
+    this.penalty = DEFAULT_TIME_AND_COST;
     this.maxStopCount = 500;
   }
 

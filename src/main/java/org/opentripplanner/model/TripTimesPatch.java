@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import java.util.List;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
@@ -9,15 +10,15 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  */
 public class TripTimesPatch {
 
-  private final TripTimes tripTimes;
+  private final RealTimeTripTimes tripTimes;
   private final List<Integer> skippedStopIndices;
 
-  public TripTimesPatch(TripTimes tripTimes, List<Integer> skippedStopIndices) {
+  public TripTimesPatch(RealTimeTripTimes tripTimes, List<Integer> skippedStopIndices) {
     this.tripTimes = tripTimes;
     this.skippedStopIndices = skippedStopIndices;
   }
 
-  public TripTimes getTripTimes() {
+  public RealTimeTripTimes getTripTimes() {
     return this.tripTimes;
   }
 

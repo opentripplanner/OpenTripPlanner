@@ -8,7 +8,15 @@ import org.opentripplanner.framework.model.Cost;
  */
 public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
 
+  /**
+   * Constant is zero and coefficient is zero. The result of {@code f(x) = 0}.
+   */
   public static CostLinearFunction ZERO = new CostLinearFunction(Cost.ZERO, 0.0);
+
+  /**
+   * Constant is zero and coefficient is one. The result of {@code f(x) = x}.
+   */
+  public static CostLinearFunction NORMAL = new CostLinearFunction(Cost.ZERO, 1.0);
 
   private CostLinearFunction(Cost a, double b) {
     super(a, b);

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.Lists;
@@ -7,9 +8,12 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
@@ -21,24 +25,23 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.transit.model.organization.Agency;
 
 public class OrcaFareService extends DefaultFareService {
-
-  private static final Logger LOG = LoggerFactory.getLogger(OrcaFareService.class);
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 
   public static final String COMM_TRANS_AGENCY_ID = "29";
   public static final String KC_METRO_AGENCY_ID = "1";
   public static final String SOUND_TRANSIT_AGENCY_ID = "40";
+  public static final String T_LINK_AGENCY_ID = "F1";
   public static final String EVERETT_TRANSIT_AGENCY_ID = "97";
   public static final String PIERCE_COUNTY_TRANSIT_AGENCY_ID = "3";
   public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
   public static final String SEATTLE_STREET_CAR_AGENCY_ID = "23";
   public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "WSF";
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
+  public static final String WHATCOM_AGENCY_ID = "14";
   public static final int ROUTE_TYPE_FERRY = 4;
   public static final String FEED_ID = "orca";
   private static final FareMedium ELECTRONIC_MEDIUM = new FareMedium(
@@ -49,6 +52,12 @@ public class OrcaFareService extends DefaultFareService {
     new FeedScopedId(FEED_ID, "cash"),
     "cash"
   );
+
+  protected enum TransferType {
+    ORCA_INTERAGENCY_TRANSFER,
+    SAME_AGENCY_TRANSFER,
+    NO_TRANSFER,
+  }
 
   protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
@@ -66,12 +75,88 @@ public class OrcaFareService extends DefaultFareService {
     SOUND_TRANSIT,
     SOUND_TRANSIT_BUS,
     SOUND_TRANSIT_SOUNDER,
+    SOUND_TRANSIT_T_LINK,
     SOUND_TRANSIT_LINK,
     WASHINGTON_STATE_FERRIES,
-    UNKNOWN,
+    WHATCOM_LOCAL,
+    WHATCOM_CROSS_COUNTY,
+    SKAGIT_LOCAL,
+    SKAGIT_CROSS_COUNTY,
+    UNKNOWN;
+
+    public TransferType getTransferType(FareType fareType) {
+      if (usesOrca(fareType) && this.permitsFreeTransfers()) {
+        return TransferType.ORCA_INTERAGENCY_TRANSFER;
+      } else if (this == KC_METRO || this == KITSAP_TRANSIT) {
+        return TransferType.SAME_AGENCY_TRANSFER;
+      }
+      return TransferType.NO_TRANSFER;
+    }
+
+    /**
+     * All transit agencies permit free transfers, apart from these.
+     */
+    public boolean permitsFreeTransfers() {
+      return switch (this) {
+        case WASHINGTON_STATE_FERRIES,
+          SKAGIT_TRANSIT,
+          WHATCOM_LOCAL,
+          WHATCOM_CROSS_COUNTY,
+          SKAGIT_CROSS_COUNTY -> false;
+        default -> true;
+      };
+    }
+
+    public boolean agencyAcceptsOrca() {
+      return switch (this) {
+        case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL -> false;
+        default -> true;
+      };
+    }
   }
 
-  static RideType getRideType(String agencyId, Route route) {
+  static class TransferData {
+
+    private Money transferDiscount;
+    private ZonedDateTime transferStartTime;
+
+    public Money getTransferDiscount() {
+      if (this.transferDiscount == null) {
+        return ZERO_USD;
+      }
+      return this.transferDiscount;
+    }
+
+    public Money getDiscountedLegPrice(Leg leg, Money legPrice) {
+      if (transferStartTime != null) {
+        var inFreeTransferWindow = inFreeTransferWindow(transferStartTime, leg.getStartTime());
+        if (inFreeTransferWindow) {
+          if (legPrice.greaterThan(transferDiscount)) {
+            this.transferStartTime = leg.getStartTime();
+            var discountedLegFare = legPrice.minus(this.transferDiscount);
+            this.transferDiscount = legPrice;
+            return discountedLegFare;
+          }
+          return Money.ZERO_USD;
+        }
+      }
+      // Start a new transfer
+      this.transferDiscount = legPrice;
+      this.transferStartTime = leg.getStartTime();
+      return legPrice;
+    }
+  }
+
+  /**
+   * Categorizes a leg based on various parameters.
+   * The classifications determine the various rules and fares applied to the leg.
+   * @param leg Leg to be classified.
+   * @return RideType classification
+   */
+  static RideType getRideType(Leg leg) {
+    var agencyId = leg.getAgency().getId().getId();
+    var route = leg.getRoute();
+    var tripId = leg.getTrip().getId().getId();
     return switch (agencyId) {
       case COMM_TRANS_AGENCY_ID -> {
         try {
@@ -84,7 +169,6 @@ public class OrcaFareService extends DefaultFareService {
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         }
       }
@@ -98,15 +182,9 @@ public class OrcaFareService extends DefaultFareService {
           // Lettered routes exist, are not an error.
         }
 
-        if (
-          route.getGtfsType() == ROUTE_TYPE_FERRY &&
-          routeLongNameFallBack(route).contains("Water Taxi: West Seattle")
-        ) {
+        if ("973".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
-        } else if (
-          route.getGtfsType() == ROUTE_TYPE_FERRY &&
-          route.getDescription().contains("Water Taxi: Vashon Island")
-        ) {
+        } else if ("975".equals(route.getShortName())) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
         yield RideType.KC_METRO;
@@ -120,16 +198,31 @@ public class OrcaFareService extends DefaultFareService {
           }
           yield RideType.PIERCE_COUNTY_TRANSIT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }
       case SOUND_TRANSIT_AGENCY_ID -> RideType.SOUND_TRANSIT;
       case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
-      case SKAGIT_TRANSIT_AGENCY_ID -> RideType.SKAGIT_TRANSIT;
+      case SKAGIT_TRANSIT_AGENCY_ID -> Set.of("80X", "90X").contains(route.getShortName())
+        ? RideType.SKAGIT_CROSS_COUNTY
+        : RideType.SKAGIT_LOCAL;
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
-      case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
+      case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
+      case KITSAP_TRANSIT_AGENCY_ID -> {
+        if (route.getGtfsType() == ROUTE_TYPE_FERRY) {
+          // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
+          if (tripId.contains("east")) {
+            yield RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
+          } else if (tripId.contains("west")) {
+            yield RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
+          }
+        }
+        yield RideType.KITSAP_TRANSIT;
+      }
+      case WHATCOM_AGENCY_ID -> "80X".equals(route.getShortName())
+        ? RideType.WHATCOM_CROSS_COUNTY
+        : RideType.WHATCOM_LOCAL;
       default -> RideType.UNKNOWN;
     };
   }
@@ -154,219 +247,147 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Checks a routeShortName against a given string after removing spaces
+   * Define which discount fare should be applied based on the fare type. If the ride type is
+   * unknown the discount fare can not be applied, use the default fare.
    */
-  private static boolean checkShortName(Route route, String compareString) {
-    String cleanCompareString = compareString.replaceAll("-", "").replaceAll(" ", "");
-    if (route.getShortName() != null) {
-      return route
-        .getShortName()
-        .replaceAll("-", "")
-        .replaceAll(" ", "")
-        .equalsIgnoreCase(cleanCompareString);
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Cleans a station name by removing spaces and special phrases.
-   */
-  private static String cleanStationName(String s) {
-    return s
-      .replaceAll(" ", "")
-      .replaceAll("(Northbound)", "")
-      .replaceAll("(Southbound)", "")
-      .replaceAll("Station", "")
-      .toLowerCase();
-  }
-
-  /**
-   * Classify the ride type based on the route information provided. In most cases the agency name is sufficient. In
-   * some cases the route description and short name are needed to define inner agency ride types. For Kitsap, the
-   * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
-   */
-  private static RideType classify(Route route, String tripId) {
-    var rideType = getRideType(route.getAgency().getId().getId(), route);
+  private Optional<Money> getLegFare(
+    FareType fareType,
+    RideType rideType,
+    Money defaultFare,
+    Leg leg
+  ) {
     if (rideType == null) {
-      return null;
+      return Optional.of(defaultFare);
     }
-    if (
-      rideType == RideType.KITSAP_TRANSIT &&
-      route.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
-      route.getGtfsType() == ROUTE_TYPE_FERRY
-    ) {
-      // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
-      if (tripId.contains("east")) {
-        rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
-      } else if (tripId.contains("west")) {
-        rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
-      }
-    } else if (rideType == RideType.SOUND_TRANSIT && checkShortName(route, "1 Line")) {
-      rideType = RideType.SOUND_TRANSIT_LINK;
-    } else if (
-      rideType == RideType.SOUND_TRANSIT &&
-      (checkShortName(route, "S Line") || checkShortName(route, "N Line"))
-    ) {
-      rideType = RideType.SOUND_TRANSIT_SOUNDER;
-    } else if (rideType == RideType.SOUND_TRANSIT) { //if it isn't Link or Sounder, then...
-      rideType = RideType.SOUND_TRANSIT_BUS;
-    }
-    return rideType;
-  }
-
-  /**
-   * Define which discount fare should be applied based on the fare type. If the ride type is unknown the discount
-   * fare can not be applied, use the default fare.
-   */
-  private Money getLegFare(FareType fareType, RideType rideType, Money defaultFare, Leg leg) {
-    if (rideType == null) {
-      return defaultFare;
+    // Filter out agencies that don't accept ORCA from the electronic fare type
+    if (usesOrca(fareType) && !rideType.agencyAcceptsOrca()) {
+      return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare();
+      case youth, electronicYouth -> Optional.of(getYouthFare());
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg.getRoute());
-      case electronicSenior, senior -> getSeniorFare(
-        fareType,
-        rideType,
-        defaultFare,
-        leg.getRoute()
-      );
+      case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
-      default -> defaultFare;
+      default -> Optional.of(defaultFare);
     };
+  }
+
+  private static Optional<Money> optionalUSD(float amount) {
+    return Optional.of(usDollars(amount));
   }
 
   /**
    * Apply regular discount fares. If the ride type cannot be matched the default fare is used.
    */
-  private Money getRegularFare(FareType fareType, RideType rideType, Money defaultFare, Leg leg) {
+  private Optional<Money> getRegularFare(
+    FareType fareType,
+    RideType rideType,
+    Money defaultFare,
+    Leg leg
+  ) {
     Route route = leg.getRoute();
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> usDollars(5.75f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> usDollars(5f);
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> usDollars(2f);
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> usDollars(10f);
-      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName(),
-        fareType,
-        defaultFare
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType)
+        ? optionalUSD(5.75f)
+        : optionalUSD(6.75f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType) ? optionalUSD(5f) : optionalUSD(5.75f);
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(2f);
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD(10f);
+      case WASHINGTON_STATE_FERRIES -> Optional.of(
+        getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
-      case SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> getSoundTransitFare(
-        leg,
-        fareType,
-        defaultFare,
-        rideType
-      );
-      case SOUND_TRANSIT_BUS -> usDollars(3.25f);
-      default -> defaultFare;
+      case SOUND_TRANSIT_BUS -> optionalUSD(3.25f);
+      case WHATCOM_LOCAL,
+        WHATCOM_CROSS_COUNTY,
+        SKAGIT_LOCAL,
+        SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
+        ? Optional.empty()
+        : Optional.of(defaultFare);
+      default -> Optional.of(defaultFare);
     };
-  }
-
-  /**
-   *  Calculate the correct Link fare from a "ride" including start and end stations.
-   */
-  private Money getSoundTransitFare(
-    Leg leg,
-    FareType fareType,
-    Money defaultFare,
-    RideType rideType
-  ) {
-    String start = cleanStationName(leg.getFrom().name.toString());
-    String end = cleanStationName(leg.getTo().name.toString());
-    // Fares are the same no matter the order of the stations
-    // Therefore, the fares DB only contains each station pair once
-    // If no match is found, try the reversed order
-    String lookupKey = String.format("%s-%s", start, end);
-    String reverseLookupKey = String.format("%s-%s", end, start);
-    Map<String, Map<FareType, Money>> fareModel = (rideType == RideType.SOUND_TRANSIT_LINK)
-      ? OrcaFaresData.linkFares
-      : OrcaFaresData.sounderFares;
-    Map<FareType, Money> fare = Optional
-      .ofNullable(fareModel.get(lookupKey))
-      .orElseGet(() -> fareModel.get(reverseLookupKey));
-
-    return (fare != null) ? fare.get(fareType) : defaultFare;
   }
 
   /**
    * Apply Orca lift discount fares based on the ride type.
    */
-  private Money getLiftFare(RideType rideType, Money defaultFare, Route route) {
+  private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Route route) {
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> usDollars(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> usDollars(2f);
-      case KC_WATER_TAXI_VASHON_ISLAND -> usDollars(4.5f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> usDollars(3.75f);
-      case KITSAP_TRANSIT -> usDollars(1f);
+      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
+      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(4.5f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(3.75f);
       case KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
+        SOUND_TRANSIT_T_LINK,
+        KITSAP_TRANSIT,
         EVERETT_TRANSIT,
-        SEATTLE_STREET_CAR -> usDollars(1.5f);
-      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName(),
-        FareType.electronicSpecial,
-        defaultFare
+        PIERCE_COUNTY_TRANSIT,
+        SEATTLE_STREET_CAR -> optionalUSD(1.00f);
+      case WASHINGTON_STATE_FERRIES -> Optional.of(
+        getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, defaultFare)
       );
-      default -> defaultFare;
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD((1f));
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD((5f));
+      case SKAGIT_LOCAL,
+        SKAGIT_CROSS_COUNTY,
+        WHATCOM_CROSS_COUNTY,
+        WHATCOM_LOCAL -> Optional.empty();
+      default -> Optional.of(defaultFare);
     };
   }
 
   /**
    * Apply senior discount fares based on the fare and ride types.
    */
-  private Money getSeniorFare(
+  private Optional<Money> getSeniorFare(
     FareType fareType,
     RideType rideType,
     Money defaultFare,
-    Route route
+    Leg leg
   ) {
+    var route = leg.getRoute();
+    var regularFare = getRegularFare(fareType, rideType, defaultFare, leg);
+    // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> usDollars(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> usDollars(2f);
-      case EVERETT_TRANSIT, SKAGIT_TRANSIT -> usDollars(0.5f);
-      case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT -> fareType.equals( // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
-          FareType.electronicSenior
-        )
-        ? usDollars(1f)
-        : defaultFare;
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
-        ? usDollars(1f)
-        : usDollars(2f);
-      case KC_WATER_TAXI_VASHON_ISLAND -> usDollars(3f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> usDollars(2.5f);
-      case KC_METRO,
+      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
+      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
+      case EVERETT_TRANSIT -> optionalUSD(0.5f);
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
-        SOUND_TRANSIT_SOUNDER -> usDollars(1f);
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
-        ? usDollars(5f)
-        : usDollars(10f);
+        SOUND_TRANSIT_SOUNDER,
+        SOUND_TRANSIT_T_LINK,
+        KC_METRO,
+        PIERCE_COUNTY_TRANSIT,
+        SEATTLE_STREET_CAR,
+        KITSAP_TRANSIT -> optionalUSD(1f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD(5f);
       // Discount specific to Skagit transit and not Orca.
-      case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
-        route.getLongName(),
-        fareType,
-        defaultFare
+      case WASHINGTON_STATE_FERRIES -> Optional.of(
+        getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
-      default -> defaultFare;
+      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> Optional.of(defaultFare.half());
+      default -> Optional.of(defaultFare);
     };
   }
 
   /**
-   * Apply youth discount fares based on the ride type.
-   * Youth ride free in Washington.
+   * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
   private Money getYouthFare() {
     return Money.ZERO_USD;
   }
 
   /**
-   * Get the washington state ferries fare matching the route long name and fare type. If no match is found, return
-   * the default fare.
+   * Get the washington state ferries fare matching the route long name and fare type. If no match
+   * is found, return the default fare.
    */
   private Money getWashingtonStateFerriesFare(
     I18NString routeLongName,
@@ -402,8 +423,9 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Get the ride price for a single leg. If testing, this class is being called directly so the required agency cash
-   * values are not available therefore the default test price is used instead.
+   * Get the ride price for a single leg. If testing, this class is being called directly so the
+   * required agency cash values are not available therefore the default test price is used
+   * instead.
    */
   protected Optional<Money> getRidePrice(
     Leg leg,
@@ -414,104 +436,93 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used. If free transfers
-   * are applicable, the most expensive discount fare across all legs is added to the final cumulative price.
-   *
-   * The computed fare for Orca card users takes into account realtime trip updates where available, so that, for
-   * instance, when a leg on a long itinerary is delayed to begin after the initial two hour window has expired,
-   * the calculated fare for that trip will be two one-way fares instead of one.
+   * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used.
+   * If free transfers are applicable, the most expensive discount fare across all legs is added to
+   * the final cumulative price.
+   * <p>
+   * The computed fare for Orca card users takes into account real-time trip updates where available,
+   * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
+   * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
+   * one.
    */
   @Override
-  public boolean populateFare(
-    ItineraryFares fare,
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    ZonedDateTime freeTransferStartTime = null;
+    var fare = ItineraryFares.empty();
     Money cost = Money.ZERO_USD;
-    Money orcaFareDiscount = Money.ZERO_USD;
-    for (Leg leg : legs) {
-      RideType rideType = classify(leg.getRoute(), leg.getTrip().getId().getId());
-      boolean ridePermitsFreeTransfers = permitsFreeTransfers(rideType);
-      if (freeTransferStartTime == null && ridePermitsFreeTransfers) {
-        // The start of a free transfer must be with a transit agency that permits it!
-        freeTransferStartTime = leg.getStartTime();
-      }
-      Optional<Money> singleLegPrice = getRidePrice(leg, fareType, fareRules);
-      Money legFare = singleLegPrice
-        .map(slp -> getLegFare(fareType, rideType, slp, leg))
-        .orElse(Money.ZERO_USD);
-      boolean inFreeTransferWindow = inFreeTransferWindow(
-        freeTransferStartTime,
-        leg.getStartTime()
-      );
-      if (hasFreeTransfers(fareType, rideType) && inFreeTransferWindow) {
-        // If using Orca (free transfers), the total fare should be equivalent to the
-        // most expensive leg of the journey.
-        // If the new fare is more than the current ORCA amount, the transfer is extended.
-        if (legFare.greaterThan(orcaFareDiscount)) {
-          freeTransferStartTime = leg.getStartTime();
-          // Note: on first leg, discount will be 0 meaning no transfer was applied.
-          addLegFareProduct(leg, fare, fareType, legFare.minus(orcaFareDiscount), orcaFareDiscount);
-          orcaFareDiscount = legFare;
-        } else {
-          // Ride is free, counts as a transfer if legFare is NOT free
-          addLegFareProduct(
-            leg,
-            fare,
-            fareType,
-            Money.ZERO_USD,
-            legFare.isPositive() ? orcaFareDiscount : Money.ZERO_USD
-          );
-        }
-      } else if (usesOrca(fareType) && !inFreeTransferWindow) {
-        // If using Orca and outside of the free transfer window, add the cumulative Orca fare (the maximum leg
-        // fare encountered within the free transfer window).
-        cost = cost.plus(orcaFareDiscount);
+    var orcaFareDiscount = new TransferData();
+    HashMap<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
 
-        // Reset the free transfer start time and next Orca fare as needed.
-        if (ridePermitsFreeTransfers) {
-          // The leg is using a ride type that permits free transfers.
-          // The next free transfer window begins at the start time of this leg.
-          freeTransferStartTime = leg.getStartTime();
-          // Reset the Orca fare to be the fare of this leg.
-          orcaFareDiscount = legFare;
+    for (Leg leg : legs) {
+      RideType rideType = getRideType(leg);
+      assert rideType != null;
+      Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
+      Optional<Money> optionalLegFare = singleLegPrice.flatMap(slp ->
+        getLegFare(fareType, rideType, slp, leg)
+      );
+      if (optionalLegFare.isEmpty()) {
+        // If there is no fare for this leg then skip the rest of the logic.
+        continue;
+      }
+      Money legFare = optionalLegFare.get();
+
+      var transferType = rideType.getTransferType(fareType);
+      if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
+        // Important to get transfer discount before calculating next leg price
+        var transferDiscount = orcaFareDiscount.getTransferDiscount();
+        var discountedFare = orcaFareDiscount.getDiscountedLegPrice(leg, legFare);
+        addLegFareProduct(
+          leg,
+          fare,
+          fareType,
+          discountedFare,
+          legFare.greaterThan(ZERO_USD) ? transferDiscount : ZERO_USD
+        );
+        cost = cost.plus(discountedFare);
+      } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
+        TransferData transferData;
+        if (perAgencyTransferDiscount.containsKey(leg.getAgency().getName())) {
+          transferData = perAgencyTransferDiscount.get(leg.getAgency().getName());
         } else {
-          // The leg is not using a ride type that permits free transfers.
-          // Since there are no free transfers for this leg, increase the total cost by the fare for this leg.
-          cost = cost.plus(legFare);
-          // The current free transfer window has expired and won't start again until another leg is
-          // encountered that does have free transfers.
-          freeTransferStartTime = null;
-          // The previous Orca fare has been applied to the total cost. Also, the non-free transfer cost has
-          // also been applied to the total cost. Therefore, the next Orca cost for the next free-transfer
-          // window needs to be reset to 0 so that it is not applied after looping through all rides.
-          orcaFareDiscount = Money.ZERO_USD;
+          transferData = new TransferData();
+          perAgencyTransferDiscount.put(leg.getAgency().getName(), transferData);
         }
-        addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
+        var transferDiscount = transferData.getTransferDiscount();
+        var discountedFare = transferData.getDiscountedLegPrice(leg, legFare);
+        addLegFareProduct(
+          leg,
+          fare,
+          fareType,
+          discountedFare,
+          legFare.greaterThan(ZERO_USD) ? transferDiscount : ZERO_USD
+        );
+        cost = cost.plus(discountedFare);
       } else {
         // If not using Orca, add the agency's default price for this leg.
         addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
         cost = cost.plus(legFare);
       }
     }
-    cost = cost.plus(orcaFareDiscount);
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
-      fare.addFare(fareType, cost);
-      return true;
-    } else {
-      return false;
+      var fp = FareProduct
+        .of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost)
+        .build();
+      fare.addItineraryProducts(List.of(fp));
     }
+    return fare;
   }
 
   /**
    * Adds a leg fare product to the given itinerary fares object
-   * @param leg The leg to create a fareproduct for
-   * @param itineraryFares The itinerary fares to store the fare product in
-   * @param fareType Fare type (split into container and rider category)
-   * @param totalFare Total fare paid after transfer
+   *
+   * @param leg              The leg to create a fareproduct for
+   * @param itineraryFares   The itinerary fares to store the fare product in
+   * @param fareType         Fare type (split into container and rider category)
+   * @param totalFare        Total fare paid after transfer
    * @param transferDiscount Transfer discount applied
    */
   private static void addLegFareProduct(
@@ -548,11 +559,28 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Check if trip falls within the transfer time window.
-   * @param freeTransferStartTime
-   * @param currentLegStartTime
+   * In the base class only the rules for a specific feed are selected and then passed to the
+   * fare engine, however here we want to explicitly compute fares across feed boundaries.
    */
-  private boolean inFreeTransferWindow(
+  @Nullable
+  @Override
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    return fareRulesPerType.get(fareType);
+  }
+
+  /**
+   * Disables functionality grouping legs by their feed.
+   * This ensures we can calculate transfers between agencies/feeds.
+   */
+  @Override
+  protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
+    return Map.of(FEED_ID, fareLegs);
+  }
+
+  /**
+   * Check if trip falls within the transfer time window.
+   */
+  private static boolean inFreeTransferWindow(
     ZonedDateTime freeTransferStartTime,
     ZonedDateTime currentLegStartTime
   ) {
@@ -560,27 +588,6 @@ public class OrcaFareService extends DefaultFareService {
     if (freeTransferStartTime == null) return false;
     Duration duration = Duration.between(freeTransferStartTime, currentLegStartTime);
     return duration.compareTo(MAX_TRANSFER_DISCOUNT_DURATION) < 0;
-  }
-
-  /**
-   * A free transfer can be applied if using Orca and the transit agency permits free transfers.
-   */
-  private boolean hasFreeTransfers(FareType fareType, RideType rideType) {
-    // King County Metro allows transfers on cash fare
-    return (
-      (permitsFreeTransfers(rideType) && usesOrca(fareType)) ||
-      (rideType == RideType.KC_METRO && !usesOrca(fareType))
-    );
-  }
-
-  /**
-   * All transit agencies permit free transfers, apart from these.
-   */
-  private boolean permitsFreeTransfers(RideType rideType) {
-    return switch (rideType) {
-      case WASHINGTON_STATE_FERRIES, SKAGIT_TRANSIT -> false;
-      default -> true;
-    };
   }
 
   /**

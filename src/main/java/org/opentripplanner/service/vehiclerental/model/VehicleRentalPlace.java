@@ -2,7 +2,7 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -80,22 +80,22 @@ public interface VehicleRentalPlace {
   /** Deep links for this rental station or individual vehicle */
   VehicleRentalStationUris getRentalUris();
 
-  default boolean networkIsNotAllowed(VehicleRentalRequest request) {
+  default boolean networkIsNotAllowed(VehicleRentalPreferences preferences) {
     if (
       getNetwork() == null &&
-      (!request.allowedNetworks().isEmpty() || !request.bannedNetworks().isEmpty())
+      (!preferences.allowedNetworks().isEmpty() || !preferences.bannedNetworks().isEmpty())
     ) {
       return false;
     }
 
-    if (request.bannedNetworks().contains(getNetwork())) {
+    if (preferences.bannedNetworks().contains(getNetwork())) {
       return true;
     }
 
-    if (request.allowedNetworks().isEmpty()) {
+    if (preferences.allowedNetworks().isEmpty()) {
       return false;
     }
 
-    return !request.allowedNetworks().contains(getNetwork());
+    return !preferences.allowedNetworks().contains(getNetwork());
   }
 }

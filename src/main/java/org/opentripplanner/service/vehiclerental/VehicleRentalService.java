@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * The read-only service for getting information about rental vehicles.
- *
+ * <p>
  * For writing data see {@link VehicleRentalRepository}
  */
 public interface VehicleRentalService {
@@ -32,7 +32,7 @@ public interface VehicleRentalService {
    * over a set, but we could use a spatial index if the number of vehicle rental stations is high
    * enough for performance to be a concern.
    */
-  List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
+  List<VehicleRentalStation> getVehicleRentalStationForEnvelope(
     double minLon,
     double minLat,
     double maxLon,

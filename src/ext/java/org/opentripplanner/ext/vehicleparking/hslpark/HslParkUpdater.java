@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -11,6 +12,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Vehicle parking updater class for https://github.com/HSLdevcom/parkandrideAPI format APIs. There
@@ -18,6 +21,8 @@ import org.opentripplanner.updater.spi.DataSource;
  * https://p.hsl.fi/docs/index.html) but this updater supports both formats.
  */
 public class HslParkUpdater implements DataSource<VehicleParking> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(HslParkUpdater.class);
 
   private static final String JSON_PARSE_PATH = "results";
 
@@ -43,31 +48,35 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
       new HslParkToVehicleParkingMapper(feedId, openingHoursCalendarService, parameters.timeZone());
     vehicleParkingGroupMapper = new HslHubToVehicleParkingGroupMapper(feedId);
     parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
+    var otpHttpClientFactory = new OtpHttpClientFactory();
     facilitiesDownloader =
       new HslFacilitiesDownloader(
         parameters.facilitiesUrl(),
         JSON_PARSE_PATH,
-        vehicleParkingMapper::parsePark
+        vehicleParkingMapper::parsePark,
+        otpHttpClientFactory
       );
     hubsDownloader =
       new HslHubsDownloader(
         parameters.hubsUrl(),
         JSON_PARSE_PATH,
-        vehicleParkingGroupMapper::parseHub
+        vehicleParkingGroupMapper::parseHub,
+        otpHttpClientFactory
       );
     utilizationsDownloader =
       new JsonDataListDownloader<>(
         parameters.utilizationsUrl(),
         "",
         parkPatchMapper::parseUtilization,
-        null
+        Map.of(),
+        otpHttpClientFactory.create(LOG)
       );
     this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();
   }
 
   /**
    * Update the data from the sources. It first fetches parks from the facilities URL and park
-   * groups from hubs URL and then realtime updates from utilizations URL. If facilitiesFrequencySec
+   * groups from hubs URL and then real-time updates from utilizations URL. If facilitiesFrequencySec
    * is configured to be over 0, it also occasionally retches the parks as new parks might have been
    * added or the state of the old parks might have changed.
    *

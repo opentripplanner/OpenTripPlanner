@@ -63,7 +63,7 @@ public class SpeedTestRequest {
     request.setTo(input.toPlace());
 
     // Filter the results inside the SpeedTest, not in the itineraries filter,
-    // when ignoring street results. This will use the default witch is 50.
+    // when ignoring street results. This will use the default which is 50.
     if (!config.ignoreStreetResults) {
       request.setNumItineraries(opts.numOfItineraries());
     }

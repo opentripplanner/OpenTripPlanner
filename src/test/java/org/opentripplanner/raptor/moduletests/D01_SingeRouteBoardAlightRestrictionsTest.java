@@ -72,7 +72,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s 0tx $940]";
+    var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s Tₓ0 C₁940]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("4m50s", TX_0, T00_00, T00_10)

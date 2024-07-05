@@ -22,13 +22,14 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -90,9 +91,11 @@ public class SpeedTest {
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
+    var transitService = new DefaultTransitService(transitModel);
+
     UpdaterConfigurator.configure(
       graph,
-      new DefaultVehiclePositionService(),
+      new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
       transitModel,
       config.updatersConfig
@@ -109,12 +112,15 @@ public class SpeedTest {
         graph,
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
-        List::of,
+        VectorTileConfig.DEFAULT,
         TestServerContext.createWorldEnvelopeService(),
-        TestServerContext.createVehiclePositionService(),
+        TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
+        TestServerContext.createEmissionsService(),
         config.flexConfig,
         List.of(),
+        null,
+        TestServerContext.createStreetLimitationParametersService(),
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

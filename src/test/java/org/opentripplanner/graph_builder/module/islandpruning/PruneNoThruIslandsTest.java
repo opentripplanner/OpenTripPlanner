@@ -1,20 +1,16 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class PruneNoThruIslandsTest {
 
@@ -22,12 +18,21 @@ public class PruneNoThruIslandsTest {
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
+    graph =
+      buildOsmGraph(
+        ResourceLoader
+          .of(PruneNoThruIslandsTest.class)
+          .file("herrenberg-island-prune-nothru.osm.pbf"),
+        10,
+        2,
+        50,
+        250
+      );
   }
 
   @Test
   public void bicycleIslandsBecomeNoThru() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -40,7 +45,7 @@ public class PruneNoThruIslandsTest {
 
   @Test
   public void carIslandsBecomeNoThru() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -61,38 +66,5 @@ public class PruneNoThruIslandsTest {
         .collect(Collectors.toSet())
         .contains("159830257")
     );
-  }
-
-  private static Graph buildOsmGraph(String osmPath) {
-    try {
-      var deduplicator = new Deduplicator();
-      var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(new StopModel(), deduplicator);
-      // Add street data from OSM
-      File osmFile = new File(osmPath);
-      OsmProvider osmProvider = new OsmProvider(osmFile, true);
-      OsmModule osmModule = OsmModule.of(osmProvider, graph).withEdgeNamer(new TestNamer()).build();
-
-      osmModule.buildGraph();
-
-      transitModel.index();
-      graph.index(transitModel.getStopModel());
-
-      // Prune floating islands and set noThru where necessary
-      PruneIslands pruneIslands = new PruneIslands(
-        graph,
-        transitModel,
-        DataImportIssueStore.NOOP,
-        null
-      );
-      pruneIslands.setPruningThresholdIslandWithoutStops(40);
-      pruneIslands.setPruningThresholdIslandWithStops(5);
-      pruneIslands.setAdaptivePruningFactor(1);
-      pruneIslands.buildGraph();
-
-      return graph;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 }

@@ -6,7 +6,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 
 * **Norway (nationwide)** Since November 2017, the national integrated ticketing agency Entur has
   prodvided a [national journey planner](https://en-tur.no/) which consumes schedule data in the EU
-  standard NeTEx format with SIRI realtime updates. Entur has contributed greatly to the OTP2 effort
+  standard NeTEx format with SIRI real-time updates. Entur has contributed greatly to the OTP2 effort
   and primarily uses OTP2 in production, handling peak loads in excess of 20 requests per second. 
   Most regional agencies in Norway, like **Ruter, Oslo area** uses OTP as a service provided by Entur.
 * **Finland (nationwide)** The [Helsinki Regional Transport Authority](https://www.reittiopas.fi/),
@@ -22,7 +22,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   service [Matkahuolto](https://en.wikipedia.org/wiki/Matkahuolto)
   has [developed a trip planner in partnership with Kyyti](https://www.kyyti.com/matkahuoltos-new-app-brings-real-travel-chains-within-the-reach-of-citizens-in-addition-to-coach-travel-hsl-tickets-are-also-available/).
 * **Skåne, Sweden**, the JourneyPlanner and mobile app for the regional transit agency [Skånetrafiken](https://www.skanetrafiken.se/)
-  uses OTP2 with the nordic profile of NeTEx and SIRI for realtime updates.
+  uses OTP2 with the nordic profile of NeTEx and SIRI for real-time updates.
 * [**Northern Colorado**](https://discover.rideno.co/)
 * [**Philadelphia and surrounding areas**](https://plan.septa.org)
 * **Portland, Oregon** TriMet is the agency that originally started the OpenTripPlanner project.

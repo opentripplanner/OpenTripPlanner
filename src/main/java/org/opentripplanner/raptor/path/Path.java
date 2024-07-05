@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -18,7 +19,15 @@ import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 
 /**
- * The result path of a Raptor search describing the one possible journey.
+ * The result of a Raptor search is a path describing the one possible journey. The path is the
+ * main DTO part of the Raptor result, but it is also used internally in Raptor. Hence, it is a bit
+ * more complex, and it has more responsiblilities than it should.
+ * <p>
+ * To improve the design, Raptor should not use the path internally. Instead, there should
+ * be a special destination arrival that could take over the Raptor responsibilities. The
+ * path would still need to be constructed at the time of arrival and then become a part of the
+ * destination arrival. The reason for this is that the data necessary to create a path is not
+ * kept in the Raptor state between rounds.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -26,9 +35,11 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   private final int iterationDepartureTime;
   private final int startTime;
+  private final int startTimeInclusivePenalty;
   private final int endTime;
+  private final int endTimeInclusivePenalty;
   private final int numberOfTransfers;
-  private final int generalizedCost;
+  private final int c1;
   private final int c2;
   private final AccessPathLeg<T> accessLeg;
   private final EgressPathLeg<T> egressLeg;
@@ -39,31 +50,39 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     int startTime,
     int endTime,
     int numberOfTransfers,
-    int generalizedCost
+    int c1
   ) {
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = startTime;
+    this.startTimeInclusivePenalty = startTime;
     this.endTime = endTime;
+    this.endTimeInclusivePenalty = endTime;
     this.numberOfTransfers = numberOfTransfers;
-    this.generalizedCost = generalizedCost;
+    this.c1 = c1;
     this.accessLeg = null;
     this.egressLeg = null;
-    this.c2 = 0;
+    this.c2 = RaptorConstants.NOT_SET;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost, int c2) {
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c1, int c2) {
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = accessLeg.fromTime();
-    this.generalizedCost = generalizedCost;
+    var access = accessLeg.access();
+    this.startTimeInclusivePenalty =
+      access.hasTimePenalty() ? startTime - access.timePenalty() : startTime;
+    this.c1 = c1;
     this.accessLeg = accessLeg;
     this.egressLeg = findEgressLeg(accessLeg);
     this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressLeg);
     this.endTime = egressLeg.toTime();
+    var egress = egressLeg.egress();
+    this.endTimeInclusivePenalty =
+      egress.hasTimePenalty() ? endTime + egress.timePenalty() : endTime;
     this.c2 = c2;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
-    this(iterationDepartureTime, accessLeg, generalizedCost, 0);
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c1) {
+    this(iterationDepartureTime, accessLeg, c1, RaptorConstants.NOT_SET);
   }
 
   /** Copy constructor */
@@ -101,13 +120,18 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   }
 
   @Override
+  public int startTimeInclusivePenalty() {
+    return startTimeInclusivePenalty;
+  }
+
+  @Override
   public final int endTime() {
     return endTime;
   }
 
   @Override
-  public final int durationInSeconds() {
-    return endTime - startTime;
+  public int endTimeInclusivePenalty() {
+    return endTimeInclusivePenalty;
   }
 
   @Override
@@ -122,7 +146,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   @Override
   public final int c1() {
-    return generalizedCost;
+    return c1;
   }
 
   @Override
@@ -240,7 +264,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
             );
             if (detailed) {
               buf.duration(leg.duration());
-              buf.generalizedCostSentiSec(leg.generalizedCost());
+              buf.c1(leg.c1());
             }
             if (transitLeg.getConstrainedTransferAfterLeg() != null) {
               constraintPrevLeg =
@@ -263,7 +287,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
       }
     }
     // Add summary info
-    buf.summary(startTime, endTime, numberOfTransfers, generalizedCost, appendToSummary);
+    buf.summary(startTime, endTime, numberOfTransfers, c1, c2, appendToSummary);
 
     return buf.toString();
   }
@@ -293,7 +317,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
     if (detailed) {
-      buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.generalizedCost());
+      int fromTime = leg.fromTime();
+      int toTime = leg.toTime();
+      int cost = leg.c1();
+      buf.time(fromTime, toTime).c1(cost);
     }
   }
 }

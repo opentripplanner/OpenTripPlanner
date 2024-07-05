@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByForwardSearch;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByReverseSearch;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.lifeCycle;
@@ -32,7 +32,7 @@ public class PathMapperTest implements RaptorTestConstants {
   private static final RaptorSlackProvider FLEX_SLACK_PROVIDER =
     FlexAccessAndEgressPathTestCase.SLACK_PROVIDER;
   private static final DefaultCostCalculator<TestTripSchedule> FLEX_COST_CALCULATOR =
-    FlexAccessAndEgressPathTestCase.COST_CALCULATOR;
+    FlexAccessAndEgressPathTestCase.C1_CALCULATOR;
 
   /* BASIC CASES */
 
@@ -42,7 +42,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var destArrival = basicTripByForwardSearch();
     var mapper = new ForwardPathMapper<>(
       SLACK_PROVIDER,
-      COST_CALCULATOR,
+      C1_CALCULATOR,
       this::stopIndexToName,
       null,
       lifeCycle(),
@@ -62,7 +62,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var destArrival = basicTripByReverseSearch();
     var mapper = new ReversePathMapper<>(
       SLACK_PROVIDER,
-      COST_CALCULATOR,
+      C1_CALCULATOR,
       this::stopIndexToName,
       null,
       lifeCycle(),

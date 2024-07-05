@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.ConstantsForTests;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -19,11 +19,11 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -37,33 +37,35 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class OsmBoardingLocationsModuleTest {
 
-  File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  RegularStop platform = TransitModelForTest
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
+  File file = ResourceLoader
+    .of(OsmBoardingLocationsModuleTest.class)
+    .file("herrenberg-minimal.osm.pbf");
+  RegularStop platform = testModel
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)
     .build();
-  RegularStop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  RegularStop floatingBusStop = TransitModelForTest.stopForTest(
-    "floating-bus-stop",
-    48.59417,
-    8.86464
-  );
+  RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
+  RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(
-      false,
-      Stream
-        .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
-        .map(VertexLabel::osm)
-        .collect(Collectors.toSet())
-    ),
-    Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      Arguments.of(
+        false,
+        Stream
+          .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
+          .map(VertexLabel::osm)
+          .collect(Collectors.toSet())
+      ),
+      Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
+    );
+  }
 
   @ParameterizedTest(
     name = "add boarding locations and link them to platform edges when skipVisibility={0}"
   )
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
@@ -72,7 +74,7 @@ class OsmBoardingLocationsModuleTest {
 
     var provider = new OsmProvider(file, false);
     var floatingBusVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
+      TransitStopVertex.of().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
     );
     var floatingBoardingLocation = factory.osmBoardingLocation(
       floatingBusVertex.getCoordinate(),
@@ -89,10 +91,10 @@ class OsmBoardingLocationsModuleTest {
     osmModule.buildGraph();
 
     var platformVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(platform).withModes(Set.of(TransitMode.RAIL))
+      TransitStopVertex.of().withStop(platform).withModes(Set.of(TransitMode.RAIL))
     );
     var busVertex = factory.transitStop(
-      new TransitStopVertexBuilder().withStop(busStop).withModes(Set.of(TransitMode.BUS))
+      TransitStopVertex.of().withStop(busStop).withModes(Set.of(TransitMode.BUS))
     );
 
     transitModel.index();

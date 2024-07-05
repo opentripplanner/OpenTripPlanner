@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingPara
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 
 /**
  * Builder for the {@link OsmModule}
@@ -23,9 +24,8 @@ public class OsmModuleBuilder {
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
-  private boolean banDiscouragedWalking = false;
-  private boolean banDiscouragedBiking = false;
   private int maxAreaNodes;
+  private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
   OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
     this.providers = providers;
@@ -67,18 +67,13 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withBanDiscouragedWalking(boolean banDiscouragedWalking) {
-    this.banDiscouragedWalking = banDiscouragedWalking;
-    return this;
-  }
-
-  public OsmModuleBuilder withBanDiscouragedBiking(boolean banDiscouragedBiking) {
-    this.banDiscouragedBiking = banDiscouragedBiking;
-    return this;
-  }
-
   public OsmModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
     this.maxAreaNodes = maxAreaNodes;
+    return this;
+  }
+
+  public OsmModuleBuilder withStreetLimitationParameters(StreetLimitationParameters parameters) {
+    this.streetLimitationParameters = parameters;
     return this;
   }
 
@@ -87,6 +82,7 @@ public class OsmModuleBuilder {
       providers,
       graph,
       issueStore,
+      streetLimitationParameters,
       new OsmProcessingParameters(
         boardingAreaRefTags,
         edgeNamer,
@@ -94,9 +90,7 @@ public class OsmModuleBuilder {
         areaVisibility,
         platformEntriesLinking,
         staticParkAndRide,
-        staticBikeParkAndRide,
-        banDiscouragedWalking,
-        banDiscouragedBiking
+        staticBikeParkAndRide
       )
     );
   }

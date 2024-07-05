@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import java.time.Duration;
 import java.util.List;
@@ -30,7 +31,8 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   private final List<RouteRequest> transferCacheRequests;
   private final List<Duration> pagingSearchWindowAdjustments;
 
-  private final Map<StopTransferPriority, Integer> stopTransferCost;
+  private final Map<StopTransferPriority, Integer> stopBoardAlightDuringTransferCost;
+  private final Duration maxSearchWindow;
   private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
   public TransitRoutingConfig(
@@ -112,18 +114,24 @@ no extra threads are started and the search is done in one thread.
         )
         .asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
-    this.stopTransferCost =
+    this.stopBoardAlightDuringTransferCost =
       c
-        .of("stopTransferCost")
+        .of("stopBoardAlightDuringTransferCost")
         .since(V2_0)
-        .summary("Use this to set a stop transfer cost for the given transfer priority")
+        .summary(
+          "Costs for boarding and alighting during transfers at stops with a given transfer priority."
+        )
         .description(
           """
-The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority
-set, the default is `allowed`. The `stopTransferCost` parameter is optional, but if listed all 
-values must be set.
+This cost is applied **both to boarding and alighting** at stops during transfers. All stops have a
+transfer cost priority set, the default is `allowed`. The `stopBoardAlightDuringTransferCost`
+parameter is optional, but if listed all values must be set.
+
+When a transfer occurs at the same stop, the cost will be applied twice since the cost is both for
+boarding and alighting,
           
-If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+If not set the `stopBoardAlightDuringTransferCost` is ignored. This is only available for NeTEx
+imported Stops.
           
 The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
           
@@ -135,7 +143,7 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 | `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
           
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the 
-`stopTransferCost` is listed.**
+`stopBoardAlightDuringTransferCost` is listed.**
 """
         )
         .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
@@ -200,6 +208,24 @@ for more info."
         )
         .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
+    this.maxSearchWindow =
+      c
+        .of("maxSearchWindow")
+        .since(V2_4)
+        .summary("Upper limit of the request parameter searchWindow.")
+        .description(
+          """
+            Maximum search window that can be set through the searchWindow API parameter.
+            Due to the way timetable data are collected before a Raptor trip search,
+            using a search window larger than 24 hours may lead to inconsistent search results.
+            Limiting the search window prevents also potential performance issues.
+            The recommended maximum value is 24 hours.
+            This parameter does not restrict the maximum duration of a dynamic search window (use
+            the parameter `transit.dynamicSearchWindow.maxWindow` to specify such a restriction).
+            """
+        )
+        .asDuration(Duration.ofHours(24));
+
     this.dynamicSearchWindowCoefficients = new DynamicSearchWindowConfig("dynamicSearchWindow", c);
   }
 
@@ -230,12 +256,12 @@ for more info."
 
   @Override
   public boolean enableStopTransferPriority() {
-    return stopTransferCost != null;
+    return stopBoardAlightDuringTransferCost != null;
   }
 
   @Override
-  public Integer stopTransferCost(StopTransferPriority key) {
-    return stopTransferCost.get(key);
+  public Integer stopBoardAlightDuringTransferCost(StopTransferPriority key) {
+    return stopBoardAlightDuringTransferCost.get(key);
   }
 
   @Override
@@ -246,6 +272,11 @@ for more info."
   @Override
   public List<RouteRequest> transferCacheRequests() {
     return transferCacheRequests;
+  }
+
+  @Override
+  public Duration maxSearchWindow() {
+    return maxSearchWindow;
   }
 
   @Override

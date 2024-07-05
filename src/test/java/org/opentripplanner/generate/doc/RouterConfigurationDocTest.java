@@ -33,9 +33,10 @@ public class RouterConfigurationDocTest {
     .skip("flex", "sandbox/Flex.md")
     .skip("routingDefaults", "RouteRequest.md")
     .skip("updaters", "UpdaterConfig.md")
-    .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .skip("vectorTiles", "sandbox/MapboxVectorTilesApi.md")
     .skipNestedElements("transferCacheRequests", "RouteRequest.md")
     .skip("rideHailingServices", "sandbox/RideHailing.md")
+    .skip("vehicleRentalServiceDirectory", "sandbox/VehicleRentalServiceDirectory.md")
     .build();
 
   /**
@@ -50,7 +51,7 @@ public class RouterConfigurationDocTest {
   public void updateBuildConfigurationDoc() {
     NodeAdapter node = readRouterConfig();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

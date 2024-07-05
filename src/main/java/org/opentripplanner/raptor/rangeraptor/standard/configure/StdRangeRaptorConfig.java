@@ -6,9 +6,9 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -174,7 +174,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    var destinationArrivalPaths = pathConfig.createDestArrivalPaths(false, null);
+    var destinationArrivalPaths = pathConfig.createDestArrivalPathsStdSearch();
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.
@@ -244,25 +244,15 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private UnknownPathFactory<T> unknownPathFactory() {
-    return oneOf(
-      new UnknownPathFactory<>(
-        resolveBestTimes(),
-        resolveBestNumberOfTransfers(),
-        ctx.calculator(),
-        ctx.slackProvider().transferSlack(),
-        ctx.egressPaths(),
-        MIN_TRAVEL_DURATION.is(ctx.profile()),
-        paretoComparator(
-          false,
-          ctx.searchParams().timetable(),
-          ctx.searchParams().preferLateArrival(),
-          ctx.searchDirection(),
-          RelaxFunction.NORMAL,
-          null
-        ),
-        ctx.lifeCycle()
-      ),
-      UnknownPathFactory.class
+    return new UnknownPathFactory<>(
+      resolveBestTimes(),
+      resolveBestNumberOfTransfers(),
+      ctx.calculator(),
+      ctx.slackProvider().transferSlack(),
+      ctx.egressPaths(),
+      MIN_TRAVEL_DURATION.is(ctx.profile()),
+      paretoComparator(ctx.paretoSetTimeConfig(), ParetoSetCost.NONE, null, null),
+      ctx.lifeCycle()
     );
   }
 

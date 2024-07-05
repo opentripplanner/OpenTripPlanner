@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -18,19 +19,20 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
  * The path builder is a utility to build paths. The path builder is responsible for reconstructing
- * information that was used in decision making inside Raptor, but not kept due to performance
+ * information that was used in decision-making inside Raptor, but not kept due to performance
  * reasons. For example information about the transfer like transfer constraints.
  * <p>
  * The path builder enforces the same logic as Raptor and generates information like the
  * generalized-cost instead of getting it from the stop-arrivals. This is convenient if a path is
- * created OUTSIDE Raptor, which is the case in the {@link org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
+ * created OUTSIDE Raptor, which is the case in the {@link
+ * org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService}.
  * <p>
  * The path builder comes in two versions. One which adds new legs to the tail of the path, allowing
  * us to add legs starting with the access leg and ending with the egress leg. The other adds legs
- * in the opposite order, from egress to access. Hence the forward and reverse mappers are
+ * in the opposite order, from egress to access. Hence, the forward and reverse mappers are
  * simplified using the head and tail builder respectively. See {@link #headPathBuilder(
- * RaptorSlackProvider, RaptorCostCalculator, RaptorStopNameResolver,
- * RaptorPathConstrainedTransferSearch)} and {@link #tailPathBuilder(RaptorSlackProvider,
+ * RaptorSlackProvider, int, RaptorCostCalculator, RaptorStopNameResolver,
+ * RaptorPathConstrainedTransferSearch)} and {@link #tailPathBuilder(RaptorSlackProvider, int,
  * RaptorCostCalculator, RaptorStopNameResolver, RaptorPathConstrainedTransferSearch)}.
  * <p>
  * The builder is also used for creating test data in unit test.
@@ -53,8 +55,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
 
-  @Nullable
-  private int c2;
+  private int c2 = RaptorConstants.NOT_SET;
 
   // Path leg elements as a double linked list. This makes it easy to look at
   // legs before and after in the logic and easy to fork, building alternative
@@ -177,10 +178,18 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     this.c2 = c2;
   }
 
+  public int c2() {
+    return tail.isC2Set() ? tail.c2() : c2;
+  }
+
+  public boolean isC2Set() {
+    return tail.isC2Set() || c2 != RaptorConstants.NOT_SET;
+  }
+
   public RaptorPath<T> build() {
     updateAggregatedFields();
     var pathLegs = createPathLegs(costCalculator, slackProvider);
-    return new Path<>(iterationDepartureTime, pathLegs, pathLegs.generalizedCostTotal(), c2);
+    return new Path<>(iterationDepartureTime, pathLegs, pathLegs.c1Total(), c2());
   }
 
   @Override

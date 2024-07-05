@@ -7,7 +7,7 @@
     "dynamicSearchWindow": {
       "maxWindow": "24h"
     },
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 3000,
       "ALLOWED": 150,
       "RECOMMENDED": 60,
@@ -15,10 +15,12 @@
     }
   },
   "routingDefaults": {
-    "walkSpeed": 1.38,
-    "transferSlack": 180,
+    "walk": {
+      "speed": 1.38,
+      "reluctance": 5
+    },
+    "transferSlack": "3m",
     "waitReluctance": 0.175,
-    "walkReluctance": 5,
     "maxDirectStreetDuration": "1h1m",
     "boardSlackForMode": {
       "RAIL": "12m"

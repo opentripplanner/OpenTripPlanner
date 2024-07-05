@@ -82,7 +82,7 @@ public class RaptorSearchWindowCalculator {
     }
 
     // TravelWindow is the time from the earliest-departure-time to the latest-arrival-time
-    int travelWindow = searchWindowSeconds + roundUpToNearestMinute(heuristicMinTransitTime);
+    int travelWindow = searchWindowSeconds + roundDownToNearestMinute(heuristicMinTransitTime);
 
     if (!params.isEarliestDepartureTimeSet()) {
       earliestDepartureTime = latestArrivalTime - travelWindow;
@@ -90,13 +90,14 @@ public class RaptorSearchWindowCalculator {
     return this;
   }
 
-  int roundUpToNearestMinute(int minTravelTimeInSeconds) {
+  int roundDownToNearestMinute(int minTravelTimeInSeconds) {
     if (minTravelTimeInSeconds < 0) {
-      throw new IllegalArgumentException("This operation is not defined for negative numbers.");
+      throw new IllegalArgumentException(
+        "This operation is not defined for negative numbers: " + minTravelTimeInSeconds
+      );
     }
-    // See the UnitTest for verification of this:
-    // We want: 0 -> 0, 1 -> 60, 59 -> 60 ...
-    return ((minTravelTimeInSeconds + 59) / 60) * 60;
+    // We want: 0 -> 0, 59 -> 0, 60 -> 60 ...
+    return (minTravelTimeInSeconds / 60) * 60;
   }
 
   /**

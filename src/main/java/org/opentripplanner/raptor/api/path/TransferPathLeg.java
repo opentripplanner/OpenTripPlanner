@@ -15,7 +15,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   private final int fromTime;
   private final int toStop;
   private final int toTime;
-  private final int generalizedCost;
+  private final int c1;
   private final RaptorTransfer transfer;
   private final PathLeg<T> next;
 
@@ -23,7 +23,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     int fromStop,
     int fromTime,
     int toTime,
-    int generalizedCost,
+    int c1,
     RaptorTransfer transfer,
     PathLeg<T> next
   ) {
@@ -31,7 +31,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
     this.fromTime = fromTime;
     this.toStop = transfer.stop();
     this.toTime = toTime;
-    this.generalizedCost = generalizedCost;
+    this.c1 = c1;
     this.transfer = transfer;
     this.next = next;
   }
@@ -61,8 +61,8 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
   }
 
   @Override
-  public int generalizedCost() {
-    return generalizedCost;
+  public int c1() {
+    return c1;
   }
 
   @Override

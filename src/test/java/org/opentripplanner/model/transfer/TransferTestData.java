@@ -8,25 +8,29 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
-  static final Station STATION = TransitModelForTest.station("Central Station").build();
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  static final Station STATION = TEST_MODEL.station("Central Station").build();
 
   static final int POS_1 = 1;
   static final int POS_2 = 2;
   static final int POS_3 = 3;
   static final int ANY_POS = 999;
 
-  static final RegularStop STOP_A = TransitModelForTest
-    .stopForTest("A", 60.0, 11.0)
+  static final RegularStop STOP_A = TEST_MODEL
+    .stop("A", 60.0, 11.0)
+    .build()
     .copy()
     .withParentStation(STATION)
     .build();
-  static final RegularStop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.0);
-  static final RegularStop STOP_S = TransitModelForTest
-    .stopForTest("S", 60.0, 11.0)
+  static final RegularStop STOP_B = TEST_MODEL.stop("B", 60.0, 11.0).build();
+  static final RegularStop STOP_S = TEST_MODEL
+    .stop("S", 60.0, 11.0)
+    .build()
     .copy()
     .withParentStation(STATION)
     .build();
-  static final RegularStop ANY_STOP = TransitModelForTest.stopForTest("any", 60.0, 11.0);
+  static final RegularStop ANY_STOP = TEST_MODEL.stop("any", 60.0, 11.0).build();
 
   static final Route ROUTE_1 = TransitModelForTest.route("1").build();
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();

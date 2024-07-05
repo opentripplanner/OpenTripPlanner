@@ -3,9 +3,11 @@
     "itineraryFilters": {
       "filterItinerariesWithSameFirstOrLastTrip": true
     },
-    "transferSlack": 180,
+    "transferSlack": "3m",
     "waitReluctance": 0.175,
-    "walkReluctance": 5,
+    "walk": {
+      "reluctance": 5
+    },
     "maxDirectStreetDuration": "3700s"
   },
   "transit": {
@@ -13,7 +15,7 @@
       "24h",
       "0h"
     ],
-    "stopTransferCost": {
+    "stopBoardAlightDuringTransferCost": {
       "DISCOURAGED": 3000,
       "ALLOWED": 150,
       "RECOMMENDED": 60,
@@ -33,7 +35,7 @@
       "fuzzyTripMatching": false,
       "history": {
         "url": "<history_endpoint_url>",
-        // Get all realtime history for current operating day date
+        // Get all real-time history for current operating day date
         "fromDateTime": "-P0D",
         "timeout": 300000
       }
@@ -42,7 +44,8 @@
       "type": "siri-azure-sx-updater",
       "topic": "<topic_name>",
       "feedId": "<feed_id>",
-      "servicebus-url": "<service_bus_url>",
+      "authenticationType": "FederatedIdentity",
+      "fullyQualifiedNamespace":  "<fully_qualified_namespace>",
       "customMidnight": 4,
       "history": {
         "url": "<history_endpoint_url>",

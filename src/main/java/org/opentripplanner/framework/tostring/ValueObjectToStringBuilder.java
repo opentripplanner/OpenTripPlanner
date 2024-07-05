@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.tostring;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Function;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -151,6 +152,10 @@ public class ValueObjectToStringBuilder {
    */
   public ValueObjectToStringBuilder addDurationSec(Integer durationSeconds) {
     return addIt(durationSeconds, DurationUtils::durationToStr);
+  }
+
+  public ValueObjectToStringBuilder addTime(Instant time) {
+    return addIt(time, Object::toString);
   }
 
   /**

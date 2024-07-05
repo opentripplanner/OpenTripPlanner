@@ -1,10 +1,9 @@
 package org.opentripplanner.raptor.api.model;
 
-import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
+import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 
@@ -34,7 +33,7 @@ public interface RaptorAccessEgress {
    * <p>
    * If this is {@link #isFree()}, then this method must return 0(zero).
    */
-  int generalizedCost();
+  int c1();
 
   /**
    * The time duration to walk or travel the path in seconds. This is not the entire duration from
@@ -45,6 +44,39 @@ public interface RaptorAccessEgress {
    * </ul>
    */
   int durationInSeconds();
+
+  /**
+   * Raptor can add an optional time-penalty to a access/egress to make it less favourable compared
+   * with other access/egress/transit options (paths). The penalty is a virtual extra duration of
+   * time added inside Raptor when comparing time. The penalty does not propagate the c1 or c2 cost
+   * values. This feature is useful when you want to limit the access/egress and the access/egress
+   * is FASTER than the preferred option.
+   * <p>
+   * For example, for Park&Ride, driving all the way to the
+   * destination is very often the best option when looking at the time criteria. When an
+   * increasing time-penalty is applied to a car access/egress, then driving become less
+   * favorable. This also improves performance, since we usually add a very high cost to
+   * driving - making all park&ride access legs optimal - forcing Raptor to compute a path for
+   * every option. The short drives are optimal on cost, and the long are optimal on time. In the
+   * case of park&ride the time-penalty enables Raptor to choose one of the shortest access/egress
+   * paths over the longer ones.
+   * <p>
+   * Another example is FLEX, where we in many use-cases want regular transit to win if there is
+   * an offer. Only in the case where the FLEX is the only solution we want it to be presented.
+   * To achieve this, we must add an extra duration to the time of the FLEX access/egress - it does
+   * not help to just add extra cost - which makes both FLEX optimal on time and transit optimal on
+   * cost. Keeping a large number of optimal access paths has a negative impact on performance as well.
+   * <p>
+   *
+   * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
+   */
+  default int timePenalty() {
+    return RaptorConstants.TIME_NOT_SET;
+  }
+
+  default boolean hasTimePenalty() {
+    return timePenalty() != RaptorConstants.TIME_NOT_SET;
+  }
 
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
   // The methods below should be only overridden when an RaptorAccessEgress is only available at
@@ -71,16 +103,16 @@ public interface RaptorAccessEgress {
   int latestArrivalTime(int requestedArrivalTime);
 
   /**
-   * This method should return {@code true} if, and only if the instance have restricted
+   * This method should return {@code true} if, and only if the instance has restricted
    * opening-hours.
    */
   boolean hasOpeningHours();
 
   /**
    * Return the opening hours in a short human-readable way for the departure at the origin. Do
-   * not parse this, this should only be used for things like testing, debugging and logging.
+   * not parse this. This should only be used for things like testing, debugging and logging.
    * <p>
-   * This method return {@code null} if there is no opening hours, see {@link #hasOpeningHours()}.
+   * This method return {@code null} if there are no opening hours, see {@link #hasOpeningHours()}.
    */
   @Nullable
   default String openingHoursToString() {
@@ -91,7 +123,7 @@ public interface RaptorAccessEgress {
     // assumes the access/egress is a continuous period without gaps withing 24 hours from the
     // opening. We ignore the access/egress duration. This is ok for test, debugging and logging.
     int edt = earliestDepartureTime(0);
-    int lat = latestArrivalTime(edt + SECONDS_IN_A_DAY);
+    int lat = latestArrivalTime(edt + (int) ChronoUnit.DAYS.getDuration().toSeconds());
 
     if (edt == TIME_NOT_SET || lat == TIME_NOT_SET) {
       return "closed";
@@ -183,7 +215,12 @@ public interface RaptorAccessEgress {
     return durationInSeconds() == 0;
   }
 
-  /** Call this from toString */
+  /** Call this from toString or {@link #asString(boolean, boolean, String)}*/
+  default String defaultToString() {
+    return asString(true, true, null);
+  }
+
+  /** Call this from toString or {@link #defaultToString()} */
   default String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     StringBuilder buf = new StringBuilder();
     if (isFree()) {
@@ -198,8 +235,8 @@ public interface RaptorAccessEgress {
       buf.append("Walk");
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
-    if (includeCost && generalizedCost() > 0) {
-      buf.append(' ').append(OtpNumberFormat.formatCostCenti(generalizedCost()));
+    if (includeCost && c1() > 0) {
+      buf.append(' ').append(RaptorValueFormatter.formatC1(c1()));
     }
     if (hasRides()) {
       buf.append(' ').append(numberOfRides()).append('x');

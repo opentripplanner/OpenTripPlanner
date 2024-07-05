@@ -5,7 +5,6 @@
   "embedRouterConfig": true,
   "areaVisibility": true,
   "platformEntriesLinking": true,
-  "matchBusRoutesToStreets": false,
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,
@@ -13,8 +12,6 @@
     "islandWithoutStopsMaxSize": 5,
     "islandWithStopsMaxSize": 5
   },
-  "banDiscouragedWalking": false,
-  "banDiscouragedBiking": false,
   "maxTransferDuration": "30m",
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,

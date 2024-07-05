@@ -87,7 +87,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
     // Note! The number of transfers is zero with stay-seated/interlining
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
-      "[0:01:10 0:10:40 9m30s 0tx $1230]";
+      "[0:01:10 0:10:40 9m30s Tₓ0 C₁1_230]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("9m30s", TX_1, T00_00, T00_30)

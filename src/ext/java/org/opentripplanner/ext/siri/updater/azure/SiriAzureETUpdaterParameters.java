@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
+import com.azure.core.amqp.implementation.ConnectionStringProperties;
 import java.time.LocalDate;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
@@ -23,6 +24,11 @@ public class SiriAzureETUpdaterParameters
 
   @Override
   public String url() {
-    return getDataInitializationUrl();
+    var url = getServiceBusUrl();
+    try {
+      return new ConnectionStringProperties(url).getEndpoint().toString();
+    } catch (IllegalArgumentException e) {
+      return url;
+    }
   }
 }

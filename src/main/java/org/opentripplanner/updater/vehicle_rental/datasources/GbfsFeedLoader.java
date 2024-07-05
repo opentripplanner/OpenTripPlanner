@@ -7,12 +7,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import org.entur.gbfs.v2_3.gbfs.GBFS;
-import org.entur.gbfs.v2_3.gbfs.GBFSFeed;
-import org.entur.gbfs.v2_3.gbfs.GBFSFeedName;
-import org.entur.gbfs.v2_3.gbfs.GBFSFeeds;
+import org.mobilitydata.gbfs.v2_3.gbfs.GBFS;
+import org.mobilitydata.gbfs.v2_3.gbfs.GBFSFeed;
+import org.mobilitydata.gbfs.v2_3.gbfs.GBFSFeedName;
+import org.mobilitydata.gbfs.v2_3.gbfs.GBFSFeeds;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class GbfsFeedLoader {
   }
 
   GbfsFeedLoader(String url, HttpHeaders httpHeaders, String languageCode) {
-    this(url, httpHeaders, languageCode, new OtpHttpClient());
+    this(url, httpHeaders, languageCode, new OtpHttpClientFactory().create(LOG));
   }
 
   /**

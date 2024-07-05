@@ -50,7 +50,7 @@ public class TableBuilder {
   }
 
   /**
-   * Return the width needed for each column. The witch is calculated by taking
+   * Return the width needed for each column. The which is calculated by taking
    * the maximum of the {@code minWidth}, header width and the maximum width for all
    * cells in the column.
    */

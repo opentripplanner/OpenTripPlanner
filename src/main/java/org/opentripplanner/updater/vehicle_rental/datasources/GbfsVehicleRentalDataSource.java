@@ -6,22 +6,25 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
-import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
-import org.entur.gbfs.v2_3.station_information.GBFSStationInformation;
-import org.entur.gbfs.v2_3.station_status.GBFSStation;
-import org.entur.gbfs.v2_3.station_status.GBFSStationStatus;
-import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
-import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
+import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
+import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.mobilitydata.gbfs.v2_3.station_information.GBFSStationInformation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStationStatus;
+import org.mobilitydata.gbfs.v2_3.system_information.GBFSSystemInformation;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by demory on 2017-03-14.
@@ -33,18 +36,21 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  */
 class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
+
   private final GbfsVehicleRentalDataSourceParameters params;
 
+  private final OtpHttpClient otpHttpClient;
   private GbfsFeedLoader loader;
   private List<GeofencingZone> geofencingZones = List.of();
-  private final OtpHttpClient otpHttpClient;
+  private boolean logGeofencingZonesDoesNotExistWarning = true;
 
   public GbfsVehicleRentalDataSource(
     GbfsVehicleRentalDataSourceParameters parameters,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.params = parameters;
-    this.otpHttpClient = otpHttpClient;
+    this.otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   @Override
@@ -126,9 +132,18 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
     if (params.geofencingZones()) {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
-
-      var mapper = new GbfsGeofencingZoneMapper(system.systemId);
-      this.geofencingZones = mapper.mapGeofencingZone(zones);
+      if (zones != null) {
+        var mapper = new GbfsGeofencingZoneMapper(system.systemId);
+        this.geofencingZones = mapper.mapGeofencingZone(zones);
+      } else {
+        if (logGeofencingZonesDoesNotExistWarning) {
+          LOG.warn(
+            "GeofencingZones is enabled in OTP, but no zones exist for network: {}",
+            params.network()
+          );
+        }
+        logGeofencingZonesDoesNotExistWarning = false;
+      }
     }
     return stations;
   }

@@ -10,7 +10,7 @@ import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 /**
  * This class contains the results for a given test case. A set of results
  * for each {@link SpeedTestProfile} is kept. A default set is also available,
- * witch can be used if there is not set for a given profile.
+ * which can be used if there is not set for a given profile.
  */
 public class ExpectedResults {
 

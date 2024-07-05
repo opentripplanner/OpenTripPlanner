@@ -15,6 +15,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -56,16 +57,20 @@ public class GraphPathFinder {
 
   private final DataOverlayContext dataOverlayContext;
 
+  private final float maxCarSpeed;
+
   public GraphPathFinder(@Nullable TraverseVisitor<State, Edge> traverseVisitor) {
-    this(traverseVisitor, null);
+    this(traverseVisitor, null, StreetConstants.DEFAULT_MAX_CAR_SPEED);
   }
 
   public GraphPathFinder(
     @Nullable TraverseVisitor<State, Edge> traverseVisitor,
-    @Nullable DataOverlayContext dataOverlayContext
+    @Nullable DataOverlayContext dataOverlayContext,
+    float maxCarSpeed
   ) {
     this.traverseVisitor = traverseVisitor;
     this.dataOverlayContext = dataOverlayContext;
+    this.maxCarSpeed = maxCarSpeed;
   }
 
   /**
@@ -81,7 +86,7 @@ public class GraphPathFinder {
 
     StreetSearchBuilder aStar = StreetSearchBuilder
       .of()
-      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(
           preferences.maxDirectDuration().valueOf(request.journey().direct().mode())

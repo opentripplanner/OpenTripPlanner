@@ -120,9 +120,10 @@ public class VehicleParking implements Serializable {
     VehicleParkingSpaces availability,
     VehicleParkingGroup vehicleParkingGroup
   ) {
-    this.id = id;
+    this.id =
+      Objects.requireNonNull(id, "%s must have an ID".formatted(this.getClass().getSimpleName()));
     this.name = name;
-    this.coordinate = coordinate;
+    this.coordinate = Objects.requireNonNull(coordinate);
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
@@ -215,31 +216,15 @@ public class VehicleParking implements Serializable {
     return availability != null;
   }
 
-  public boolean hasSpacesAvailable(
-    TraverseMode traverseMode,
-    boolean wheelchairAccessible,
-    boolean useAvailability
-  ) {
+  public boolean hasSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible) {
     switch (traverseMode) {
       case BICYCLE:
-        if (useAvailability && hasRealTimeDataForMode(TraverseMode.BICYCLE, false)) {
-          return availability.getBicycleSpaces() > 0;
-        } else {
-          return bicyclePlaces;
-        }
+        return bicyclePlaces;
       case CAR:
         if (wheelchairAccessible) {
-          if (useAvailability && hasRealTimeDataForMode(TraverseMode.CAR, true)) {
-            return availability.getWheelchairAccessibleCarSpaces() > 0;
-          } else {
-            return wheelchairAccessibleCarPlaces;
-          }
+          return wheelchairAccessibleCarPlaces;
         } else {
-          if (useAvailability && hasRealTimeDataForMode(TraverseMode.CAR, false)) {
-            return availability.getCarSpaces() > 0;
-          } else {
-            return carPlaces;
-          }
+          return carPlaces;
         }
       default:
         return false;

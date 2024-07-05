@@ -35,14 +35,20 @@ public class RaptorRequestTransferCache {
     return transferCache;
   }
 
+  public void put(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
+    final CacheKey cacheKey = new CacheKey(transfersByStopIndex, request);
+    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.create(
+      transfersByStopIndex,
+      cacheKey.request
+    );
+
+    LOG.info("Initializing cache with request: {}", cacheKey.options);
+    transferCache.put(cacheKey, raptorTransferIndex);
+  }
+
   public RaptorTransferIndex get(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     try {
-      return transferCache.get(
-        new CacheKey(
-          transfersByStopIndex,
-          StreetSearchRequestMapper.mapToTransferRequest(request).build()
-        )
-      );
+      return transferCache.get(new CacheKey(transfersByStopIndex, request));
     } catch (ExecutionException e) {
       throw new RuntimeException("Failed to get item from transfer cache", e);
     }
@@ -53,7 +59,7 @@ public class RaptorRequestTransferCache {
       @Override
       @Nonnull
       public RaptorTransferIndex load(@Nonnull CacheKey cacheKey) {
-        LOG.info("Adding request to cache: {}", cacheKey.options);
+        LOG.info("Adding runtime request to cache: {}", cacheKey.options);
         return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.request);
       }
     };
@@ -65,10 +71,10 @@ public class RaptorRequestTransferCache {
     private final StreetSearchRequest request;
     private final StreetRelevantOptions options;
 
-    private CacheKey(List<List<Transfer>> transfersByStopIndex, StreetSearchRequest request) {
+    private CacheKey(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
       this.transfersByStopIndex = transfersByStopIndex;
-      this.request = request;
-      this.options = new StreetRelevantOptions(request);
+      this.request = StreetSearchRequestMapper.mapToTransferRequest(request).build();
+      this.options = new StreetRelevantOptions(this.request);
     }
 
     @Override

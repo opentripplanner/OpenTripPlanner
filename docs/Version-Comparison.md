@@ -52,7 +52,8 @@ the EU profile, and generalization to the EU profile should be feasible once it 
 | SIRI Realtime                                     | no                                                                                                          | yes                                                                                             |
 | Elevation data                                    | TIFF and NED                                                                                                | TIFF and NED                                                                                    |
 | One-to-many routing,<br> isochrones and scripting | yes                                                                                                         | no                                                                                              |
-| Java version                                      | 8+                                                                                                          | 11+                                                                                             |
+| Isochrones                                        | yes                                                                                                         | yes                                                                                             |
+| Java version                                      | 8+                                                                                                          | 21+                                                                                             |
 | Multiple regions per server                       | yes                                                                                                         | no                                                                                              |
 | Hot reloading of graphs                           | yes                                                                                                         | no                                                                                              |
 | Street (OSM) routing algorithm                    | Generalized cost A*                                                                                         | Generalized cost A*                                                                             |
@@ -80,35 +81,18 @@ other projects where they are more actively developed.
 
 ### Analysis
 
-Many OpenTripPlanner contributors have been primarily interested in transportation and urban
-planning use cases. We consider these use cases quite important. This has been a major area of
-application for OpenTripPlanner and has helped popularize cumulative opportunities accessibility
-metrics. For example, the University of Minnesota Accessibility Observatory used OpenTripPlanner
-for [Access Across America](http://access.umn.edu/research/america/). Nonetheless, the analysis code
-in OTP1 is essentially an unmaintained and unsupported early prototype for later projects,
-specifically Conveyal's R5 (and the Conveyal Analysis system built upon it). OTP1 seems to have
-gained popularity for analysis uses due to the existence of documentation and an active user
-community, but has significant technical shortcomings. One of these is simply speed: OTP1 can be
-orders of magnitude slower (and more memory-intensive) than the approaches exemplified in R5. The
-other is the requirement to search at a single specific time. Travel times and especially wait times
-on scheduled transit vary greatly depending on when you depart. Accounting for variation over a time
-window requires repeated independent searches at each possible departure time, which is very
-inefficient. R5 is highly optimized to capture variations in travel time across time windows and
-account for uncertainty in waiting times on frequency-based routes.
+From the beginning of the project, many OTP contributors and users have used OTP in research,
+analysis, and planning applications. They have prototyped many ideas within the OTP codebase, 
+including one-to-many searches producing travel time grids, isochrones, and access-to-opportunities
+metrics. While some of these features may still be available as optional "sandbox" features in OTP2, they are unsupported and may be removed in the near future.
 
-Due to its similarity to the R5 approach, OTP2's transit router would not have these same problems.
-Nonetheless, we have decided not to port the OTP1 analysis features over to OTP2 since it would
-broaden the focus away from passenger information and draw finite attention away from existing
-projects like R5 and Conveyal Analysis.
-
-Accordingly, we have made an effort to clean up and augment OTP1 analysis documentation for
-researchers who will continue to need it. It should remain possible for people to continue using
-OTP1 if they prefer. If you would instead like to apply the innovations present in OTP2, we
-recommend looking into R5 or Conveyal Analysis.
+Most work of this kind moved over separate projects focused on urban planning and analytics. As of 
+version 2, OTP has chosen to focus entirely on passenger information rather than analytics
+applications. See the [Analysis](Analysis.md) page for more details.
 
 ### Routers API and Hot Reloading
 
-Via it's Routers API, OTP1 allows loading data and serving APIs for multiple separate geographic
+Via its Routers API, OTP1 allows loading data and serving APIs for multiple separate geographic
 areas. This is functionally equivalent to running more than one OTP server with separate data sets.
 This system also allows reloading transportation network data when it changes, or even pushing new
 data over a network connection.
@@ -125,7 +109,7 @@ OTP2 to simplify the code base and make it easier to reason about security.
 Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of
 functionality, just a different way of expressing things due to the new routing algorithms. A
 summary of parameters that have been removed and their replacements can be found in the [migration
-guide](Version-Comparison.md#Migration guide)
+guide](Version-Comparison.md#migration-guide)
 
 ## OTP Trip planning and Transit index APIs
 
@@ -136,12 +120,12 @@ GraphQL API, the only supported way of sending requests to the OTP routing engin
 Details of those two APIs are available at the following pages:
 
 
-- [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) - HSL's GraphQL API used by the Digitransit
+- [GTFS GraphQL API](apis/GTFS-GraphQL-API.md) - HSL's GraphQL API used by the Digitransit
   project.
-- [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
+- [Transmodel API](apis/TransmodelApi.md) - Entur's Transmodel API
 
 The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
-uses GTFS terminology, while the Entur API is Transmodel(NeTEx) based. Both APIs are similar in
+uses GTFS terminology, while the Entur API is Transmodel (NeTEx) based. Both APIs are similar in
 semantics and structure, and provide the same functionality. 
 
 ## Additional characteristics added in OTP2

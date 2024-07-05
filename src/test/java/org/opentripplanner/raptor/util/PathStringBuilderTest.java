@@ -64,28 +64,28 @@ public class PathStringBuilderTest {
     int START_TIME = time(12, 35, 0);
     int END_TIME = time(13, 45, 0);
     assertEquals(
-      "[12:35 13:45 1h10m 1tx $1.23]",
-      subject.summary(START_TIME, END_TIME, 1, 123).toString()
+      "[12:35 13:45 1h10m Tₓ1 C₁1.23 C₂5]",
+      subject.summary(START_TIME, END_TIME, 1, 123, 5).toString()
     );
   }
 
   @Test
   public void summaryGeneralizedCostOnly() {
-    assertEquals("[$0.01]", subject.summary(1).toString());
+    assertEquals("[C₁0.01 C₂7]", subject.summary(1, 7).toString());
   }
 
   @Test
   public void path() {
     int egressDuration = 3600 + 37 * 60 + 7;
     assertEquals(
-      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m 0tx $567]",
+      "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m Tₓ0 C₁567 C₂7]",
       subject
         .walk(37)
         .stop(227)
         .transit(MODE, T_10_46_05, T_10_55)
         .stop(112)
         .walk(egressDuration)
-        .summary(time(10, 44, 0), time(12, 33, 0), 0, 56700)
+        .summary(time(10, 44, 0), time(12, 33, 0), 0, 56700, 7)
         .toString()
     );
   }
@@ -93,14 +93,14 @@ public class PathStringBuilderTest {
   @Test
   public void pathWithoutAccessAndEgress() {
     assertEquals(
-      "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s 0tx $60 3pz]",
+      "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s Tₓ0 C₁60 C₂9 3pz]",
       subject
         .accessEgress(free(227))
         .stop(227)
         .transit(MODE, T_10_46_05, T_10_55)
         .stop(112)
         .accessEgress(free(112))
-        .summary(T_10_46_05, T_10_55, 0, 6000, b -> b.text("3pz"))
+        .summary(T_10_46_05, T_10_55, 0, 6000, 9, b -> b.text("3pz"))
         .toString()
     );
   }

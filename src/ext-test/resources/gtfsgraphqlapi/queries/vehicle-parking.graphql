@@ -1,6 +1,0 @@
-{
-    vehicleParkings {
-        name
-        vehicleParkingId
-    }
-}

@@ -1,6 +1,9 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.COBB_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.GCT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.MARTA_AGENCY_ID;
@@ -10,7 +13,6 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,7 +21,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -30,20 +32,25 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.StopModel;
 
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
-  public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
+  private static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
+  private static final String FEED_ID = "A";
   private static AtlantaFareService atlFareService;
 
   @BeforeAll
   public static void setUpClass() {
-    Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
+    Map<FeedScopedId, FareRuleSet> regularFareRules = Map.of(
+      new FeedScopedId(FEED_ID, "regular"),
+      FareModelForTest.INSIDE_CITY_CENTER_SET
+    );
     atlFareService = new TestAtlantaFareService(regularFareRules.values());
   }
 
   @Test
-  public void fromMartaTransfers() {
+  void fromMartaTransfers() {
     List<Leg> rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(XPRESS_AGENCY_ID, 1));
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
@@ -69,7 +76,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
-  public void fromCobbTransfers() {
+  void fromCobbTransfers() {
     List<Leg> rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
@@ -98,13 +105,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
-  public void fromGctTransfers() {
+  void fromGctTransfers() {
     List<Leg> rides = List.of(getLeg(GCT_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
   }
 
   @Test
-  public void tooManyLegs() {
+  void tooManyLegs() {
     List<Leg> rides = List.of(
       getLeg(MARTA_AGENCY_ID, 0),
       getLeg(MARTA_AGENCY_ID, 1),
@@ -158,7 +165,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
-  public void expiredTransfer() {
+  void expiredTransfer() {
     List<Leg> rides = List.of(
       getLeg(MARTA_AGENCY_ID, 0),
       getLeg(MARTA_AGENCY_ID, 1),
@@ -179,7 +186,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
-  public void useStreetcar() {
+  void useStreetcar() {
     var STREETCAR_PRICE = DEFAULT_TEST_RIDE_PRICE.minus(usDollars(1));
     List<Leg> rides = List.of(
       getLeg(MARTA_AGENCY_ID, 0),
@@ -199,6 +206,18 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)).plus(STREETCAR_PRICE));
   }
 
+  @Test
+  void fullItinerary() {
+    var itin = createItinerary(MARTA_AGENCY_ID, "1", 0);
+    var fares = atlFareService.calculateFares(itin);
+    assertNotNull(fares);
+    assertTrue(fares.getLegProducts().isEmpty());
+    var itineraryProducts = fares.getItineraryProducts();
+    assertFalse(itineraryProducts.isEmpty());
+    var fp = itineraryProducts.stream().filter(p -> p.name().equals("regular")).findAny().get();
+    assertEquals(Money.usDollars(3.49f), fp.price());
+  }
+
   /**
    * These tests are designed to specifically validate ATL fares. Since these fares are hard-coded,
    * it is acceptable to make direct calls to the ATL fare service with predefined routes. Where the
@@ -206,9 +225,17 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    * used. This will be the same for all cash fare types except when overriden above.
    */
   private static void calculateFare(List<Leg> rides, Money expectedFare) {
-    ItineraryFares fare = new ItineraryFares();
-    atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
-    assertEquals(expectedFare, fare.getFare(FareType.electronicRegular));
+    var fare = atlFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
+    assertEquals(
+      expectedFare,
+      fare
+        .getItineraryProducts()
+        .stream()
+        .filter(fp -> fp.name().equals(FareType.electronicRegular.name()))
+        .findFirst()
+        .get()
+        .price()
+    );
 
     var fareProducts = fare
       .getItineraryProducts()
@@ -230,25 +257,31 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   private static Leg createLeg(String agencyId, String shortName, long startTimeMins) {
+    final var itin = createItinerary(agencyId, shortName, startTimeMins);
+    return itin.getLegs().get(0);
+  }
+
+  private static Itinerary createItinerary(String agencyId, String shortName, long startTimeMins) {
+    var stopModelBuilder = StopModel.of();
     Agency agency = Agency
-      .of(new FeedScopedId("A", agencyId))
+      .of(new FeedScopedId(FEED_ID, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
 
     // Set up stops
-    RegularStop firstStop = RegularStop
-      .of(new FeedScopedId("A", "1"))
+    RegularStop firstStop = stopModelBuilder
+      .regularStop(new FeedScopedId(FEED_ID, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString("first stop"))
       .build();
-    RegularStop lastStop = RegularStop
-      .of(new FeedScopedId("A", "2"))
+    RegularStop lastStop = stopModelBuilder
+      .regularStop(new FeedScopedId(FEED_ID, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString("last stop"))
       .build();
 
-    FeedScopedId routeFeedScopeId = new FeedScopedId("A", "123");
+    FeedScopedId routeFeedScopeId = new FeedScopedId(FEED_ID, "123");
     Route route = Route
       .of(routeFeedScopeId)
       .withAgency(agency)
@@ -258,11 +291,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
-    var itin = newItinerary(Place.forStop(firstStop), start)
+    return newItinerary(Place.forStop(firstStop), start)
       .bus(route, 1, start, T11_12, Place.forStop(lastStop))
       .build();
-
-    return itin.getLegs().get(0);
   }
 
   private static class TestAtlantaFareService extends AtlantaFareService {

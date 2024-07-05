@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
@@ -11,18 +12,19 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfShouldReturnTheSameInstanceWhenBuild() {
     var pref = new RoutingPreferences();
-    var copy = pref.copyOf().build();
-    assertNotSame(pref, copy);
+    var same = pref.copyOf().build();
+    assertSame(pref, same);
+    // Change one thing to force making a copy
+    var copy = pref.copyOf().withCar(c -> c.withReluctance(3.5)).build();
+    assertNotSame(pref.car(), copy.car());
 
     // Immutable classes should not change
-    assertSame(pref.car(), copy.car());
     assertSame(pref.bike(), copy.bike());
     assertSame(pref.walk(), copy.walk());
     assertSame(pref.transfer(), copy.transfer());
     assertSame(pref.wheelchair(), copy.wheelchair());
     assertSame(pref.transit(), copy.transit());
     assertSame(pref.street(), copy.street());
-    assertSame(pref.rental(), copy.rental());
     assertSame(pref.itineraryFilter(), copy.itineraryFilter());
     assertSame(pref.system(), copy.system());
   }
@@ -48,6 +50,16 @@ public class RoutingPreferencesTest {
   }
 
   @Test
+  public void copyOfWithScooterChanges() {
+    var pref = new RoutingPreferences();
+    var copy = pref.copyOf().withScooter(b -> b.withReluctance(2.5)).build();
+
+    assertNotSame(pref, copy);
+    assertNotSame(pref.scooter(), copy.scooter());
+    assertSame(pref.walk(), copy.walk());
+  }
+
+  @Test
   public void copyOfWithWalkChanges() {
     var pref = new RoutingPreferences();
     var copy = pref.copyOf().withWalk(w -> w.withReluctance(2.5)).build();
@@ -60,7 +72,7 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithTransferChanges() {
     var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withTransfer(t -> t.withSlack(2)).build();
+    var copy = pref.copyOf().withTransfer(t -> t.withSlack(Duration.ofSeconds(2))).build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.transfer(), copy.transfer());
@@ -106,16 +118,6 @@ public class RoutingPreferencesTest {
 
     assertNotSame(pref, copy);
     assertNotSame(pref.street(), copy.street());
-  }
-
-  @Test
-  public void copyOfWithRentalChanges() {
-    var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withRental(r -> r.withDropoffCost(2)).build();
-
-    assertNotSame(pref, copy);
-    assertNotSame(pref.rental(), copy.rental());
-    assertSame(pref.itineraryFilter(), copy.itineraryFilter());
   }
 
   @Test

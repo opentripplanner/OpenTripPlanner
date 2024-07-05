@@ -20,10 +20,12 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkSequenceProjection;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
@@ -102,10 +104,10 @@ class ServiceLinkMapperTest {
     quayIdByStopPointRef.add("RUT:StopPoint:2", "NSR:Quay:2");
     quayIdByStopPointRef.add("RUT:StopPoint:3", "NSR:Quay:3");
 
-    EntityById<RegularStop> stopsById = new EntityById<>();
+    EntityById<RegularStop> stopsById = new DefaultEntityById<>();
     issueStore = new DefaultDataImportIssueStore();
 
-    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore, stopsById);
+    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore, new StopModel().withContext());
     stopPatternBuilder = StopPattern.create(3);
 
     Station parentStation = Station
@@ -122,7 +124,7 @@ class ServiceLinkMapperTest {
         new NetexMainAndSubMode(TransitMode.BUS, "UNKNOWN"),
         Accessibility.NO_INFORMATION
       );
-      stopPatternBuilder.stops[i] = stop;
+      stopPatternBuilder.stops.with(i, stop);
       stopsById.add(stop);
     }
 

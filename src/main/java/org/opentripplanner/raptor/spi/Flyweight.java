@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This interface is used to tag methods witch return flyweight objects. The implementation may
+ * This interface is used to tag methods which return flyweight objects. The implementation may
  * choose not to implement the return type as a flyweight object, but the Raptor implementation
  * is guaranteed to treat them as such - enabling the optimization.
  * <p>

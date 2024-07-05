@@ -15,6 +15,8 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessWithPenalty;
+import org.opentripplanner.raptor.rangeraptor.transit.EgressWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
@@ -22,8 +24,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
- * helps to cache and calculate values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It helps to cache and calculate
+ * values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
@@ -40,6 +42,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private int fromTime = NOT_SET;
   private int toTime = NOT_SET;
+  private int c2 = RaptorConstants.NOT_SET;
 
   private PathBuilderLeg<T> prev = null;
   private PathBuilderLeg<T> next = null;
@@ -54,6 +57,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     this.fromTime = other.fromTime;
     this.toTime = other.toTime;
     this.leg = other.leg;
+    this.c2 = other.c2;
 
     // Mutable fields
     if (other.next != null) {
@@ -72,7 +76,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  /* factory methods */
+  /* accessors */
 
   public int fromTime() {
     return fromTime;
@@ -94,14 +98,24 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return leg.toStop();
   }
 
-  /* accessors */
-
   public int toStopPos() {
     return asTransitLeg().toStopPos();
   }
 
   public int durationInSec() {
     return toTime - fromTime;
+  }
+
+  public int c2() {
+    return c2;
+  }
+
+  public void c2(int c2) {
+    this.c2 = c2;
+  }
+
+  public boolean isC2Set() {
+    return c2 != RaptorConstants.NOT_SET;
   }
 
   @Nullable
@@ -144,6 +158,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   public T trip() {
     return asTransitLeg().trip;
+  }
+
+  public PathBuilderLeg<T> prev() {
+    return prev;
   }
 
   public PathBuilderLeg<T> next() {
@@ -198,18 +216,15 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <p>
    * This method is safe to use event as long as the next leg is set.
    */
-  public int generalizedCost(
-    RaptorCostCalculator<T> costCalculator,
-    RaptorSlackProvider slackProvider
-  ) {
+  public int c1(RaptorCostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
     if (costCalculator == null) {
       return RaptorCostCalculator.ZERO_COST;
     }
     if (isAccess()) {
-      return asAccessLeg().streetPath.generalizedCost();
+      return asAccessLeg().streetPath.c1();
     }
     if (isTransfer()) {
-      return asTransferLeg().transfer.generalizedCost();
+      return asTransferLeg().transfer.c1();
     }
     if (isTransit()) {
       return transitCost(costCalculator, slackProvider);
@@ -294,10 +309,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return new PathBuilderLeg<>(new MyEgressLeg(egress));
   }
 
-  PathBuilderLeg<T> prev() {
-    return prev;
-  }
-
   void setPrev(PathBuilderLeg<T> prev) {
     this.prev = prev;
   }
@@ -348,11 +359,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /* Build helper methods, package local */
 
   private static int cost(RaptorCostCalculator<?> costCalculator, RaptorAccessEgress streetPath) {
-    return costCalculator != null ? streetPath.generalizedCost() : RaptorCostCalculator.ZERO_COST;
+    return costCalculator != null ? streetPath.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
   private static int cost(RaptorCostCalculator<?> costCalculator, RaptorTransfer transfer) {
-    return costCalculator != null ? transfer.generalizedCost() : RaptorCostCalculator.ZERO_COST;
+    return costCalculator != null ? transfer.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
   private void setTime(int fromTime, int toTime) {
@@ -438,7 +449,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider
   ) {
     int cost = egressCost(costCalculator, slackProvider);
-    return new EgressPathLeg<>(asEgressLeg().streetPath, fromTime, toTime, cost);
+    var egressPath = asEgressLeg().streetPath;
+    return new EgressPathLeg<>(egressPath, fromTime, toTime, cost);
   }
 
   /**
@@ -685,12 +697,22 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     final RaptorAccessEgress streetPath;
 
     MyStreetLeg(RaptorAccessEgress streetPath) {
-      this.streetPath = streetPath;
+      this.streetPath = removeTimePenaltyDecorator(streetPath);
     }
 
     @Override
     public boolean hasRides() {
       return streetPath.hasRides();
+    }
+
+    private static RaptorAccessEgress removeTimePenaltyDecorator(RaptorAccessEgress path) {
+      if (path instanceof AccessWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      if (path instanceof EgressWithPenalty awp) {
+        return awp.removeDecorator();
+      }
+      return path;
     }
   }
 

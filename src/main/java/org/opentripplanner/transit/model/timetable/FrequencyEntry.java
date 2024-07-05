@@ -6,6 +6,8 @@ import org.opentripplanner.model.Frequency;
 /**
  * Uses a TripTimes to represent multiple trips following the same template at regular intervals.
  * (see GTFS frequencies.txt)
+ * <p>
+ * Refactor this to inherit {@link TripTimes}
  */
 public class FrequencyEntry implements Serializable {
 
@@ -116,11 +118,13 @@ public class FrequencyEntry implements Serializable {
    * Returns a disposable TripTimes for this frequency entry in which the vehicle passes the given
    * stop index (not stop sequence number) at the given time. This allows us to separate the
    * departure/arrival search process from actually instantiating a TripTimes, to avoid making too
-   * many short-lived clones. This delegation is a sign that maybe FrequencyEntry should subclass
+   * many short-lived clones. This delegation is a sign that maybe FrequencyEntry should implement
    * TripTimes.
    */
   public TripTimes materialize(int stop, int time, boolean depart) {
-    return tripTimes.timeShift(stop, time, depart);
+    // TODO: The cast should be changed, the internal type should be scheduledTripTimes and the
+    //       shift method should partially be inlined here
+    return ((RealTimeTripTimes) tripTimes).timeShift(stop, time, depart);
   }
 
   /** Used in debugging / dumping times. */

@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
@@ -23,7 +22,7 @@ class TransitStopArrivalC2Test {
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
+  private static final int ACCESS_C1 = ACCESS_WALK.c1();
   private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
     ACCESS_DEPARTURE_TIME,
     ACCESS_WALK
@@ -78,7 +77,7 @@ class TransitStopArrivalC2Test {
 
   @Test
   public void c1() {
-    assertEquals(ACCESS_COST + TRANSIT_C1, subject.c1());
+    assertEquals(ACCESS_C1 + TRANSIT_C1, subject.c1());
   }
 
   @Test
@@ -104,7 +103,7 @@ class TransitStopArrivalC2Test {
   @Test
   public void testToString() {
     assertEquals(
-      "Transit { round: 1, stop: 101, arrival: [9:20 $1880], pattern: BUS T1 }",
+      "Transit { round: 1, stop: 101, arrival: [9:20 C₁1_880 C₂8000], pattern: BUS T1 }",
       subject.toString()
     );
   }

@@ -19,7 +19,7 @@ import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
-public class Ring {
+class Ring {
 
   private final LinearRing shell;
   private final List<Ring> holes = new ArrayList<>();
@@ -115,7 +115,7 @@ public class Ring {
         lrholelist.add(ring);
       }
     }
-    LinearRing[] lrholes = lrholelist.toArray(new LinearRing[lrholelist.size()]);
+    LinearRing[] lrholes = lrholelist.toArray(new LinearRing[0]);
     return factory.createPolygon(shell, lrholes);
   }
 

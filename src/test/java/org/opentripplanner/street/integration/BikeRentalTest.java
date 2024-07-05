@@ -433,8 +433,14 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> allowedNetworks
   ) {
     Consumer<RouteRequest> setter = options -> {
-      options.journey().rental().setAllowedNetworks(allowedNetworks);
-      options.journey().rental().setBannedNetworks(bannedNetworks);
+      options.withPreferences(preferences ->
+        preferences.withBike(bike ->
+          bike.withRental(rental -> {
+            rental.withAllowedNetworks(allowedNetworks);
+            rental.withBannedNetworks(bannedNetworks);
+          })
+        )
+      );
     };
 
     assertEquals(
@@ -457,8 +463,14 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> allowedNetworks
   ) {
     Consumer<RouteRequest> setter = options -> {
-      options.journey().rental().setAllowedNetworks(allowedNetworks);
-      options.journey().rental().setBannedNetworks(bannedNetworks);
+      options.withPreferences(preferences ->
+        preferences.withBike(bike ->
+          bike.withRental(rental -> {
+            rental.withAllowedNetworks(allowedNetworks);
+            rental.withBannedNetworks(bannedNetworks);
+          })
+        )
+      );
     };
 
     assertEquals(
@@ -580,17 +592,15 @@ public class BikeRentalTest extends GraphRoutingTest {
       toVertex,
       arriveBy,
       options -> {
-        options.withPreferences(p ->
-          p.withRental(rental ->
-            rental
-              .withUseAvailabilityInformation(useAvailabilityInformation)
-              .withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost)
+        options.withPreferences(preferences ->
+          preferences.withBike(bike ->
+            bike.withRental(rental -> {
+              rental.withUseAvailabilityInformation(useAvailabilityInformation);
+              rental.withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
+              rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+            })
           )
         );
-        options
-          .journey()
-          .rental()
-          .setAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
       }
     );
   }
@@ -605,13 +615,15 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     request.setArriveBy(arriveBy);
 
+    optionsSetter.accept(request);
+
     request.withPreferences(preferences ->
-      preferences.withRental(rental ->
-        rental.withPickupTime(42).withPickupCost(62).withDropoffCost(33).withDropoffTime(15)
+      preferences.withBike(bike ->
+        bike.withRental(rental ->
+          rental.withPickupTime(42).withPickupCost(62).withDropOffCost(33).withDropOffTime(15)
+        )
       )
     );
-
-    optionsSetter.accept(request);
 
     return runStreetSearchAndCreateDescriptor(
       fromVertex,

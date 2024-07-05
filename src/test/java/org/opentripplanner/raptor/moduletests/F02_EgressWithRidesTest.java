@@ -71,15 +71,15 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
 
   static List<RaptorModuleTestCase> testCases() {
     var prefix = "Walk 1m ~ B ~ BUS R1 0:10 ";
-    var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]";
-    var bestNTransfers = prefix + "0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx $2400]";
-    var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s 2tx $1378]";
-    var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m 1tx $1740]";
+    var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m Tₓ2 C₁1_380]";
+    var bestNTransfers = prefix + "0:18 ~ F ~ Walk 10m [0:09 0:28 19m Tₓ0 C₁2_400]";
+    var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s Tₓ2 C₁1_378]";
+    var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m Tₓ1 C₁1_740]";
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:00 0:09 9m 2tx]", "[0:00 0:11 11m 1tx]", "[0:00 0:19 19m 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m 0tx]")
+      .add(TC_MIN_DURATION, "[0:00 0:09 9m Tₓ2]", "[0:00 0:11 11m Tₓ1]", "[0:00 0:19 19m Tₓ0]")
+      .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m Tₓ0]")
       .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(bestArrivalTime))
       // "First" alighting wins for reverse
       .add(TC_STANDARD_REV_ONE, withoutCost(bestNTransfers))

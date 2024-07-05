@@ -14,6 +14,6 @@ public record TurnRestrictionUnknown(OSMWithTags entity, String tagval) implemen
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, tagval, entity.getOpenStreetMapLink(), entity.getId());
+    return String.format(HTMLFMT, tagval, entity.url(), entity.getId());
   }
 }

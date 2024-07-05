@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -16,8 +17,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.emissions.EmissionsConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -112,8 +115,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean platformEntriesLinking;
 
-  public final boolean matchBusRoutesToStreets;
-
   /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
@@ -148,8 +149,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   /** See {@link IslandPruningConfig}. */
   public final IslandPruningConfig islandPruning;
 
-  public final boolean banDiscouragedWalking;
-  public final boolean banDiscouragedBiking;
   public final Duration maxTransferDuration;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
@@ -166,22 +165,25 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Set<String> boardingLocationTags;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
+  public final EmissionsConfig emissions;
   public final TransitFeeds transitFeeds;
-  public boolean staticParkAndRide;
-  public boolean staticBikeParkAndRide;
-  public double distanceBetweenElevationSamples;
-  public double maxElevationPropagationMeters;
-  public boolean readCachedElevations;
-  public boolean writeCachedElevations;
+  public final boolean staticParkAndRide;
+  public final boolean staticBikeParkAndRide;
+  public final double distanceBetweenElevationSamples;
+  public final double maxElevationPropagationMeters;
+  public final boolean readCachedElevations;
+  public final boolean writeCachedElevations;
 
-  public boolean includeEllipsoidToGeoidDifference;
+  public final boolean includeEllipsoidToGeoidDifference;
 
-  public boolean multiThreadElevationCalculations;
+  public final boolean multiThreadElevationCalculations;
 
-  public LocalDate transitServiceStart;
+  public final LocalDate transitServiceStart;
 
-  public LocalDate transitServiceEnd;
-  public ZoneId transitModelTimeZone;
+  public final LocalDate transitServiceEnd;
+  public final ZoneId transitModelTimeZone;
+
+  public final URI stopConsolidation;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -210,18 +212,6 @@ public class BuildConfig implements OtpDataStoreConfig {
             shortest way rather than around the edge of it. (These calculations can be time consuming).
             """
         )
-        .asBoolean(false);
-    banDiscouragedWalking =
-      root
-        .of("banDiscouragedWalking")
-        .since(V2_0)
-        .summary("Should walking be allowed on OSM ways tagged with `foot=discouraged`")
-        .asBoolean(false);
-    banDiscouragedBiking =
-      root
-        .of("banDiscouragedBiking")
-        .since(V2_0)
-        .summary("Should biking be allowed on OSM ways tagged with `bicycle=discouraged`")
         .asBoolean(false);
     configVersion =
       root
@@ -280,14 +270,6 @@ all of the elevation values in the street edges.
 
     islandPruning = IslandPruningConfig.fromConfig(root);
 
-    matchBusRoutesToStreets =
-      root
-        .of("matchBusRoutesToStreets")
-        .since(V1_5)
-        .summary(
-          "Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking."
-        )
-        .asBoolean(false);
     maxDataImportIssuesPerFile =
       root
         .of("maxDataImportIssuesPerFile")
@@ -621,10 +603,21 @@ Netex data is also often supplied in a ZIP file.
         )
         .asUri(null);
 
+    stopConsolidation =
+      root
+        .of("stopConsolidationFile")
+        .since(V2_5)
+        .summary(
+          "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."
+        )
+        .asUri(null);
+
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
+    emissions = new EmissionsConfig("emissions", root);
+
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds =
@@ -685,6 +678,12 @@ Netex data is also often supplied in a ZIP file.
   }
 
   @Override
+  @Nullable
+  public URI stopConsolidation() {
+    return stopConsolidation;
+  }
+
+  @Override
   public Pattern gtfsLocalFilePattern() {
     return gtfsLocalFilePattern;
   }
@@ -726,5 +725,12 @@ Netex data is also often supplied in a ZIP file.
 
   public NodeAdapter asNodeAdapter() {
     return root;
+  }
+
+  /**
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
+   */
+  public boolean hasUnknownParameters() {
+    return root.hasUnknownParameters();
   }
 }

@@ -1,0 +1,5 @@
+{
+  "transitModelTimeZone": "America/Los_Angeles",
+  "fares": "orca",
+  "stopConsolidationFile": "consolidated-stops.csv"
+}

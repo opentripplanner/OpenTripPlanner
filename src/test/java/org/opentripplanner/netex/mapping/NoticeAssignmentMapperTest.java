@@ -13,6 +13,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -48,7 +49,7 @@ public class NoticeAssignmentMapperTest {
 
     Route route = TransitModelForTest.route(ROUTE_ID).build();
 
-    EntityById<Route> routesById = new EntityById<>();
+    EntityById<Route> routesById = new DefaultEntityById<>();
     routesById.add(route);
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
@@ -57,7 +58,7 @@ public class NoticeAssignmentMapperTest {
       List.of(),
       new HierarchicalMapById<>(),
       routesById,
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       new HashMap<>()
     );
 
@@ -107,8 +108,8 @@ public class NoticeAssignmentMapperTest {
       MappingSupport.ID_FACTORY,
       serviceJourneys,
       noticesById,
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       stopTimesById
     );
 

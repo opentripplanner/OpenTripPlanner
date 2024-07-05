@@ -19,7 +19,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 class OpenGisMapper {
 
   static Geometry mapGeometry(PolygonType polygonType) {
-    return new Polygon(
+    Polygon polygon = new Polygon(
       new LinearRing(
         mapCoordinateSequence(polygonType.getExterior()),
         GeometryUtils.getGeometryFactory()
@@ -31,6 +31,10 @@ class OpenGisMapper {
         .toArray(LinearRing[]::new),
       GeometryUtils.getGeometryFactory()
     );
+    if (!polygon.isValid()) {
+      throw new IllegalArgumentException("The polygon has an invalid geometry");
+    }
+    return polygon;
   }
 
   private static CoordinateSequence mapCoordinateSequence(

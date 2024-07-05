@@ -206,7 +206,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public boolean vehicleRentalIsFinished() {
+  private boolean vehicleRentalIsFinished() {
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (
@@ -214,14 +214,17 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         !stateData.insideNoRentalDropOffArea
       ) ||
       (
-        getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
+        getRequest()
+          .preferences()
+          .rental(getRequest().mode())
+          .allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
       )
     );
   }
 
-  public boolean vehicleRentalNotStarted() {
+  private boolean vehicleRentalNotStarted() {
     return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
   }
 
@@ -471,6 +474,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .addNum("weight", weight)
       .addObj("vertex", vertex)
       .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
+      .addEnum("formFactor", vehicleRentalFormFactor())
+      .addBoolIfTrue("RENTING_FROM_STATION", isRentingVehicleFromStation())
+      .addBoolIfTrue(
+        "RENTING_FREE_FLOATING",
+        isRentingFloatingVehicle() && !isRentingVehicleFromStation()
+      )
       .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
       .toString();
   }
@@ -497,7 +506,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   private State reversedClone() {
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
-      .withPreferences(p -> p.withRental(r -> r.withUseAvailabilityInformation(false)))
+      .withPreferences(p -> {
+        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
+        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
+      })
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

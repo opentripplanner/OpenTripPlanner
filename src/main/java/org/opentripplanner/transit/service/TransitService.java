@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -33,6 +32,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -44,7 +44,20 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
- * Entry point for read-only requests towards the transit API.
+ * TransitService is a read-only interface for retrieving public transport data. It provides a
+ * frozen view of all these elements at a point in time, which is not affected by incoming realtime
+ * data, allowing results to remain stable over the course of a request. This can be used for
+ * fetching tables of specific information like the routes passing through a particular stop, or for
+ * gaining access to the entirety of the data to perform routing.
+ * <p>
+ * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TransitModel.
+ *   Is this intentional, because TransitLayer is meant to be read-only and TransitModel is not?
+ *   Should this be renamed TransitDataService since it seems to provide access to the data but
+ *   not to transit routing functionality (which is provided by the RoutingService)?
+ *   The DefaultTransitService implementation has a TransitModel instance and many of its methods
+ *   read through to that TransitModel instance. But that field itself is not exposed, while the
+ *   TransitLayer is here. It seems like exposing the raw TransitLayer is still a risk since it's
+ *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
  */
 public interface TransitService {
   Collection<String> getFeedIds();
@@ -96,7 +109,11 @@ public interface TransitService {
 
   Collection<RegularStop> listRegularStops();
 
+  Collection<GroupStop> listGroupStops();
+
   StopLocation getStopLocation(FeedScopedId parseId);
+
+  Collection<StopLocation> getStopOrChildStops(FeedScopedId id);
 
   Collection<StopLocationsGroup> listStopLocationGroups();
 
@@ -186,7 +203,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<RegularStop> findRegularStop(Envelope envelope);
+  Collection<RegularStop> findRegularStops(Envelope envelope);
 
   Collection<AreaStop> findAreaStops(Envelope envelope);
 

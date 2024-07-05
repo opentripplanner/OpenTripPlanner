@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.opentripplanner.raptor.api.model.PathLegType;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
@@ -29,7 +30,7 @@ final class Transit<T extends RaptorTripSchedule>
 
   @Override
   public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+    return RaptorConstants.NOT_SET;
   }
 
   @Override

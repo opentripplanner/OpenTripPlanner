@@ -58,9 +58,9 @@ public class B02_EgressTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    String expStd = "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx]";
+    String expStd = "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s Tₓ0]";
     String expStdRevOne =
-      "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx]";
+      "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s Tₓ0]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("17m20s", TX_0, T00_00, T00_30)
@@ -70,9 +70,9 @@ public class B02_EgressTest implements RaptorTestConstants {
       .add(TC_STANDARD_REV_ONE, expStdRevOne)
       .add(
         multiCriteria(),
-        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]",
-        "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s 0tx $1960]",
-        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx $1722]"
+        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s Tₓ0 C₁2_080]",
+        "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s Tₓ0 C₁1_960]",
+        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s Tₓ0 C₁1_722]"
       )
       .build();
   }

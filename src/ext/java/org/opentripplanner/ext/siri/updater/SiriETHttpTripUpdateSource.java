@@ -1,11 +1,16 @@
 package org.opentripplanner.ext.siri.updater;
 
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -21,48 +26,45 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private final String url;
 
-  private final SiriHttpLoader siriHttpLoader;
+  private final SiriLoader siriLoader;
   private final String requestorRef;
 
   /**
-   * True iff the last list with updates represent all updates that are active right now, i.e. all
-   * previous updates should be disregarded
+   * The incrementality of the last received collection of updates.
    */
-  private boolean fullDataset = true;
+  private UpdateIncrementality updateIncrementality = FULL_DATASET;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
   public SiriETHttpTripUpdateSource(Parameters parameters) {
     this.feedId = parameters.feedId();
     this.url = parameters.url();
 
-    requestorRef =
+    this.requestorRef =
       parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
         ? "otp-" + UUID.randomUUID()
         : parameters.requestorRef();
 
-    siriHttpLoader =
-      new SiriHttpLoader(
-        url,
-        parameters.timeout(),
-        parameters.httpRequestHeaders(),
-        parameters.previewInterval()
-      );
+    this.siriLoader = createLoader(url, parameters);
   }
 
   @Override
-  public Siri getUpdates() {
+  public Optional<Siri> getUpdates() {
     long t1 = System.currentTimeMillis();
     try {
-      Siri siri = siriHttpLoader.fetchETFeed(requestorRef);
-
-      if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
-        LOG.info("Newer data has already been processed");
-        return null;
+      var siri = siriLoader.fetchETFeed(requestorRef);
+      if (siri.map(Siri::getServiceDelivery).isEmpty()) {
+        return Optional.empty();
       }
-      lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
+
+      var serviceDelivery = siri.get().getServiceDelivery();
+      if (serviceDelivery.getResponseTimestamp().isBefore(lastTimestamp)) {
+        LOG.info("Newer data has already been processed");
+        return Optional.empty();
+      }
+      lastTimestamp = serviceDelivery.getResponseTimestamp();
 
       //All subsequent requests will return changes since last request
-      fullDataset = false;
+      updateIncrementality = DIFFERENTIAL;
       return siri;
     } catch (OtpHttpClientException e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
@@ -71,12 +73,12 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
       LOG.warn("Failed to parse SIRI-ET feed from {}", url, e);
     }
-    return null;
+    return Optional.empty();
   }
 
   @Override
-  public boolean getFullDatasetValueOfLastUpdates() {
-    return fullDataset;
+  public UpdateIncrementality incrementalityOfLastUpdates() {
+    return updateIncrementality;
   }
 
   @Override
@@ -86,6 +88,22 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   public String toString() {
     return "SiriETHttpTripUpdateSource(" + url + ")";
+  }
+
+  private static SiriLoader createLoader(String url, Parameters parameters) {
+    // Load real-time updates from a file.
+    if (SiriFileLoader.matchesUrl(url)) {
+      return new SiriFileLoader(url);
+    }
+    // Fallback to default loader
+    else {
+      return new SiriHttpLoader(
+        url,
+        parameters.timeout(),
+        parameters.httpRequestHeaders(),
+        parameters.previewInterval()
+      );
+    }
   }
 
   public interface Parameters {

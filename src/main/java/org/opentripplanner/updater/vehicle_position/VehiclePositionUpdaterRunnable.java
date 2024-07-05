@@ -9,7 +9,7 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 
 public record VehiclePositionUpdaterRunnable(
   List<VehiclePosition> updates,
-  VehiclePositionPatternMatcher matcher
+  RealtimeVehiclePatternMatcher matcher
 )
   implements GraphWriterRunnable {
   public VehiclePositionUpdaterRunnable {
@@ -20,6 +20,6 @@ public record VehiclePositionUpdaterRunnable(
   @Override
   public void run(Graph graph, TransitModel transitModel) {
     // Apply new vehicle positions
-    matcher.applyVehiclePositionUpdates(updates);
+    matcher.applyRealtimeVehicleUpdates(updates);
   }
 }

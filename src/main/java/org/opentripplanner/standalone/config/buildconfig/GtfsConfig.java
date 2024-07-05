@@ -74,7 +74,7 @@ public class GtfsConfig {
           .description(
             """
             This parameter sets the generic level of preference. What is the actual cost can be changed
-            with the `stopTransferCost` parameter in the router configuration.
+            with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
             """
           )
           .docDefaultValue(docDefaults.stationTransferPreference())

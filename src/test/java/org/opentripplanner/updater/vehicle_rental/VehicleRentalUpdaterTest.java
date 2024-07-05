@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -83,6 +84,12 @@ class VehicleRentalUpdaterTest {
     @Override
     public String url() {
       return "https://example.com";
+    }
+
+    @Nullable
+    @Override
+    public String network() {
+      return "Test";
     }
 
     @Nonnull

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class GtfsRealtimeHttpVehiclePositionSource {
   public GtfsRealtimeHttpVehiclePositionSource(URI url, HttpHeaders headers) {
     this.url = url;
     this.headers = HttpHeaders.of().acceptProtobuf().add(headers).build();
-    this.otpHttpClient = new OtpHttpClient();
+    this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
   }
 
   /**

@@ -13,9 +13,11 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -58,6 +60,14 @@ public class ToStringBuilder {
    */
   public static ToStringBuilder of(Class<?> clazz) {
     return new ToStringBuilder(clazz.getSimpleName());
+  }
+
+  /**
+   * Create a ToStringBuilder for a "named" type. The preferred method is {@link #of(Class)},
+   * but this can be used if the type is unknown or irrelevant.
+   */
+  public static ToStringBuilder of(String name) {
+    return new ToStringBuilder(name);
   }
 
   /**
@@ -127,11 +137,19 @@ public class ToStringBuilder {
   }
 
   /**
+   * Add the result of the given supplier. If the supplier return {@code  null} or an exceptions
+   * is thrown, then nothing is added - the result is ignored.
+   */
+  public ToStringBuilder addObjOpSafe(String name, Supplier<?> body) {
+    return addObj(name, ObjectUtils.safeGetOrNull(body));
+  }
+
+  /**
    * Use this if you would like a custom toString function to convert the value. If the given value
    * is null, then the value is not printed.
    * <p>
    * Implementation note! The "Op" (Operation) suffix is necessary to separate this from
-   * {@link #addObj(String, Object, Object)},  when the last argument is null.
+   * {@link #addObj(String, Object, Object)}, when the last argument is null.
    */
   public <T> ToStringBuilder addObjOp(
     String name,
@@ -168,7 +186,7 @@ public class ToStringBuilder {
     return addIt(name, Arrays.toString(value));
   }
 
-  /** Add collection if not null or not empty, all elements are added */
+  /** Add the collection if not null or not empty, all elements are added */
   public ToStringBuilder addCol(String name, Collection<?> c) {
     return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
   }
@@ -186,19 +204,25 @@ public class ToStringBuilder {
   }
 
   /** Add the collection, truncate the number of elements at given maxLimit. */
-  public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
+  public <T> ToStringBuilder addCollection(
+    String name,
+    Collection<T> c,
+    int maxLimit,
+    Function<T, String> toString
+  ) {
     if (c == null) {
       return this;
     }
     if (c.size() > maxLimit + 1) {
-      String value = c
-        .stream()
-        .limit(maxLimit)
-        .map(Object::toString)
-        .collect(Collectors.joining(", "));
+      String value = c.stream().limit(maxLimit).map(toString).collect(Collectors.joining(", "));
       return addIt(name + "(" + maxLimit + "/" + c.size() + ")", "[" + value + ", ..]");
     }
     return addIfNotNull(name, c);
+  }
+
+  /** Add the collection, truncate the number of elements at given maxLimit. */
+  public <T> ToStringBuilder addCollection(String name, Collection<T> c, int maxLimit) {
+    return addCollection(name, c, maxLimit, Object::toString);
   }
 
   public ToStringBuilder addColSize(String name, Collection<?> c) {
@@ -237,7 +261,7 @@ public class ToStringBuilder {
    * DATE is not printed. {@code null} value is ignored.
    */
   public ToStringBuilder addTime(String name, ZonedDateTime time) {
-    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_TIME::format);
+    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format);
   }
 
   /**
@@ -372,7 +396,7 @@ public class ToStringBuilder {
    * Map the given object to a String. If the input object is {@code null} the string
    * {@code "null"} is returned if not the {@link Object#toString()} method is called.
    */
-  public static String nullSafeToString(@Nullable Object object) {
+  static String nullSafeToString(@Nullable Object object) {
     if (object == null) {
       return NULL_VALUE;
     }

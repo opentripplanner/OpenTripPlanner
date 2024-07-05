@@ -27,6 +27,7 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
   private ZonedDateTime creationTime;
   private ZonedDateTime updatedTime;
   private String siriCodespace;
+  private Integer version;
   private final Set<EntitySelector> entities = new HashSet<>();
   private final List<TimePeriod> timePeriods = new ArrayList<>();
 
@@ -36,11 +37,11 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
 
   TransitAlertBuilder(TransitAlert original) {
     super(original);
-    this.headerText = original.headerText();
-    this.descriptionText = original.descriptionText();
+    this.headerText = original.headerText().orElse(null);
+    this.descriptionText = original.descriptionText().orElse(null);
     this.detailText = original.detailText();
     this.adviceText = original.adviceText();
-    this.url = original.url();
+    this.url = original.url().orElse(null);
     this.siriUrls.addAll(original.siriUrls());
     this.type = original.type();
     this.severity = original.severity();
@@ -164,6 +165,15 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
 
   public TransitAlertBuilder withCreationTime(ZonedDateTime creationTime) {
     this.creationTime = creationTime;
+    return this;
+  }
+
+  public Integer version() {
+    return version;
+  }
+
+  public TransitAlertBuilder withVersion(Integer version) {
+    this.version = version;
     return this;
   }
 

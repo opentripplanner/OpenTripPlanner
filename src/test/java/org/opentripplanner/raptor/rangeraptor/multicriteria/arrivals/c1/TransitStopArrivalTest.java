@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
@@ -10,6 +9,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 class TransitStopArrivalTest {
@@ -23,7 +23,7 @@ class TransitStopArrivalTest {
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
+  private static final int ACCESS_C1 = ACCESS_WALK.c1();
   private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
     ACCESS_DEPARTURE_TIME,
     ACCESS_WALK
@@ -38,13 +38,13 @@ class TransitStopArrivalTest {
     .build();
   private static final int TRANSIT_TRAVEL_DURATION =
     ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
-  private static final int TRANSIT_COST = 128000;
+  private static final int TRANSIT_C1 = 128000;
   private static final int ROUND = 1;
   private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_C1,
     TRANSIT_TRIP
   );
 
@@ -76,12 +76,12 @@ class TransitStopArrivalTest {
 
   @Test
   public void c1() {
-    assertEquals(ACCESS_COST + TRANSIT_COST, subject.c1());
+    assertEquals(ACCESS_C1 + TRANSIT_C1, subject.c1());
   }
 
   @Test
   public void c2() {
-    assertThrows(UnsupportedOperationException.class, subject::c2);
+    assertEquals(RaptorConstants.NOT_SET, subject.c2());
   }
 
   @Test
@@ -102,7 +102,7 @@ class TransitStopArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Transit { round: 1, stop: 101, arrival: [9:20 $1880], pattern: BUS T1 }",
+      "Transit { round: 1, stop: 101, arrival: [9:20 C₁1_880], pattern: BUS T1 }",
       subject.toString()
     );
   }

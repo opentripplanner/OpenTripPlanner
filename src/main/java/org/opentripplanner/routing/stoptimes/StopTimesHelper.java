@@ -52,6 +52,10 @@ public class StopTimesHelper {
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
   ) {
+    if (numberOfDepartures <= 0) {
+      return List.of();
+    }
+
     List<StopTimesInPattern> result = new ArrayList<>();
 
     // Fetch all patterns, including those from realtime sources

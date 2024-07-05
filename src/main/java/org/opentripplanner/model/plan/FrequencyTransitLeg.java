@@ -1,16 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -21,36 +14,9 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
   private final int frequencyHeadwayInSeconds;
 
-  public FrequencyTransitLeg(
-    TripTimes tripTimes,
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    LocalDate serviceDate,
-    ZoneId zoneId,
-    ConstrainedTransfer transferFromPreviousLeg,
-    ConstrainedTransfer transferToNextLeg,
-    int generalizedCost,
-    int frequencyHeadwayInSeconds,
-    @Nullable Float accessibilityScore
-  ) {
-    super(
-      tripTimes,
-      tripPattern,
-      boardStopIndexInPattern,
-      alightStopIndexInPattern,
-      startTime,
-      endTime,
-      serviceDate,
-      zoneId,
-      transferFromPreviousLeg,
-      transferToNextLeg,
-      generalizedCost,
-      accessibilityScore
-    );
-    this.frequencyHeadwayInSeconds = frequencyHeadwayInSeconds;
+  FrequencyTransitLeg(FrequencyTransitLegBuilder builder) {
+    super(builder);
+    this.frequencyHeadwayInSeconds = builder.frequencyHeadwayInSeconds();
   }
 
   @Override
@@ -89,8 +55,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime),
-        ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
+        LegTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
         i,
         tripTimes.gtfsSequenceOfStopIndex(i)
       );
@@ -101,20 +67,6 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
   @Override
   public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new FrequencyTransitLeg(
-      tripTimes,
-      tripPattern,
-      boardStopPosInPattern,
-      alightStopPosInPattern,
-      getStartTime(),
-      getEndTime(),
-      serviceDate,
-      zoneId,
-      getTransferFromPrevLeg(),
-      getTransferToNextLeg(),
-      getGeneralizedCost(),
-      frequencyHeadwayInSeconds,
-      score
-    );
+    return new FrequencyTransitLegBuilder(this).withAccessibilityScore(score).build();
   }
 }

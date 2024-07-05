@@ -51,6 +51,7 @@ public record FareProduct(
     return ToStringBuilder
       .of(FareProduct.class)
       .addStr("id", id.toString())
+      .addStr("name", name)
       .addObj("amount", price)
       .addDuration("duration", validity)
       .addObj("category", category)

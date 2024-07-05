@@ -1,11 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -23,13 +21,13 @@ class TransferStopArrivalC2Test {
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
+  private static final int ACCESS_C1 = ACCESS_WALK.c1();
 
   private static final int TRANSIT_TO_STOP = 101;
   private static final int TRANSIT_BOARD_TIME = 9 * 60 * 60;
   private static final int TRANSIT_LEG_DURATION = 1200;
   private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
-  private static final int TRANSIT_COST = 128000;
+  private static final int TRANSIT_C1 = 128000;
   private static final RaptorTripSchedule TRANSIT_TRIP = null;
   private static final int ROUND = 1;
 
@@ -40,11 +38,11 @@ class TransferStopArrivalC2Test {
     TRANSFER_TO_STOP,
     TRANSFER_LEG_DURATION
   );
-  private static final int TRANSFER_COST = TRANSFER_WALK.generalizedCost();
+  private static final int TRANSFER_C1 = TRANSFER_WALK.c1();
 
-  private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;
+  private static final int EXPECTED_C1 = ACCESS_C1 + TRANSIT_C1 + TRANSFER_C1;
 
-  private static final int TRANSIT_C2 = 600;
+  private static final int TRANSIT_C2 = 6;
 
   private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
     ACCESS_DEPARTURE_TIME,
@@ -55,7 +53,7 @@ class TransferStopArrivalC2Test {
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_C1,
     TRANSIT_C2,
     TRANSIT_TRIP
   );
@@ -84,7 +82,7 @@ class TransferStopArrivalC2Test {
 
   @Test
   public void c1() {
-    assertEquals(EXPECTED_COST, subject.c1());
+    assertEquals(EXPECTED_C1, subject.c1());
   }
 
   @Test
@@ -114,7 +112,7 @@ class TransferStopArrivalC2Test {
   @Test
   public void testToString() {
     assertEquals(
-      "Walk { round: 1, stop: 102, arrival: [9:26 $2600], path: On-Street 6m ~ 102 }",
+      "Walk { round: 1, stop: 102, arrival: [9:26 C₁2_600 C₂6], path: On-Street 6m ~ 102 }",
       subject.toString()
     );
   }

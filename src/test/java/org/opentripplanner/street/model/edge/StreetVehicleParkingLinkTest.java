@@ -11,34 +11,33 @@ import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.test.support.VariableSource;
 
 class StreetVehicleParkingLinkTest {
 
-  static Stream<Arguments> testCases = Stream.of(
-    of(Set.of(), Set.of(), Set.of(), true),
-    of(Set.of("a-tag"), Set.of(), Set.of(), true),
-    of(Set.of("a"), Set.of("a"), Set.of(), false),
-    of(Set.of("a"), Set.of("a"), Set.of("a"), false),
-    of(Set.of("a", "b"), Set.of("b"), Set.of("a"), false),
-    of(Set.of("a", "b"), Set.of(), Set.of("a"), true),
-    of(Set.of("a", "b"), Set.of(), Set.of("c"), false)
-  );
+  static Stream<Arguments> testCases() {
+    return Stream.of(
+      of(Set.of(), Set.of(), Set.of(), true),
+      of(Set.of("a-tag"), Set.of(), Set.of(), true),
+      of(Set.of("a"), Set.of("a"), Set.of(), false),
+      of(Set.of("a"), Set.of("a"), Set.of("a"), false),
+      of(Set.of("a", "b"), Set.of("b"), Set.of("a"), false),
+      of(Set.of("a", "b"), Set.of(), Set.of("a"), true),
+      of(Set.of("a", "b"), Set.of(), Set.of("c"), false)
+    );
+  }
 
   @ParameterizedTest(name = "Parking[tags={0}], Request[not={1}, select={2}] should traverse={3}")
-  @VariableSource("testCases")
+  @MethodSource("testCases")
   void foo(Set<String> parkingTags, Set<String> not, Set<String> select, boolean shouldTraverse) {
     var streetVertex = intersectionVertex(1, 1);
     var parking = VehicleParking
@@ -59,17 +58,18 @@ class StreetVehicleParkingLinkTest {
       .build();
 
     var entranceVertex = new VehicleParkingEntranceVertex(entrance);
-    var parkingReq = new VehicleParkingRequest();
-
-    Set<VehicleParkingFilter> notFilter = Set.of(new VehicleParkingFilter.TagsFilter(not));
-    Set<VehicleParkingFilter> selectFilter = Set.of(new VehicleParkingFilter.TagsFilter(select));
-
-    parkingReq.setFilter(new VehicleParkingFilterRequest(notFilter, selectFilter));
 
     var req = StreetSearchRequest.of();
     req.withMode(StreetMode.BIKE_TO_PARK);
-    req.withParking(parkingReq);
-    req.withPreferences(p -> p.withBike(bike -> bike.withParkCost(0)));
+    req.withPreferences(p ->
+      p.withBike(bike -> {
+        bike.withParking(parkingPreferences -> {
+          parkingPreferences.withRequiredVehicleParkingTags(select);
+          parkingPreferences.withBannedVehicleParkingTags(not);
+          parkingPreferences.withCost(0);
+        });
+      })
+    );
 
     var edge = StreetVehicleParkingLink.createStreetVehicleParkingLink(
       streetVertex,

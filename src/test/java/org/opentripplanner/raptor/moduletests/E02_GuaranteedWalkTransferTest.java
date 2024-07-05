@@ -83,7 +83,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ Walk 30s ~ C ~ BUS R2 0:05 0:10 ~ D ~ Walk 30s " +
-      "[0:01:10 0:10:40 9m30s 1tx $1260]";
+      "[0:01:10 0:10:40 9m30s Tₓ1 C₁1_260]";
     return RaptorModuleTestCase
       .of()
       // BUG! 10 minutes is wrong, it should be 9m30s - Raptor may drop optimal paths,

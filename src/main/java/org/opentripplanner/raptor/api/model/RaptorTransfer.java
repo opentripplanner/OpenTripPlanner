@@ -20,7 +20,7 @@ public interface RaptorTransfer {
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
    */
-  int generalizedCost();
+  int c1();
 
   /**
    * The time duration to walk or travel the path in seconds. This is not the entire duration from

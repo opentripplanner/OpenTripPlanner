@@ -41,6 +41,7 @@ public class FareRuleMapperTest {
     var data = new GtfsTestData();
 
     FARE_ATTRIBUTE.setId(AGENCY_AND_ID);
+    FARE_ATTRIBUTE.setCurrencyType("USD");
 
     FARE_RULE.setId(ID);
     FARE_RULE.setContainsId(CONTAINS_ID);
@@ -79,7 +80,7 @@ public class FareRuleMapperTest {
     assertNull(result.getRoute());
   }
 
-  /** Mapping the same object twice, should return the the same instance. */
+  /** Mapping the same object twice, should return the same instance. */
   @Test
   public void testMapCache() throws Exception {
     org.opentripplanner.ext.fares.model.FareRule result1 = subject.map(FARE_RULE);

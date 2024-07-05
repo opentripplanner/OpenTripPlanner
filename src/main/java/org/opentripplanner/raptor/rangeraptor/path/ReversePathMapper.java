@@ -65,6 +65,9 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
       switch (arrival.arrivedBy()) {
         case ACCESS:
           pathBuilder.egress(arrival.accessPath().access());
+
+          pathBuilder.c2(arrival.c2());
+
           return pathBuilder.build();
         case TRANSIT:
           var times = tripSearch.find(arrival);

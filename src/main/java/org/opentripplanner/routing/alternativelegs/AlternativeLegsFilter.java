@@ -14,6 +14,10 @@ public enum AlternativeLegsFilter {
   ),
   SAME_MODE((Leg leg) ->
     (TripPattern tripPattern) -> leg.getTrip().getMode().equals(tripPattern.getMode())
+  ),
+  SAME_SUBMODE((Leg leg) ->
+    (TripPattern tripPattern) ->
+      leg.getTrip().getNetexSubMode().equals(tripPattern.getNetexSubmode())
   );
 
   public final Function<Leg, Predicate<TripPattern>> predicateGenerator;

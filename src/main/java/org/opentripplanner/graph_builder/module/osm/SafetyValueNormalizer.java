@@ -90,12 +90,12 @@ class SafetyValueNormalizer {
     boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
 
     if (street != null) {
-      double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();
+      double bicycleSafety = wayData.bicycleSafety().forward();
       street.setBicycleSafetyFactor((float) bicycleSafety);
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = (float) bicycleSafety;
       }
-      double walkSafety = wayData.getWalkSafetyFeatures().forward();
+      double walkSafety = wayData.walkSafety().forward();
       street.setWalkSafetyFactor((float) walkSafety);
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = (float) walkSafety;
@@ -111,12 +111,12 @@ class SafetyValueNormalizer {
     }
 
     if (backStreet != null) {
-      double bicycleSafety = wayData.getBicycleSafetyFeatures().back();
+      double bicycleSafety = wayData.bicycleSafety().back();
       if (bicycleSafety < bestBikeSafety) {
         bestBikeSafety = (float) bicycleSafety;
       }
       backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-      double walkSafety = wayData.getWalkSafetyFeatures().back();
+      double walkSafety = wayData.walkSafety().back();
       if (walkSafety < bestWalkSafety) {
         bestWalkSafety = (float) walkSafety;
       }

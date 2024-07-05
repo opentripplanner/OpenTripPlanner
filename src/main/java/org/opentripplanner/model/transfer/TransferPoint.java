@@ -52,7 +52,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public interface TransferPoint {
   /**
-   * Utility method witch can be used in APIs to get the trip, if it exists, from a transfer point.
+   * Utility method which can be used in APIs to get the trip, if it exists, from a transfer point.
    */
   @Nullable
   static Trip getTrip(TransferPoint point) {
@@ -60,7 +60,7 @@ public interface TransferPoint {
   }
 
   /**
-   * Utility method witch can be used in APIs to get the route, if it exists, from a transfer
+   * Utility method which can be used in APIs to get the route, if it exists, from a transfer
    * point.
    */
   @Nullable

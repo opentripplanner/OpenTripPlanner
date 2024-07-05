@@ -10,8 +10,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -37,23 +35,25 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OsmModuleTest {
+
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
-    );
+    File file = RESOURCE_LOADER.file("map.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, true);
 
@@ -111,12 +111,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("NYC_small.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
@@ -168,7 +163,6 @@ public class OsmModuleTest {
     OSMWithTags way = new OSMWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
-    way.addTag("access", "no");
     way.addTag("surface", "gravel");
 
     WayPropertySet wayPropertySet = new WayPropertySet();
@@ -176,10 +170,10 @@ public class OsmModuleTest {
     // where there are no way specifiers, the default is used
     WayProperties wayData = wayPropertySet.getDataForWay(way);
     assertEquals(wayData.getPermission(), ALL);
-    assertEquals(wayData.getWalkSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getWalkSafetyFeatures().back(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().back(), 1.0);
+    assertEquals(wayData.walkSafety().forward(), 1.0);
+    assertEquals(wayData.walkSafety().back(), 1.0);
+    assertEquals(wayData.bicycleSafety().forward(), 1.0);
+    assertEquals(wayData.bicycleSafety().back(), 1.0);
 
     // add two equal matches: lane only...
     OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
@@ -217,7 +211,7 @@ public class OsmModuleTest {
     wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getBicycleSafetyFeatures().forward(), 1.5);
+    assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -234,9 +228,9 @@ public class OsmModuleTest {
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
     // right (with traffic) comes from track
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    assertEquals(0.25, dataForWay.bicycleSafety().forward());
     // left comes from lane
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
+    assertEquals(0.75, dataForWay.bicycleSafety().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");
@@ -304,12 +298,37 @@ public class OsmModuleTest {
       });
   }
 
+  /**
+   * Test that a barrier vertex at ending street will get no access limit
+   */
+  @Test
+  void testBarrierAtEnd() {
+    var deduplicator = new Deduplicator();
+    var graph = new Graph(deduplicator);
+
+    File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
+    OsmProvider provider = new OsmProvider(file, false);
+    OsmModule loader = OsmModule.of(provider, graph).build();
+    loader.buildGraph();
+
+    Vertex start = graph.getVertex(VertexLabel.osm(1));
+    Vertex end = graph.getVertex(VertexLabel.osm(3));
+
+    assertNotNull(start);
+    assertNotNull(end);
+    assertEquals(end.getClass(), BarrierVertex.class);
+    var barrier = (BarrierVertex) end;
+
+    // assert that pruning removed traversal restrictions
+    assertEquals(barrier.getBarrierPermissions(), ALL);
+  }
+
   @Nonnull
   private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(f -> new File(getClass().getResource(f).getFile()))
+      .map(RESOURCE_LOADER::file)
       .map(f -> new OsmProvider(f, false))
       .toList();
     var module = OsmModule
@@ -334,12 +353,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("usf_area.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();

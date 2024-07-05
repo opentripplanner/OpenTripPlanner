@@ -65,10 +65,7 @@ public enum StreetTraversalPermission {
       return true;
     } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else if (modes.getCar() && allows(StreetTraversalPermission.CAR)) {
-      return true;
-    }
-    return false;
+    } else return modes.getCar() && allows(StreetTraversalPermission.CAR);
   }
 
   /**
@@ -79,10 +76,7 @@ public enum StreetTraversalPermission {
       return true;
     } else if (mode.isCyclingIsh() && allows(StreetTraversalPermission.BICYCLE)) {
       return true;
-    } else if (mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR)) {
-      return true;
-    }
-    return false;
+    } else return mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR);
   }
 
   /**
@@ -93,10 +87,9 @@ public enum StreetTraversalPermission {
   }
 
   /**
-   * Returns true if there no modes are by this permission.
+   * Returns true if this permission allows nothing to traverse
    */
   public boolean allowsNothing() {
-    // TODO(flamholz): what about CROSSHATCHED?
     return this == StreetTraversalPermission.NONE;
   }
 }

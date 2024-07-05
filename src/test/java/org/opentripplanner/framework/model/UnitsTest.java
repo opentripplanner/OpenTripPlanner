@@ -39,7 +39,7 @@ class UnitsTest {
     assertEquals(0, Units.duration(0));
     assertEquals(10_000, Units.duration(10_000));
     var ex = assertThrows(IllegalArgumentException.class, () -> Units.duration(-1));
-    assertEquals("Negative value not expected: -1", ex.getMessage());
+    assertEquals("Negative value not expected for value: -1", ex.getMessage());
   }
 
   @Test

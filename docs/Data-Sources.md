@@ -5,7 +5,7 @@
 At the core of OpenTripPlanner is a library of Java code that finds efficient paths through
 multi-modal transportation networks built
 from [OpenStreetMap](http://wiki.openstreetmap.org/wiki/Main_Page)
-and [GTFS](https://developers.google.com/transit/gtfs/) data. It can also receive GTFS-RT (realtime)
+and [GTFS](https://developers.google.com/transit/gtfs/) data. It can also receive GTFS-RT (real-time)
 data.
 
 In addition to GTFS, OTP can also load data in the Nordic Profile of Netex, the EU-standard transit

@@ -15,27 +15,30 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class HslParkUpdaterTest {
 
+  private static final ResourceLoader LOADER = ResourceLoader.of(HslParkUpdaterTest.class);
+  private static final String UTILIZATIONS_URL = LOADER.url("utilizations.json").toString();
+  private static final String HUBS_URL = LOADER.url("hubs.json").toString();
+  private static final String FACILITIES_URL = LOADER.url("facilities.json").toString();
+
   @Test
   void parseParks() {
-    var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
-    var hubsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/hubs.json";
-    var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
     var timeZone = ZoneIds.HELSINKI;
 
     var parameters = new HslParkUpdaterParameters(
       "",
       3000,
-      facilitiesUrl,
+      FACILITIES_URL,
       "hslpark",
       null,
       30,
-      utilizationsUrl,
+      UTILIZATIONS_URL,
       timeZone,
-      hubsUrl
+      HUBS_URL
     );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),
@@ -149,21 +152,18 @@ public class HslParkUpdaterTest {
 
   @Test
   void parseParksWithoutTimeZone() {
-    var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
-    var hubsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/hubs.json";
-    var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
     ZoneId timeZone = null;
 
     var parameters = new HslParkUpdaterParameters(
       "",
       3000,
-      facilitiesUrl,
+      FACILITIES_URL,
       "hslpark",
       null,
       30,
-      utilizationsUrl,
+      UTILIZATIONS_URL,
       timeZone,
-      hubsUrl
+      HUBS_URL
     );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),

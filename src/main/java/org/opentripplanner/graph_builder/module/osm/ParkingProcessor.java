@@ -135,7 +135,7 @@ class ParkingProcessor {
     if (openingHoursTag != null) {
       final ZoneId zoneId = entity.getOsmProvider().getZoneId();
       final var id = entity.getId();
-      final var link = entity.getOpenStreetMapLink();
+      final var link = entity.url();
       try {
         return osmOpeningHoursParser.parseOpeningHours(
           openingHoursTag,
@@ -293,7 +293,7 @@ class ParkingProcessor {
   ) {
     LOG.debug(
       "Creating an artificial entrance for {} as it's not linked to the street network",
-      entity.getOpenStreetMapLink()
+      entity.url()
     );
     return List.of(builder ->
       builder

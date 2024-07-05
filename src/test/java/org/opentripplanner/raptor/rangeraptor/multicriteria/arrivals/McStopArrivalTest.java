@@ -14,8 +14,8 @@ class McStopArrivalTest {
   private static final int STOP = 9;
   private static final boolean ARRIVED_ON_BOARD = true;
   private static final boolean ARRIVED_ON_FOOT = false;
-  private static final int COST_100 = 100;
-  private static final int COST_777 = 777;
+  private static final int C1_100 = 100;
+  private static final int C1_777 = 777;
   private static final int PARETO_ROUND_ONE = 1;
   private static final int PARETO_ROUND_TWO = 2;
   private static final int ARRIVAL_TIME_EARLY = 12;
@@ -26,29 +26,29 @@ class McStopArrivalTest {
     // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
     assertFalse(
       McStopArrival.compareBase(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT)
       )
     );
     // Arrival-time is better
     assertTrue(
       McStopArrival.compareBase(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD)
       )
     );
     // Pareto-round is better
     assertTrue(
       McStopArrival.compareBase(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, C1_100, C1_100, ARRIVED_ON_BOARD)
       )
     );
     // C1 is better
     assertTrue(
       McStopArrival.compareBase(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_777, ARRIVED_ON_FOOT),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_777, C1_100, ARRIVED_ON_BOARD)
       )
     );
   }
@@ -58,15 +58,15 @@ class McStopArrivalTest {
     // Same values for arrivedOnBoard. Ignore arrival-time, pareto-round, c1 and c2
     assertFalse(
       McStopArrival.compareArrivedOnBoard(
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_BOARD)
       )
     );
     // Arrived on-board is better
     assertTrue(
       McStopArrival.compareArrivedOnBoard(
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_777, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, C1_777, C1_777, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, C1_100, C1_100, ARRIVED_ON_FOOT)
       )
     );
   }
@@ -83,7 +83,7 @@ class McStopArrivalTest {
       ARRIVAL_TIME_EARLY,
       PARETO_ROUND_ONE,
       bestC1,
-      COST_100,
+      C1_100,
       ARRIVED_ON_BOARD
     );
 
@@ -92,8 +92,8 @@ class McStopArrivalTest {
     assertFalse(
       McStopArrival.relaxedCompareBase(
         relaxC1,
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, COST_777, ARRIVED_ON_FOOT)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, C1_777, ARRIVED_ON_FOOT)
       )
     );
 
@@ -101,8 +101,8 @@ class McStopArrivalTest {
     assertTrue(
       McStopArrival.relaxedCompareBase(
         relaxC1,
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, bestC1, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, bestC1, C1_100, ARRIVED_ON_BOARD)
       )
     );
 
@@ -110,16 +110,16 @@ class McStopArrivalTest {
     assertTrue(
       McStopArrival.relaxedCompareBase(
         relaxC1,
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, bestC1, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, rejectC1, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, bestC1, C1_100, ARRIVED_ON_BOARD)
       )
     );
     // C1 is better, other the same
     assertTrue(
       McStopArrival.relaxedCompareBase(
         relaxC1,
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, okC1, COST_100, ARRIVED_ON_BOARD),
-        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, COST_100, ARRIVED_ON_BOARD)
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, okC1, C1_100, ARRIVED_ON_BOARD),
+        new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, bestC1, C1_100, ARRIVED_ON_BOARD)
       )
     );
   }

@@ -5,8 +5,6 @@ import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 public class StreetSearchRequestBuilder {
 
@@ -15,8 +13,6 @@ public class StreetSearchRequestBuilder {
   RoutingPreferences preferences;
   boolean arriveBy;
   boolean wheelchair;
-  VehicleParkingRequest parking;
-  VehicleRentalRequest rental;
   GenericLocation from;
   GenericLocation to;
 
@@ -26,8 +22,6 @@ public class StreetSearchRequestBuilder {
     this.preferences = original.preferences();
     this.arriveBy = original.arriveBy();
     this.wheelchair = original.wheelchair();
-    this.parking = original.parking().clone();
-    this.rental = original.rental();
     this.from = original.from();
     this.to = original.to();
   }
@@ -58,16 +52,6 @@ public class StreetSearchRequestBuilder {
 
   public StreetSearchRequestBuilder withWheelchair(boolean wheelchair) {
     this.wheelchair = wheelchair;
-    return this;
-  }
-
-  public StreetSearchRequestBuilder withParking(VehicleParkingRequest parking) {
-    this.parking = parking;
-    return this;
-  }
-
-  public StreetSearchRequestBuilder withRental(VehicleRentalRequest rental) {
-    this.rental = rental;
     return this;
   }
 

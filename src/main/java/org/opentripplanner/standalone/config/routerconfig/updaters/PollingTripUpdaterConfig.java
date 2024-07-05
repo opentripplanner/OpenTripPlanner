@@ -56,7 +56,7 @@ public class PollingTripUpdaterConfig {
 """
         )
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
-      c.of("feedId").since(V1_5).summary("Which feed the updates apply to.").asString(null),
+      c.of("feedId").since(V1_5).summary("Which feed the updates apply to.").asString(),
       url,
       headers
     );

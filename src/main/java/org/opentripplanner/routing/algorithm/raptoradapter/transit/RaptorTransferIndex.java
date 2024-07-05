@@ -43,11 +43,7 @@ public class RaptorTransferIndex {
         .stream()
         .flatMap(s -> s.asRaptorTransfer(request).stream())
         .collect(
-          toMap(
-            RaptorTransfer::stop,
-            Function.identity(),
-            (a, b) -> a.generalizedCost() < b.generalizedCost() ? a : b
-          )
+          toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
         )
         .values();
 

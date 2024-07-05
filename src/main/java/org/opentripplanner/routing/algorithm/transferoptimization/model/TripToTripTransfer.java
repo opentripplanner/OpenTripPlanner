@@ -45,7 +45,7 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
   }
 
   public int generalizedCost() {
-    return sameStop() ? 0 : pathTransfer.generalizedCost();
+    return sameStop() ? 0 : pathTransfer.c1();
   }
 
   public boolean sameStop() {

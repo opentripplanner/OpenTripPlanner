@@ -11,11 +11,4 @@ public interface TransitEntityBuilder<
    * for clients not in the same context (updaters vs routing requests).
    */
   E save();
-
-  /**
-   * Delete the entity represented by the builder id (original) from the current context. The
-   * change will propagate to the master Service/Index when the context is committed. Not all
-   * entities can be deleted, if so this method will throw an exception.
-   */
-  void delete();
 }

@@ -2,12 +2,9 @@ package org.opentripplanner.routing.api.request;
 
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 public class RequestModes {
 
@@ -39,10 +36,11 @@ public class RequestModes {
     StreetMode directMode,
     StreetMode transferMode
   ) {
-    this.accessMode = (accessMode != null && accessMode.access) ? accessMode : NOT_SET;
-    this.egressMode = (egressMode != null && egressMode.egress) ? egressMode : NOT_SET;
+    this.accessMode = (accessMode != null && accessMode.accessAllowed()) ? accessMode : NOT_SET;
+    this.egressMode = (egressMode != null && egressMode.egressAllowed()) ? egressMode : NOT_SET;
     this.directMode = directMode != null ? directMode : NOT_SET;
-    this.transferMode = (transferMode != null && transferMode.transfer) ? transferMode : NOT_SET;
+    this.transferMode =
+      (transferMode != null && transferMode.transferAllowed()) ? transferMode : NOT_SET;
   }
 
   public RequestModes(RequestModesBuilder builder) {

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.time.Duration;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 
 /**
  * Convert Raptor internal cost to OTP domain model cost, and back.
@@ -47,7 +47,7 @@ public final class RaptorCostConverter {
    * Convert Raptor internal cost to a string with format $###.## (in seconds)
    */
   public static String toString(int raptorCost) {
-    return OtpNumberFormat.formatCostCenti(raptorCost);
+    return RaptorValueFormatter.formatC1(raptorCost);
   }
 
   /**

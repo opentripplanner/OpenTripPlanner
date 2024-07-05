@@ -2,10 +2,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
@@ -20,6 +16,7 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
@@ -38,8 +35,7 @@ public class UnroutableTest {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
 
-    URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
-    File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
+    var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     OsmProvider provider = new OsmProvider(osmDataFile, true);
     OsmModule osmBuilder = OsmModule.of(provider, graph).withAreaVisibility(true).build();
     osmBuilder.buildGraph();

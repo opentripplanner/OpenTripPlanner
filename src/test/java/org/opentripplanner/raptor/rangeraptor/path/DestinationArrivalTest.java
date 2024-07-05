@@ -14,7 +14,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC
 public class DestinationArrivalTest {
 
   private static final int ANY = 9_999;
-  private static final int BOARD_SLACK = 60;
   private static final int ACCESS_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 72;
@@ -22,7 +21,7 @@ public class DestinationArrivalTest {
     ACCESS_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
+  private static final int ACCESS_COST = ACCESS_WALK.c1();
 
   private static final int TRANSIT_STOP = 101;
   private static final int TRANSIT_BOARD_TIME = ACCESS_DEPARTURE_TIME + 10 * 60;
@@ -31,10 +30,11 @@ public class DestinationArrivalTest {
   private static final int TRANSIT_COST = 84000;
 
   private static final int DESTINATION_DURATION_TIME = 50;
-  private static final int DESTINATION_COST = 50000;
+  private static final int DESTINATION_C1 = 50000;
+  private static final int DESTINATION_C2 = 5;
 
   private static final int EXPECTED_ARRIVAL_TIME = TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME;
-  private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_COST;
+  private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_C1;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY = new StopArrivalFactoryC1<RaptorTripSchedule>();
 
@@ -57,7 +57,8 @@ public class DestinationArrivalTest {
     TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
-    DESTINATION_COST
+    DESTINATION_C1,
+    DESTINATION_C2
   );
 
   @Test
@@ -83,7 +84,7 @@ public class DestinationArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 $1484], path: Walk 50s $100 ~ 101 }",
+      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 C₁1_484 C₂5], path: Walk 50s C₁100 ~ 101 }",
       subject.toString()
     );
   }

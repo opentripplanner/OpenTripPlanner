@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,6 +15,15 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 
+/**
+ * Internal representation of a GTFS-RT Service Alert or SIRI Situation Exchange (SX) message.
+ * These are text descriptions of problems affecting specific stops, routes, or other components
+ * of the transit system which will be displayed to users as text.
+ * Although they have flags describing the effect of the problem described in the text, these
+ * messages do not currently modify routing behavior on their own. They must be accompanied by
+ * messages of other types to actually impact routing. However, there is ongoing discussion about
+ * allowing Alerts to affect routing, especially for cases such as stop closure messages.
+ */
 public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAlertBuilder> {
 
   private final I18NString headerText;
@@ -32,6 +42,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   //null means unknown
   private final Integer priority;
   private final ZonedDateTime creationTime;
+  private final Integer version;
   private final ZonedDateTime updatedTime;
   private final String siriCodespace;
   private final Set<EntitySelector> entities;
@@ -51,6 +62,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.effect = builder.effect();
     this.priority = builder.priority();
     this.creationTime = builder.creationTime();
+    this.version = builder.version();
     this.updatedTime = builder.updatedTime();
     this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
@@ -61,12 +73,12 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return new TransitAlertBuilder(id);
   }
 
-  public I18NString headerText() {
-    return headerText;
+  public Optional<I18NString> headerText() {
+    return Optional.ofNullable(headerText);
   }
 
-  public I18NString descriptionText() {
-    return descriptionText;
+  public Optional<I18NString> descriptionText() {
+    return Optional.ofNullable(descriptionText);
   }
 
   public I18NString detailText() {
@@ -77,9 +89,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return adviceText;
   }
 
-  @Nullable
-  public I18NString url() {
-    return url;
+  public Optional<I18NString> url() {
+    return Optional.ofNullable(url);
   }
 
   public List<AlertUrl> siriUrls() {
@@ -117,6 +128,16 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   public ZonedDateTime creationTime() {
     return creationTime;
+  }
+
+  /**
+   * Note: Only supported for TransitAlerts created from SIRI-SX messages
+   *
+   * @return Version as provided, or <code>null</code>
+   */
+  @Nullable
+  public Integer version() {
+    return version;
   }
 
   public ZonedDateTime updatedTime() {
@@ -179,6 +200,19 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       .orElse(null);
   }
 
+  /**
+   * Checks if the alert has a NO_SERVICE alert active at the requested time.
+   * @param instant
+   * @return
+   */
+  public boolean noServiceAt(Instant instant) {
+    return (
+      effect.equals(AlertEffect.NO_SERVICE) &&
+      (getEffectiveStartDate() != null && getEffectiveStartDate().isBefore(instant)) &&
+      (getEffectiveEndDate() == null || getEffectiveEndDate().isAfter(instant))
+    );
+  }
+
   @Override
   public boolean sameAs(@Nonnull TransitAlert other) {
     return (
@@ -195,6 +229,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(effect, other.effect) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(creationTime, other.creationTime) &&
+      Objects.equals(version, other.version) &&
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&

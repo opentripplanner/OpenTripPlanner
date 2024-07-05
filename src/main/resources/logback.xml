@@ -73,13 +73,16 @@
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
   <logger name="org.opentripplanner.raptor.RaptorService" level="info"/>
 
+  <!-- Turn on/off: debug/info to log OTP request/response -->
+  <logger name="org.opentripplanner.routing.service.DefaultRoutingService" level="info" />
+
+
   <!-- THIRD PARTY LOGGERS -->
 
   <logger name="ch.qos.logback" level="warn"/>
   <logger name="com.amazonaws" level="info"/>
   <logger name="org.apache.hc" level="info" />
   <logger name="com.conveyal" level="info"/>
-  <logger name="notprivacysafe.graphql" level="off" />
 
   <!-- Avoid printing info messages about calendars when building graph -->
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
@@ -90,6 +93,11 @@
   <logger name="org.glassfish.grizzly" level="info" />
   <!-- Suppress info logs from azure packages -->
   <logger name="com.azure" level="warn" />
+
+  <!--Log errors in GraphQL data fetchers. This is disabled by default.
+     Set it to "warn" to log these errors.
+  -->
+  <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
   <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />

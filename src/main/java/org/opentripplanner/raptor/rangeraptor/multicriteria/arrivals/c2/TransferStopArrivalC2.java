@@ -21,7 +21,7 @@ final class TransferStopArrivalC2<T extends RaptorTripSchedule> extends Abstract
       1,
       transferPath.stop(),
       arrivalTime,
-      previous.c1() + transferPath.generalizedCost(),
+      previous.c1() + transferPath.c1(),
       previous.c2()
     );
     this.transfer = transferPath;

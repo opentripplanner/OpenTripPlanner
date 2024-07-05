@@ -73,20 +73,12 @@ public class CalendarServiceData implements Serializable {
     }
   }
 
-  public LocalDate getFirstDate() {
-    return serviceIdsByDate
-      .keySet()
-      .stream()
-      .min(LocalDate::compareTo)
-      .orElseThrow(() -> new IllegalStateException("No service data is available"));
+  public Optional<LocalDate> getFirstDate() {
+    return serviceIdsByDate.keySet().stream().min(LocalDate::compareTo);
   }
 
-  public LocalDate getLastDate() {
-    return serviceIdsByDate
-      .keySet()
-      .stream()
-      .max(LocalDate::compareTo)
-      .orElseThrow(() -> new IllegalStateException("No service data is available"));
+  public Optional<LocalDate> getLastDate() {
+    return serviceIdsByDate.keySet().stream().max(LocalDate::compareTo);
   }
 
   /* private methods */

@@ -1,7 +1,7 @@
 export default {
   introspection: {
     type: 'sdl',
-    paths: ['src/ext/resources/gtfsgraphqlapi/schema.graphqls'],
+    paths: ['src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'],
   },
   website: {
     template: 'carbon-multi-page',
@@ -17,25 +17,34 @@ export default {
 This is the static documentation of the OTP GraphQL GTFS API.
 
 The GraphQL endpoint of your instance, which you should point your tooling to, is 
-\`http://localhost:8080/otp/routers/default/index/graphql\`
+\`http://localhost:8080/otp/gtfs/v1\`
 
 Please also check out the interactive API explorer built into every instance and available
 at http://localhost:8080/graphiql 
 
 ![GraphiQL screenshot](https://docs.opentripplanner.org/en/dev-2.x/images/graphiql.png)
 
-## Activation
+## Configuration
 
-This API used to be off by default but since June '23 that has changed.
+This API is activated by default.
 
 To learn how to deactivate it, read the
-[documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/GtfsGraphQlApi/).
+[documentation](https://docs.opentripplanner.org/en/dev-2.x/apis/GTFS-GraphQL-API/).
 `,
       }],
       appTitle: 'OTP GTFS GraphQL API',
       queryGenerationFactories: {
         'Polyline': '<>',
-        'GeoJson': '<>'
+        'GeoJson': '<>',
+        'OffsetDateTime': '2024-02-05T18:04:23+01:00',
+        'Duration': 'PT10M',
+        'CoordinateValue': 19.24,
+        'Reluctance': 3.1,
+        'Speed': 3.4,
+        'Cost': 100,
+        'Ratio': 0.25,
+        'Locale': 'en'
+
       },
     }
   },

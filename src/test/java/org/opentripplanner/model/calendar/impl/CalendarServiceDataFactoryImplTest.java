@@ -124,7 +124,7 @@ public class CalendarServiceDataFactoryImplTest {
   private static GtfsContext createCtxBuilder() throws IOException {
     GtfsContextBuilder ctxBuilder = contextBuilder(
       TransitModelForTest.FEED_ID,
-      ConstantsForTests.FAKE_GTFS
+      ConstantsForTests.SIMPLE_GTFS
     );
     OtpTransitServiceBuilder builder = ctxBuilder
       .withDataImportIssueStore(DataImportIssueStore.NOOP)

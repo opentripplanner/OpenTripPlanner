@@ -27,7 +27,6 @@ import org.opentripplanner.street.model.vertex.TransitBoardingAreaVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -90,7 +89,8 @@ public class AddTransitModelEntitiesToGraph {
     addPathwayNodesToGraph();
     addBoardingAreasToGraph();
 
-    // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
+    // Although pathways are loaded from GTFS they are street data, so we will put them in the
+    // street graph.
     createPathwayEdgesAndAddThemToGraph();
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
@@ -123,7 +123,7 @@ public class AddTransitModelEntitiesToGraph {
     for (RegularStop stop : otpTransitService.stopModel().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = vertexFactory.transitStop(
-        new TransitStopVertexBuilder().withStop(stop).withModes(modes)
+        TransitStopVertex.of().withStop(stop).withModes(modes)
       );
 
       if (modes != null && modes.contains(TransitMode.SUBWAY)) {

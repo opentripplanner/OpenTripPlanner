@@ -14,12 +14,12 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
  * <pre>
  * **  RUN RAPTOR FOR MINUTE: 0:09  **
  *
- * ARRIVAL  |   LEG   | RND |  STOP |  ARRIVE  |    COST   | TRIP | DETAILS
+ * ARRIVAL  |   LEG   | RND |  STOP |  ARRIVE  |    C1     | TRIP | DETAILS
  *  Accept  |  Access |   0 |     2 | 00:09:30 |    12 000 |      | Accepted element: Walk 30s ~ 2 (cost: 12000)
  *
  * **  RUN RAPTOR FOR MINUTE: 0:08  **
  *
- * ARRIVAL  |   LEG   | RND |  STOP |  ARRIVE  |    COST   | TRIP | DETAILS
+ * ARRIVAL  |   LEG   | RND |  STOP |  ARRIVE  |    C1     | TRIP | DETAILS
  *   Drop   |  Access |   0 |     2 | 00:09:30 |    12 000 |      | Droped element: Walk 30s ~ 2 (cost: 12000)
  *   ->by   |  Access |   0 |     2 | 00:08:30 |    12 000 |      | ->by element: Walk 30s ~ 2 (cost: 12000)
  *  Accept  |  Access |   0 |     2 | 00:08:30 |    12 000 |      | Accepted element: Walk 30s ~ 2 (cost: 12000)

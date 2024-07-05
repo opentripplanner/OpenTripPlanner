@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -11,6 +9,7 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
@@ -78,13 +77,12 @@ public class StopArrivalFactoryC1Test {
     var stopArrival = accessArrival();
 
     assertEquals(STOP_A, stopArrival.stop());
-    assertEquals(ACCESS.generalizedCost(), stopArrival.c1());
+    assertEquals(ACCESS.c1(), stopArrival.c1());
     assertEquals(ACCESS_DURATION, stopArrival.travelDuration());
     assertEquals(ORIGIN_DEPARTURE_TIME + ACCESS_DURATION, stopArrival.arrivalTime());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
-    assertThrows(UnsupportedOperationException.class, stopArrival::c2);
+    assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 
   @Test
@@ -97,8 +95,7 @@ public class StopArrivalFactoryC1Test {
     assertEquals(STOP_ARRIVAL_TRANSIT_TIME - ORIGIN_DEPARTURE_TIME, stopArrival.travelDuration());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
-    assertThrows(UnsupportedOperationException.class, stopArrival::c2);
+    assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 
   @Test
@@ -107,7 +104,7 @@ public class StopArrivalFactoryC1Test {
     var stopArrival = transferArrival(prevArrival);
 
     assertEquals(STOP_C, stopArrival.stop());
-    assertEquals(prevArrival.c1() + TRANSFER.generalizedCost(), stopArrival.c1());
+    assertEquals(prevArrival.c1() + TRANSFER.c1(), stopArrival.c1());
     assertEquals(
       prevArrival.arrivalTime() + TRANSFER.durationInSeconds(),
       stopArrival.arrivalTime()
@@ -115,7 +112,6 @@ public class StopArrivalFactoryC1Test {
     assertEquals(DurationUtils.durationInSeconds("11m30s"), stopArrival.travelDuration());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
-    assertThrows(UnsupportedOperationException.class, stopArrival::c2);
+    assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 }

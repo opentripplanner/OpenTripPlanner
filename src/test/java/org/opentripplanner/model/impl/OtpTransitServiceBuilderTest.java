@@ -88,7 +88,7 @@ public class OtpTransitServiceBuilderTest {
   /* private methods */
 
   private static OtpTransitServiceBuilder createBuilder() throws IOException {
-    OtpTransitServiceBuilder builder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS)
+    OtpTransitServiceBuilder builder = contextBuilder(FEED_ID, ConstantsForTests.SIMPLE_GTFS)
       .getTransitBuilder();
     Agency agency = agency(builder);
 

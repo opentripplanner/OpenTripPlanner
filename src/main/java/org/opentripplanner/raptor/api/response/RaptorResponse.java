@@ -17,20 +17,20 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 public class RaptorResponse<T extends RaptorTripSchedule> {
 
   private final Collection<RaptorPath<T>> paths;
-  private final RaptorRequest<T> requestOriginal;
   private final RaptorRequest<T> requestUsed;
   private final StopArrivals arrivals;
+  private final boolean heuristicPathExist;
 
   public RaptorResponse(
     Collection<RaptorPath<T>> paths,
     StopArrivals arrivals,
-    RaptorRequest<T> requestOriginal,
-    RaptorRequest<T> requestUsed
+    RaptorRequest<T> requestUsed,
+    boolean heuristicPathExist
   ) {
     this.paths = paths;
     this.arrivals = arrivals;
-    this.requestOriginal = requestOriginal;
     this.requestUsed = requestUsed;
+    this.heuristicPathExist = heuristicPathExist;
   }
 
   /**
@@ -53,13 +53,6 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The original request issued to perform the travel search.
-   */
-  public RaptorRequest<T> requestOriginal() {
-    return requestOriginal;
-  }
-
-  /**
    * The actual request used to perform the travel search. In the case of a multi-criteria search,
    * heuristics is used to optimize the search and the request is changed to account for this. Also,
    * different optimization may add filters (stop filter) to the request. Heuristics is also used to
@@ -69,12 +62,20 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
     return requestUsed;
   }
 
+  /**
+   * Return {@code true} if the heuristic and the main search does not find any connections.
+   * Searching again with another time/search-window will not produce any results. There is no paths
+   * in the set of days provided in the transit data with the request usd.
+   */
+  public boolean noConnectionFound() {
+    return paths.isEmpty() && !heuristicPathExist;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
       .of(RaptorResponse.class)
       .addObj("paths", paths)
-      .addObj("requestOriginal", requestOriginal)
       .addObj("requestUsed", requestUsed)
       .toString();
   }

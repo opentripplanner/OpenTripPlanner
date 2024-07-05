@@ -29,6 +29,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final TransitService transitService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
+  private final Set<FeedScopedId> filterByStations;
   private final Set<FeedScopedId> filterByRoutes;
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
@@ -40,6 +41,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final boolean includeVehicleRentals;
   private final boolean includeCarParking;
   private final boolean includeBikeParking;
+  private final boolean includeStations;
   private final int maxResults;
   private final double radiusMeters;
 
@@ -64,23 +66,31 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
     int maxResults,
     double radiusMeters
   ) {
+    if (filterByPlaceTypes == null || filterByPlaceTypes.isEmpty()) {
+      throw new IllegalArgumentException("No place type filter was included in request");
+    }
     this.transitService = transitService;
+
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);
+    this.filterByStations = toSet(filterByStations);
     this.filterByRoutes = toSet(filterByRoutes);
     this.filterByVehicleRental = toSet(filterByBikeRentalStations);
-
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
+
     includePatternAtStops = shouldInclude(filterByPlaceTypes, PlaceType.PATTERN_AT_STOP);
     includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
+    includeStations = shouldInclude(filterByPlaceTypes, PlaceType.STATION);
     this.maxResults = maxResults;
+
     this.radiusMeters = radiusMeters;
   }
 
@@ -134,7 +144,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
 
   private static <T> Set<T> toSet(List<T> list) {
     if (list == null) {
-      return null;
+      return Set.of();
     }
     return Set.copyOf(list);
   }
@@ -156,7 +166,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   private boolean shouldInclude(List<PlaceType> filterByPlaceTypes, PlaceType type) {
-    return filterByPlaceTypes == null || filterByPlaceTypes.contains(type);
+    return filterByPlaceTypes.contains(type);
   }
 
   private boolean stopHasPatternsWithMode(RegularStop stop, Set<TransitMode> modes) {
@@ -167,17 +177,54 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       .anyMatch(modes::contains);
   }
 
+  private boolean stopIsIncludedByStopFilter(RegularStop stop) {
+    return filterByStops.isEmpty() || filterByStops.contains(stop.getId());
+  }
+
+  private boolean stopIsIncludedByStationFilter(RegularStop stop) {
+    return (
+      ((filterByStations.isEmpty() || filterByStations.contains(stop.getParentStation().getId())))
+    );
+  }
+
+  private boolean stopIsIncludedByModeFilter(RegularStop stop) {
+    return filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes);
+  }
+
+  /* Checks whether the stop is included in the stop filter and whether the stop should be considered
+   * a stop or a station in the search.*/
+  private boolean stopShouldNotBeIncludedAsStop(RegularStop stop) {
+    return (
+      (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (!includeStations && !stopIsIncludedByStopFilter(stop))
+    );
+  }
+
+  /* Checks if the stop is a part of a station and whether that station is
+   * included in the station filter */
+  private boolean stopShouldNotBeIncludedAsStation(RegularStop stop) {
+    return stop.isPartOfStation() && !stopIsIncludedByStationFilter(stop);
+  }
+
   private void handleStop(RegularStop stop, double distance) {
-    if (filterByStops != null && !filterByStops.contains(stop.getId())) {
+    // Do not consider stop if it is not included in the stop or mode filter
+    // or if it or its parent station has already been seen.
+    if (
+      stopShouldNotBeIncludedAsStop(stop) ||
+      stopShouldNotBeIncludedAsStation(stop) ||
+      seenStops.contains(stop.getId()) ||
+      seenStops.contains(stop.getStationOrStopId()) ||
+      !stopIsIncludedByModeFilter(stop)
+    ) {
       return;
     }
-    if (
-      includeStops &&
-      !seenStops.contains(stop.getId()) &&
-      (filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
-    ) {
-      placesFound.add(new PlaceAtDistance(stop, distance));
+
+    if (includeStations && stop.getParentStation() != null) {
+      seenStops.add(stop.getParentStation().getId());
+      placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
+    } else if (includeStops) {
       seenStops.add(stop.getId());
+      placesFound.add(new PlaceAtDistance(stop, distance));
     }
   }
 
@@ -186,9 +233,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       List<TripPattern> patterns = transitService
         .getPatternsForStop(stop)
         .stream()
-        .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
+        .filter(pattern -> filterByModes.isEmpty() || filterByModes.contains(pattern.getMode()))
         .filter(pattern ->
-          filterByRoutes == null || filterByRoutes.contains(pattern.getRoute().getId())
+          filterByRoutes.isEmpty() || filterByRoutes.contains(pattern.getRoute().getId())
         )
         .filter(pattern -> pattern.canBoard(stop))
         .toList();
@@ -209,7 +256,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     if (!includeVehicleRentals) {
       return;
     }
-    if (filterByVehicleRental != null && !filterByVehicleRental.contains(station.getStationId())) {
+    if (
+      !filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.getStationId())
+    ) {
       return;
     }
     if (seenVehicleRentalPlaces.contains(station.getId())) {

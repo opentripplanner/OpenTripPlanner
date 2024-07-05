@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.model.site;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -19,23 +21,26 @@ public class GroupStop
   implements StopLocation {
 
   private final int index;
-  private final Set<StopLocation> stopLocations;
+  private final List<StopLocation> stopLocations;
   private final I18NString name;
   private final GeometryCollection geometry;
+
+  private final GeometryCollection encompassingAreaGeometry;
 
   private final WgsCoordinate centroid;
 
   GroupStop(GroupStopBuilder builder) {
     super(builder.getId());
-    this.index = INDEX_COUNTER.getAndIncrement();
+    this.index = builder.createIndex();
     this.name = builder.name();
     this.geometry = builder.geometry();
     this.centroid = Objects.requireNonNull(builder.centroid());
     this.stopLocations = builder.stopLocations();
+    this.encompassingAreaGeometry = builder.encompassingAreaGeometry();
   }
 
-  public static GroupStopBuilder of(FeedScopedId id) {
-    return new GroupStopBuilder(id);
+  public static GroupStopBuilder of(FeedScopedId id, IntSupplier indexCounter) {
+    return new GroupStopBuilder(id, indexCounter);
   }
 
   @Override
@@ -60,6 +65,12 @@ public class GroupStop
   }
 
   @Override
+  @Nonnull
+  public StopType getStopType() {
+    return StopType.FLEXIBLE_GROUP;
+  }
+
+  @Override
   public String getFirstZoneAsString() {
     return null;
   }
@@ -73,9 +84,22 @@ public class GroupStop
     return centroid;
   }
 
+  /**
+   * Returns the geometry of all stops and areas belonging to this location group.
+   */
   @Override
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  /**
+   * Returns the geometry of the area that encompasses the bounds of this StopLocation group. If the
+   * group is defined as all the stops within an area, then this will return the geometry of the
+   * area. If the group is defined simply as a list of stops, this will return an empty optional.
+   */
+  @Override
+  public Optional<? extends Geometry> getEncompassingAreaGeometry() {
+    return Optional.ofNullable(encompassingAreaGeometry);
   }
 
   @Override
@@ -91,7 +115,9 @@ public class GroupStop
   /**
    * Returns all the locations belonging to this location group.
    */
-  public Set<StopLocation> getLocations() {
+  @Override
+  @Nonnull
+  public List<StopLocation> getChildLocations() {
     return stopLocations;
   }
 
@@ -100,7 +126,7 @@ public class GroupStop
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
-      Objects.equals(stopLocations, other.getLocations())
+      Objects.equals(stopLocations, other.getChildLocations())
     );
   }
 

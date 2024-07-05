@@ -8,18 +8,15 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_I
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
-import gnu.trove.set.hash.TIntHashSet;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -30,7 +27,6 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -44,6 +40,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
@@ -211,16 +208,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withTrip(trip)
       .build();
 
-    var template = new FlexAccessTemplate(
-      null,
-      flexTrip,
-      0,
-      1,
-      null,
-      new FlexServiceDate(LocalDate.now(), 0, new TIntHashSet()),
-      new DirectFlexPathCalculator(),
-      FlexConfig.DEFAULT
-    );
+    int fromStopPos = 0;
+    int toStopPos = 1;
+    LocalDate serviceDate = LocalDate.of(2024, Month.MAY, 22);
 
     var fromv = StreetModelForTest.intersectionVertex(
       "v1",
@@ -234,15 +224,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
 
     var flexPath = new DirectFlexPathCalculator()
-      .calculateFlexPath(fromv, tov, template.fromStopIndex, template.toStopIndex);
+      .calculateFlexPath(fromv, tov, fromStopPos, toStopPos);
 
-    var edge = FlexTripEdge.createFlexTripEdge(
+    var edge = new FlexTripEdge(
       fromv,
       tov,
       lastPlace.stop,
       to.stop,
       flexTrip,
-      template,
+      fromStopPos,
+      toStopPos,
+      serviceDate,
       flexPath
     );
 
@@ -475,44 +467,40 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build();
-    final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
     ScheduledTransitLeg leg;
 
     if (headwaySecs != null) {
       leg =
-        new FrequencyTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          headwaySecs,
-          null
-        );
+        new FrequencyTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .withFrequencyHeadwayInSeconds(headwaySecs)
+          .build();
     } else {
       leg =
-        new ScheduledTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          null
-        );
+        new ScheduledTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .build();
     }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));

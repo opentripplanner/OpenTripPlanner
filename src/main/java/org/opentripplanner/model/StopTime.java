@@ -7,6 +7,7 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model, it is not
@@ -62,28 +63,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public StopTime() {}
 
-  public StopTime(StopTime st) {
-    this.trip = st.trip;
-    this.stop = st.stop;
-    this.arrivalTime = st.arrivalTime;
-    this.departureTime = st.departureTime;
-    this.timepoint = st.timepoint;
-    this.stopSequence = st.stopSequence;
-    this.stopHeadsign = st.stopHeadsign;
-    this.routeShortName = st.routeShortName;
-    this.pickupType = st.pickupType;
-    this.dropOffType = st.dropOffType;
-    this.shapeDistTraveled = st.shapeDistTraveled;
-    this.farePeriodId = st.farePeriodId;
-    this.flexWindowStart = st.flexWindowStart;
-    this.flexWindowEnd = st.flexWindowEnd;
-    this.flexContinuousPickup = st.flexContinuousPickup;
-    this.flexContinuousDropOff = st.flexContinuousDropOff;
-    this.dropOffBookingInfo = st.dropOffBookingInfo;
-    this.pickupBookingInfo = st.pickupBookingInfo;
-    this.headsignVias = st.headsignVias;
-  }
-
   /**
    * The id is used to navigate/link StopTime to other entities (Map from StopTime.id -> Entity.id).
    * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
@@ -136,10 +115,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.arrivalTime = arrivalTime;
   }
 
-  public void clearArrivalTime() {
-    this.arrivalTime = MISSING_VALUE;
-  }
-
   public boolean isDepartureTimeSet() {
     return departureTime != MISSING_VALUE;
   }
@@ -155,10 +130,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.departureTime = departureTime;
   }
 
-  public void clearDepartureTime() {
-    this.departureTime = MISSING_VALUE;
-  }
-
   public boolean isTimepointSet() {
     return timepoint != MISSING_VALUE;
   }
@@ -172,10 +143,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setTimepoint(int timepoint) {
     this.timepoint = timepoint;
-  }
-
-  public void clearTimepoint() {
-    this.timepoint = MISSING_VALUE;
   }
 
   public I18NString getStopHeadsign() {
@@ -220,10 +187,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setShapeDistTraveled(double shapeDistTraveled) {
     this.shapeDistTraveled = shapeDistTraveled;
-  }
-
-  public void clearShapeDistTraveled() {
-    this.shapeDistTraveled = MISSING_VALUE;
   }
 
   public String getFarePeriodId() {
@@ -309,14 +272,6 @@ public final class StopTime implements Comparable<StopTime> {
     dropOffType = PickDrop.CANCELLED;
   }
 
-  public void cancelDropOff() {
-    dropOffType = PickDrop.CANCELLED;
-  }
-
-  public void cancelPickup() {
-    pickupType = PickDrop.CANCELLED;
-  }
-
   @Override
   public String toString() {
     return (
@@ -342,5 +297,12 @@ public final class StopTime implements Comparable<StopTime> {
     }
 
     return MISSING_VALUE;
+  }
+
+  /**
+   * Does this stop time define a flex window?
+   */
+  public boolean hasFlexWindow() {
+    return flexWindowStart != MISSING_VALUE || flexWindowEnd != MISSING_VALUE;
   }
 }

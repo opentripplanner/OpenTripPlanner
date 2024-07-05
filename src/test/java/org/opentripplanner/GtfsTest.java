@@ -13,6 +13,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
@@ -127,7 +129,7 @@ public abstract class GtfsTest {
     // Init preferences
     routingRequest.withPreferences(preferences -> {
       preferences.withTransfer(tx -> {
-        tx.withSlack(0);
+        tx.withSlack(Duration.ZERO);
         tx.withWaitReluctance(1);
         tx.withCost(preferLeastTransfers ? 300 : 0);
       });
@@ -207,7 +209,9 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false),
+        TimetableSnapshotSourceParameters.DEFAULT
+          .withPurgeExpiredData(true)
+          .withMaxSnapshotFrequency(Duration.ZERO),
         transitModel
       );
     alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
@@ -215,7 +219,6 @@ public abstract class GtfsTest {
     alertsUpdateHandler.setFeedId(feedId.getId());
 
     try {
-      final boolean fullDataset = false;
       InputStream inputStream = new FileInputStream(gtfsRealTime);
       FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
       List<FeedEntity> feedEntityList = feedMessage.getEntityList();
@@ -226,7 +229,7 @@ public abstract class GtfsTest {
       timetableSnapshotSource.applyTripUpdates(
         null,
         REQUIRED_NO_DATA,
-        fullDataset,
+        UpdateIncrementality.DIFFERENTIAL,
         updates,
         feedId.getId()
       );

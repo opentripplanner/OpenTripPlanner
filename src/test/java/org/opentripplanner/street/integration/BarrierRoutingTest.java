@@ -31,6 +31,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class BarrierRoutingTest {
 
@@ -41,7 +42,7 @@ public class BarrierRoutingTest {
   @BeforeAll
   public static void createGraph() {
     TestOtpModel model = ConstantsForTests.buildOsmGraph(
-      ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM
+      ResourceLoader.of(BarrierRoutingTest.class).file("herrenberg-barrier-gates.osm.pbf")
     );
     graph = model.graph();
     graph.index(model.transitModel().getStopModel());
@@ -65,7 +66,10 @@ public class BarrierRoutingTest {
       from,
       to,
       BIKE,
-      rr -> rr.withPreferences(p -> p.withBike(it -> it.withWalkingReluctance(1d))),
+      rr ->
+        rr.withPreferences(p ->
+          p.withBike(it -> it.withWalking(walking -> walking.withReluctance(1d)))
+        ),
       itineraries ->
         itineraries
           .stream()

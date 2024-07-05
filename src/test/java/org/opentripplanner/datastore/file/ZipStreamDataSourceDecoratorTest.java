@@ -21,7 +21,6 @@ import org.opentripplanner.datastore.api.DataSource;
 class ZipStreamDataSourceDecoratorTest {
 
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
-  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS;
   static final List<String> EXPECTED_ZIP_ENTRIES = List.of(
     "trips.txt",
     "agency.txt",
@@ -61,8 +60,8 @@ class ZipStreamDataSourceDecoratorTest {
   @Test
   void testAccessorsForNoneExistingFile() throws IOException {
     // Given:
-    File target = new File(FILENAME);
-    File copyTarget = new File(FILENAME);
+    File target = ConstantsForTests.CALTRAIN_GTFS;
+    File copyTarget = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
       new FileDataSource(target, GTFS)
     );
@@ -93,7 +92,7 @@ class ZipStreamDataSourceDecoratorTest {
   @Test
   void testIO() throws IOException {
     // Given:
-    File target = new File(FILENAME);
+    File target = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
       new FileDataSource(target, GTFS)
     );
@@ -119,7 +118,7 @@ class ZipStreamDataSourceDecoratorTest {
 
   @Test
   void testMaxZipEntrySizeInMemory() throws IOException {
-    File target = new File(FILENAME);
+    File target = ConstantsForTests.CALTRAIN_GTFS;
     // force offloading to disk by setting maxZipEntrySizeInMemory=1
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
       new FileDataSource(target, GTFS),
@@ -142,7 +141,7 @@ class ZipStreamDataSourceDecoratorTest {
   @Test
   void testEntryProperties() {
     // Given:
-    File target = new File(FILENAME);
+    File target = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
       new FileDataSource(target, GTFS)
     );

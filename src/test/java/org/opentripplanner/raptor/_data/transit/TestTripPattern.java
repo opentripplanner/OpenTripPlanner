@@ -20,6 +20,8 @@ public class TestTripPattern implements DefaultTripPattern {
 
   private int patternIndex = 0;
 
+  private int priorityGroupId = 0;
+
   /**
    * <pre>
    * 0 - 000 : No restriction
@@ -54,6 +56,11 @@ public class TestTripPattern implements DefaultTripPattern {
 
   TestTripPattern withPatternIndex(int index) {
     this.patternIndex = index;
+    return this;
+  }
+
+  public TestTripPattern withPriorityGroup(int priorityGroupId) {
+    this.priorityGroupId = priorityGroupId;
     return this;
   }
 
@@ -119,8 +126,7 @@ public class TestTripPattern implements DefaultTripPattern {
 
   @Override
   public int priorityGroupId() {
-    // TODO C2 - Add routing tests for priority groups later ...
-    throw new UnsupportedOperationException();
+    return priorityGroupId;
   }
 
   @Override

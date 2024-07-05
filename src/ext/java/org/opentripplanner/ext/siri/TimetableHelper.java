@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import org.opentripplanner.ext.siri.mapper.OccupancyMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
@@ -52,7 +52,7 @@ public class TimetableHelper {
 
   public static void applyUpdates(
     ZonedDateTime departureDate,
-    TripTimes tripTimes,
+    RealTimeTripTimes tripTimes,
     int index,
     boolean isLastStop,
     boolean isJourneyPredictionInaccurate,
@@ -75,29 +75,29 @@ public class TimetableHelper {
     }
 
     int scheduledArrivalTime = tripTimes.getArrivalTime(index);
-    int realtimeArrivalTime = getAvailableTime(
+    int realTimeArrivalTime = getAvailableTime(
       departureDate,
       call::getActualArrivalTime,
       call::getExpectedArrivalTime
     );
 
     int scheduledDepartureTime = tripTimes.getDepartureTime(index);
-    int realtimeDepartureTime = getAvailableTime(
+    int realTimeDepartureTime = getAvailableTime(
       departureDate,
       call::getActualDepartureTime,
       call::getExpectedDepartureTime
     );
 
     int[] possibleArrivalTimes = index == 0
-      ? new int[] { realtimeArrivalTime, realtimeDepartureTime, scheduledArrivalTime }
-      : new int[] { realtimeArrivalTime, scheduledArrivalTime };
+      ? new int[] { realTimeArrivalTime, realTimeDepartureTime, scheduledArrivalTime }
+      : new int[] { realTimeArrivalTime, scheduledArrivalTime };
     var arrivalTime = handleMissingRealtime(possibleArrivalTimes);
     int arrivalDelay = arrivalTime - scheduledArrivalTime;
     tripTimes.updateArrivalDelay(index, arrivalDelay);
 
     int[] possibleDepartureTimes = isLastStop
-      ? new int[] { realtimeDepartureTime, realtimeArrivalTime, scheduledDepartureTime }
-      : new int[] { realtimeDepartureTime, scheduledDepartureTime };
+      ? new int[] { realTimeDepartureTime, realTimeArrivalTime, scheduledDepartureTime }
+      : new int[] { realTimeDepartureTime, scheduledDepartureTime };
     var departureTime = handleMissingRealtime(possibleDepartureTimes);
     int departureDelay = departureTime - scheduledDepartureTime;
     tripTimes.updateDepartureDelay(index, departureDelay);

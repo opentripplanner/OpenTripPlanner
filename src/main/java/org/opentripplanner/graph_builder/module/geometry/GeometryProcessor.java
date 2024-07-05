@@ -80,7 +80,7 @@ public class GeometryProcessor {
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
-      trip.getShapeId().getId().equals("")
+      trip.getShapeId().getId().isEmpty()
     ) {
       return null;
     }

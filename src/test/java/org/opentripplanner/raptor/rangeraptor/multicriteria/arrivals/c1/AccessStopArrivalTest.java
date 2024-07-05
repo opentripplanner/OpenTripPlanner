@@ -11,6 +11,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
@@ -21,7 +22,7 @@ class AccessStopArrivalTest {
   private static final int ACCESS_DURATION = 10 * 60;
   private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
   private static final TestAccessEgress WALK = TestAccessEgress.walk(ALIGHT_STOP, ACCESS_DURATION);
-  private static final int COST = WALK.generalizedCost();
+  private static final int C1 = WALK.c1();
 
   private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
     DEPARTURE_TIME,
@@ -46,12 +47,12 @@ class AccessStopArrivalTest {
 
   @Test
   public void c1() {
-    assertEquals(COST, subject.c1());
+    assertEquals(C1, subject.c1());
   }
 
   @Test
   public void c2() {
-    assertThrows(UnsupportedOperationException.class, subject::c2);
+    assertEquals(RaptorConstants.NOT_SET, subject.c2());
   }
 
   @Test
@@ -79,7 +80,7 @@ class AccessStopArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Access { stop: 100, arrival: [8:10 $1200], path: Walk 10m $1200 ~ 100 }",
+      "Access { stop: 100, arrival: [8:10 C₁1_200], path: Walk 10m C₁1_200 ~ 100 }",
       subject.toString()
     );
   }

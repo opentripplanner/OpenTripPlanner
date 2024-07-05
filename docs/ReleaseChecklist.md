@@ -69,12 +69,6 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Apply the changes recorded
       in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
     * While still on the tag commit, run `mvn deploy -Prelease`.
-* Set up next development iteration
-    * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
-    * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
-    * `git add pom.xml docs/Changelog.md`
-    * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
-    * `git push`
 * Check that Maven artifact appears on Maven Central
     * [Directory listing of OTP releases on Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/)
     * It may take a while (half an hour) for releases to show up in the central repo after Travis
@@ -83,10 +77,30 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git checkout dev-2.x`
     * `git merge master`
     * `git push`
-* Email the OTP dev and users mailing lists
+* Set up next development iteration
+    * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
+    * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
+    * `git add pom.xml docs/Changelog.md`
+    * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
+    * `git push`
+* Send a message in Gitter and email the OTP users mailing lists
     * Mention the new version number.
     * Provide links to the new developer documentation.
     * Provide links to the artifacts directory on Maven Central.
+* Prepare for the next release in GitHub by renaming the released milestone and creating a new
+  milestone for the next release. Then make sure all issues and PRs are tagged with the correct
+  milestone.
+    * Close open PRs older than 2 years, make sure the milestone is set to `Rejected`.
+    * Rename the old milestone from `x.y (Next Release)` to `x.y`. All issues and PRs assigned to 
+      this milestone are automatically updated.
+    * Create a new milestone: `x.y+1 (Next Release)`
+    * All PullRequests SHOULD have a milestone (except some very old ones) 
+        * Assign all *open* PRs to this new milestone `x.y+1 (Next Release)`.
+        * Assign all *closed* PRs without a milestone in the release to the released milestone 
+          `x.y`. Make sure NOT to include very old PRs or PRs merged after the release(if any).
+    * Some issues have a milestone, but not all.
+        * Move all open issues with the released milestone `x.y` to the next release 
+          `x.y+1 (Next Release)`. 
 
 ## Artifact Signing
 

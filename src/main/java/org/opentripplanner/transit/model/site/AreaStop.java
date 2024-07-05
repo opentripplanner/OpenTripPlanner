@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -36,7 +38,7 @@ public class AreaStop
 
   AreaStop(AreaStopBuilder builder) {
     super(builder.getId());
-    this.index = INDEX_COUNTER.getAndIncrement();
+    this.index = builder.createIndex();
     // according to the spec stop location names are optional for flex zones so, we set the id
     // as the bogus name. *shrug*
     if (builder.name() == null) {
@@ -53,8 +55,8 @@ public class AreaStop
     this.centroid = Objects.requireNonNull(builder.centroid());
   }
 
-  public static AreaStopBuilder of(FeedScopedId id) {
-    return new AreaStopBuilder(id);
+  public static AreaStopBuilder of(FeedScopedId id, IntSupplier indexCounter) {
+    return new AreaStopBuilder(id, indexCounter);
   }
 
   @Override
@@ -83,6 +85,12 @@ public class AreaStop
     return url;
   }
 
+  @Nonnull
+  @Override
+  public StopType getStopType() {
+    return StopType.FLEXIBLE_AREA;
+  }
+
   @Override
   public String getFirstZoneAsString() {
     return zoneId;
@@ -100,6 +108,14 @@ public class AreaStop
   @Override
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  /**
+   * Returns the geometry of area that defines the stop, in this case the same as getGeometry.
+   */
+  @Override
+  public Optional<Geometry> getEncompassingAreaGeometry() {
+    return Optional.of(geometry);
   }
 
   @Override

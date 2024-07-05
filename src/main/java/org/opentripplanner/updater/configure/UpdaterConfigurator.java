@@ -3,17 +3,17 @@ package org.opentripplanner.updater.configure;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
+import org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -23,7 +23,6 @@ import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
-import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
@@ -46,20 +45,20 @@ public class UpdaterConfigurator {
   private final Graph graph;
   private final TransitModel transitModel;
   private final UpdatersParameters updatersParameters;
-  private final VehiclePositionRepository vehiclePositionRepository;
+  private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
   private UpdaterConfigurator(
     Graph graph,
-    VehiclePositionRepository vehiclePositionRepository,
+    RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
-    this.vehiclePositionRepository = vehiclePositionRepository;
+    this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitModel = transitModel;
     this.updatersParameters = updatersParameters;
@@ -67,15 +66,15 @@ public class UpdaterConfigurator {
 
   public static void configure(
     Graph graph,
-    VehiclePositionRepository vehiclePositionService,
-    VehicleRentalRepository vehicleRentalService,
+    RealtimeVehicleRepository realtimeVehicleRepository,
+    VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
       graph,
-      vehiclePositionService,
-      vehicleRentalService,
+      realtimeVehicleRepository,
+      vehicleRentalRepository,
       transitModel,
       updatersParameters
     )
@@ -142,11 +141,11 @@ public class UpdaterConfigurator {
 
     if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
       int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
-      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections);
+      var otpHttpClientFactory = new OtpHttpClientFactory(maxHttpConnections);
       for (var configItem : updatersParameters.getVehicleRentalParameters()) {
         var source = VehicleRentalDataSourceFactory.create(
           configItem.sourceParameters(),
-          otpHttpClient
+          otpHttpClientFactory
         );
         updaters.add(
           new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
@@ -163,7 +162,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(
-        new PollingVehiclePositionUpdater(configItem, vehiclePositionRepository, transitModel)
+        new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository, transitModel)
       );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
@@ -176,11 +175,6 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
-    }
-    for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
-      updaters.add(
-        new WebsocketGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot(), transitModel)
-      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(

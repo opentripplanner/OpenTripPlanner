@@ -39,8 +39,8 @@ import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
-import org.opentripplanner.graph_builder.module.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
+import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -120,11 +120,20 @@ public class GtfsModule implements GraphBuilderModule {
 
     boolean hasTransit = false;
 
+    Map<String, GtfsBundle> feedIdsEncountered = new HashMap<>();
+
     try {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
+
+        final String feedId = gtfsBundle.getFeedId().getId();
+        verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
+
+        feedIdsEncountered.put(feedId, gtfsBundle);
+
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
-          gtfsBundle.getFeedId().getId(),
+          new OtpTransitServiceBuilder(transitModel.getStopModel(), issueStore),
+          feedId,
           issueStore,
           gtfsBundle.discardMinTransferTimes(),
           gtfsDao,
@@ -200,6 +209,32 @@ public class GtfsModule implements GraphBuilderModule {
     transitModel.validateTimeZones();
 
     transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
+  }
+
+  /**
+   * Verifies that a feed id is not assigned twice.
+   * <p>
+   * Duplicates can happen in the following cases:
+   *  - the feed id is configured twice in build-config.json
+   *  - two GTFS feeds have the same feed_info.feed_id
+   *  - a GTFS feed defines a feed_info.feed_id like '3' that collides with an auto-generated one
+   * <p>
+   * Debugging these cases is very confusing, so we prevent it from happening.
+   */
+  private static void verifyUniqueFeedId(
+    GtfsBundle gtfsBundle,
+    Map<String, GtfsBundle> feedIdsEncountered,
+    String feedId
+  ) {
+    if (feedIdsEncountered.containsKey(feedId)) {
+      LOG.error(
+        "Feed id '{}' has been used for {} but it was already assigned to {}.",
+        feedId,
+        gtfsBundle,
+        feedIdsEncountered.get(feedId)
+      );
+      throw new IllegalArgumentException("Duplicate feed id: '%s'".formatted(feedId));
+    }
   }
 
   @Override
@@ -353,6 +388,9 @@ public class GtfsModule implements GraphBuilderModule {
       transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
       transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
       transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
+    }
+    for (var transferRule : store.getAllEntitiesForType(FareLegRule.class)) {
+      transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
     }
     for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
       pathway.getId().setAgencyId(reader.getDefaultAgencyId());

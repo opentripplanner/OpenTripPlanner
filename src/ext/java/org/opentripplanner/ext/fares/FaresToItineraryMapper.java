@@ -4,7 +4,6 @@ import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
 
 /**
  * Takes fares and applies them to the legs of an itinerary.
@@ -12,7 +11,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 public class FaresToItineraryMapper {
 
   public static void addFaresToLegs(ItineraryFares fares, Itinerary i) {
-    var itineraryInstances = fares
+    var itineraryFareUses = fares
       .getItineraryProducts()
       .stream()
       .map(fp -> {
@@ -21,13 +20,10 @@ public class FaresToItineraryMapper {
       })
       .toList();
 
-    i
-      .getLegs()
-      .stream()
-      .filter(ScheduledTransitLeg.class::isInstance)
-      .forEach(l -> {
-        var legInstances = fares.getLegProducts().get(l);
-        l.setFareProducts(ListUtils.combine(itineraryInstances, legInstances));
-      });
+    i.transformTransitLegs(leg -> {
+      var legUses = fares.getLegProducts().get(leg);
+      leg.setFareProducts(ListUtils.combine(itineraryFareUses, legUses));
+      return leg;
+    });
   }
 }

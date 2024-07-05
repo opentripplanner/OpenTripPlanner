@@ -3,6 +3,7 @@ package org.opentripplanner.framework.time;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -163,6 +164,46 @@ public class TimeUtilsTest {
     assertEquals(
       "2021-11-01T03:03+01:00[Europe/Oslo]",
       TimeUtils.zonedDateTime(D2021_10_31, T26_03, CET).toString()
+    );
+  }
+
+  @Test
+  void testMsToString() {
+    assertEquals("0s", TimeUtils.msToString(0));
+    assertEquals("0.001s", TimeUtils.msToString(1));
+    assertEquals("0.012s", TimeUtils.msToString(12));
+    assertEquals("1s", TimeUtils.msToString(1000));
+    assertEquals("1.1s", TimeUtils.msToString(1100));
+    assertEquals("1.02s", TimeUtils.msToString(1020));
+    assertEquals("1.003s", TimeUtils.msToString(1003));
+    assertEquals("1.234s", TimeUtils.msToString(1234));
+
+    // Negative numbers
+    assertEquals("-1s", TimeUtils.msToString(-1000));
+    assertEquals("-1.234s", TimeUtils.msToString(-1234));
+  }
+
+  @Test
+  void toTransitTimeSeconds() {
+    var timeZero = ZonedDateTime.of(
+      LocalDate.of(2024, Month.JANUARY, 15),
+      LocalTime.of(0, 0, 0),
+      ZoneIds.UTC
+    );
+    // otp zero is identical to time
+    assertEquals(
+      0,
+      TimeUtils.toTransitTimeSeconds(timeZero, Instant.parse("2024-01-15T00:00:00Z"))
+    );
+    // Test positive offset - otp zero is 1h2m3s before time
+    assertEquals(
+      3723,
+      TimeUtils.toTransitTimeSeconds(timeZero, Instant.parse("2024-01-15T01:02:03Z"))
+    );
+    // Test negative offset - otp zero is 30m after time
+    assertEquals(
+      -1800,
+      TimeUtils.toTransitTimeSeconds(timeZero, Instant.parse("2024-01-14T23:30:00Z"))
     );
   }
 

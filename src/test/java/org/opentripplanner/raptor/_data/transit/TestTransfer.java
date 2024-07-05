@@ -32,7 +32,7 @@ public record TestTransfer(int stop, int durationInSeconds, int cost) implements
   }
 
   @Override
-  public int generalizedCost() {
+  public int c1() {
     return cost;
   }
 

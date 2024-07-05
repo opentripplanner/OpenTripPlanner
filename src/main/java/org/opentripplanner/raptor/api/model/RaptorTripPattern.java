@@ -46,7 +46,7 @@ public interface RaptorTripPattern {
   int slackIndex();
 
   /**
-   * A pattern may belong to a transit-priority-group. Each group is given an advantage during
+   * A pattern may belong to a transit-group-priority. Each group is given an advantage during
    * the multi-criteria search, so the best alternative for each group is found.
    */
   int priorityGroupId();

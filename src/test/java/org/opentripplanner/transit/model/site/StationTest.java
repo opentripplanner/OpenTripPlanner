@@ -18,13 +18,15 @@ class StationTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final Station PARENT_STATION = TransitModelForTest.station("stationId").build();
   private static final String CODE = "code";
 
   public static final WgsCoordinate COORDINATE = new WgsCoordinate(0, 0);
   private static final StopTransferPriority PRIORITY = StopTransferPriority.ALLOWED;
   private static final ZoneId TIMEZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   private static final I18NString URL = new NonLocalizedString("url");
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
+
   private static final Station subject = Station
     .of(TransitModelForTest.id(ID))
     .withName(NAME)

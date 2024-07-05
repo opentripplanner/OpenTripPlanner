@@ -1,0 +1,191 @@
+{
+  "data" : {
+    "plan" : {
+      "itineraries" : [
+        {
+          "legs" : [
+            {
+              "mode" : "WALK",
+              "from" : {
+                "name" : "A",
+                "lat" : 5.0,
+                "lon" : 8.0,
+                "departureTime" : 1580641200000,
+                "arrivalTime" : 1580641200000
+              },
+              "to" : {
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641220000,
+                "arrivalTime" : 1580641220000
+              },
+              "startTime" : 1580641200000,
+              "endTime" : 1580641220000,
+              "generalizedCost" : 40,
+              "fareProducts" : [ ]
+            },
+            {
+              "mode" : "BUS",
+              "from" : {
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641260000,
+                "arrivalTime" : 1580641260000
+              },
+              "to" : {
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580642100000,
+                "arrivalTime" : 1580642100000
+              },
+              "startTime" : 1580641260000,
+              "endTime" : 1580642100000,
+              "generalizedCost" : 992,
+              "fareProducts" : [
+                {
+                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                  "product" : {
+                    "id" : "F:day-pass",
+                    "name" : "day-pass",
+                    "__typename" : "DefaultFareProduct",
+                    "price" : {
+                      "currency" : {
+                        "digits" : 2,
+                        "code" : "EUR"
+                      },
+                      "amount" : 10.0
+                    },
+                    "riderCategory" : {
+                      "id" : "F:senior-citizens",
+                      "name" : "Senior citizens"
+                    },
+                    "medium" : {
+                      "id" : "F:oyster",
+                      "name" : "TfL Oyster Card"
+                    }
+                  }
+                },
+                {
+                  "id" : "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
+                  "product" : {
+                    "id" : "F:single-ticket",
+                    "name" : "single-ticket",
+                    "__typename" : "DefaultFareProduct",
+                    "price" : {
+                      "currency" : {
+                        "digits" : 2,
+                        "code" : "EUR"
+                      },
+                      "amount" : 10.0
+                    },
+                    "riderCategory" : {
+                      "id" : "F:senior-citizens",
+                      "name" : "Senior citizens"
+                    },
+                    "medium" : {
+                      "id" : "F:oyster",
+                      "name" : "TfL Oyster Card"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "mode" : "RAIL",
+              "from" : {
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580643000000,
+                "arrivalTime" : 1580643000000
+              },
+              "to" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "startTime" : 1580643000000,
+              "endTime" : 1580644200000,
+              "generalizedCost" : 2040,
+              "fareProducts" : [
+                {
+                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                  "product" : {
+                    "id" : "F:day-pass",
+                    "name" : "day-pass",
+                    "__typename" : "DefaultFareProduct",
+                    "price" : {
+                      "currency" : {
+                        "digits" : 2,
+                        "code" : "EUR"
+                      },
+                      "amount" : 10.0
+                    },
+                    "riderCategory" : {
+                      "id" : "F:senior-citizens",
+                      "name" : "Senior citizens"
+                    },
+                    "medium" : {
+                      "id" : "F:oyster",
+                      "name" : "TfL Oyster Card"
+                    }
+                  }
+                },
+                {
+                  "id" : "46190ddd-93b0-3136-adb7-a18394f8b0ef",
+                  "product" : {
+                    "id" : "F:single-ticket",
+                    "name" : "single-ticket",
+                    "__typename" : "DefaultFareProduct",
+                    "price" : {
+                      "currency" : {
+                        "digits" : 2,
+                        "code" : "EUR"
+                      },
+                      "amount" : 10.0
+                    },
+                    "riderCategory" : {
+                      "id" : "F:senior-citizens",
+                      "name" : "Senior citizens"
+                    },
+                    "medium" : {
+                      "id" : "F:oyster",
+                      "name" : "TfL Oyster Card"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "mode" : "CAR",
+              "from" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "to" : {
+                "name" : "E",
+                "lat" : 9.0,
+                "lon" : 10.0,
+                "departureTime" : 1580644800000,
+                "arrivalTime" : 1580644800000
+              },
+              "startTime" : 1580644200000,
+              "endTime" : 1580644800000,
+              "generalizedCost" : 1000,
+              "fareProducts" : [ ]
+            }
+          ],
+          "fares" : [ ]
+        }
+      ]
+    }
+  }
+}

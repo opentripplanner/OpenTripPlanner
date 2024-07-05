@@ -6,9 +6,9 @@ take a few minutes!
 ## Get Java
 
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of
-the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 17 or later. We
-recommend running on Java 17 rather than a later version, as it is a long-term support release.
-Run `java -version` to check that you have version 17 or newer of the JVM installed. If you do not,
+the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 21 or later. We
+recommend running on Java 21 rather than a later version, as it is a long-term support release.
+Run `java -version` to check that you have version 21 or newer of the JVM installed. If you do not,
 you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 ## Get OTP
@@ -18,9 +18,9 @@ JAR containing all other libraries needed for OTP to work, and is available from
 repository. You will be able to go
 to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/),
 navigate to
-the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.4.0/),
+the [directory of releases](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.5.0/),
 and download
-the [file with `shaded.jar` suffix](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.4.0/otp-2.4.0-shaded.jar)
+the [file with `shaded.jar` suffix](https://repo1.maven.org/maven2/org/opentripplanner/otp/2.5.0/otp-2.5.0-shaded.jar)
 .
 
 You may also want to get your own copy of the OTP source code
@@ -64,6 +64,8 @@ states, from which you can prepare your own smaller bounding-box extracts
 using [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis#Extracting_bounding_boxes)
 , [osmconvert](http://wiki.openstreetmap.org/wiki/Osmconvert#Applying_Geographical_Borders), or (our
 favorite) [Osmium-Tool](https://osmcode.org/osmium-tool/manual.html#creating-geographic-extracts).
+There is also [Protomaps](https://app.protomaps.com/) which can create custom extracts 
+for any region of the world with an easy to use drag and drop interface.
 OSM data can be delivered as XML or in the more compact binary PBF format. OpenTripPlanner consumes
 only PBF because it's smaller and more efficient.
 
@@ -127,7 +129,7 @@ below and in other tutorials.
 The simplest way to use OTP is to build a graph in a single step and start a server immediately,
 without saving it to disk. The command to do so is:
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --build --serve /home/username/otp
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --build --serve /home/username/otp
 
 where `/home/username/otp` should be the directory where you put your configuration and input files.
 
@@ -139,10 +141,11 @@ with your local OpenTripPlanner instance.
 
 This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your
 local machine. It can be informative to watch the HTTP requests and responses being generated using
-the developer tools in your web browser. OTP's built-in web server will run by default on ports 8080
-and 8081 for HTTP and HTTPS respectively. If by any chance some other software is already using one
-or both of those port numbers, you can specify different port numbers with switches
-like `--port 8801 --securePort 8802`.
+the developer tools in your web browser. OTP's built-in web server will run by default on port 8080.
+If by any chance some other software is already using that port number, you can specify a different
+port number with a switch
+`--port 8801`.
+
 
 ## Saving a Graph
 
@@ -151,13 +154,13 @@ build a graph from street and transit data then save it to a file using the `--b
 command line parameters together. If for example your current working directory (`.`) contains the
 input files and the OTP JAR file, you can use this command:
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --build --save .
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --build --save .
 
 This will produce a file called `graph.obj` in the same directory as the inputs. The server can then
 be started later using the `--load` parameter, and will read this file instead of building the graph
 from scratch:
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --load .
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --load .
 
 Another reason to perform these two phases separately is that the building process loads the entire
 GTFS and OSM data sets into memory, so can require significantly more memory than just running a
@@ -174,16 +177,16 @@ graph once, and then layer transit data on top of the streets to make the final 
 Again assuming the input files and OTP JAR file are in the current working directory, you can build
 a street graph with OSM and elevation data only (ignoring transit input files) with this command:
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --buildStreet .
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --buildStreet .
 
 Then, to build a graph layering transit data on top of the saved street graph (built using the
 previous command):
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --loadStreet --save .
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --loadStreet --save .
 
 Finally, the server can be started using the `--load` parameter:
 
-    $ java -Xmx2G -jar otp-2.4.0-shaded.jar --load .
+    $ java -Xmx2G -jar otp-2.5.0-shaded.jar --load .
 
 ## Command Line Switches
 
@@ -201,4 +204,4 @@ You can run the OTP .jar file with the `--help` option for a full list of comman
 
 ## Exploring the API
 
-If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](GraphQL-Tutorial.md).
+If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](apis/GraphQL-Tutorial.md).
