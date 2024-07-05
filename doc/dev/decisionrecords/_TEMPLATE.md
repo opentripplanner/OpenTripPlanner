@@ -11,8 +11,10 @@ Original pull-request: {#NNNN}
 
 ### Context and Problem Statement
 
-<!-- Describe the context and problem statement, e.g., in free form using two to three sentences. You
-may want to articulate the issue in the form of a question -->
+<!-- 
+   Describe the context and problem statement, e.g., in free form using two to three
+   sentences. You may want to articulate the issue in the form of a question.
+-->
 
 ### Other options
 
