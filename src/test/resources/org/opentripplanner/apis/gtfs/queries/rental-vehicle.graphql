@@ -3,7 +3,6 @@
     vehicleId
     name
     allowPickupNow
-    network
     lon
     lat
     rentalUris {
@@ -16,7 +15,8 @@
       formFactor
       propulsionType
     }
-    vehicleRentalSystem {
+    rentalNetwork {
+      networkId
       url
     }
   }

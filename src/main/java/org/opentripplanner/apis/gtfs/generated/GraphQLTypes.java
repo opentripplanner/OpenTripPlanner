@@ -2409,6 +2409,7 @@ public class GraphQLTypes {
     private String before;
     private GraphQLInputFiltersInput filterByIds;
     private List<GraphQLMode> filterByModes;
+    private List<String> filterByNetwork;
     private List<GraphQLFilterPlaceType> filterByPlaceTypes;
     private Integer first;
     private Integer last;
@@ -2416,7 +2417,6 @@ public class GraphQLTypes {
     private Double lon;
     private Integer maxDistance;
     private Integer maxResults;
-    private List<String> filterByNetwork;
 
     public GraphQLQueryTypeNearestArgs(Map<String, Object> args) {
       if (args != null) {
@@ -2431,6 +2431,7 @@ public class GraphQLTypes {
               .map(GraphQLMode.class::cast)
               .collect(Collectors.toList());
         }
+        this.filterByNetwork = (List<String>) args.get("filterByNetwork");
         if (args.get("filterByPlaceTypes") != null) {
           this.filterByPlaceTypes =
             ((List<Object>) args.get("filterByPlaceTypes")).stream()
@@ -2448,7 +2449,6 @@ public class GraphQLTypes {
         this.lon = (Double) args.get("lon");
         this.maxDistance = (Integer) args.get("maxDistance");
         this.maxResults = (Integer) args.get("maxResults");
-        this.filterByNetwork = (List<String>) args.get("filterByNetwork");
       }
     }
 
@@ -2466,6 +2466,10 @@ public class GraphQLTypes {
 
     public List<GraphQLMode> getGraphQLFilterByModes() {
       return this.filterByModes;
+    }
+
+    public List<String> getGraphQLFilterByNetwork() {
+      return this.filterByNetwork;
     }
 
     public List<GraphQLFilterPlaceType> getGraphQLFilterByPlaceTypes() {
@@ -2512,6 +2516,10 @@ public class GraphQLTypes {
       this.filterByModes = filterByModes;
     }
 
+    public void setGraphQLFilterByNetwork(List<String> filterByNetwork) {
+      this.filterByNetwork = filterByNetwork;
+    }
+
     public void setGraphQLFilterByPlaceTypes(List<GraphQLFilterPlaceType> filterByPlaceTypes) {
       this.filterByPlaceTypes = filterByPlaceTypes;
     }
@@ -2538,14 +2546,6 @@ public class GraphQLTypes {
 
     public void setGraphQLMaxResults(Integer maxResults) {
       this.maxResults = maxResults;
-    }
-
-    public List<String> getGraphQLFilterByNetwork() {
-      return this.filterByNetwork;
-    }
-
-    public void setGraphQLFilterByNetwork(List<String> networks) {
-      this.filterByNetwork = networks;
     }
   }
 

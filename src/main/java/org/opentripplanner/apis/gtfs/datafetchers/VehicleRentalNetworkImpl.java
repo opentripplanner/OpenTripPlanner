@@ -5,7 +5,12 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 
-public class VehicleRentalSystemImpl implements GraphQLDataFetchers.GraphQLVehicleRentalSystem {
+public class VehicleRentalNetworkImpl implements GraphQLDataFetchers.GraphQLVehicleRentalNetwork {
+
+  @Override
+  public DataFetcher<String> networkId() {
+    return environment -> getSource(environment).systemId;
+  }
 
   @Override
   public DataFetcher<String> url() {

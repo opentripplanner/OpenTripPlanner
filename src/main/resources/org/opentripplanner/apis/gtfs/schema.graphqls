@@ -1741,15 +1741,15 @@ type RentalVehicle implements Node & PlaceInterface {
   "Name of the vehicle"
   name: String!
   "ID of the rental network."
-  network: String
+  network: String @deprecated(reason : "Use `networkId` from `rentalNetwork` instead.")
   "If true, vehicle is not disabled."
   operative: Boolean
+  "The vehicle rental network information. This is referred as system in the GBFS terminology."
+  rentalNetwork: VehicleRentalNetwork!
   "Platform-specific URLs to begin the vehicle."
   rentalUris: VehicleRentalUris
   "ID of the vehicle in the format of network:id"
   vehicleId: String
-  "The vehicle rental system information."
-  vehicleRentalSystem: VehicleRentalSystem
   "The type of the rental vehicle (scooter, bicycle, car...)"
   vehicleType: RentalVehicleType
 }
@@ -2417,6 +2417,21 @@ type VehiclePosition {
   vehicleId: String
 }
 
+"""
+Vehicle rental network, which is referred as system in the GBFS terminology. Note, the same operator can operate in multiple
+regions either with the same network/system or with a different one. This can contain information about either the rental brand
+or about the operator.
+"""
+type VehicleRentalNetwork {
+  """
+  ID of the vehicle rental network. In GBFS, this is the `system_id` field from the system information, but it can
+  be overridden in the configuration to have a different value so this field doesn't necessarily match the source data.
+  """
+  networkId: String!
+  "The rental vehicle operator's network/system URL. In GBFS, this is the `url` field from the system information."
+  url: String
+}
+
 "Vehicle rental station represents a location where users can rent bicycles etc. for a fee."
 type VehicleRentalStation implements Node & PlaceInterface {
   """
@@ -2447,7 +2462,7 @@ type VehicleRentalStation implements Node & PlaceInterface {
   "Name of the vehicle rental station"
   name: String!
   "ID of the rental network."
-  network: String
+  network: String @deprecated(reason : "Use `networkId` from `rentalNetwork` instead.")
   "If true, station is on and in service."
   operative: Boolean
   """
@@ -2456,6 +2471,8 @@ type VehicleRentalStation implements Node & PlaceInterface {
   are always the total capacity divided by two.
   """
   realtime: Boolean
+  "The vehicle rental network information. This is referred as system in the GBFS terminology."
+  rentalNetwork: VehicleRentalNetwork!
   "Platform-specific URLs to begin renting a vehicle from this station."
   rentalUris: VehicleRentalUris
   """
@@ -2468,18 +2485,11 @@ type VehicleRentalStation implements Node & PlaceInterface {
   spacesAvailable: Int @deprecated(reason : "Use `availableSpaces` instead, which also contains the space vehicle types")
   "ID of the vehicle in the format of network:id"
   stationId: String
-  "The vehicle rental system information."
-  vehicleRentalSystem: VehicleRentalSystem
   """
   Number of vehicles currently available on the rental station.
   See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
   """
   vehiclesAvailable: Int @deprecated(reason : "Use `availableVehicles` instead, which also contains vehicle types")
-}
-
-type VehicleRentalSystem {
-  "The rental vehicle operator's system URL."
-  url: String
 }
 
 type VehicleRentalUris {

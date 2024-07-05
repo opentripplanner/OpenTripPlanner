@@ -28,7 +28,6 @@
     allowPickup
     allowDropoffNow
     allowPickupNow
-    network
     lon
     lat
     capacity
@@ -39,7 +38,8 @@
       web
     }
     operative
-    vehicleRentalSystem {
+    rentalNetwork {
+      networkId
       url
     }
   }

@@ -47,14 +47,14 @@
       "allowPickup" : false,
       "allowDropoffNow" : false,
       "allowPickupNow" : false,
-      "network" : "Network-1",
       "lon" : 18.99,
       "lat" : 47.51,
       "capacity" : null,
       "allowOverloading" : false,
       "rentalUris" : null,
       "operative" : false,
-      "vehicleRentalSystem" : {
+      "rentalNetwork" : {
+        "networkId" : "Network-1",
         "url" : "https://foo.bar"
       }
     }

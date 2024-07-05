@@ -119,11 +119,11 @@ class GraphQLIntegrationTest {
     .withSpaces(10)
     .withVehicleTypeBicycle(5, 7)
     .withVehicleTypeElectricBicycle(5, 3)
-    .withSystem("system-1", "https://foo.bar")
+    .withSystem("Network-1", "https://foo.bar")
     .build();
 
   private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
-    .withSystem("system-1", "https://foo.bar")
+    .withSystem("Network-1", "https://foo.bar")
     .build();
 
   static final Graph GRAPH = new Graph();
