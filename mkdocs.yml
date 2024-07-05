@@ -90,7 +90,6 @@ nav:
     - "Developers' Guide": 'Developers-Guide.md'
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
-    - Codestyle: 'Codestyle.md'
     - Sandbox Development: 'SandboxExtension.md'
     - Release Checklist: 'ReleaseChecklist.md'
 - Sandbox:
