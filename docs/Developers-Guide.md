@@ -199,7 +199,7 @@ formats like 02/01/12.
 
 ## Code style
 
-The OTP code style is described on a separate [style guide page](Codestyle.md).
+The OTP code style is described on a separate [style guide page](../doc/dev/decisionrecords/Codestyle.md).
 
 ## Code conventions and architecture
 

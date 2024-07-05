@@ -51,7 +51,7 @@ Editor > Code Style_. Then select **Project** in the \_Scheme drop down.
 You can run the Prettier Maven plugin as an external tool in IntelliJ. Set it up as an
 `External tool` and assign a key-shortcut to the tool execution.
 
-![External Tool Dialog](images/ExternalToolDialog.png)
+![External Tool Dialog](../../../docs/images/ExternalToolDialog.png)
 
 ```
 Name:              Prettier Format Current File

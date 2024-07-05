@@ -7,11 +7,11 @@ is put together with the source; hopefully making it easier to maintain. Instead
 modules in old style _package-info.java_ files we use _package.md_ files. This document should serve
 as an index to all existing top-level documented components.
 
-This document is far from complete - hopefully it can evolve over time and become a good
+This document is far from complete. Hopefully it can evolve over time and become a good
 introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
 detailed discussions on many design decisions.
 
-We document [Architectural Decision](ADRs.md) in a log. Make sure you as a developer are familiar 
+We document [Decision Records](DECISION_RECORDS.md) in a log. Make sure you as a developer are familiar 
 with the decisions and follow them. Reviewers should use them actively when reviewing code and may
 use them to ask for changes.
 
@@ -30,7 +30,7 @@ examples. The Transit model is more complex than the VehiclePosition model.
    class has the same name as the interface with prefix `Default`.
  - `Domain Model` A model witch encapsulate a business area. In the drawing two examples are shown,
    the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
-   implementation have a separate `Service` and `Repository`. Almost all http endpoints are , 
+   implementation has a separate `Service` and `Repository`. Almost all http endpoints are, 
    read-only so the `Service` can focus on serving the http API endpoints, while the repository
    is used to maintain the model by the updaters. 
 
