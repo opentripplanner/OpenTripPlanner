@@ -124,6 +124,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment -> getSource(environment).isInterlinedWithPreviousLeg();
   }
 
+  @Override
+  public DataFetcher<Integer> headway() {
+    return environment -> getSource(environment).getHeadway();
+  }
+
   // TODO
   @Override
   public DataFetcher<Boolean> intermediatePlace() {

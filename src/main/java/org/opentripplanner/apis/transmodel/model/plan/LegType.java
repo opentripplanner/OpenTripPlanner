@@ -166,6 +166,15 @@ public class LegType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("headway")
+          .description("The leg's headway in seconds")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> leg(env).getHeadway())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("pointsOnLink")
           .description("The leg's geometry.")
           .type(linkGeometryType)

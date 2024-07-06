@@ -483,6 +483,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Boolean> interlineWithPreviousLeg();
 
+    public DataFetcher<Integer> headway();
+
     public DataFetcher<Boolean> intermediatePlace();
 
     public DataFetcher<Iterable<StopArrival>> intermediatePlaces();
