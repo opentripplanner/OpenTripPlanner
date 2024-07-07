@@ -354,7 +354,7 @@ public class TimetableSnapshot {
       if (toKeepTimetables.isEmpty()) {
         it.remove();
       } else {
-        timetables.put(pattern, toKeepTimetables);
+        timetables.put(pattern, ImmutableSortedSet.copyOfSorted(toKeepTimetables));
       }
     }
 
