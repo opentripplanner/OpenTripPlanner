@@ -19,8 +19,4 @@ public record NetworkParameters(
   String network,
   boolean geofencingZones,
   boolean allowKeepingAtDestination
-) {
-  public NetworkParameters withName(String network) {
-    return new NetworkParameters(network, geofencingZones, allowKeepingAtDestination);
-  }
-}
+) {}
