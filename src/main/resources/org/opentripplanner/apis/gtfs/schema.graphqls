@@ -1183,8 +1183,8 @@ type QueryType {
     nearest places related to bicycling.
     """
     filterByModes: [Mode],
-    "Only include vehicle rental networks that match one of the given network names."
-    filterByNetwork: [String],
+    "Only include vehicle rental networks that match one of the given network ids."
+    filterByNetwork: [String!],
     "Only return places that are one of these types, e.g. `STOP` or `VEHICLE_RENT`"
     filterByPlaceTypes: [FilterPlaceType],
     first: Int,
