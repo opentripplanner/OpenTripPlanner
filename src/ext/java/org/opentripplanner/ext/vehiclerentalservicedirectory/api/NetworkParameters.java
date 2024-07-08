@@ -6,7 +6,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  * Parameters for a specific network.
  * <p>
  * The {@link GbfsVehicleRentalDataSourceParameters} supports {@code overloadingAllowed}
- * which is not included here since they are not part of
+ * which is not included here since it is not part of
  * the GBFS specification. If there is a demand for it, it can be added.
  * <p>
  * @param network The network name
