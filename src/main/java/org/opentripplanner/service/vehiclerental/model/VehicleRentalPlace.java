@@ -80,6 +80,9 @@ public interface VehicleRentalPlace {
   /** Deep links for this rental station or individual vehicle */
   VehicleRentalStationUris getRentalUris();
 
+  /** System information for the vehicle rental provider */
+  VehicleRentalSystem getVehicleRentalSystem();
+
   default boolean networkIsNotAllowed(VehicleRentalPreferences preferences) {
     if (
       getNetwork() == null &&

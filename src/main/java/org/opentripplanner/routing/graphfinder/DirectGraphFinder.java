@@ -63,6 +63,7 @@ public class DirectGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
+    List<String> filterByNetwork,
     TransitService transitService
   ) {
     throw new UnsupportedOperationException("Not implemented");
