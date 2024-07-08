@@ -29,7 +29,7 @@ class AddedTest {
 
   @Test
   void addedTrip() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().build();
 
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
       .addStopTime(STOP_A1_ID, 30)
@@ -43,7 +43,7 @@ class AddedTest {
 
   @Test
   void addedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -74,7 +74,7 @@ class AddedTest {
 
   @Test
   void addedWithUnknownStop() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -98,7 +98,7 @@ class AddedTest {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
       // add extension to set route name, url, mode
       .addTripExtension()

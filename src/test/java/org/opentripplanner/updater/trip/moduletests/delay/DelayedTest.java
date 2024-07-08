@@ -25,7 +25,7 @@ class DelayedTest {
 
   @Test
   void singleStopDelay() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
 
     var tripUpdate = new TripUpdateBuilder(
       RealtimeTestEnvironment.TRIP_1_ID,
@@ -72,7 +72,7 @@ class DelayedTest {
    */
   @Test
   void complexDelay() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
     var tripId = RealtimeTestEnvironment.TRIP_2_ID;
 

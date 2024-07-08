@@ -34,7 +34,7 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.gtfs().withTrip1();
+    var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
     var pattern1 = env.getPatternForTrip(env.trip1());
 
     final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
@@ -67,7 +67,7 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
     var addedTripId = "added-trip";
     // First add ADDED trip
     var update = new TripUpdateBuilder(

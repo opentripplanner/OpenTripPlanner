@@ -96,7 +96,7 @@ public final class RealtimeTestEnvironment {
   private Trip trip1;
   private Trip trip2;
 
-  private enum SourceType {
+  enum SourceType {
     GTFS_RT,
     SIRI,
   }
@@ -104,24 +104,21 @@ public final class RealtimeTestEnvironment {
   /**
    * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
    */
-  public static RealtimeTestEnvironment siri() {
-    return new RealtimeTestEnvironment(SourceType.SIRI);
+  public static RealtimeTestEnvironmentBuilder siri() {
+    return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.SIRI);
   }
 
   /**
    * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
    */
-  public static RealtimeTestEnvironment gtfs() {
-    return new RealtimeTestEnvironment(SourceType.GTFS_RT);
+  public static RealtimeTestEnvironmentBuilder gtfs() {
+    return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.GTFS_RT);
   }
 
-  private RealtimeTestEnvironment(SourceType sourceType) {
+  RealtimeTestEnvironment(SourceType sourceType, boolean withTrip1, boolean withTrip2) {
     transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
-
-    withTrip1();
-    withTrip2();
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(
@@ -131,8 +128,14 @@ public final class RealtimeTestEnvironment {
     transitModel.getServiceCodes().put(SERVICE_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
-    transitModel.index();
+    if (withTrip1) {
+      withTrip1();
+    }
+    if (withTrip2) {
+      withTrip2();
+    }
 
+    transitModel.index();
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
     // we are actively refactoring to remove this restriction
     // for the time being you cannot run a SIRI and GTFS-RT test at the same time
@@ -146,7 +149,7 @@ public final class RealtimeTestEnvironment {
     dateTimeHelper = new DateTimeHelper(timeZone, RealtimeTestEnvironment.SERVICE_DATE);
   }
 
-  public RealtimeTestEnvironment withTrip1() {
+  private RealtimeTestEnvironment withTrip1() {
     trip1 =
       createTrip(
         TRIP_1_ID,
@@ -157,7 +160,7 @@ public final class RealtimeTestEnvironment {
     return this;
   }
 
-  public RealtimeTestEnvironment withTrip2() {
+  private RealtimeTestEnvironment withTrip2() {
     trip2 =
       createTrip(
         TRIP_2_ID,

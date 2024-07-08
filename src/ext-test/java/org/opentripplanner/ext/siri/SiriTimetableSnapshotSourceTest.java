@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.OPERATOR_1_ID;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.ROUTE_1_ID;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_1_ID;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_2_ID;
 
 import java.util.Set;
 import org.junit.jupiter.api.Disabled;
@@ -16,12 +18,12 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testCancelTrip() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(env.trip1()).getRealTimeState());
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
 
@@ -33,7 +35,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testAddJourney() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
@@ -56,7 +58,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
@@ -105,13 +107,13 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testReplaceJourney() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
       .withIsExtraJourney(true)
       // replace trip1
-      .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
       .withRecordedCalls(builder -> builder.call(env.stopA1).departAimedActual("00:01", "00:02"))
@@ -138,10 +140,10 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = updatedJourneyBuilder(env)
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(1, result.successful());
@@ -157,13 +159,13 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
         builder
           .withServiceDate(RealtimeTestEnvironment.SERVICE_DATE)
-          .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+          .withVehicleJourneyRef(TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -176,7 +178,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -189,7 +191,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
@@ -203,7 +205,7 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->
@@ -228,10 +230,10 @@ class SiriTimetableSnapshotSourceTest {
    */
   @Test
   void testChangeQuay() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
       )
@@ -251,10 +253,10 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testCancelStop() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip2().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip2().getId().getId())
+      .withDatedVehicleJourneyRef(TRIP_2_ID)
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -279,10 +281,10 @@ class SiriTimetableSnapshotSourceTest {
   @Test
   @Disabled("Not supported yet")
   void testAddStop() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
       )
@@ -312,7 +314,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNotMonitored() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withMonitored(false)
@@ -325,12 +327,12 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testReplaceJourneyWithoutEstimatedVehicleJourneyCode() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef("newJourney")
       .withIsExtraJourney(true)
-      .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
       .withEstimatedCalls(builder ->
@@ -350,10 +352,10 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNegativeHopTime() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -370,10 +372,10 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testNegativeDwellTime() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip2().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip2().getId().getId())
+      .withDatedVehicleJourneyRef(TRIP_2_ID)
       .withRecordedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -395,10 +397,10 @@ class SiriTimetableSnapshotSourceTest {
   @Test
   @Disabled("Not supported yet")
   void testExtraUnknownStop() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
