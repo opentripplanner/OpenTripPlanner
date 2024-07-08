@@ -28,7 +28,7 @@ class DelayedTest {
     var env = RealtimeTestEnvironment.gtfs();
 
     var tripUpdate = new TripUpdateBuilder(
-      env.trip1.getId().getId(),
+      RealtimeTestEnvironment.TRIP_1_ID,
       RealtimeTestEnvironment.SERVICE_DATE,
       SCHEDULED,
       env.timeZone
@@ -40,8 +40,8 @@ class DelayedTest {
 
     assertEquals(1, result.successful());
 
-    var pattern1 = env.getPatternForTrip(env.trip1);
-    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
+    var pattern1 = env.getPatternForTrip(env.trip1());
+    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
 
     var snapshot = env.getTimetableSnapshot();
     var trip1Realtime = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
@@ -59,11 +59,11 @@ class DelayedTest {
 
     assertEquals(
       "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
-      env.getScheduledTimetable(env.trip1.getId())
+      env.getScheduledTimetable(env.trip1().getId())
     );
     assertEquals(
       "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
-      env.getRealtimeTimetable(env.trip1.getId().getId())
+      env.getRealtimeTimetable(RealtimeTestEnvironment.TRIP_1_ID)
     );
   }
 
@@ -74,7 +74,7 @@ class DelayedTest {
   void complexDelay() {
     var env = RealtimeTestEnvironment.gtfs();
 
-    var tripId = env.trip2.getId().getId();
+    var tripId = RealtimeTestEnvironment.TRIP_2_ID;
 
     var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
@@ -86,7 +86,7 @@ class DelayedTest {
 
     var snapshot = env.getTimetableSnapshot();
 
-    final TripPattern originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2);
+    final TripPattern originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2());
 
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -115,11 +115,11 @@ class DelayedTest {
 
     assertEquals(
       "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
-      env.getScheduledTimetable(env.trip2.getId())
+      env.getScheduledTimetable(env.trip2().getId())
     );
     assertEquals(
       "UPDATED | A1 0:01 0:01:01 | B1 0:02:10 0:02:31 | C1 0:02:50 0:02:51",
-      env.getRealtimeTimetable(env.trip2)
+      env.getRealtimeTimetable(env.trip2())
     );
   }
 }

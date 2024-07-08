@@ -2,6 +2,8 @@ package org.opentripplanner.ext.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.OPERATOR_1_ID;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.ROUTE_1_ID;
 
 import java.util.Set;
 import org.junit.jupiter.api.Disabled;
@@ -16,17 +18,17 @@ class SiriTimetableSnapshotSourceTest {
   void testCancelTrip() {
     var env = RealtimeTestEnvironment.siri();
 
-    assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(env.trip1).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(env.trip1()).getRealTimeState());
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(env.trip1).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(env.trip1()).getRealTimeState());
   }
 
   @Test
@@ -36,8 +38,8 @@ class SiriTimetableSnapshotSourceTest {
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
       .withIsExtraJourney(true)
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
       .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
@@ -61,8 +63,8 @@ class SiriTimetableSnapshotSourceTest {
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
       .withIsExtraJourney(true)
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -109,9 +111,9 @@ class SiriTimetableSnapshotSourceTest {
       .withEstimatedVehicleJourneyCode("newJourney")
       .withIsExtraJourney(true)
       // replace trip1
-      .withVehicleJourneyRef(env.trip1.getId().getId())
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
+      .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
       .withRecordedCalls(builder -> builder.call(env.stopA1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(env.stopC1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
@@ -127,7 +129,7 @@ class SiriTimetableSnapshotSourceTest {
     );
 
     // Original trip should not get canceled
-    var originalTripTimes = env.getTripTimesForTrip(env.trip1);
+    var originalTripTimes = env.getTripTimesForTrip(env.trip1());
     assertEquals(RealTimeState.SCHEDULED, originalTripTimes.getRealTimeState());
   }
 
@@ -139,14 +141,14 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = updatedJourneyBuilder(env)
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(1, result.successful());
     assertTripUpdated(env);
     assertEquals(
       "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
-      env.getRealtimeTimetable(env.trip1)
+      env.getRealtimeTimetable(env.trip1())
     );
   }
 
@@ -161,7 +163,7 @@ class SiriTimetableSnapshotSourceTest {
       .withFramedVehicleJourneyRef(builder ->
         builder
           .withServiceDate(RealtimeTestEnvironment.SERVICE_DATE)
-          .withVehicleJourneyRef(env.trip1.getId().getId())
+          .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -229,7 +231,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
       )
@@ -243,7 +245,7 @@ class SiriTimetableSnapshotSourceTest {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 [R] 0:00:15 0:00:15 | B2 0:00:33 0:00:33",
-      env.getRealtimeTimetable(env.trip1)
+      env.getRealtimeTimetable(env.trip1())
     );
   }
 
@@ -252,7 +254,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip2.getId().getId())
+      .withDatedVehicleJourneyRef(env.trip2().getId().getId())
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -269,7 +271,7 @@ class SiriTimetableSnapshotSourceTest {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 0:01:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 0:01:30 0:01:30",
-      env.getRealtimeTimetable(env.trip2)
+      env.getRealtimeTimetable(env.trip2())
     );
   }
 
@@ -280,7 +282,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
       )
@@ -300,7 +302,7 @@ class SiriTimetableSnapshotSourceTest {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 0:00:15 0:00:15 | D1 [C] 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
-      env.getRealtimeTimetable(env.trip1)
+      env.getRealtimeTimetable(env.trip1())
     );
   }
 
@@ -328,9 +330,9 @@ class SiriTimetableSnapshotSourceTest {
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef("newJourney")
       .withIsExtraJourney(true)
-      .withVehicleJourneyRef(env.trip1.getId().getId())
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
+      .withVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -351,7 +353,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -371,7 +373,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip2.getId().getId())
+      .withDatedVehicleJourneyRef(env.trip2().getId().getId())
       .withRecordedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -396,7 +398,7 @@ class SiriTimetableSnapshotSourceTest {
     var env = RealtimeTestEnvironment.siri();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef(env.trip1.getId().getId())
+      .withDatedVehicleJourneyRef(RealtimeTestEnvironment.TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
           .call(env.stopA1)
@@ -429,7 +431,7 @@ class SiriTimetableSnapshotSourceTest {
   private static void assertTripUpdated(RealtimeTestEnvironment env) {
     assertEquals(
       "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
-      env.getRealtimeTimetable(env.trip1)
+      env.getRealtimeTimetable(env.trip1())
     );
   }
 }

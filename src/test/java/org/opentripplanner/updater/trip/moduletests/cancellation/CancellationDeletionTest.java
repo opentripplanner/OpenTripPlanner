@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_1_ID;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -32,22 +34,16 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.gtfs();
-    var pattern1 = env.getPatternForTrip(env.trip1);
+    var env = RealtimeTestEnvironment.gtfs().withTrip1();
+    var pattern1 = env.getPatternForTrip(env.trip1());
 
-    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1.getId());
+    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
 
-    var update = new TripUpdateBuilder(
-      env.trip1.getId().getId(),
-      RealtimeTestEnvironment.SERVICE_DATE,
-      relationship,
-      env.timeZone
-    )
-      .build();
+    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, env.timeZone).build();
     assertSuccess(env.applyTripUpdate(update));
 
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
+    var forToday = snapshot.resolve(pattern1, SERVICE_DATE);
     var schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
     assertNotSame(forToday.getTripTimes(tripIndex1), schedule.getTripTimes(tripIndex1));
@@ -76,7 +72,7 @@ public class CancellationDeletionTest {
     // First add ADDED trip
     var update = new TripUpdateBuilder(
       addedTripId,
-      RealtimeTestEnvironment.SERVICE_DATE,
+      SERVICE_DATE,
       ScheduleRelationship.ADDED,
       env.timeZone
     )
@@ -88,14 +84,7 @@ public class CancellationDeletionTest {
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     // Cancel or delete the added trip
-    update =
-      new TripUpdateBuilder(
-        addedTripId,
-        RealtimeTestEnvironment.SERVICE_DATE,
-        relationship,
-        env.timeZone
-      )
-        .build();
+    update = new TripUpdateBuilder(addedTripId, SERVICE_DATE, relationship, env.timeZone).build();
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     var snapshot = env.getTimetableSnapshot();
@@ -105,7 +94,7 @@ public class CancellationDeletionTest {
     assertNotNull(patternsAtA, "Added trip pattern should be found");
     var tripPattern = patternsAtA.stream().findFirst().get();
 
-    var forToday = snapshot.resolve(tripPattern, RealtimeTestEnvironment.SERVICE_DATE);
+    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
     var schedule = snapshot.resolve(tripPattern, null);
 
     assertNotSame(forToday, schedule);

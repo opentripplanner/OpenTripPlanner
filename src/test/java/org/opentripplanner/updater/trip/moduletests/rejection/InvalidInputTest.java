@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_1_ID;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,9 +27,9 @@ class InvalidInputTest {
   @ParameterizedTest
   @MethodSource("cases")
   void invalidTripDate(LocalDate date) {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().withTrip1();
 
-    var update = new TripUpdateBuilder(env.trip1.getId().getId(), date, SCHEDULED, env.timeZone)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone)
       .addDelayedStopTime(2, 60, 80)
       .build();
 

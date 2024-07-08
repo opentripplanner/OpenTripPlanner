@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_2_ID;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import org.junit.jupiter.api.Test;
@@ -25,9 +26,8 @@ public class SkippedTest {
   @Test
   void scheduledTripWithSkippedAndScheduled() {
     var env = RealtimeTestEnvironment.gtfs();
-    String scheduledTripId = env.trip2.getId().getId();
 
-    var tripUpdate = new TripUpdateBuilder(scheduledTripId, SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -35,13 +35,13 @@ public class SkippedTest {
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
 
-    assertOriginalTripPatternIsDeleted(env, env.trip2.getId());
+    assertOriginalTripPatternIsDeleted(env, env.trip2().getId());
 
-    assertNewTripTimesIsUpdated(env, env.trip2.getId());
+    assertNewTripTimesIsUpdated(env, env.trip2().getId());
 
     assertEquals(
       "UPDATED | A1 0:01 0:01:01 | B1 [C] 0:01:52 0:01:58 | C1 0:02:50 0:02:51",
-      env.getRealtimeTimetable(scheduledTripId)
+      env.getRealtimeTimetable(TRIP_2_ID)
     );
   }
 
@@ -57,7 +57,7 @@ public class SkippedTest {
   @Test
   void scheduledTripWithPreviouslySkipped() {
     var env = RealtimeTestEnvironment.gtfs();
-    var tripId = env.trip2.getId();
+    var tripId = env.trip2().getId();
 
     var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
       .addDelayedStopTime(0, 0)
@@ -108,7 +108,7 @@ public class SkippedTest {
   void skippedNoData() {
     var env = RealtimeTestEnvironment.gtfs();
 
-    final FeedScopedId tripId = env.trip2.getId();
+    final FeedScopedId tripId = env.trip2().getId();
 
     var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
       .addNoDataStop(0)
@@ -124,7 +124,7 @@ public class SkippedTest {
 
     assertEquals(
       "UPDATED | A1 [ND] 0:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 [ND] 0:01:20 0:01:21",
-      env.getRealtimeTimetable(env.trip2)
+      env.getRealtimeTimetable(env.trip2())
     );
   }
 
@@ -178,7 +178,7 @@ public class SkippedTest {
     RealtimeTestEnvironment env,
     FeedScopedId tripId
   ) {
-    var originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2);
+    var originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2());
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
 

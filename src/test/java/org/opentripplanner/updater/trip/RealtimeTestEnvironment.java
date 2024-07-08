@@ -50,6 +50,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  */
 public final class RealtimeTestEnvironment {
 
+  // static constants
   private static final TimetableSnapshotSourceParameters PARAMETERS = new TimetableSnapshotSourceParameters(
     Duration.ZERO,
     false
@@ -59,6 +60,12 @@ public final class RealtimeTestEnvironment {
   public static final String STOP_A1_ID = "A1";
   public static final String STOP_B1_ID = "B1";
   public static final String STOP_C1_ID = "C1";
+  public static final String TRIP_1_ID = "TestTrip1";
+  public static final String TRIP_2_ID = "TestTrip2";
+  public static final String OPERATOR_1_ID = "TestOperator1";
+  public static final String ROUTE_1_ID = "TestRoute1";
+
+  // instance variables
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -78,14 +85,16 @@ public final class RealtimeTestEnvironment {
     .withRegularStop(stopC1)
     .withRegularStop(stopD1)
     .build();
-  public final FeedScopedId operator1Id = TransitModelForTest.id("TestOperator1");
-  public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
-  public final Trip trip1;
-  public final Trip trip2;
+
+  public final Route route1 = TransitModelForTest.route(ROUTE_1_ID).build();
+
   public final TransitModel transitModel;
   private final SiriTimetableSnapshotSource siriSource;
   private final TimetableSnapshotSource gtfsSource;
   private final DateTimeHelper dateTimeHelper;
+
+  private Trip trip1;
+  private Trip trip2;
 
   private enum SourceType {
     GTFS_RT,
@@ -111,24 +120,8 @@ public final class RealtimeTestEnvironment {
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
 
-    Route route1 = TransitModelForTest.route(route1Id).build();
-
-    trip1 =
-      createTrip(
-        "TestTrip1",
-        route1,
-        List.of(new StopCall(stopA1, 10, 11), new StopCall(stopB1, 20, 21))
-      );
-    trip2 =
-      createTrip(
-        "TestTrip2",
-        route1,
-        List.of(
-          new StopCall(stopA1, 60, 61),
-          new StopCall(stopB1, 70, 71),
-          new StopCall(stopC1, 80, 81)
-        )
-      );
+    withTrip1();
+    withTrip2();
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(
@@ -151,6 +144,49 @@ public final class RealtimeTestEnvironment {
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(timeZone, RealtimeTestEnvironment.SERVICE_DATE);
+  }
+
+  public RealtimeTestEnvironment withTrip1() {
+    trip1 =
+      createTrip(
+        TRIP_1_ID,
+        route1,
+        List.of(new StopCall(stopA1, 10, 11), new StopCall(stopB1, 20, 21))
+      );
+    transitModel.index();
+    return this;
+  }
+
+  public RealtimeTestEnvironment withTrip2() {
+    trip2 =
+      createTrip(
+        TRIP_2_ID,
+        route1,
+        List.of(
+          new StopCall(stopA1, 60, 61),
+          new StopCall(stopB1, 70, 71),
+          new StopCall(stopC1, 80, 81)
+        )
+      );
+
+    transitModel.index();
+    return this;
+  }
+
+  public Trip trip1() {
+    Objects.requireNonNull(
+      trip1,
+      "trip1 was not added to the test environment. Call withTrip1() to add it."
+    );
+    return trip1;
+  }
+
+  public Trip trip2() {
+    Objects.requireNonNull(
+      trip2,
+      "trip2 was not added to the test environment. Call withTrip2() to add it."
+    );
+    return trip2;
   }
 
   public static FeedScopedId id(String id) {
