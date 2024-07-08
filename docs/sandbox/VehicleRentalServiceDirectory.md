@@ -1,10 +1,10 @@
 # Vehicle Rental Service Directory API support
 
-This adds support for the GBFS service directory endpoint component located at 
-https://github.com/entur/lamassu. OTP uses the service directory to lookup and connect to all GBFS
-endpoints registered in the directory. This simplifies the management of the GBFS endpoints, since
-multiple services/components like OTP can connect to the directory and get the necessary
-configuration from it.
+This adds support for the GBFS service directory endpoint component
+[Lamassu](https://github.com/entur/lamassu). 
+OTP uses the service directory to lookup and connects to all GBFS endpoints registered in the 
+directory. This simplifies the management of the GBFS endpoints, since multiple services/components 
+like OTP can connect to the directory and get the necessary configuration from it.
 
 
 ## Contact Info
