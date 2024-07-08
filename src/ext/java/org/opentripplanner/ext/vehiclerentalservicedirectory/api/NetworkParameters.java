@@ -11,6 +11,9 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  * <p>
  * @param network The network name
  * @param geofencingZones enable geofencingZones for the given network
+ * @param allowKeepingAtDestination if a vehicle that was picked up from a station must be returned
+ *                                  to another one or can be kept at the destination.
+ *                                  {@link org.opentripplanner.standalone.config.routerconfig.updaters.sources.VehicleRentalSourceFactory#allOwKeepingRentedVehicleAtDestination()}
  */
 public record NetworkParameters(
   String network,

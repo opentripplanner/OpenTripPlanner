@@ -80,11 +80,22 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
             .of("geofencingZones")
             .since(V2_4)
             .summary("Enables geofencingZones for the given network")
+            .description(
+              "See the regular [GBFS documentation](../UpdaterConfig.md#GBFS vehicle rental systems) for more information."
+            )
             .asBoolean(false),
           c
             .of("allowKeepingVehicleAtDestination")
             .since(V2_5)
-            .summary("Enables `allowKeepingVehicleAtDestination` for the given network")
+            .summary("Enables `allowKeepingVehicleAtDestination` for the given network.")
+            .description(
+              """
+              Configures if a vehicle rented from a station must be returned to another one or can
+              be kept at the end of the trip.
+              
+              See the regular [GBFS documentation](../UpdaterConfig.md#GBFS vehicle rental systems) for more information.
+              """
+            )
             .asBoolean(false)
         )
       );
