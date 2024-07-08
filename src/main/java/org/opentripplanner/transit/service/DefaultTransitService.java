@@ -34,6 +34,7 @@ import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -181,6 +182,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getRouteForId(id);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
   @Override
   public void addRoutes(Route route) {
     this.transitModelIndex.addRoutes(route);
@@ -259,6 +264,15 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getTripForId().get(id);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripForId(FeedScopedId tripId, Trip trip) {
+    transitModelIndex.getTripForId().put(tripId, trip);
+  }
+
   @Override
   public Collection<Trip> getAllTrips() {
     OTPRequestTimeoutException.checkForTimeout();
@@ -276,6 +290,15 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternForTrip().get(trip);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addPatternForTrip(Trip trip, TripPattern pattern) {
+    transitModelIndex.getPatternForTrip().put(trip, pattern);
+  }
+
   @Override
   public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
     TripPattern realtimePattern = getRealtimeAddedTripPattern(trip.getId(), serviceDate);
@@ -289,6 +312,15 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<TripPattern> getPatternsForRoute(Route route) {
     OTPRequestTimeoutException.checkForTimeout();
     return this.transitModelIndex.getPatternsForRoute().get(route);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addPatternsForRoute(Route route, TripPattern pattern) {
+    transitModelIndex.getPatternsForRoute().put(route, pattern);
   }
 
   @Override
@@ -475,6 +507,15 @@ public class DefaultTransitService implements TransitEditorService {
     return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripOnServiceDateById(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+    transitModelIndex.getTripOnServiceDateById().put(id, tripOnServiceDate);
+  }
+
   @Override
   public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
     return transitModelIndex.getTripOnServiceDateForTripAndDay().values();
@@ -485,6 +526,29 @@ public class DefaultTransitService implements TransitEditorService {
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripOnServiceDateForTripAndDay(
+    TripIdAndServiceDate tripIdAndServiceDate,
+    TripOnServiceDate tripOnServiceDate
+  ) {
+    transitModelIndex
+      .getTripOnServiceDateForTripAndDay()
+      .put(tripIdAndServiceDate, tripOnServiceDate);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+    return transitModel.getOrCreateServiceIdForDate(serviceDate);
   }
 
   @Override
@@ -577,6 +641,11 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
     return sortByOccurrenceAndReduce(getPatternModesOfStop(stop)).toList();
+  }
+
+  @Override
+  public Deduplicator getDeduplicator() {
+    return transitModel.getDeduplicator();
   }
 
   /**

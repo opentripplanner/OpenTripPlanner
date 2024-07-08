@@ -36,7 +36,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
@@ -52,7 +52,7 @@ import uk.org.siri.siri20.VehicleModesEnumeration;
 class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
-  private final TransitModel transitModel;
+  private final TransitEditorService transitService;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> getTripPatternId;
@@ -73,7 +73,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
-    TransitModel transitModel,
+    TransitEditorService transitService,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
   ) {
@@ -112,16 +112,16 @@ class AddedTripBuilder {
 
     calls = CallWrapper.of(estimatedVehicleJourney);
 
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.entityResolver = entityResolver;
     this.getTripPatternId = getTripPatternId;
-    timeZone = transitModel.getTimeZone();
+    timeZone = transitService.getTimeZone();
 
     replacedTrips = getReplacedVehicleJourneys(estimatedVehicleJourney);
   }
 
   AddedTripBuilder(
-    TransitModel transitModel,
+    TransitEditorService transitService,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
     FeedScopedId tripId,
@@ -139,9 +139,9 @@ class AddedTripBuilder {
     String headsign,
     List<TripOnServiceDate> replacedTrips
   ) {
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.entityResolver = entityResolver;
-    this.timeZone = transitModel.getTimeZone();
+    this.timeZone = transitService.getTimeZone();
     this.getTripPatternId = getTripPatternId;
     this.tripId = tripId;
     this.operator = operator;
@@ -168,7 +168,7 @@ class AddedTripBuilder {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
-    FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
+    FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
       return UpdateError.result(tripId, NO_START_DATE);
     }
@@ -181,7 +181,7 @@ class AddedTripBuilder {
       }
       route = createRoute(agency);
       LOG.info("Adding route {} to transitModel.", route);
-      transitModel.getTransitModelIndex().addRoutes(route);
+      transitService.addRoutes(route);
     }
 
     Trip trip = createTrip(route, calServiceId);
@@ -221,14 +221,14 @@ class AddedTripBuilder {
     RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
       trip,
       aimedStopTimes,
-      transitModel.getDeduplicator()
+      transitService.getDeduplicator()
     );
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
     tripTimes.validateNonIncreasingTimes();
-    tripTimes.setServiceCode(transitModel.getServiceCodes().get(trip.getServiceId()));
+    tripTimes.setServiceCode(transitService.getServiceCodeForId(trip.getServiceId()));
     pattern.add(tripTimes);
     RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();
 
@@ -267,17 +267,14 @@ class AddedTripBuilder {
 
     // Adding trip to index necessary to include values in graphql-queries
     // TODO - SIRI: should more data be added to index?
-    transitModel.getTransitModelIndex().getTripForId().put(tripId, trip);
-    transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
-    transitModel.getTransitModelIndex().getPatternsForRoute().put(route, pattern);
-    transitModel
-      .getTransitModelIndex()
-      .getTripOnServiceDateById()
-      .put(tripOnServiceDate.getId(), tripOnServiceDate);
-    transitModel
-      .getTransitModelIndex()
-      .getTripOnServiceDateForTripAndDay()
-      .put(new TripIdAndServiceDate(tripId, serviceDate), tripOnServiceDate);
+    transitService.addTripForId(tripId, trip);
+    transitService.addPatternForTrip(trip, pattern);
+    transitService.addPatternsForRoute(route, pattern);
+    transitService.addTripOnServiceDateById(tripOnServiceDate.getId(), tripOnServiceDate);
+    transitService.addTripOnServiceDateForTripAndDay(
+      new TripIdAndServiceDate(tripId, serviceDate),
+      tripOnServiceDate
+    );
 
     return Result.success(new TripUpdate(stopPattern, updatedTripTimes, serviceDate));
   }
@@ -312,8 +309,7 @@ class AddedTripBuilder {
    */
   @Nullable
   private Agency resolveAgency() {
-    return transitModel
-      .getTransitModelIndex()
+    return transitService
       .getAllRoutes()
       .stream()
       .filter(r -> r != null && r.getOperator() != null && r.getOperator().equals(operator))

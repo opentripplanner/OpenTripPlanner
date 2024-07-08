@@ -25,6 +25,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -231,4 +232,6 @@ public interface TransitService {
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
   List<TransitMode> getModesOfStopLocation(StopLocation stop);
+
+  Deduplicator getDeduplicator();
 }
