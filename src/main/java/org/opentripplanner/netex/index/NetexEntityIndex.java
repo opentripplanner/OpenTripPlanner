@@ -1,9 +1,6 @@
 package org.opentripplanner.netex.index;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
@@ -101,7 +98,7 @@ public class NetexEntityIndex {
   public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
   public final HierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById;
   public final HierarchicalMapById<Branding> brandingById;
-  public final Set<Parking> parkings;
+  public final HierarchicalMapById<Parking> parkings;
 
   // Relations between entities - The Netex XML sometimes relies on the
   // nested structure of the XML document, rater than explicit references.
@@ -147,7 +144,7 @@ public class NetexEntityIndex {
     this.tariffZonesById = new HierarchicalVersionMapById<>();
     this.brandingById = new HierarchicalMapById<>();
     this.timeZone = new HierarchicalElement<>();
-    this.parkings = new HashSet<>(0);
+    this.parkings = new HierarchicalMapById<>();
   }
 
   /**
@@ -190,7 +187,7 @@ public class NetexEntityIndex {
     this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
     this.brandingById = new HierarchicalMapById<>(parent.brandingById);
     this.timeZone = new HierarchicalElement<>(parent.timeZone);
-    this.parkings = new HashSet<>(parent.parkings);
+    this.parkings = new HierarchicalMapById<>(parent.parkings);
   }
 
   /**
@@ -361,8 +358,8 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ImmutableSet<Parking> getParkings() {
-        return ImmutableSet.copyOf(parkings);
+      public ReadOnlyHierarchicalMapById<Parking> getParkings() {
+        return parkings;
       }
 
       @Override

@@ -205,7 +205,7 @@ public class NetexMapper {
 
   public Collection<VehicleParking> mapVehicleParkings() {
     var mapper = new VehicleParkingMapper(idFactory);
-    return mapper.map(currentNetexIndex.getParkings());
+    return mapper.map(currentNetexIndex.getParkings().localValues());
   }
 
   /* PRIVATE METHODS */

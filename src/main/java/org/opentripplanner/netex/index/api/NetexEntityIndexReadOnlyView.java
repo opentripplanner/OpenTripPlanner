@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.index.api;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Branding;
@@ -82,7 +81,7 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
 
-  ImmutableSet<Parking> getParkings();
+  ReadOnlyHierarchicalMapById<Parking> getParkings();
 
   ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
 
