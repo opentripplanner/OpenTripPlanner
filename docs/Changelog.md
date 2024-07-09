@@ -42,6 +42,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Convert transferSlack configuration to duration [#5897](https://github.com/opentripplanner/OpenTripPlanner/pull/5897)
 - Expose stop transfer priority in Transmodel API [#5942](https://github.com/opentripplanner/OpenTripPlanner/pull/5942)
 - Add rental system to GraphQL API [#5909](https://github.com/opentripplanner/OpenTripPlanner/pull/5909)
+- Improve handling of SIRI added trip with unresolvable agency [#5931](https://github.com/opentripplanner/OpenTripPlanner/pull/5931)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
