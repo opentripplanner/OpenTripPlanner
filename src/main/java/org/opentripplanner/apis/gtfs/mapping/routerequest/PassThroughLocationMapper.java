@@ -24,7 +24,7 @@ class PassThroughLocationMapper {
   ) {
     final List<String> stops = (List<String>) map.get("placeIds");
     final String name = (String) map.get("name");
-    if (stops == null) {
+    if (stops == null || stops.isEmpty()) {
       throw new IllegalArgumentException("No stops in pass-through point");
     }
 
