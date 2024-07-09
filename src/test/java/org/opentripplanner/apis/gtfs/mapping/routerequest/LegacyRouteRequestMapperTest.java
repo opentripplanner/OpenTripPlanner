@@ -37,6 +37,8 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -46,7 +48,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var transitModel = new TransitModel();
+    var testModel = TransitModelForTest.of();
+    var stopModelBuilder = testModel
+      .stopModelBuilder()
+      .withRegularStop(testModel.stop("stop1").build());
+    var transitModel = new TransitModel(stopModelBuilder.build(), new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(transitModel);
     context =
@@ -253,6 +259,26 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
     assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
+  }
+
+  @Test
+  void passThroughPoints() {
+    Map<String, Object> arguments = Map.of(
+      "passThroughPoints",
+      List.of(Map.of("placeIds", List.of("F:stop1")))
+    );
+
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
+    assertEquals(
+      "[PassThroughPoint[stopLocations=[RegularStop{F:stop1 stop1}], name=null]]",
+      routeRequest.getPassThroughPoints().toString()
+    );
+
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertEquals(List.of(), noParamsReq.getPassThroughPoints());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
