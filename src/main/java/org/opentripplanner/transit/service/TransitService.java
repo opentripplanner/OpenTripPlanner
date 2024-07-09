@@ -8,8 +8,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -184,10 +186,7 @@ public interface TransitService {
 
   GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
 
-  /**
-   * Return the timetable for a given trip pattern and date, taking into account real-time updates.
-   * If no real-times update are applied, fall back to scheduled data.
-   */
+  @Nullable
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
   TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
@@ -254,4 +253,8 @@ public interface TransitService {
   List<TransitMode> getModesOfStopLocation(StopLocation stop);
 
   Deduplicator getDeduplicator();
+
+  Set<LocalDate> getAllServiceCodes();
+
+  Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
 }

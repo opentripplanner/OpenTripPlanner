@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +20,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +41,7 @@ public class TransitLayerUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerUpdater.class);
 
   private final TransitModel transitModel;
-
-  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
+  private final TransitService transitService;
 
   /**
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
@@ -58,12 +57,9 @@ public class TransitLayerUpdater {
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
 
-  public TransitLayerUpdater(
-    TransitModel transitModel,
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate
-  ) {
+  public TransitLayerUpdater(TransitModel transitModel, TransitService transitService) {
     this.transitModel = transitModel;
-    this.serviceCodesRunningForDate = serviceCodesRunningForDate;
+    this.transitService = transitService;
   }
 
   public void update(
@@ -82,7 +78,7 @@ public class TransitLayerUpdater {
 
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      serviceCodesRunningForDate
+      transitService.getServiceCodesRunningForDate()
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();

@@ -18,6 +18,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that the
@@ -46,9 +48,10 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     /* Agencies */
     String feedId = transitModel.getFeedIds().iterator().next();
     Agency agency;
-    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "azerty"));
+    TransitService transitService = new DefaultTransitService(transitModel);
+    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
-    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "agency"));
+    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "agency"));
     assertEquals(feedId + ":" + "agency", agency.getId().toString());
     assertEquals("Fake Agency", agency.getName());
 
@@ -67,21 +70,19 @@ public class DefaultRoutingServiceTest extends GtfsTest {
    */
   @Test
   public void testPatternsCoherent() {
-    for (Trip trip : transitModel.getTransitModelIndex().getTripForId().values()) {
-      TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    TransitService transitService = new DefaultTransitService(transitModel);
+    for (Trip trip : transitService.getAllTrips()) {
+      TripPattern pattern = transitService.getPatternForTrip(trip);
       assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
     }
     /* This one depends on a feed where each TripPattern appears on only one route. */
-    for (Route route : transitModel.getTransitModelIndex().getAllRoutes()) {
-      for (TripPattern pattern : transitModel
-        .getTransitModelIndex()
-        .getPatternsForRoute()
-        .get(route)) {
+    for (Route route : transitService.getAllRoutes()) {
+      for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
         assertEquals(pattern.getRoute(), route);
       }
     }
     for (var stop : transitModel.getStopModel().listStopLocations()) {
-      for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
+      for (TripPattern pattern : transitService.getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
       }

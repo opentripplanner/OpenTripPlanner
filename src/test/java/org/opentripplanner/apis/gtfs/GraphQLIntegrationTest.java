@@ -93,6 +93,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -196,8 +197,20 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+    TransitEditorService transitService = new DefaultTransitService(transitModel) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
 
-    routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
+    };
+    routes.forEach(transitService::addRoutes);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -253,20 +266,6 @@ class GraphQLIntegrationTest {
 
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);
-
-    var transitService = new DefaultTransitService(transitModel) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
-
-      @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);

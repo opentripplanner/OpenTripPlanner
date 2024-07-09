@@ -217,7 +217,8 @@ public final class RealtimeTestEnvironment {
   }
 
   public TripPattern getPatternForTrip(Trip trip) {
-    return transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    var transitService = getTransitService();
+    return transitService.getPatternForTrip(trip);
   }
 
   public TimetableSnapshot getTimetableSnapshot() {

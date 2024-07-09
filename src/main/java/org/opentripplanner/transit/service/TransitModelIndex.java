@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-public class TransitModelIndex {
+class TransitModelIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitModelIndex.class);
 
@@ -117,20 +117,20 @@ public class TransitModelIndex {
     LOG.info("Transit Model index init complete.");
   }
 
-  public Agency getAgencyForId(FeedScopedId id) {
+  Agency getAgencyForId(FeedScopedId id) {
     return agencyForId.get(id);
   }
 
-  public Route getRouteForId(FeedScopedId id) {
+  Route getRouteForId(FeedScopedId id) {
     return routeForId.get(id);
   }
 
-  public void addRoutes(Route route) {
+  void addRoutes(Route route) {
     routeForId.put(route.getId(), route);
   }
 
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
-  public Set<Route> getRoutesForStop(StopLocation stop) {
+  Set<Route> getRoutesForStop(StopLocation stop) {
     Set<Route> routes = new HashSet<>();
     for (TripPattern p : getPatternsForStop(stop)) {
       routes.add(p.getRoute());
@@ -138,11 +138,11 @@ public class TransitModelIndex {
     return routes;
   }
 
-  public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
+  Collection<TripPattern> getPatternsForStop(StopLocation stop) {
     return patternsForStopId.get(stop);
   }
 
-  public Collection<Trip> getTripsForStop(StopLocation stop) {
+  Collection<Trip> getTripsForStop(StopLocation stop) {
     return getPatternsForStop(stop)
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
@@ -152,43 +152,43 @@ public class TransitModelIndex {
   /**
    * Get a list of all operators spanning across all feeds.
    */
-  public Collection<Operator> getAllOperators() {
+  Collection<Operator> getAllOperators() {
     return getOperatorForId().values();
   }
 
-  public Map<FeedScopedId, Operator> getOperatorForId() {
+  Map<FeedScopedId, Operator> getOperatorForId() {
     return operatorForId;
   }
 
-  public Map<FeedScopedId, Trip> getTripForId() {
+  Map<FeedScopedId, Trip> getTripForId() {
     return tripForId;
   }
 
-  public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
+  Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
     return tripOnServiceDateById;
   }
 
-  public Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+  Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
     return tripOnServiceDateForTripAndDay;
   }
 
-  public Collection<Route> getAllRoutes() {
+  Collection<Route> getAllRoutes() {
     return routeForId.values();
   }
 
-  public Map<Trip, TripPattern> getPatternForTrip() {
+  Map<Trip, TripPattern> getPatternForTrip() {
     return patternForTrip;
   }
 
-  public Multimap<Route, TripPattern> getPatternsForRoute() {
+  Multimap<Route, TripPattern> getPatternsForRoute() {
     return patternsForRoute;
   }
 
-  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+  Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
     return serviceCodesRunningForDate;
   }
 
-  public FlexIndex getFlexIndex() {
+  FlexIndex getFlexIndex() {
     return flexIndex;
   }
 
@@ -229,11 +229,11 @@ public class TransitModelIndex {
     }
   }
 
-  public Multimap<GroupOfRoutes, Route> getRoutesForGroupOfRoutes() {
+  Multimap<GroupOfRoutes, Route> getRoutesForGroupOfRoutes() {
     return routesForGroupOfRoutes;
   }
 
-  public Map<FeedScopedId, GroupOfRoutes> getGroupOfRoutesForId() {
+  Map<FeedScopedId, GroupOfRoutes> getGroupOfRoutesForId() {
     return groupOfRoutesForId;
   }
 }

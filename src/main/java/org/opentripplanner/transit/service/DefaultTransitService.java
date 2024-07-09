@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -657,6 +658,16 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Deduplicator getDeduplicator() {
     return transitModel.getDeduplicator();
+  }
+
+  @Override
+  public Set<LocalDate> getAllServiceCodes() {
+    return Collections.unmodifiableSet(transitModelIndex.getServiceCodesRunningForDate().keySet());
+  }
+
+  @Override
+  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+    return Collections.unmodifiableMap(transitModelIndex.getServiceCodesRunningForDate());
   }
 
   /**
