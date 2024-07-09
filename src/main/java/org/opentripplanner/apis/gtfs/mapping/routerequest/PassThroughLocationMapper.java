@@ -15,10 +15,7 @@ class PassThroughLocationMapper {
     final TransitService transitService,
     final List<Map<String, Object>> passThroughPoints
   ) {
-    return passThroughPoints
-      .stream()
-      .map(p -> handlePoint(transitService, p))
-      .toList();
+    return passThroughPoints.stream().map(p -> handlePoint(transitService, p)).toList();
   }
 
   private static PassThroughPoint handlePoint(

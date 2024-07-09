@@ -260,7 +260,11 @@ public class LegacyRouteRequestMapper {
     return request;
   }
 
-  static void mapPassThroughPoints(RouteRequest request, CallerWithEnvironment callWith, TransitService transitService) {
+  static void mapPassThroughPoints(
+    RouteRequest request,
+    CallerWithEnvironment callWith,
+    TransitService transitService
+  ) {
     callWith.argument(
       "passThroughPoints",
       (List<Map<String, Object>> v) -> {

@@ -1421,6 +1421,35 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPassThroughPointInput {
+
+    private String name;
+    private List<String> placeIds;
+
+    public GraphQLPassThroughPointInput(Map<String, Object> args) {
+      if (args != null) {
+        this.name = (String) args.get("name");
+        this.placeIds = (List<String>) args.get("placeIds");
+      }
+    }
+
+    public String getGraphQLName() {
+      return this.name;
+    }
+
+    public List<String> getGraphQLPlaceIds() {
+      return this.placeIds;
+    }
+
+    public void setGraphQLName(String name) {
+      this.name = name;
+    }
+
+    public void setGraphQLPlaceIds(List<String> placeIds) {
+      this.placeIds = placeIds;
+    }
+  }
+
   public static class GraphQLPatternAlertsArgs {
 
     private List<GraphQLPatternAlertType> types;
@@ -2661,6 +2690,7 @@ public class GraphQLTypes {
     private GraphQLOptimizeType optimize;
     private String pageCursor;
     private GraphQLVehicleParkingInput parking;
+    private List<GraphQLPassThroughPointInput> passThroughPoints;
     private GraphQLInputPreferredInput preferred;
     private Boolean reverseOptimizeOnTheFly;
     private Long searchWindow;
@@ -2738,6 +2768,10 @@ public class GraphQLTypes {
         }
         this.pageCursor = (String) args.get("pageCursor");
         this.parking = new GraphQLVehicleParkingInput((Map<String, Object>) args.get("parking"));
+        if (args.get("passThroughPoints") != null) {
+          this.passThroughPoints =
+            (List<GraphQLPassThroughPointInput>) args.get("passThroughPoints");
+        }
         this.preferred =
           new GraphQLInputPreferredInput((Map<String, Object>) args.get("preferred"));
         this.reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
@@ -2935,6 +2969,10 @@ public class GraphQLTypes {
 
     public GraphQLVehicleParkingInput getGraphQLParking() {
       return this.parking;
+    }
+
+    public List<GraphQLPassThroughPointInput> getGraphQLPassThroughPoints() {
+      return this.passThroughPoints;
     }
 
     public GraphQLInputPreferredInput getGraphQLPreferred() {
@@ -3193,6 +3231,10 @@ public class GraphQLTypes {
 
     public void setGraphQLParking(GraphQLVehicleParkingInput parking) {
       this.parking = parking;
+    }
+
+    public void setGraphQLPassThroughPoints(List<GraphQLPassThroughPointInput> passThroughPoints) {
+      this.passThroughPoints = passThroughPoints;
     }
 
     public void setGraphQLPreferred(GraphQLInputPreferredInput preferred) {

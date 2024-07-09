@@ -1380,6 +1380,8 @@ type QueryType {
     pageCursor: String,
     "Preferences for vehicle parking"
     parking: VehicleParkingInput,
+    "The list of points the journey is required to pass through."
+    passThroughPoints: [PassThroughPoint!],
     "List of routes and agencies which are given higher preference when planning the itinerary"
     preferred: InputPreferred,
     """
@@ -3941,6 +3943,18 @@ input ParkingFilter {
 input ParkingFilterOperation {
   "Filter parking facilities based on their tag"
   tags: [String]
+}
+
+"Defines one point which the journey must pass through."
+input PassThroughPoint {
+  "Optional name of the pass-through point for debugging and logging. It is not used in routing."
+  name: String
+  """
+  The list of *stop location ids* which define the pass-through point. At least one id is required.
+  Stop and Station are supported location types.
+  The journey must pass through at least one of these entities - not all of them.
+  """
+  placeIds: [String!]
 }
 
 "A coordinate used for a location in a plan query."
