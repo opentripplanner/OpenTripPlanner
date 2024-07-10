@@ -314,8 +314,7 @@ public class TimetableSnapshot {
 
         if (tripTimesToRemove != null) {
           for (Timetable originalTimetable : sortedTimetables) {
-            boolean isDirty = originalTimetable.getTripTimes().contains(tripTimesToRemove);
-            if (isDirty) {
+            if (originalTimetable.getTripTimes().contains(tripTimesToRemove)) {
               Timetable updatedTimetable = copyTimetable(pattern, serviceDate, originalTimetable);
               updatedTimetable.getTripTimes().remove(tripTimesToRemove);
             }
