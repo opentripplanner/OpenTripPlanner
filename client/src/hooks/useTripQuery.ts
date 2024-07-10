@@ -52,9 +52,15 @@ const query = graphql(`
           duration
           fromPlace {
             name
+            quay {
+              id
+            }
           }
           toPlace {
             name
+            quay {
+              id
+            }
           }
           toEstimatedCall {
             destinationDisplay {

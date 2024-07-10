@@ -24,7 +24,12 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
           </>
         )}{' '}
         <div></div>
-        {leg.mode !== Mode.Foot && <u>{leg.fromPlace.name}</u>} {!isLast && <u>→ {leg.toPlace.name}</u>}
+        {leg.mode !== Mode.Foot && (
+          <>
+            <u title={leg.fromPlace.quay?.id}>{leg.fromPlace.name}</u> →{' '}
+          </>
+        )}{' '}
+        {!isLast && <u title={leg.toPlace.quay?.id}>{leg.toPlace.name}</u>}
       </div>
     </div>
   );
