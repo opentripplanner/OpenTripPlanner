@@ -16,7 +16,7 @@ public record SafetyFeatures(double forward, double back) {
   /**
    * Does forward and back have the same value?
    */
-  public boolean isSymetric() {
+  public boolean isSymmetric() {
     return forward == back;
   }
 }
