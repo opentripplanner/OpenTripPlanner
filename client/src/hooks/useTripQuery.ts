@@ -77,6 +77,12 @@ const query = graphql(`
           pointsOnLink {
             points
           }
+          interchangeTo {
+            staySeated
+          }
+          interchangeFrom {
+            staySeated
+          }
         }
         systemNotices {
           tag
