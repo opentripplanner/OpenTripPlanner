@@ -3,7 +3,7 @@
     "maxJourneyDuration": "6h",
     "boardSlack": "0s",
     "alightSlack": "0s",
-    "transferSlack": 180,
+    "transferSlack": "3m",
     "waitReluctance": 0.9,
     "walk": {
       "reluctance": 1.75,

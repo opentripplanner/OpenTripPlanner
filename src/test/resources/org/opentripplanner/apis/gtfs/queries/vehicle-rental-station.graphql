@@ -28,7 +28,6 @@
     allowPickup
     allowDropoffNow
     allowPickupNow
-    network
     lon
     lat
     capacity
@@ -39,5 +38,9 @@
       web
     }
     operative
+    rentalNetwork {
+      networkId
+      url
+    }
   }
 }

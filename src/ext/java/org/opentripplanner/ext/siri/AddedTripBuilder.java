@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -172,7 +175,11 @@ class AddedTripBuilder {
 
     Route route = entityResolver.resolveRoute(lineRef);
     if (route == null) {
-      route = createRoute();
+      Agency agency = resolveAgency();
+      if (agency == null) {
+        return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY);
+      }
+      route = createRoute(agency);
       LOG.info("Adding route {} to transitModel.", route);
       transitModel.getTransitModelIndex().addRoutes(route);
     }
@@ -278,24 +285,34 @@ class AddedTripBuilder {
   /**
    * Method to create a Route. Commonly used to create a route if a real-time message
    * refers to a route that is not in the transit model.
-   *
-   * We will find the first Route with same Operator, and use the same Authority
-   * If no operator found, copy the agency from replaced route
-   *
    * If no name is given for the route, an empty string will be set as the name.
    *
    * @return a new Route
    */
-  private Route createRoute() {
+  @Nonnull
+  private Route createRoute(Agency agency) {
     var routeBuilder = Route.of(entityResolver.resolveId(lineRef));
 
     routeBuilder.withShortName(shortName);
     routeBuilder.withMode(transitMode);
     routeBuilder.withNetexSubmode(transitSubMode);
     routeBuilder.withOperator(operator);
+    routeBuilder.withAgency(agency);
 
-    // TODO - SIRI: Is there a better way to find authority/Agency?
-    Agency agency = transitModel
+    return routeBuilder.build();
+  }
+
+  /**
+   * Attempt to find the agency to which this new trip belongs.
+   * The algorithm retrieves any route operated by the same operator as the one operating this new
+   * trip and resolves its agency.
+   * If no route with the same operator can be found, the algorithm falls back to retrieving the
+   * agency operating the replaced route.
+   * If none can be found the method returns null.
+   */
+  @Nullable
+  private Agency resolveAgency() {
+    return transitModel
       .getTransitModelIndex()
       .getAllRoutes()
       .stream()
@@ -303,9 +320,6 @@ class AddedTripBuilder {
       .findFirst()
       .map(Route::getAgency)
       .orElseGet(() -> replacedRoute != null ? replacedRoute.getAgency() : null);
-    routeBuilder.withAgency(agency);
-
-    return routeBuilder.build();
   }
 
   private Trip createTrip(Route route, FeedScopedId calServiceId) {

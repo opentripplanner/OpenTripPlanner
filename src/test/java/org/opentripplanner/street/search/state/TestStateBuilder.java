@@ -16,6 +16,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -217,6 +218,19 @@ public class TestStateBuilder {
   public TestStateBuilder stop() {
     count++;
     return arriveAtStop(testModel.stop("stop", count, count).build());
+  }
+
+  /**
+   * Add a state that arrives at a rental station.
+   */
+  public TestStateBuilder rentalStation(VehicleRentalStation station) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = new VehicleRentalPlaceVertex(station);
+
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
+    currentState = link.traverse(currentState)[0];
+    return this;
   }
 
   public TestStateBuilder enterStation(String id) {

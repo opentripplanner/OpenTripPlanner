@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -39,6 +40,8 @@ public class LinearFunctionSerialization {
     String.join(SEP, DUR, PLUS, NUM, VARIABLE)
   );
 
+  private static final Pattern DECIMAL_NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+
   private LinearFunctionSerialization() {}
 
   /**
@@ -61,11 +64,7 @@ public class LinearFunctionSerialization {
       var coefficient = Double.parseDouble(coefficientText);
       coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
 
-      // Unfortunately, to be backwards compatible we need to support decimal numbers.
-      // If a decimal number, then the value is converted to seconds
-      var constant = constantText.matches("\\d+(\\.\\d+)?")
-        ? Duration.ofSeconds(IntUtils.round(Double.parseDouble(constantText)))
-        : DurationUtils.duration(constantText);
+      var constant = parseDecimalSecondsOrDuration(constantText);
 
       return Optional.of(factory.apply(constant, coefficient));
     }
@@ -84,5 +83,25 @@ public class LinearFunctionSerialization {
       DurationUtils.durationToStr(constant),
       Units.factorToString(coefficient)
     );
+  }
+
+  /**
+   * Parse a String as a Duration.
+   * Unfortunately, to be backwards compatible we need to support decimal numbers.
+   * If the text represents a decimal number, then the value is converted to seconds.
+   * <br/>
+   * The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot be used
+   * here since it supports only integer seconds, not decimal seconds.
+   *
+   */
+  private static Duration parseDecimalSecondsOrDuration(String text) {
+    try {
+      if (DECIMAL_NUMBER_PATTERN.matcher(text).matches()) {
+        return Duration.ofSeconds(IntUtils.round(Double.parseDouble(text)));
+      }
+      return DurationUtils.duration(text);
+    } catch (DateTimeParseException e) {
+      throw new IllegalArgumentException("Unable to parse duration: '" + text + "'");
+    }
   }
 }

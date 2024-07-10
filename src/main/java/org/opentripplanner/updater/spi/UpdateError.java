@@ -49,6 +49,7 @@ public record UpdateError(
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
     NOT_MONITORED,
+    CANNOT_RESOLVE_AGENCY,
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {

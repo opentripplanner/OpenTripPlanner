@@ -10,6 +10,7 @@ import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -52,6 +53,9 @@ class GbfsGeofencingZoneMapper {
       return null;
     }
     var name = Objects.requireNonNullElseGet(f.getProperties().getName(), () -> fallbackId(g));
+    if (!StringUtils.hasValue(name)) {
+      name = fallbackId(g);
+    }
     var dropOffBanned = !f.getProperties().getRules().get(0).getRideAllowed();
     var passThroughBanned = !f.getProperties().getRules().get(0).getRideThroughAllowed();
     return new GeofencingZone(

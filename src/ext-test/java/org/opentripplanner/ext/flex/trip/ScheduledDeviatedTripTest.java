@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -186,15 +185,6 @@ class ScheduledDeviatedTripTest {
     var arrivalTime = tripTimes.getArrivalTime(1);
 
     assertEquals(StopTime.MISSING_VALUE, arrivalTime);
-  }
-
-  /**
-   * Checks that trips which have continuous pick up/drop off set are parsed correctly.
-   */
-  @Test
-  void parseContinuousPickup() {
-    var lincolnGraph = FlexIntegrationTestData.lincolnCountyGtfs();
-    assertNotNull(lincolnGraph);
   }
 
   @BeforeAll

@@ -389,6 +389,22 @@ public class ParameterBuilder {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
   }
 
+  /**
+   * Accepts both a string-formatted duration or a number of seconds as a number.
+   * In the documentation it will claim that it only accepts durations as the number is only for
+   * backwards compatibility.
+   */
+  public Duration asDurationOrSeconds(Duration defaultValue) {
+    info.withType(DURATION);
+    setInfoOptional(defaultValue.toString());
+    var node = build();
+    if (node.isTextual()) {
+      return asDuration(defaultValue);
+    } else {
+      return Duration.ofSeconds((long) asDouble(defaultValue.toSeconds()));
+    }
+  }
+
   public List<Duration> asDurations(List<Duration> defaultValues) {
     return ofArrayAsList(DURATION, defaultValues, node -> parseDuration(node.asText()));
   }

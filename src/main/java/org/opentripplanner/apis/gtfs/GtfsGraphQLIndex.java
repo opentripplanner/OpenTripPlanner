@@ -75,6 +75,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.TripOccupancyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.UnknownImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalNetworkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
@@ -166,6 +167,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(BookingTimeImpl.class))
         .type(typeWiring.build(BookingInfoImpl.class))
         .type(typeWiring.build(VehicleRentalStationImpl.class))
+        .type(typeWiring.build(VehicleRentalNetworkImpl.class))
         .type(typeWiring.build(RentalVehicleImpl.class))
         .type(typeWiring.build(RentalVehicleTypeImpl.class))
         .type(typeWiring.build(StopOnRouteImpl.class))

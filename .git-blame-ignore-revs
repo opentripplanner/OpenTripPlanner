@@ -4,3 +4,8 @@
 # project-wide reformatting with prettier
 9c9dd613489a348d2381acdcbeab8f86589154d7
 
+# graphql test and documentation reformatting with prettier
+12c51f44f204db31d34a1eeb0d59204226e0fa5d
+
+# reorder and reformat GTFS GraphQL API schema file with graphql-java
+14051fab312a67cae9a460aaf0bbc77223bec624

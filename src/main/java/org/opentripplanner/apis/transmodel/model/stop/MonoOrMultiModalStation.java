@@ -8,6 +8,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 public class MonoOrMultiModalStation {
 
@@ -40,6 +41,8 @@ public class MonoOrMultiModalStation {
 
   private final MonoOrMultiModalStation parentStation;
 
+  private final StopTransferPriority priority;
+
   public MonoOrMultiModalStation(Station station, MultiModalStation parentStation) {
     this.id = station.getId();
     this.name = station.getName();
@@ -50,6 +53,7 @@ public class MonoOrMultiModalStation {
     this.url = station.getUrl();
     this.timezone = station.getTimezone();
     this.childStops = station.getChildStops();
+    this.priority = station.getPriority();
     this.parentStation = parentStation != null ? new MonoOrMultiModalStation(parentStation) : null;
   }
 
@@ -63,6 +67,7 @@ public class MonoOrMultiModalStation {
     this.url = multiModalStation.getUrl();
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
+    this.priority = null;
     this.parentStation = null;
   }
 
@@ -100,6 +105,10 @@ public class MonoOrMultiModalStation {
 
   public Collection<StopLocation> getChildStops() {
     return childStops;
+  }
+
+  public StopTransferPriority getPriority() {
+    return priority;
   }
 
   public MonoOrMultiModalStation getParentStation() {

@@ -440,7 +440,7 @@ public class TripQuery {
             "This time is in addition to time it might take to walk between stops."
           )
           .type(Scalars.GraphQLInt)
-          .defaultValue(preferences.transfer().slack())
+          .defaultValue(preferences.transfer().slack().toSeconds())
           .build()
       )
       .argument(

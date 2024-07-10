@@ -46,7 +46,10 @@ public class TransferMapperTest {
   );
   private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
 
-  private static final LocationMapper LOCATION_MAPPER = new LocationMapper(STOP_MODEL_BUILDER);
+  private static final LocationMapper LOCATION_MAPPER = new LocationMapper(
+    STOP_MODEL_BUILDER,
+    ISSUE_STORE
+  );
 
   private static final LocationGroupMapper LOCATION_GROUP_MAPPER = new LocationGroupMapper(
     STOP_MAPPER,

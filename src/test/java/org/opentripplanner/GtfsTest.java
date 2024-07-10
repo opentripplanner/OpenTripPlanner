@@ -129,7 +129,7 @@ public abstract class GtfsTest {
     // Init preferences
     routingRequest.withPreferences(preferences -> {
       preferences.withTransfer(tx -> {
-        tx.withSlack(0);
+        tx.withSlack(Duration.ZERO);
         tx.withWaitReluctance(1);
         tx.withCost(preferLeastTransfers ? 300 : 0);
       });

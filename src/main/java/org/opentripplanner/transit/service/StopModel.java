@@ -162,6 +162,7 @@ public class StopModel implements Serializable {
     return groupStopById.values();
   }
 
+  @Nullable
   public StopLocation stopByIndex(int stopIndex) {
     return index.stopByIndex(stopIndex);
   }

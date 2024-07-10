@@ -731,7 +731,7 @@ but we want to calculate the transfers always from OSM data.
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
 **Path:** /gtfsDefaults   
-**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum values:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Should there be some preference or aversion for transfers at stops that are part of a station.
 
@@ -980,7 +980,7 @@ but we want to calculate the transfers always from OSM data.
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
 **Path:** /transitFeeds/[0]   
-**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum values:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.
 

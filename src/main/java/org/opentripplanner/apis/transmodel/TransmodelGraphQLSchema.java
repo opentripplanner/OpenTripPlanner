@@ -912,6 +912,7 @@ public class TransmodelGraphQLSchema {
             List<String> filterByBikeRentalStations = null;
             List<String> filterByBikeParks = null;
             List<String> filterByCarParks = null;
+            List<String> filterByNetwork = null;
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
@@ -960,6 +961,7 @@ public class TransmodelGraphQLSchema {
                   filterByStations,
                   filterByRoutes,
                   filterByBikeRentalStations,
+                  filterByNetwork,
                   GqlUtil.getTransitService(environment)
                 );
 

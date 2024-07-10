@@ -56,6 +56,15 @@ public class Polygons {
     }
   );
 
+  public static final Polygon SELF_INTERSECTING = FAC.createPolygon(
+    new Coordinate[] {
+      Coordinates.of(1, 1),
+      Coordinates.of(1, 2),
+      Coordinates.of(1, 3),
+      Coordinates.of(1, 1),
+    }
+  );
+
   public static org.geojson.Polygon toGeoJson(Polygon polygon) {
     var ret = new org.geojson.Polygon();
 

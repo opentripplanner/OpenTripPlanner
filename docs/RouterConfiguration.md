@@ -363,7 +363,7 @@ for more info."
 
 **Since version:** `2.0` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /transit   
-**Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum keys:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Costs for boarding and alighting during transfers at stops with a given transfer priority.
 
@@ -532,7 +532,7 @@ Used to group requests when monitoring OTP.
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,
-    "transferSlack" : 120,
+    "transferSlack" : "2m",
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },
