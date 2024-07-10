@@ -51,12 +51,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -73,8 +71,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
-
-  private final TestTransitData data = new TestTransitData();
+  private static final Route ROUTE = TransitModelForTest.route("route").build();
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
@@ -84,9 +81,9 @@ public class RaptorPathToItineraryMapperTest {
     STOP_COSTS
   );
 
-  private static final RegularStop S1 = TEST_MODEL.stop("STOP1", 0.0, 0.0).build();
-
-  private static final RegularStop S2 = TEST_MODEL.stop("STOP2", 1.0, 1.0).build();
+  private static final RegularStop S1 = TEST_MODEL.stop("STOP1").build();
+  private static final RegularStop S2 = TEST_MODEL.stop("STOP2").build();
+  private static final RegularStop S3 = TEST_MODEL.stop("STOP3").build();
 
   @ParameterizedTest
   @ValueSource(ints = { 0, 3000, -3000 })
@@ -111,6 +108,21 @@ public class RaptorPathToItineraryMapperTest {
       itinerary.getLegs().get(0).getGeneralizedCost(),
       "Incorrect cost returned"
     );
+  }
+
+  @Test
+  void extraLegWhenTransferringAtSameStop() {
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
+
+    var schedule = getTestTripSchedule2();
+    var path = new TestPathBuilder(COST_CALCULATOR)
+      .access(TRANSIT_START - BOARD_SLACK, 1)
+      .bus(schedule, 2)
+      .bus(schedule, 1)
+      .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
+    var itinerary = mapper.createItinerary(path);
+
+    assertEquals(3, itinerary.getLegs().size());
   }
 
   @Test
@@ -233,7 +245,12 @@ public class RaptorPathToItineraryMapperTest {
       new HashMap<>(),
       null,
       null,
-      TEST_MODEL.stopModelBuilder().withRegularStop(S1).withRegularStop(S2).build(),
+      TEST_MODEL
+        .stopModelBuilder()
+        .withRegularStop(S1)
+        .withRegularStop(S2)
+        .withRegularStop(S3)
+        .build(),
       null,
       null,
       null,
@@ -241,21 +258,30 @@ public class RaptorPathToItineraryMapperTest {
     );
   }
 
+  private TestTripSchedule getTestTripSchedule2() {
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+
+    var timetable = new TestTripSchedule.Builder()
+      .times(
+        TimeUtils.time("10:00"),
+        TimeUtils.time("10:05"),
+        TimeUtils.time("10:10"),
+        TimeUtils.time("10:15"),
+        TimeUtils.time("10:20")
+      )
+      .pattern(pattern)
+      .originalPattern(getOriginalPattern(pattern))
+      .build();
+
+    data.withRoutes(TestRoute.route("TestRoute_1", 1, 2, 3, 2, 1).withTimetable(timetable));
+
+    return data.getRoute(0).getTripSchedule(0);
+  }
+
   private TestTripSchedule getTestTripSchedule() {
-    var agency = Agency
-      .of(new FeedScopedId("TestFeed", "Auth_1"))
-      .withName("Test_Agency")
-      .withTimezone("Europe/Stockholm")
-      .build();
-
-    var route = Route
-      .of(new FeedScopedId("TestFeed", "Line_1"))
-      .withAgency(agency)
-      .withMode(TransitMode.BUS)
-      .withShortName("Test_Bus")
-      .build();
-
-    var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(route);
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(ROUTE);
 
     var timetable = new TestTripSchedule.Builder()
       .times(TRANSIT_START, TRANSIT_END)

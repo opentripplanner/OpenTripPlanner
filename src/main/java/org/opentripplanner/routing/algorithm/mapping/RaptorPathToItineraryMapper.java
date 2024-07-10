@@ -105,9 +105,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     Leg transitLeg = null;
 
+    PathLeg<T> previousLeg = null;
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
+        // two transit legs following each other
+        if (isTransferAtSameStop(previousLeg, pathLeg)) {
+          legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
+        }
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
@@ -123,6 +128,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         }
       }
 
+      previousLeg = pathLeg;
       pathLeg = pathLeg.nextLeg();
     }
 
@@ -162,6 +168,18 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()) - penaltyCost);
 
     return itinerary;
+  }
+
+  private static <T extends TripSchedule> boolean isTransferAtSameStop(
+    PathLeg<T> previousLeg,
+    PathLeg<T> currentLeg
+  ) {
+    return (
+      previousLeg != null &&
+      previousLeg.isTransitLeg() &&
+      currentLeg.isTransitLeg() &&
+      (previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop())
+    );
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
@@ -262,6 +280,22 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private boolean isFree(EgressPathLeg<T> egressPathLeg) {
     return egressPathLeg.egress().isFree();
+  }
+
+  private Leg createArtificalTransferLeg(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
+    var transferStop = Place.forStop(transitLayer.getStopByIndex(previousLeg.toStop()));
+    return StreetLeg
+      .create()
+      .withMode(TraverseMode.WALK)
+      .withStartTime(createZonedDateTime(previousLeg.toTime()))
+      .withEndTime(createZonedDateTime(nextLeg.fromTime()))
+      .withFrom(transferStop)
+      .withTo(transferStop)
+      .withDistanceMeters(0)
+      .withGeneralizedCost(0)
+      .withGeometry(GeometryUtils.makeLineString(transferStop.coordinate, transferStop.coordinate))
+      .withWalkSteps(List.of())
+      .build();
   }
 
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
