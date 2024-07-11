@@ -178,6 +178,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       previousLeg != null &&
       previousLeg.isTransitLeg() &&
       currentLeg.isTransitLeg() &&
+      !previousLeg.asTransitLeg().isStaySeatedOntoNextLeg() &&
       (previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop())
     );
   }
