@@ -45,6 +45,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve handling of SIRI added trip with unresolvable agency [#5931](https://github.com/opentripplanner/OpenTripPlanner/pull/5931)
 - Fix copy-on-write in TimetableSnapshot [#5941](https://github.com/opentripplanner/OpenTripPlanner/pull/5941)
 - Generate documentation for OSM tag mappers [#5929](https://github.com/opentripplanner/OpenTripPlanner/pull/5929)
+- Disable Legacy REST API by default [#5948](https://github.com/opentripplanner/OpenTripPlanner/pull/5948)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
