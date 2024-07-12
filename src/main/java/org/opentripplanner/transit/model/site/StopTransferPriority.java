@@ -9,31 +9,35 @@ package org.opentripplanner.transit.model.site;
  */
 public enum StopTransferPriority {
   /**
-   * Block transfers from/to this stop. In OTP this is not a definitive block, just a huge penalty
-   * is added to the cost function.
+   * Preferred place to transfer, strongly recommended.
    * <p>
-   * NeTEx equivalent is NO_INTERCHANGE.
+   * NeTEx equivalent is PREFERRED_INTERCHANGE.
    */
-  DISCOURAGED,
-
-  /**
-   * Allow transfers from/to this stop. This is the default.
-   * <p>
-   * NeTEx equivalent is INTERCHANGE_ALLOWED.
-   */
-  ALLOWED,
-
+  PREFERRED,
   /**
    * Recommended stop place.
    * <p>
    * NeTEx equivalent is RECOMMENDED_INTERCHANGE.
    */
   RECOMMENDED,
+  /**
+   * Allow transfers from/to this stop. This is the default.
+   * <p>
+   * NeTEx equivalent is INTERCHANGE_ALLOWED.
+   */
+  ALLOWED,
+  /**
+   * Block transfers from/to this stop. In OTP this is not a definitive block, just a huge penalty
+   * is added to the cost function.
+   * <p>
+   * NeTEx equivalent is NO_INTERCHANGE.
+   */
+  DISCOURAGED;
 
   /**
-   * Preferred place to transfer, strongly recommended.
-   * <p>
-   * NeTEx equivalent is PREFERRED_INTERCHANGE.
+   * The {@link #ALLOWED} is used as default value in cases where the value is not set.
    */
-  PREFERRED,
+  public static StopTransferPriority defaultValue() {
+    return ALLOWED;
+  }
 }

@@ -79,7 +79,7 @@
     },
     "waitReluctance": 1.0,
     "otherThanPreferredRoutesPenalty": 300,
-    "transferSlack": 120,
+    "transferSlack": "2m",
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
       "AIRPLANE": "35m"
@@ -420,6 +420,18 @@
         "fromDateTime": "-P1D",
         "timeout": 300000
       }
+    },
+    // SIRI ET Google Pubsub updater
+    {
+      "type": "siri-et-google-pubsub-updater",
+      "feedId": "feed_id",
+      "reconnectPeriod": "5s",
+      "initialGetDataTimeout": "1m20s",
+      "topicProjectName": "google_pubsub_topic_project_name",
+      "subscriptionProjectName": "google_pubsub_subscription_project_name",
+      "topicName": "estimated_timetables",
+      "dataInitializationUrl": "https://example.com/some/path",
+      "fuzzyTripMatching": true
     },
     {
       "type": "vehicle-parking",

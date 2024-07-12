@@ -4,12 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
 class TransferPreferencesTest {
 
   private static final int COST = 200;
-  private static final int SLACK = 150;
+  private static final Duration SLACK = Duration.ofSeconds(150);
   private static final double WAIT_RELUCTANCE = 0.95;
   private static final int MAX_TRANSFERS = 17;
   private static final int MAX_ADDITIONAL_TRANSFERS = 7;
@@ -82,7 +83,7 @@ class TransferPreferencesTest {
     assertEquals(
       "TransferPreferences{" +
       "cost: $200, " +
-      "slack: 150, " +
+      "slack: 2m30s, " +
       "waitReluctance: 0.95, " +
       "maxTransfers: 17, " +
       "maxAdditionalTransfers: 7, " +

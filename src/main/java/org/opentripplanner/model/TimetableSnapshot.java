@@ -1,6 +1,8 @@
 package org.opentripplanner.model;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -9,6 +11,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
@@ -80,8 +83,7 @@ public class TimetableSnapshot {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and
    * tracked by the TripPatternCache. <p>
    * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update. The type of the field is specifically HashMap (rather than the more general
-   * Map interface) because we need to efficiently clone it. <p>
+   * least one update.<p>
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
@@ -91,16 +93,15 @@ public class TimetableSnapshot {
    * The compound key approach better reflects the fact that there should be only one Timetable per
    * TripPattern and date.
    */
-  private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
+  private Map<TripPattern, SortedSet<Timetable>> timetables = new HashMap<>();
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
    * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
-   * trip ID and the service date. The type of this field is HashMap rather than the more general
-   * Map interface because we need to efficiently clone it whenever we start building up a new
-   * snapshot. TODO RT_AB: clarify if this is an index or the original source of truth.
+   * trip ID and the service date.
+   * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
-  private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
+  private Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
 
   /**
    * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
@@ -186,25 +187,7 @@ public class TimetableSnapshot {
     Timetable tt = resolve(pattern, serviceDate);
     // we need to perform the copy of Timetable here rather than in Timetable.update()
     // to avoid repeatedly copying in case several updates are applied to the same timetable
-    if (!dirtyTimetables.contains(tt)) {
-      Timetable old = tt;
-      tt = new Timetable(tt, serviceDate);
-      SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
-      if (sortedTimetables == null) {
-        sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
-      } else {
-        SortedSet<Timetable> temp = new TreeSet<>(new SortedTimetableComparator());
-        temp.addAll(sortedTimetables);
-        sortedTimetables = temp;
-      }
-      if (old.getServiceDate() != null) {
-        sortedTimetables.remove(old);
-      }
-      sortedTimetables.add(tt);
-      timetables.put(pattern, sortedTimetables);
-      dirtyTimetables.add(tt);
-      dirty = true;
-    }
+    tt = copyTimetable(pattern, serviceDate, tt);
 
     // Assume all trips in a pattern are from the same feed, which should be the case.
     // Find trip index
@@ -256,9 +239,8 @@ public class TimetableSnapshot {
     if (!force && !this.isDirty()) {
       return null;
     }
-    ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
-    ret.realtimeAddedTripPattern =
-      (HashMap<TripIdAndServiceDate, TripPattern>) this.realtimeAddedTripPattern.clone();
+    ret.timetables = Map.copyOf(timetables);
+    ret.realtimeAddedTripPattern = Map.copyOf(realtimeAddedTripPattern);
 
     if (transitLayerUpdater != null) {
       transitLayerUpdater.update(dirtyTimetables, timetables);
@@ -267,7 +249,7 @@ public class TimetableSnapshot {
     this.dirtyTimetables.clear();
     this.dirty = false;
 
-    ret.setPatternsForStop(HashMultimap.create(this.patternsForStop));
+    ret.patternsForStop = ImmutableSetMultimap.copyOf(patternsForStop);
 
     ret.readOnly = true; // mark the snapshot as henceforth immutable
     return ret;
@@ -304,6 +286,10 @@ public class TimetableSnapshot {
    * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    if (readOnly) {
+      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+    }
+
     boolean success = false;
 
     final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);
@@ -330,10 +316,10 @@ public class TimetableSnapshot {
         }
 
         if (tripTimesToRemove != null) {
-          for (Timetable sortedTimetable : sortedTimetables) {
-            boolean isDirty = sortedTimetable.getTripTimes().remove(tripTimesToRemove);
-            if (isDirty) {
-              dirtyTimetables.add(sortedTimetable);
+          for (Timetable originalTimetable : sortedTimetables) {
+            if (originalTimetable.getTripTimes().contains(tripTimesToRemove)) {
+              Timetable updatedTimetable = copyTimetable(pattern, serviceDate, originalTimetable);
+              updatedTimetable.getTripTimes().remove(tripTimesToRemove);
             }
           }
         }
@@ -370,7 +356,7 @@ public class TimetableSnapshot {
       if (toKeepTimetables.isEmpty()) {
         it.remove();
       } else {
-        timetables.put(pattern, toKeepTimetables);
+        timetables.put(pattern, ImmutableSortedSet.copyOfSorted(toKeepTimetables));
       }
     }
 
@@ -407,10 +393,6 @@ public class TimetableSnapshot {
     return patternsForStop.get(stop);
   }
 
-  public void setPatternsForStop(SetMultimap<StopLocation, TripPattern> patternsForStop) {
-    this.patternsForStop = patternsForStop;
-  }
-
   /**
    * Does this snapshot contain any realtime data or is it completely empty?
    */
@@ -424,7 +406,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear out
    * @return true if the timetable changed as a result of the call
    */
-  protected boolean clearTimetable(String feedId) {
+  private boolean clearTimetable(String feedId) {
     return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
   }
 
@@ -434,7 +416,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear out
    * @return true if the realtimeAddedTripPattern changed as a result of the call
    */
-  protected boolean clearRealtimeAddedTripPattern(String feedId) {
+  private boolean clearRealtimeAddedTripPattern(String feedId) {
     return realtimeAddedTripPattern
       .keySet()
       .removeIf(realtimeAddedTripPattern ->
@@ -453,6 +435,39 @@ public class TimetableSnapshot {
         patternsForStop.put(stop, tripPattern);
       }
     }
+  }
+
+  /**
+   * Make a copy of the given timetable for a given pattern and service date.
+   * If the timetable was already copied-on write in this snapshot, the same instance will be
+   * returned. The SortedSet that holds the collection of Timetables for that pattern
+   * (sorted by service date) is shared between multiple snapshots and must be copied as well.<br/>
+   * Note on performance: if  multiple Timetables are modified in a SortedSet, the SortedSet will be
+   * copied multiple times. The impact on memory/garbage collection is assumed to be minimal
+   * since the collection is small.
+   * The SortedSet is made immutable to prevent change after snapshot publication.
+   */
+  private Timetable copyTimetable(TripPattern pattern, LocalDate serviceDate, Timetable tt) {
+    if (!dirtyTimetables.contains(tt)) {
+      Timetable old = tt;
+      tt = new Timetable(tt, serviceDate);
+      SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
+      if (sortedTimetables == null) {
+        sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
+      } else {
+        SortedSet<Timetable> temp = new TreeSet<>(new SortedTimetableComparator());
+        temp.addAll(sortedTimetables);
+        sortedTimetables = temp;
+      }
+      if (old.getServiceDate() != null) {
+        sortedTimetables.remove(old);
+      }
+      sortedTimetables.add(tt);
+      timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
+      dirtyTimetables.add(tt);
+      dirty = true;
+    }
+    return tt;
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {

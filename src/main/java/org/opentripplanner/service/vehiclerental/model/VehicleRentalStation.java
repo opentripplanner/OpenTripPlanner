@@ -173,6 +173,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
+  public VehicleRentalSystem getVehicleRentalSystem() {
+    return system;
+  }
+
+  @Override
   public String toString() {
     return String.format(
       ROOT,

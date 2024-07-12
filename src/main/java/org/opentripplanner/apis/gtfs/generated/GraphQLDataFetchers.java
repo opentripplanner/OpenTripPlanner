@@ -58,6 +58,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
@@ -852,6 +853,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Boolean> operative();
 
+    public DataFetcher<VehicleRentalSystem> rentalNetwork();
+
     public DataFetcher<VehicleRentalStationUris> rentalUris();
 
     public DataFetcher<String> vehicleId();
@@ -1266,6 +1269,17 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> vehicleId();
   }
 
+  /**
+   * Vehicle rental network, which is referred as system in the GBFS terminology. Note, the same operator can operate in multiple
+   * regions either with the same network/system or with a different one. This can contain information about either the rental brand
+   * or about the operator.
+   */
+  public interface GraphQLVehicleRentalNetwork {
+    public DataFetcher<String> networkId();
+
+    public DataFetcher<String> url();
+  }
+
   /** Vehicle rental station represents a location where users can rent bicycles etc. for a fee. */
   public interface GraphQLVehicleRentalStation {
     public DataFetcher<Boolean> allowDropoff();
@@ -1297,6 +1311,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> operative();
 
     public DataFetcher<Boolean> realtime();
+
+    public DataFetcher<VehicleRentalSystem> rentalNetwork();
 
     public DataFetcher<VehicleRentalStationUris> rentalUris();
 

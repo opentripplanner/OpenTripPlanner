@@ -10,15 +10,12 @@ import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 public record SiriETGooglePubsubUpdaterParameters(
   @Nonnull String configRef,
   @Nullable String feedId,
-  String type,
-  @Deprecated String projectName,
   String subscriptionProjectName,
   String topicProjectName,
   String topicName,
   @Nullable String dataInitializationUrl,
   Duration reconnectPeriod,
   Duration initialGetDataTimeout,
-  boolean purgeExpiredData,
   boolean fuzzyTripMatching
 )
   implements UrlUpdaterParameters {
@@ -26,16 +23,6 @@ public record SiriETGooglePubsubUpdaterParameters(
   public static Duration INITIAL_GET_DATA_TIMEOUT = Duration.ofSeconds(30);
 
   public SiriETGooglePubsubUpdaterParameters {
-    Objects.requireNonNull(type);
-
-    if (subscriptionProjectName == null && topicProjectName == null) {
-      // New config-parameters not yet in use
-      // TODO: Remove deprecated `projectName` when config is updated
-      Objects.requireNonNull(projectName);
-      subscriptionProjectName = projectName;
-      topicProjectName = projectName;
-    }
-
     Objects.requireNonNull(subscriptionProjectName);
     Objects.requireNonNull(topicProjectName);
     Objects.requireNonNull(topicName);
@@ -50,14 +37,11 @@ public record SiriETGooglePubsubUpdaterParameters(
       .of(SiriETGooglePubsubUpdaterParameters.class)
       .addObj("configRef", configRef, null)
       .addObj("feedId", feedId, null)
-      .addObj("type", type)
-      .addObj("projectName", projectName)
-      .addObj("subscriptionProjectName", subscriptionProjectName, projectName)
-      .addObj("topicProjectName", topicProjectName, projectName)
+      .addObj("subscriptionProjectName", subscriptionProjectName)
+      .addObj("topicProjectName", topicProjectName)
       .addObj("topicName", topicName)
       .addDuration("reconnectPeriod", reconnectPeriod, RECONNECT_PERIOD)
       .addDuration("initialGetDataTimeout", initialGetDataTimeout, INITIAL_GET_DATA_TIMEOUT)
-      .addBoolIfTrue("purgeExpiredData", purgeExpiredData)
       .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
       .addObj("dataInitializationUrl", dataInitializationUrl, null)
       .toString();

@@ -1167,6 +1167,8 @@ type StopPlace implements PlaceInterface {
   ): [Quay] @timingData
   "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
   situations: [PtSituationElement!]!
+  "Specify the priority of interchanges at this stop"
+  stopInterchangePriority: StopInterchangePriority
   tariffZones: [TariffZone]!
   timeZone: String
   "The transport modes of quays under this stop place."
@@ -1174,7 +1176,7 @@ type StopPlace implements PlaceInterface {
   "The transport submode serviced by this stop place."
   transportSubmode: [TransportSubmode]
   "Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED"
-  weighting: InterchangeWeighting
+  weighting: InterchangeWeighting @deprecated(reason : "Not implemented. Use stopInterchangePriority")
 }
 
 "List of coordinates between two stops as a polyline"
@@ -1213,6 +1215,36 @@ type TimeAndDayOffset {
   dayOffset: Int
   "Local time"
   time: Time
+}
+
+"""
+The time-penalty is applied to either the access-legs and/or egress-legs. Both access and
+egress may contain more than one leg; Hence, the penalty is not a field on leg.
+
+Note! This is for debugging only. This type can change without notice.
+"""
+type TimePenaltyWithCost {
+  """
+  The time-penalty is applied to either the access-legs and/or egress-legs. Both access
+  and egress may contain more than one leg; Hence, the penalty is not a field on leg. The
+  `appliedTo` describe witch part of the itinerary that this instance applies to.
+  """
+  appliedTo: String
+  """
+  The time-penalty does also propagate to the `generalizedCost`. As a result of the given
+  time-penalty, the generalized-cost also increased by the given amount. This delta is
+  included in the itinerary generalized-cost. In some cases the generalized-cost-delta is
+  excluded when comparing itineraries - that happens if one of the itineraries is a
+  "direct/street-only" itinerary. Time-penalty can not be set for direct searches, so it
+  needs to be excluded from such comparison to be fair. The unit is transit-seconds.
+  """
+  generalizedCostDelta: Int
+  """
+  The time-penalty added to the actual time/duration when comparing the itinerary with
+  other itineraries. This is used to decide witch is the best option, but is not visible
+  - the actual departure and arrival-times are not modified.
+  """
+  timePenalty: String
 }
 
 "Scheduled passing times. These are not affected by real time updates."
@@ -1309,6 +1341,14 @@ type TripPattern {
   streetDistance: Float
   "Get all system notices."
   systemNotices: [SystemNotice!]!
+  """
+  A time and cost penalty applied to access and egress to favor regular scheduled
+  transit over potentially faster options with FLEX, Car, bike and scooter.
+  
+  Note! This field is meant for debugging only. The field can be removed without notice
+  in the future.
+  """
+  timePenalty: [TimePenaltyWithCost!]!
   "A cost calculated to favor transfer with higher priority. This field is meant for debugging only."
   transferPriorityCost: Int
   "A cost calculated to distribute wait-time and avoid very short transfers. This field is meant for debugging only."
@@ -1493,6 +1533,7 @@ enum InterchangePriority {
   recommended
 }
 
+"Deprecated. Use STOP_INTERCHANGE_PRIORITY"
 enum InterchangeWeighting {
   "Third highest priority interchange."
   interchangeAllowed
@@ -1706,6 +1747,17 @@ enum StopCondition {
   requestStop
   "Situation applies when stop is the startpoint of the leg."
   startPoint
+}
+
+enum StopInterchangePriority {
+  "Allow transfers from/to this stop. This is the default. NeTEx equivalent is INTERCHANGE_ALLOWED."
+  allowed
+  "Block transfers from/to this stop. In OTP this is not a definitive block, just a huge penalty is added to the cost function. NeTEx equivalent is NO_INTERCHANGE."
+  discouraged
+  "Preferred place to transfer, strongly recommended. NeTEx equivalent is PREFERRED_INTERCHANGE."
+  preferred
+  "Recommended stop place. NeTEx equivalent is RECOMMENDED_INTERCHANGE."
+  recommended
 }
 
 enum StreetMode {

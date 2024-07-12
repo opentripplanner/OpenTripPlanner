@@ -75,6 +75,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.TripOccupancyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.UnknownImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalNetworkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
@@ -83,6 +84,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
@@ -165,6 +167,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(BookingTimeImpl.class))
         .type(typeWiring.build(BookingInfoImpl.class))
         .type(typeWiring.build(VehicleRentalStationImpl.class))
+        .type(typeWiring.build(VehicleRentalNetworkImpl.class))
         .type(typeWiring.build(RentalVehicleImpl.class))
         .type(typeWiring.build(RentalVehicleTypeImpl.class))
         .type(typeWiring.build(StopOnRouteImpl.class))
@@ -210,7 +213,11 @@ class GtfsGraphQLIndex {
         );
     }
 
-    GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
+    GraphQL graphQL = GraphQL
+      .newGraphQL(indexSchema)
+      .instrumentation(instrumentation)
+      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
+      .build();
 
     if (variables == null) {
       variables = new HashMap<>();

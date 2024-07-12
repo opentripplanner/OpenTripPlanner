@@ -52,7 +52,7 @@
     },
     "waitReluctance": 1.0,
     "otherThanPreferredRoutesPenalty": 300,
-    "transferSlack": 120,
+    "transferSlack": "2m",
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
       "AIRPLANE" : "2100s"
@@ -123,8 +123,9 @@
     {
       "type": "siri-et-google-pubsub-updater",
       "feedId": "EN",
-      "projectName": "entur-ror",
+      "topicProjectName": "entur-anshar",
       "topicName": "estimated_timetables",
+      "subscriptionProjectName": "entur-otp2",
       "dataInitializationUrl": "https://example.com"
     },
     // SIRI ET updater

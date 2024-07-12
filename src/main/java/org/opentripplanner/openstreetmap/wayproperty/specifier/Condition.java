@@ -107,13 +107,24 @@ public sealed interface Condition {
     NONE,
   }
 
+  /**
+   * Selects tags where a given key/value matches.
+   */
   record Equals(String key, String value) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return way.hasTag(exKey) && way.isTag(exKey, value);
     }
+
+    @Override
+    public String toString() {
+      return "%s=%s".formatted(key, value);
+    }
   }
 
+  /**
+   * Selects tags with a given key.
+   */
   record Present(String key) implements Condition {
     @Override
     public MatchResult matchType() {
@@ -123,31 +134,63 @@ public sealed interface Condition {
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return way.hasTag(exKey);
     }
+
+    @Override
+    public String toString() {
+      return "present(%s)".formatted(key);
+    }
   }
 
+  /**
+   * Selects tags where a given tag is absent.
+   */
   record Absent(String key) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return !way.hasTag(exKey);
     }
+
+    @Override
+    public String toString() {
+      return "!%s".formatted(key);
+    }
   }
 
+  /**
+   * Selects tags where the integer value is greater than a given number.
+   */
   record GreaterThan(String key, int value) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() > value;
     }
+
+    @Override
+    public String toString() {
+      return "%s > %s".formatted(key, value);
+    }
   }
 
+  /**
+   * Selects tags where the integer value is less than a given number.
+   */
   record LessThan(String key, int value) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() < value;
     }
+
+    @Override
+    public String toString() {
+      return "%s < %s".formatted(key, value);
+    }
   }
 
+  /**
+   * Selects integer tag values and checks if they are in between a lower and an upper bound.
+   */
   record InclusiveRange(String key, int upper, int lower) implements Condition {
     public InclusiveRange {
       if (upper < lower) {
@@ -160,18 +203,36 @@ public sealed interface Condition {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() >= lower && maybeInt.getAsInt() <= upper;
     }
+
+    @Override
+    public String toString() {
+      return "%s > %s < %s".formatted(lower, key, upper);
+    }
   }
 
-  record EqualsAnyIn(String key, String... values) implements Condition {
+  /**
+   * Selects a tag which has one of a set of given values.
+   */
+  record OneOf(String key, String... values) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value));
     }
+
+    @Override
+    public String toString() {
+      return "%s one of [%s]".formatted(key, String.join(", ", values));
+    }
   }
 
-  record EqualsAnyInOrAbsent(String key, String... values) implements Condition {
+  /**
+   * Selects a tag where one of the following conditions is true:
+   *  - one of a set of given values matches
+   *  - the tag is absent
+   */
+  record OneOfOrAbsent(String key, String... values) implements Condition {
     /* A use case for this is to detect the absence of a sidewalk, cycle lane or verge*/
-    public EqualsAnyInOrAbsent(String key) {
+    public OneOfOrAbsent(String key) {
       this(key, "no", "none");
     }
 
@@ -180,6 +241,11 @@ public sealed interface Condition {
       return (
         !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value))
       );
+    }
+
+    @Override
+    public String toString() {
+      return "%s not one of [%s] or absent".formatted(key, String.join(", ", values));
     }
   }
 }

@@ -363,7 +363,7 @@ for more info."
 
 **Since version:** `2.0` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /transit   
-**Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum keys:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Costs for boarding and alighting during transfers at stops with a given transfer priority.
 
@@ -532,7 +532,7 @@ Used to group requests when monitoring OTP.
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,
-    "transferSlack" : 120,
+    "transferSlack" : "2m",
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },
@@ -858,6 +858,17 @@ Used to group requests when monitoring OTP.
         "fromDateTime" : "-P1D",
         "timeout" : 300000
       }
+    },
+    {
+      "type" : "siri-et-google-pubsub-updater",
+      "feedId" : "feed_id",
+      "reconnectPeriod" : "5s",
+      "initialGetDataTimeout" : "1m20s",
+      "topicProjectName" : "google_pubsub_topic_project_name",
+      "subscriptionProjectName" : "google_pubsub_subscription_project_name",
+      "topicName" : "estimated_timetables",
+      "dataInitializationUrl" : "https://example.com/some/path",
+      "fuzzyTripMatching" : true
     },
     {
       "type" : "vehicle-parking",

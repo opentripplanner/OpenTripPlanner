@@ -70,6 +70,7 @@ import org.opentripplanner.apis.transmodel.model.plan.LegType;
 import org.opentripplanner.apis.transmodel.model.plan.PathGuidanceType;
 import org.opentripplanner.apis.transmodel.model.plan.PlanPlaceType;
 import org.opentripplanner.apis.transmodel.model.plan.RoutingErrorType;
+import org.opentripplanner.apis.transmodel.model.plan.TripPatternTimePenaltyType;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.TripType;
@@ -314,6 +315,7 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
+    GraphQLObjectType tripPatternTimePenaltyType = TripPatternTimePenaltyType.create();
     GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
     GraphQLObjectType placeType = PlanPlaceType.create(
       bikeRentalStationType,
@@ -339,7 +341,12 @@ public class TransmodelGraphQLSchema {
       elevationStepType,
       gqlUtil
     );
-    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
+    GraphQLObjectType tripPatternType = TripPatternType.create(
+      systemNoticeType,
+      legType,
+      tripPatternTimePenaltyType,
+      gqlUtil
+    );
     GraphQLObjectType routingErrorType = RoutingErrorType.create();
 
     GraphQLOutputType tripType = TripType.create(
@@ -905,6 +912,7 @@ public class TransmodelGraphQLSchema {
             List<String> filterByBikeRentalStations = null;
             List<String> filterByBikeParks = null;
             List<String> filterByCarParks = null;
+            List<String> filterByNetwork = null;
             @SuppressWarnings("rawtypes")
             Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
@@ -953,6 +961,7 @@ public class TransmodelGraphQLSchema {
                   filterByStations,
                   filterByRoutes,
                   filterByBikeRentalStations,
+                  filterByNetwork,
                   GqlUtil.getTransitService(environment)
                 );
 

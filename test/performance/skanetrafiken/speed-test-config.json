@@ -19,7 +19,7 @@
       "speed": 1.38,
       "reluctance": 5
     },
-    "transferSlack": 180,
+    "transferSlack": "3m",
     "waitReluctance": 0.175,
     "maxDirectStreetDuration": "1h1m",
     "boardSlackForMode": {

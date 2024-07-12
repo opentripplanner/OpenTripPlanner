@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
+import java.util.Set;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -74,6 +75,30 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(createExtraJourney);
     assertEquals(0, result.successful());
     assertFailure(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, result);
+  }
+
+  @Test
+  void testAddedJourneyWithUnresolvableAgency() {
+    var env = RealtimeTestEnvironment.siri();
+
+    // Create an extra journey with unknown line and operator
+    var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
+      .withEstimatedVehicleJourneyCode("newJourney")
+      .withIsExtraJourney(true)
+      .withOperatorRef("unknown operator")
+      .withLineRef("unknown line")
+      .withEstimatedCalls(builder ->
+        builder
+          .call(env.stopA1)
+          .departAimedExpected("10:58", "10:48")
+          .call(env.stopB1)
+          .arriveAimedExpected("10:08", "10:58")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(createExtraJourney);
+    assertEquals(0, result.successful());
+    assertFailure(UpdateError.UpdateErrorType.CANNOT_RESOLVE_AGENCY, result);
   }
 
   @Test
