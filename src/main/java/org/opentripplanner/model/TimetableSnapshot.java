@@ -93,7 +93,7 @@ public class TimetableSnapshot {
    * The compound key approach better reflects the fact that there should be only one Timetable per
    * TripPattern and date.
    */
-  private Map<TripPattern, SortedSet<Timetable>> timetables = new HashMap<>();
+  private final Map<TripPattern, SortedSet<Timetable>> timetables;
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
@@ -101,7 +101,7 @@ public class TimetableSnapshot {
    * trip ID and the service date.
    * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
-  private Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
+  private final Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern;
 
   /**
    * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
@@ -111,19 +111,35 @@ public class TimetableSnapshot {
    * more than once.
    * TODO RT_AB: More general handling of all realtime indexes outside primary data structures.
    */
-  private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
+  private final SetMultimap<StopLocation, TripPattern> patternsForStop;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
    * shouldn't be possible to change it to false anymore.
    */
-  private boolean readOnly = false;
+  private final boolean readOnly;
 
   /**
    * Boolean value indicating that this timetable snapshot contains changes compared to the state of
    * the last commit if true.
    */
   private boolean dirty = false;
+
+  public TimetableSnapshot() {
+    this(new HashMap<>(), new HashMap<>(), HashMultimap.create(), false);
+  }
+
+  private TimetableSnapshot(
+    Map<TripPattern, SortedSet<Timetable>> timetables,
+    Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern,
+    SetMultimap<StopLocation, TripPattern> patternsForStop,
+    boolean readOnly
+  ) {
+    this.timetables = timetables;
+    this.realtimeAddedTripPattern = realtimeAddedTripPattern;
+    this.patternsForStop = patternsForStop;
+    this.readOnly = readOnly;
+  }
 
   /**
    * Returns an updated timetable for the specified pattern if one is available in this snapshot, or
@@ -235,12 +251,15 @@ public class TimetableSnapshot {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
     }
 
-    TimetableSnapshot ret = new TimetableSnapshot();
     if (!force && !this.isDirty()) {
       return null;
     }
-    ret.timetables = Map.copyOf(timetables);
-    ret.realtimeAddedTripPattern = Map.copyOf(realtimeAddedTripPattern);
+    TimetableSnapshot ret = new TimetableSnapshot(
+      Map.copyOf(timetables),
+      Map.copyOf(realtimeAddedTripPattern),
+      ImmutableSetMultimap.copyOf(patternsForStop),
+      true
+    );
 
     if (transitLayerUpdater != null) {
       transitLayerUpdater.update(dirtyTimetables, timetables);
@@ -249,9 +268,6 @@ public class TimetableSnapshot {
     this.dirtyTimetables.clear();
     this.dirty = false;
 
-    ret.patternsForStop = ImmutableSetMultimap.copyOf(patternsForStop);
-
-    ret.readOnly = true; // mark the snapshot as henceforth immutable
     return ret;
   }
 
