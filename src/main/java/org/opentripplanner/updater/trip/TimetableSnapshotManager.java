@@ -159,8 +159,6 @@ public final class TimetableSnapshotManager {
     buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
   }
 
-
-
   /**
    * Remove realtime data from previous service dates from the snapshot. This is useful so that
    * instances that run for multiple days don't accumulate a lot of realtime data for past

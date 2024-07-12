@@ -71,7 +71,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         parameters,
         () -> LocalDate.now(transitModel.getTimeZone())
       );
-    this.transitService = new DefaultTransitService(transitModel);
+    this.transitService = new DefaultTransitService(transitModel, getTimetableSnapshotBuffer());
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
 
@@ -107,15 +107,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       snapshotManager.clearBuffer(feedId);
     }
 
-      for (var etDelivery : updates) {
-        for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
-          var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
-          LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
-          for (EstimatedVehicleJourney journey : journeys) {
-            results.add(apply(journey, transitService, fuzzyTripMatcher, entityResolver));
-          }
+    for (var etDelivery : updates) {
+      for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
+        var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
+        LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
+        for (EstimatedVehicleJourney journey : journeys) {
+          results.add(apply(journey, transitService, fuzzyTripMatcher, entityResolver));
         }
       }
+    }
 
     LOG.debug("message contains {} trip updates", updates.size());
 
@@ -199,7 +199,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     return getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
   }
-
 
   private Result<TripUpdate, UpdateError> handleModifiedTrip(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,

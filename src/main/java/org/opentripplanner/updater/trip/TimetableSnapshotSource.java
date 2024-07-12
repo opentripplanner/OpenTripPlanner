@@ -119,7 +119,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     this.snapshotManager =
       new TimetableSnapshotManager(transitModel.getTransitLayerUpdater(), parameters, localDateNow);
     this.timeZone = transitModel.getTimeZone();
-    this.transitService = new DefaultTransitService(transitModel);
+    this.transitService =
+      new DefaultTransitService(transitModel, snapshotManager.getTimetableSnapshotBuffer());
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
     this.localDateNow = localDateNow;
