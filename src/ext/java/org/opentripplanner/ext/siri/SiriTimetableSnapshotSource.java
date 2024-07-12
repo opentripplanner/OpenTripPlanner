@@ -129,6 +129,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return snapshotManager.getTimetableSnapshot();
   }
 
+  private TimetableSnapshot getTimetableSnapshotBuffer() {
+    return snapshotManager.getTimetableSnapshotBuffer();
+  }
+
   private Result<UpdateSuccess, UpdateError> apply(
     EstimatedVehicleJourney journey,
     TransitEditorService transitService,
@@ -193,12 +197,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
-    if (timetableSnapshot != null) {
-      return timetableSnapshot.resolve(tripPattern, serviceDate);
-    }
-    return tripPattern.getScheduledTimetable();
+    return getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
   }
+
 
   private Result<TripUpdate, UpdateError> handleModifiedTrip(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,

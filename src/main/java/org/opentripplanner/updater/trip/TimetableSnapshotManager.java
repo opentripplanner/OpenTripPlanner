@@ -90,6 +90,10 @@ public final class TimetableSnapshotManager {
     return snapshot;
   }
 
+  public TimetableSnapshot getTimetableSnapshotBuffer() {
+    return buffer;
+  }
+
   /**
    * Request a commit of the timetable snapshot.
    * <p>
@@ -154,6 +158,8 @@ public final class TimetableSnapshotManager {
   public void revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     buffer.revertTripToScheduledTripPattern(tripId, serviceDate);
   }
+
+
 
   /**
    * Remove realtime data from previous service dates from the snapshot. This is useful so that
