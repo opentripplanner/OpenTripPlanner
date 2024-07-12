@@ -1380,8 +1380,6 @@ type QueryType {
     pageCursor: String,
     "Preferences for vehicle parking"
     parking: VehicleParkingInput,
-    "The list of points the journey is required to pass through."
-    viaPoints: [ViaPoint!],
     "List of routes and agencies which are given higher preference when planning the itinerary"
     preferred: InputPreferred,
     """
@@ -1474,6 +1472,8 @@ type QueryType {
     triangle: InputTriangle,
     "List of routes and agencies which are given lower preference when planning the itinerary"
     unpreferred: InputUnpreferred,
+    "The list of points the journey is required to pass through."
+    viaPoints: [ViaPointInput!],
     """
     How much less bad is waiting at the beginning of the trip (replaces
     `waitReluctance` on the first boarding). Default value: 0.4
@@ -3945,25 +3945,6 @@ input ParkingFilterOperation {
   tags: [String]
 }
 
-"Defines one point which the journey must pass through."
-input ViaPoint {
-  "Optional name of the via point for debugging and logging. It is not used in routing."
-  name: String
-  element: ViaElement!
-}
-
-input ViaElement {
-  # we want to keep a space here for adding a coordinate rather than a list of stop location ids
-  # once we do that the API has to detect this case and switch from the pass-through routing
-  # to the via routing, which uses a different, less efficient algorithm.
-  """
-  The list of *stop location ids* which define the pass-through point. At least one id is required.
-  Stop and Station are supported location types.
-  The journey must pass through at least one of these entities - not all of them.
-  """
-  placeIds: [String!]
-}
-
 "A coordinate used for a location in a plan query."
 input PlanCoordinateInput {
   "Latitude as a WGS84 format number."
@@ -4334,6 +4315,22 @@ input VehicleParkingInput {
   preferred options are available.
   """
   unpreferredCost: Int
+}
+
+input ViaElementInput {
+  """
+  The list of *stop location ids* which define the pass-through point. At least one id is required.
+  Stop and Station are supported location types.
+  The journey must pass through at least one of these entities - not all of them.
+  """
+  placeIds: [String!]
+}
+
+"Defines one point which the journey must pass through."
+input ViaPointInput {
+  element: ViaElementInput!
+  "Optional name of the via point for debugging and logging. It is not used in routing."
+  name: String
 }
 
 "Preferences related to walking (excluding walking a bicycle or a scooter)."
