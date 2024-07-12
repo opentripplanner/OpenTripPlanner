@@ -1381,7 +1381,7 @@ type QueryType {
     "Preferences for vehicle parking"
     parking: VehicleParkingInput,
     "The list of points the journey is required to pass through."
-    passThroughPoints: [PassThroughPoint!],
+    viaPoints: [ViaPoint!],
     "List of routes and agencies which are given higher preference when planning the itinerary"
     preferred: InputPreferred,
     """
@@ -3946,9 +3946,16 @@ input ParkingFilterOperation {
 }
 
 "Defines one point which the journey must pass through."
-input PassThroughPoint {
-  "Optional name of the pass-through point for debugging and logging. It is not used in routing."
+input ViaPoint {
+  "Optional name of the via point for debugging and logging. It is not used in routing."
   name: String
+  element: ViaElement!
+}
+
+input ViaElement {
+  # we want to keep a space here for adding a coordinate rather than a list of stop location ids
+  # once we do that the API has to detect this case and switch from the pass-through routing
+  # to the via routing, which uses a different, less efficient algorithm.
   """
   The list of *stop location ids* which define the pass-through point. At least one id is required.
   Stop and Station are supported location types.
