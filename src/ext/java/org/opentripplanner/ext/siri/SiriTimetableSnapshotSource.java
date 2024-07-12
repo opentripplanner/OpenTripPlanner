@@ -102,11 +102,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    snapshotManager.withLock(() -> {
-      if (incrementality == FULL_DATASET) {
-        // Remove all updates from the buffer
-        snapshotManager.clearBuffer(feedId);
-      }
+    if (incrementality == FULL_DATASET) {
+      // Remove all updates from the buffer
+      snapshotManager.clearBuffer(feedId);
+    }
 
       for (var etDelivery : updates) {
         for (var estimatedJourneyVersion : etDelivery.getEstimatedJourneyVersionFrames()) {
@@ -118,10 +117,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
       }
 
-      LOG.debug("message contains {} trip updates", updates.size());
+    LOG.debug("message contains {} trip updates", updates.size());
 
-      snapshotManager.purgeAndCommit();
-    });
+    snapshotManager.purgeAndCommit();
 
     return UpdateResult.ofResults(results);
   }

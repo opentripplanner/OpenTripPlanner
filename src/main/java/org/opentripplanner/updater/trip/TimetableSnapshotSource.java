@@ -156,121 +156,119 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     Map<ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
-    snapshotManager.withLock(() -> {
-      if (updateIncrementality == FULL_DATASET) {
-        // Remove all updates from the buffer
-        snapshotManager.clearBuffer(feedId);
+    if (updateIncrementality == FULL_DATASET) {
+      // Remove all updates from the buffer
+      snapshotManager.clearBuffer(feedId);
+    }
+
+    LOG.debug("message contains {} trip updates", updates.size());
+    int uIndex = 0;
+    for (TripUpdate tripUpdate : updates) {
+      if (!tripUpdate.hasTrip()) {
+        debug(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+        continue;
       }
 
-      LOG.debug("message contains {} trip updates", updates.size());
-      int uIndex = 0;
-      for (TripUpdate tripUpdate : updates) {
-        if (!tripUpdate.hasTrip()) {
-          debug(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
-          continue;
-        }
+      if (fuzzyTripMatcher != null) {
+        final TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
+        tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
+      }
 
-        if (fuzzyTripMatcher != null) {
-          final TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
-          tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
-        }
+      final TripDescriptor tripDescriptor = tripUpdate.getTrip();
 
-        final TripDescriptor tripDescriptor = tripUpdate.getTrip();
+      if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
+        debug(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
+        results.add(Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE)));
+        continue;
+      }
 
-        if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
-          debug(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
-          results.add(Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE)));
-          continue;
-        }
+      FeedScopedId tripId = new FeedScopedId(feedId, tripUpdate.getTrip().getTripId());
 
-        FeedScopedId tripId = new FeedScopedId(feedId, tripUpdate.getTrip().getTripId());
-
-        LocalDate serviceDate;
-        if (tripDescriptor.hasStartDate()) {
-          try {
-            serviceDate = ServiceDateUtils.parseString(tripDescriptor.getStartDate());
-          } catch (final ParseException e) {
-            debug(
-              tripId,
-              "Failed to parse start date in gtfs-rt trip update: {}",
-              tripDescriptor.getStartDate()
-            );
-            continue;
-          }
-        } else {
-          // TODO: figure out the correct service date. For the special case that a trip
-          // starts for example at 40:00, yesterday would probably be a better guess.
-          serviceDate = localDateNow.get();
-        }
-        // Determine what kind of trip update this is
-        var scheduleRelationship = Objects.requireNonNullElse(
-          tripDescriptor.getScheduleRelationship(),
-          SCHEDULED
-        );
-        if (updateIncrementality == DIFFERENTIAL) {
-          purgePatternModifications(scheduleRelationship, tripId, serviceDate);
-        }
-
-        uIndex += 1;
-        LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
-        LOG.trace("{}", tripUpdate);
-
-        Result<UpdateSuccess, UpdateError> result;
+      LocalDate serviceDate;
+      if (tripDescriptor.hasStartDate()) {
         try {
-          result =
-            switch (scheduleRelationship) {
-              case SCHEDULED -> handleScheduledTrip(
-                tripUpdate,
-                tripId,
-                serviceDate,
-                backwardsDelayPropagationType
-              );
-              case ADDED -> validateAndHandleAddedTrip(
-                tripUpdate,
-                tripDescriptor,
-                tripId,
-                serviceDate
-              );
-              case CANCELED -> handleCanceledTrip(
-                tripId,
-                serviceDate,
-                CancelationType.CANCEL,
-                updateIncrementality
-              );
-              case DELETED -> handleCanceledTrip(
-                tripId,
-                serviceDate,
-                CancelationType.DELETE,
-                updateIncrementality
-              );
-              case REPLACEMENT -> validateAndHandleModifiedTrip(
-                tripUpdate,
-                tripDescriptor,
-                tripId,
-                serviceDate
-              );
-              case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
-              case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
-            };
-        } catch (DataValidationException e) {
-          result = DataValidationExceptionMapper.toResult(e);
+          serviceDate = ServiceDateUtils.parseString(tripDescriptor.getStartDate());
+        } catch (final ParseException e) {
+          debug(
+            tripId,
+            "Failed to parse start date in gtfs-rt trip update: {}",
+            tripDescriptor.getStartDate()
+          );
+          continue;
         }
-
-        results.add(result);
-        if (result.isFailure()) {
-          debug(tripId, "Failed to apply TripUpdate.");
-          LOG.trace(" Contents: {}", tripUpdate);
-          if (failuresByRelationship.containsKey(scheduleRelationship)) {
-            var c = failuresByRelationship.get(scheduleRelationship);
-            failuresByRelationship.put(scheduleRelationship, ++c);
-          } else {
-            failuresByRelationship.put(scheduleRelationship, 1);
-          }
-        }
+      } else {
+        // TODO: figure out the correct service date. For the special case that a trip
+        // starts for example at 40:00, yesterday would probably be a better guess.
+        serviceDate = localDateNow.get();
+      }
+      // Determine what kind of trip update this is
+      var scheduleRelationship = Objects.requireNonNullElse(
+        tripDescriptor.getScheduleRelationship(),
+        SCHEDULED
+      );
+      if (updateIncrementality == DIFFERENTIAL) {
+        purgePatternModifications(scheduleRelationship, tripId, serviceDate);
       }
 
-      snapshotManager.purgeAndCommit();
-    });
+      uIndex += 1;
+      LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
+      LOG.trace("{}", tripUpdate);
+
+      Result<UpdateSuccess, UpdateError> result;
+      try {
+        result =
+          switch (scheduleRelationship) {
+            case SCHEDULED -> handleScheduledTrip(
+              tripUpdate,
+              tripId,
+              serviceDate,
+              backwardsDelayPropagationType
+            );
+            case ADDED -> validateAndHandleAddedTrip(
+              tripUpdate,
+              tripDescriptor,
+              tripId,
+              serviceDate
+            );
+            case CANCELED -> handleCanceledTrip(
+              tripId,
+              serviceDate,
+              CancelationType.CANCEL,
+              updateIncrementality
+            );
+            case DELETED -> handleCanceledTrip(
+              tripId,
+              serviceDate,
+              CancelationType.DELETE,
+              updateIncrementality
+            );
+            case REPLACEMENT -> validateAndHandleModifiedTrip(
+              tripUpdate,
+              tripDescriptor,
+              tripId,
+              serviceDate
+            );
+            case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+            case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
+          };
+      } catch (DataValidationException e) {
+        result = DataValidationExceptionMapper.toResult(e);
+      }
+
+      results.add(result);
+      if (result.isFailure()) {
+        debug(tripId, "Failed to apply TripUpdate.");
+        LOG.trace(" Contents: {}", tripUpdate);
+        if (failuresByRelationship.containsKey(scheduleRelationship)) {
+          var c = failuresByRelationship.get(scheduleRelationship);
+          failuresByRelationship.put(scheduleRelationship, ++c);
+        } else {
+          failuresByRelationship.put(scheduleRelationship, 1);
+        }
+      }
+    }
+
+    snapshotManager.purgeAndCommit();
 
     var updateResult = UpdateResult.ofResults(results);
 
