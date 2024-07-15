@@ -9,10 +9,9 @@ public record KeyValue(String key, Object value) {
     return new KeyValue(key, value);
   }
   public static KeyValue kv(String key, FeedScopedId value) {
-    if(value !=null){
+    if (value != null) {
       return new KeyValue(key, value.toString());
-    }
-    else {
+    } else {
       return new KeyValue(key, null);
     }
   }

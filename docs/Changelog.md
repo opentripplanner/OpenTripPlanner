@@ -41,6 +41,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix NullPointerException in stop transfer priority cost vector generation [#5943](https://github.com/opentripplanner/OpenTripPlanner/pull/5943)
 - Convert transferSlack configuration to duration [#5897](https://github.com/opentripplanner/OpenTripPlanner/pull/5897)
 - Expose stop transfer priority in Transmodel API [#5942](https://github.com/opentripplanner/OpenTripPlanner/pull/5942)
+- Add rental system to GraphQL API [#5909](https://github.com/opentripplanner/OpenTripPlanner/pull/5909)
+- Improve handling of SIRI added trip with unresolvable agency [#5931](https://github.com/opentripplanner/OpenTripPlanner/pull/5931)
+- Fix copy-on-write in TimetableSnapshot [#5941](https://github.com/opentripplanner/OpenTripPlanner/pull/5941)
+- Generate documentation for OSM tag mappers [#5929](https://github.com/opentripplanner/OpenTripPlanner/pull/5929)
+- Disable Legacy REST API by default [#5948](https://github.com/opentripplanner/OpenTripPlanner/pull/5948)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

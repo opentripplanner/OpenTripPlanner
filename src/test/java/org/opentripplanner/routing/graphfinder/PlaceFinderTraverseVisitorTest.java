@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -96,6 +97,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -124,6 +126,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -148,6 +151,7 @@ public class PlaceFinderTraverseVisitorTest {
       transitService,
       List.of(TransitMode.BUS),
       List.of(PlaceType.STOP, PlaceType.STATION),
+      null,
       null,
       null,
       null,
@@ -181,6 +185,7 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(PlaceType.STOP, PlaceType.STATION),
       List.of(STOP2.getId(), STOP3.getId()),
       List.of(STATION1.getId()),
+      null,
       null,
       null,
       1,
@@ -217,6 +222,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -250,6 +256,7 @@ public class PlaceFinderTraverseVisitorTest {
       List.of(STATION1.getId()),
       null,
       null,
+      null,
       1,
       500
     );
@@ -273,5 +280,75 @@ public class PlaceFinderTraverseVisitorTest {
     assertEquals(List.of(STATION1, STOP4), res);
 
     visitor.visitVertex(state1);
+  }
+
+  @Test
+  void rentalStation() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      null,
+      1,
+      500
+    );
+    var station = new TestVehicleRentalStationBuilder().build();
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    visitor.visitVertex(state1);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    assertEquals(List.of(station), res);
+  }
+
+  @Test
+  void rentalStationWithNetworksFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      List.of("Network-1"),
+      1,
+      500
+    );
+    var station = new TestVehicleRentalStationBuilder().build();
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    visitor.visitVertex(state1);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    assertEquals(List.of(station), res);
+
+    visitor =
+      new PlaceFinderTraverseVisitor(
+        transitService,
+        null,
+        List.of(PlaceType.VEHICLE_RENT),
+        null,
+        null,
+        null,
+        null,
+        List.of("Network-2"),
+        1,
+        500
+      );
+
+    assertEquals(List.of(), visitor.placesFound);
+    state1 = TestStateBuilder.ofWalking().rentalStation(station).build();
+    visitor.visitVertex(state1);
+
+    res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    assertEquals(List.of(), res);
   }
 }
