@@ -38,8 +38,8 @@ class VehicleParkingMapper {
     if (parking.getTotalCapacity() == null) {
       issueStore.add(
         "MissingParkingCapacity",
-        "NeTEx Parking %s does not contain totalCapacity",
-        parking.getId()
+        "NeTEx Parking '%s' does not contain totalCapacity",
+        parkingDebugId(parking)
       );
       return null;
     }
@@ -53,6 +53,18 @@ class VehicleParkingMapper {
       .carPlaces(!hasBikes(parking))
       .entrance(mapEntrance(parking))
       .build();
+  }
+
+  private static String parkingDebugId(Parking parking) {
+    if (parking.getId() != null) {
+      return parking.getId();
+    } else if (parking.getName() != null) {
+      return parking.getName().getValue();
+    } else if (parking.getCentroid() != null) {
+      return parking.getCentroid().toString();
+    } else {
+      return parking.toString();
+    }
   }
 
   private VehicleParking.VehicleParkingEntranceCreator mapEntrance(Parking parking) {
