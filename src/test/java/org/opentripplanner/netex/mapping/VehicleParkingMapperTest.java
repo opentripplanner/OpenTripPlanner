@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.AGRICULTURAL_VEHICLE;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.ALL_PASSENGER_VEHICLES;
@@ -13,9 +14,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -27,10 +32,6 @@ import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
 class VehicleParkingMapperTest {
 
-  private static final VehicleParkingMapper MAPPER = new VehicleParkingMapper(
-    new FeedScopedIdFactory("parking")
-  );
-
   public static List<Set<ParkingVehicleEnumeration>> carCases() {
     return List.of(Set.of(), Set.of(CAR, AGRICULTURAL_VEHICLE, ALL_PASSENGER_VEHICLES));
   }
@@ -38,7 +39,7 @@ class VehicleParkingMapperTest {
   @ParameterizedTest
   @MethodSource("carCases")
   void mapCarLot(Set<ParkingVehicleEnumeration> vehicleTypes) {
-    var vp = MAPPER.map(parking(vehicleTypes));
+    var vp = mapper().map(parking(vehicleTypes));
     assertCommonProperties(vp);
     assertTrue(vp.hasAnyCarPlaces());
     assertEquals(VehicleParkingSpaces.builder().carSpaces(10).build(), vp.getCapacity());
@@ -51,10 +52,31 @@ class VehicleParkingMapperTest {
   @ParameterizedTest
   @MethodSource("bicycleCases")
   void mapBicycleLot(Set<ParkingVehicleEnumeration> vehicleTypes) {
-    var vp = MAPPER.map(parking(vehicleTypes));
+    var vp = mapper().map(parking(vehicleTypes));
     assertCommonProperties(vp);
     assertTrue(vp.hasBicyclePlaces());
     assertEquals(VehicleParkingSpaces.builder().bicycleSpaces(10).build(), vp.getCapacity());
+  }
+
+  @Test
+  void dropEmptyCapacity() {
+    var parking = parking(Set.of(CAR));
+    parking.setTotalCapacity(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("MissingParkingCapacity"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  private VehicleParkingMapper mapper() {
+    return mapper(DataImportIssueStore.NOOP);
+  }
+
+  private static VehicleParkingMapper mapper(DataImportIssueStore issueStore) {
+    return new VehicleParkingMapper(new FeedScopedIdFactory("parking"), issueStore);
   }
 
   private static void assertCommonProperties(VehicleParking vp) {

@@ -522,13 +522,15 @@ public class NetexMapper {
   }
 
   private void mapVehicleParkings() {
-    var mapper = new VehicleParkingMapper(idFactory);
+    var mapper = new VehicleParkingMapper(idFactory, issueStore);
     currentNetexIndex
       .getParkingsById()
       .localKeys()
       .forEach(id -> {
         var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
-        transitBuilder.vehicleParkings().add(parking);
+        if (parking != null) {
+          transitBuilder.vehicleParkings().add(parking);
+        }
       });
   }
 

@@ -4,10 +4,10 @@ import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CYCLE;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.E_CYCLE;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.PEDAL_CYCLE;
 
-import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -26,16 +26,23 @@ class VehicleParkingMapper {
     E_CYCLE,
     CYCLE
   );
+  private final DataImportIssueStore issueStore;
 
-  VehicleParkingMapper(FeedScopedIdFactory idFactory) {
+  VehicleParkingMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
+    this.issueStore = issueStore;
   }
 
-  Collection<VehicleParking> map(Collection<Parking> parkings) {
-    return parkings.stream().map(this::map).collect(Collectors.toUnmodifiableSet());
-  }
-
+  @Nullable
   VehicleParking map(Parking parking) {
+    if (parking.getTotalCapacity() == null) {
+      issueStore.add(
+        "MissingParkingCapacity",
+        "NeTEx Parking %s does not contain totalCapacity",
+        parking.getId()
+      );
+      return null;
+    }
     return VehicleParking
       .builder()
       .id(idFactory.createId(parking.getId()))
