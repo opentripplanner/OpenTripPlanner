@@ -358,7 +358,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<Parking> getParkings() {
+      public ReadOnlyHierarchicalMapById<Parking> getParkingsById() {
         return parkings;
       }
 

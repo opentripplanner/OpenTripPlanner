@@ -19,7 +19,6 @@ import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -78,9 +77,9 @@ public class NetexMapper {
 
   /**
    * Shared/cached entity index, used by more than one mapper. This index provides alternative
-   * indexes to netex entites, as well as global indexes to OTP domain objects needed in the mapping
+   * indexes to netex entities, as well as global indexes to OTP domain objects needed in the mapping
    * process. Some of these indexes are feed scoped, and some are file group level scoped. As a rule
-   * of tomb the indexes for OTP Model entities are global(small memory overhead), while the indexes
+   * of thumb the indexes for OTP Model entities are global(small memory overhead), while the indexes
    * for the Netex entities follow the main index {@link  #currentNetexIndex}, hence sopped by file
    * group.
    */
@@ -159,7 +158,7 @@ public class NetexMapper {
 
   /**
    * <p>
-   * This method mapes the last Netex file imported using the *local* entities in the hierarchical
+   * This method maps the last Netex file imported using the *local* entities in the hierarchical
    * {@link NetexEntityIndexReadOnlyView}.
    * </p>
    * <p>
@@ -200,12 +199,9 @@ public class NetexMapper {
     mapTripPatterns(serviceIds);
     mapNoticeAssignments();
 
-    addEntriesToGroupMapperForPostProcessingLater();
-  }
+    mapVehicleParkings();
 
-  public Collection<VehicleParking> mapVehicleParkings() {
-    var mapper = new VehicleParkingMapper(idFactory);
-    return mapper.map(currentNetexIndex.getParkings().localValues());
+    addEntriesToGroupMapperForPostProcessingLater();
   }
 
   /* PRIVATE METHODS */
@@ -523,6 +519,17 @@ public class NetexMapper {
         currentNetexIndex.getServiceJourneyInterchangeById().localValues()
       );
     }
+  }
+
+  private void mapVehicleParkings() {
+    var mapper = new VehicleParkingMapper(idFactory);
+    currentNetexIndex
+      .getParkingsById()
+      .localKeys()
+      .forEach(id -> {
+        var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
+        transitBuilder.vehicleParkings().add(parking);
+      });
   }
 
   /**

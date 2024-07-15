@@ -81,7 +81,7 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
 
-  ReadOnlyHierarchicalMapById<Parking> getParkings();
+  ReadOnlyHierarchicalMapById<Parking> getParkingsById();
 
   ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
 

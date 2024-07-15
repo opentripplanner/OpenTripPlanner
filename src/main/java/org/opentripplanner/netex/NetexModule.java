@@ -102,7 +102,7 @@ public class NetexModule implements GraphBuilderModule {
 
         transitModel.validateTimeZones();
 
-        var lots = netexBundle.vehicleParkings();
+        var lots = transitBuilder.vehicleParkings();
         graph.getVehicleParkingService().updateVehicleParking(lots, List.of());
         var linker = new VehicleParkingHelper(graph);
         lots.forEach(linker::linkVehicleParkingToGraph);

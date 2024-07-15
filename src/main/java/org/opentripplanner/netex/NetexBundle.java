@@ -3,7 +3,6 @@ package org.opentripplanner.netex;
 import jakarta.xml.bind.JAXBException;
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -18,7 +17,6 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
@@ -115,13 +113,6 @@ public class NetexBundle implements Closeable {
   @Override
   public void close() throws IOException {
     source.close();
-  }
-
-  /**
-   * Return the list of parking lots contained in the netex bundle.
-   */
-  public Collection<VehicleParking> vehicleParkings() {
-    return mapper.mapVehicleParkings();
   }
 
   /** Load all files entries in the bundle */
