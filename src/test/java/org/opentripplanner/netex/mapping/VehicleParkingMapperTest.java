@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.AGRICULTURAL_VEHICLE;
+import static org.rutebanken.netex.model.ParkingVehicleEnumeration.ALL_PASSENGER_VEHICLES;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CAR;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CAR_WITH_CARAVAN;
 import static org.rutebanken.netex.model.ParkingVehicleEnumeration.CYCLE;
@@ -31,7 +32,7 @@ class VehicleParkingMapperTest {
   );
 
   public static List<Set<ParkingVehicleEnumeration>> carCases() {
-    return List.of(Set.of(), Set.of(CAR, AGRICULTURAL_VEHICLE));
+    return List.of(Set.of(), Set.of(CAR, AGRICULTURAL_VEHICLE, ALL_PASSENGER_VEHICLES));
   }
 
   @ParameterizedTest
