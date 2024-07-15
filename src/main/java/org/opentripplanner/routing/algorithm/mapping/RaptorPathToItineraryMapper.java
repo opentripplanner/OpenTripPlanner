@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
@@ -109,12 +110,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
-        // two transit legs following each other
-        if (isTransferAtSameStop(previousLeg, pathLeg)) {
-          legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
+        if(OTPFeature.ExtraTransferLegOnSameStop.isOn()) {
+          if (isPathTransferAtSameStop(previousLeg, pathLeg)) {
+            legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
+          }
         }
-        transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
-        legs.add(transitLeg);
+          transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
+          legs.add(transitLeg);
       }
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
@@ -170,7 +172,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return itinerary;
   }
 
-  private static <T extends TripSchedule> boolean isTransferAtSameStop(
+  private static <T extends TripSchedule> boolean isPathTransferAtSameStop(
     PathLeg<T> previousLeg,
     PathLeg<T> currentLeg
   ) {
