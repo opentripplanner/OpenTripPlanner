@@ -1097,4 +1097,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     CANCEL,
     DELETE,
   }
+
+  public void flushBuffer() {
+    snapshotManager.purgeAndCommit();
+  }
 }

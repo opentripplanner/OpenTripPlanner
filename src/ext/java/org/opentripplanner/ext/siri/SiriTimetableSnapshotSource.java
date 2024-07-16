@@ -327,4 +327,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     return success;
   }
+
+  public void flushBuffer() {
+    snapshotManager.purgeAndCommit();
+  }
 }

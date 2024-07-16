@@ -2,6 +2,7 @@ package org.opentripplanner.updater.configure;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
@@ -20,6 +21,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
@@ -94,6 +96,9 @@ public class UpdaterConfigurator {
     );
 
     GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, transitModel, updaters);
+
+    configureTimetableSnapshotFlush(updaterManager);
+
     updaterManager.startUpdaters();
 
     // Stop the updater manager if it contains nothing
@@ -222,5 +227,22 @@ public class UpdaterConfigurator {
         new TimetableSnapshotSource(updatersParameters.timetableSnapshotParameters(), transitModel);
     }
     return gtfsTimetableSnapshotSource;
+  }
+
+  /**
+   * If SIRI or GTFS real-time updaters are in use, configure a periodic flush of the timetable
+   * snapshot.
+   */
+  private void configureTimetableSnapshotFlush(GraphUpdaterManager updaterManager) {
+    if (siriTimetableSnapshotSource != null || gtfsTimetableSnapshotSource != null) {
+      updaterManager
+        .getScheduler()
+        .scheduleWithFixedDelay(
+          new TimetableSnapshotFlush(siriTimetableSnapshotSource, gtfsTimetableSnapshotSource),
+          0,
+          updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
+          TimeUnit.SECONDS
+        );
+    }
   }
 }
