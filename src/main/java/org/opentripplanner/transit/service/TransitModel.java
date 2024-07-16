@@ -169,6 +169,7 @@ public class TransitModel implements Serializable {
     }
   }
 
+  @Nullable
   public TimetableSnapshot getTimetableSnapshot() {
     return timetableSnapshotProvider == null
       ? null
