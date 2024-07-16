@@ -78,7 +78,7 @@ class AddedTripBuilderTest {
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
   private final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, DEDUPLICATOR);
-  private TransitEditorService TRANSIT_SERVICE;
+  private TransitEditorService transitService;
   private EntityResolver ENTITY_RESOLVER;
 
   @BeforeEach
@@ -103,7 +103,7 @@ class AddedTripBuilderTest {
 
     // Create transit model index
     TRANSIT_MODEL.index();
-    TRANSIT_SERVICE = new DefaultTransitService(TRANSIT_MODEL);
+    transitService = new DefaultTransitService(TRANSIT_MODEL);
 
     // Create the entity resolver only after the model has been indexed
     ENTITY_RESOLVER =
@@ -113,7 +113,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTrip() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -242,7 +242,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnAddedRoute() {
     var firstAddedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -268,7 +268,7 @@ class AddedTripBuilderTest {
     var tripId2 = TransitModelForTest.id("TRIP_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       tripId2,
@@ -319,7 +319,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnExistingRoute() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -350,7 +350,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripWithoutReplacedRoute() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -393,7 +393,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnMissingServiceId() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -448,7 +448,7 @@ class AddedTripBuilderTest {
     );
 
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -487,7 +487,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -534,7 +534,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_SERVICE,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
