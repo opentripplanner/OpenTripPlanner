@@ -102,7 +102,7 @@ public final class TimetableSnapshotManager {
    *
    * @param force Force the committing of a new snapshot even if the above conditions are not met.
    */
-  public void commitTimetableSnapshot(final boolean force) {
+  void commitTimetableSnapshot(final boolean force) {
     if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
