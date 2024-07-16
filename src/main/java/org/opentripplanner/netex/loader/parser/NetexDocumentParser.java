@@ -53,7 +53,7 @@ public class NetexDocumentParser {
     new NetexDocumentParser(index, ignoredFeatures).parse(doc);
   }
 
-  public static void finnishUp() {
+  public static void finishUp() {
     ServiceFrameParser.logSummary();
   }
 

@@ -137,7 +137,7 @@ public class NetexBundle implements Closeable {
       });
     }
     mapper.finishUp();
-    NetexDocumentParser.finnishUp();
+    NetexDocumentParser.finishUp();
   }
 
   /**
