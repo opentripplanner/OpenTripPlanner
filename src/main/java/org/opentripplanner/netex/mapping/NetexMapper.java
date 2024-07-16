@@ -332,8 +332,9 @@ public class NetexMapper {
         .getStationsByMultiModalStationRfs()
         .get(multiModalStopPlace.getId());
       var multiModalStation = mapper.map(multiModalStopPlace, stations);
-
-      transitBuilder.stopModel().withMultiModalStation(multiModalStation);
+      if (multiModalStation != null) {
+        transitBuilder.stopModel().withMultiModalStation(multiModalStation);
+      }
     }
   }
 
