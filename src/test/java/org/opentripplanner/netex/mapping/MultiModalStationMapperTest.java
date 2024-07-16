@@ -1,7 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -22,9 +23,9 @@ class MultiModalStationMapperTest {
     );
     StopPlace stopPlace = new StopPlace();
     stopPlace.setId(NetexTestDataSupport.STOP_PLACE_ID);
-    Assertions.assertNull(multiModalStationMapper.map(stopPlace, List.of()));
-    Assertions.assertEquals(1, dataIssueStore.listIssues().size());
-    Assertions.assertEquals(
+    assertNull(multiModalStationMapper.map(stopPlace, List.of()));
+    assertEquals(1, dataIssueStore.listIssues().size());
+    assertEquals(
       "MultiModalStationWithoutCoordinates",
       dataIssueStore.listIssues().getFirst().getType()
     );
