@@ -6,10 +6,13 @@ import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
 
+import com.google.common.collect.ImmutableSetMultimap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -46,6 +49,12 @@ class DefaultTransitServiceTest {
     transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     transitModel.index();
 
+    transitModel.initTimetableSnapshotProvider(() -> {
+      TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+      timetableSnapshot.setPatternsForStop(ImmutableSetMultimap.of(STOP_B, BUS_PATTERN));
+      return timetableSnapshot;
+    });
+
     service =
       new DefaultTransitService(transitModel) {
         @Override
@@ -75,5 +84,17 @@ class DefaultTransitServiceTest {
   void stationModes() {
     var modes = service.getModesOfStopLocationsGroup(STATION);
     assertEquals(List.of(RAIL, FERRY, TRAM), modes);
+  }
+
+  @Test
+  void getPatternForStopsWithoutRealTime() {
+    Collection<TripPattern> patternsForStop = service.getPatternsForStop(STOP_B, false);
+    assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN), patternsForStop);
+  }
+
+  @Test
+  void getPatternForStopsWithRealTime() {
+    Collection<TripPattern> patternsForStop = service.getPatternsForStop(STOP_B, true);
+    assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, BUS_PATTERN), patternsForStop);
   }
 }
