@@ -257,15 +257,18 @@ public class NetexFeedParameters implements DataSourceConfig {
     }
 
     public Builder withIgnoreFareFrame(boolean ignoreFareFrame) {
-      if (ignoreFareFrame) {
-        this.ignoredFeatures.add(FARE_FRAME);
-      }
-      return this;
+      return applyIgnore(ignoreFareFrame, FARE_FRAME);
     }
 
     public Builder withIgnoreParking(boolean ignoreParking) {
-      if (ignoreParking) {
-        this.ignoredFeatures.add(PARKING);
+      return applyIgnore(ignoreParking, PARKING);
+    }
+
+    private Builder applyIgnore(boolean ignore, IgnorableFeature feature) {
+      if (ignore) {
+        ignoredFeatures.add(feature);
+      } else {
+        ignoredFeatures.remove(feature);
       }
       return this;
     }
