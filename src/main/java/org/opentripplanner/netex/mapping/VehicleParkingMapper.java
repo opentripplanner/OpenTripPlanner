@@ -55,6 +55,10 @@ class VehicleParkingMapper {
       .build();
   }
 
+  /**
+   * In the Nordic profile many fields of {@link Parking} are optional so even adding the ID to the
+   * issue store can lead to NPEs. For this reason we have a lot of fallbacks.
+   */
   private static String parkingDebugId(Parking parking) {
     if (parking.getId() != null) {
       return parking.getId();
