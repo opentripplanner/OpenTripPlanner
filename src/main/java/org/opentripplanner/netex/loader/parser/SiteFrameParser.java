@@ -1,10 +1,14 @@
 package org.opentripplanner.netex.loader.parser;
 
+import static org.opentripplanner.netex.config.IgnorableFeature.PARKING;
+
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.support.JAXBUtils;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -36,7 +40,14 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   private final Collection<TariffZone_VersionStructure> tariffZones = new ArrayList<>();
 
   private final Collection<Quay> quays = new ArrayList<>();
+
   private final Collection<Parking> parkings = new ArrayList<>(0);
+
+  private final Set<IgnorableFeature> ignoredFeatures;
+
+  SiteFrameParser(Set<IgnorableFeature> ignoredFeatures) {
+    this.ignoredFeatures = ignoredFeatures;
+  }
 
   @Override
   public void parse(Site_VersionFrameStructure frame) {
@@ -54,7 +65,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
       parseTariffZones(frame.getTariffZones().getTariffZone());
     }
 
-    if (frame.getParkings() != null) {
+    if (!ignoredFeatures.contains(PARKING) && frame.getParkings() != null) {
       parseParkings(frame.getParkings().getParking());
     }
     // Keep list sorted alphabetically
