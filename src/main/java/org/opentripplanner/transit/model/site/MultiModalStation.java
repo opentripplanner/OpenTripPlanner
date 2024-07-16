@@ -37,11 +37,11 @@ public class MultiModalStation
     super(builder.getId());
     // Required fields
     this.childStations = Objects.requireNonNull(builder.childStations());
+    this.coordinate = Objects.requireNonNull(builder.coordinate());
     this.name = I18NString.assertHasValue(builder.name());
 
     // Optional fields
     // TODO Make required
-    this.coordinate = builder.coordinate();
     this.code = builder.code();
     this.description = builder.description();
     this.url = builder.url();
