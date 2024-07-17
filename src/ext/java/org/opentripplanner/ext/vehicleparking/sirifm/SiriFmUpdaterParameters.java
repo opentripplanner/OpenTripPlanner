@@ -1,18 +1,20 @@
-package org.opentripplanner.ext.vehicleparking.bikely;
+package org.opentripplanner.ext.vehicleparking.sirifm;
 
-import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.FULL;
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType.SIRI_FM;
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.AVAILABILITY;
 
 import java.net.URI;
 import java.time.Duration;
+import org.opentripplanner.ext.vehicleparking.noi.NoiUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
- * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by
- * {@link BikelyUpdater}.
+ * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
+ * NoiUpdater}.
  */
-public record BikelyUpdaterParameters(
+public record SiriFmUpdaterParameters(
   String configRef,
   URI url,
   String feedId,
@@ -22,11 +24,11 @@ public record BikelyUpdaterParameters(
   implements VehicleParkingUpdaterParameters {
   @Override
   public VehicleParkingSourceType sourceType() {
-    return VehicleParkingSourceType.BIKELY;
+    return SIRI_FM;
   }
 
   @Override
   public UpdateType updateType() {
-    return FULL;
+    return AVAILABILITY;
   }
 }

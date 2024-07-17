@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vehicleparking.bikeep;
 
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.FULL;
+
 import java.net.URI;
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -21,5 +23,10 @@ public record BikeepUpdaterParameters(
   @Override
   public VehicleParkingSourceType sourceType() {
     return VehicleParkingSourceType.BIKEEP;
+  }
+
+  @Override
+  public UpdateType updateType() {
+    return FULL;
   }
 }

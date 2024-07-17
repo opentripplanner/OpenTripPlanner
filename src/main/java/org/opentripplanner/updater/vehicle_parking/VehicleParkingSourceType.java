@@ -7,4 +7,5 @@ public enum VehicleParkingSourceType {
   BIKELY,
   NOI_OPEN_DATA_HUB,
   BIKEEP,
+  SIRI_FM,
 }

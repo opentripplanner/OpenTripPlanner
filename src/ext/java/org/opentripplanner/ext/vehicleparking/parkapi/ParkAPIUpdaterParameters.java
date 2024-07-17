@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.FULL;
+
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.List;
@@ -21,4 +23,9 @@ public record ParkAPIUpdaterParameters(
   VehicleParkingSourceType sourceType,
   ZoneId timeZone
 )
-  implements VehicleParkingUpdaterParameters {}
+  implements VehicleParkingUpdaterParameters {
+  @Override
+  public UpdateType updateType() {
+    return FULL;
+  }
+}

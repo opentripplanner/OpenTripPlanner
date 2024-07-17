@@ -13,6 +13,7 @@ import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -92,6 +93,17 @@ public class VehicleParkingUpdaterConfig {
       case BIKEEP -> new BikeepUpdaterParameters(
         updaterRef,
         c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
+        feedId,
+        c
+          .of("frequency")
+          .since(V2_6)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
+        HttpHeadersConfig.headers(c, V2_6)
+      );
+      case SIRI_FM -> new SiriFmUpdaterParameters(
+        updaterRef,
+        c.of("url").since(V2_6).summary("URL of the SIRI-FM Light endpoint.").asUri(),
         feedId,
         c
           .of("frequency")

@@ -239,21 +239,38 @@ public class VehicleParking implements Serializable {
       return false;
     }
 
-    switch (traverseMode) {
-      case BICYCLE:
-        return availability.getBicycleSpaces() != null;
-      case CAR:
+    return switch (traverseMode) {
+      case BICYCLE -> availability.getBicycleSpaces() != null;
+      case CAR -> {
         var places = wheelchairAccessibleCarPlaces
           ? availability.getWheelchairAccessibleCarSpaces()
           : availability.getCarSpaces();
-        return places != null;
-      default:
-        return false;
-    }
+        yield places != null;
+      }
+      default -> false;
+    };
   }
 
+  /**
+   * The only mutable method in this class: it allows to update the available parking spaces during
+   * real-time updates.
+   */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
     this.availability = vehicleParkingSpaces;
+  }
+
+  public void close() {
+    var builder = VehicleParkingSpaces.builder();
+    if (hasCarPlaces()) {
+      builder.carSpaces(0);
+    }
+    if (hasWheelchairAccessibleCarPlaces()) {
+      builder.wheelchairAccessibleCarSpaces(0);
+    }
+    if (hasBicyclePlaces()) {
+      builder.bicycleSpaces(0);
+    }
+    updateAvailability(builder.build());
   }
 
   @Override
