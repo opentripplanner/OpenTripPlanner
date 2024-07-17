@@ -99,8 +99,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     Trip trip,
     LocalDate sd
   ) {
-    // TODO OTP2 RT_VP a new instance of DefaultTransitService must be created to retrieve
-    // the latest TimetableSnapshot
+    // a new instance of DefaultTransitService must be created to retrieve
+    // the current TimetableSnapshot
     return (new DefaultTransitService(transitModel)).getPatternForTrip(trip, sd);
   }
 }
