@@ -41,7 +41,7 @@ public class TripPatternForDateMapper {
    * @param serviceCodesRunningForDate - READ ONLY
    */
   TripPatternForDateMapper(Map<LocalDate, TIntSet> serviceCodesRunningForDate) {
-    this.serviceCodesRunningForDate = Collections.unmodifiableMap(serviceCodesRunningForDate);
+    this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
   /**
