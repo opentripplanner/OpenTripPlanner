@@ -204,7 +204,7 @@ public class UpdaterConfigurator {
             )
           );
         }
-        case AVAILABILITY -> {
+        case AVAILABILITY_ONLY -> {
           var source = AvailabilityDatasourceFactory.create(configItem);
           updaters.add(
             new VehicleParkingAvailabilityUpdater(

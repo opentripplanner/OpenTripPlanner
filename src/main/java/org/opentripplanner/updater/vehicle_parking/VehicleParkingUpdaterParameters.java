@@ -12,6 +12,6 @@ public interface VehicleParkingUpdaterParameters extends PollingGraphUpdaterPara
 
   enum UpdateType {
     FULL,
-    AVAILABILITY,
+    AVAILABILITY_ONLY,
   }
 }

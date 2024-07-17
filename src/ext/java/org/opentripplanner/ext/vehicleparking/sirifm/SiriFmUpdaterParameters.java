@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vehicleparking.sirifm;
 
 import static org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType.SIRI_FM;
-import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.AVAILABILITY;
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.AVAILABILITY_ONLY;
 
 import java.net.URI;
 import java.time.Duration;
@@ -29,6 +29,6 @@ public record SiriFmUpdaterParameters(
 
   @Override
   public UpdateType updateType() {
-    return AVAILABILITY;
+    return AVAILABILITY_ONLY;
   }
 }

@@ -88,20 +88,21 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
           "Parking with id {} does not exist. Skipping availability update.",
           update.vehicleParkingId()
         );
-      }
-      var parking = parkingById.get(update.vehicleParkingId());
+      } else {
+        var parking = parkingById.get(update.vehicleParkingId());
 
-      switch (update) {
-        case ParkingClosed closed -> parking.close();
-        case AvailabilityUpdated availabilityUpdated -> {
-          var builder = VehicleParkingSpaces.builder();
-          if (parking.hasCarPlaces()) {
-            builder.carSpaces(availabilityUpdated.spacesAvailable());
+        switch (update) {
+          case ParkingClosed closed -> parking.close();
+          case AvailabilityUpdated availabilityUpdated -> {
+            var builder = VehicleParkingSpaces.builder();
+            if (parking.hasCarPlaces()) {
+              builder.carSpaces(availabilityUpdated.spacesAvailable());
+            }
+            if (parking.hasBicyclePlaces()) {
+              builder.bicycleSpaces(availabilityUpdated.spacesAvailable());
+            }
+            parking.updateAvailability(builder.build());
           }
-          if (parking.hasBicyclePlaces()) {
-            builder.bicycleSpaces(availabilityUpdated.spacesAvailable());
-          }
-          parking.updateAvailability(builder.build());
         }
       }
     }
