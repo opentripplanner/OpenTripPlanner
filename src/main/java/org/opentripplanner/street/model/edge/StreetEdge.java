@@ -1183,8 +1183,8 @@ public class StreetEdge
       s1.incrementWalkDistance(getDistanceWithElevation());
     }
 
-    if (traverseMode.isCyclingIsh() && s1.isVehicleRentable()) {
-      s1.incrementDrivenBatteryMeters(getDistanceWithElevation());
+    if (s1.isRentingVehicle()) {
+      s1.incrementTraversedBatteryMeters(getDistanceWithElevation());
     }
 
     if (costExtension != null) {

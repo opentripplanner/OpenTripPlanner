@@ -1,17 +1,16 @@
 package org.opentripplanner.routing.impl;
 
-import java.util.Optional;
 import org.opentripplanner.street.search.state.State;
 
 public class BatteryValidator {
 
   public static boolean wouldBatteryRunOut(Object current) {
-    double drivenBatteryMeters =
-      ((org.opentripplanner.street.search.state.State) current).drivenBatteryMeters;
-    Optional<Double> currentRangeMeters = ((State) current).currentRangeMeters;
-    if (currentRangeMeters.isEmpty()) {
+    State state = (State) current;
+    double traversedBatteryMeters = state.traversedBatteryMeters;
+    double currentRangeMeters = state.currentRangeMeters;
+    if (currentRangeMeters == Double.POSITIVE_INFINITY) {
       return false;
     }
-    return currentRangeMeters.get() < drivenBatteryMeters;
+    return currentRangeMeters < traversedBatteryMeters;
   }
 }

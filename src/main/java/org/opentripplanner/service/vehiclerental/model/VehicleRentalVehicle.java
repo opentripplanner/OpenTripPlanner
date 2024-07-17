@@ -135,7 +135,8 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
-  public Optional<Double> getCurrentRangeMeters() {
-    return Optional.ofNullable(currentRangeMeters);
+  @Override
+  public double getCurrentRangeMeters() {
+    return currentRangeMeters;
   }
 }

@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -54,10 +53,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   public double walkDistance;
 
   // how far a sharing vehicle powered by battery has driven
-  public double drivenBatteryMeters;
+  public double traversedBatteryMeters;
 
   //the available battery distance of a currently selected sharing vehicle
-  public Optional<Double> currentRangeMeters;
+  //setting a magic value of 0.0 to make sure
+  public double currentRangeMeters;
 
   /* CONSTRUCTORS */
 
@@ -89,8 +89,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         vertex.rentalRestrictions().noDropOffNetworks();
     }
     this.walkDistance = 0;
-    this.drivenBatteryMeters = 0;
-    this.currentRangeMeters = Optional.empty();
+    this.traversedBatteryMeters = 0;
+    this.currentRangeMeters = Double.POSITIVE_INFINITY;
     this.time = startTime.getEpochSecond();
   }
 
@@ -369,7 +369,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
       editor.incrementWeight(orig.getWeightDelta());
       editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-      editor.incrementDrivenBatteryMeters(orig.getBatteryDistanceDelta());
+      editor.incrementTraversedBatteryMeters(orig.getBatteryDistanceDelta());
       editor.setCurrentRangeMeters(orig.getCurrentRangeMeters());
 
       // propagate the modes through to the reversed edge
@@ -516,17 +516,17 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   private double getBatteryDistanceDelta() {
     if (backState != null) {
-      return Math.abs(this.drivenBatteryMeters - backState.drivenBatteryMeters);
+      return Math.abs(this.traversedBatteryMeters - backState.traversedBatteryMeters);
     } else {
       return 0.0;
     }
   }
 
-  private Optional<Double> getCurrentRangeMeters() {
+  private double getCurrentRangeMeters() {
     if (backState != null) {
       return backState.currentRangeMeters;
     } else {
-      return Optional.empty();
+      return Double.POSITIVE_INFINITY;
     }
   }
 

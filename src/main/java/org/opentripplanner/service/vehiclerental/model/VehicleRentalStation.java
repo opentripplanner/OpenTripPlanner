@@ -178,6 +178,11 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
+  public double getCurrentRangeMeters() {
+    return Double.POSITIVE_INFINITY;
+  }
+
+  @Override
   public String toString() {
     return String.format(
       ROOT,

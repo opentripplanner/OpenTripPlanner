@@ -212,10 +212,7 @@ public class VehicleRentalEdge extends Edge {
     };
   }
 
-  public Optional<Double> getCurrentRangeMeters() {
-    if (vertex.getStation() instanceof VehicleRentalVehicle) {
-      return ((VehicleRentalVehicle) vertex.getStation()).getCurrentRangeMeters();
-    }
-    return Optional.empty();
+  public double getCurrentRangeMeters() {
+    return vertex.getStation().getCurrentRangeMeters();
   }
 }

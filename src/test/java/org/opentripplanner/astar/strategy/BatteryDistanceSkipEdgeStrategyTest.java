@@ -3,7 +3,6 @@ package org.opentripplanner.astar.strategy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.impl.BatteryValidator;
@@ -20,7 +19,7 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
   void batteryIsNotEnough() {
     var state = getState(100.0);
 
-    state.currentRangeMeters = Optional.of(0.0);
+    state.currentRangeMeters = 0.0;
 
     var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
 
@@ -34,7 +33,7 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
   @Test
   void batteryIsEnough() {
     var state = getState(100.0);
-    state.currentRangeMeters = Optional.of(4000.0);
+    state.currentRangeMeters = 4000.0;
 
     var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
     assertFalse(strategy.shouldSkipEdge(state, null));
@@ -48,7 +47,7 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
   void batteryDiesAtFinalLocation() {
     var state = getState(100.0);
 
-    state.currentRangeMeters = Optional.of(100.0);
+    state.currentRangeMeters = 100.0;
 
     var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
     assertFalse(strategy.shouldSkipEdge(state, null));
@@ -61,7 +60,7 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
   @Test
   void noDrivenMeters() {
     var state = getState(0.0);
-    state.currentRangeMeters = Optional.of(100.0);
+    state.currentRangeMeters = 100.0;
 
     var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
     assertFalse(strategy.shouldSkipEdge(state, null));
@@ -74,15 +73,15 @@ public class BatteryDistanceSkipEdgeStrategyTest extends GraphRoutingTest {
   @Test
   void batteryHasNoValue() {
     var state = TestStateBuilder.ofScooterRental().build();
-    state.currentRangeMeters = Optional.empty();
+    state.currentRangeMeters = Double.POSITIVE_INFINITY;
 
     var strategy = new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut);
     assertFalse(strategy.shouldSkipEdge(state, null));
   }
 
-  private static State getState(double drivenBatteryMeters) {
+  private static State getState(double traversedBatteryMeters) {
     var state = TestStateBuilder.ofScooterRental().build();
-    state.drivenBatteryMeters = drivenBatteryMeters;
+    state.traversedBatteryMeters = traversedBatteryMeters;
     return state;
   }
 }
