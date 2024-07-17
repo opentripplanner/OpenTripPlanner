@@ -125,10 +125,6 @@ public class TransitModelIndex {
     return routeForId.get(id);
   }
 
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   *           - this when doing the issue #3030.
-   */
   public void addRoutes(Route route) {
     routeForId.put(route.getId(), route);
   }

@@ -23,8 +23,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -56,9 +56,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
-  private final TransitModel transitModel;
 
-  private final TransitService transitService;
+  private final TransitEditorService transitService;
 
   private final TimetableSnapshotManager snapshotManager;
 
@@ -72,7 +71,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         parameters,
         () -> LocalDate.now(transitModel.getTimeZone())
       );
-    this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
@@ -115,7 +113,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           var journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
           LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
           for (EstimatedVehicleJourney journey : journeys) {
-            results.add(apply(journey, transitModel, fuzzyTripMatcher, entityResolver));
+            results.add(apply(journey, transitService, fuzzyTripMatcher, entityResolver));
           }
         }
       }
@@ -135,7 +133,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private Result<UpdateSuccess, UpdateError> apply(
     EstimatedVehicleJourney journey,
-    TransitModel transitModel,
+    TransitEditorService transitService,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
   ) {
@@ -147,7 +145,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         result =
           new AddedTripBuilder(
             journey,
-            transitModel,
+            transitService,
             entityResolver,
             tripPatternIdGenerator::generateUniqueTripPatternId
           )
@@ -265,7 +263,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       pattern,
       estimatedVehicleJourney,
       serviceDate,
-      transitModel.getTimeZone(),
+      transitService.getTimeZone(),
       entityResolver
     )
       .build();
