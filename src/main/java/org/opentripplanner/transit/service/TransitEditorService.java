@@ -40,4 +40,8 @@ public interface TransitEditorService extends TransitService {
   FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
 
   void setTransitLayer(TransitLayer transitLayer);
+
+  boolean hasRealtimeTransitLayer();
+
+  void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer);
 }

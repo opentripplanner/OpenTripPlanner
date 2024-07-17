@@ -212,7 +212,7 @@ public class ConstructApplication {
     transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
     transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
     transitModel.setTransitLayerUpdater(
-      new TransitLayerUpdater(transitModel, new DefaultTransitService(transitModel))
+      new TransitLayerUpdater(new DefaultTransitService(transitModel))
     );
   }
 

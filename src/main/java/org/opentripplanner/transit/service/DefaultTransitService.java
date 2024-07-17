@@ -596,6 +596,16 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
+    transitModel.setRealtimeTransitLayer(realtimeTransitLayer);
+  }
+
+  @Override
+  public boolean hasRealtimeTransitLayer() {
+    return transitModel.hasRealtimeTransitLayer();
+  }
+
+  @Override
   public CalendarService getCalendarService() {
     return this.transitModel.getCalendarService();
   }
