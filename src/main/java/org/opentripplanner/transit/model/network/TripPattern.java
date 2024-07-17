@@ -331,17 +331,6 @@ public final class TripPattern
 
   /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
 
-  // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
-  // and would avoid mistakes where real-time updates are accidentally not taken into account.
-
-  public boolean stopPatternIsEqual(TripPattern other) {
-    return stopPattern.equals(other.stopPattern);
-  }
-
-  public Trip getTrip(int tripIndex) {
-    return scheduledTimetable.getTripTimes(tripIndex).getTrip();
-  }
-
   // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
   /**
    * Add the given tripTimes to this pattern's scheduled timetable, recording the corresponding trip
