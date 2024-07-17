@@ -80,7 +80,7 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
   private AvailabiltyUpdate mapToUpdate(FacilityConditionStructure c) {
     var id = new FeedScopedId(params.feedId(), c.getFacilityRef().getValue());
     var available = c.getMonitoredCountings().getFirst().getCount().intValue();
-    return new AvailabiltyUpdate.AvailabilityUpdated(id, available);
+    return new AvailabiltyUpdate(id, available);
   }
 
   /**

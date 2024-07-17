@@ -15,8 +15,6 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.vehicle_parking.AvailabiltyUpdate.AvailabilityUpdated;
-import org.opentripplanner.updater.vehicle_parking.AvailabiltyUpdate.ParkingClosed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +57,17 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     } else {
       var updates = source.getUpdates();
 
-      var graphWriterRunnable = new VehicleParkingGraphWriterRunnable(updates);
+      var graphWriterRunnable = new UpdateAvailabilities(updates);
       saveResultOnGraph.execute(graphWriterRunnable);
     }
   }
 
-  private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {
+  private class UpdateAvailabilities implements GraphWriterRunnable {
 
     private final List<AvailabiltyUpdate> updates;
     private final Map<FeedScopedId, VehicleParking> parkingById;
 
-    private VehicleParkingGraphWriterRunnable(List<AvailabiltyUpdate> updates) {
+    private UpdateAvailabilities(List<AvailabiltyUpdate> updates) {
       this.updates = List.copyOf(updates);
       this.parkingById =
         vehicleParkingService
@@ -90,20 +88,14 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
         );
       } else {
         var parking = parkingById.get(update.vehicleParkingId());
-
-        switch (update) {
-          case ParkingClosed closed -> parking.close();
-          case AvailabilityUpdated availabilityUpdated -> {
-            var builder = VehicleParkingSpaces.builder();
-            if (parking.hasCarPlaces()) {
-              builder.carSpaces(availabilityUpdated.spacesAvailable());
-            }
-            if (parking.hasBicyclePlaces()) {
-              builder.bicycleSpaces(availabilityUpdated.spacesAvailable());
-            }
-            parking.updateAvailability(builder.build());
-          }
+        var builder = VehicleParkingSpaces.builder();
+        if (parking.hasCarPlaces()) {
+          builder.carSpaces(update.spacesAvailable());
         }
+        if (parking.hasBicyclePlaces()) {
+          builder.bicycleSpaces(update.spacesAvailable());
+        }
+        parking.updateAvailability(builder.build());
       }
     }
   }
