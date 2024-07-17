@@ -50,11 +50,11 @@ public class TimetableSnapshotSourceTest {
   )
     .build();
   private TransitModel transitModel;
+  private TransitService transitService;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
   private String feedId;
-  private TransitService transitService;
 
   @BeforeEach
   public void setUp() {
@@ -62,7 +62,7 @@ public class TimetableSnapshotSourceTest {
     transitModel = model.transitModel();
     transitService = new DefaultTransitService(transitModel);
 
-    feedId = transitModel.getFeedIds().stream().findFirst().get();
+    feedId = transitService.getFeedIds().stream().findFirst().get();
   }
 
   @Test
@@ -119,7 +119,7 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
 
       final long midnightSecondsSinceEpoch = ServiceDateUtils
-        .asStartOfService(SERVICE_DATE, transitModel.getTimeZone())
+        .asStartOfService(SERVICE_DATE, transitService.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();

@@ -62,7 +62,7 @@ class AddedTest {
     assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
     assertEquals(TransitMode.RAIL, route.getMode());
 
-    var fromTransitModel = env.transitModel.getTransitModelIndex().getRouteForId(route.getId());
+    var fromTransitModel = env.getTransitService().getRouteForId(route.getId());
     assertEquals(fromTransitModel, route);
 
     assertEquals(PickDrop.CALL_AGENCY, pattern.getBoardType(0));
@@ -117,7 +117,7 @@ class AddedTest {
     var secondRoute = secondPattern.getRoute();
 
     assertSame(firstRoute, secondRoute);
-    assertNotNull(env.transitModel.getTransitModelIndex().getRouteForId(firstRoute.getId()));
+    assertNotNull(env.getTransitService().getRouteForId(firstRoute.getId()));
   }
 
   private TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {

@@ -169,8 +169,7 @@ class AddedTripBuilderTest {
     assertEquals(route, pattern.getRoute());
     assertTrue(
       transitService
-        .getServiceCodesRunningForDate()
-        .get(SERVICE_DATE)
+        .getServiceCodesRunningForDate(SERVICE_DATE)
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
       "serviceId should be running on service date"
     );
