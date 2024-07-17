@@ -2,14 +2,10 @@ package org.opentripplanner.ext.vehicleparking.sirifm;
 
 import static uk.org.siri.siri21.CountingTypeEnumeration.PRESENT_COUNT;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
+import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -20,8 +16,11 @@ import org.opentripplanner.updater.vehicle_parking.AvailabiltyUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.FacilityConditionStructure;
-import uk.org.siri.siri21.Siri;
 
+/**
+ * Parses SIRI 2.1 XML data into parking availability updates. The data needs to conform to the
+ * Italian profile of SIRI-FM.
+ */
 public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriFmUpdater.class);
@@ -29,16 +28,6 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
   private final OtpHttpClient httpClient;
   private final Map<String, String> headers;
   private List<AvailabiltyUpdate> updates = List.of();
-
-  private static final JAXBContext jaxbContext;
-
-  static {
-    try {
-      jaxbContext = JAXBContext.newInstance(Siri.class);
-    } catch (JAXBException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   public SiriFmUpdater(SiriFmUpdaterParameters parameters) {
     params = parameters;
@@ -61,7 +50,7 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
         params.url(),
         headers,
         resp -> {
-          var siri = parseXml(resp);
+          var siri = SiriXml.parseXml(resp);
 
           return Stream
             .ofNullable(siri.getServiceDelivery())
@@ -94,16 +83,6 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
     );
   }
 
-  private Siri parseXml(InputStream stream) {
-    try {
-      var xmlif = XMLInputFactory.newInstance();
-      var jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-      var streamReader = xmlif.createXMLStreamReader(stream);
-      return (Siri) jaxbUnmarshaller.unmarshal(streamReader);
-    } catch (JAXBException | XMLStreamException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   @Override
   public List<AvailabiltyUpdate> getUpdates() {
