@@ -56,8 +56,6 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
 
   @Override
   public boolean update() {
-    LOG.error("RUNNING {}", this);
-
     updates =
       httpClient.getAndMap(
         params.url(),
@@ -92,7 +90,7 @@ public class SiriFmUpdater implements DataSource<AvailabiltyUpdate> {
       c.getFacilityRef() != null &&
       c.getFacilityRef().getValue() != null &&
       c.getMonitoredCountings().size() == 1 &&
-      c.getMonitoredCountings().stream().anyMatch(mc -> mc.getCountingType() == PRESENT_COUNT)
+      c.getMonitoredCountings().getFirst().getCountingType() == PRESENT_COUNT
     );
   }
 
