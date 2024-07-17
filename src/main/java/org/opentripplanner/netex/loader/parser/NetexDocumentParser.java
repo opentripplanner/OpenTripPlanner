@@ -79,7 +79,7 @@ public class NetexDocumentParser {
       parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
     } else if (value instanceof SiteFrame) {
       parse((SiteFrame) value, new SiteFrameParser(ignoredFeatures));
-    } else if (ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame) {
+    } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame) {
       parse((FareFrame) value, new FareFrameParser());
     } else if (value instanceof CompositeFrame) {
       // We recursively parse composite frames and content until there
