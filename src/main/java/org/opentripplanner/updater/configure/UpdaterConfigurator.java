@@ -190,7 +190,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       switch (configItem.updateType()) {
-        case AVAILABILITY -> {
+        case FULL -> {
           var source = VehicleParkingDataSourceFactory.create(
             configItem,
             openingHoursCalendarService
@@ -204,7 +204,7 @@ public class UpdaterConfigurator {
             )
           );
         }
-        case FULL -> {
+        case AVAILABILITY -> {
           var source = AvailabilityDatasourceFactory.create(configItem);
           updaters.add(
             new VehicleParkingAvailabilityUpdater(
