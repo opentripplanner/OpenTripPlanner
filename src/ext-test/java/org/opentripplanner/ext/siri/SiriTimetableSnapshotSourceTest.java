@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.util.Set;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 
 class SiriTimetableSnapshotSourceTest {
@@ -413,10 +413,6 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
-  }
-
-  private void assertFailure(UpdateError.UpdateErrorType expectedError, UpdateResult result) {
-    assertEquals(Set.of(expectedError), result.failures().keySet());
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
