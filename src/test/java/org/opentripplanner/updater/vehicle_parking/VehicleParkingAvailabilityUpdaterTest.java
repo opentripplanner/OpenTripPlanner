@@ -46,22 +46,16 @@ class VehicleParkingAvailabilityUpdaterTest {
     }
   };
   private static final FeedScopedId ID = id("parking1");
+  private static final AvailabiltyUpdate DEFAULT_UPDATE = new AvailabiltyUpdate(ID, 8);
 
   @Test
-  void updateAvailability() {
-    var service = new VehicleParkingService();
-
-    var parking = VehicleParking
-      .builder()
-      .id(ID)
-      .name(I18NString.of("parking"))
-      .coordinate(WgsCoordinate.GREENWICH)
-      .carPlaces(true)
-      .capacity(VehicleParkingSpaces.builder().carSpaces(10).build())
-      .build();
-    service.updateVehicleParking(List.of(parking), List.of());
-
-    var updater = new VehicleParkingAvailabilityUpdater(PARAMETERS, new StubDatasource(), service);
+  void updateCarAvailability() {
+    var service = buildParkingService(VehicleParkingSpaces.builder().carSpaces(10).build());
+    var updater = new VehicleParkingAvailabilityUpdater(
+      PARAMETERS,
+      new StubDatasource(DEFAULT_UPDATE),
+      service
+    );
 
     runUpdaterOnce(updater);
 
@@ -69,6 +63,58 @@ class VehicleParkingAvailabilityUpdaterTest {
     assertEquals(ID, updated.getId());
     assertEquals(8, updated.getAvailability().getCarSpaces());
     assertNull(updated.getAvailability().getBicycleSpaces());
+  }
+
+  @Test
+  void updateBicycleAvailability() {
+    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var updater = new VehicleParkingAvailabilityUpdater(
+      PARAMETERS,
+      new StubDatasource(DEFAULT_UPDATE),
+      service
+    );
+
+    runUpdaterOnce(updater);
+
+    var updated = service.getVehicleParkings().toList().getFirst();
+    assertEquals(ID, updated.getId());
+    assertEquals(8, updated.getAvailability().getBicycleSpaces());
+    assertNull(updated.getAvailability().getCarSpaces());
+  }
+  @Test
+  void notFound() {
+    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var updater = new VehicleParkingAvailabilityUpdater(
+      PARAMETERS,
+      new StubDatasource(new AvailabiltyUpdate(id("not-found"), 100)),
+      service
+    );
+
+    runUpdaterOnce(updater);
+
+    var updated = service.getVehicleParkings().toList().getFirst();
+    assertEquals(ID, updated.getId());
+    assertNull(updated.getAvailability());
+  }
+
+  private static VehicleParkingService buildParkingService(VehicleParkingSpaces capacity) {
+    var service = new VehicleParkingService();
+
+    var parking = parkingBuilder()
+      .carPlaces(capacity.getCarSpaces() != null)
+      .bicyclePlaces(capacity.getBicycleSpaces() != null)
+      .capacity(capacity)
+      .build();
+    service.updateVehicleParking(List.of(parking), List.of());
+    return service;
+  }
+
+  private static VehicleParking.VehicleParkingBuilder parkingBuilder() {
+    return VehicleParking
+      .builder()
+      .id(ID)
+      .name(I18NString.of("parking"))
+      .coordinate(WgsCoordinate.GREENWICH);
   }
 
   private void runUpdaterOnce(VehicleParkingAvailabilityUpdater updater) {
@@ -95,6 +141,12 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   private static class StubDatasource implements DataSource<AvailabiltyUpdate> {
 
+    private final AvailabiltyUpdate update;
+
+    private StubDatasource(AvailabiltyUpdate update) {
+      this.update = update;
+    }
+
     @Override
     public boolean update() {
       return true;
@@ -102,7 +154,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     @Override
     public List<AvailabiltyUpdate> getUpdates() {
-      return List.of(new AvailabiltyUpdate(ID, 8));
+      return List.of(update);
     }
   }
 }

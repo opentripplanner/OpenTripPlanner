@@ -51,10 +51,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
 
   @Override
   protected void runPolling() {
-    LOG.debug("Updating parking availability from {}", source);
-    if (!source.update()) {
-      LOG.debug("No updates");
-    } else {
+    if (source.update()) {
       var updates = source.getUpdates();
 
       var graphWriterRunnable = new UpdateAvailabilities(updates);
