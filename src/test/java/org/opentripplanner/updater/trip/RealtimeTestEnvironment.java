@@ -221,6 +221,7 @@ public final class RealtimeTestEnvironment {
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
+    commitTimetableSnapshot();
     if (siriSource != null) {
       return siriSource.getTimetableSnapshot();
     } else {
@@ -300,7 +301,19 @@ public final class RealtimeTestEnvironment {
     boolean fuzzyMatching
   ) {
     Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
-    return getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(updates, DIFFERENTIAL);
+    UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
+      .applyUpdate(updates, DIFFERENTIAL);
+    commitTimetableSnapshot();
+    return updateResult;
+  }
+
+  private void commitTimetableSnapshot() {
+    if (siriSource != null) {
+      siriSource.flushBuffer();
+    }
+    if (gtfsSource != null) {
+      gtfsSource.flushBuffer();
+    }
   }
 
   private Trip createTrip(String id, Route route, List<StopCall> stops) {

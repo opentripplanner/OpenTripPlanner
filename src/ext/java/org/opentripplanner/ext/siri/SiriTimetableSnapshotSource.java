@@ -119,8 +119,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LOG.debug("message contains {} trip updates", updates.size());
 
-    snapshotManager.purgeAndCommit();
-
     return UpdateResult.ofResults(results);
   }
 
@@ -328,6 +326,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return success;
   }
 
+  /**
+   * Flush pending changes in the timetable snapshot buffer and publish a new snapshot.
+   */
   public void flushBuffer() {
     snapshotManager.purgeAndCommit();
   }

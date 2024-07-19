@@ -233,6 +233,7 @@ public abstract class GtfsTest {
         updates,
         feedId.getId()
       );
+      timetableSnapshotSource.flushBuffer();
       alertsUpdateHandler.update(feedMessage);
     } catch (Exception exception) {}
   }

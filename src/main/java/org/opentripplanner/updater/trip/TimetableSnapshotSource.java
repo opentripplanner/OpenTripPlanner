@@ -269,8 +269,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
 
-    snapshotManager.purgeAndCommit();
-
     var updateResult = UpdateResult.ofResults(results);
 
     if (updateIncrementality == FULL_DATASET) {

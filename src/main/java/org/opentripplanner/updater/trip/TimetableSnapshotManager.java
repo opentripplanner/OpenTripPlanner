@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -44,13 +43,6 @@ public final class TimetableSnapshotManager {
   private final ConcurrentPublished<TimetableSnapshot> snapshot = new ConcurrentPublished<>();
 
   /**
-   * If a timetable snapshot is requested less than this number of milliseconds after the previous
-   * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-   * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
-   */
-  private final CountdownTimer snapshotFrequencyThrottle;
-
-  /**
    * Should expired real-time data be purged from the graph.
    * TODO RT_AB: Clarify exactly what "purge" means and in what circumstances would one turn it off.
    */
@@ -74,7 +66,6 @@ public final class TimetableSnapshotManager {
     Supplier<LocalDate> localDateNow
   ) {
     this.transitLayerUpdater = transitLayerUpdater;
-    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = Objects.requireNonNull(localDateNow);
     // Force commit so that snapshot initializes
@@ -104,20 +95,11 @@ public final class TimetableSnapshotManager {
    * @param force Force the committing of a new snapshot even if the above conditions are not met.
    */
   void commitTimetableSnapshot(final boolean force) {
-    if (force || snapshotFrequencyThrottle.timeIsUp()) {
-      if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer);
-        snapshot.publish(buffer.commit(transitLayerUpdater, force));
-
-        // We only reset the timer when the snapshot is updated. This will cause the first
-        // update to be committed after a silent period. This should not have any effect in
-        // a busy updater. It is however useful when manually testing the updater.
-        snapshotFrequencyThrottle.restart();
-      } else {
-        LOG.debug("Buffer was unchanged, keeping old snapshot.");
-      }
+    if (force || buffer.isDirty()) {
+      LOG.debug("Committing {}", buffer);
+      snapshot.publish(buffer.commit(transitLayerUpdater, force));
     } else {
-      LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
+      LOG.debug("Buffer was unchanged, keeping old snapshot.");
     }
   }
 
