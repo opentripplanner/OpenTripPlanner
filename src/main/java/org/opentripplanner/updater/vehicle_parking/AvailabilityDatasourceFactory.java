@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_parking;
 
-import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdater;
+import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmDatasource;
 import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdaterParameters;
 import org.opentripplanner.updater.spi.DataSource;
 
@@ -11,7 +11,7 @@ public class AvailabilityDatasourceFactory {
 
   public static DataSource<AvailabiltyUpdate> create(VehicleParkingUpdaterParameters parameters) {
     return switch (parameters.sourceType()) {
-      case SIRI_FM -> new SiriFmUpdater((SiriFmUpdaterParameters) parameters);
+      case SIRI_FM -> new SiriFmDatasource((SiriFmUpdaterParameters) parameters);
       case PARK_API,
         BICYCLE_PARK_API,
         HSL_PARK,

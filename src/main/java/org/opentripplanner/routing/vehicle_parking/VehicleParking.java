@@ -259,20 +259,6 @@ public class VehicleParking implements Serializable {
     this.availability = vehicleParkingSpaces;
   }
 
-  public void close() {
-    var builder = VehicleParkingSpaces.builder();
-    if (hasCarPlaces()) {
-      builder.carSpaces(0);
-    }
-    if (hasWheelchairAccessibleCarPlaces()) {
-      builder.wheelchairAccessibleCarSpaces(0);
-    }
-    if (hasBicyclePlaces()) {
-      builder.bicycleSpaces(0);
-    }
-    updateAvailability(builder.build());
-  }
-
   @Override
   public int hashCode() {
     return Objects.hash(
