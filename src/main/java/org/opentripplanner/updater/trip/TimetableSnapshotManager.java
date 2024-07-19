@@ -8,6 +8,7 @@ import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -38,9 +39,9 @@ public final class TimetableSnapshotManager {
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
-   * to more than one routing thread if the maximum snapshot frequency is exceeded.
+   * to more than one routing thread.
    */
-  private volatile TimetableSnapshot snapshot = null;
+  private final ConcurrentPublished<TimetableSnapshot> snapshot = new ConcurrentPublished<>();
 
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
@@ -87,7 +88,7 @@ public final class TimetableSnapshotManager {
    * to the snapshot to release resources.
    */
   public TimetableSnapshot getTimetableSnapshot() {
-    return snapshot;
+    return snapshot.get();
   }
 
   public TimetableSnapshot getTimetableSnapshotBuffer() {
@@ -106,7 +107,7 @@ public final class TimetableSnapshotManager {
     if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
-        snapshot = buffer.commit(transitLayerUpdater, force);
+        snapshot.publish(buffer.commit(transitLayerUpdater, force));
 
         // We only reset the timer when the snapshot is updated. This will cause the first
         // update to be committed after a silent period. This should not have any effect in
