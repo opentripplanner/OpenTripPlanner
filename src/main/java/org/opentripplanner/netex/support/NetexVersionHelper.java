@@ -26,7 +26,11 @@ public class NetexVersionHelper {
    * increasing integer. A bigger value indicate a later version.
    */
   public static int versionOf(EntityInVersionStructure e) {
-    return Integer.parseInt(e.getVersion());
+    if(e.getVersion().equals("any")){
+      return 1;
+    } else{
+      return Integer.parseInt(e.getVersion());
+    }
   }
 
   /**
