@@ -30,7 +30,7 @@ public class VehicleParkingUpdaterConfig {
       .of("feedId")
       .since(V2_2)
       .summary("The id of the data source, which will be the prefix of the parking lot's id.")
-      .description("This will end up in the API responses as the feed id of of the parking lot.")
+      .description("This will end up in the API responses as the feed id of the parking lot.")
       .asString();
     return switch (sourceType) {
       case HSL_PARK -> new HslParkUpdaterParameters(
@@ -103,7 +103,19 @@ public class VehicleParkingUpdaterConfig {
       );
       case SIRI_FM -> new SiriFmUpdaterParameters(
         updaterRef,
-        c.of("url").since(V2_6).summary("URL of the SIRI-FM Light endpoint.").asUri(),
+        c
+          .of("url")
+          .since(V2_6)
+          .summary("URL of the SIRI-FM Light endpoint.")
+          .description(
+            """
+          SIRI Light means that it must be available as a HTTP GET request rather than the usual
+          SIRI request mechanism of HTTP POST.
+          
+          The contents must also conform to the [Italian SIRI profile](https://github.com/noi-techpark/sta-nap-export/files/15302688/240502_SpecificaSIRI_v.1.0.3.pdf).
+          """
+          )
+          .asUri(),
         feedId,
         c
           .of("frequency")

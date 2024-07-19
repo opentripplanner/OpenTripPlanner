@@ -48,6 +48,15 @@ All updaters have the following parameters in common:
 
 <!-- INSERT: bikeep -->
 
+## SIRI-FM
+
+The SIRI-FM updaters works slighly differently from the other in that it only updates the availability
+of parking but does not create new lots in realtime.
+
+The data source must conform to the [Italian SIRI-FM](https://github.com/noi-techpark/sta-nap-export/files/15302688/240502_SpecificaSIRI_v.1.0.3.pdf) profile.
+
+<!-- INSERT: siri-fm -->
+
 ## Changelog
 
 - Create initial sandbox implementation (January 2022, [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))

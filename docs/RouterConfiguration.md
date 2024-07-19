@@ -875,6 +875,12 @@ Used to group requests when monitoring OTP.
       "feedId" : "bikeep",
       "sourceType" : "bikeep",
       "url" : "https://services.bikeep.com/location/v1/public-areas/no-baia-mobility/locations"
+    },
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "parking",
+      "sourceType" : "siri-fm",
+      "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
     }
   ],
   "rideHailingServices" : [

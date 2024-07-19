@@ -81,6 +81,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     assertEquals(8, updated.getAvailability().getBicycleSpaces());
     assertNull(updated.getAvailability().getCarSpaces());
   }
+
   @Test
   void notFound() {
     var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
