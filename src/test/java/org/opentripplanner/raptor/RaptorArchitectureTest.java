@@ -200,7 +200,8 @@ public class RaptorArchitectureTest {
         RAPTOR_UTIL,
         CONFIGURE,
         RR_INTERNAL_API,
-        RR_TRANSIT
+        RR_TRANSIT,
+        RANGE_RAPTOR
       )
       .verify();
   }

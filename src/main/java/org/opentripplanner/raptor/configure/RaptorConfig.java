@@ -8,6 +8,7 @@ import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -120,7 +121,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     RaptorWorkerState<T> workerState,
     RoutingStrategy<T> routingStrategy
   ) {
-    return new RangeRaptor<>(
+    var worker = new DefaultRangeRaptorWorker<>(
       workerState,
       routingStrategy,
       ctx.transit(),
@@ -128,9 +129,19 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.accessPaths(),
       ctx.roundProvider(),
       ctx.calculator(),
-      ctx.createLifeCyclePublisher(),
+      ctx.lifeCycle(),
       ctx.performanceTimers(),
       ctx.useConstrainedTransfers()
+    );
+
+    return new RangeRaptor<>(
+      worker,
+      ctx.transit(),
+      ctx.accessPaths(),
+      ctx.roundProvider(),
+      ctx.calculator(),
+      ctx.createLifeCyclePublisher(),
+      ctx.performanceTimers()
     );
   }
 

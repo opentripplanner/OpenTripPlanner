@@ -1,16 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor;
 
-import java.util.Collection;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
@@ -50,18 +45,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 @SuppressWarnings("Duplicates")
 public final class RangeRaptor<T extends RaptorTripSchedule> {
 
-  private final RoutingStrategy<T> transitWorker;
-
-  /**
-   * The RangeRaptor state - we delegate keeping track of state to the state object, this allows
-   * the worker implementation to focus on the algorithm, while the state keep track of the result.
-   * <p/>
-   * This also allows us to try out different strategies for storing the result in memory. For a
-   * long time, we had a state which stored all data as int arrays in addition to the current
-   * object-oriented approach. There were no performance differences(=> GC is not the bottleneck),
-   * so we dropped the integer array implementation.
-   */
-  private final RaptorWorkerState<T> state;
+  private final DefaultRangeRaptorWorker<T> worker;
 
   /**
    * The round tracker keep track for the current Raptor round, and abort the search if the round
@@ -70,8 +54,6 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
   private final RoundTracker roundTracker;
 
   private final RaptorTransitDataProvider<T> transitData;
-
-  private final SlackProvider slackProvider;
 
   private final RaptorTransitCalculator<T> calculator;
 
@@ -83,31 +65,21 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
 
   private final int minNumberOfRounds;
 
-  private final boolean enableTransferConstraints;
-
-  private int iterationDepartureTime;
-
   public RangeRaptor(
-    RaptorWorkerState<T> state,
-    RoutingStrategy<T> transitWorker,
+    DefaultRangeRaptorWorker<T> worker,
     RaptorTransitDataProvider<T> transitData,
-    SlackProvider slackProvider,
     AccessPaths accessPaths,
     RoundProvider roundProvider,
     RaptorTransitCalculator<T> calculator,
     LifeCycleEventPublisher lifeCyclePublisher,
-    RaptorTimers timers,
-    boolean enableTransferConstraints
+    RaptorTimers timers
   ) {
-    this.transitWorker = transitWorker;
-    this.state = state;
+    this.worker = worker;
     this.transitData = transitData;
-    this.slackProvider = slackProvider;
     this.calculator = calculator;
     this.timers = timers;
     this.accessPaths = accessPaths;
     this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
-    this.enableTransferConstraints = enableTransferConstraints;
 
     // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
     // "everyone" by providing access to it in the context.
@@ -123,6 +95,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
    */
   public RaptorWorkerResult<T> route() {
     timers.route(() -> {
+      int iterationDepartureTime = RaptorConstants.TIME_NOT_SET;
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());
       transitData.setup();
 
@@ -132,8 +105,8 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
       while (it.hasNext()) {
-        setupIteration(it.next());
-        runRaptorForMinute();
+        iterationDepartureTime = it.next();
+        runRaptorForMinute(iterationDepartureTime);
       }
 
       // Iterate over virtual departure times - this is needed to allow access with a time-penalty
@@ -141,34 +114,37 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
       if (!calculator.oneIterationOnly()) {
         final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
         while (as.hasNext()) {
-          setupIteration(as.next());
-          runRaptorForMinute();
+          iterationDepartureTime = as.next();
+          runRaptorForMinute(iterationDepartureTime);
         }
       }
     });
-    return state.results();
+    return worker.results();
   }
 
   /**
    * Perform one minute of a RAPTOR search.
    */
-  private void runRaptorForMinute() {
-    findAccessOnStreetForRound();
+  private void runRaptorForMinute(int iterationDepartureTime) {
+    setupIteration(iterationDepartureTime);
+    worker.findAccessOnStreetForRound();
 
-    while (hasMoreRounds()) {
+    while (worker.hasMoreRounds()) {
       lifeCycle.prepareForNextRound(roundTracker.nextRound());
 
       // NB since we have transfer limiting not bothering to cut off search when there are no
       // more transfers as that will be rare and complicates the code
-      findTransitForRound();
+      worker.findTransitForRound();
+      lifeCycle.transitsForRoundComplete();
 
-      findAccessOnBoardForRound();
+      worker.findAccessOnBoardForRound();
 
-      findTransfersForRound();
+      worker.findTransfersForRound();
+      lifeCycle.transfersForRoundComplete();
 
-      lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
+      lifeCycle.roundComplete(worker.isDestinationReachedInCurrentRound());
 
-      findAccessOnStreetForRound();
+      worker.findAccessOnStreetForRound();
     }
 
     // This state is repeatedly modified as the outer loop progresses over departure minutes.
@@ -184,96 +160,11 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     if (round() < minNumberOfRounds) {
       return true;
     }
-    return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
-  }
-
-  /**
-   * Perform a scheduled search
-   */
-  private void findTransitForRound() {
-    timers.findTransitForRound(() -> {
-      IntIterator stops = state.stopsTouchedPreviousRound();
-      IntIterator routeIndexIterator = transitData.routeIndexIterator(stops);
-
-      while (routeIndexIterator.hasNext()) {
-        var routeIndex = routeIndexIterator.next();
-        var route = transitData.getRouteForIndex(routeIndex);
-        var pattern = route.pattern();
-        var txSearch = enableTransferConstraints
-          ? calculator.transferConstraintsSearch(transitData, routeIndex)
-          : null;
-
-        int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
-        int boardSlack = slackProvider.boardSlack(pattern.slackIndex());
-
-        transitWorker.prepareForTransitWith(route);
-
-        IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
-
-        while (stop.hasNext()) {
-          int stopPos = stop.next();
-          int stopIndex = pattern.stopIndex(stopPos);
-
-          transitWorker.prepareForNextStop(stopIndex, stopPos);
-
-          // attempt to alight if we're on board, this is done above the board search
-          // so that we don't alight on first stop boarded
-          if (calculator.alightingPossibleAt(pattern, stopPos)) {
-            if (enableTransferConstraints && txSearch.transferExistSourceStop(stopPos)) {
-              transitWorker.alightConstrainedTransferExist(stopIndex, stopPos, alightSlack);
-            } else {
-              transitWorker.alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
-            }
-          }
-
-          if (calculator.boardingPossibleAt(pattern, stopPos)) {
-            // Don't attempt to board if this stop was not reached in the last round.
-            // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
-            if (state.isStopReachedInPreviousRound(stopIndex)) {
-              // has constrained transfers
-              if (enableTransferConstraints && txSearch.transferExistTargetStop(stopPos)) {
-                transitWorker.boardWithConstrainedTransfer(
-                  stopIndex,
-                  stopPos,
-                  boardSlack,
-                  txSearch
-                );
-              } else {
-                transitWorker.boardWithRegularTransfer(stopIndex, stopPos, boardSlack);
-              }
-            }
-          }
-        }
-      }
-      lifeCycle.transitsForRoundComplete();
-    });
-  }
-
-  private void findTransfersForRound() {
-    timers.findTransfersForRound(() -> {
-      IntIterator it = state.stopsTouchedByTransitCurrentRound();
-
-      while (it.hasNext()) {
-        final int fromStop = it.next();
-        // no need to consider loop transfers, since we don't mark patterns here any more
-        // loop transfers are already included by virtue of those stops having been reached
-        state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
-      }
-
-      lifeCycle.transfersForRoundComplete();
-    });
+    return worker.hasMoreRounds() && roundTracker.hasMoreRounds();
   }
 
   private int round() {
     return roundTracker.round();
-  }
-
-  private void findAccessOnStreetForRound() {
-    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
-  }
-
-  private void findAccessOnBoardForRound() {
-    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
   }
 
   /**
@@ -281,22 +172,6 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
    */
   private void setupIteration(int iterationDepartureTime) {
     OTPRequestTimeoutException.checkForTimeout();
-    this.iterationDepartureTime = iterationDepartureTime;
-    lifeCycle.setupIteration(this.iterationDepartureTime);
-  }
-
-  /**
-   * Set the departure time in the scheduled search to the given departure time, and prepare for the
-   * scheduled search at the next-earlier minute.
-   */
-  private void addAccessPaths(Collection<RaptorAccessEgress> accessPaths) {
-    for (RaptorAccessEgress it : accessPaths) {
-      int departureTime = calculator.departureTime(it, iterationDepartureTime);
-
-      // Access must be available after the iteration departure time
-      if (departureTime != RaptorConstants.TIME_NOT_SET) {
-        transitWorker.setAccessToStop(it, departureTime);
-      }
-    }
+    lifeCycle.setupIteration(iterationDepartureTime);
   }
 }
