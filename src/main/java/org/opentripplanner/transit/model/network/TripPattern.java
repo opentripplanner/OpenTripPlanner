@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -28,7 +27,6 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
@@ -122,20 +120,27 @@ public final class TripPattern
 
   private final RoutingTripPattern routingTripPattern;
 
-  public TripPattern(TripPatternBuilder builder) {
+  TripPattern(TripPatternBuilder builder) {
     super(builder.getId());
     this.name = builder.getName();
     this.route = builder.getRoute();
     this.stopPattern = requireNonNull(builder.getStopPattern());
     this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
-    this.mode = requireNonNullElseGet(builder.getMode(), route::getMode);
-    this.netexSubMode = requireNonNullElseGet(builder.getNetexSubmode(), route::getNetexSubmode);
+    this.mode = requireNonNull(builder.getMode());
+    this.netexSubMode = requireNonNull(builder.getNetexSubmode());
     this.containsMultipleModes = builder.getContainsMultipleModes();
 
-    this.scheduledTimetable =
-      builder.getScheduledTimetable() != null
-        ? builder.getScheduledTimetable()
-        : new Timetable(this);
+    if (builder.getScheduledTimetable() != null) {
+      if (builder.getScheduledTimetableBuilder() != null) {
+        throw new IllegalArgumentException(
+          "Cannot provide both scheduled timetable and scheduled timetable builder"
+        );
+      }
+      this.scheduledTimetable = builder.getScheduledTimetable();
+    } else {
+      this.scheduledTimetable =
+        builder.getScheduledTimetableBuilder().withTripPattern(this).build();
+    }
 
     this.originalTripPattern = builder.getOriginalTripPattern();
 
@@ -330,56 +335,6 @@ public final class TripPattern
   }
 
   /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * Add the given tripTimes to this pattern's scheduled timetable, recording the corresponding trip
-   * as one of the scheduled trips on this pattern.
-   */
-  public void add(TripTimes tt) {
-    // Only scheduled trips (added at graph build time, rather than directly to the timetable
-    // via updates) are in this list.
-    scheduledTimetable.addTripTimes(tt);
-
-    // Check that all trips added to this pattern are on the initially declared route.
-    // Identity equality is valid on GTFS entity objects.
-    if (this.route != tt.getTrip().getRoute()) {
-      LOG.warn(
-        "The trip {} is on route {} but its stop pattern is on route {}.",
-        tt.getTrip(),
-        tt.getTrip().getRoute(),
-        route
-      );
-    }
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
-   * trip as one of the scheduled trips on this pattern.
-   * TODO possible improvements: combine freq entries and TripTimes. Do not keep trips list in TripPattern
-   * since it is redundant.
-   */
-  public void add(FrequencyEntry freq) {
-    scheduledTimetable.addFrequencyEntry(freq);
-    if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
-      LOG.warn(
-        "The trip {} is on a different route than its stop pattern, which is on {}.",
-        freq.tripTimes.getTrip(),
-        route
-      );
-    }
-  }
-
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  /**
-   * Remove all trips matching the given predicate.
-   *
-   * @param removeTrip it the predicate returns true
-   */
-  public void removeTrips(Predicate<Trip> removeTrip) {
-    scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
-  }
 
   /**
    * Checks that this is TripPattern is based of the provided TripPattern and contains same stops

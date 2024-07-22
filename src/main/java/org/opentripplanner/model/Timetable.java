@@ -19,10 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -48,8 +45,7 @@ import org.slf4j.LoggerFactory;
  * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
  * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
  * <p>
- * TODO OTP2 - Move this to package: org.opentripplanner.model after as Entur NeTEx PRs are merged.
- *     Also consider moving its dependencies into package org.opentripplanner.routing. The NEW
+ * TODO OTP2 consider moving dependencies into package org.opentripplanner.routing. The NEW
  *     Timetable should not have any dependencies to [?]
  */
 public class Timetable implements Serializable {
@@ -58,28 +54,31 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes = new ArrayList<>();
+  private final List<TripTimes> tripTimes;
 
-  private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
+  private final List<FrequencyEntry> frequencyEntries;
 
   @Nullable
   private final LocalDate serviceDate;
 
-  /** Construct an empty Timetable. */
-  public Timetable(TripPattern pattern) {
-    this.pattern = pattern;
-    this.serviceDate = null;
+  Timetable(TimetableBuilder timetableBuilder) {
+    this.pattern = timetableBuilder.getPattern();
+    this.serviceDate = timetableBuilder.getServiceDate();
+    tripTimes = List.copyOf(timetableBuilder.getTripTimes());
+    frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
   }
 
   /**
    * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified
    * timetable.
    */
-  Timetable(Timetable tt, @Nonnull LocalDate serviceDate) {
-    Objects.requireNonNull(serviceDate);
-    tripTimes.addAll(tt.tripTimes);
-    this.serviceDate = serviceDate;
-    this.pattern = tt.pattern;
+  public static TimetableBuilder of(Timetable tt) {
+    return new TimetableBuilder(tt);
+  }
+
+  /** Construct an empty Timetable. */
+  public static TimetableBuilder of() {
+    return new TimetableBuilder();
   }
 
   /** @return the index of TripTimes for this trip ID in this particular Timetable */
@@ -132,17 +131,6 @@ public class Timetable implements Serializable {
       }
     }
     return null;
-  }
-
-  /**
-   * Set new trip times for trip given a trip index
-   *
-   * @param tripIndex trip index of trip
-   * @param tt        new trip times for trip
-   * @return old trip times of trip
-   */
-  public TripTimes setTripTimes(int tripIndex, TripTimes tt) {
-    return tripTimes.set(tripIndex, tt);
   }
 
   /**
@@ -386,44 +374,6 @@ public class Timetable implements Serializable {
     return Result.success(new TripTimesPatch(newTimes, skippedStopIndices));
   }
 
-  /**
-   * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed any time
-   * trips are added, but this is not done automatically because it is time consuming and should
-   * only be done once after an entire batch of trips are added. Note that the trip is not added to
-   * the enclosing pattern here, but in the pattern's wrapper function. Here we don't know if it's a
-   * scheduled trip or a realtime-added trip.
-   */
-  public void addTripTimes(TripTimes tt) {
-    tripTimes.add(tt);
-  }
-
-  /**
-   * Apply the same update to all trip-times inculuding scheduled and frequency based
-   * trip times.
-   * <p>
-   * THIS IS NOT THREAD-SAFE - ONLY USE THIS METHOD DURING GRAPH-BUILD!
-   */
-  public void updateAllTripTimes(UnaryOperator<TripTimes> update) {
-    tripTimes.replaceAll(update);
-    frequencyEntries.replaceAll(it ->
-      new FrequencyEntry(
-        it.startTime,
-        it.endTime,
-        it.headway,
-        it.exactTimes,
-        update.apply(it.tripTimes)
-      )
-    );
-  }
-
-  /**
-   * Add a frequency entry to this Timetable. See addTripTimes method. Maybe Frequency Entries
-   * should just be TripTimes for simplicity.
-   */
-  public void addFrequencyEntry(FrequencyEntry freq) {
-    frequencyEntries.add(freq);
-  }
-
   public boolean isValidFor(LocalDate serviceDate) {
     return this.serviceDate == null || this.serviceDate.equals(serviceDate);
   }
@@ -492,5 +442,14 @@ public class Timetable implements Serializable {
       // Pattern is created only for real-time updates
       return null;
     }
+  }
+
+  /**
+   * @return true if the timetable was created by a real-time update, false if this
+   * timetable is based on scheduled data.
+   * Only real-time timetables have a service date.
+   */
+  public boolean isCreatedByRealTimeUpdater() {
+    return serviceDate != null;
   }
 }

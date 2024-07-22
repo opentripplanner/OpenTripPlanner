@@ -355,8 +355,8 @@ public final class RealtimeTestEnvironment {
     final TripPattern pattern = TransitModelForTest
       .tripPattern(id + "Pattern", route)
       .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(StopCall::stop).toList()))
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    pattern.add(tripTimes);
 
     transitModel.addTripPattern(pattern.getId(), pattern);
 
