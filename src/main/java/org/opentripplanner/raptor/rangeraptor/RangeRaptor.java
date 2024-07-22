@@ -48,7 +48,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
+public final class RangeRaptor<T extends RaptorTripSchedule> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -87,7 +87,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
 
   private int iterationDepartureTime;
 
-  public DefaultRangeRaptorWorker(
+  public RangeRaptor(
     RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,

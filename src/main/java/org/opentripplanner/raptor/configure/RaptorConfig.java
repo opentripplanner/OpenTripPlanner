@@ -8,7 +8,7 @@ import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
@@ -51,7 +51,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return new SearchContext<>(request, tuningParameters, transit, acceptC2AtDestination());
   }
 
-  public DefaultRangeRaptorWorker<T> createStdWorker(
+  public RangeRaptor<T> createStdWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
@@ -60,7 +60,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return createWorker(context, stdConfig.state(), stdConfig.strategy());
   }
 
-  public DefaultRangeRaptorWorker<T> createMcWorker(
+  public RangeRaptor<T> createMcWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
@@ -73,7 +73,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       );
   }
 
-  public DefaultRangeRaptorWorker<T> createHeuristicSearch(
+  public RangeRaptor<T> createHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
@@ -115,12 +115,12 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return McRangeRaptorConfig.passThroughPointsService(request.multiCriteria());
   }
 
-  private DefaultRangeRaptorWorker<T> createWorker(
+  private RangeRaptor<T> createWorker(
     SearchContext<T> ctx,
     RaptorWorkerState<T> workerState,
     RoutingStrategy<T> routingStrategy
   ) {
-    return new DefaultRangeRaptorWorker<>(
+    return new RangeRaptor<>(
       workerState,
       routingStrategy,
       ctx.transit(),
