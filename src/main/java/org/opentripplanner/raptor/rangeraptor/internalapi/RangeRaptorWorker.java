@@ -8,7 +8,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorWorker<T extends RaptorTripSchedule> {
+public interface RangeRaptorWorker<T extends RaptorTripSchedule> {
   /**
    * Perform the routing request.
    */
