@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
@@ -49,8 +48,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
-  implements RaptorWorker<T> {
+public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -123,7 +121,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    * <p/>
    * Run the scheduled search, round 0 is the street search.
    */
-  @Override
   public RaptorWorkerResult<T> route() {
     timers.route(() -> {
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());

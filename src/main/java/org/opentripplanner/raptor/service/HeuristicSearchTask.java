@@ -8,6 +8,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
@@ -33,7 +34,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private final RaptorTransitDataProvider<T> transitData;
 
   private boolean run = false;
-  private RaptorWorker<T> search = null;
+  private DefaultRangeRaptorWorker<T> search = null;
   private RaptorRequest<T> originalRequest;
   private RaptorRequest<T> heuristicRequest;
   private RaptorWorkerResult<T> result = null;

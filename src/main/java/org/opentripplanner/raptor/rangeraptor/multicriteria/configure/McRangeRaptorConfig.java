@@ -7,11 +7,11 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
+import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
@@ -70,9 +70,9 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /**
    * Create new multi-criteria worker with optional heuristics.
    */
-  public RaptorWorker<T> createWorker(
+  public DefaultRangeRaptorWorker<T> createWorker(
     Heuristics heuristics,
-    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
+    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, DefaultRangeRaptorWorker<T>> createWorker
   ) {
     McRangeRaptorWorkerState<T> state = createState(heuristics);
     return createWorker.apply(state, createTransitWorkerStrategy(state));
