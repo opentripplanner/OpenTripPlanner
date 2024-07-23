@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 /**
  * Used to concatenate matches with either the logical "AND" or "OR" operator.

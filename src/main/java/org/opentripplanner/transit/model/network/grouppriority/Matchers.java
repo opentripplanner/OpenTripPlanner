@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.AND;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.OR;
+import static org.opentripplanner.transit.model.network.grouppriority.BinarySetOperator.AND;
+import static org.opentripplanner.transit.model.network.grouppriority.BinarySetOperator.OR;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * This class turns a {@link TransitGroupSelect} into a matcher.
@@ -28,49 +27,38 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * a `CompositeMatcher`. So, a new matcher is only created if the field in the
  * select is present.
  */
-public abstract class PriorityGroupMatcher {
+final class Matchers {
 
-  private static final PriorityGroupMatcher NOOP = new PriorityGroupMatcher() {
-    @Override
-    boolean match(TripPattern pattern) {
-      return false;
-    }
+  private static final Matcher NOOP = new EmptyMatcher();
 
-    @Override
-    boolean isEmpty() {
-      return true;
-    }
-  };
-
-  public static PriorityGroupMatcher of(TransitGroupSelect select) {
+  static Matcher of(TransitGroupSelect select) {
     if (select.isEmpty()) {
       return NOOP;
     }
-    List<PriorityGroupMatcher> list = new ArrayList<>();
+    List<Matcher> list = new ArrayList<>();
 
     if (!select.modes().isEmpty()) {
       list.add(new ModeMatcher(select.modes()));
     }
     if (!select.subModeRegexp().isEmpty()) {
-      list.add(
-        new RegExpMatcher("SubMode", select.subModeRegexp(), p -> p.getNetexSubmode().name())
-      );
+      list.add(new RegExpMatcher("SubMode", select.subModeRegexp(), EntityAdapter::subMode));
     }
     if (!select.agencyIds().isEmpty()) {
-      list.add(new IdMatcher("Agency", select.agencyIds(), p -> p.getRoute().getAgency().getId()));
+      list.add(new IdMatcher("Agency", select.agencyIds(), EntityAdapter::agencyId));
     }
     if (!select.routeIds().isEmpty()) {
-      list.add(new IdMatcher("Route", select.routeIds(), p -> p.getRoute().getId()));
+      list.add(new IdMatcher("Route", select.routeIds(), EntityAdapter::routeId));
     }
     return andOf(list);
   }
 
-  static PriorityGroupMatcher[] of(Collection<TransitGroupSelect> selectors) {
+  @SuppressWarnings("unchecked")
+  static Matcher[] of(Collection<TransitGroupSelect> selectors) {
     return selectors
       .stream()
-      .map(PriorityGroupMatcher::of)
-      .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
-      .toArray(PriorityGroupMatcher[]::new);
+      .map(Matchers::of)
+      .filter(Predicate.not(Matcher::isEmpty))
+      .toArray(Matcher[]::new);
   }
 
   private static <T> String arrayToString(BinarySetOperator op, T[] values) {
@@ -81,9 +69,9 @@ public abstract class PriorityGroupMatcher {
     return values.stream().map(Objects::toString).collect(Collectors.joining(" " + op + " "));
   }
 
-  private static PriorityGroupMatcher andOf(List<PriorityGroupMatcher> list) {
+  private static Matcher andOf(List<Matcher> list) {
     // Remove empty/noop matchers
-    list = list.stream().filter(Predicate.not(PriorityGroupMatcher::isEmpty)).toList();
+    list = list.stream().filter(Predicate.not(Matcher::isEmpty)).toList();
 
     if (list.isEmpty()) {
       return NOOP;
@@ -94,13 +82,25 @@ public abstract class PriorityGroupMatcher {
     return new AndMatcher(list);
   }
 
-  abstract boolean match(TripPattern pattern);
+  private static final class EmptyMatcher implements Matcher {
 
-  boolean isEmpty() {
-    return false;
+    @Override
+    public boolean match(EntityAdapter entity) {
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return true;
+    }
+
+    @Override
+    public String toString() {
+      return "Empty";
+    }
   }
 
-  private static final class ModeMatcher extends PriorityGroupMatcher {
+  private static final class ModeMatcher implements Matcher {
 
     private final Set<TransitMode> modes;
 
@@ -109,8 +109,8 @@ public abstract class PriorityGroupMatcher {
     }
 
     @Override
-    boolean match(TripPattern pattern) {
-      return modes.contains(pattern.getMode());
+    public boolean match(EntityAdapter entity) {
+      return modes.contains(entity.mode());
     }
 
     @Override
@@ -119,26 +119,26 @@ public abstract class PriorityGroupMatcher {
     }
   }
 
-  private static final class RegExpMatcher extends PriorityGroupMatcher {
+  private static final class RegExpMatcher implements Matcher {
 
     private final String typeName;
-    private final Pattern[] subModeRegexp;
-    private final Function<TripPattern, String> toValue;
+    private final Pattern[] patterns;
+    private final Function<EntityAdapter, String> toValue;
 
     public RegExpMatcher(
       String typeName,
-      List<String> subModeRegexp,
-      Function<TripPattern, String> toValue
+      List<String> regexps,
+      Function<EntityAdapter, String> toValue
     ) {
       this.typeName = typeName;
-      this.subModeRegexp = subModeRegexp.stream().map(Pattern::compile).toArray(Pattern[]::new);
+      this.patterns = regexps.stream().map(Pattern::compile).toArray(Pattern[]::new);
       this.toValue = toValue;
     }
 
     @Override
-    boolean match(TripPattern pattern) {
-      var value = toValue.apply(pattern);
-      for (Pattern p : subModeRegexp) {
+    public boolean match(EntityAdapter entity) {
+      var value = toValue.apply(entity);
+      for (Pattern p : patterns) {
         if (p.matcher(value).matches()) {
           return true;
         }
@@ -148,20 +148,20 @@ public abstract class PriorityGroupMatcher {
 
     @Override
     public String toString() {
-      return typeName + "Regexp(" + arrayToString(OR, subModeRegexp) + ')';
+      return typeName + "Regexp(" + arrayToString(OR, patterns) + ')';
     }
   }
 
-  private static final class IdMatcher extends PriorityGroupMatcher {
+  private static final class IdMatcher implements Matcher {
 
     private final String typeName;
     private final Set<FeedScopedId> ids;
-    private final Function<TripPattern, FeedScopedId> idProvider;
+    private final Function<EntityAdapter, FeedScopedId> idProvider;
 
     public IdMatcher(
       String typeName,
       List<FeedScopedId> ids,
-      Function<TripPattern, FeedScopedId> idProvider
+      Function<EntityAdapter, FeedScopedId> idProvider
     ) {
       this.typeName = typeName;
       this.ids = new HashSet<>(ids);
@@ -169,8 +169,8 @@ public abstract class PriorityGroupMatcher {
     }
 
     @Override
-    boolean match(TripPattern pattern) {
-      return ids.contains(idProvider.apply(pattern));
+    public boolean match(EntityAdapter entity) {
+      return ids.contains(idProvider.apply(entity));
     }
 
     @Override
@@ -183,18 +183,18 @@ public abstract class PriorityGroupMatcher {
    * Takes a list of matchers and provide a single interface. All matchers in the list must match
    * for the composite matcher to return a match.
    */
-  private static final class AndMatcher extends PriorityGroupMatcher {
+  private static final class AndMatcher implements Matcher {
 
-    private final PriorityGroupMatcher[] matchers;
+    private final Matcher[] matchers;
 
-    public AndMatcher(List<PriorityGroupMatcher> matchers) {
-      this.matchers = matchers.toArray(PriorityGroupMatcher[]::new);
+    public AndMatcher(List<Matcher> matchers) {
+      this.matchers = matchers.toArray(Matcher[]::new);
     }
 
     @Override
-    boolean match(TripPattern pattern) {
+    public boolean match(EntityAdapter entity) {
       for (var m : matchers) {
-        if (!m.match(pattern)) {
+        if (!m.match(entity)) {
           return false;
         }
       }

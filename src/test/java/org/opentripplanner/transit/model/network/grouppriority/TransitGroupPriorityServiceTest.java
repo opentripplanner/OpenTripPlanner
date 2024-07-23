@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+package org.opentripplanner.transit.model.network.grouppriority;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_A;
@@ -7,12 +7,14 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 
-class PriorityGroupConfiguratorTest {
+class TransitGroupPriorityServiceTest {
 
   private static final String AGENCY_A1 = "A1";
   private static final String AGENCY_A2 = "A2";
@@ -65,13 +67,15 @@ class PriorityGroupConfiguratorTest {
   private final TripPattern railR3 = routeR3.getTripPattern();
   private final TripPattern ferryF3 = routeF3.getTripPattern();
   private final TripPattern busB3 = routeB3.getTripPattern();
+  private final TripPattern nullTripPattern = null;
+  private final Trip nullTrip = null;
 
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
-    var subject = PriorityGroupConfigurator.of(List.of(), List.of());
+    var subject = TransitGroupPriorityService.empty();
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(busB2));
-    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(null));
+    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(nullTripPattern));
   }
 
   @Test
@@ -82,21 +86,26 @@ class PriorityGroupConfiguratorTest {
       .build();
 
     // Add matcher `byAgency` for bus and real
-    var subject = PriorityGroupConfigurator.of(List.of(select), List.of());
+    var subject = new TransitGroupPriorityService(List.of(select), List.of());
 
     // Agency groups are indexed (group-id set) at request time
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTripPattern));
     assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));
     assertEquals(EXP_GROUP_3, subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(busB3));
     assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(ferryF3));
+
+    // Verify we get the same result with using the trip, not trip-pattern
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTrip));
+    assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2.getTrip(0)));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3.getTrip(0)));
   }
 
   @Test
   void lookupTransitPriorityGroupIdByGlobalMode() {
     // Global groups are indexed (group-id set) at construction time
-    var subject = PriorityGroupConfigurator.of(
+    var subject = new TransitGroupPriorityService(
       List.of(),
       List.of(
         TransitGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),
@@ -104,12 +113,16 @@ class PriorityGroupConfiguratorTest {
       )
     );
 
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTripPattern));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR1));
     assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
     assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));
     assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB3));
     assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(ferryF3));
+
+    // Verify we get the same result with using the trip, not trip-pattern
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTrip));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR1.getTrip(0)));
   }
 
   private static TestRouteData route(
