@@ -1773,7 +1773,7 @@ enum StreetMode {
   car_park
   "Walk to a pickup point along the road, drive to a drop-off point along the road, and walk the rest of the way. This can include various taxi-services or kiss & ride."
   car_pickup
-  "Walk to a car rental point along the road, drive to a drop-off point along the road, and walk the rest of the way. This can include car rental at fixed locations or free-floating services."
+  "Walk to a car rental point along the road, drive to a drop-off point along the road, and walk the rest of the way. This can include car rentals at fixed locations or free-floating services."
   car_rental
   "Walk to an eligible pickup area for flexible transportation, ride to an eligible drop-off area and then walk the rest of the way."
   flexible
