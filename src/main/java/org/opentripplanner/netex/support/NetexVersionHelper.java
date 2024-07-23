@@ -16,6 +16,9 @@ import org.rutebanken.netex.model.ValidBetween;
  */
 public class NetexVersionHelper {
 
+  private static final String ANY = "any";
+  private static final int UNKNOWN_VERSION = -1;
+
   /**
    * private constructor to prevent instantiation of utility class
    */
@@ -23,12 +26,12 @@ public class NetexVersionHelper {
 
   /**
    * According to the <b>Norwegian Netex profile</b> the version number must be a positive
-   * increasing integer. A bigger value indicate a later version.
+   * increasing integer. A bigger value indicates a later version.
    */
   public static int versionOf(EntityInVersionStructure e) {
-    if(e.getVersion().equals("any")){
-      return 1;
-    } else{
+    if (e.getVersion().equals(ANY)) {
+      return UNKNOWN_VERSION;
+    } else {
       return Integer.parseInt(e.getVersion());
     }
   }
@@ -38,7 +41,7 @@ public class NetexVersionHelper {
    * elements exist in the collection {@code -1} is returned.
    */
   public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
-    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(-1);
+    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
   }
 
   /**
