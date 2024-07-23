@@ -2,6 +2,7 @@ package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -52,6 +53,11 @@ public class ExactMatchSpecifier implements OsmSpecifier {
     } else {
       return NO_MATCH_SCORE;
     }
+  }
+
+  @Override
+  public String toDocString() {
+    return conditions.stream().map(Object::toString).collect(Collectors.joining("; "));
   }
 
   public boolean allTagsMatch(OSMWithTags way) {

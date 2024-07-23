@@ -1,17 +1,29 @@
 {
-  nearest(lat: 60.19915, lon: 24.94089, maxDistance: 500) {
+  nearest(
+    lat: 60.19915
+    lon: 24.94089
+    maxDistance: 500
+    filterByPlaceTypes: [STOP, VEHICLE_RENT]
+    filterByNetwork: ["Network-1"]
+  ) {
     edges {
       node {
         place {
-          ...on Stop {
+          ... on Stop {
+            id
+            gtfsId
+            parentStation {
               id
-              gtfsId
-              parentStation {
-                id
-              }
             }
+          }
+          ... on RentalVehicle {
+            vehicleId
+          }
+          ... on VehicleRentalStation {
+            stationId
           }
         }
       }
     }
   }
+}

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 import java.util.Comparator;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
+import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 /**
  * Comparator used to compare a SINGLE criteria for dominance. The difference between this and the
@@ -21,6 +21,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppri
  */
 @FunctionalInterface
 public interface SingleCriteriaComparator {
+  DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
+
   /**
    * The left criteria dominates the right criteria. Note! The right criteria may dominate
    * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
@@ -46,10 +48,9 @@ public interface SingleCriteriaComparator {
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   static SingleCriteriaComparator compareTransitGroupsPriority() {
     return (left, right) ->
-      TransitGroupPriority32n.dominate(
-        left.getGeneralizedCost2().get(),
-        right.getGeneralizedCost2().get()
-      );
+      GROUP_PRIORITY_CALCULATOR
+        .dominanceFunction()
+        .leftDominateRight(left.getGeneralizedCost2().get(), right.getGeneralizedCost2().get());
   }
 
   static SingleCriteriaComparator compareLessThan(final ToIntFunction<Itinerary> op) {

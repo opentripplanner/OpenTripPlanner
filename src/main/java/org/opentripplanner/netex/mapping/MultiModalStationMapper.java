@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -21,6 +22,7 @@ class MultiModalStationMapper {
     this.idFactory = idFactory;
   }
 
+  @Nullable
   MultiModalStation map(StopPlace stopPlace, Collection<Station> childStations) {
     MultiModalStationBuilder multiModalStation = MultiModalStation
       .of(idFactory.createId(stopPlace.getId()))
@@ -34,13 +36,13 @@ class MultiModalStationMapper {
     if (coordinate == null) {
       issueStore.add(
         "MultiModalStationWithoutCoordinates",
-        "MultiModal station {} does not contain any coordinates.",
+        "MultiModal station %s does not contain any coordinates.",
         multiModalStation.getId()
       );
+      return null;
     } else {
       multiModalStation.withCoordinate(coordinate);
+      return multiModalStation.build();
     }
-
-    return multiModalStation.build();
   }
 }

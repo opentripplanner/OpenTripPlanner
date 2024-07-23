@@ -2,6 +2,7 @@ package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -25,10 +26,6 @@ public class LogicalOrSpecifier implements OsmSpecifier {
     this.subSpecs = Arrays.asList(specifiers);
   }
 
-  public LogicalOrSpecifier(Condition... conditions) {
-    this.subSpecs = Arrays.stream(conditions).map(ExactMatchSpecifier::new).toList();
-  }
-
   public LogicalOrSpecifier(String... specs) {
     this.subSpecs = Arrays.stream(specs).map(ExactMatchSpecifier::new).toList();
   }
@@ -46,5 +43,10 @@ public class LogicalOrSpecifier implements OsmSpecifier {
     } else {
       return 0;
     }
+  }
+
+  @Override
+  public String toDocString() {
+    return subSpecs.stream().map(ExactMatchSpecifier::toDocString).collect(Collectors.joining("|"));
   }
 }

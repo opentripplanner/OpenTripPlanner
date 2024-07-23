@@ -1,5 +1,7 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
@@ -70,6 +72,11 @@ public class BestMatchSpecifier implements OsmSpecifier {
     }
     score += matches == conditions.length ? 10 : 0;
     return score;
+  }
+
+  @Override
+  public String toDocString() {
+    return Arrays.stream(conditions).map(Object::toString).collect(Collectors.joining("; "));
   }
 
   @Override

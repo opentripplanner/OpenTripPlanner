@@ -9,12 +9,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 class SingleCriteriaComparatorTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);
@@ -91,7 +92,7 @@ class SingleCriteriaComparatorTest {
     var group2 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(2).build();
     var group1And2 = newItinerary(A)
       .bus(1, START, END_LOW, C)
-      .withGeneralizedCost2(TransitGroupPriority32n.mergeInGroupId(1, 2))
+      .withGeneralizedCost2(GROUP_PRIORITY_CALCULATOR.mergeInGroupId(1, 2))
       .build();
 
     var subject = SingleCriteriaComparator.compareTransitGroupsPriority();

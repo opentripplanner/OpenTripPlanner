@@ -147,8 +147,20 @@ public class StopPlaceType {
           .description(
             "Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED"
           )
+          .deprecate("Not implemented. Use stopInterchangePriority")
           .type(EnumTypes.INTERCHANGE_WEIGHTING)
           .dataFetcher(environment -> 0)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("stopInterchangePriority")
+          .description("Specify the priority of interchanges at this stop")
+          .type(EnumTypes.STOP_INTERCHANGE_PRIORITY)
+          .dataFetcher(environment ->
+            ((MonoOrMultiModalStation) environment.getSource()).getPriority()
+          )
           .build()
       )
       .field(

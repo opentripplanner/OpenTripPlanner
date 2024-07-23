@@ -330,6 +330,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
         : DEFAULT_PLACE_TYPES;
+      List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
       try {
@@ -347,6 +348,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
                 filterByStations,
                 filterByRoutes,
                 filterByBikeRentalStations,
+                filterByNetwork,
                 getTransitService(environment)
               )
           );

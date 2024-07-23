@@ -18,7 +18,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private final RelaxFunction relaxC1;
 
   @Nullable
-  private final RaptorTransitGroupCalculator transitPriorityCalculator;
+  private final RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
 
   private final List<PassThroughPoint> passThroughPoints;
 
@@ -63,7 +63,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return relaxC1;
   }
 
-  public Optional<RaptorTransitGroupCalculator> transitPriorityCalculator() {
+  public Optional<RaptorTransitGroupPriorityCalculator> transitPriorityCalculator() {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
@@ -140,7 +140,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
-    private RaptorTransitGroupCalculator transitPriorityCalculator;
+    private RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
     private List<PassThroughPoint> passThroughPoints;
     private Double relaxCostAtDestination;
 
@@ -163,11 +163,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     @Nullable
-    public RaptorTransitGroupCalculator transitPriorityCalculator() {
+    public RaptorTransitGroupPriorityCalculator transitPriorityCalculator() {
       return transitPriorityCalculator;
     }
 
-    public Builder<T> withTransitPriorityCalculator(RaptorTransitGroupCalculator value) {
+    public Builder<T> withTransitPriorityCalculator(RaptorTransitGroupPriorityCalculator value) {
       transitPriorityCalculator = value;
       return this;
     }

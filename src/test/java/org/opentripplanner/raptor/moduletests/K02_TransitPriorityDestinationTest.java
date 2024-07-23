@@ -25,7 +25,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
@@ -37,7 +37,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class K02_TransitPriorityDestinationTest {
 
-  private static final RaptorTransitGroupCalculator PRIORITY_GROUP_CALCULATOR =
+  private static final RaptorTransitGroupPriorityCalculator PRIORITY_GROUP_CALCULATOR =
     TestGroupPriorityCalculator.PRIORITY_CALCULATOR;
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 

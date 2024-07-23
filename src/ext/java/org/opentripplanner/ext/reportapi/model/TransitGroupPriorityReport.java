@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.PriorityGroupConfigurator;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 
 /**
  * This class is used to report all transit-groups used for transit-group-priority. The report is
@@ -17,14 +17,14 @@ import org.opentripplanner.transit.model.network.TripPattern;
 public class TransitGroupPriorityReport {
 
   public static String build(Collection<TripPattern> patterns, TransitRequest request) {
-    var c = PriorityGroupConfigurator.of(
+    var service = new TransitGroupPriorityService(
       request.priorityGroupsByAgency(),
       request.priorityGroupsGlobal()
     );
 
     var map = new TreeMap<Integer, DebugEntity>();
     for (var it : patterns) {
-      int groupId = c.lookupTransitGroupPriorityId(it);
+      int groupId = service.lookupTransitGroupPriorityId(it);
       var de = map.computeIfAbsent(groupId, DebugEntity::new);
       de.add(
         it.getRoute().getAgency().getId().toString(),

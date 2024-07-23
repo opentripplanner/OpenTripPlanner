@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
@@ -15,10 +15,10 @@ public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {
 
   private int currentPatternGroupPriority;
-  private final RaptorTransitGroupCalculator transitGroupPriorityCalculator;
+  private final RaptorTransitGroupPriorityCalculator transitGroupPriorityCalculator;
 
   public TransitGroupPriorityRideFactory(
-    RaptorTransitGroupCalculator transitGroupPriorityCalculator
+    RaptorTransitGroupPriorityCalculator transitGroupPriorityCalculator
   ) {
     this.transitGroupPriorityCalculator = transitGroupPriorityCalculator;
   }
@@ -55,6 +55,6 @@ public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
    * Currently transit-group-priority is the only usage of c2
    */
   private int calculateC2(int c2) {
-    return transitGroupPriorityCalculator.mergeGroupIds(c2, currentPatternGroupPriority);
+    return transitGroupPriorityCalculator.mergeInGroupId(c2, currentPatternGroupPriority);
   }
 }

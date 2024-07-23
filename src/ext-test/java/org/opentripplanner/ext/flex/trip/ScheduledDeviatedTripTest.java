@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -42,14 +41,15 @@ import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
- * contains both flex zones but also scheduled stops. Inside the zone passengers can get on or off
- * anywhere so there it works more like a taxi.
+ * contains both flex zones but also scheduled stops. Inside the zone, passengers can get on or off
+ * anywhere, so there it works more like a taxi.
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
@@ -188,15 +188,6 @@ class ScheduledDeviatedTripTest {
     assertEquals(StopTime.MISSING_VALUE, arrivalTime);
   }
 
-  /**
-   * Checks that trips which have continuous pick up/drop off set are parsed correctly.
-   */
-  @Test
-  void parseContinuousPickup() {
-    var lincolnGraph = FlexIntegrationTestData.lincolnCountyGtfs();
-    assertNotNull(lincolnGraph);
-  }
-
   @BeforeAll
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
@@ -222,6 +213,7 @@ class ScheduledDeviatedTripTest {
     var result = TransitRouter.route(
       request,
       serverContext,
+      TransitGroupPriorityService.empty(),
       transitStartOfTime,
       additionalSearchDays,
       new DebugTimingAggregator()

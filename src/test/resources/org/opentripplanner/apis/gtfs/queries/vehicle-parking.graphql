@@ -1,6 +1,6 @@
 {
-    vehicleParkings {
-        name
-        vehicleParkingId
-    }
+  vehicleParkings {
+    name
+    vehicleParkingId
+  }
 }

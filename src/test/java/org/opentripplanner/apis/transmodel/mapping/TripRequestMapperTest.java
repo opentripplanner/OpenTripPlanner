@@ -15,12 +15,10 @@ import graphql.schema.DataFetchingEnvironmentImpl;
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
@@ -401,6 +400,19 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertEquals(StreetMode.BIKE_RENTAL, req.journey().egress().mode());
     assertEquals(StreetMode.BIKE_TO_PARK, req.journey().direct().mode());
     assertEquals(StreetMode.WALK, req.journey().transfer().mode());
+  }
+
+  /**
+   * This tests that both the new parameter name 'transferSlack` and the deprecated one
+   * 'minimumTransferTime' (for backwards compatibility) are correctly mapped to the internal
+   * transfer slack as a duration.
+   */
+  @ParameterizedTest
+  @ValueSource(strings = { "transferSlack", "minimumTransferTime" })
+  public void testBackwardsCompatibleTransferSlack(String name) {
+    Map<String, Object> arguments = Map.of(name, 101);
+    var req = TripRequestMapper.createRequest(executionContext(arguments));
+    assertEquals(Duration.ofSeconds(101), req.preferences().transfer().slack());
   }
 
   @Test

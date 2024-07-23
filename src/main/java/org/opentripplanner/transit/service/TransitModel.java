@@ -169,6 +169,7 @@ public class TransitModel implements Serializable {
     }
   }
 
+  @Nullable
   public TimetableSnapshot getTimetableSnapshot() {
     return timetableSnapshotProvider == null
       ? null
@@ -254,8 +255,6 @@ public class TransitModel implements Serializable {
    * Get or create a serviceId for a given date. This method is used when a new trip is added from a
    * realtime data update. It make sure the date is in the existing transit service period.
    * <p>
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   *           - this when doing the issue #3030.
    *
    * @param serviceDate service date for the added service id
    * @return service-id for date if it exist or is created. If the given service date is outside the

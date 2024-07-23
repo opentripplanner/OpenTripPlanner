@@ -320,36 +320,36 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 | Config Parameter                 |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |----------------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-parking"         |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
-| [feedId](#u__13__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
+| [feedId](#u__14__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
 | frequency                        |    `duration`   | How often to update the source.                                              | *Optional* | `"PT1M"`      |  2.6  |
-| [sourceType](#u__13__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
+| [sourceType](#u__14__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
 | url                              |      `uri`      | URL of the locations endpoint.                                               | *Required* |               |  2.6  |
-| [headers](#u__13__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
+| [headers](#u__14__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
 
 
 #### Details
 
-<h4 id="u__13__feedId">feedId</h4>
+<h4 id="u__14__feedId">feedId</h4>
 
 **Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[13] 
+**Path:** /updaters/[14] 
 
 The id of the data source, which will be the prefix of the parking lot's id.
 
 This will end up in the API responses as the feed id of of the parking lot.
 
-<h4 id="u__13__sourceType">sourceType</h4>
+<h4 id="u__14__sourceType">sourceType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[13]   
+**Path:** /updaters/[14]   
 **Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep`
 
 The source of the vehicle updates.
 
-<h4 id="u__13__headers">headers</h4>
+<h4 id="u__14__headers">headers</h4>
 
 **Since version:** `2.6` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[13] 
+**Path:** /updaters/[14] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 

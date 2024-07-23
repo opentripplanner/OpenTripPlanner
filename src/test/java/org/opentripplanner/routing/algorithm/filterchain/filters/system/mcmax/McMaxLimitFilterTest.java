@@ -11,12 +11,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 class McMaxLimitFilterTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);
@@ -26,12 +27,15 @@ class McMaxLimitFilterTest {
   private static final Place[] PLACES = { A, B, C, D, E };
 
   private static final int START = 3600 * 10;
-  private static final int GROUP_A = TransitGroupPriority32n.groupId(1);
-  private static final int GROUP_B = TransitGroupPriority32n.groupId(2);
-  private static final int GROUP_C = TransitGroupPriority32n.groupId(3);
-  private static final int GROUP_AB = TransitGroupPriority32n.mergeInGroupId(GROUP_A, GROUP_B);
-  private static final int GROUP_BC = TransitGroupPriority32n.mergeInGroupId(GROUP_B, GROUP_C);
-  private static final int GROUP_ABC = TransitGroupPriority32n.mergeInGroupId(GROUP_AB, GROUP_C);
+
+  // Note! Each group id needs to be a power of 2. This is implementation-specific, but using the
+  //       TransitGroupPriorityService here to generate these ids is a bit over-kill.
+  private static final int GROUP_A = 0x01;
+  private static final int GROUP_B = 0x02;
+  private static final int GROUP_C = 0x04;
+  private static final int GROUP_AB = GROUP_PRIORITY_CALCULATOR.mergeInGroupId(GROUP_A, GROUP_B);
+  private static final int GROUP_BC = GROUP_PRIORITY_CALCULATOR.mergeInGroupId(GROUP_B, GROUP_C);
+  private static final int GROUP_ABC = GROUP_PRIORITY_CALCULATOR.mergeInGroupId(GROUP_AB, GROUP_C);
 
   private static final boolean EXP_KEEP = true;
   private static final boolean EXP_DROP = false;

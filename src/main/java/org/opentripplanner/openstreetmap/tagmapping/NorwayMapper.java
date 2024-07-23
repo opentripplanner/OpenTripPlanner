@@ -30,7 +30,7 @@ class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    var hasSidewalk = new Condition.EqualsAnyIn("sidewalk", "yes", "left", "right", "both");
+    var hasSidewalk = new Condition.OneOf("sidewalk", "yes", "left", "right", "both");
     var hasPrefixSidewalk = new Condition.Equals("sidewalk", "yes"); // e.g sidewalk:left=yes
     props.setDefaultWalkSafetyForPermission((permission, speedLimit, way) ->
       switch (permission) {
@@ -74,16 +74,16 @@ class NorwayMapper implements OsmTagMapper {
     var cycleSafetyLowTraffic = 1.83;
     var cycleSafetyVeryLowTraffic = 1.57;
 
-    var isTrunkOrPrimary = new Condition.EqualsAnyIn(
+    var isTrunkOrPrimary = new Condition.OneOf(
       "highway",
       "trunk",
       "trunk_link",
       "primary",
       "primary_link"
     );
-    var isSecondaryHighway = new Condition.EqualsAnyIn("highway", "secondary", "secondary_link");
-    var isTertiaryHighway = new Condition.EqualsAnyIn("highway", "tertiary", "tertiary_link");
-    var isClassifiedRoad = new Condition.EqualsAnyIn(
+    var isSecondaryHighway = new Condition.OneOf("highway", "secondary", "secondary_link");
+    var isTertiaryHighway = new Condition.OneOf("highway", "tertiary", "tertiary_link");
+    var isClassifiedRoad = new Condition.OneOf(
       "highway",
       "trunk",
       "trunk_link",
@@ -94,7 +94,7 @@ class NorwayMapper implements OsmTagMapper {
       "tertiary",
       "tertiary_link"
     );
-    var isClassifiedOrUnclassifiedRoad = new Condition.EqualsAnyIn(
+    var isClassifiedOrUnclassifiedRoad = new Condition.OneOf(
       "highway",
       "trunk",
       "trunk_link",
@@ -107,7 +107,7 @@ class NorwayMapper implements OsmTagMapper {
       "unclassified"
     );
 
-    var isNormalRoad = new Condition.EqualsAnyIn(
+    var isNormalRoad = new Condition.OneOf(
       "highway",
       "trunk",
       "trunk_link",
@@ -166,7 +166,7 @@ class NorwayMapper implements OsmTagMapper {
     );
 
     props.setProperties(
-      new ExactMatchSpecifier(new Condition.EqualsAnyIn("highway", "motorway", "motorway_link")),
+      new ExactMatchSpecifier(new Condition.OneOf("highway", "motorway", "motorway_link")),
       withModes(CAR)
     );
 
@@ -205,7 +205,7 @@ class NorwayMapper implements OsmTagMapper {
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("cycleway", "lane"),
-        new Condition.EqualsAnyIn("highway", "unclassified", "residential")
+        new Condition.OneOf("highway", "unclassified", "residential")
       ),
       cycleLaneInLowTraffic
     );
@@ -224,7 +224,7 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("oneway", "yes"),
-        new Condition.EqualsAnyInOrAbsent("cycleway"),
+        new Condition.OneOfOrAbsent("cycleway"),
         isNormalRoad
       ),
       ofBicycleSafety(1, 1.15)
@@ -233,7 +233,7 @@ class NorwayMapper implements OsmTagMapper {
     // Discourage cycling along tram tracks
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("embedded_rails", "tram", "light_rail", "disused")
+        new Condition.OneOf("embedded_rails", "tram", "light_rail", "disused")
       ),
       ofBicycleSafety(1.2)
     );
@@ -252,12 +252,12 @@ class NorwayMapper implements OsmTagMapper {
       new LogicalOrSpecifier(
         new ExactMatchSpecifier(
           new Condition.Equals("bridge", "yes"),
-          new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate"),
+          new Condition.OneOfOrAbsent("sidewalk", "no", "separate"),
           isClassifiedOrUnclassifiedRoad
         ),
         new ExactMatchSpecifier(
           new Condition.Equals("verge", "no"),
-          new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate"),
+          new Condition.OneOfOrAbsent("sidewalk", "no", "separate"),
           isClassifiedOrUnclassifiedRoad
         )
       ),
@@ -268,7 +268,7 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("junction", "roundabout"),
-        new Condition.EqualsAnyInOrAbsent("sidewalk", "no", "separate")
+        new Condition.OneOfOrAbsent("sidewalk", "no", "separate")
       ),
       ofWalkSafety(2.)
     );
@@ -297,7 +297,7 @@ class NorwayMapper implements OsmTagMapper {
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("highway", "service"),
-        new Condition.EqualsAnyIn("bus", "yes", "designated")
+        new Condition.OneOf("bus", "yes", "designated")
       ),
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(cycleSafetyMediumLowTraffic).walkSafety(1.9)
     );
@@ -404,49 +404,49 @@ class NorwayMapper implements OsmTagMapper {
 
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("trail_visibility", "bad", "low", "poor", "horrible", "no"),
+        new Condition.OneOf("trail_visibility", "bad", "low", "poor", "horrible", "no"),
         new Condition.Equals("highway", "path")
       ),
       withModes(NONE)
     );
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn(
+        new Condition.OneOf(
           "sac_scale",
           "demanding_mountain_hiking",
           "alpine_hiking",
           "demanding_alpine_hiking",
           "difficult_alpine_hiking"
         ),
-        new Condition.EqualsAnyIn("highway", "path", "steps")
+        new Condition.OneOf("highway", "path", "steps")
       ),
       withModes(NONE)
     );
     props.setProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("smoothness", "horrible", "very_horrible"),
-        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+        new Condition.OneOf("smoothness", "horrible", "very_horrible"),
+        new Condition.OneOf("highway", "path", "bridleway", "track")
       ),
       withModes(PEDESTRIAN).walkSafety(1.15)
     );
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("smoothness", "impassable"),
-        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+        new Condition.OneOf("highway", "path", "bridleway", "track")
       ),
       withModes(NONE)
     );
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.InclusiveRange("mtb:scale", 2, 1),
-        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+        new Condition.OneOf("highway", "path", "bridleway", "track")
       ),
       withModes(PEDESTRIAN).walkSafety(1.15)
     );
     props.setProperties(
       new ExactMatchSpecifier(
         new Condition.GreaterThan("mtb:scale", 2),
-        new Condition.EqualsAnyIn("highway", "path", "bridleway", "track")
+        new Condition.OneOf("highway", "path", "bridleway", "track")
       ),
       withModes(NONE)
     );
@@ -461,7 +461,7 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties("surface=metal_grid", ofBicycleSafety(1.2));
     props.setMixinProperties("surface=metal", ofBicycleSafety(1.2));
     // Paved but damaged
-    var isPaved = new Condition.EqualsAnyIn(
+    var isPaved = new Condition.OneOf(
       "surface",
       "asfalt",
       "concrete",
@@ -502,46 +502,46 @@ class NorwayMapper implements OsmTagMapper {
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Absent("tracktype"),
-        new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway")
+        new Condition.OneOfOrAbsent("surface", "unpaved"),
+        new Condition.OneOf("highway", "track", "bridleway")
       ),
       ofBicycleSafety(1.8).walkSafety(1.6)
     );
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade2"),
-        new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
+        new Condition.OneOfOrAbsent("surface", "unpaved"),
+        new Condition.OneOf("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(1.4).walkSafety(1.4)
     );
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade3"),
-        new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
+        new Condition.OneOfOrAbsent("surface", "unpaved"),
+        new Condition.OneOf("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(1.8).walkSafety(1.6)
     );
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade4"),
-        new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
+        new Condition.OneOfOrAbsent("surface", "unpaved"),
+        new Condition.OneOf("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(2.3).walkSafety(1.8)
     );
     props.setMixinProperties(
       new ExactMatchSpecifier(
         new Condition.Equals("tracktype", "grade5"),
-        new Condition.EqualsAnyInOrAbsent("surface", "unpaved"),
-        new Condition.EqualsAnyIn("highway", "track", "bridleway", "service", "unclassified")
+        new Condition.OneOfOrAbsent("surface", "unpaved"),
+        new Condition.OneOf("highway", "track", "bridleway", "service", "unclassified")
       ),
       ofBicycleSafety(2.3).walkSafety(2.4)
     );
     props.setMixinProperties(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyInOrAbsent("surface"),
+        new Condition.OneOfOrAbsent("surface"),
         new Condition.Equals("highway", "path")
       ),
       ofBicycleSafety(2.3).walkSafety(2.4)
@@ -560,7 +560,7 @@ class NorwayMapper implements OsmTagMapper {
      */
 
     props.setCarSpeed(
-      new ExactMatchSpecifier(new Condition.EqualsAnyIn("highway", "motorway", "motorway_link")),
+      new ExactMatchSpecifier(new Condition.OneOf("highway", "motorway", "motorway_link")),
       30.56f // 110 km/t
     );
 
@@ -570,7 +570,7 @@ class NorwayMapper implements OsmTagMapper {
     );
     props.setCarSpeed(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn(
+        new Condition.OneOf(
           "highway",
           "trunk",
           "trunk_link",
@@ -589,8 +589,8 @@ class NorwayMapper implements OsmTagMapper {
     );
     props.setCarSpeed(
       new ExactMatchSpecifier(
-        new Condition.EqualsAnyIn("sidewalk", "yes", "both", "left", "right", "separate"),
-        new Condition.EqualsAnyIn(
+        new Condition.OneOf("sidewalk", "yes", "both", "left", "right", "separate"),
+        new Condition.OneOf(
           "highway",
           "trunk",
           "trunk_link",

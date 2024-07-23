@@ -26,7 +26,7 @@ class PreferencesMapper {
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));
     preferences.withCar(car -> mapCarPreferences(car, callWith));
     preferences.withScooter(scooter -> mapScooterPreferences(scooter, callWith));
-    preferences.withTransfer(transfer -> mapTransferPreferences(transfer, environment, callWith));
+    preferences.withTransfer(transfer -> mapTransferPreferences(transfer, callWith));
     preferences.withTransit(transit -> mapTransitPreferences(transit, environment, callWith));
     preferences.withItineraryFilter(itineraryFilter ->
       mapItineraryFilterPreferences(itineraryFilter, environment, callWith)

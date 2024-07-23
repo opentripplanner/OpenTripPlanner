@@ -34,6 +34,21 @@ class ExecutionResultMapperTest {
     "}"
   );
 
+  public static final String TOO_LARGE_MESSAGE =
+    "The number of fields in the GraphQL result exceeds the maximum allowed: 100000";
+
+  private static final String TOO_LARGE_RESPONSE = quoteReplace(
+    "{'" +
+    "errors':[{" +
+    "'message':'" +
+    TOO_LARGE_MESSAGE +
+    "'," +
+    "'locations':[]," +
+    "'extensions':{'classification':'ResponseTooLarge'}" +
+    "}]" +
+    "}"
+  );
+
   public static final String SYSTEM_ERROR_MESSAGE = "A system error!";
 
   public static final String SYSTEM_ERROR_RESPONSE = quoteReplace(
@@ -60,6 +75,13 @@ class ExecutionResultMapperTest {
     var response = ExecutionResultMapper.timeoutResponse();
     assertEquals(422, response.getStatus());
     assertEquals(TIMEOUT_RESPONSE, response.getEntity().toString());
+  }
+
+  @Test
+  void tooLargeResponse() {
+    var response = ExecutionResultMapper.tooLargeResponse(TOO_LARGE_MESSAGE);
+    assertEquals(422, response.getStatus());
+    assertEquals(TOO_LARGE_RESPONSE, response.getEntity().toString());
   }
 
   @Test

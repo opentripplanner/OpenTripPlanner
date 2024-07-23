@@ -13,6 +13,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
+  private VehicleRentalSystem system = null;
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
 
@@ -27,6 +28,28 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   public TestFreeFloatingRentalVehicleBuilder withLongitude(double longitude) {
     this.longitude = longitude;
+    return this;
+  }
+
+  public TestFreeFloatingRentalVehicleBuilder withSystem(String id, String url) {
+    this.system =
+      new VehicleRentalSystem(
+        id,
+        null,
+        null,
+        null,
+        null,
+        url,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      );
     return this;
   }
 
@@ -63,6 +86,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.latitude = latitude;
     vehicle.longitude = longitude;
     vehicle.vehicleType = vehicleType;
+    vehicle.system = system;
     return vehicle;
   }
 }
