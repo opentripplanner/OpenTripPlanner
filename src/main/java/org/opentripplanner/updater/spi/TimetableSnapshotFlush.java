@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Flush the timetable snapshot buffer by committing pending changes.
+ * Exceptions occurring during the flush are caught and ignored: the scheduler can then retry
+ * the task later.
  */
 public class TimetableSnapshotFlush implements Runnable {
 
@@ -25,13 +27,17 @@ public class TimetableSnapshotFlush implements Runnable {
 
   @Override
   public void run() {
-    LOG.debug("Flushing timetable snapshot buffer");
-    if (siriTimetableSnapshotSource != null) {
-      siriTimetableSnapshotSource.flushBuffer();
+    try {
+      LOG.debug("Flushing timetable snapshot buffer");
+      if (siriTimetableSnapshotSource != null) {
+        siriTimetableSnapshotSource.flushBuffer();
+      }
+      if (gtfsTimetableSnapshotSource != null) {
+        gtfsTimetableSnapshotSource.flushBuffer();
+      }
+      LOG.debug("Flushed timetable snapshot buffer");
+    } catch (Throwable t) {
+      LOG.error("Error flushing timetable snapshot buffer", t);
     }
-    if (gtfsTimetableSnapshotSource != null) {
-      gtfsTimetableSnapshotSource.flushBuffer();
-    }
-    LOG.debug("Flushed timetable snapshot buffer");
   }
 }
