@@ -59,7 +59,7 @@ public class VehicleParkingEntranceVertex extends Vertex {
     return hasLink(getIncoming()) || hasLink(getOutgoing());
   }
 
-  private boolean hasLink(Collection<Edge> incoming) {
-    return incoming.stream().anyMatch(StreetVehicleParkingLink.class::isInstance);
+  private boolean hasLink(Collection<Edge> edges) {
+    return edges.stream().anyMatch(StreetVehicleParkingLink.class::isInstance);
   }
 }
