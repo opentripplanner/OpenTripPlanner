@@ -172,7 +172,7 @@ public class NetexConfig {
           .since(V2_6)
           .summary("Ignore Parking elements.")
           .docDefaultValue(base.ignoreParking())
-          .asBoolean(base.ignoreFareFrame())
+          .asBoolean(base.ignoreParking())
       );
   }
 
