@@ -98,8 +98,14 @@ class TransitGroupPriorityServiceTest {
 
     // Verify we get the same result with using the trip, not trip-pattern
     assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTrip));
-    assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2.getTrip(0)));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3.getTrip(0)));
+    assertEquals(
+      EXP_GROUP_1,
+      subject.lookupTransitGroupPriorityId(busB2.getScheduledTimetable().getTripTimes(0).getTrip())
+    );
+    assertEquals(
+      EXP_GROUP_2,
+      subject.lookupTransitGroupPriorityId(railR3.getScheduledTimetable().getTripTimes(0).getTrip())
+    );
   }
 
   @Test
@@ -122,7 +128,10 @@ class TransitGroupPriorityServiceTest {
 
     // Verify we get the same result with using the trip, not trip-pattern
     assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(nullTrip));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR1.getTrip(0)));
+    assertEquals(
+      EXP_GROUP_2,
+      subject.lookupTransitGroupPriorityId(railR1.getScheduledTimetable().getTripTimes(0).getTrip())
+    );
   }
 
   private static TestRouteData route(
