@@ -2,25 +2,7 @@ import { Leg, Mode } from '../../gql/graphql.ts';
 import { LegTime } from './LegTime.tsx';
 import { formatDistance } from '../../util/formatDistance.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
-import logo from '../../static/img/stay-seated.svg';
-import React from 'react';
-
-const staySeatedIcon: (leg: Leg) => React.JSX.Element = (leg: Leg) => {
-  if (leg.interchangeFrom?.staySeated) {
-    return (
-      <img
-        alt="Stay-seated transfer"
-        title="Stay-seated transfer"
-        src={logo}
-        width="20"
-        height="20"
-        className="d-inline-block align-middle"
-      />
-    );
-  } else {
-    return <></>;
-  }
-};
+import { InterchangeInfo } from './InterchangeInfo.tsx';
 
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
   return (
@@ -29,7 +11,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         {formatDistance(leg.distance)}, {formatDuration(leg.duration)}
       </div>
       <div>
-        {staySeatedIcon(leg)}
+        <InterchangeInfo leg={leg} />
         <LegTime
           aimedTime={leg.aimedStartTime}
           expectedTime={leg.expectedStartTime}
