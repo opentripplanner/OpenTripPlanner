@@ -45,6 +45,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     super(params);
     this.vehiclePositionSource =
       new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
+    // TODO Inject TransitService, do not create it here. We currently do not
+    //      support dagger injection in updaters, so this is ok for now.
     TransitService transitService = new DefaultTransitService(transitModel);
     var fuzzyTripMatcher = params.fuzzyTripMatching()
       ? new GtfsRealtimeFuzzyTripMatcher(transitService)
