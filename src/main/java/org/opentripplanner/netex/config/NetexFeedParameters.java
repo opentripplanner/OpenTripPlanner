@@ -148,7 +148,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedFilePattern.equals(that.sharedFilePattern) &&
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
-      ignoredFeatures == that.ignoredFeatures &&
+      ignoredFeatures.equals(that.ignoredFeatures) &&
       ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
     );
   }
