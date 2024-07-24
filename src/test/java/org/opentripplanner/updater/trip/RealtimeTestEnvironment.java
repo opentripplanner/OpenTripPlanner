@@ -221,7 +221,6 @@ public final class RealtimeTestEnvironment {
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
-    commitTimetableSnapshot();
     if (siriSource != null) {
       return siriSource.getTimetableSnapshot();
     } else {
@@ -285,13 +284,15 @@ public final class RealtimeTestEnvironment {
     UpdateIncrementality incrementality
   ) {
     Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
-    return gtfsSource.applyTripUpdates(
+    UpdateResult updateResult = gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,
       updates,
       getFeedId()
     );
+    commitTimetableSnapshot();
+    return updateResult;
   }
 
   // private methods
