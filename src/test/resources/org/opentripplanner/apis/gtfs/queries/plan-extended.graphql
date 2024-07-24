@@ -13,7 +13,7 @@
     viaPoints: [
       {
         name: "Flower shop"
-        element: { placeIds: ["trimet:1123", "trimet:30284"] }
+        element: { placeIds: ["F:A", "F:B"] }
       }
     ]
   ) {
