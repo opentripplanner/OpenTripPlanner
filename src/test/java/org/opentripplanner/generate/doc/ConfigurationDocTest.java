@@ -3,8 +3,8 @@ package org.opentripplanner.generate.doc;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.generate.doc.support.ConfigTypeTable.configTypeTable;
 import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
@@ -16,9 +16,9 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 @GeneratesDocumentation
 public class ConfigurationDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "Configuration.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "Configuration.md");
 
-  private static final File OUT_FILE = new File(DOCS_ROOT, "Configuration.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "Configuration.md");
 
   private static final String CONFIG_TYPE_PLACEHOLDER = "CONFIGURATION-TYPES-TABLE";
   private static final String OTP_FEATURE_PLACEHOLDER = "OTP-FEATURE-TABLE";

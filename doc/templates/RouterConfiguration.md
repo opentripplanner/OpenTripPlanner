@@ -1,7 +1,7 @@
 <!--
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
-   - Template directory is:  /doc-templates
+   - Template directory is:  /doc/templates
    - Generated directory is: /docs 
 -->
 

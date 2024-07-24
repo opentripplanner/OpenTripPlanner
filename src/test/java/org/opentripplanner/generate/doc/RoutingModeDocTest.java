@@ -3,8 +3,8 @@ package org.opentripplanner.generate.doc;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 
 import java.io.File;
@@ -19,8 +19,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 @GeneratesDocumentation
 public class RoutingModeDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RoutingModes.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "RoutingModes.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "RoutingModes.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "RoutingModes.md");
 
   @Test
   public void updateDocs() {

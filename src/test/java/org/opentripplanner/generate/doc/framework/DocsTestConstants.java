@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
  */
 public interface DocsTestConstants {
   Logger LOG = LoggerFactory.getLogger(DocsTestConstants.class);
-  File TEMPLATE_ROOT = new File("doc-templates");
-  File DOCS_ROOT = new File("doc/user");
+  File DOC_ROOT = new File("doc");
+  File TEMPLATE_PATH = new File(DOC_ROOT, "templates");
+  File USER_DOC_PATH = new File(DOC_ROOT, "user");
 
   /**
    * This method return {@code true} if the /docs directory is available. If not, a warning is
@@ -18,7 +19,7 @@ public interface DocsTestConstants {
    * annotation.
    */
   static boolean docsExistOrWarn() {
-    if (DOCS_ROOT.exists()) {
+    if (USER_DOC_PATH.exists()) {
       return true;
     }
     LOG.warn(
