@@ -142,11 +142,11 @@ public class LinkStopToPlatformTest {
       LOG.debug("Edge {}", e);
     }
 
-    // Two bottom edges gets split into half (+2 edges)
-    // both split points are linked to the stop bidirectonally (+4 edges).
-    // both split points also link to 2 visibility points at opposite side (+8 edges)
-    // 14 new edges in total
-    assertEquals(22, graph.getEdges().size());
+    // Two bottom edges gets split into half (+2 edges) by one (reused) split vertex
+    // the split point is linked to the stop bidirectonally (+2 edges).
+    // the split point also links to 2 visibility points at opposite side (+4 edges)
+    // 8 new edges in total
+    assertEquals(16, graph.getEdges().size());
   }
 
   /**

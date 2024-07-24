@@ -675,16 +675,16 @@ public class TestHalfEdges {
     int numVerticesBefore = graph.getVertices().size();
     TestStreetLinkerModule.link(graph, transitModel);
     int numVerticesAfter = graph.getVertices().size();
-    assertEquals(4, numVerticesAfter - numVerticesBefore);
+    assertEquals(2, numVerticesAfter - numVerticesBefore);
     Collection<Edge> outgoing = station1.getOutgoing();
-    assertEquals(2, outgoing.size());
+    assertEquals(1, outgoing.size());
     Edge edge = outgoing.iterator().next();
 
     Vertex midpoint = edge.getToVertex();
     assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
 
     outgoing = station2.getOutgoing();
-    assertEquals(2, outgoing.size());
+    assertEquals(1, outgoing.size());
     edge = outgoing.iterator().next();
 
     Vertex station2point = edge.getToVertex();
