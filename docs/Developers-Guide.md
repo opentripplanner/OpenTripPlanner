@@ -197,17 +197,16 @@ Please use only ISO 8601 date format (YYYY-MM-DD) in documentation, comments, an
 project. This avoids the ambiguity that can result from differing local interpretations of date
 formats like 02/01/12.
 
-## Code style
-
-The OTP code style is described on a separate [style guide page](../doc/dev/decisionrecords/Codestyle.md).
-
 ## Code conventions and architecture
 
-The [architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
-and [code conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
-are only available on GitHub, not in the project documentation. These documents contain relative 
-links to code so, they are a bit easier to maintain that way. The target audience is also active 
-OTP developers that have the code checked out locally.
+The development and architecture documentation are only available on GitHub, not in the user project
+documentation (https://www.opentripplanner.org/). These documents contain relative links to code, 
+so they are a bit easier to maintain that way. The primary audience is also active OTP developers 
+that have the code checked out locally.
+
+ - [Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
+ - [Code Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
+ - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DECISION_RECORDS.md)
 
 
 ## Continuous Integration
