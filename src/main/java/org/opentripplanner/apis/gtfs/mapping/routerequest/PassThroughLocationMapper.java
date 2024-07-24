@@ -22,7 +22,7 @@ class PassThroughLocationMapper {
     final TransitService transitService,
     Map<String, Object> map
   ) {
-    Map<String, Object> element= (Map<String, Object>) map.get("element");
+    Map<String, Object> element = (Map<String, Object>) map.get("element");
     List<String> stops = (List<String>) element.get("placeIds");
 
     final String name = (String) element.get("name");
