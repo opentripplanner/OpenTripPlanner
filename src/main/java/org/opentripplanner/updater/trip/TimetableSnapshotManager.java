@@ -82,6 +82,12 @@ public final class TimetableSnapshotManager {
     return snapshot.get();
   }
 
+  /**
+   * @return the current timetable snapshot buffer that contains pending changes (not yet published
+   * in a snapshot).
+   * This should be used in the context of an updater to build a TransitEditorService that sees all
+   * the changes applied so far by real-time updates.
+   */
   public TimetableSnapshot getTimetableSnapshotBuffer() {
     return buffer;
   }
