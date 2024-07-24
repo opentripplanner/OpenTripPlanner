@@ -25,7 +25,7 @@ public class GraphQLTutorialDocTest {
   private static final File OUT_FILE = new File(DOCS_ROOT + "/apis", "GraphQL-Tutorial.md");
 
   /**
-   * NOTE! This test updates the {@code docs/GraphQlTutorial.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/GraphQlTutorial.md} document based on the latest
    * version of the code.
    * This test fails if the document have changed. This make sure that this test fails in the
    * CI pipeline if config file changes is not committed. Manually inspect the changes in the

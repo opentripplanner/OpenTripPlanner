@@ -40,7 +40,7 @@ public class SiriGooglePubSubConfigDocTest {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/sandbox/SiriGooglePubSubUpdater.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/sandbox/SiriGooglePubSubUpdater.md} document based on the latest
    * version of the code.
    */
   @Test

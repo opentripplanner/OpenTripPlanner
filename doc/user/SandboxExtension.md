@@ -30,7 +30,7 @@
   added in the test directory: `src/ext-test`
 - To integrate the new feature into OTP you may have to create new extension points in the main/core
   code. Changes to the core OTP are subject to normal a review process.
-- Create a readme file (`docs/sandbox/<Extension Name>.md` package including:
+- Create a readme file (`doc/user/sandbox/<Extension Name>.md` package including:
     - Extension Name
     - Contact info
     - Change log

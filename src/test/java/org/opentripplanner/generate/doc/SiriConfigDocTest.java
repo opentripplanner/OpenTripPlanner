@@ -34,7 +34,7 @@ public class SiriConfigDocTest {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/sandbox/SiriUpdater.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/sandbox/SiriUpdater.md} document based on the latest
    * version of the code.
    */
   @Test

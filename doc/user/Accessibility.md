@@ -109,4 +109,4 @@ inaccessible to wheelchair users.
 ## Example
 
 A full configuration example is available
-at [`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/docs/examples/ibi)
+at [`/docs/examples`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/doc/user/examples/ibi)

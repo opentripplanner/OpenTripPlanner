@@ -14,8 +14,8 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Check all links and references to the release and update to the target release version. Search
       all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new
       version.
-    * In `docs/index.md` replace what is the latest version and add a new line for the previous one
-* Update `docs/Changelog.md`
+    * In `doc/user/index.md` replace what is the latest version and add a new line for the previous one
+* Update `doc/user/Changelog.md`
     * Lines should have been added or updated as each pull request was merged
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add
       any missing items
@@ -78,9 +78,9 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git merge master`
     * `git push`
 * Set up next development iteration
-    * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
+    * Add a new section header to `doc/user/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
     * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
-    * `git add pom.xml docs/Changelog.md`
+    * `git add pom.xml doc/user/Changelog.md`
     * `git commit -m "Prepare next development iteration x.y+1.0-SNAPSHOT"`
     * `git push`
 * Send a message in Gitter and email the OTP users mailing lists

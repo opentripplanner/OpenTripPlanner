@@ -219,7 +219,7 @@ compile and test the new code, providing feedback on the stability of the build.
 
 ### Changelog workflow
 
-The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md)
+The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/user/Changelog.md)
 is generated from the pull-request(PR) _title_ using the
 [changelog workflow](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/automatic-changelog.yml)
 . The workflow runs after the PR is merged, and it changes, commits and pushes the _Changelog.md_. A

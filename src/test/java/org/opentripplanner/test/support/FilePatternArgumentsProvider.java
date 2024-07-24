@@ -19,7 +19,7 @@ import org.junit.jupiter.params.support.AnnotationConsumer;
 
 /**
  * This annotation processor allows you to provide a file pattern like
- * "docs/examples/**\/build-config.json" as the input for a JUnit
+ * "doc/user/examples/**\/build-config.json" as the input for a JUnit
  * {@link org.junit.jupiter.params.ParameterizedTest}.
  * <p>
  * Check the usages of {@link FilePatternSource} to see examples for how to use.

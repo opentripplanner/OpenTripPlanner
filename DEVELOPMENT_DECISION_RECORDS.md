@@ -31,7 +31,7 @@ notes on `private` members and as inline comments.
 > If you decide to NOT follow these decision records, then you must document why.
 
 **See also**
- - [Developers-Guide &gt; Code comments](docs/Developers-Guide.md#code-comments).
+ - [Developers-Guide &gt; Code comments](doc/user/Developers-Guide.md#code-comments).
  - [Codestyle &gt; Javadoc Guidlines](doc/dev/decisionrecords/Codestyle.md#javadoc-guidlines) - JavaDoc checklist
 
 

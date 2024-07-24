@@ -38,7 +38,7 @@ public class BuildConfigurationDocTest {
     .build();
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
    * version of the code. The following is auto generated:
    * <ul>
    *   <li>The configuration type table</li>

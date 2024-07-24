@@ -24,14 +24,14 @@ public class ConfigurationDocTest {
   private static final String OTP_FEATURE_PLACEHOLDER = "OTP-FEATURE-TABLE";
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
    * version of the code. The following is auto generated:
    * <ul>
    *   <li>The configuration type table</li>
    *   <li>The list of OTP features</li>
    * </ul>
-   * This test fails if the document have changed. This make sure that this test fails in the
-   * CI pipeline if config file changes is not committed. Manually inspect the changes in the
+   * This test fails if the document has changed. This makes sure that this test fails in the
+   * CI pipeline if config file changes are not committed. Manually inspect the changes in the
    * configuration, commit the configuration document, and run test again to pass.
    */
   @Test
