@@ -26,9 +26,7 @@ public record LocalDateRange(@Nullable LocalDate startInclusive, @Nullable Local
    */
   public boolean contains(LocalDate date) {
     return (
-      (
-        startInclusive == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)
-      ) &&
+      (startInclusive == null || date.isEqual(startInclusive) || date.isAfter(startInclusive)) &&
       (endExclusive == null || date.isBefore(endExclusive))
     );
   }
