@@ -7,6 +7,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 
 public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehicleRentalStation {
 
@@ -105,6 +106,11 @@ public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehi
   @Override
   public DataFetcher<RentalVehicleEntityCounts> availableSpaces() {
     return environment -> getSource(environment).getVehicleSpaceCounts();
+  }
+
+  @Override
+  public DataFetcher<VehicleRentalSystem> rentalNetwork() {
+    return environment -> getSource(environment).getVehicleRentalSystem();
   }
 
   private VehicleRentalStation getSource(DataFetchingEnvironment environment) {

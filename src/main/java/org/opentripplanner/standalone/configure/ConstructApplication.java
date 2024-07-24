@@ -33,6 +33,7 @@ import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -202,7 +203,7 @@ public class ConstructApplication {
     TransitModel transitModel,
     TransitTuningParameters tuningParameters
   ) {
-    if (!transitModel.hasTransit() || transitModel.getTransitModelIndex() == null) {
+    if (!transitModel.hasTransit() || !transitModel.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
@@ -211,10 +212,7 @@ public class ConstructApplication {
     transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
     transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
     transitModel.setTransitLayerUpdater(
-      new TransitLayerUpdater(
-        transitModel,
-        transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
-      )
+      new TransitLayerUpdater(new DefaultTransitService(transitModel))
     );
   }
 

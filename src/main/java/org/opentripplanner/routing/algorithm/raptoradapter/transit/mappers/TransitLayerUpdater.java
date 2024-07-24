@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +19,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +39,7 @@ public class TransitLayerUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerUpdater.class);
 
-  private final TransitModel transitModel;
-
-  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
+  private final TransitEditorService transitService;
 
   /**
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
@@ -58,19 +55,15 @@ public class TransitLayerUpdater {
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
 
-  public TransitLayerUpdater(
-    TransitModel transitModel,
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate
-  ) {
-    this.transitModel = transitModel;
-    this.serviceCodesRunningForDate = serviceCodesRunningForDate;
+  public TransitLayerUpdater(TransitEditorService transitService) {
+    this.transitService = transitService;
   }
 
   public void update(
     Set<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
   ) {
-    if (!transitModel.hasRealtimeTransitLayer()) {
+    if (!transitService.hasRealtimeTransitLayer()) {
       return;
     }
 
@@ -78,11 +71,11 @@ public class TransitLayerUpdater {
 
     // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
     // changed during this update process.
-    TransitLayer realtimeTransitLayer = new TransitLayer(transitModel.getRealtimeTransitLayer());
+    TransitLayer realtimeTransitLayer = new TransitLayer(transitService.getRealtimeTransitLayer());
 
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      serviceCodesRunningForDate
+      transitService.getServiceCodesRunningForDate()
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();
@@ -229,7 +222,7 @@ public class TransitLayerUpdater {
 
     // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
     // guarantee that the reference is set after all the fields have been updated.
-    transitModel.setRealtimeTransitLayer(realtimeTransitLayer);
+    transitService.setRealtimeTransitLayer(realtimeTransitLayer);
 
     LOG.debug(
       "UPDATING {} tripPatterns took {} ms",

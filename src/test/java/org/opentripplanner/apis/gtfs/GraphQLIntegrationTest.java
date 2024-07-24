@@ -73,8 +73,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -91,6 +93,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -111,6 +114,18 @@ class GraphQLIntegrationTest {
     .of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
     .toList();
+
+  private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
+    .withVehicles(10)
+    .withSpaces(10)
+    .withVehicleTypeBicycle(5, 7)
+    .withVehicleTypeElectricBicycle(5, 3)
+    .withSystem("Network-1", "https://foo.bar")
+    .build();
+
+  private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+    .withSystem("Network-1", "https://foo.bar")
+    .build();
 
   static final Graph GRAPH = new Graph();
 
@@ -182,8 +197,20 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+    TransitEditorService transitService = new DefaultTransitService(transitModel) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
 
-    routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
+    };
+    routes.forEach(transitService::addRoutes);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -240,20 +267,6 @@ class GraphQLIntegrationTest {
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);
 
-    var transitService = new DefaultTransitService(transitModel) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
-
-      @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
-
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
@@ -280,13 +293,8 @@ class GraphQLIntegrationTest {
     realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
-    VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
-      .withVehicles(10)
-      .withSpaces(10)
-      .withVehicleTypeBicycle(5, 7)
-      .withVehicleTypeElectricBicycle(5, 3)
-      .build();
-    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
+    defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE);
 
     context =
       new GraphQLRequestContext(
@@ -448,13 +456,15 @@ class GraphQLIntegrationTest {
       List<FeedScopedId> filterByStations,
       List<FeedScopedId> filterByRoutes,
       List<String> filterByBikeRentalStations,
+      List<String> filterByNetwork,
       TransitService transitService
     ) {
-      return List
-        .of(TransitModelForTest.of().stop("A").build())
-        .stream()
-        .map(stop -> new PlaceAtDistance(stop, 0))
-        .toList();
+      var stop = TransitModelForTest.of().stop("A").build();
+      return List.of(
+        new PlaceAtDistance(stop, 0),
+        new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
+        new PlaceAtDistance(RENTAL_VEHICLE, 50)
+      );
     }
   };
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -33,7 +36,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
@@ -49,7 +52,7 @@ import uk.org.siri.siri20.VehicleModesEnumeration;
 class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
-  private final TransitModel transitModel;
+  private final TransitEditorService transitService;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> getTripPatternId;
@@ -70,7 +73,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
-    TransitModel transitModel,
+    TransitEditorService transitService,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId
   ) {
@@ -109,16 +112,16 @@ class AddedTripBuilder {
 
     calls = CallWrapper.of(estimatedVehicleJourney);
 
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.entityResolver = entityResolver;
     this.getTripPatternId = getTripPatternId;
-    timeZone = transitModel.getTimeZone();
+    timeZone = transitService.getTimeZone();
 
     replacedTrips = getReplacedVehicleJourneys(estimatedVehicleJourney);
   }
 
   AddedTripBuilder(
-    TransitModel transitModel,
+    TransitEditorService transitService,
     EntityResolver entityResolver,
     Function<Trip, FeedScopedId> getTripPatternId,
     FeedScopedId tripId,
@@ -136,9 +139,9 @@ class AddedTripBuilder {
     String headsign,
     List<TripOnServiceDate> replacedTrips
   ) {
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.entityResolver = entityResolver;
-    this.timeZone = transitModel.getTimeZone();
+    this.timeZone = transitService.getTimeZone();
     this.getTripPatternId = getTripPatternId;
     this.tripId = tripId;
     this.operator = operator;
@@ -165,16 +168,20 @@ class AddedTripBuilder {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
-    FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
+    FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
     Route route = entityResolver.resolveRoute(lineRef);
     if (route == null) {
-      route = createRoute();
+      Agency agency = resolveAgency();
+      if (agency == null) {
+        return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY);
+      }
+      route = createRoute(agency);
       LOG.info("Adding route {} to transitModel.", route);
-      transitModel.getTransitModelIndex().addRoutes(route);
+      transitService.addRoutes(route);
     }
 
     Trip trip = createTrip(route, calServiceId);
@@ -214,14 +221,14 @@ class AddedTripBuilder {
     RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
       trip,
       aimedStopTimes,
-      transitModel.getDeduplicator()
+      transitService.getDeduplicator()
     );
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
     tripTimes.validateNonIncreasingTimes();
-    tripTimes.setServiceCode(transitModel.getServiceCodes().get(trip.getServiceId()));
+    tripTimes.setServiceCode(transitService.getServiceCodeForId(trip.getServiceId()));
     pattern.add(tripTimes);
     RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();
 
@@ -260,17 +267,14 @@ class AddedTripBuilder {
 
     // Adding trip to index necessary to include values in graphql-queries
     // TODO - SIRI: should more data be added to index?
-    transitModel.getTransitModelIndex().getTripForId().put(tripId, trip);
-    transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
-    transitModel.getTransitModelIndex().getPatternsForRoute().put(route, pattern);
-    transitModel
-      .getTransitModelIndex()
-      .getTripOnServiceDateById()
-      .put(tripOnServiceDate.getId(), tripOnServiceDate);
-    transitModel
-      .getTransitModelIndex()
-      .getTripOnServiceDateForTripAndDay()
-      .put(new TripIdAndServiceDate(tripId, serviceDate), tripOnServiceDate);
+    transitService.addTripForId(tripId, trip);
+    transitService.addPatternForTrip(trip, pattern);
+    transitService.addPatternsForRoute(route, pattern);
+    transitService.addTripOnServiceDateById(tripOnServiceDate.getId(), tripOnServiceDate);
+    transitService.addTripOnServiceDateForTripAndDay(
+      new TripIdAndServiceDate(tripId, serviceDate),
+      tripOnServiceDate
+    );
 
     return Result.success(new TripUpdate(stopPattern, updatedTripTimes, serviceDate));
   }
@@ -278,34 +282,40 @@ class AddedTripBuilder {
   /**
    * Method to create a Route. Commonly used to create a route if a real-time message
    * refers to a route that is not in the transit model.
-   *
-   * We will find the first Route with same Operator, and use the same Authority
-   * If no operator found, copy the agency from replaced route
-   *
    * If no name is given for the route, an empty string will be set as the name.
    *
    * @return a new Route
    */
-  private Route createRoute() {
+  @Nonnull
+  private Route createRoute(Agency agency) {
     var routeBuilder = Route.of(entityResolver.resolveId(lineRef));
 
     routeBuilder.withShortName(shortName);
     routeBuilder.withMode(transitMode);
     routeBuilder.withNetexSubmode(transitSubMode);
     routeBuilder.withOperator(operator);
+    routeBuilder.withAgency(agency);
 
-    // TODO - SIRI: Is there a better way to find authority/Agency?
-    Agency agency = transitModel
-      .getTransitModelIndex()
+    return routeBuilder.build();
+  }
+
+  /**
+   * Attempt to find the agency to which this new trip belongs.
+   * The algorithm retrieves any route operated by the same operator as the one operating this new
+   * trip and resolves its agency.
+   * If no route with the same operator can be found, the algorithm falls back to retrieving the
+   * agency operating the replaced route.
+   * If none can be found the method returns null.
+   */
+  @Nullable
+  private Agency resolveAgency() {
+    return transitService
       .getAllRoutes()
       .stream()
       .filter(r -> r != null && r.getOperator() != null && r.getOperator().equals(operator))
       .findFirst()
       .map(Route::getAgency)
       .orElseGet(() -> replacedRoute != null ? replacedRoute.getAgency() : null);
-    routeBuilder.withAgency(agency);
-
-    return routeBuilder.build();
   }
 
   private Trip createTrip(Route route, FeedScopedId calServiceId) {

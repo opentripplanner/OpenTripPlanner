@@ -29,11 +29,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Equals;
-import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.EqualsAnyIn;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.GreaterThan;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.InclusiveRange;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.LessThan;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.MatchResult;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.OneOf;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Present;
 
 class ConditionTest {
@@ -46,7 +46,7 @@ class ConditionTest {
   static Condition moreThanFourLanes = new GreaterThan("lanes", 4);
   static Condition lessThanFourLanes = new LessThan("lanes", 4);
   static Condition betweenFiveAndThreeLanes = new InclusiveRange("lanes", 5, 3);
-  static Condition smoothnessBadAndWorseThanBad = new EqualsAnyIn(
+  static Condition smoothnessBadAndWorseThanBad = new OneOf(
     "smoothness",
     "bad",
     "very_bad",
@@ -54,7 +54,7 @@ class ConditionTest {
     "very_horrible",
     "impassable"
   );
-  static Condition noSidewalk = new Condition.EqualsAnyInOrAbsent("sidewalk");
+  static Condition noSidewalk = new Condition.OneOfOrAbsent("sidewalk");
 
   static Stream<Arguments> equalsCases() {
     return Stream.of(

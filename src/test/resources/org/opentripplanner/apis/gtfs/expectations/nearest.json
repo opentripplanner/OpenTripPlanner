@@ -10,6 +10,20 @@
               "parentStation" : null
             }
           }
+        },
+        {
+          "node" : {
+            "place" : {
+              "stationId" : "Network-1:FooStation"
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "vehicleId" : "Network-1:free-floating-bicycle"
+            }
+          }
         }
       ]
     }

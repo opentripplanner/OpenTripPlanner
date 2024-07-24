@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 
-public class TestGroupPriorityCalculator implements RaptorTransitGroupCalculator {
+public class TestGroupPriorityCalculator implements RaptorTransitGroupPriorityCalculator {
 
-  public static final RaptorTransitGroupCalculator PRIORITY_CALCULATOR = new TestGroupPriorityCalculator();
+  public static final RaptorTransitGroupPriorityCalculator PRIORITY_CALCULATOR = new TestGroupPriorityCalculator();
 
   public static final int GROUP_A = 0x01;
   public static final int GROUP_B = 0x02;

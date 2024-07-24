@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -18,6 +19,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that the
@@ -26,6 +29,15 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
 public class DefaultRoutingServiceTest extends GtfsTest {
+
+  private TransitService transitService;
+
+  @BeforeEach
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+    transitService = new DefaultTransitService(transitModel);
+  }
 
   @Override
   public String getFeedName() {
@@ -44,16 +56,16 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     }
 
     /* Agencies */
-    String feedId = transitModel.getFeedIds().iterator().next();
+    String feedId = transitService.getFeedIds().iterator().next();
     Agency agency;
-    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "azerty"));
+    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
-    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "agency"));
+    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "agency"));
     assertEquals(feedId + ":" + "agency", agency.getId().toString());
     assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
-    transitModel.getStopModel().getRegularStop(new FeedScopedId("X", "Y"));
+    transitService.getRegularStop(new FeedScopedId("X", "Y"));
     /* Trips */
     //        graph.index.tripForId;
     //        graph.index.routeForId;
@@ -67,21 +79,18 @@ public class DefaultRoutingServiceTest extends GtfsTest {
    */
   @Test
   public void testPatternsCoherent() {
-    for (Trip trip : transitModel.getTransitModelIndex().getTripForId().values()) {
-      TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    for (Trip trip : transitService.getAllTrips()) {
+      TripPattern pattern = transitService.getPatternForTrip(trip);
       assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
     }
     /* This one depends on a feed where each TripPattern appears on only one route. */
-    for (Route route : transitModel.getTransitModelIndex().getAllRoutes()) {
-      for (TripPattern pattern : transitModel
-        .getTransitModelIndex()
-        .getPatternsForRoute()
-        .get(route)) {
+    for (Route route : transitService.getAllRoutes()) {
+      for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
         assertEquals(pattern.getRoute(), route);
       }
     }
-    for (var stop : transitModel.getStopModel().listStopLocations()) {
-      for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
+    for (var stop : transitService.listStopLocations()) {
+      for (TripPattern pattern : transitService.getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
       }
@@ -90,13 +99,13 @@ public class DefaultRoutingServiceTest extends GtfsTest {
 
   @Test
   public void testSpatialIndex() {
-    String feedId = transitModel.getFeedIds().iterator().next();
+    String feedId = transitService.getFeedIds().iterator().next();
     FeedScopedId idJ = new FeedScopedId(feedId, "J");
-    var stopJ = transitModel.getStopModel().getRegularStop(idJ);
+    var stopJ = transitService.getRegularStop(idJ);
     FeedScopedId idL = new FeedScopedId(feedId, "L");
-    var stopL = transitModel.getStopModel().getRegularStop(idL);
+    var stopL = transitService.getRegularStop(idL);
     FeedScopedId idM = new FeedScopedId(feedId, "M");
-    var stopM = transitModel.getStopModel().getRegularStop(idM);
+    var stopM = transitService.getRegularStop(idM);
     TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
     TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
     TransitStopVertex stopvM = graph.getStopVertexForStopId(idM);
@@ -106,7 +115,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<RegularStop> stops = transitModel.getStopModel().findRegularStops(env);
+    Collection<RegularStop> stops = transitService.findRegularStops(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));

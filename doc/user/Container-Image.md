@@ -4,7 +4,9 @@ The CI pipeline deploys container images for runtimes like Docker, Kubernetes or
 [Dockerhub](https://hub.docker.com/r/opentripplanner/opentripplanner/tags).
 
 The image assumes you use a volume to mount the input data (GTFS/NeTex, OSM) and config files into 
-`/var/opentripplanner/`. When serving a graph it's also expected to be in this directory.
+`/var/opentripplanner/`. When serving a graph it's also expected to be in this directory. If a logback
+extensions file needs to be used, it should be mounted to the root location `/logback-include-extensions.xml`
+instead of the `/var/opentripplanner/` directory.
 
 ## Quick start
 

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -259,6 +260,52 @@ public class TimetableSnapshotTest {
 
     assertNull(resolver.commit());
     assertFalse(resolver.isDirty());
+  }
+
+  @Test
+  void testCannotUpdateReadOnlyTimetableSnapshot() {
+    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+    LocalDate today = LocalDate.now(timeZone);
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.update(pattern, null, today)
+    );
+  }
+
+  @Test
+  void testCannotCommitReadOnlyTimetableSnapshot() {
+    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+    assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.commit(null, true));
+  }
+
+  @Test
+  void testCannotClearReadOnlyTimetableSnapshot() {
+    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+    assertThrows(ConcurrentModificationException.class, () -> committedSnapshot.clear(null));
+  }
+
+  @Test
+  void testCannotPurgeReadOnlyTimetableSnapshot() {
+    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.purgeExpiredData(null)
+    );
+  }
+
+  @Test
+  void testCannotRevertReadOnlyTimetableSnapshot() {
+    TimetableSnapshot committedSnapshot = createCommittedSnapshot();
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.revertTripToScheduledTripPattern(null, null)
+    );
+  }
+
+  private static TimetableSnapshot createCommittedSnapshot() {
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    return timetableSnapshot.commit(null, true);
   }
 
   private Result<?, UpdateError> updateResolver(
