@@ -118,7 +118,7 @@ class GraphQLIntegrationTest {
     .toList();
   private static final Route ROUTE = TransitModelForTest.route("a-route").build();
 
-  private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
+  private static final VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
     .withVehicles(10)
     .withSpaces(10)
     .withVehicleTypeBicycle(5, 7)
@@ -126,7 +126,7 @@ class GraphQLIntegrationTest {
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
-  private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+  private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
     .build();
 

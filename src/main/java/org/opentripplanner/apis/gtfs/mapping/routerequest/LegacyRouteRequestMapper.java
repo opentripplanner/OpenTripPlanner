@@ -57,7 +57,7 @@ public class LegacyRouteRequestMapper {
     callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
     callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
-    mapPassThroughPoints(request, callWith, context.transitService());
+    mapViaPoints(request, callWith, context.transitService());
 
     request.setDateTime(
       environment.getArgument("date"),
@@ -260,16 +260,14 @@ public class LegacyRouteRequestMapper {
     return request;
   }
 
-  static void mapPassThroughPoints(
+  static void mapViaPoints(
     RouteRequest request,
     CallerWithEnvironment callWith,
     TransitService transitService
   ) {
     callWith.argument(
-      "passThroughPoints",
-      (List<Map<String, Object>> v) -> {
-        request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v));
-      }
+      "viaPoints",
+      (List<Map<String, Object>> v) -> request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v))
     );
   }
 

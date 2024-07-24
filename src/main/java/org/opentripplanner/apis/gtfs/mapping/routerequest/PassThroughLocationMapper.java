@@ -22,8 +22,10 @@ class PassThroughLocationMapper {
     final TransitService transitService,
     Map<String, Object> map
   ) {
-    final List<String> stops = (List<String>) map.get("placeIds");
-    final String name = (String) map.get("name");
+    Map<String, Object> element= (Map<String, Object>) map.get("element");
+    List<String> stops = (List<String>) element.get("placeIds");
+
+    final String name = (String) element.get("name");
     if (stops == null || stops.isEmpty()) {
       throw new IllegalArgumentException("No stops in pass-through point");
     }

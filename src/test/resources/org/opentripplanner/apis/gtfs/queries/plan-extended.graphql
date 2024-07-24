@@ -10,6 +10,10 @@
       filters: [{ select: [{ tags: ["e"] }] }]
     }
     transportModes: [{ mode: CAR, qualifier: HAIL }]
+    viaPoints: [{
+      name: "Flower shop"
+      element: { placeIds: ["trimet:1123", "trimet:30284"] }
+    }]
   ) {
     itineraries {
       start
