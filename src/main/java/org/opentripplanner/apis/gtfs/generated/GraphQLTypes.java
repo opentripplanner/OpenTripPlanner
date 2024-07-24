@@ -1421,35 +1421,6 @@ public class GraphQLTypes {
     }
   }
 
-  public static class GraphQLPassThroughPointInput {
-
-    private String name;
-    private List<String> placeIds;
-
-    public GraphQLPassThroughPointInput(Map<String, Object> args) {
-      if (args != null) {
-        this.name = (String) args.get("name");
-        this.placeIds = (List<String>) args.get("placeIds");
-      }
-    }
-
-    public String getGraphQLName() {
-      return this.name;
-    }
-
-    public List<String> getGraphQLPlaceIds() {
-      return this.placeIds;
-    }
-
-    public void setGraphQLName(String name) {
-      this.name = name;
-    }
-
-    public void setGraphQLPlaceIds(List<String> placeIds) {
-      this.placeIds = placeIds;
-    }
-  }
-
   public static class GraphQLPatternAlertsArgs {
 
     private List<GraphQLPatternAlertType> types;
@@ -2690,7 +2661,6 @@ public class GraphQLTypes {
     private GraphQLOptimizeType optimize;
     private String pageCursor;
     private GraphQLVehicleParkingInput parking;
-    private List<GraphQLPassThroughPointInput> passThroughPoints;
     private GraphQLInputPreferredInput preferred;
     private Boolean reverseOptimizeOnTheFly;
     private Long searchWindow;
@@ -2703,6 +2673,7 @@ public class GraphQLTypes {
     private List<GraphQLTransportModeInput> transportModes;
     private GraphQLInputTriangleInput triangle;
     private GraphQLInputUnpreferredInput unpreferred;
+    private List<GraphQLViaPointInput> viaPoints;
     private Double waitAtBeginningFactor;
     private Double waitReluctance;
     private Integer walkBoardCost;
@@ -2768,10 +2739,6 @@ public class GraphQLTypes {
         }
         this.pageCursor = (String) args.get("pageCursor");
         this.parking = new GraphQLVehicleParkingInput((Map<String, Object>) args.get("parking"));
-        if (args.get("passThroughPoints") != null) {
-          this.passThroughPoints =
-            (List<GraphQLPassThroughPointInput>) args.get("passThroughPoints");
-        }
         this.preferred =
           new GraphQLInputPreferredInput((Map<String, Object>) args.get("preferred"));
         this.reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
@@ -2788,6 +2755,9 @@ public class GraphQLTypes {
         this.triangle = new GraphQLInputTriangleInput((Map<String, Object>) args.get("triangle"));
         this.unpreferred =
           new GraphQLInputUnpreferredInput((Map<String, Object>) args.get("unpreferred"));
+        if (args.get("viaPoints") != null) {
+          this.viaPoints = (List<GraphQLViaPointInput>) args.get("viaPoints");
+        }
         this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
         this.waitReluctance = (Double) args.get("waitReluctance");
         this.walkBoardCost = (Integer) args.get("walkBoardCost");
@@ -2971,10 +2941,6 @@ public class GraphQLTypes {
       return this.parking;
     }
 
-    public List<GraphQLPassThroughPointInput> getGraphQLPassThroughPoints() {
-      return this.passThroughPoints;
-    }
-
     public GraphQLInputPreferredInput getGraphQLPreferred() {
       return this.preferred;
     }
@@ -3021,6 +2987,10 @@ public class GraphQLTypes {
 
     public GraphQLInputUnpreferredInput getGraphQLUnpreferred() {
       return this.unpreferred;
+    }
+
+    public List<GraphQLViaPointInput> getGraphQLViaPoints() {
+      return this.viaPoints;
     }
 
     public Double getGraphQLWaitAtBeginningFactor() {
@@ -3233,10 +3203,6 @@ public class GraphQLTypes {
       this.parking = parking;
     }
 
-    public void setGraphQLPassThroughPoints(List<GraphQLPassThroughPointInput> passThroughPoints) {
-      this.passThroughPoints = passThroughPoints;
-    }
-
     public void setGraphQLPreferred(GraphQLInputPreferredInput preferred) {
       this.preferred = preferred;
     }
@@ -3283,6 +3249,10 @@ public class GraphQLTypes {
 
     public void setGraphQLUnpreferred(GraphQLInputUnpreferredInput unpreferred) {
       this.unpreferred = unpreferred;
+    }
+
+    public void setGraphQLViaPoints(List<GraphQLViaPointInput> viaPoints) {
+      this.viaPoints = viaPoints;
     }
 
     public void setGraphQLWaitAtBeginningFactor(Double waitAtBeginningFactor) {
@@ -5101,6 +5071,54 @@ public class GraphQLTypes {
     NORMAL,
     PARKANDRIDE,
     TRANSIT,
+  }
+
+  public static class GraphQLViaElementInput {
+
+    private List<String> placeIds;
+
+    public GraphQLViaElementInput(Map<String, Object> args) {
+      if (args != null) {
+        this.placeIds = (List<String>) args.get("placeIds");
+      }
+    }
+
+    public List<String> getGraphQLPlaceIds() {
+      return this.placeIds;
+    }
+
+    public void setGraphQLPlaceIds(List<String> placeIds) {
+      this.placeIds = placeIds;
+    }
+  }
+
+  public static class GraphQLViaPointInput {
+
+    private GraphQLViaElementInput element;
+    private String name;
+
+    public GraphQLViaPointInput(Map<String, Object> args) {
+      if (args != null) {
+        this.element = new GraphQLViaElementInput((Map<String, Object>) args.get("element"));
+        this.name = (String) args.get("name");
+      }
+    }
+
+    public GraphQLViaElementInput getGraphQLElement() {
+      return this.element;
+    }
+
+    public String getGraphQLName() {
+      return this.name;
+    }
+
+    public void setGraphQLElement(GraphQLViaElementInput element) {
+      this.element = element;
+    }
+
+    public void setGraphQLName(String name) {
+      this.name = name;
+    }
   }
 
   public static class GraphQLWalkPreferencesInput {
