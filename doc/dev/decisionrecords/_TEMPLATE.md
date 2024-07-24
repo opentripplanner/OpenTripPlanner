@@ -2,7 +2,7 @@
 
 {DESCRIPTION}
 <!-- 
-  One or two sentences which go into the [DECISION_RECORDS](/DECISION_RECORDS.md) document
+  One or two sentences which go into the [DECISION_RECORDS](/DEVELOPMENT_DECISION_RECORDS.md) document
   later. 
 -->
 

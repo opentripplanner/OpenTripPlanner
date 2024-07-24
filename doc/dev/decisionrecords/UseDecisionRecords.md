@@ -7,7 +7,7 @@ OTP development.
 
 ## Process
 
-Decisions we make in the developer meetings are recorded in the [Decision Records](/DECISION_RECORDS.md)
+Decisions we make in the developer meetings are recorded in the [Developer Decision Records](/DEVELOPMENT_DECISION_RECORDS.md)
 list. If the decision is small and uncontroversial, but yet important and can be expressed in 
 maximum 2 sentences, we will list it here without any more documentation. If the decision requires
 a bit more discussion and explanations, then we will create a PR with a document for it.
