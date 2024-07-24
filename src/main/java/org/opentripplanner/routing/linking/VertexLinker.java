@@ -17,6 +17,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
@@ -69,6 +70,12 @@ public class VertexLinker {
    */
   private final EdgeSpatialIndex edgeSpatialIndex;
 
+  /**
+   * Spatial index of permanent splitter vertices (only used during graph build) to reuse split
+   * vertices for forward and backward edges.
+   */
+  private final HashGridSpatialIndex<SplitterVertex> permanentSplitterVertices;
+
   private final Graph graph;
 
   private final StopModel stopModel;
@@ -86,6 +93,7 @@ public class VertexLinker {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
     this.stopModel = stopModel;
+    this.permanentSplitterVertices = new HashGridSpatialIndex<>();
   }
 
   public void linkVertexPermanently(
@@ -456,6 +464,18 @@ public class VertexLinker {
     return v;
   }
 
+  private SplitterVertex existingSplitterVertexAt(double x, double y) {
+    List<SplitterVertex> splitterVerticesAtLocation = permanentSplitterVertices
+      .query(new Envelope(x, x, y, y))
+      .stream()
+      .filter(c -> c.getX() == x && c.getY() == y)
+      .toList();
+    if (!splitterVerticesAtLocation.isEmpty()) {
+      return (SplitterVertex) splitterVerticesAtLocation.getFirst();
+    }
+    return null;
+  }
+
   private SplitterVertex splitVertex(
     StreetEdge originalEdge,
     Scope scope,
@@ -477,7 +497,13 @@ public class VertexLinker {
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
-      v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
+      SplitterVertex existingSplitterVertex = existingSplitterVertexAt(x, y);
+      if (existingSplitterVertex == null) {
+        v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
+        permanentSplitterVertices.insert(new Envelope(v.getCoordinate()), v);
+      } else {
+        v = existingSplitterVertex;
+      }
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
