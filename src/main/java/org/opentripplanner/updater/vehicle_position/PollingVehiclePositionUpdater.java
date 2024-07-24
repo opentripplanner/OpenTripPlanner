@@ -3,13 +3,13 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -45,18 +45,20 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     super(params);
     this.vehiclePositionSource =
       new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
-    var index = transitModel.getTransitModelIndex();
+    // TODO Inject TransitService, do not create it here. We currently do not
+    //      support dagger injection in updaters, so this is ok for now.
+    TransitService transitService = new DefaultTransitService(transitModel);
     var fuzzyTripMatcher = params.fuzzyTripMatching()
-      ? new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel))
+      ? new GtfsRealtimeFuzzyTripMatcher(transitService)
       : null;
     this.realtimeVehiclePatternMatcher =
       new RealtimeVehiclePatternMatcher(
         params.feedId(),
-        tripId -> index.getTripForId().get(tripId),
-        trip -> index.getPatternForTrip().get(trip),
+        transitService::getTripForId,
+        transitService::getPatternForTrip,
         (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
         realtimeVehicleRepository,
-        transitModel.getTimeZone(),
+        transitService.getTimeZone(),
         fuzzyTripMatcher,
         params.vehiclePositionFeatures()
       );
@@ -99,9 +101,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     Trip trip,
     LocalDate sd
   ) {
-    return Optional
-      .ofNullable(transitModel.getTimetableSnapshot())
-      .map(snapshot -> snapshot.getRealtimeAddedTripPattern(trip.getId(), sd))
-      .orElseGet(() -> transitModel.getTransitModelIndex().getPatternForTrip().get(trip));
+    // a new instance of DefaultTransitService must be created to retrieve
+    // the current TimetableSnapshot
+    return (new DefaultTransitService(transitModel)).getPatternForTrip(trip, sd);
   }
 }

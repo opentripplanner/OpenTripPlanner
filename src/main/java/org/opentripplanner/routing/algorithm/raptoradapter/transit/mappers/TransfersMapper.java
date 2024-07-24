@@ -6,7 +6,7 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 class TransfersMapper {
 
@@ -14,7 +14,7 @@ class TransfersMapper {
    * Copy pre-calculated transfers from the original graph
    * @return a list where each element is a list of transfers for the corresponding stop index
    */
-  static List<List<Transfer>> mapTransfers(StopModel stopModel, TransitModel transitModel) {
+  static List<List<Transfer>> mapTransfers(StopModel stopModel, TransitService transitService) {
     List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
     for (int i = 0; i < stopModel.stopIndexSize(); ++i) {
@@ -26,7 +26,7 @@ class TransfersMapper {
 
       ArrayList<Transfer> list = new ArrayList<>();
 
-      for (PathTransfer pathTransfer : transitModel.getTransfersByStop(stop)) {
+      for (PathTransfer pathTransfer : transitService.getTransfersByStop(stop)) {
         if (pathTransfer.to instanceof RegularStop) {
           int toStopIndex = pathTransfer.to.getIndex();
           Transfer newTransfer;

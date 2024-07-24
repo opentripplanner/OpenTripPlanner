@@ -67,9 +67,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit model index which is needed by the nearby stop finder. */
-    if (transitModel.getTransitModelIndex() == null) {
-      transitModel.index();
-    }
+    transitModel.index();
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();

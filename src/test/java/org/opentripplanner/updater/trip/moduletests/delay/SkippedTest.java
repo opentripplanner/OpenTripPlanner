@@ -132,8 +132,8 @@ public class SkippedTest {
     RealtimeTestEnvironment env,
     FeedScopedId tripId
   ) {
-    var trip = env.transitModel.getTransitModelIndex().getTripForId().get(tripId);
-    var originalTripPattern = env.transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+    var trip = env.getTransitService().getTripForId(tripId);
+    var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -178,10 +178,7 @@ public class SkippedTest {
     RealtimeTestEnvironment env,
     FeedScopedId tripId
   ) {
-    var originalTripPattern = env.transitModel
-      .getTransitModelIndex()
-      .getPatternForTrip()
-      .get(env.trip2);
+    var originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
 
