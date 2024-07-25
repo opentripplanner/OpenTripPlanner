@@ -16,7 +16,7 @@ class LocalDateRangeMapperTest {
 
   private static final LocalDate DATE = LocalDate.parse("2024-05-27");
 
-  public static List<GraphQLTypes.GraphQLLocalDateRangeInput> noFilterCases() {
+  private static List<GraphQLTypes.GraphQLLocalDateRangeInput> noFilterCases() {
     var list = new ArrayList<GraphQLTypes.GraphQLLocalDateRangeInput>();
     list.add(null);
     list.add(new GraphQLTypes.GraphQLLocalDateRangeInput(Map.of()));
