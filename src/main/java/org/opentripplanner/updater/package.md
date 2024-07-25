@@ -52,11 +52,11 @@ An important characteristic of this approach is that _no locking is necessary_. 
 
 Arguably the process of creating an immutable live snapshot (and a corresponding new writable buffer) should be handled by a GraphWriterRunnable on the single graph updater thread. This would serve to defer any queued modifications until the new buffer is in place, without introducing any further locking mechanisms.
 
-## Copy on Write Strategy in Timetable Snapshots
+## Copy-on-Write Strategy in Timetable Snapshots
 
 This is a high-level diagram of how the timetable snapshots are used to look up both scheduled and realtime arrival and departure times for a particular TripPattern:
 
-![Timetable Lookup Diagram](images/timetable-lookup.svg)
+<img alt="Timetable Lookup Diagram" src="images/timetable-lookup.svg" width="50%"/>
 
 The following is a step-by-step diagram of how successive timetable snapshots are built up in a buffer, using a copy-on-write strategy to reuse as many object instances as possible (minimizing time and memory spent on copies) while ensuring that existing snapshots visible to routing or API threads are unchanging. This is a more detailed look at the bottom half of the "Threads, Queues, and Buffers" diagram above, and particularly the yellow boxes near its center representing the buffered and live transit data. Unlike that diagram, time is on the vertical axis here.
 
