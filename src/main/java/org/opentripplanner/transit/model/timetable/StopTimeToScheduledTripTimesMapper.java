@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
@@ -107,9 +108,9 @@ class StopTimeToScheduledTripTimesMapper {
    * stop sequence.
    * @return May be null if no stop in the entire sequence of stops has any via strings. Any
    * subarray may also be null or empty if no Via strings are displayed at that particular stop.
-   * @see org.opentripplanner.transit.model.timetable.ScheduledTripTimes#headsignVias
+   * @see org.opentripplanner.transit.model.timetable.TripTimes#getHeadsignVias(int)
    */
-  @Nullable 
+  @Nullable
   private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
     if (
       stopTimes
