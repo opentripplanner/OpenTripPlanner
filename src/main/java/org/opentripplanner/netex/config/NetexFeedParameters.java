@@ -31,7 +31,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final String SHARED_GROUP_FILE_PATTERN = "(\\w{3})-.*-shared\\.xml";
   private static final String GROUP_FILE_PATTERN = "(\\w{3})-.*\\.xml";
   private static final boolean NO_TRANSFERS_ON_ISOLATED_STOPS = false;
-  private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of();
+  private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
