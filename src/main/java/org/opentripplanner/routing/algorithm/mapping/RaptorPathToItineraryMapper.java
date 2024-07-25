@@ -110,13 +110,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
-        if(OTPFeature.ExtraTransferLegOnSameStop.isOn()) {
+        if (OTPFeature.ExtraTransferLegOnSameStop.isOn()) {
           if (isPathTransferAtSameStop(previousLeg, pathLeg)) {
             legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
           }
         }
-          transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
-          legs.add(transitLeg);
+        transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
+        legs.add(transitLeg);
       }
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
