@@ -54,25 +54,51 @@ Arguably the process of creating an immutable live snapshot (and a corresponding
 
 ## Copy-on-Write Strategy in Timetable Snapshots
 
-This is a high-level diagram of how the timetable snapshots are used to look up both scheduled and realtime arrival and departure times for a particular TripPattern:
+Below is a high-level diagram of how the timetable snapshots are used to look up arrival and departure times for a particular TripPattern. Each Route is associated with N different TripPatterns (essentially, N different unique sequences of stops). The TimetableSnapshot is used to look up a Timetable for a given TripPattern. That Timetable provides an unchanging view of both realtime-updated and original scheduled arrival/departure times for all trips that match the given TripPattern. The arrays of arrival and departure times for all these trips are parallel to the array of stops for the TripPattern used to look them up. They have the same length, and a given index corresponds to the same stop in any of these arrays. Note that this is a simplification; in reality the data structures are further broken down to reflect which services are running on each specific date.
 
 <img alt="Timetable Lookup Diagram" src="images/timetable-lookup.svg" width="50%"/>
 
-The following is a step-by-step diagram of how successive timetable snapshots are built up in a buffer, using a copy-on-write strategy to reuse as many object instances as possible (minimizing time and memory spent on copies) while ensuring that existing snapshots visible to routing or API threads are unchanging. This is a more detailed look at the bottom half of the "Threads, Queues, and Buffers" diagram above, and particularly the yellow boxes near its center representing the buffered and live transit data. Unlike that diagram, time is on the vertical axis here.
+Next, we will walk through a step-by-step diagram of how successive timetable snapshots are built up in a buffer, using a copy-on-write strategy to reuse as many object instances as possible (minimizing time and memory spent on copies) while ensuring that any existing snapshots visible to routing or API threads are consistent and unchanging. This is a more detailed look at the bottom half of the "Threads, Queues, and Buffers" diagram above, and particularly the yellow boxes near its center representing the buffered and live transit data. Unlike that diagram, time is on the vertical axis here.
 
-In the below diagram, each blue box represents a shallow-copied object, maintaining a protective copy of the minimal subtree at and above any leaf nodes that are changed by incoming realtime messages. Eventually this snapshot is frozen ("committed" in database terms) and handed off to routing and API services. At that point, the process begins anew with green boxes representing the minimal subtree of shallow protective copies. Once no threads are using a snapshot anymore the snapshot can be garbage collected, transitively releasing any objects that are no longer used. The final section of this diagram illustrates that without any further active steps by OTP or the JVM, simply rearranging elements of the drawing after garbage collection occurs reveals that our routing thread is seeing a full coherent snapshot composed of objects created over the course of several subsequent snapshots.
+In the first four diagrams below, each blue box represents a shallow-copied object, maintaining a protective copy of the minimal subtree at and above any leaf nodes that are changed by incoming realtime messages. These shallow copies are being created in a private buffer that is visible only to a single thread that is sequentially executing GraphWriterRunnables enqueued by GraphUpdaters. 
 
 <!-- With []() image syntax markdown sets all widths to 100%, completely ignoring the stated
      dimensions in each SVG file. Use HTML img tags to force width in percent, which is set to
      viewBox width divided by 20 to maintain relative sizes. -->
 
+<br>
 <img alt="Snapshot Copy-on-Write Diagram 1" src="images/snapshot-manager-1.svg" width="45%"/><br>
+
+In preparation for applying updates, the collections in the root object of the buffer are shallow-copied. The collection objects themselves are duplicated, but the references they contain remain unchanged: they continue to reference the same existing Timetable instances.
+
 <img alt="Snapshot Copy-on-Write Diagram 2" src="images/snapshot-manager-2.svg" width="42%"/><br>
+
+At this point, the realtime system receives some updated departure times for the first trip on TripPattern A. This will require a change to a primitive array of departure times for that particular trip. All objects leading from the root of the snapshot down to that leaf array are copied in a selective deep copy. Specifically, the Timetable for TripPattern A and the first TripTimes within that Timetable are copied. All other elements in collections continue to point at the previously existing object instances. This is indicated by the (1:N-1) cardinality of the references pointing from the blue copied boxes back to the pre-existing white boxes.
+
+From this step onward, the "requests" box on the right side of the diagram will demonstrate how the snapshots interact with incoming routing and API requests and garbage collection. One of the HTTP handler threads is actively performing routing, so has been given a request-scoped reference to the current live snapshot. 
+
 <img alt="Snapshot Copy-on-Write Diagram 3" src="images/snapshot-manager-3.svg" width="77%"/><br>
+
+In the next diagram, the selective deep copy is complete. The departure times have been updated, and are reachable from the root of the buffer snapshot, without affecting any pre-existing snapshots. The changes to the buffer are not published immediately; a series of changes is usually batched for publication every few seconds. Another incoming HTTP request, this time for the GraphQL API, is given a request-scoped reference to the same immutable live snapshot.
+
 <img alt="Snapshot Copy-on-Write Diagram 4" src="images/snapshot-manager-4.svg" width="83%"/><br>
+
+Every few seconds, the buffer contents are frozen ("committed" in database terms) and made available to routing and API services as a new "live snapshot". Once the snapshot is made visible to other threads, its entire object tree is immutable by convention. This immutability will eventually be enforced in code. The process of applying single-threaded updates to the private buffer begins anew. The blue instances have been promoted to become the current live snapshot. Green boxes will now represent the minimal subtree of shallow protective copies in the private buffer. Note that the two HTTP requests are still in progress, and retain their references to the previous, unchanging snapshot S even though we have published a new snapshot T. In this way, each request maintains a consistent view of all the transit data until it completes.
+
 <img alt="Snapshot Copy-on-Write Diagram 5" src="images/snapshot-manager-5.svg" width="87%"/><br>
+
+Now the realtime system receives some updated arrival and departure times for the third trip in TripPattern B. It again makes a protective copy of all items from the root of the snapshot down to the leaf arrays it needs to update. This includes the Timetable for TripPattern B and the third TripTimes in that Timetable, as well as some primitive arrays. Note that the copied collections in the buffer now contain a mixture of references to white, blue, and green objects from three generations of snapshots. Both live snapshots S and T remain unchanged by the writes to the copies in the buffer, even though the buffer reuses most of the instances in these previous snapshots.
+
+The routing request has now completed and released its reference to the original snapshot S (white). But another routing request has arrived on another HTTP handler thread, and is given a request-scoped reference to the current live snapshot T (blue).
+
 <img alt="Snapshot Copy-on-Write Diagram 6" src="images/snapshot-manager-6.svg" width="93%"/><br>
+
+Once the GraphQL request completes, no threads are using the old snapshot S (white) anymore. That snapshot will now be garbage collected, transitively releasing any objects that are no longer used because they've been superseded by protective copies.
+
 <img alt="Snapshot Copy-on-Write Diagram 7" src="images/snapshot-manager-7.svg" width="92%"/><br>
+
+Without any further active steps by OTP or the JVM, simply rearranging elements of the diagram after garbage collection occurs reveals that our routing thread is seeing a full coherent snapshot composed of objects created over the course of several subsequent snapshots. The buffer (green) will soon be promoted to the current live snapshot and the cycle continues.
+
 <img alt="Snapshot Copy-on-Write Diagram 8" src="images/snapshot-manager-8.svg" width="75%"/><br>
 
 
