@@ -62,14 +62,18 @@ The following is a step-by-step diagram of how successive timetable snapshots ar
 
 In the below diagram, each blue box represents a shallow-copied object, maintaining a protective copy of the minimal subtree at and above any leaf nodes that are changed by incoming realtime messages. Eventually this snapshot is frozen ("committed" in database terms) and handed off to routing and API services. At that point, the process begins anew with green boxes representing the minimal subtree of shallow protective copies. Once no threads are using a snapshot anymore the snapshot can be garbage collected, transitively releasing any objects that are no longer used. The final section of this diagram illustrates that without any further active steps by OTP or the JVM, simply rearranging elements of the drawing after garbage collection occurs reveals that our routing thread is seeing a full coherent snapshot composed of objects created over the course of several subsequent snapshots.
 
-![Snapshot Copy-on-Write Diagram 1](images/snapshot-manager-1.svg)
-![Snapshot Copy-on-Write Diagram 2](images/snapshot-manager-2.svg)
-![Snapshot Copy-on-Write Diagram 3](images/snapshot-manager-3.svg)
-![Snapshot Copy-on-Write Diagram 4](images/snapshot-manager-4.svg)
-![Snapshot Copy-on-Write Diagram 5](images/snapshot-manager-5.svg)
-![Snapshot Copy-on-Write Diagram 6](images/snapshot-manager-6.svg)
-![Snapshot Copy-on-Write Diagram 7](images/snapshot-manager-7.svg)
-![Snapshot Copy-on-Write Diagram 8](images/snapshot-manager-8.svg)
+<!-- With []() image syntax markdown sets all widths to 100%, completely ignoring the stated
+     dimensions in each SVG file. Use HTML img tags to force width in percent, which is set to
+     viewBox width divided by 20 to maintain relative sizes. -->
+
+<img alt="Snapshot Copy-on-Write Diagram 1" src="images/snapshot-manager-1.svg" width="45%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 2" src="images/snapshot-manager-2.svg" width="42%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 3" src="images/snapshot-manager-3.svg" width="77%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 4" src="images/snapshot-manager-4.svg" width="83%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 5" src="images/snapshot-manager-5.svg" width="87%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 6" src="images/snapshot-manager-6.svg" width="93%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 7" src="images/snapshot-manager-7.svg" width="92%"/><br>
+<img alt="Snapshot Copy-on-Write Diagram 8" src="images/snapshot-manager-8.svg" width="75%"/><br>
 
 
 ## Design Considerations
