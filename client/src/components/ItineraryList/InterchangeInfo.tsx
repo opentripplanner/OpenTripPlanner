@@ -17,6 +17,6 @@ export function InterchangeInfo({ leg }: { leg: Leg }) {
       />
     );
   } else {
-    return <></>;
+    return null;
   }
 }
