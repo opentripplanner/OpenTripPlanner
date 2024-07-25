@@ -139,11 +139,11 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   I18NString getHeadsign(int stop);
 
   /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
+   * Vias are an additional intermediate destinations between the given stop and the terminus, which
+   * are displayed alongside the terminus headsign. Vias often change or are displayed only at
+   * certain stops along the way. While the concept of Headsigns exists in both GTFS (Headsign) and
+   * Netex (DestinationDisplay), the Via concept is only present in Transmodel.
+   * @return a list of via names visible at the given stop, or an empty list if there are no vias.
    */
   List<String> getHeadsignVias(int stop);
 

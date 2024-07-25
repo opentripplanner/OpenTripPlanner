@@ -220,6 +220,7 @@ public class TripTimeOnDate {
     return tripTimes.getHeadsign(stopIndex);
   }
 
+  /** @return a list of via names visible at this stop, or an empty list if there are no vias. */
   public List<String> getHeadsignVias() {
     return tripTimes.getHeadsignVias(stopIndex);
   }

@@ -63,13 +63,10 @@ public final class ScheduledTripTimes implements TripTimes {
 
   /**
    * A 2D array of String containing zero or more Via messages displayed at each stop in the
-   * stop sequence. A Via is an additional intermediate destination that is displayed alongside the
-   * terminus headsign, but will usually change or only be displayed at certain stops along the way.
-   * While the concept of Headsigns exists in both GTFS (Headsign) and Netex (DestinationDisplay),
-   * the Via concept is only present in Transmodel. This reference be null if no stop in the entire
-   * sequence of stops has any via strings. Any subarray may also be null or empty if no Via strings
-   * are displayed at that particular stop. These nulls are allowed to conserve memory in the common
-   * case where there are few or no via messages.
+   * stop sequence. This reference be null if no stop in the entire sequence of stops has any via
+   * strings. Any subarray may also be null or empty if no Via strings are displayed at that
+   * particular stop. These nulls are allowed to conserve memory in the common case where there are
+   * few or no via messages.
    */
   @Nullable
   private final String[][] headsignVias;
