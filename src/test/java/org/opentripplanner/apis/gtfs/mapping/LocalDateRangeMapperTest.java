@@ -29,7 +29,7 @@ class LocalDateRangeMapperTest {
     assertFalse(LocalDateRangeUtil.hasServiceDateFilter(input));
   }
 
-  public static List<Map<String, Object>> hasFilterCases() {
+  private static List<Map<String, Object>> hasFilterCases() {
     return List.of(Map.of("start", DATE), Map.of("end", DATE), Map.of("start", DATE, "end", DATE));
   }
 
