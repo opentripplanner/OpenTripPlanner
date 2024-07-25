@@ -16,7 +16,7 @@ Builder initStop(Stop stop) {
 You may use records, but avoid using records if you can not encapsulate it properly. Be especially
 aware of arrays fields (can not be protected) and collections (remember to make a defensive copy).
 If you need to override `equals` and `hashCode`, then it is probably not worth it.
-Be aware that `equals` compare references, not the value of a field. Consider overriding `toString`.
+The default `equals()` and `hashCode()` implementation is shallow, so all nested fields need to be records or value-objects. Consider overriding `toString`.
 
 ### Builders
 
