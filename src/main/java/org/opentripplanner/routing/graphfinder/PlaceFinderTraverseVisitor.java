@@ -31,6 +31,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final Set<FeedScopedId> filterByStops;
   private final Set<FeedScopedId> filterByStations;
   private final Set<FeedScopedId> filterByRoutes;
+  private final Set<String> filterByNetwork;
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
@@ -69,6 +70,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
+    List<String> filterByNetwork,
     int maxResults,
     double radiusMeters
   ) {
@@ -82,6 +84,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     this.filterByStations = toSet(filterByStations);
     this.filterByRoutes = toSet(filterByRoutes);
     this.filterByVehicleRental = toSet(filterByBikeRentalStations);
+    this.filterByNetwork = toSet(filterByNetwork);
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
 
     includePatternAtStops = shouldInclude(filterByPlaceTypes, PlaceType.PATTERN_AT_STOP);
@@ -262,6 +265,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       return;
     }
     if (seenVehicleRentalPlaces.contains(station.getId())) {
+      return;
+    }
+    if (!filterByNetwork.isEmpty() && !filterByNetwork.contains(station.getNetwork())) {
       return;
     }
     seenVehicleRentalPlaces.add(station.getId());

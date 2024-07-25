@@ -127,7 +127,9 @@ public final class RegularStop
   @Override
   @Nonnull
   public StopTransferPriority getPriority() {
-    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+    return isPartOfStation()
+      ? getParentStation().getPriority()
+      : StopTransferPriority.defaultValue();
   }
 
   @Override

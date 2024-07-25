@@ -190,12 +190,21 @@ public class TransitLayerMapper {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }
+    int defaultCost = RaptorCostConverter.toRaptorCost(
+      tuningParams.stopBoardAlightDuringTransferCost(StopTransferPriority.defaultValue())
+    );
     int[] stopBoardAlightTransferCosts = new int[stops.stopIndexSize()];
 
     for (int i = 0; i < stops.stopIndexSize(); ++i) {
-      StopTransferPriority priority = stops.stopByIndex(i).getPriority();
-      int domainCost = tuningParams.stopBoardAlightDuringTransferCost(priority);
-      stopBoardAlightTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+      // There can be holes in the stop index, so we need to account for 'null' here.
+      var stop = stops.stopByIndex(i);
+      if (stop == null) {
+        stopBoardAlightTransferCosts[i] = defaultCost;
+      } else {
+        var priority = stop.getPriority();
+        int domainCost = tuningParams.stopBoardAlightDuringTransferCost(priority);
+        stopBoardAlightTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+      }
     }
     return stopBoardAlightTransferCosts;
   }

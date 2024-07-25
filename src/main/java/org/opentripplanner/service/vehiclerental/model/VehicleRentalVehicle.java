@@ -128,4 +128,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public VehicleRentalStationUris getRentalUris() {
     return rentalUris;
   }
+
+  @Override
+  public VehicleRentalSystem getVehicleRentalSystem() {
+    return system;
+  }
 }

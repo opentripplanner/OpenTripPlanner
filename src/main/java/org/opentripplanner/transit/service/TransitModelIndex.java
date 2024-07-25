@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -126,10 +125,6 @@ public class TransitModelIndex {
     return routeForId.get(id);
   }
 
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   *           - this when doing the issue #3030.
-   */
   public void addRoutes(Route route) {
     routeForId.put(route.getId(), route);
   }
@@ -152,24 +147,6 @@ public class TransitModelIndex {
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toList());
-  }
-
-  /**
-   * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
-   * added by realtime updates are added to the collection. A set is used here because trip patterns
-   * that were updated by realtime data is both part of the TransitModelIndex and the TimetableSnapshot.
-   */
-  public Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  ) {
-    Set<TripPattern> tripPatterns = new HashSet<>(getPatternsForStop(stop));
-
-    if (timetableSnapshot != null) {
-      tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
-    }
-
-    return tripPatterns;
   }
 
   /**

@@ -47,6 +47,7 @@ config:
     BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     VehicleRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalStation#VehicleRentalStation
+    VehicleRentalNetwork: org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem#VehicleRentalSystem
     RentalVehicleEntityCounts: org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts#RentalVehicleEntityCounts
     RentalVehicleTypeCount: org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount#RentalVehicleTypeCount
     RentalVehicle: org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle#VehicleRentalVehicle

@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -60,12 +61,13 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, List.of(), third));
     tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), third));
 
-    // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
+    // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset
+    // in time when requested.
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
       new TestTransitDataProviderFilter(),
-      PriorityGroupConfigurator.empty()
+      TransitGroupPriorityService.empty()
     );
 
     // Get the results

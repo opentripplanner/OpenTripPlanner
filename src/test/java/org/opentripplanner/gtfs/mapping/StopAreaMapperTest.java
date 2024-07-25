@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.graph_builder.issue.api.DataImportIssueStore.NOOP;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ class StopAreaMapperTest {
   void map() {
     var stopModel = StopModel.of();
     var stopMapper = new StopMapper(new TranslationHelper(), ignored -> null, stopModel);
-    var locationMapper = new LocationMapper(stopModel);
+    var locationMapper = new LocationMapper(stopModel, NOOP);
     var mapper = new StopAreaMapper(stopMapper, locationMapper, stopModel);
 
     var area = new Area();

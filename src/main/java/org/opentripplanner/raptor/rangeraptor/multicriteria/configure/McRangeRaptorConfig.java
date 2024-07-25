@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
-import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
@@ -201,7 +201,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return null;
   }
 
-  private RaptorTransitGroupCalculator getTransitGroupPriorityCalculator() {
+  private RaptorTransitGroupPriorityCalculator getTransitGroupPriorityCalculator() {
     return mcRequest().transitPriorityCalculator().orElseThrow();
   }
 
