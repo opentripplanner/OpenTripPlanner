@@ -109,6 +109,7 @@ class StopTimeToScheduledTripTimesMapper {
    * subarray may also be null or empty if no Via strings are displayed at that particular stop.
    * @see org.opentripplanner.transit.model.timetable.ScheduledTripTimes#headsignVias
    */
+  @Nullable 
   private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
     if (
       stopTimes
