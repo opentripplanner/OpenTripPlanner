@@ -52,9 +52,15 @@ const query = graphql(`
           duration
           fromPlace {
             name
+            quay {
+              id
+            }
           }
           toPlace {
             name
+            quay {
+              id
+            }
           }
           toEstimatedCall {
             destinationDisplay {
@@ -70,6 +76,12 @@ const query = graphql(`
           }
           pointsOnLink {
             points
+          }
+          interchangeTo {
+            staySeated
+          }
+          interchangeFrom {
+            staySeated
           }
         }
         systemNotices {
