@@ -63,19 +63,16 @@ class TimetableSnapshotManagerTest {
 
   static Stream<Arguments> purgeExpiredDataTestCases() {
     return Stream.of(
-      // purgeExpiredData   maxSnapshotFrequency || snapshots PatternSnapshotA  PatternSnapshotB
-      Arguments.of(Boolean.TRUE, -1, NotSame, NotSame),
-      Arguments.of(Boolean.FALSE, -1, NotSame, Same),
-      Arguments.of(Boolean.TRUE, 1000, NotSame, NotSame),
-      Arguments.of(Boolean.FALSE, 1000, Same, Same)
+      // purgeExpiredData   || snapshots PatternSnapshotA  PatternSnapshotB
+      Arguments.of(Boolean.TRUE, NotSame, NotSame),
+      Arguments.of(Boolean.FALSE, NotSame, Same)
     );
   }
 
-  @ParameterizedTest(name = "purgeExpired: {0}, maxFrequency: {1}  ||  {2}  {3}")
+  @ParameterizedTest(name = "purgeExpired: {0} ||  {1}  {2}")
   @MethodSource("purgeExpiredDataTestCases")
   public void testPurgeExpiredData(
     boolean purgeExpiredData,
-    int maxSnapshotFrequency,
     SameAssert expSnapshots,
     SameAssert expPatternAeqB
   ) {
@@ -85,9 +82,7 @@ class TimetableSnapshotManagerTest {
 
     var snapshotManager = new TimetableSnapshotManager(
       null,
-      TimetableSnapshotSourceParameters.DEFAULT
-        .withPurgeExpiredData(purgeExpiredData)
-        .withMaxSnapshotFrequency(Duration.ofMillis(maxSnapshotFrequency)),
+      TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(purgeExpiredData),
       clock::get
     );
 

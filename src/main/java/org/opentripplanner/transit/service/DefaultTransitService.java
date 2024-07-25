@@ -79,6 +79,14 @@ public class DefaultTransitService implements TransitEditorService {
     this.transitModelIndex = transitModel.getTransitModelIndex();
   }
 
+  public DefaultTransitService(
+    TransitModel transitModel,
+    TimetableSnapshot timetableSnapshotBuffer
+  ) {
+    this(transitModel);
+    this.timetableSnapshot = timetableSnapshotBuffer;
+  }
+
   @Override
   public Collection<String> getFeedIds() {
     return this.transitModel.getFeedIds();
