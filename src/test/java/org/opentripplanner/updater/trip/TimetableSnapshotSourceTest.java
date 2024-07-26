@@ -83,28 +83,6 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testGetSnapshotWithMaxSnapshotFrequencyCleared() {
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequency(Duration.ofMillis(-1)),
-      transitModel
-    );
-
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      DIFFERENTIAL,
-      List.of(CANCELLATION),
-      feedId
-    );
-
-    final TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
-    assertNotNull(newSnapshot);
-    assertNotSame(snapshot, newSnapshot);
-  }
-
-  @Test
   public void testHandleModifiedTrip() {
     // GIVEN
 
@@ -221,6 +199,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdate),
       feedId
     );
+    updater.flushBuffer();
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();

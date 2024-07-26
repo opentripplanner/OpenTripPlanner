@@ -90,6 +90,14 @@ public enum OTPFeature {
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
   LegacyRestApi(false, true, "Enable legacy REST API. This API will be removed in the future."),
+  MultiCriteriaGroupMaxFilter(
+    false,
+    false,
+    "Keep the best itinerary with respect to each criteria used in the transit-routing search. " +
+    "For example the itinerary with the lowest cost, fewest transfers, and each unique transit-group " +
+    "(transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default " +
+    "for now, until this feature is well tested."
+  ),
   RealtimeResolver(
     false,
     true,

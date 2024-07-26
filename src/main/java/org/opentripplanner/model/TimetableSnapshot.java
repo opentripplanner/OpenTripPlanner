@@ -65,6 +65,11 @@ import org.slf4j.LoggerFactory;
  * up timetables on this class could conceivably be replaced with snapshotting entire views of the
  * transit network. It would also be possible to make the realtime version of Timetables or
  * TripTimes the primary view, and include references back to their scheduled versions.
+ * <p>
+ * Implementation note: when a snapshot is committed, the mutable state of this class is stored
+ * in final fields and completely initialized in the constructor. This provides an additional
+ * guarantee of safe-publication without synchronization.
+ * (see <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field Semantics</a>)
  */
 public class TimetableSnapshot {
 

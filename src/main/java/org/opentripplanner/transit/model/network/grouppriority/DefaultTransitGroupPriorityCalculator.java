@@ -10,7 +10,7 @@ public final class DefaultTransitGroupPriorityCalculator
   implements RaptorTransitGroupPriorityCalculator {
 
   @Override
-  public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
+  public int mergeInGroupId(int currentGroupIds, int boardingGroupId) {
     return TransitGroupPriority32n.mergeInGroupId(currentGroupIds, boardingGroupId);
   }
 

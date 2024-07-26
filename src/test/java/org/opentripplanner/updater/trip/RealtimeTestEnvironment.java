@@ -284,13 +284,15 @@ public final class RealtimeTestEnvironment {
     UpdateIncrementality incrementality
   ) {
     Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
-    return gtfsSource.applyTripUpdates(
+    UpdateResult updateResult = gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,
       updates,
       getFeedId()
     );
+    commitTimetableSnapshot();
+    return updateResult;
   }
 
   // private methods
@@ -300,7 +302,19 @@ public final class RealtimeTestEnvironment {
     boolean fuzzyMatching
   ) {
     Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
-    return getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(updates, DIFFERENTIAL);
+    UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
+      .applyUpdate(updates, DIFFERENTIAL);
+    commitTimetableSnapshot();
+    return updateResult;
+  }
+
+  private void commitTimetableSnapshot() {
+    if (siriSource != null) {
+      siriSource.flushBuffer();
+    }
+    if (gtfsSource != null) {
+      gtfsSource.flushBuffer();
+    }
   }
 
   private Trip createTrip(String id, Route route, List<StopCall> stops) {

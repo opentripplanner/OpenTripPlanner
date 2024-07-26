@@ -11,7 +11,7 @@ public interface RaptorTransitGroupPriorityCalculator {
    * @param boardingGroupId the transit group id to add to the given set.
    * @return the new computed set of groupIds
    */
-  int mergeGroupIds(int currentGroupIds, int boardingGroupId);
+  int mergeInGroupId(int currentGroupIds, int boardingGroupId);
 
   /**
    * This is the dominance function to use for comparing transit-groups.

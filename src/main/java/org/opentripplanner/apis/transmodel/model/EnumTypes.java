@@ -435,6 +435,13 @@ public class EnumTypes {
       "This can include various taxi-services or kiss & ride."
     )
     .value(
+      "car_rental",
+      StreetMode.CAR_RENTAL,
+      "Walk to a car rental point along " +
+      "the road, drive to a drop-off point along the road, and walk the rest of the way. " +
+      "This can include car rentals at fixed locations or free-floating services."
+    )
+    .value(
       "flexible",
       StreetMode.FLEXIBLE,
       "Walk to an eligible pickup area for " +
