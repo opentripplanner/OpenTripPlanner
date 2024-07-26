@@ -4,8 +4,8 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
@@ -18,12 +18,12 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
 
   /** Arrivals by round and stop - [round][stop] */
   private final StopArrivalState<T>[][] arrivals;
-  private final RoundProvider roundProvider;
+  private int round;
 
-  public StdStopArrivals(int nRounds, int nStops, RoundProvider roundProvider) {
-    this.roundProvider = roundProvider;
+  public StdStopArrivals(int nRounds, int nStops, WorkerLifeCycle lifeCycle) {
     //noinspection unchecked
     this.arrivals = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];
+    lifeCycle.onPrepareForNextRound(r -> this.round = r);
   }
 
   /**
@@ -71,12 +71,12 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
 
   void setAccessTime(int time, RaptorAccessEgress access, boolean bestTime) {
     final int stop = access.stop();
-    var existingArrival = getOrCreateStopIndex(round(), stop);
+    var existingArrival = getOrCreateStopIndex(round, stop);
 
     if (existingArrival instanceof AccessStopArrivalState) {
       ((AccessStopArrivalState<?>) existingArrival).setAccessTime(time, access, bestTime);
     } else {
-      arrivals[round()][stop] =
+      arrivals[round][stop] =
         new AccessStopArrivalState<>(
           time,
           access,
@@ -92,13 +92,13 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
    */
   void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
     int stop = transfer.stop();
-    var state = getOrCreateStopIndex(round(), stop);
+    var state = getOrCreateStopIndex(round, stop);
 
     state.transferToStop(fromStop, arrivalTime, transfer);
   }
 
   void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
-    var state = getOrCreateStopIndex(round(), stop);
+    var state = getOrCreateStopIndex(round, stop);
 
     state.arriveByTransit(time, boardStop, boardTime, trip);
 
@@ -108,13 +108,13 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
   }
 
   int bestTimePreviousRound(int stop) {
-    return get(round() - 1, stop).time();
+    return get(round - 1, stop).time();
   }
 
   /* private methods */
 
   TransitArrival<T> previousTransit(int boardStopIndex) {
-    final int prevRound = round() - 1;
+    final int prevRound = round - 1;
     int stopIndex = boardStopIndex;
     StopArrivalState<T> state = get(prevRound, boardStopIndex);
 
@@ -127,10 +127,6 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     return state.arrivedByTransit()
       ? TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime())
       : null;
-  }
-
-  private int round() {
-    return roundProvider.round();
   }
 
   private StopArrivalState<T> getOrCreateStopIndex(final int round, final int stop) {

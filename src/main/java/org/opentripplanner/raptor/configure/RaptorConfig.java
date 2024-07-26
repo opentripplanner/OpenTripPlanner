@@ -127,7 +127,6 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.transit(),
       ctx.slackProvider(),
       ctx.accessPaths(),
-      ctx.roundProvider(),
       ctx.calculator(),
       ctx.lifeCycle(),
       ctx.performanceTimers(),
@@ -138,7 +137,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       worker,
       ctx.transit(),
       ctx.accessPaths(),
-      ctx.roundProvider(),
+      ctx.roundTracker(),
       ctx.calculator(),
       ctx.createLifeCyclePublisher(),
       ctx.performanceTimers()

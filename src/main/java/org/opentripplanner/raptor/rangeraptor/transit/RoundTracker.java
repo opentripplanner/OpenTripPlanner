@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
 /**
@@ -9,7 +8,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
  * In round 0 the access paths with one leg are added. In round 1 the first transit and transfers is
  * added, ...
  */
-public class RoundTracker implements RoundProvider {
+public class RoundTracker {
+
+  private static final int ROUND_ZERO = 0;
+  private static final int FIRST_ROUND = 1;
 
   /**
    * The extra number of rounds/transfers we accept compared to the trip with the fewest number of
@@ -20,7 +22,7 @@ public class RoundTracker implements RoundProvider {
   /**
    * The current round in progress (round index).
    */
-  private int round = 0;
+  private int round = ROUND_ZERO;
 
   /**
    * The round upper limit for when to abort the search.
@@ -61,14 +63,14 @@ public class RoundTracker implements RoundProvider {
    * Return true if this round is the fist round, calculating the first transit path. Access is
    * calculated in round zero (0).
    */
-  public boolean isFirstRound() {
-    return round == 1;
+  public static boolean isFirstRound(int round) {
+    return round == FIRST_ROUND;
   }
 
   /**
    * Before each iteration, initialize the round to 0.
    */
-  private void setupIteration() {
+  public void setupIteration() {
     round = 0;
   }
 

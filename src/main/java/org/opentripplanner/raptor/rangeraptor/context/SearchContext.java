@@ -25,7 +25,6 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
@@ -193,7 +192,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return tuningParameters.maxNumberOfTransfers() + 1;
   }
 
-  public RoundProvider roundProvider() {
+  public RoundTracker roundTracker() {
     return roundTracker;
   }
 
@@ -227,7 +226,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
       accessPaths().hasTimeDependentAccess(),
       slackProvider(),
       calculator(),
-      roundProvider(),
       lifeCycle()
     );
   }

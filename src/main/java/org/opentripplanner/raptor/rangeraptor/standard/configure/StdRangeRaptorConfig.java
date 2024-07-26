@@ -163,7 +163,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private StopArrivalsState<T> wrapStopArrivalsStateWithDebugger(StopArrivalsState<T> state) {
     if (ctx.debugFactory().isDebugStopArrival()) {
       return new DebugStopArrivalsState<>(
-        ctx.roundProvider(),
+        ctx.lifeCycle(),
         ctx.debugFactory(),
         stopsCursor(),
         state
@@ -219,7 +219,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       this.stopArrivals =
         withBestNumberOfTransfers(
           oneOf(
-            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider()),
+            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.lifeCycle()),
             StdStopArrivals.class
           )
         );
@@ -232,7 +232,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   private SimpleBestNumberOfTransfers createSimpleBestNumberOfTransfers() {
     return withBestNumberOfTransfers(
-      new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider())
+      new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.lifeCycle())
     );
   }
 

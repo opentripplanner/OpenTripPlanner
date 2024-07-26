@@ -7,13 +7,11 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
-import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -62,12 +60,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
    */
   private final RaptorWorkerState<T> state;
 
-  /**
-   * The round tracker keep track for the current Raptor round, and abort the search if the round
-   * max limit is reached.
-   */
-  private final RoundTracker roundTracker;
-
   private final RaptorTransitDataProvider<T> transitData;
 
   private final SlackProvider slackProvider;
@@ -84,13 +76,14 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
 
   private int iterationDepartureTime;
 
+  private int round;
+
   public DefaultRangeRaptorWorker(
     RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
     SlackProvider slackProvider,
     AccessPaths accessPaths,
-    RoundProvider roundProvider,
     RaptorTransitCalculator<T> calculator,
     WorkerLifeCycle lifeCycle,
     RaptorTimers timers,
@@ -106,10 +99,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
     this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
     this.enableTransferConstraints = enableTransferConstraints;
 
-    // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
-    // "everyone" by providing access to it in the context.
-    this.roundTracker = (RoundTracker) roundProvider;
     lifeCycle.onSetupIteration(time -> this.iterationDepartureTime = time);
+    lifeCycle.onPrepareForNextRound(round -> this.round = round);
   }
 
   public RaptorWorkerResult<T> results() {
@@ -120,10 +111,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
    * Check if the RangeRaptor should continue with a new round.
    */
   boolean hasMoreRounds() {
-    if (round() < minNumberOfRounds) {
-      return true;
-    }
-    return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
+    return state.isNewRoundAvailable();
   }
 
   /**
@@ -204,16 +192,12 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
     return state.isDestinationReachedInCurrentRound();
   }
 
-  private int round() {
-    return roundTracker.round();
-  }
-
   void findAccessOnStreetForRound() {
-    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
+    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round));
   }
 
   void findAccessOnBoardForRound() {
-    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
+    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round));
   }
 
   /**

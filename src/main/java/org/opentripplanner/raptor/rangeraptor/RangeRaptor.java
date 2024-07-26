@@ -5,7 +5,6 @@ import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
@@ -69,7 +68,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     DefaultRangeRaptorWorker<T> worker,
     RaptorTransitDataProvider<T> transitData,
     AccessPaths accessPaths,
-    RoundProvider roundProvider,
+    RoundTracker roundTracker,
     RaptorTransitCalculator<T> calculator,
     LifeCycleEventPublisher lifeCyclePublisher,
     RaptorTimers timers
@@ -80,10 +79,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     this.timers = timers;
     this.accessPaths = accessPaths;
     this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
-
-    // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
-    // "everyone" by providing access to it in the context.
-    this.roundTracker = (RoundTracker) roundProvider;
+    this.roundTracker = roundTracker;
     this.lifeCycle = lifeCyclePublisher;
   }
 
@@ -129,7 +125,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     setupIteration(iterationDepartureTime);
     worker.findAccessOnStreetForRound();
 
-    while (worker.hasMoreRounds()) {
+    while (hasMoreRounds()) {
       lifeCycle.prepareForNextRound(roundTracker.nextRound());
 
       // NB since we have transfer limiting not bothering to cut off search when there are no
@@ -172,6 +168,8 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
    */
   private void setupIteration(int iterationDepartureTime) {
     OTPRequestTimeoutException.checkForTimeout();
+    roundTracker.setupIteration();
+    lifeCycle.prepareForNextRound(round());
     lifeCycle.setupIteration(iterationDepartureTime);
   }
 }
