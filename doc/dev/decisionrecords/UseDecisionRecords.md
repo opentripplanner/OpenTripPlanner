@@ -1,8 +1,8 @@
 # Decision Records
 
 [TODO - Not precise] An OTP Decision Record is a justified software design choice that addresses a
-functional or non-functional requirement that is significant. [Architectural Decision Records](https://adr.github.io/)
-is a similar concept, but we have widened the scope to include any relevant decision about the
+significant functional or non-functional requirement. [Architectural Decision Records](https://adr.github.io/)
+is a similar concept, but we have widened the scope to include any relevant decision about
 OTP development.
 
 ## Process
