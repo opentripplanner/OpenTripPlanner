@@ -15,11 +15,11 @@ public class TestGroupPriorityCalculator implements RaptorTransitGroupPriorityCa
   public static final int GROUP_B = 0x02;
   public static final int GROUP_C = 0x04;
 
-  private static final int GROUP_AB = PRIORITY_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_B);
-  private static final int GROUP_AC = PRIORITY_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_C);
+  private static final int GROUP_AB = PRIORITY_CALCULATOR.mergeInGroupId(GROUP_A, GROUP_B);
+  private static final int GROUP_AC = PRIORITY_CALCULATOR.mergeInGroupId(GROUP_A, GROUP_C);
 
   @Override
-  public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
+  public int mergeInGroupId(int currentGroupIds, int boardingGroupId) {
     return currentGroupIds | boardingGroupId;
   }
 

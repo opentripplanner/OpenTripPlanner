@@ -100,7 +100,6 @@ class ZipStreamDataSourceDecoratorTest {
     Collection<DataSource> content = subject.content();
     Collection<String> names = content.stream().map(DataSource::name).toList();
 
-    System.out.println(names);
     assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES), names.toString());
 
     DataSource entry = subject.entry("agency.txt");

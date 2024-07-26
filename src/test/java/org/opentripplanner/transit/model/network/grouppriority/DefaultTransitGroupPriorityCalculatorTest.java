@@ -13,7 +13,7 @@ class DefaultTransitGroupPriorityCalculatorTest {
   @Test
   void mergeGroupIds() {
     // Smoke test, should not fail
-    subject.mergeGroupIds(1, 2);
+    subject.mergeInGroupId(1, 2);
   }
 
   @Test

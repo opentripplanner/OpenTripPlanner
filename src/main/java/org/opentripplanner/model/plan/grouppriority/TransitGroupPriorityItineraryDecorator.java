@@ -40,7 +40,7 @@ public class TransitGroupPriorityItineraryDecorator {
       for (Leg leg : itinerary.getLegs()) {
         if (leg.getTrip() != null) {
           int newGroupId = priorityGroupConfigurator.lookupTransitGroupPriorityId(leg.getTrip());
-          c2 = transitGroupCalculator.mergeGroupIds(c2, newGroupId);
+          c2 = transitGroupCalculator.mergeInGroupId(c2, newGroupId);
         }
       }
       itinerary.setGeneralizedCost2(c2);
