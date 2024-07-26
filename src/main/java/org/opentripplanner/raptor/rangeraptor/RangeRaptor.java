@@ -4,6 +4,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
@@ -44,7 +45,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 @SuppressWarnings("Duplicates")
 public final class RangeRaptor<T extends RaptorTripSchedule> {
 
-  private final DefaultRangeRaptorWorker<T> worker;
+  private final RangeRaptorWorker<T> worker;
 
   /**
    * The round tracker keep track for the current Raptor round, and abort the search if the round
@@ -65,7 +66,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
   private final int minNumberOfRounds;
 
   public RangeRaptor(
-    DefaultRangeRaptorWorker<T> worker,
+    RangeRaptorWorker<T> worker,
     RaptorTransitDataProvider<T> transitData,
     AccessPaths accessPaths,
     RoundTracker roundTracker,

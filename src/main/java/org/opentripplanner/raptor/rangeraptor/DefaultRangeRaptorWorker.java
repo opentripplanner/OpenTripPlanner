@@ -5,6 +5,7 @@ import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -45,7 +46,8 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
+public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
+  implements RangeRaptorWorker<T> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -103,6 +105,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
     lifeCycle.onPrepareForNextRound(round -> this.round = round);
   }
 
+  @Override
   public RaptorWorkerResult<T> results() {
     return state.results();
   }
@@ -110,14 +113,16 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
   /**
    * Check if the RangeRaptor should continue with a new round.
    */
-  boolean hasMoreRounds() {
+  @Override
+  public boolean hasMoreRounds() {
     return state.isNewRoundAvailable();
   }
 
   /**
    * Perform a scheduled search
    */
-  void findTransitForRound() {
+  @Override
+  public void findTransitForRound() {
     timers.findTransitForRound(() -> {
       IntIterator stops = state.stopsTouchedPreviousRound();
       IntIterator routeIndexIterator = transitData.routeIndexIterator(stops);
@@ -175,7 +180,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
     });
   }
 
-  void findTransfersForRound() {
+  @Override
+  public void findTransfersForRound() {
     timers.findTransfersForRound(() -> {
       IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
@@ -188,15 +194,18 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> {
     });
   }
 
-  boolean isDestinationReachedInCurrentRound() {
+  @Override
+  public boolean isDestinationReachedInCurrentRound() {
     return state.isDestinationReachedInCurrentRound();
   }
 
-  void findAccessOnStreetForRound() {
+  @Override
+  public void findAccessOnStreetForRound() {
     addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round));
   }
 
-  void findAccessOnBoardForRound() {
+  @Override
+  public void findAccessOnBoardForRound() {
     addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round));
   }
 
