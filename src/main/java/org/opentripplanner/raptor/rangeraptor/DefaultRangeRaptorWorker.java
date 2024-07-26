@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor;
 
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessPaths.calculateMaxNumberOfRides;
+
 import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -70,6 +73,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
   private final RaptorTimers timers;
 
+  @Nullable
   private final AccessPaths accessPaths;
 
   private final int minNumberOfRounds;
@@ -85,7 +89,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
     SlackProvider slackProvider,
-    AccessPaths accessPaths,
+    @Nullable AccessPaths accessPaths,
     RaptorTransitCalculator<T> calculator,
     WorkerLifeCycle lifeCycle,
     RaptorTimers timers,
@@ -98,7 +102,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     this.calculator = calculator;
     this.timers = timers;
     this.accessPaths = accessPaths;
-    this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
+    this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
     this.enableTransferConstraints = enableTransferConstraints;
 
     lifeCycle.onSetupIteration(time -> this.iterationDepartureTime = time);

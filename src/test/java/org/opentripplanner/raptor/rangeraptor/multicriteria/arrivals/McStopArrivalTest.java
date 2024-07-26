@@ -149,5 +149,10 @@ class McStopArrivalTest {
     public boolean arrivedOnBoard() {
       return arrivedOnBoard;
     }
+
+    @Override
+    public McStopArrival<TestTripSchedule> addSlackToArrivalTime(int slack) {
+      throw new UnsupportedOperationException();
+    }
   }
 }

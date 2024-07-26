@@ -79,7 +79,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     this.calculator = calculator;
     this.timers = timers;
     this.accessPaths = accessPaths;
-    this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
+    this.minNumberOfRounds = AccessPaths.calculateMaxNumberOfRides(accessPaths);
     this.roundTracker = roundTracker;
     this.lifeCycle = lifeCyclePublisher;
   }

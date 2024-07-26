@@ -58,4 +58,9 @@ final class TransitStopArrivalC2<T extends RaptorTripSchedule>
   public boolean arrivedOnBoard() {
     return true;
   }
+
+  @Override
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new TransitStopArrivalC2<>(previous(), stop(), arrivalTime() + slack, c1(), c2(), trip);
+  }
 }

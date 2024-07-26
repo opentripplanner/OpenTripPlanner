@@ -1,46 +1,185 @@
 package org.opentripplanner.raptor.api.request;
 
-import java.util.Collection;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
 public final class ViaLocation {
 
-  private final String label;
-  private final Collection<ViaConnection> connections;
+  private static final int MAX_WAIT_TIME_LIMIT = (int) Duration.ofHours(24).toSeconds();
 
-  public ViaLocation(String label, Collection<ViaConnection> connections) {
+  private final String label;
+  private final boolean allowPassThrough;
+  private final int minimumWaitTime;
+  private final List<ViaConnection> connections;
+
+  private ViaLocation(
+    String label,
+    boolean allowPassThrough,
+    Duration minimumWaitTime,
+    List<StopAndTransfer> connections
+  ) {
     this.label = label;
+    this.allowPassThrough = allowPassThrough;
+    this.minimumWaitTime =
+      IntUtils.requireInRange(
+        (int) minimumWaitTime.toSeconds(),
+        RaptorConstants.ZERO,
+        MAX_WAIT_TIME_LIMIT,
+        "minimumWaitTime"
+      );
     this.connections = validateConnections(connections);
+
+    if (allowPassThrough && this.minimumWaitTime > RaptorConstants.ZERO) {
+      throw new IllegalArgumentException("Pass-through and min-wait-time is not allowed.");
+    }
   }
 
+  /**
+   * Force the path through a set of stops, either on-board or as an alight or board stop.
+   */
+  public static Builder allowPassThrough(@Nullable String label) {
+    return new Builder(label, true, Duration.ZERO);
+  }
+
+  /**
+   * Force the path through one of the listed connections. To visit a stop, the path must board or
+   * alight transit at the given stop, on-board visits do not count, see
+   * {@link #allowPassThrough(String)}.
+   */
+  public static Builder via(@Nullable String label) {
+    return new Builder(label, false, Duration.ZERO);
+  }
+
+  /**
+   * Force the path through one of the listed connections, and wait the given minimum-wait-time
+   * before continuing. To visit a stop, the path must board or alight transit at the given stop,
+   * on-board visits do not count, see {@link #allowPassThrough(String)}.
+   */
+  public static Builder via(@Nullable String label, Duration minimumWaitTime) {
+    return new Builder(label, false, minimumWaitTime);
+  }
+
+  @Nullable
   public String label() {
     return label;
   }
 
-  public Collection<ViaConnection> connections() {
+  public boolean allowPassThrough() {
+    return allowPassThrough;
+  }
+
+  public int minimumWaitTime() {
+    return minimumWaitTime;
+  }
+
+  public List<ViaConnection> connections() {
     return connections;
   }
 
-  @Override
   public String toString() {
-    return "ViaLocation{label: " + label + ", connections: " + connections + "}";
+    return toString(Integer::toString);
   }
 
-  private Collection<ViaConnection> validateConnections(Collection<ViaConnection> connections) {
-    var list = List.copyOf(connections);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ViaLocation that = (ViaLocation) o;
+    return (
+      allowPassThrough == that.allowPassThrough &&
+      minimumWaitTime == that.minimumWaitTime &&
+      Objects.equals(label, that.label) &&
+      Objects.equals(connections, that.connections)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(label, allowPassThrough, minimumWaitTime, connections);
+  }
+
+  public String toString(RaptorStopNameResolver stopNameResolver) {
+    var buf = new StringBuilder("Via{");
+    if (label != null) {
+      buf.append("label: ").append(label).append(", ");
+    }
+    if (allowPassThrough) {
+      buf.append("allowPassThrough, ");
+    }
+    if (minimumWaitTime > RaptorConstants.ZERO) {
+      buf.append("minWaitTime: ").append(DurationUtils.durationToStr(minimumWaitTime)).append(", ");
+    }
+    buf
+      .append("connections: ")
+      .append(connections.stream().map(it -> it.toString(stopNameResolver)).toList());
+    return buf.append("}").toString();
+  }
+
+  private List<ViaConnection> validateConnections(List<StopAndTransfer> connections) {
+    if (connections.isEmpty()) {
+      throw new IllegalArgumentException("At least one connection is required.");
+    }
+    var list = connections
+      .stream()
+      .map(it -> new ViaConnection(this, it.fromStop, it.transfer))
+      .toList();
 
     // Compare all pairs to check for duplicates and none optimal connections
     for (int i = 0; i < list.size(); ++i) {
       var a = list.get(i);
       for (int j = i + 1; j < list.size(); ++j) {
         var b = list.get(j);
-        if (a.equals(b) || a.isBetterThan(b) || b.isBetterThan(a)) {
+        if (a.isBetterOrEqual(b) || b.isBetterOrEqual(a)) {
           throw new IllegalArgumentException(
-            "All connection need to be pareto-optimal. " + "a: " + a + ", b: " + b
+            "All connection need to be pareto-optimal: (" + a + ") <-> (" + b + ")"
           );
         }
       }
     }
     return list;
   }
+
+  public static final class Builder {
+
+    private final String label;
+    private final boolean allowPassThrough;
+    private final Duration minimumWaitTime;
+    private final List<StopAndTransfer> connections = new ArrayList<>();
+
+    public Builder(String label, boolean allowPassThrough, Duration minimumWaitTime) {
+      this.label = label;
+      this.allowPassThrough = allowPassThrough;
+      this.minimumWaitTime = minimumWaitTime;
+    }
+
+    public Builder addViaStop(int stop) {
+      this.connections.add(new StopAndTransfer(stop, null));
+      return this;
+    }
+
+    public Builder addViaTransfer(int fromStop, RaptorTransfer transfer) {
+      this.connections.add(new StopAndTransfer(fromStop, transfer));
+      return this;
+    }
+
+    public ViaLocation build() {
+      return new ViaLocation(label, allowPassThrough, minimumWaitTime, connections);
+    }
+  }
+
+  /**
+   * Use internally to store connection data, before creating the connection objects. If is
+   * needed to create the bidirectional relationship between {@link ViaLocation} and
+   * {@link ViaConnection}.
+   */
+  private record StopAndTransfer(int fromStop, @Nullable RaptorTransfer transfer) {}
 }

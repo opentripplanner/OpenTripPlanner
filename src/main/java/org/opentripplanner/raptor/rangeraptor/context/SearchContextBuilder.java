@@ -1,12 +1,15 @@
 package org.opentripplanner.raptor.rangeraptor.context;
 
+import java.util.List;
 import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.api.request.ViaLocation;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
+import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 public class SearchContextBuilder<T extends RaptorTripSchedule> {
@@ -31,24 +34,46 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   }
 
   public SearchContext<T> build() {
+    return createContext(accessPaths(), viaConnections(), egressPaths());
+  }
+
+  private SearchContext<T> createContext(
+    AccessPaths accessPaths,
+    List<ViaConnections> viaConnections,
+    @Nullable EgressPaths egressPaths
+  ) {
     return new SearchContext<>(
       request,
       tuningParameters,
       transit,
-      accessPaths(tuningParameters.iterationDepartureStepInSeconds(), request),
-      egressPaths(request),
+      accessPaths,
+      viaConnections,
+      egressPaths,
       acceptC2AtDestination
     );
   }
 
-  private static AccessPaths accessPaths(int iterationStep, RaptorRequest<?> request) {
+  private AccessPaths accessPaths() {
+    int iterationStep = tuningParameters.iterationDepartureStepInSeconds();
     boolean forward = request.searchDirection().isForward();
     var params = request.searchParams();
     var paths = forward ? params.accessPaths() : params.egressPaths();
     return AccessPaths.create(iterationStep, paths, request.profile(), request.searchDirection());
   }
 
-  private static EgressPaths egressPaths(RaptorRequest<?> request) {
+  private List<ViaConnections> viaConnections() {
+    return request.searchParams().hasViaLocations()
+      ? request
+        .searchParams()
+        .viaLocations()
+        .stream()
+        .map(ViaLocation::connections)
+        .map(ViaConnections::new)
+        .toList()
+      : List.of();
+  }
+
+  private EgressPaths egressPaths() {
     boolean forward = request.searchDirection().isForward();
     var params = request.searchParams();
     var paths = forward ? params.egressPaths() : params.accessPaths();

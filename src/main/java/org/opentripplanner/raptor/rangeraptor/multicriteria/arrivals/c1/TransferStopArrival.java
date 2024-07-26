@@ -55,4 +55,9 @@ final class TransferStopArrival<T extends RaptorTripSchedule> extends McStopArri
   public boolean arrivedOnBoard() {
     return false;
   }
+
+  @Override
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new TransferStopArrival<>(previous(), transfer, arrivalTime() + slack);
+  }
 }

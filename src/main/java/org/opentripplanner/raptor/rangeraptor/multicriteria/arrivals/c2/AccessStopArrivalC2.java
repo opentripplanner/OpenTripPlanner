@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
+import static org.opentripplanner.raptor.api.model.AbstractAccessEgressDecorator.accessEgressWithExtraSlack;
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import org.opentripplanner.raptor.api.model.PathLegType;
@@ -7,6 +8,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
@@ -16,6 +18,7 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
  */
 final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractStopArrivalC2<T> {
 
+  private final int departureTime;
   private final RaptorAccessEgress access;
 
   AccessStopArrivalC2(int departureTime, RaptorAccessEgress access) {
@@ -27,6 +30,7 @@ final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractSt
       access.c1(),
       RaptorCostCalculator.ZERO_COST
     );
+    this.departureTime = departureTime;
     this.access = access;
   }
 
@@ -55,6 +59,11 @@ final class AccessStopArrivalC2<T extends RaptorTripSchedule> extends AbstractSt
     int newDepartureTime = newArrivalTime - access.durationInSeconds();
 
     return new AccessStopArrivalC2<>(newDepartureTime, access);
+  }
+
+  @Override
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new AccessStopArrivalC2<>(departureTime, accessEgressWithExtraSlack(access, slack));
   }
 
   @Override

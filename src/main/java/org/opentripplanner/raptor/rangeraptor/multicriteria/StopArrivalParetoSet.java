@@ -42,7 +42,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     private ParetoSetEventListener<ArrivalView<T>> nextSearchListener = null;
     private final ParetoComparator<McStopArrival<T>> comparator;
 
-    public Builder(ParetoComparator<McStopArrival<T>> comparator) {
+    Builder(ParetoComparator<McStopArrival<T>> comparator) {
       this.comparator = comparator;
     }
 
@@ -76,7 +76,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
       // stop to appear before the path is logged (in case both debuggers are enabled).
       return new StopArrivalParetoSet<>(
         comparator,
-        ParetoSetEventListenerComposite.of(debugListener, egressListener, nextSearchListener)
+        ParetoSetEventListenerComposite.of(debugListener, nextSearchListener, egressListener)
       );
     }
   }

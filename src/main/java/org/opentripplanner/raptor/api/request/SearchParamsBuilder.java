@@ -163,7 +163,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
-  public List<ViaLocation> viaLocations() {
+  public Collection<ViaLocation> viaLocations() {
     return viaLocations;
   }
 
