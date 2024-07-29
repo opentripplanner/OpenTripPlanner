@@ -1,10 +1,12 @@
 package org.opentripplanner.street.model.vertex;
 
+import java.util.Collection;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 
@@ -48,5 +50,16 @@ public class VehicleParkingEntranceVertex extends Vertex {
 
   public boolean isWalkAccessible() {
     return parkingEntrance.isWalkAccessible();
+  }
+
+  /**
+   * Is this vertex already linked to the graph with a {@link StreetVehicleParkingLink}?
+   */
+  public boolean isLinkedToGraph() {
+    return hasLink(getIncoming()) || hasLink(getOutgoing());
+  }
+
+  private boolean hasLink(Collection<Edge> edges) {
+    return edges.stream().anyMatch(StreetVehicleParkingLink.class::isInstance);
   }
 }

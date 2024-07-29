@@ -9,6 +9,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.loader.GroupEntries;
@@ -45,7 +46,7 @@ public class NetexBundle implements Closeable {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
-  private final boolean ignoreFareFrame;
+  private final Set<IgnorableFeature> ignoredFeatures;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -62,7 +63,7 @@ public class NetexBundle implements Closeable {
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops,
-    boolean ignoreFareFrame
+    Set<IgnorableFeature> ignorableFeatures
   ) {
     this.feedId = feedId;
     this.source = source;
@@ -71,7 +72,7 @@ public class NetexBundle implements Closeable {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
-    this.ignoreFareFrame = ignoreFareFrame;
+    this.ignoredFeatures = Set.copyOf(ignorableFeatures);
   }
 
   /** load the bundle, map it to the OTP transit model and return */
@@ -136,7 +137,7 @@ public class NetexBundle implements Closeable {
       });
     }
     mapper.finishUp();
-    NetexDocumentParser.finnishUp();
+    NetexDocumentParser.finishUp();
   }
 
   /**
@@ -179,7 +180,7 @@ public class NetexBundle implements Closeable {
       LOG.info("reading entity {}: {}", fileDescription, entry.name());
       issueStore.startProcessingSource(entry.name());
       PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asInputStream());
-      NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoreFareFrame);
+      NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoredFeatures);
     } catch (JAXBException e) {
       throw new RuntimeException(e.getMessage(), e);
     } finally {

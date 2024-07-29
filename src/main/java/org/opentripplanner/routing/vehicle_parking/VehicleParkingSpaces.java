@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
  * The number of spaces by type. {@code null} if unknown.
@@ -68,6 +69,16 @@ public class VehicleParkingSpaces implements Serializable {
       Objects.equals(carSpaces, that.carSpaces) &&
       Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces)
     );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(VehicleParkingSpaces.class)
+      .addNum("carSpaces", carSpaces)
+      .addNum("wheelchairAccessibleCarSpaces", wheelchairAccessibleCarSpaces)
+      .addNum("bicycleSpaces", bicycleSpaces)
+      .toString();
   }
 
   public static class VehicleParkingSpacesBuilder {

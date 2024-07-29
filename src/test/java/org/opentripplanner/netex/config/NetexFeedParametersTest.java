@@ -89,7 +89,7 @@ class NetexFeedParametersTest {
 
   @Test
   void testToString() {
-    assertEquals("NetexFeedParameters{}", DEFAULT.toString());
+    assertEquals("NetexFeedParameters{ignoredFeatures: [PARKING]}", DEFAULT.toString());
     assertEquals(
       "NetexFeedParameters{" +
       "source: https://my.test.com, " +
@@ -98,6 +98,7 @@ class NetexFeedParametersTest {
       "sharedGroupFilePattern: '[sharedGoupFil]+', " +
       "groupFilePattern: '[groupFile]+', " +
       "ignoreFilePattern: '[ignoreFl]+', " +
+      "ignoredFeatures: [PARKING], " +
       "ferryIdsNotAllowedForBicycle: [Ferry:Id]" +
       "}",
       subject.toString()
