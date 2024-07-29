@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -160,8 +162,12 @@ class LuceneIndexTest {
         );
       }
     };
-    index = new LuceneIndex(transitService);
-    mapper = new StopClusterMapper(transitService);
+    var stopConsolidationService = new DefaultStopConsolidationService(
+      new DefaultStopConsolidationRepository(),
+      transitModel
+    );
+    index = new LuceneIndex(transitService, stopConsolidationService);
+    mapper = new StopClusterMapper(transitService, stopConsolidationService);
   }
 
   @Test

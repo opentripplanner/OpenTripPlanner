@@ -3,6 +3,7 @@ package org.opentripplanner.ext.geocoder;
 import static org.opentripplanner.ext.geocoder.StopCluster.LocationType.STATION;
 import static org.opentripplanner.ext.geocoder.StopCluster.LocationType.STOP;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -28,9 +31,14 @@ import org.opentripplanner.transit.service.TransitService;
 class StopClusterMapper {
 
   private final TransitService transitService;
+  private final StopConsolidationService stopConsolidationService;
 
-  StopClusterMapper(TransitService transitService) {
+  StopClusterMapper(
+    TransitService transitService,
+    @Nullable StopConsolidationService stopConsolidationService
+  ) {
     this.transitService = transitService;
+    this.stopConsolidationService = stopConsolidationService;
   }
 
   /**
@@ -45,16 +53,71 @@ class StopClusterMapper {
     Collection<StopLocation> stopLocations,
     Collection<StopLocationsGroup> stopLocationsGroups
   ) {
+    var stopClusters = buildStopClusters(stopLocations);
+    var stationClusters = buildStationClusters(stopLocationsGroups);
+    var consolidatedStopClusters = buildConsolidatedStopClusters();
+
+    return Iterables.concat(stopClusters, stationClusters, consolidatedStopClusters);
+  }
+
+  private Iterable<LuceneStopCluster> buildConsolidatedStopClusters() {
+    var multiMap = stopConsolidationService
+      .replacements()
+      .stream()
+      .collect(
+        ImmutableListMultimap.toImmutableListMultimap(
+          StopReplacement::primary,
+          StopReplacement::secondary
+        )
+      );
+    return multiMap
+      .keySet()
+      .stream()
+      .map(primary -> {
+        var secondaryIds = multiMap.get(primary);
+        var secondaries = secondaryIds
+          .stream()
+          .map(transitService::getStopLocation)
+          .filter(Objects::nonNull)
+          .toList();
+        var codes = ListUtils.combine(
+          ListUtils.ofNullable(primary.getCode()),
+          getCodes(secondaries)
+        );
+        var names = ListUtils.combine(
+          ListUtils.ofNullable(primary.getName()),
+          getNames(secondaries)
+        );
+
+        return new LuceneStopCluster(
+          primary.getId().toString(),
+          secondaryIds.stream().map(id -> id.toString()).toList(),
+          names,
+          codes,
+          toCoordinate(primary.getCoordinate())
+        );
+      })
+      .toList();
+  }
+
+  private static List<LuceneStopCluster> buildStationClusters(
+    Collection<StopLocationsGroup> stopLocationsGroups
+  ) {
+    return stopLocationsGroups.stream().map(StopClusterMapper::map).toList();
+  }
+
+  private List<LuceneStopCluster> buildStopClusters(Collection<StopLocation> stopLocations) {
     List<StopLocation> stops = stopLocations
       .stream()
       // remove stop locations without a parent station
       .filter(sl -> sl.getParentStation() == null)
+      .filter(sl -> !stopConsolidationService.isPartOfConsolidatedStop(sl))
       // stops without a name (for example flex areas) are useless for searching, so we remove them, too
       .filter(sl -> sl.getName() != null)
       .toList();
 
     // if they are very close to each other and have the same name, only one is chosen (at random)
-    var deduplicatedStops = stops
+    return stops
       .stream()
       .collect(
         Collectors.groupingBy(sl ->
@@ -66,9 +129,6 @@ class StopClusterMapper {
       .map(group -> map(group).orElse(null))
       .filter(Objects::nonNull)
       .toList();
-    var stations = stopLocationsGroups.stream().map(StopClusterMapper::map).toList();
-
-    return Iterables.concat(deduplicatedStops, stations);
   }
 
   private static LuceneStopCluster map(StopLocationsGroup g) {

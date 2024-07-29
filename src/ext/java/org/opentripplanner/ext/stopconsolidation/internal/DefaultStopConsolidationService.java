@@ -68,6 +68,11 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   @Override
+  public boolean isPartOfConsolidatedStop(StopLocation sl) {
+    return isSecondaryStop(sl) || isPrimaryStop(sl);
+  }
+
+  @Override
   public boolean isActive() {
     return !repo.groups().isEmpty();
   }
