@@ -43,7 +43,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private final RaptorConfig<T> config;
   private final RaptorTransitDataProvider<T> transitData;
   private final RaptorRequest<T> originalRequest;
-  private final RaptorSearchWindowCalculator dynamicSearchParamsCalculator;
+  private final RaptorSearchWindowCalculator dynamicSearchWindowCalculator;
 
   private final HeuristicSearchTask<T> fwdHeuristics;
   private final HeuristicSearchTask<T> revHeuristics;
@@ -56,7 +56,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.config = config;
     this.transitData = transitData;
     this.originalRequest = originalRequest;
-    this.dynamicSearchParamsCalculator =
+    this.dynamicSearchWindowCalculator =
       config.searchWindowCalculator().withSearchParams(originalRequest.searchParams());
 
     this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
@@ -274,10 +274,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     SearchParamsBuilder<T> builder = request.mutate().searchParams();
 
     if (!request.searchParams().isEarliestDepartureTimeSet()) {
-      builder.earliestDepartureTime(dynamicSearchParamsCalculator.getEarliestDepartureTime());
+      builder.earliestDepartureTime(dynamicSearchWindowCalculator.getEarliestDepartureTime());
     }
     if (!request.searchParams().isSearchWindowSet()) {
-      builder.searchWindowInSeconds(dynamicSearchParamsCalculator.getSearchWindowSeconds());
+      builder.searchWindowInSeconds(dynamicSearchWindowCalculator.getSearchWindowSeconds());
     }
     // We do not set the latest-arrival-time, because we do not want to limit the forward
     // multi-criteria search, it does not have much effect on the performance - we only risk
@@ -287,7 +287,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private void calculateDynamicSearchParametersFromHeuristics(@Nullable Heuristics heuristics) {
     if (heuristics != null) {
-      dynamicSearchParamsCalculator
+      dynamicSearchWindowCalculator
         .withHeuristics(
           heuristics.bestOverallJourneyTravelDuration(),
           heuristics.minWaitTimeForJourneysReachingDestination()
