@@ -75,9 +75,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   }
 
   public SearchParamsBuilder<T> searchWindow(Duration searchWindow) {
-    this.searchWindowInSeconds =
-      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds();
-    return this;
+    return searchWindowInSeconds(
+      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds()
+    );
   }
 
   /**

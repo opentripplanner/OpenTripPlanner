@@ -291,15 +291,15 @@ public class RouteRequest implements Cloneable, Serializable {
    * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
    * latest arrival time (LAT - EAT).
    * <p>
-   * All optimal travels that depart within the search window is guaranteed to be found.
+   * All optimal travels that depart within the search window are guaranteed to be found.
    * <p>
    * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
    * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
    * confuse this with the travel-window, which is the time between EDT to LAT.
    * <p>
    * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
-   * dynamically  assigned a suitable value, if not set. In a small to medium size operation you may
-   * use a fixed value, like 60 minutes. If you have a mixture of high frequency cities routes and
+   * dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you may
+   * use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
    * infrequent long distant journeys, the best option is normally to use the dynamic auto
    * assignment.
    * <p>

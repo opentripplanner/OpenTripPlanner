@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * The {@link ParetoSet} do only support ONE listener, this class uses the composite pattern to
@@ -16,9 +18,23 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
 
   private final List<ParetoSetEventListener<T>> listeners = new ArrayList<>();
 
+  /**
+   * Take a list of listeners and return a composite listener. Input listeners witch is {@code null}
+   * is skipped. If no listeners are provided, all listeners are {@code null}, then
+   * {@code null} is returned. If just one listener is passed in the listener it-self is returned
+   * (without any wrapper).
+   */
+  @Nullable
   @SafeVarargs
-  public ParetoSetEventListenerComposite(ParetoSetEventListener<T>... listeners) {
-    this(Arrays.asList(listeners));
+  public static <T> ParetoSetEventListener<T> of(ParetoSetEventListener<T>... listeners) {
+    var list = Arrays.stream(listeners).filter(Objects::nonNull).toList();
+    if (list.isEmpty()) {
+      return null;
+    }
+    if (list.size() == 1) {
+      return list.get(0);
+    }
+    return new ParetoSetEventListenerComposite<>(list);
   }
 
   private ParetoSetEventListenerComposite(

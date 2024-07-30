@@ -67,19 +67,18 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     try {
       enableHeuristicSearchBasedOnOptimizationsAndSearchParameters();
 
-      // Run heuristics, if no destination is reached
+      // Run the heuristics if no destination is reached
       runHeuristics();
 
       // Set search-window and other dynamic calculated parameters
-      RaptorRequest<T> dynamicRequest = originalRequest;
-      dynamicRequest = requestWithDynamicSearchParams(dynamicRequest);
+      var dynamicRequest = requestWithDynamicSearchParams(originalRequest);
 
       return createAndRunDynamicRRWorker(dynamicRequest);
     } catch (DestinationNotReachedException e) {
       return new RaptorResponse<>(
         Collections.emptyList(),
         null,
-        // If a trip exist(forward heuristics succeed), but is outside the calculated
+        // If a trip exists(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
         // performed. This enables the client to page to the next window
         requestWithDynamicSearchParams(originalRequest),

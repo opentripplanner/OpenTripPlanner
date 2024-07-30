@@ -13,6 +13,7 @@ import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -58,7 +59,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   ) {
     var context = context(transitData, request);
     var stdConfig = new StdRangeRaptorConfig<>(context);
-    return createWorker(context, stdConfig.state(), stdConfig.strategy());
+    return createRangeRaptor(context, stdConfig.state(), stdConfig.strategy());
   }
 
   public RangeRaptor<T> createMcWorker(
@@ -66,21 +67,18 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     RaptorRequest<T> request,
     Heuristics heuristics
   ) {
-    final SearchContext<T> context = context(transitData, request);
-    return new McRangeRaptorConfig<>(context, passThroughPointsService)
-      .createWorker(
-        heuristics,
-        (state, routingStrategy) -> createWorker(context, state, routingStrategy)
-      );
+    var context = context(transitData, request);
+    var mcConfig = new McRangeRaptorConfig<>(context, passThroughPointsService)
+      .withHeuristics(heuristics);
+
+    return createRangeRaptor(context, mcConfig.state(), mcConfig.strategy());
   }
 
   public RangeRaptor<T> createHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    var context = context(transitData, request);
-    var stdConfig = new StdRangeRaptorConfig<>(context);
-    return createWorker(context, stdConfig.state(), stdConfig.strategy());
+    return createStdWorker(transitData, request);
   }
 
   public Heuristics createHeuristic(
@@ -116,12 +114,12 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return McRangeRaptorConfig.passThroughPointsService(request.multiCriteria());
   }
 
-  private RangeRaptor<T> createWorker(
+  private RangeRaptorWorker<T> createWorker(
     SearchContext<T> ctx,
     RaptorWorkerState<T> workerState,
     RoutingStrategy<T> routingStrategy
   ) {
-    var worker = new DefaultRangeRaptorWorker<>(
+    return new DefaultRangeRaptorWorker<>(
       workerState,
       routingStrategy,
       ctx.transit(),
@@ -132,7 +130,9 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.performanceTimers(),
       ctx.useConstrainedTransfers()
     );
+  }
 
+  private RangeRaptor<T> createRangeRaptor(SearchContext<T> ctx, RangeRaptorWorker<T> worker) {
     return new RangeRaptor<>(
       worker,
       ctx.transit(),
@@ -142,6 +142,14 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.createLifeCyclePublisher(),
       ctx.performanceTimers()
     );
+  }
+
+  private RangeRaptor<T> createRangeRaptor(
+    SearchContext<T> ctx,
+    RaptorWorkerState<T> workerState,
+    RoutingStrategy<T> routingStrategy
+  ) {
+    return createRangeRaptor(ctx, createWorker(ctx, workerState, routingStrategy));
   }
 
   private IntPredicate acceptC2AtDestination() {

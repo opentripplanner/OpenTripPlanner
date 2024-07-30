@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -44,8 +43,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> context;
   private final PathConfig<T> pathConfig;
+  private final PassThroughPointsService passThroughPointsService;
   private DestinationArrivalPaths<T> paths;
-  private PassThroughPointsService passThroughPointsService;
+  private McRangeRaptorWorkerState<T> state;
+  private RoutingStrategy<T> strategy;
+  private Heuristics heuristics;
 
   public McRangeRaptorConfig(
     SearchContext<T> context,
@@ -70,12 +72,20 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /**
    * Create new multi-criteria worker with optional heuristics.
    */
-  public RangeRaptor<T> createWorker(
-    Heuristics heuristics,
-    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RangeRaptor<T>> createWorker
-  ) {
-    McRangeRaptorWorkerState<T> state = createState(heuristics);
-    return createWorker.apply(state, createTransitWorkerStrategy(state));
+  public McRangeRaptorConfig<T> withHeuristics(Heuristics heuristics) {
+    this.heuristics = heuristics;
+    return this;
+  }
+
+  /**
+   * Create new multi-criteria worker with optional heuristics.
+   */
+  public RoutingStrategy<T> strategy() {
+    return createTransitWorkerStrategy(createState(heuristics));
+  }
+
+  public RaptorWorkerState<T> state() {
+    return createState(heuristics);
   }
 
   /* private factory methods */
@@ -111,15 +121,19 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
-    return new McRangeRaptorWorkerState<>(
-      createStopArrivals(),
-      createDestinationArrivalPaths(),
-      createHeuristicsProvider(heuristics),
-      createStopArrivalFactory(),
-      context.costCalculator(),
-      context.calculator(),
-      context.lifeCycle()
-    );
+    if (state == null) {
+      state =
+        new McRangeRaptorWorkerState<>(
+          createStopArrivals(),
+          createDestinationArrivalPaths(),
+          createHeuristicsProvider(heuristics),
+          createStopArrivalFactory(),
+          context.costCalculator(),
+          context.calculator(),
+          context.lifeCycle()
+        );
+    }
+    return state;
   }
 
   private McStopArrivalFactory<T> createStopArrivalFactory() {

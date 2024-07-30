@@ -55,16 +55,16 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
   }
 
-  public boolean reached(int stopIndex) {
+  boolean reached(int stopIndex) {
     return arrivals[stopIndex] != null && !arrivals[stopIndex].isEmpty();
   }
 
   /** Slow! do not use during routing! */
-  public int bestArrivalTime(int stopIndex) {
+  int bestArrivalTime(int stopIndex) {
     return minInt(arrivals[stopIndex].stream(), McStopArrival::arrivalTime);
   }
 
-  public boolean reachedByTransit(int stopIndex) {
+  boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
       arrivals[stopIndex].stream().anyMatch(a -> a.arrivedBy(TRANSIT))
@@ -72,12 +72,12 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /** Slow! do not use during routing! */
-  public int bestTransitArrivalTime(int stopIndex) {
+  int bestTransitArrivalTime(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::arrivalTime);
   }
 
   /** Slow! do not use during routing! */
-  public int smallestNumberOfTransfers(int stopIndex) {
+  int smallestNumberOfTransfers(int stopIndex) {
     return transitStopArrivalsMinInt(stopIndex, McStopArrival::numberOfTransfers);
   }
 
@@ -100,22 +100,16 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     debugStats.debugStatInfo(arrivals);
   }
 
-  public boolean hasArrivalsAfterMarker(int stop) {
-    StopArrivalParetoSet<T> it = arrivals[stop];
-    if (it == null) {
-      return false;
-    }
-    return it.hasElementsAfterMarker();
+  boolean hasArrivalsAfterMarker(int stop) {
+    var it = arrivals[stop];
+    return it != null && it.hasElementsAfterMarker();
   }
 
   /** List all transits arrived this round. */
   Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
-    StopArrivalParetoSet<T> it = arrivals[stop];
-    if (it == null) {
-      // Avoid creating new objects in a tight loop
-      return Collections::emptyIterator;
-    }
-    return it.elementsAfterMarker();
+    var it = arrivals[stop];
+    // Avoid creating new objects in a tight loop
+    return it == null ? Collections::emptyIterator : it.elementsAfterMarker();
   }
 
   void clearTouchedStopsAndSetStopMarkers() {
@@ -131,10 +125,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
       arrivals[stop] =
-        StopArrivalParetoSet.createStopArrivalSet(
-          comparatorFactory.compareArrivalTimeRoundAndCost(),
-          debugHandlerFactory.paretoSetStopArrivalListener(stop)
-        );
+        StopArrivalParetoSet
+          .of(comparatorFactory.compareArrivalTimeRoundAndCost())
+          .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+          .build();
     }
     return arrivals[stop];
   }
@@ -145,10 +139,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       for (var access : accessPaths.arrivedOnBoardByNumOfRides(nRides)) {
         int stop = access.stop();
         arrivals[stop] =
-          StopArrivalParetoSet.createStopArrivalSet(
-            comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival(),
-            debugHandlerFactory.paretoSetStopArrivalListener(stop)
-          );
+          StopArrivalParetoSet
+            .of(comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival())
+            .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+            .build();
       }
     }
   }
@@ -166,12 +160,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       .forEachEntry((stop, list) -> {
         // The factory is creating the actual "glue"
         this.arrivals[stop] =
-          StopArrivalParetoSet.createEgressStopArrivalSet(
-            comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival(),
-            list,
-            paths,
-            debugHandlerFactory.paretoSetStopArrivalListener(stop)
-          );
+          StopArrivalParetoSet
+            .of(comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival())
+            .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+            .withEgressListener(list, paths)
+            .build();
         return true;
       });
   }
