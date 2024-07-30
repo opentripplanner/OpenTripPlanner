@@ -22,8 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
@@ -87,7 +85,6 @@ import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,10 +94,6 @@ class GtfsGraphQLIndex {
   static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLIndex.class);
 
   private static final GraphQLSchema indexSchema = buildSchema();
-
-  static final ExecutorService threadPool = Executors.newCachedThreadPool(
-    OtpRequestThreadFactory.of("gtfs-api-%d")
-  );
 
   protected static GraphQLSchema buildSchema() {
     try {
@@ -119,6 +112,7 @@ class GtfsGraphQLIndex {
         .scalar(GraphQLScalars.COORDINATE_VALUE_SCALAR)
         .scalar(GraphQLScalars.COST_SCALAR)
         .scalar(GraphQLScalars.RELUCTANCE_SCALAR)
+        .scalar(GraphQLScalars.LOCAL_DATE_SCALAR)
         .scalar(ExtendedScalars.GraphQLLong)
         .scalar(ExtendedScalars.Locale)
         .scalar(

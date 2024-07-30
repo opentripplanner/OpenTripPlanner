@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.apis.transmodel.model.scalars.DateScalarFactory;
 import org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunctionFactory;
 import org.opentripplanner.apis.transmodel.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.apis.transmodel.model.scalars.TimeScalarFactory;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.framework.graphql.scalar.DateScalarFactory;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -45,7 +45,7 @@ public class GqlUtil {
   public GqlUtil(ZoneId timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
-    this.dateScalar = DateScalarFactory.createDateScalar();
+    this.dateScalar = DateScalarFactory.createTransmodelDateScalar();
     this.doubleFunctionScalar = DoubleFunctionFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
