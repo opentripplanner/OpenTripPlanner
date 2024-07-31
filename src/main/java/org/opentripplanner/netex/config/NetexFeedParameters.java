@@ -34,6 +34,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
+  private static final Set<String> ROUTE_TO_CENTROID_STATION_IDS = Collections.emptySet();
 
   public static final NetexFeedParameters DEFAULT = new NetexFeedParameters();
 
@@ -49,6 +50,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private final String groupFilePattern;
   private final String ignoreFilePattern;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final Set<String> routeToCentroidStationIds;
   private final boolean noTransfersOnIsolatedStops;
   private final Set<IgnorableFeature> ignoredFeatures;
 
@@ -64,6 +66,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ignoreFilePattern = Pattern.compile(IGNORE_FILE_PATTERN).pattern();
     }
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
+    this.routeToCentroidStationIds = ROUTE_TO_CENTROID_STATION_IDS;
     this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
     this.ignoredFeatures = IGNORED_FEATURES;
   }
@@ -76,6 +79,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.groupFilePattern = requireNonNull(builder.groupFilePattern);
     this.ignoreFilePattern = requireNonNull(builder.ignoreFilePattern);
     this.ferryIdsNotAllowedForBicycle = Set.copyOf(builder.ferryIdsNotAllowedForBicycle);
+    this.routeToCentroidStationIds = Set.copyOf(builder.routeToCentroidStationIds);
     this.noTransfersOnIsolatedStops = builder.noTransfersOnIsolatedStops;
     this.ignoredFeatures = Set.copyOf(builder.ignoredFeatures);
   }
@@ -123,6 +127,11 @@ public class NetexFeedParameters implements DataSourceConfig {
   }
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
+  public Set<String> routeToCentroidStationIds() {
+    return routeToCentroidStationIds;
+  }
+
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public boolean noTransfersOnIsolatedStops() {
     return noTransfersOnIsolatedStops;
   }
@@ -149,7 +158,8 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoredFeatures.equals(that.ignoredFeatures) &&
-      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
+      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle) &&
+      routeToCentroidStationIds.equals(that.routeToCentroidStationIds)
     );
   }
 
@@ -163,7 +173,8 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedGroupFilePattern,
       groupFilePattern,
       ignoredFeatures,
-      ferryIdsNotAllowedForBicycle
+      ferryIdsNotAllowedForBicycle,
+      routeToCentroidStationIds
     );
   }
 
@@ -179,6 +190,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       .addStr("ignoreFilePattern", ignoreFilePattern, DEFAULT.ignoreFilePattern)
       .addCol("ignoredFeatures", ignoredFeatures)
       .addCol("ferryIdsNotAllowedForBicycle", ferryIdsNotAllowedForBicycle, Set.of())
+      .addCol("routeToCentroidStationIds", routeToCentroidStationIds, Set.of())
       .toString();
   }
 
@@ -196,6 +208,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private String groupFilePattern;
     private String ignoreFilePattern;
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
+    private final Set<String> routeToCentroidStationIds = new HashSet<>();
     private boolean noTransfersOnIsolatedStops;
     private final Set<IgnorableFeature> ignoredFeatures;
 
@@ -208,6 +221,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.groupFilePattern = original.groupFilePattern;
       this.ignoreFilePattern = original.ignoreFilePattern;
       this.ferryIdsNotAllowedForBicycle.addAll(original.ferryIdsNotAllowedForBicycle);
+      this.routeToCentroidStationIds.addAll(original.routeToCentroidStationIds);
       this.noTransfersOnIsolatedStops = original.noTransfersOnIsolatedStops;
       this.ignoredFeatures = new HashSet<>(original.ignoredFeatures);
     }
@@ -248,6 +262,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
     public Builder addFerryIdsNotAllowedForBicycle(Collection<String> ferryId) {
       ferryIdsNotAllowedForBicycle.addAll(ferryId);
+      return this;
+    }
+
+    public Builder addRouteToCentroidStationIds(Collection<String> stationIds) {
+      routeToCentroidStationIds.addAll(stationIds);
       return this;
     }
 

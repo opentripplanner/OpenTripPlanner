@@ -16,11 +16,13 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
+import org.opentripplanner.street.model.edge.StreetTransitStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitStationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -70,6 +72,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph, transitModel);
       linkTransitEntrances(graph);
+      linkTransitStationCentroids(graph);
       linkVehicleParks(graph, issueStore);
     }
 
@@ -251,6 +254,32 @@ public class StreetLinkerModule implements GraphBuilderModule {
               StreetTransitEntranceLink.createStreetTransitEntranceLink(
                 streetVertex,
                 (TransitEntranceVertex) vertex
+              )
+            )
+        );
+    }
+  }
+
+  private void linkTransitStationCentroids(Graph graph) {
+    LOG.info("Linking TransitStationCentroidVertices to graph...");
+    for (TransitStationCentroidVertex tVertex : graph.getVerticesOfType(
+      TransitStationCentroidVertex.class
+    )) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          tVertex,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              StreetTransitStationCentroidLink.createStreetTransitStationLink(
+                (TransitStationCentroidVertex) vertex,
+                streetVertex
+              ),
+              StreetTransitStationCentroidLink.createStreetTransitStationLink(
+                streetVertex,
+                (TransitStationCentroidVertex) vertex
               )
             )
         );

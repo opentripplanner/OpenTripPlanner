@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RequestModes;
 
 // TODO VIA: Javadoc
@@ -30,6 +31,13 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   public StreetRequest direct() {
     return direct;
+  }
+
+  /**
+   * Get the access or egress StreetRequest depending on the type in the parameter
+   */
+  public StreetRequest accessOrEgress(AccessEgressType accessOrEgress) {
+    return accessOrEgress.isEgress() ? egress : access;
   }
 
   public void setModes(RequestModes modes) {

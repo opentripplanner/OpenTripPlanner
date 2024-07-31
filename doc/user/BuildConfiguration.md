@@ -83,6 +83,7 @@ Sections follow that describe particular settings in more depth.
 |    [sharedFilePattern](#nd_sharedFilePattern)                            |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |  `string[]` | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
+|    [routeToCentroidStationIds](#nd_routeToCentroidStationIds)            |  `string[]` | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.6  |
 | [osm](#osm)                                                              |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                                                           | *Optional* |                                   |  2.2  |
 |       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.                                                  | *Optional* | `"default"`                       |  2.2  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
@@ -113,6 +114,7 @@ Sections follow that describe particular settings in more depth.
 |       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
+|       [routeToCentroidStationIds](#tf_1_routeToCentroidStationIds)       |  `string[]` | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.6  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -922,6 +924,26 @@ For this reason we allow bicycles on ferries by default and allow to override th
 case where this is not the case.
 
 
+<h3 id="nd_routeToCentroidStationIds">routeToCentroidStationIds</h3>
+
+**Since version:** `2.6` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /netexDefaults 
+
+List stations that should route to centroid.
+
+This field contains a list of station ids for which the centroid will be used instead
+of the stop coordinates.
+
+When doing street routing from/to a station the default behaviour is to route to any of
+the stations' child stops. This can cause strange results for stations that have stops
+spread over a large area.
+
+For some stations you might instead wish to use the centroid of the station as the
+source/destination for street routing. In this case the centroid will be  used both for
+direct street search and for access/egress street search where the station is used as
+the start/end of the access/egress.
+
+
 <h3 id="osm">osm</h3>
 
 **Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
@@ -1065,6 +1087,26 @@ where bicycle conveyance can be defined.
 
 For this reason we allow bicycles on ferries by default and allow to override the rare
 case where this is not the case.
+
+
+<h3 id="tf_1_routeToCentroidStationIds">routeToCentroidStationIds</h3>
+
+**Since version:** `2.6` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /transitFeeds/[1] 
+
+List stations that should route to centroid.
+
+This field contains a list of station ids for which the centroid will be used instead
+of the stop coordinates.
+
+When doing street routing from/to a station the default behaviour is to route to any of
+the stations' child stops. This can cause strange results for stations that have stops
+spread over a large area.
+
+For some stations you might instead wish to use the centroid of the station as the
+source/destination for street routing. In this case the centroid will be  used both for
+direct street search and for access/egress street search where the station is used as
+the start/end of the access/egress.
 
 
 

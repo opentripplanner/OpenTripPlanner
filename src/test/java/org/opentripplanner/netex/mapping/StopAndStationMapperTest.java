@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
+import static org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration.TRAM;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -159,7 +161,8 @@ class StopAndStationMapperTest {
       StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      false
+      false,
+      Set.of()
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
@@ -229,7 +232,8 @@ class StopAndStationMapperTest {
       StopModel.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      isolated
+      isolated,
+      Set.of()
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
@@ -279,6 +283,33 @@ class StopAndStationMapperTest {
     );
   }
 
+  @Test
+  void testRouteToCentroid() {
+    var routeToCentroidStationIds = Set.of("NSR:StopPlace:1");
+    StopAndStationMapper stopMapper = new StopAndStationMapper(
+      MappingSupport.ID_FACTORY,
+      new HierarchicalVersionMapById<>(),
+      null,
+      StopModel.of(),
+      DEFAULT_TIME_ZONE,
+      DataImportIssueStore.NOOP,
+      false,
+      routeToCentroidStationIds
+    );
+
+    stopMapper.mapParentAndChildStops(
+      List.of(createStopPlace("NSR:StopPlace:1", "A", "1", 59.1, 10.0, TRAM))
+    );
+    stopMapper.mapParentAndChildStops(
+      List.of(createStopPlace("NSR:StopPlace:2", "B", "1", 59.2, 10.0, TRAM))
+    );
+
+    var stations = stopMapper.resultStations;
+    assertEquals(2, stations.size());
+    assertTrue(stations.get(0).shouldRouteToCentroid());
+    assertFalse(stations.get(1).shouldRouteToCentroid());
+  }
+
   private static StopAndStationMapper createStopAndStationMapper(
     StopModelBuilder stopModelBuilder
   ) {
@@ -289,7 +320,8 @@ class StopAndStationMapperTest {
       stopModelBuilder,
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
-      false
+      false,
+      Set.of()
     );
   }
 

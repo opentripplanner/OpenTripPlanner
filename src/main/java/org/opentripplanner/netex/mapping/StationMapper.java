@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -35,6 +36,9 @@ class StationMapper {
   private final ZoneId defaultTimeZone;
 
   private final boolean noTransfersOnIsolatedStops;
+
+  private final Set<String> routeToCentroidStationIds;
+
   private final StopModelBuilder stopModelBuilder;
 
   StationMapper(
@@ -42,12 +46,14 @@ class StationMapper {
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
     boolean noTransfersOnIsolatedStops,
+    Set<String> routeToCentroidStationIds,
     StopModelBuilder stopModelBuilder
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
+    this.routeToCentroidStationIds = routeToCentroidStationIds;
     this.stopModelBuilder = stopModelBuilder;
   }
 
@@ -61,6 +67,7 @@ class StationMapper {
       .of(id)
       .withName(resolveName(stopPlace))
       .withCoordinate(mapCoordinate(stopPlace))
+      .withShouldRouteToCentroid(shouldRouteToCentroid(stopPlace))
       .withDescription(
         NonLocalizedString.ofNullable(stopPlace.getDescription(), MultilingualString::getValue)
       )
@@ -81,6 +88,10 @@ class StationMapper {
     }
 
     return builder.build();
+  }
+
+  private boolean shouldRouteToCentroid(StopPlace stopPlace) {
+    return routeToCentroidStationIds.contains(stopPlace.getId());
   }
 
   private ZoneId ofZoneId(String stopPlaceId, String zoneId) {

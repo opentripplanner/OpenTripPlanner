@@ -158,6 +158,29 @@ public class NetexConfig {
           .docDefaultValue(dft.ferryIdsNotAllowedForBicycle())
           .asStringSet(base.ferryIdsNotAllowedForBicycle())
       )
+      .addRouteToCentroidStationIds(
+        config
+          .of("routeToCentroidStationIds")
+          .since(V2_6)
+          .summary("List stations that should route to centroid.")
+          .description(
+            """
+            This field contains a list of station ids for which the centroid will be used instead
+            of the stop coordinates.
+            
+            When doing street routing from/to a station the default behaviour is to route to any of
+            the stations' child stops. This can cause strange results for stations that have stops
+            spread over a large area.
+            
+            For some stations you might instead wish to use the centroid of the station as the
+            source/destination for street routing. In this case the centroid will be  used both for
+            direct street search and for access/egress street search where the station is used as
+            the start/end of the access/egress.
+            """
+          )
+          .docDefaultValue(dft.routeToCentroidStationIds())
+          .asStringSet(base.routeToCentroidStationIds())
+      )
       .withIgnoreFareFrame(
         config
           .of("ignoreFareFrame")

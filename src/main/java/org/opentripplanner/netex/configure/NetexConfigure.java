@@ -73,6 +73,7 @@ public class NetexConfigure {
       hierarchy(source, config),
       transitServiceBuilder,
       config.ferryIdsNotAllowedForBicycle(),
+      config.routeToCentroidStationIds(),
       buildParams.maxStopToShapeSnapDistance,
       config.noTransfersOnIsolatedStops(),
       config.ignoredFeatures()
