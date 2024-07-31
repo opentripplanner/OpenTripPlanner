@@ -46,6 +46,23 @@
     // noise, so we slow it down a bit
     {
       "matchPackageNames": [
+        "org.mockito:mockito-core",
+        "com.tngtech.archunit:archunit",
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
+        "com.google.truth:truth",
+        "org.jacoco:jacoco-maven-plugin", // coverage plugin
+        "org.apache.commons:commons-compress" // only used by tests
+      ],
+      "matchPackagePrefixes": [
+        "org.junit.jupiter:",
+      ],
+      "groupName": "Test dependencies",
+      "automerge": true,
+      "schedule": "on the 17th day of the month"
+    },
+    {
+      "matchPackageNames": [
         "org.mobilitydata:gbfs-java-model"
       ],
       "matchUpdateTypes": ["patch"],
@@ -110,13 +127,6 @@
     {
       "description": "automatically merge test, logging and build dependencies",
       "matchPackageNames": [
-        "org.mockito:mockito-core",
-        "com.tngtech.archunit:archunit",
-        "org.apache.maven.plugins:maven-surefire-plugin",
-        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
-        "com.google.truth:truth",
-        "org.jacoco:jacoco-maven-plugin", // coverage plugin
-        "org.apache.commons:commons-compress", // only used by tests
         // maven plugins
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
@@ -128,7 +138,6 @@
         "org.sonatype.plugins:nexus-staging-maven-plugin"
       ],
       "matchPackagePrefixes": [
-        "org.junit.jupiter:",
         "org.slf4j:"
       ],
       "automerge": true,
