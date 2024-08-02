@@ -62,7 +62,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
   private final TransitService transitService;
-  private final Set<MappingFeature> optionalFeatures;
+  private final Set<MappingFeature> optInFeatures;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -78,14 +78,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
-    Set<MappingFeature> optionalFeatures
+    Set<MappingFeature> optInFeatures
   ) {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
-    this.optionalFeatures = Set.copyOf(optionalFeatures);
+    this.optInFeatures = Set.copyOf(optInFeatures);
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -115,10 +115,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
         if (
-          optionalFeatures.contains(TRANSFER_LEG_ON_SAME_STOP) &&
+          optInFeatures.contains(TRANSFER_LEG_ON_SAME_STOP) &&
           isPathTransferAtSameStop(previousLeg, pathLeg)
         ) {
-          legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
+          legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));
         }
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
@@ -290,7 +290,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return egressPathLeg.egress().isFree();
   }
 
-  private Leg createArtificalTransferLeg(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
+  /**
+   * If a routing result transfers at the very same stop RAPTOR doesn't add a path leg. However,
+   * sometimes we want to create a zero distance leg so the UI can show a transfer. Since it would
+   * be considered backwards-incompatible, this is an opt-in feature.
+   */
+  private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
     var transferStop = Place.forStop(transitLayer.getStopByIndex(previousLeg.toStop()));
     return StreetLeg
       .create()
