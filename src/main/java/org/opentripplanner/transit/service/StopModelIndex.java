@@ -105,7 +105,11 @@ class StopModelIndex {
       // Log this as warning if more than 5% of the space is null
       LOG
         .atLevel(p >= 5.0 ? Level.WARN : Level.INFO)
-        .log("The stop index contains holes in it. {} of {} is null.", c, stopsByIndex.length);
+        .log(
+          "The stop index contains holes in it. {} of {} entries are null.",
+          c,
+          stopsByIndex.length
+        );
     }
   }
 }

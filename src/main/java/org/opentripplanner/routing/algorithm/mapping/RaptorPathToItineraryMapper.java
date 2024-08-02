@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.routing.algorithm.mapping.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toOtpDomainCost;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
@@ -61,6 +62,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
   private final TransitService transitService;
+  private final Set<MappingFeature> optionalFeatures;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -75,13 +77,15 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
-    RouteRequest request
+    RouteRequest request,
+    Set<MappingFeature> optionalFeatures
   ) {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
+    this.optionalFeatures = Set.copyOf(optionalFeatures);
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -110,10 +114,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
-        if (OTPFeature.ExtraTransferLegOnSameStop.isOn()) {
-          if (isPathTransferAtSameStop(previousLeg, pathLeg)) {
-            legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
-          }
+        if (
+          optionalFeatures.contains(TRANSFER_LEG_ON_SAME_STOP) &&
+          isPathTransferAtSameStop(previousLeg, pathLeg)
+        ) {
+          legs.add(createArtificalTransferLeg(previousLeg, pathLeg));
         }
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
