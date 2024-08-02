@@ -53,7 +53,8 @@ All updaters have the following parameters in common:
 The SIRI-FM updaters works slighly differently from the other in that it only updates the availability
 of parking but does not create new lots in realtime.
 
-The data source must conform to the [Italian SIRI-FM](https://github.com/noi-techpark/sta-nap-export/files/15302688/240502_SpecificaSIRI_v.1.0.3.pdf) profile.
+The data source must conform to the [Italian SIRI-FM](https://github.com/5Tsrl/siri-italian-profile) profile
+requires SIRI 2.1.
 
 <!-- INSERT: siri-fm -->
 

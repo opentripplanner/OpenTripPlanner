@@ -112,7 +112,8 @@ public class VehicleParkingUpdaterConfig {
           SIRI Light means that it must be available as a HTTP GET request rather than the usual
           SIRI request mechanism of HTTP POST.
           
-          The contents must also conform to the [Italian SIRI profile](https://github.com/noi-techpark/sta-nap-export/files/15302688/240502_SpecificaSIRI_v.1.0.3.pdf).
+          The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
+          which requires SIRI 2.1.
           """
           )
           .asUri(),
