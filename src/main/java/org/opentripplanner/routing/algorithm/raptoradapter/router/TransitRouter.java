@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
@@ -167,8 +166,7 @@ public class TransitRouter {
       serverContext.transitService(),
       transitLayer,
       transitSearchTimeZero,
-      request,
-      Set.of()
+      request
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();

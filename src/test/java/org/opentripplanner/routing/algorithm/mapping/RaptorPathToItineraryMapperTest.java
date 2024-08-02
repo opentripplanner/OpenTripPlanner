@@ -5,16 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
-import static org.opentripplanner.routing.algorithm.mapping.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
+import static org.opentripplanner.routing.api.request.preference.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.MappingFeature;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -189,7 +191,7 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   @Nested
-  class OptionalFeatures {
+  class OptInFeatures {
 
     @Test
     void noExtraLegWhenTransferringAtSameStop() {
@@ -281,13 +283,20 @@ public class RaptorPathToItineraryMapperTest {
       .toInstant();
     TransitModel transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.CET);
+    final RouteRequest request = new RouteRequest();
+    request.withPreferences(p ->
+      p.withMapping(m ->
+        m.apply(mp ->
+          mp.withOptInFeatures(Arrays.stream(featureSwitches).collect(Collectors.toSet()))
+        )
+      )
+    );
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(transitModel),
       getTransitLayer(),
       dateTime.atZone(ZoneIds.CET),
-      new RouteRequest(),
-      Set.of(featureSwitches)
+      request
     );
   }
 

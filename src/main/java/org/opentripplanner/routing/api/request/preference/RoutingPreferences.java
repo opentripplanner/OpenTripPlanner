@@ -27,6 +27,7 @@ public final class RoutingPreferences implements Serializable {
   private final ScooterPreferences scooter;
   private final SystemPreferences system;
   private final ItineraryFilterPreferences itineraryFilter;
+  private final MappingPreferences mapping;
 
   public RoutingPreferences() {
     this.transit = TransitPreferences.DEFAULT;
@@ -39,6 +40,7 @@ public final class RoutingPreferences implements Serializable {
     this.scooter = ScooterPreferences.DEFAULT;
     this.system = SystemPreferences.DEFAULT;
     this.itineraryFilter = ItineraryFilterPreferences.DEFAULT;
+    this.mapping = MappingPreferences.DEFAULT;
   }
 
   private RoutingPreferences(Builder builder) {
@@ -52,6 +54,7 @@ public final class RoutingPreferences implements Serializable {
     this.scooter = requireNonNull(builder.scooter());
     this.system = requireNonNull(builder.system());
     this.itineraryFilter = requireNonNull(builder.itineraryFilter());
+    this.mapping = requireNonNull(builder.mappingPreferences());
   }
 
   public Builder of() {
@@ -136,6 +139,10 @@ public final class RoutingPreferences implements Serializable {
     return itineraryFilter;
   }
 
+  public MappingPreferences mapping() {
+    return mapping;
+  }
+
   public SystemPreferences system() {
     return system;
   }
@@ -169,7 +176,8 @@ public final class RoutingPreferences implements Serializable {
       Objects.equals(car, that.car) &&
       Objects.equals(scooter, that.scooter) &&
       Objects.equals(system, that.system) &&
-      Objects.equals(itineraryFilter, that.itineraryFilter)
+      Objects.equals(itineraryFilter, that.itineraryFilter) &&
+      Objects.equals(mapping, that.mapping)
     );
   }
 
@@ -202,6 +210,7 @@ public final class RoutingPreferences implements Serializable {
     private ScooterPreferences scooter = null;
     private SystemPreferences system = null;
     private ItineraryFilterPreferences itineraryFilter = null;
+    private MappingPreferences mappingPreferences = null;
 
     public Builder(RoutingPreferences original) {
       this.original = original;
@@ -308,8 +317,18 @@ public final class RoutingPreferences implements Serializable {
       return this;
     }
 
+    public MappingPreferences mappingPreferences() {
+      return mappingPreferences == null ? original.mapping : mappingPreferences;
+    }
+
     public Builder apply(Consumer<Builder> body) {
       body.accept(this);
+      return this;
+    }
+
+    public Builder withMapping(Consumer<MappingPreferences.Builder> body) {
+      this.mappingPreferences =
+        ifNotNull(this.mappingPreferences, original.mapping).copyOf().apply(body).build();
       return this;
     }
 

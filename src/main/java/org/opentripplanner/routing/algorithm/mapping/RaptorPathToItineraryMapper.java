@@ -1,13 +1,12 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.routing.algorithm.mapping.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.routing.api.request.preference.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -62,7 +61,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
   private final TransitService transitService;
-  private final Set<MappingFeature> optInFeatures;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -77,15 +75,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
-    RouteRequest request,
-    Set<MappingFeature> optInFeatures
+    RouteRequest request
   ) {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
-    this.optInFeatures = Set.copyOf(optInFeatures);
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -115,7 +111,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
         if (
-          optInFeatures.contains(TRANSFER_LEG_ON_SAME_STOP) &&
+          request.preferences().mapping().optsInto(TRANSFER_LEG_ON_SAME_STOP) &&
           isPathTransferAtSameStop(previousLeg, pathLeg)
         ) {
           legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));

@@ -1,4 +1,6 @@
-package org.opentripplanner.routing.algorithm.mapping;
+package org.opentripplanner.routing.api.request.preference;
+
+import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 
 /**
  * Opt-in features for {@link RaptorPathToItineraryMapper}.
