@@ -71,7 +71,7 @@ public final class ScheduledTripTimes implements TripTimes {
   @Nullable
   private final String[][] headsignVias;
 
-  /** TODO RT_AB: document, what is this for? */
+  /** This is for matching stops with external services, in the realtime-updaters for example. */
   private final int[] originalGtfsStopSequence;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
