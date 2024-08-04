@@ -191,6 +191,7 @@ travel time `x` (in seconds).
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
+    preferences.withMapping(it -> mapItineraryFilterParams("itineraryFilters", c, it));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {
