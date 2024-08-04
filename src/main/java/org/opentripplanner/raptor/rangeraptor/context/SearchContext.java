@@ -73,21 +73,19 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
-  /**
-   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
-   *                             for accepting it at the destination, if not this is {@code null}.
-   */
   public SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
     RaptorTransitDataProvider<T> transit,
+    AccessPaths accessPaths,
+    EgressPaths egressPaths,
     @Nullable IntPredicate acceptC2AtDestination
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
-    this.accessPaths = accessPaths(tuningParameters.iterationDepartureStepInSeconds(), request);
-    this.egressPaths = egressPaths(request);
+    this.accessPaths = accessPaths;
+    this.egressPaths = egressPaths;
     this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker =
       new RoundTracker(
@@ -97,6 +95,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
       );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     this.acceptC2AtDestination = acceptC2AtDestination;
+  }
+
+  /**
+   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
+   *                             for accepting it at the destination, if not this is {@code null}.
+   */
+  public static <T extends RaptorTripSchedule> SearchContext<T> of(
+    RaptorRequest<T> request,
+    RaptorTuningParameters tuningParameters,
+    RaptorTransitDataProvider<T> transit,
+    @Nullable IntPredicate acceptC2AtDestination
+  ) {
+    return new SearchContextBuilder<>(request, tuningParameters, transit, acceptC2AtDestination)
+      .build();
   }
 
   public AccessPaths accessPaths() {
@@ -310,20 +322,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return searchDirection.isForward()
       ? p -> slackProvider.boardSlack(p.slackIndex())
       : p -> slackProvider.alightSlack(p.slackIndex());
-  }
-
-  private static AccessPaths accessPaths(int iterationStep, RaptorRequest<?> request) {
-    boolean forward = request.searchDirection().isForward();
-    var params = request.searchParams();
-    var paths = forward ? params.accessPaths() : params.egressPaths();
-    return AccessPaths.create(iterationStep, paths, request.profile(), request.searchDirection());
-  }
-
-  private static EgressPaths egressPaths(RaptorRequest<?> request) {
-    boolean forward = request.searchDirection().isForward();
-    var params = request.searchParams();
-    var paths = forward ? params.egressPaths() : params.accessPaths();
-    return EgressPaths.create(paths, request.profile());
   }
 
   static ParetoSetTime paretoSetTimeConfig(

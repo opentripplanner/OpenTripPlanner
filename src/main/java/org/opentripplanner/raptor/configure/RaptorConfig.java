@@ -50,7 +50,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
     // The passThroughPointsService is needed to create the context, so we initialize it here.
     this.passThroughPointsService = createPassThroughPointsService(request);
-    return new SearchContext<>(request, tuningParameters, transit, acceptC2AtDestination());
+    return SearchContext.of(request, tuningParameters, transit, acceptC2AtDestination());
   }
 
   public RangeRaptor<T> createStdWorker(
