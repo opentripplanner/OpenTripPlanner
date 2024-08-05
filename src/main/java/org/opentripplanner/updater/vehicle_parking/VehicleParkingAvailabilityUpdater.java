@@ -54,17 +54,17 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     if (source.update()) {
       var updates = source.getUpdates();
 
-      var graphWriterRunnable = new UpdateAvailabilities(updates);
+      var graphWriterRunnable = new AvailabilityUpdater(updates);
       saveResultOnGraph.execute(graphWriterRunnable);
     }
   }
 
-  private class UpdateAvailabilities implements GraphWriterRunnable {
+  private class AvailabilityUpdater implements GraphWriterRunnable {
 
     private final List<AvailabiltyUpdate> updates;
     private final Map<FeedScopedId, VehicleParking> parkingById;
 
-    private UpdateAvailabilities(List<AvailabiltyUpdate> updates) {
+    private AvailabilityUpdater(List<AvailabiltyUpdate> updates) {
       this.updates = List.copyOf(updates);
       this.parkingById =
         vehicleParkingService
