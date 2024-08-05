@@ -33,6 +33,7 @@ class VehicleParkingAvailabilityUpdaterTest {
         "type" : "vehicle-parking",
         "feedId" : "parking",
         "sourceType" : "siri-fm",
+        "frequency": "0s",
         "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
       }
     """
