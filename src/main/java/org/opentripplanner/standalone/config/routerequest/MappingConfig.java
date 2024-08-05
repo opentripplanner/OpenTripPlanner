@@ -4,14 +4,13 @@ import static org.opentripplanner.standalone.config.framework.json.EnumMapper.do
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
-import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.MappingFeature;
 import org.opentripplanner.routing.api.request.preference.MappingPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class MappingConfig {
 
-  public static void mapItineraryFilterParams(
+  public static void mapMappingParams(
     String parameterName,
     NodeAdapter root,
     MappingPreferences.Builder builder
@@ -19,26 +18,22 @@ public class MappingConfig {
     NodeAdapter c = root
       .of(parameterName)
       .since(V2_6)
-      .summary(
-        "Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results."
-      )
+      .summary("Configure mapping of the internal data structures into itineraries.")
       .asObject();
 
     if (c.isEmpty()) {
       return;
     }
-    var dft = builder.original();
 
     builder
       .withOptInFeatures(
         c
-          .of("debug")
+          .of("optInFeatures")
           .since(V2_0)
-          .summary(ItineraryFilterDebugProfile.OFF.typeDescription())
+          .summary(MappingFeature.TRANSFER_LEG_ON_SAME_STOP.typeDescription())
           .description(docEnumValueList(MappingFeature.values()))
           .asEnumSet(MappingFeature.class)
       )
       .build();
   }
-
 }

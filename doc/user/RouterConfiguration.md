@@ -606,6 +606,11 @@ Used to group requests when monitoring OTP.
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
       "stairsReluctance" : 100
+    },
+    "mapping" : {
+      "optInFeatures" : [
+        "transfer-leg-on-same-stop"
+      ]
     }
   },
   "flex" : {
