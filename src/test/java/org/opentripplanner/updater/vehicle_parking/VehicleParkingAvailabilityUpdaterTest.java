@@ -2,10 +2,10 @@ package org.opentripplanner.updater.vehicle_parking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import com.google.common.util.concurrent.Futures;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -24,27 +25,20 @@ import org.opentripplanner.updater.spi.GraphUpdater;
 
 class VehicleParkingAvailabilityUpdaterTest {
 
-  private static final VehicleParkingUpdaterParameters PARAMETERS = new VehicleParkingUpdaterParameters() {
-    @Override
-    public VehicleParkingSourceType sourceType() {
-      return VehicleParkingSourceType.SIRI_FM;
-    }
+  private static final VehicleParkingUpdaterParameters PARAMETERS = VehicleParkingUpdaterConfig.create(
+    "ref",
+    newNodeAdapterForTest(
+      """
+      {
+        "type" : "vehicle-parking",
+        "feedId" : "parking",
+        "sourceType" : "siri-fm",
+        "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
+      }
+    """
+    )
+  );
 
-    @Override
-    public UpdateType updateType() {
-      return UpdateType.AVAILABILITY_ONLY;
-    }
-
-    @Override
-    public Duration frequency() {
-      return Duration.ZERO;
-    }
-
-    @Override
-    public String configRef() {
-      return null;
-    }
-  };
   private static final FeedScopedId ID = id("parking1");
   private static final AvailabiltyUpdate DEFAULT_UPDATE = new AvailabiltyUpdate(ID, 8);
 

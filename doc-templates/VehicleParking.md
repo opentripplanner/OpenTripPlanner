@@ -50,7 +50,7 @@ All updaters have the following parameters in common:
 
 ## SIRI-FM
 
-The SIRI-FM updaters works slighly differently from the others in that it only updates the availability
+The SIRI-FM updater works slightly differently from the others in that it only updates the availability
 of parking but does not create new lots in realtime.
 
 The data source must conform to the [Italian SIRI-FM](https://github.com/5Tsrl/siri-italian-profile) profile

@@ -32,8 +32,6 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sets up and starts all the graph updaters.
@@ -43,8 +41,6 @@ import org.slf4j.LoggerFactory;
  * GraphUpdaterManager.
  */
 public class UpdaterConfigurator {
-
-  private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfigurator.class);
 
   private final Graph graph;
   private final TransitModel transitModel;
