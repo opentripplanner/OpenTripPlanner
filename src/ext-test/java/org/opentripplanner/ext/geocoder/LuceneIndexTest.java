@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -259,7 +260,7 @@ class LuceneIndexTest {
     @Test
     void fuzzyStopClusters() {
       var result1 = index.queryStopClusters("arts").map(primaryId()).toList();
-      assertEquals(List.of(ARTS_CENTER.getId()), result1);
+      assertEquals(List.of(ARTS_CENTER.getId(), ARTHUR.getId()), result1);
     }
 
     @Test
@@ -327,14 +328,15 @@ class LuceneIndexTest {
       assertEquals("A Publisher", cluster.primary().feedPublisher().name());
     }
 
-    @Test
-    void number() {
-      var names = index
-        .queryStopClusters("Meridian Ave N & N 148")
-        .map(c -> c.primary().name())
-        .toList();
+    @ParameterizedTest
+    @ValueSource(strings = { "Meridian Ave N & N 148th", "Meridian Ave N & N 148" })
+    void shortTokens(String query) {
+      var names = index.queryStopClusters(query).map(c -> c.primary().name()).toList();
       assertEquals(
-        List.of(MERIDIAN_AVE.getName().toString(), MERIDIAN_N_1.getName().toString()),
+        Stream
+          .of(MERIDIAN_AVE, MERIDIAN_N_3, MERIDIAN_N_1)
+          .map(s -> s.getName().toString())
+          .toList(),
         names
       );
     }

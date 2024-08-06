@@ -28,7 +28,7 @@ class EnglishNGramAnalyzer extends Analyzer {
     result = new StopFilter(result, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
     result = new PorterStemFilter(result);
     result = new CapitalizationFilter(result);
-    result = new NGramTokenFilter(result, 4, 10, true);
+    result = new NGramTokenFilter(result, 3, 10, true);
     return new TokenStreamComponents(src, result);
   }
 }

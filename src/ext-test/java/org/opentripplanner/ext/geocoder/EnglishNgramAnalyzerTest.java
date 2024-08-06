@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -17,9 +18,9 @@ class EnglishNgramAnalyzerTest {
     var analyzer = new EnglishNGramAnalyzer();
     List<String> result = analyze("Alexanderplatz", analyzer);
 
-    //System.out.println(result.stream().collect(Collectors.joining("\",\"", "\"", "\"")));
     assertEquals(
       List.of(
+        "Ale",
         "Alex",
         "Alexa",
         "Alexan",
@@ -27,6 +28,7 @@ class EnglishNgramAnalyzerTest {
         "Alexande",
         "Alexander",
         "Alexanderp",
+        "lex",
         "lexa",
         "lexan",
         "lexand",
@@ -34,6 +36,7 @@ class EnglishNgramAnalyzerTest {
         "lexander",
         "lexanderp",
         "lexanderpl",
+        "exa",
         "exan",
         "exand",
         "exande",
@@ -41,6 +44,7 @@ class EnglishNgramAnalyzerTest {
         "exanderp",
         "exanderpl",
         "exanderpla",
+        "xan",
         "xand",
         "xande",
         "xander",
@@ -48,6 +52,7 @@ class EnglishNgramAnalyzerTest {
         "xanderpl",
         "xanderpla",
         "xanderplat",
+        "and",
         "ande",
         "ander",
         "anderp",
@@ -55,27 +60,34 @@ class EnglishNgramAnalyzerTest {
         "anderpla",
         "anderplat",
         "anderplatz",
+        "nde",
         "nder",
         "nderp",
         "nderpl",
         "nderpla",
         "nderplat",
         "nderplatz",
+        "der",
         "derp",
         "derpl",
         "derpla",
         "derplat",
         "derplatz",
+        "erp",
         "erpl",
         "erpla",
         "erplat",
         "erplatz",
+        "rpl",
         "rpla",
         "rplat",
         "rplatz",
+        "pla",
         "plat",
         "platz",
+        "lat",
         "latz",
+        "atz",
         "Alexanderplatz"
       ),
       result
@@ -87,29 +99,39 @@ class EnglishNgramAnalyzerTest {
     var analyzer = new EnglishNGramAnalyzer();
     List<String> result = analyze("Meridian Ave N & N 148th St", analyzer);
 
+    System.out.println(result.stream().collect(Collectors.joining("\",\"", "\"", "\"")));
     assertEquals(
       List.of(
+        "Mer",
         "Meri",
         "Merid",
         "Meridi",
         "Meridia",
         "Meridian",
+        "eri",
         "erid",
         "eridi",
         "eridia",
         "eridian",
+        "rid",
         "ridi",
         "ridia",
         "ridian",
+        "idi",
         "idia",
         "idian",
+        "dia",
         "dian",
+        "ian",
         "Av",
         "N",
         "N",
+        "148",
         "148t",
         "148th",
+        "48t",
         "48th",
+        "8th",
         "St"
       ),
       result
