@@ -98,33 +98,9 @@ class LuceneIndexTest {
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  static final RegularStop MERIDIAN_AVE = TEST_MODEL
-    .stop("Meridian Ave N & N 148th St")
-    .withId(FeedScopedId.parse("kcm:16340"))
-    .withCode("16340")
-    .withCoordinate(47.736145, -122.33445)
-    .build();
-
-  static final RegularStop MERIDIAN_N_1 = TEST_MODEL
-    .stop("Meridian N & Spencer")
-    .withId(FeedScopedId.parse("pierce:13268"))
-    .withCode("4168")
-    .withCoordinate(47.209366, -122.293999)
-    .build();
-
-  static final RegularStop MERIDIAN_N_2 = TEST_MODEL
-    .stop("Meridian N & Spencer")
-    .withId(FeedScopedId.parse("pierce:30976"))
-    .withCode("4169")
-    .withCoordinate(47.209316, -122.293841)
-    .build();
-
-  static final RegularStop MERIDIAN_N_3 = TEST_MODEL
-    .stop("N 205th St & Meridian Ave N")
-    .withId(FeedScopedId.parse("commtrans:490"))
-    .withCode("490")
-    .withCoordinate(47.777632, -122.3346)
-    .build();
+  static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop("Meridian Ave N & N 148th St").build();
+  static final RegularStop MERIDIAN_N1 = TEST_MODEL.stop("Meridian N & Spencer").build();
+  static final RegularStop MERIDIAN_N2 = TEST_MODEL.stop("N 205th St & Meridian Ave N").build();
 
   static LuceneIndex index;
 
@@ -142,9 +118,8 @@ class LuceneIndexTest {
         WESTHAFEN,
         ARTS_CENTER,
         ARTHUR,
-        MERIDIAN_N_1,
-        MERIDIAN_N_2,
-        MERIDIAN_N_3,
+        MERIDIAN_N1,
+        MERIDIAN_N2,
         MERIDIAN_AVE
       )
       .forEach(stopModel::withRegularStop);
@@ -335,10 +310,7 @@ class LuceneIndexTest {
     void shortTokens(String query) {
       var names = index.queryStopClusters(query).map(c -> c.primary().name()).toList();
       assertEquals(
-        Stream
-          .of(MERIDIAN_AVE, MERIDIAN_N_3, MERIDIAN_N_1)
-          .map(s -> s.getName().toString())
-          .toList(),
+        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
         names
       );
     }
