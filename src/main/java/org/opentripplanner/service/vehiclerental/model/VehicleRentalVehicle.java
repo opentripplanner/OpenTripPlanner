@@ -137,6 +137,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
   @Override
   public double getCurrentRangeMeters() {
+    if (currentRangeMeters == null) {
+      return Double.POSITIVE_INFINITY;
+    }
     return currentRangeMeters;
   }
 }
