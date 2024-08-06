@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
+import static org.opentripplanner.inspector.vector.KeyValue.kv;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
@@ -52,10 +54,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
       new KeyValue("desc", i18NStringMapper.mapToApi(stop.getDescription())),
       new KeyValue("type", getType(transitService, stop)),
       new KeyValue("routes", getRoutes(transitService, stop)),
-      new KeyValue(
-        "parentStation",
-        stop.getParentStation() != null ? stop.getParentStation().getId() : null
-      )
+      kv("parentStation", stop.getParentStation() != null ? stop.getParentStation().getId() : null)
     );
   }
 
