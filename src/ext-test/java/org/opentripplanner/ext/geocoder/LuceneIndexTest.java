@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -98,9 +97,33 @@ class LuceneIndexTest {
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop("Meridian Ave N & N 148th").build();
+  static final RegularStop MERIDIAN_AVE = TEST_MODEL
+    .stop("Meridian Ave N & N 148th St")
+    .withId(FeedScopedId.parse("kcm:16340"))
+    .withCode("16340")
+    .withCoordinate(47.736145, -122.33445)
+    .build();
 
-  static final RegularStop MERIDIAN_1 = TEST_MODEL.stop("Meridian N & Spencer").build();
+  static final RegularStop MERIDIAN_N_1 = TEST_MODEL
+    .stop("Meridian N & Spencer")
+    .withId(FeedScopedId.parse("pierce:13268"))
+    .withCode("4168")
+    .withCoordinate(47.209366,-122.293999)
+    .build();
+
+  static final RegularStop MERIDIAN_N_2 = TEST_MODEL
+    .stop("Meridian N & Spencer")
+    .withId(FeedScopedId.parse("pierce:30976"))
+    .withCode("4169")
+    .withCoordinate(47.209316,-122.293841)
+    .build();
+
+  static final RegularStop MERIDIAN_N_3 = TEST_MODEL
+    .stop("N 205th St & Meridian Ave N")
+    .withId(FeedScopedId.parse("commtrans:490"))
+    .withCode("490")
+    .withCoordinate(47.209316,-122.293841)
+    .build();
 
   static LuceneIndex index;
 
@@ -118,8 +141,10 @@ class LuceneIndexTest {
         WESTHAFEN,
         ARTS_CENTER,
         ARTHUR,
-        MERIDIAN_AVE,
-        MERIDIAN_1
+        MERIDIAN_N_1,
+        MERIDIAN_N_2,
+        MERIDIAN_N_3,
+        MERIDIAN_AVE
       )
       .forEach(stopModel::withRegularStop);
     List
@@ -303,16 +328,13 @@ class LuceneIndexTest {
     }
 
     @Test
-    void numbers() {
-      var result = index
-        .queryStopClusters("Meridian Ave N & N 148")
-        .map(s -> s.primary().name())
-        .toList();
-      assertEquals(List.of("Meridian Ave N & N 148th", "Meridian N & Spencer"), result);
+    void number() {
+      var names = index.queryStopClusters("Meridian Ave N & N 148").map(c -> c.primary().name()).toList();
+      assertEquals(List.of(MERIDIAN_AVE.getName().toString(), MERIDIAN_N_1.getName().toString()), names);
     }
   }
 
-  private static @Nonnull Function<StopCluster, FeedScopedId> primaryId() {
+  private static Function<StopCluster, FeedScopedId> primaryId() {
     return c -> c.primary().id();
   }
 }
