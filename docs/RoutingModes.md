@@ -13,6 +13,10 @@ Routing modes on streets, including walking, biking, driving, and car-sharing.
 
 Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
 
+Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
+is called `bikesAllowed`.
+
+
 <h4 id="BIKE_RENTAL">BIKE_RENTAL</h4>
 
 Taking a rented, shared-mobility bike for part or the entirety of the route.

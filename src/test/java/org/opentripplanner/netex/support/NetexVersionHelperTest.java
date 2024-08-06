@@ -19,32 +19,39 @@ import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.EntityInVersionStructure;
 import org.rutebanken.netex.model.ValidBetween;
 
-public class NetexVersionHelperTest {
+class NetexVersionHelperTest {
 
   private static final EntityInVersionStructure E_VER_1 = new EntityInVersionStructure()
     .withVersion("1");
   private static final EntityInVersionStructure E_VER_2 = new EntityInVersionStructure()
     .withVersion("2");
+  private static final EntityInVersionStructure E_VER_ANY = new EntityInVersionStructure()
+    .withVersion("any");
 
   @Test
-  public void versionOfTest() {
+  void versionOfTest() {
     assertEquals(1, versionOf(E_VER_1));
   }
 
   @Test
-  public void latestVersionInTest() {
+  void any() {
+    assertEquals(-1, versionOf(E_VER_ANY));
+  }
+
+  @Test
+  void latestVersionInTest() {
     assertEquals(2, latestVersionIn(Arrays.asList(E_VER_1, E_VER_2)));
     assertEquals(-1, latestVersionIn(Collections.emptyList()));
   }
 
   @Test
-  public void lastestVersionedElementInTest() {
+  void lastestVersionedElementInTest() {
     assertEquals(E_VER_2, latestVersionedElementIn(Arrays.asList(E_VER_1, E_VER_2)));
     assertNull(latestVersionedElementIn(Collections.emptyList()));
   }
 
   @Test
-  public void comparingVersionTest() {
+  void comparingVersionTest() {
     // Given a comparator (subject under test)
     Comparator<EntityInVersionStructure> subject = comparingVersion();
     // And a entity with version as the E_VER_1 entity
@@ -62,7 +69,7 @@ public class NetexVersionHelperTest {
   }
 
   @Test
-  public void testFirstRelevantDateTime() {
+  void testFirstRelevantDateTime() {
     var may1st = LocalDateTime.of(2021, MAY, 1, 14, 0);
     var may2nd = LocalDateTime.of(2021, MAY, 2, 14, 0);
     var may3rd = LocalDateTime.of(2021, MAY, 3, 14, 0);

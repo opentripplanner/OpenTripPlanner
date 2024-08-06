@@ -1,0 +1,2 @@
+﻿feed_publisher_name,feed_id,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version,default_lang,feed_contact_email,feed_contact_url
+Cobblinc,,https://www.cobbcounty.org/transportation/cobblinc,en,20211018,20211111,,,,

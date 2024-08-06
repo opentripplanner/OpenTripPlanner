@@ -14,29 +14,35 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.ext.restapi.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * OTP simple built-in geocoder used by the debug client.
  */
-@Path("/routers/{ignoreRouterId}/geocode")
+@Path("/geocode")
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
-  private final OtpServerRequestContext serverContext;
-
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated
-  @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
+  private final LuceneIndex luceneIndex;
 
   public GeocoderResource(@Context OtpServerRequestContext requestContext) {
-    serverContext = requestContext;
+    luceneIndex = requestContext.lucenceIndex();
+  }
+
+  /**
+   * This class is only here for backwards-compatibility. It will be removed in the future.
+   */
+  @Path("/routers/{ignoreRouterId}/geocode")
+  public static class GeocoderResourceOldPath extends GeocoderResource {
+
+    public GeocoderResourceOldPath(
+      @Context OtpServerRequestContext serverContext,
+      @PathParam("ignoreRouterId") String ignore
+    ) {
+      super(serverContext);
+    }
   }
 
   /**
@@ -65,7 +71,7 @@ public class GeocoderResource {
   @GET
   @Path("stopClusters")
   public Response stopClusters(@QueryParam("query") String query) {
-    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query).toList();
+    var clusters = luceneIndex.queryStopClusters(query).toList();
 
     return Response.status(Response.Status.OK).entity(clusters).build();
   }
@@ -90,8 +96,7 @@ public class GeocoderResource {
   }
 
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
-    return LuceneIndex
-      .forServer(serverContext)
+    return luceneIndex
       .queryStopLocations(query, autocomplete)
       .map(sl ->
         new SearchResult(
@@ -105,8 +110,7 @@ public class GeocoderResource {
   }
 
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
-    return LuceneIndex
-      .forServer(serverContext)
+    return luceneIndex
       .queryStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(

@@ -16,6 +16,16 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
+ * This is the primary implementation of TransitAlertService, which actually retains its own set
+ * of TransitAlerts and indexes them for fast lookup by which transit entity is affected.
+ * The only other implementation exists just to combine several instances of this primary
+ * implementation into one.
+ * TODO RT_AB: investigate why each updater has its own service instead of taking turns
+ *   sequentially writing to a single service. Original design was for all data and indexes to be
+ *   associated with the Graph or transit model (i.e. the object graph of instances of the transit
+ *   model) and for updaters to submit write tasks that would patch the current version in a
+ *   sequential way, e.g. "add these 10 alerts", "remove these 5 alerts", etc.
+ *
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
  * must be met for the alert to be displayed. This is the case in both the Norwegian interpretation
  * of SIRI, and the GTFS-RT alerts specification.
@@ -32,13 +42,17 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public void setAlerts(Collection<TransitAlert> alerts) {
+    // FIXME RT_AB: this is patched live by updaters while in use (being read) by other threads
+    //   performing trip planning. The single-action assignment helps a bit, but the map can be
+    //   swapped out while the delegating service is in the middle of multiple calls that read from
+    //   it. The consistent approach would be to duplicate the entire service, update it
+    //   copy-on-write, and swap in the entire service after the update.
     Multimap<EntityKey, TransitAlert> newAlerts = HashMultimap.create();
     for (TransitAlert alert : alerts) {
       for (EntitySelector entity : alert.entities()) {
         newAlerts.put(entity.key(), alert);
       }
     }
-
     this.alerts = newAlerts;
   }
 

@@ -24,8 +24,8 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -134,7 +134,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary itinerary = new Itinerary(legs);
 
     // Map general itinerary fields
-    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()));
     itinerary.setArrivedAtDestinationWithRentedVehicle(
       mapped != null && mapped.isArrivedAtDestinationWithRentedVehicle()
     );
@@ -146,16 +145,21 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
-    if (accessPathLeg.access() instanceof DefaultAccessEgress ae) {
+    var penaltyCost = 0;
+    if (accessPathLeg.access() instanceof RoutingAccessEgress ae) {
       itinerary.setAccessPenalty(ae.penalty());
+      penaltyCost += ae.penalty().cost().toSeconds();
     }
 
-    if (egressPathLeg.egress() instanceof DefaultAccessEgress ae) {
-      itinerary.setAccessPenalty(ae.penalty());
+    if (egressPathLeg.egress() instanceof RoutingAccessEgress ae) {
+      itinerary.setEgressPenalty(ae.penalty());
+      penaltyCost += ae.penalty().cost().toSeconds();
     }
     if (path.isC2Set()) {
       itinerary.setGeneralizedCost2(path.c2());
     }
+
+    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()) - penaltyCost);
 
     return itinerary;
   }
@@ -165,7 +169,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return List.of();
     }
 
-    DefaultAccessEgress accessPath = (DefaultAccessEgress) accessPathLeg.access();
+    RoutingAccessEgress accessPath = (RoutingAccessEgress) accessPathLeg.access();
 
     var graphPath = new GraphPath<>(accessPath.getLastState());
 
@@ -176,10 +180,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     int fromTime = accessPathLeg.fromTime();
-
-    if (accessPath.hasPenalty()) {
-      fromTime = accessPath.timeShiftDepartureTimeToActualTime(fromTime);
-    }
 
     return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).getLegs();
   }
@@ -279,7 +279,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return null;
     }
 
-    DefaultAccessEgress egressPath = (DefaultAccessEgress) egressPathLeg.egress();
+    RoutingAccessEgress egressPath = (RoutingAccessEgress) egressPathLeg.egress();
 
     var graphPath = new GraphPath<>(egressPath.getLastState());
 

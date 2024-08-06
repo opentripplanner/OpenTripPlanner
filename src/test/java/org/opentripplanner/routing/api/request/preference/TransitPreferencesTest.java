@@ -42,7 +42,7 @@ class TransitPreferencesTest {
     .setUnpreferredCost(UNPREFERRED_COST)
     .withBoardSlack(b -> b.withDefault(D45s).with(TransitMode.AIRPLANE, D35m))
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
-    .withTransitGroupPriorityGeneralizedCostSlack(TRANSIT_GROUP_PRIORITY_RELAX)
+    .withRelaxTransitGroupPriority(TRANSIT_GROUP_PRIORITY_RELAX)
     .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
     .setIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
     .setIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
@@ -77,8 +77,8 @@ class TransitPreferencesTest {
   }
 
   @Test
-  void relaxTransitPriorityGroup() {
-    assertEquals(TRANSIT_GROUP_PRIORITY_RELAX, subject.relaxTransitPriorityGroup());
+  void relaxTransitGroupPriority() {
+    assertEquals(TRANSIT_GROUP_PRIORITY_RELAX, subject.relaxTransitGroupPriority());
   }
 
   @Test
@@ -125,7 +125,7 @@ class TransitPreferencesTest {
       "reluctanceForMode: {AIRPLANE=2.1}, " +
       "otherThanPreferredRoutesPenalty: $350, " +
       "unpreferredCost: 5m + 1.15 t, " +
-      "relaxTransitPriorityGroup: 5m + 1.50 t, " +
+      "relaxTransitGroupPriority: 5m + 1.50 t, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
       "includeRealtimeCancellations, " +

@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.BikePreferencesMapper.mapBikePreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.CarPreferencesMapper.mapCarPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.ItineraryFilterPreferencesMapper.mapItineraryFilterPreferences;
-import static org.opentripplanner.apis.transmodel.mapping.preferences.ItineraryFilterPreferencesMapper.mapRentalPreferences;
+import static org.opentripplanner.apis.transmodel.mapping.preferences.ScooterPreferencesMapper.mapScooterPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.StreetPreferencesMapper.mapStreetPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransferPreferencesMapper.mapTransferPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransitPreferencesMapper.mapTransitPreferences;
@@ -25,11 +25,11 @@ class PreferencesMapper {
     preferences.withWalk(walk -> mapWalkPreferences(walk, callWith));
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));
     preferences.withCar(car -> mapCarPreferences(car, callWith));
-    preferences.withTransfer(transfer -> mapTransferPreferences(transfer, environment, callWith));
+    preferences.withScooter(scooter -> mapScooterPreferences(scooter, callWith));
+    preferences.withTransfer(transfer -> mapTransferPreferences(transfer, callWith));
     preferences.withTransit(transit -> mapTransitPreferences(transit, environment, callWith));
     preferences.withItineraryFilter(itineraryFilter ->
       mapItineraryFilterPreferences(itineraryFilter, environment, callWith)
     );
-    preferences.withRental(rental -> mapRentalPreferences(rental, environment, callWith));
   }
 }

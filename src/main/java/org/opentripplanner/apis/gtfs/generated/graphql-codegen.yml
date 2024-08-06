@@ -27,6 +27,14 @@ config:
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Grams
     Duration: java.time.Duration
+    Cost: org.opentripplanner.framework.model.Cost
+    CoordinateValue: Double
+    Locale: java.util.Locale
+    OffsetDateTime: java.time.OffsetDateTime
+    Speed: Double
+    Reluctance: Double
+    Ratio: Double
+    LocalDate: java.time.LocalDate
   mappers:
     AbsoluteDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection#GraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency
@@ -39,13 +47,14 @@ config:
     BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     VehicleRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalStation#VehicleRentalStation
+    VehicleRentalNetwork: org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem#VehicleRentalSystem
     RentalVehicleEntityCounts: org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts#RentalVehicleEntityCounts
     RentalVehicleTypeCount: org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount#RentalVehicleTypeCount
     RentalVehicle: org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle#VehicleRentalVehicle
     VehicleRentalUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed#GraphQLBikesAllowed
-    BookingInfo: org.opentripplanner.model.BookingInfo
-    BookingTime: org.opentripplanner.model.BookingTime
+    BookingInfo: org.opentripplanner.transit.model.timetable.booking.BookingInfo#BookingInfo
+    BookingTime: org.opentripplanner.transit.model.timetable.booking.BookingTime#BookingTime
     CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
@@ -57,13 +66,13 @@ config:
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
     Emissions: org.opentripplanner.model.plan.Emissions#Emissions
-    fare: java.util.Map#Map<String, Object>
-    fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
+    FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
+    LegTime: org.opentripplanner.model.plan.LegTime#LegTime
     Mode: String
     OccupancyStatus: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus#GraphQLOccupancyStatus
     TransitMode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode
@@ -75,6 +84,9 @@ config:
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
+    PlanConnection: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
+    PlanEdge: graphql.relay.DefaultEdge#DefaultEdge<Itinerary>
+    PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
     RealtimeState: String
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route

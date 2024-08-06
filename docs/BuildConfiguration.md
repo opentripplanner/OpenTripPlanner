@@ -35,12 +35,12 @@ Sections follow that describe particular settings in more depth.
 | maxTransferDuration                                                      |  `duration` | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.                                              | *Optional* | `"PT30M"`                         |  2.1  |
 | [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |  `boolean`  | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                  |  `boolean`  | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
-| osmNaming                                                                |   `string`  | A custom OSM namer to use.                                                                                                                                     | *Optional* |                                   |  2.0  |
+| [osmNaming](#osmNaming)                                                  |    `enum`   | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
 | platformEntriesLinking                                                   |  `boolean`  | Link unconnected entries to public transport platforms.                                                                                                        | *Optional* | `false`                           |  2.0  |
 | [readCachedElevations](#readCachedElevations)                            |  `boolean`  | Whether to read cached elevation data.                                                                                                                         | *Optional* | `true`                            |  2.0  |
 | staticBikeParkAndRide                                                    |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
 | staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
-| stopConsolidationFile                                                    |   `string`  | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
+| stopConsolidationFile                                                    |    `uri`    | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
 | [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
 | [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
 | [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
@@ -78,6 +78,7 @@ Sections follow that describe particular settings in more depth.
 |    [groupFilePattern](#nd_groupFilePattern)                              |   `regexp`  | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
 |    ignoreFareFrame                                                       |  `boolean`  | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
 |    [ignoreFilePattern](#nd_ignoreFilePattern)                            |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
+|    ignoreParking                                                         |  `boolean`  | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
 |    noTransfersOnIsolatedStops                                            |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
 |    [sharedFilePattern](#nd_sharedFilePattern)                            |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
@@ -106,6 +107,7 @@ Sections follow that describe particular settings in more depth.
 |       [groupFilePattern](#tf_1_groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
 |       ignoreFareFrame                                                    |  `boolean`  | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
 |       [ignoreFilePattern](#tf_1_ignoreFilePattern)                       |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
+|       ignoreParking                                                      |  `boolean`  | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
 |       noTransfersOnIsolatedStops                                         |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
 |       [sharedFilePattern](#tf_1_sharedFilePattern)                       |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
 |       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
@@ -237,22 +239,6 @@ The mechanism is that for any two identical tags, OTP will use the first one.
   ]
 }
 ```
-
-### Custom naming
-
-You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field
-in `build-config.json`, such as:
-
-```JSON
-// build-config.json
-{
-  "osmNaming": "portland"
-}
-```
-
-There is currently only one custom naming module called `portland` (which has no parameters).
-
-
 
 ## Elevation data
 
@@ -536,6 +522,14 @@ deployment depending on your infrastructure. Set the parameter to `true` to cach
 data, and to `false` to read the stream from the source each time.
 
 
+<h3 id="osmNaming">osmNaming</h3>
+
+**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
+**Path:** /   
+**Enum values:** `default` | `portland` | `sidewalks`
+
+A custom OSM namer to use.
+
 <h3 id="readCachedElevations">readCachedElevations</h3>
 
 **Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
@@ -739,12 +733,12 @@ but we want to calculate the transfers always from OSM data.
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
 **Path:** /gtfsDefaults   
-**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum values:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Should there be some preference or aversion for transfers at stops that are part of a station.
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
-with the `stopTransferCost` parameter in the router configuration.
+with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
@@ -945,7 +939,7 @@ the local filesystem.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osm/[0]   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
@@ -953,7 +947,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osmDefaults   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
 
@@ -988,12 +982,12 @@ but we want to calculate the transfers always from OSM data.
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
 **Path:** /transitFeeds/[0]   
-**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum values:** `preferred` | `recommended` | `allowed` | `discouraged`
 
 Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
-with the `stopTransferCost` parameter in the router configuration.
+with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>

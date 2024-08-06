@@ -10,7 +10,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -36,6 +39,7 @@ import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -43,6 +47,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -76,6 +81,14 @@ public class DefaultTransitService implements TransitEditorService {
   public DefaultTransitService(TransitModel transitModel) {
     this.transitModel = transitModel;
     this.transitModelIndex = transitModel.getTransitModelIndex();
+  }
+
+  public DefaultTransitService(
+    TransitModel transitModel,
+    TimetableSnapshot timetableSnapshotBuffer
+  ) {
+    this(transitModel);
+    this.timetableSnapshot = timetableSnapshotBuffer;
   }
 
   @Override
@@ -184,6 +197,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getRouteForId(id);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
   @Override
   public void addRoutes(Route route) {
     this.transitModelIndex.addRoutes(route);
@@ -231,6 +248,12 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public Collection<GroupStop> listGroupStops() {
+    OTPRequestTimeoutException.checkForTimeout();
+    return transitModel.getStopModel().listGroupStops();
+  }
+
+  @Override
   public StopLocation getStopLocation(FeedScopedId id) {
     return transitModel.getStopModel().getStopLocation(id);
   }
@@ -254,6 +277,15 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Trip getTripForId(FeedScopedId id) {
     return this.transitModelIndex.getTripForId().get(id);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripForId(FeedScopedId tripId, Trip trip) {
+    transitModelIndex.getTripForId().put(tripId, trip);
   }
 
   @Override
@@ -326,6 +358,15 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternForTrip().get(trip);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addPatternForTrip(Trip trip, TripPattern pattern) {
+    transitModelIndex.getPatternForTrip().put(trip, pattern);
+  }
+
   @Override
   public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
     TripPattern realtimePattern = getRealtimeAddedTripPattern(trip.getId(), serviceDate);
@@ -339,6 +380,15 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<TripPattern> getPatternsForRoute(Route route) {
     OTPRequestTimeoutException.checkForTimeout();
     return this.transitModelIndex.getPatternsForRoute().get(route);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addPatternsForRoute(Route route, TripPattern pattern) {
+    transitModelIndex.getPatternsForRoute().put(route, pattern);
   }
 
   @Override
@@ -448,15 +498,23 @@ public class DefaultTransitService implements TransitEditorService {
   /**
    * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
    * added by realtime updates are added to the collection.
+   * A set is used here because trip patterns
+   * that were updated by realtime data is both part of the TransitModelIndex and the TimetableSnapshot
    */
   @Override
   public Collection<TripPattern> getPatternsForStop(
     StopLocation stop,
     boolean includeRealtimeUpdates
   ) {
-    return transitModel
-      .getTransitModelIndex()
-      .getPatternsForStop(stop, includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null);
+    Set<TripPattern> tripPatterns = new HashSet<>(getPatternsForStop(stop));
+
+    if (includeRealtimeUpdates) {
+      TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+      if (currentSnapshot != null) {
+        tripPatterns.addAll(currentSnapshot.getPatternsForStop(stop));
+      }
+    }
+    return tripPatterns;
   }
 
   @Override
@@ -484,28 +542,28 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate) {
     OTPRequestTimeoutException.checkForTimeout();
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    return timetableSnapshot != null
-      ? timetableSnapshot.resolve(tripPattern, serviceDate)
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    return currentSnapshot != null
+      ? currentSnapshot.resolve(tripPattern, serviceDate)
       : tripPattern.getScheduledTimetable();
   }
 
   @Override
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot == null) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot == null) {
       return null;
     }
-    return timetableSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
+    return currentSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
   }
 
   @Override
   public boolean hasRealtimeAddedTripPatterns() {
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot == null) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot == null) {
       return false;
     }
-    return timetableSnapshot.hasRealtimeAddedTripPatterns();
+    return currentSnapshot.hasRealtimeAddedTripPatterns();
   }
 
   /**
@@ -513,6 +571,7 @@ public class DefaultTransitService implements TransitEditorService {
    *
    * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
    */
+  @Nullable
   private TimetableSnapshot lazyGetTimeTableSnapShot() {
     if (this.timetableSnapshot == null) {
       timetableSnapshot = transitModel.getTimetableSnapshot();
@@ -525,6 +584,15 @@ public class DefaultTransitService implements TransitEditorService {
     return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripOnServiceDateById(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+    transitModelIndex.getTripOnServiceDateById().put(id, tripOnServiceDate);
+  }
+
   @Override
   public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
     return transitModelIndex.getTripOnServiceDateForTripAndDay().values();
@@ -535,6 +603,29 @@ public class DefaultTransitService implements TransitEditorService {
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public void addTripOnServiceDateForTripAndDay(
+    TripIdAndServiceDate tripIdAndServiceDate,
+    TripOnServiceDate tripOnServiceDate
+  ) {
+    transitModelIndex
+      .getTripOnServiceDateForTripAndDay()
+      .put(tripIdAndServiceDate, tripOnServiceDate);
+  }
+
+  /**
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * this when doing the issue #3030.
+   */
+  @Override
+  public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
+    return transitModel.getOrCreateServiceIdForDate(serviceDate);
   }
 
   @Override
@@ -570,6 +661,16 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
+    transitModel.setRealtimeTransitLayer(realtimeTransitLayer);
+  }
+
+  @Override
+  public boolean hasRealtimeTransitLayer() {
+    return transitModel.hasRealtimeTransitLayer();
+  }
+
+  @Override
   public CalendarService getCalendarService() {
     return this.transitModel.getCalendarService();
   }
@@ -600,7 +701,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<RegularStop> findRegularStop(Envelope envelope) {
+  public Collection<RegularStop> findRegularStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
     return transitModel.getStopModel().findRegularStops(envelope);
   }
@@ -608,7 +709,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<AreaStop> findAreaStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
-    return transitModel.getStopModel().queryLocationIndex(envelope);
+    return transitModel.getStopModel().findAreaStops(envelope);
   }
 
   @Override
@@ -627,6 +728,21 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
     return sortByOccurrenceAndReduce(getPatternModesOfStop(stop)).toList();
+  }
+
+  @Override
+  public Deduplicator getDeduplicator() {
+    return transitModel.getDeduplicator();
+  }
+
+  @Override
+  public Set<LocalDate> getAllServiceCodes() {
+    return Collections.unmodifiableSet(transitModelIndex.getServiceCodesRunningForDate().keySet());
+  }
+
+  @Override
+  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+    return Collections.unmodifiableMap(transitModelIndex.getServiceCodesRunningForDate());
   }
 
   /**

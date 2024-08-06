@@ -12,7 +12,6 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
@@ -31,23 +30,21 @@ public class FaresFilterTest implements PlanTestConstants {
       .bus(ID, 52, 100, C)
       .build();
 
-    List<Itinerary> input = List.of(i1, i1, i1);
-
-    input.forEach(i -> assertEquals(ItineraryFares.empty(), i.getFares()));
+    assertEquals(ItineraryFares.empty(), i1.getFares());
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(2.80f));
 
     var leg = i1.getLegs().get(1);
     var fp = new FareProduct(id("fp"), "fare product", Money.euros(10.00f), null, null, null);
     fares.addFareProduct(leg, fp);
 
-    var filter = new FaresFilter((FareService) itinerary -> fares);
-    var filtered = filter.filter(input);
+    var filter = new DecorateWithFare((FareService) itinerary -> fares);
 
-    filtered.forEach(i -> assertEquals(fares, i.getFares()));
+    filter.decorate(i1);
 
-    var busLeg = filtered.get(0).getTransitLeg(1);
+    assertEquals(fares, i1.getFares());
+
+    var busLeg = i1.getTransitLeg(1);
 
     assertEquals(
       List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),

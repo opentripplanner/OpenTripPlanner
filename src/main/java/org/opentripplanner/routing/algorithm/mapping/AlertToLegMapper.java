@@ -91,8 +91,8 @@ public class AlertToLegMapper {
             )
           );
 
-          ZonedDateTime stopArrival = visit.arrival;
-          ZonedDateTime stopDeparture = visit.departure;
+          ZonedDateTime stopArrival = visit.arrival.scheduledTime();
+          ZonedDateTime stopDeparture = visit.departure.scheduledTime();
 
           addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
         }

@@ -2,6 +2,7 @@ package org.opentripplanner.apis.transmodel.model.framework;
 
 import graphql.Scalars;
 import graphql.language.ArrayValue;
+import graphql.language.EnumValue;
 import graphql.language.FloatValue;
 import graphql.language.ObjectField;
 import graphql.language.ObjectValue;
@@ -139,7 +140,7 @@ public class PenaltyForStreetModeType {
         ObjectField
           .newObjectField()
           .name(FIELD_STREET_MODE)
-          .value((Value) streetModeGQL.getValue())
+          .value(EnumValue.of(streetModeGQL.getName()))
           .build()
       )
       .objectField(

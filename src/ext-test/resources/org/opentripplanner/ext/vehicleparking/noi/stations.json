@@ -1,0 +1,159 @@
+{
+  "last_updated": 1711368767,
+  "ttl": 0,
+  "version": "3.0.0",
+  "data": {
+    "stations": [
+      {
+        "type": "station",
+        "station_id": "105",
+        "name": "P05 - Laurin",
+        "lat": 46.498174,
+        "lon": 11.357255,
+        "city": "Bolzano - Bozen",
+        "capacity": 90,
+        "free": 57
+      },
+      {
+        "type": "station",
+        "station_id": "TRENTO:areaexsitviacanestrinip1",
+        "name": "Area ex SIT via Canestrini - P1",
+        "lat": 46.0691,
+        "lon": 11.1162,
+        "address": "Lung'Adige Monte Grappa",
+        "city": "Trento",
+        "capacity": 300,
+        "free": 0
+      },
+      {
+        "type": "station",
+        "station_id": "ROVERETO:asm",
+        "name": "A.S.M.",
+        "lat": 45.893593,
+        "lon": 11.036507,
+        "address": "Piazzale ex-A.S.M - Via Manzoni - Rovereto",
+        "city": "Rovereto",
+        "capacity": 145,
+        "free": 42
+      },
+      {
+        "type": "station",
+        "station_id": "ROVERETO:centrostorico",
+        "name": "Centro Storico",
+        "lat": 45.890306,
+        "lon": 11.045004,
+        "address": "Viale dei Colli - Rovereto",
+        "city": "Rovereto",
+        "capacity": 143,
+        "free": 20
+      },
+      {
+        "type": "station",
+        "station_id": "ROVERETO:mart",
+        "name": "Mart",
+        "lat": 45.894705,
+        "lon": 11.044661,
+        "address": "Mart - Via Sticcotta - Rovereto",
+        "city": "Rovereto",
+        "capacity": 224,
+        "free": 224
+      },
+      {
+        "type": "sensor",
+        "station_id": "001bc50670100557-0.30188412882192206",
+        "group_name": "area viale Druso",
+        "group_id": "area_viale_druso",
+        "name": "piazzetta Mazzoni 3",
+        "lat": 46.495025,
+        "lon": 11.347069,
+        "address": "area viale Druso",
+        "city": "Bolzano - Bozen",
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "001bc50670100541-0.9632040952321754",
+        "group_name": "Via A. Rosmini 22-26",
+        "group_id": "via_a_rosmini_22_26",
+        "name": "Via A. Rosmini 22-26",
+        "lat": 46.498292,
+        "lon": 11.348031,
+        "address": "Via A. Rosmini 22-26",
+        "city": "Bolzano - Bozen",
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "001bc50670112a6b-0.6239539554369709",
+        "group_name": "Via Amalfi",
+        "group_id": "via_amalfi",
+        "name": "Via Amalfi angolo Via Druso",
+        "lat": 46.495283,
+        "lon": 11.332472,
+        "address": "Via Amalfi",
+        "city": "Bolzano - Bozen",
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "001bc5067010064d-0.18879954213280836",
+        "group_name": "area viale Druso",
+        "group_id": "area_viale_druso",
+        "name": "piazzetta Mazzoni 4",
+        "lat": 46.495056,
+        "lon": 11.347056,
+        "address": "area viale Druso",
+        "city": "Bolzano - Bozen",
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "001bc50670112976-0.4989211141789258",
+        "group_name": "Viale Druso 237",
+        "group_id": "viale_druso_237",
+        "name": "Viale Druso 237",
+        "lat": 46.495,
+        "lon": 11.328703,
+        "address": "Viale Druso 237",
+        "city": "Bolzano - Bozen",
+        "free": true
+      },
+      {
+        "type": "sensor",
+        "station_id": "9398a35b-ef3d-eb11-b9ed-0050f244b601-0.12775006754129703",
+        "group_id": "",
+        "name": "Parksensoren Bozen - PNI Parksensor Nr.3 Siegesplatz Parkplatz",
+        "lat": 46.501,
+        "lon": 11.3431,
+        "free": true
+      },
+      {
+        "type": "sensor",
+        "station_id": "7776d25f-f03d-eb11-b9ed-0050f244b601-0.4355636862513992",
+        "group_id": "",
+        "name": "Parksensoren Bozen - PNI Parksensor Nr.5 DucaDaostastrasse",
+        "lat": 46.4953,
+        "lon": 11.3396,
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "e3e26add-ee3d-eb11-b9ed-0050f244b601-0.8423578257530036",
+        "group_id": "",
+        "name": "Parksensoren Bozen - PNI Parksensor Nr.4 Bahnhof BZ Richtung Rittnerseilbahn",
+        "lat": 46.497,
+        "lon": 11.3583,
+        "free": false
+      },
+      {
+        "type": "sensor",
+        "station_id": "935af00d-aa5f-eb11-9889-501ac5928d31-0.8458736393052522",
+        "group_id": "",
+        "name": "Parksensoren Bozen - PNI Parksensor Nr.10 Commissariato - Viale Eugenio di savoia",
+        "lat": 46.5057,
+        "lon": 11.3395,
+        "free": false
+      }
+    ]
+  }
+}

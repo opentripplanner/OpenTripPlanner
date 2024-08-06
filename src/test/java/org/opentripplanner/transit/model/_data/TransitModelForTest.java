@@ -5,8 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import org.locationtech.jts.geom.Geometry;
+import java.util.stream.Stream;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner._support.geometry.Coordinates;
+import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -23,7 +28,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
@@ -51,6 +56,18 @@ public class TransitModelForTest {
   public static final String TIME_ZONE_ID = "Europe/Paris";
   public static final String OTHER_TIME_ZONE_ID = "America/Los_Angeles";
   public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
+
+  // This is used to create valid objects - do not use it for verification
+  private static final Polygon ANY_POLYGON = GeometryUtils
+    .getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        Coordinates.of(61.0, 10.0),
+        Coordinates.of(61.0, 12.0),
+        Coordinates.of(60.0, 11.0),
+        Coordinates.of(61.0, 10.0),
+      }
+    );
 
   public static final Agency AGENCY = Agency
     .of(id("A1"))
@@ -149,22 +166,21 @@ public class TransitModelForTest {
       .withPriority(StopTransferPriority.ALLOWED);
   }
 
-  public GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
+  public GroupStop groupStop(String idAndName, RegularStop... stops) {
     var builder = stopModelBuilder
       .groupStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName));
 
-    stops.forEach(builder::addLocation);
+    Stream.of(stops).forEach(builder::addLocation);
 
     return builder.build();
   }
 
-  public AreaStop areaStopForTest(String idAndName, Geometry geometry) {
+  public AreaStopBuilder areaStop(String idAndName) {
     return stopModelBuilder
       .areaStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
-      .withGeometry(geometry)
-      .build();
+      .withGeometry(ANY_POLYGON);
   }
 
   public StopTime stopTime(Trip trip, int seq) {
@@ -221,19 +237,23 @@ public class TransitModelForTest {
   public StopPattern stopPattern(int numberOfStops) {
     var builder = StopPattern.create(numberOfStops);
     for (int i = 0; i < numberOfStops; i++) {
-      builder.stops[i] = stop("Stop_" + i).build();
-      builder.pickups[i] = PickDrop.SCHEDULED;
-      builder.dropoffs[i] = PickDrop.SCHEDULED;
+      builder.stops.with(i, stop("Stop_" + i).build());
+      builder.pickups.with(i, PickDrop.SCHEDULED);
+      builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
     return builder.build();
   }
 
   public static StopPattern stopPattern(RegularStop... stops) {
-    var builder = StopPattern.create(stops.length);
-    for (int i = 0; i < stops.length; i++) {
-      builder.stops[i] = stops[i];
-      builder.pickups[i] = PickDrop.SCHEDULED;
-      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    return stopPattern(Arrays.asList(stops));
+  }
+
+  public static StopPattern stopPattern(List<RegularStop> stops) {
+    var builder = StopPattern.create(stops.size());
+    for (int i = 0; i < stops.size(); i++) {
+      builder.stops.with(i, stops.get(i));
+      builder.pickups.with(i, PickDrop.SCHEDULED);
+      builder.dropoffs.with(i, PickDrop.SCHEDULED);
     }
     return builder.build();
   }
@@ -246,7 +266,7 @@ public class TransitModelForTest {
       .withStopPattern(stopPattern(3));
   }
 
-  public UnscheduledTrip unscheduledTrip(FeedScopedId id, StopLocation... stops) {
+  public UnscheduledTrip unscheduledTrip(String id, StopLocation... stops) {
     var stopTimes = Arrays
       .stream(stops)
       .map(s -> {
@@ -258,10 +278,22 @@ public class TransitModelForTest {
         return st;
       })
       .toList();
+    return unscheduledTrip(id, stopTimes);
+  }
+
+  public UnscheduledTrip unscheduledTrip(String id, List<StopTime> stopTimes) {
     return UnscheduledTrip
-      .of(id)
+      .of(id(id))
       .withTrip(trip("flex-trip").build())
       .withStopTimes(stopTimes)
+      .build();
+  }
+
+  public ScheduledDeviatedTrip scheduledDeviatedTrip(String id, StopTime... stopTimes) {
+    return ScheduledDeviatedTrip
+      .of(id(id))
+      .withTrip(trip("flex-trip").build())
+      .withStopTimes(Arrays.asList(stopTimes))
       .build();
   }
 }

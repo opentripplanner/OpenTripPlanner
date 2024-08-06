@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class ScheduledTripTimesTest {
@@ -102,7 +103,7 @@ class ScheduledTripTimesTest {
   @Test
   void validateLastArrivalTimeIsNotMoreThan20DaysAfterFirstDepartureTime() {
     var ex = assertThrows(
-      IllegalArgumentException.class,
+      DataValidationException.class,
       () ->
         ScheduledTripTimes
           .of()
@@ -111,7 +112,10 @@ class ScheduledTripTimesTest {
           .withTrip(TRIP)
           .build()
     );
-    assertEquals("The value is not in range[-43200, 1728000]: 1728001", ex.getMessage());
+    assertEquals(
+      "The arrivalTime is not in range[-12h, 20d]. Time: 10:00:01+20d, stop-pos: 2, trip: F:Trip-1.",
+      ex.getMessage()
+    );
   }
 
   @Test

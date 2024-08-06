@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
@@ -95,11 +96,8 @@ public class StreetVehicleParkingLink extends Edge {
     return vehicleParkingEntranceVertex.getName();
   }
 
+  @Override
   public LineString getGeometry() {
-    return null;
-  }
-
-  public double getDistanceMeters() {
-    return 0;
+    return GeometryUtils.makeLineString(fromv.getCoordinate(), tov.getCoordinate());
   }
 }

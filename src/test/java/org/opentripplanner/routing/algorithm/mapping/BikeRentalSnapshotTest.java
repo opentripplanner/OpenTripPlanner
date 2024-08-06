@@ -89,7 +89,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
-    request.journey().rental().setAllowArrivingInRentedVehicleAtDestination(true);
+    allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -104,7 +104,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
-    request.journey().rental().setAllowArrivingInRentedVehicleAtDestination(true);
+    allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
     request.setTo(p2);
     request.setArriveBy(true);
@@ -160,5 +160,13 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
+  }
+
+  private void allowArrivalWithRentalVehicle(RouteRequest request) {
+    request.withPreferences(preferences ->
+      preferences.withBike(bike ->
+        bike.withRental(rental -> rental.withAllowArrivingInRentedVehicleAtDestination(true))
+      )
+    );
   }
 }

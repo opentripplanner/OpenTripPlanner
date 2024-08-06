@@ -8,18 +8,15 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_I
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
-import gnu.trove.set.hash.TIntHashSet;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
-import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -30,7 +27,6 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -59,6 +55,8 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
  */
 public class TestItineraryBuilder implements PlanTestConstants {
 
+  private static final int NOT_SET = -1_999_999;
+
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
   public static final Route BUS_ROUTE = route("1").withMode(TransitMode.BUS).build();
   public static final Route RAIL_ROUTE = route("2").withMode(TransitMode.RAIL).build();
@@ -73,7 +71,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private final List<Leg> legs = new ArrayList<>();
   private Place lastPlace;
   private int lastEndTime;
-  private int cost = 0;
+  private int c1 = 0;
+  private int c2 = NOT_SET;
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -212,16 +211,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withTrip(trip)
       .build();
 
-    var template = new FlexAccessTemplate(
-      null,
-      flexTrip,
-      0,
-      1,
-      null,
-      new FlexServiceDate(LocalDate.now(), 0, new TIntHashSet()),
-      new DirectFlexPathCalculator(),
-      FlexConfig.DEFAULT
-    );
+    int fromStopPos = 0;
+    int toStopPos = 1;
+    LocalDate serviceDate = LocalDate.of(2024, Month.MAY, 22);
 
     var fromv = StreetModelForTest.intersectionVertex(
       "v1",
@@ -235,22 +227,24 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
 
     var flexPath = new DirectFlexPathCalculator()
-      .calculateFlexPath(fromv, tov, template.fromStopIndex, template.toStopIndex);
+      .calculateFlexPath(fromv, tov, fromStopPos, toStopPos);
 
-    var edge = FlexTripEdge.createFlexTripEdge(
+    var edge = new FlexTripEdge(
       fromv,
       tov,
       lastPlace.stop,
       to.stop,
       flexTrip,
-      template,
+      fromStopPos,
+      toStopPos,
+      serviceDate,
       flexPath
     );
 
     FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = end;
@@ -339,17 +333,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
   }
 
-  public Itinerary egress(int walkDuration) {
-    walk(walkDuration, null);
-    return build();
-  }
-
-  public Itinerary build() {
-    Itinerary itinerary = new Itinerary(legs);
-    itinerary.setGeneralizedCost(cost);
-    return itinerary;
-  }
-
   public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
     return transit(
       RAIL_ROUTE,
@@ -408,6 +391,34 @@ public class TestItineraryBuilder implements PlanTestConstants {
     legs.add(rhl);
 
     return this;
+  }
+
+  public TestItineraryBuilder withGeneralizedCost2(int c2) {
+    this.c2 = c2;
+    return this;
+  }
+
+  public Itinerary egress(int walkDuration) {
+    walk(walkDuration, null);
+    return build();
+  }
+
+  /**
+   * Override any value set for c1. The given value will be assigned to the itinerary
+   * independent of any values set on the legs.
+   */
+  public Itinerary build(int c1) {
+    this.c1 = c1;
+    return build();
+  }
+
+  public Itinerary build() {
+    Itinerary itinerary = new Itinerary(legs);
+    itinerary.setGeneralizedCost(c1);
+    if (c2 != NOT_SET) {
+      itinerary.setGeneralizedCost2(c2);
+    }
+    return itinerary;
   }
 
   /* private methods */
@@ -515,7 +526,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = end;
@@ -545,7 +556,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .build();
 
     legs.add(leg);
-    cost += legCost;
+    c1 += legCost;
 
     // Setup for adding another leg
     lastEndTime = endTime;

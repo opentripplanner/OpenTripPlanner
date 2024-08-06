@@ -1,0 +1,2 @@
+agency_id,agency_url,agency_lang,agency_name,agency_phone,agency_timezone,agency_fare_url
+1696,https://www.cityofaspen.com/215/Transportation,en,City of Aspen,970-920-5267,America/Denver,

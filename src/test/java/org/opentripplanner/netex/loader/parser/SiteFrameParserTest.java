@@ -6,6 +6,7 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.index.NetexEntityIndex;
@@ -21,7 +22,7 @@ class SiteFrameParserTest {
 
   @Test
   void testParseQuays() {
-    SiteFrameParser siteFrameParser = new SiteFrameParser();
+    SiteFrameParser siteFrameParser = new SiteFrameParser(Set.of());
     SiteFrame siteFrame = OBJECT_FACTORY.createSiteFrame();
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
 

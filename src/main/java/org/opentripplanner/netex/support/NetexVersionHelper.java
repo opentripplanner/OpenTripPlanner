@@ -17,16 +17,34 @@ import org.rutebanken.netex.model.ValidBetween;
 public class NetexVersionHelper {
 
   /**
+   * @see NetexVersionHelper#versionOf(EntityInVersionStructure)
+   */
+  private static final String ANY = "any";
+  /**
+   * A special value that represents an unknown version.
+   */
+  private static final int UNKNOWN_VERSION = -1;
+
+  /**
    * private constructor to prevent instantiation of utility class
    */
   private NetexVersionHelper() {}
 
   /**
    * According to the <b>Norwegian Netex profile</b> the version number must be a positive
-   * increasing integer. A bigger value indicate a later version.
+   * increasing integer. A bigger value indicates a later version.
+   * However, the special value "any" is also supported and returns a constant meaning "unknown".
+   * The EPIP profile at
+   * http://netex.uk/netex/doc/2019.05.07-v1.1_FinalDraft/prCEN_TS_16614-PI_Profile_FV_%28E%29-2019-Final-Draft-v3.pdf (page 33)
+   * defines this as follows: "Use "any" if the VERSION is unknown (note that this will trigger NeTEx's
+   * XML automatic consistency check)."
    */
   public static int versionOf(EntityInVersionStructure e) {
-    return Integer.parseInt(e.getVersion());
+    if (e.getVersion().equals(ANY)) {
+      return UNKNOWN_VERSION;
+    } else {
+      return Integer.parseInt(e.getVersion());
+    }
   }
 
   /**
@@ -34,7 +52,7 @@ public class NetexVersionHelper {
    * elements exist in the collection {@code -1} is returned.
    */
   public static int latestVersionIn(Collection<? extends EntityInVersionStructure> list) {
-    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(-1);
+    return list.stream().mapToInt(NetexVersionHelper::versionOf).max().orElse(UNKNOWN_VERSION);
   }
 
   /**

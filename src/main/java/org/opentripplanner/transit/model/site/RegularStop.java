@@ -81,6 +81,12 @@ public final class RegularStop
     return url;
   }
 
+  @Nonnull
+  @Override
+  public StopType getStopType() {
+    return StopType.REGULAR;
+  }
+
   @Override
   @Nullable
   public ZoneId getTimeZone() {
@@ -121,7 +127,9 @@ public final class RegularStop
   @Override
   @Nonnull
   public StopTransferPriority getPriority() {
-    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
+    return isPartOfStation()
+      ? getParentStation().getPriority()
+      : StopTransferPriority.defaultValue();
   }
 
   @Override

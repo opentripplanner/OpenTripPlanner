@@ -81,6 +81,13 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     return values.isEmpty() ? new EnumMap<>(type) : new EnumMap<>(values);
   }
 
+  /**
+   * Convert the values to an {@link EnumMap}.
+   */
+  public EnumMap<E, TimeAndCostPenalty> asEnumMap() {
+    return copyValues();
+  }
+
   private static <F extends Enum<F>> String toString(
     Class<?> clazz,
     Map<F, TimeAndCostPenalty> values
@@ -105,7 +112,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     private final TimeAndCostPenaltyForEnum<E> original;
     private final EnumMap<E, TimeAndCostPenalty> values;
 
-    Builder(TimeAndCostPenaltyForEnum<E> original) {
+    private Builder(TimeAndCostPenaltyForEnum<E> original) {
       this.original = original;
       this.values = original.copyValues();
     }

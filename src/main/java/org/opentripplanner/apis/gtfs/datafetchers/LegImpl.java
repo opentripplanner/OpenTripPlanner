@@ -6,18 +6,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
+import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -29,6 +29,7 @@ import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
@@ -78,6 +79,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<LegTime> end() {
+    return environment -> getSource(environment).end();
+  }
+
+  @Override
+  @Deprecated
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).getEndTime().toInstant().toEpochMilli();
   }
@@ -93,8 +100,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       Leg source = getSource(environment);
       return new StopArrival(
         source.getFrom(),
-        source.getStartTime(),
-        source.getStartTime(),
+        source.start(),
+        source.start(),
         source.getBoardStopPosInPattern(),
         source.getBoardingGtfsStopSequence()
       );
@@ -216,6 +223,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<LegTime> start() {
+    return environment -> getSource(environment).start();
+  }
+
+  @Override
+  @Deprecated
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).getStartTime().toInstant().toEpochMilli();
   }
@@ -231,8 +244,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       Leg source = getSource(environment);
       return new StopArrival(
         source.getTo(),
-        source.getEndTime(),
-        source.getEndTime(),
+        source.end(),
+        source.end(),
         source.getAlightStopPosInPattern(),
         source.getAlightGtfsStopSequence()
       );

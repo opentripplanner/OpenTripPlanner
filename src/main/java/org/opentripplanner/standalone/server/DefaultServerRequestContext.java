@@ -6,9 +6,10 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -24,7 +25,8 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
 @HttpRequestScoped
@@ -39,14 +41,16 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final TileRendererManager tileRendererManager;
-  private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
-  private final FlexConfig flexConfig;
+  private final VectorTileConfig vectorTileConfig;
+  private final FlexParameters flexParameters;
   private final TraverseVisitor traverseVisitor;
   private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
   private final EmissionsService emissionsService;
   private final StopConsolidationService stopConsolidationService;
+  private final StreetLimitationParametersService streetLimitationParametersService;
+  private final LuceneIndex luceneIndex;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -59,15 +63,17 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
     TileRendererManager tileRendererManager,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     EmissionsService emissionsService,
     List<RideHailingService> rideHailingServices,
     StopConsolidationService stopConsolidationService,
-    FlexConfig flexConfig,
-    TraverseVisitor traverseVisitor
+    StreetLimitationParametersService streetLimitationParametersService,
+    FlexParameters flexParameters,
+    TraverseVisitor traverseVisitor,
+    @Nullable LuceneIndex luceneIndex
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -75,9 +81,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.tileRendererManager = tileRendererManager;
-    this.vectorTileLayers = vectorTileLayers;
+    this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
-    this.flexConfig = flexConfig;
+    this.flexParameters = flexParameters;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
@@ -85,6 +91,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
     this.stopConsolidationService = stopConsolidationService;
+    this.streetLimitationParametersService = streetLimitationParametersService;
+    this.luceneIndex = luceneIndex;
   }
 
   /**
@@ -97,15 +105,17 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     MeterRegistry meterRegistry,
-    VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
+    VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     @Nullable EmissionsService emissionsService,
-    FlexConfig flexConfig,
+    FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
-    @Nullable TraverseVisitor traverseVisitor
+    StreetLimitationParametersService streetLimitationParametersService,
+    @Nullable TraverseVisitor traverseVisitor,
+    @Nullable LuceneIndex luceneIndex
   ) {
     return new DefaultServerRequestContext(
       graph,
@@ -115,15 +125,17 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       meterRegistry,
       raptorConfig,
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
-      vectorTileLayers,
+      vectorTileConfig,
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
       rideHailingServices,
       stopConsolidationService,
-      flexConfig,
-      traverseVisitor
+      streetLimitationParametersService,
+      flexParameters,
+      traverseVisitor,
+      luceneIndex
     );
   }
 
@@ -200,6 +212,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
+  public StreetLimitationParametersService streetLimitationParametersService() {
+    return streetLimitationParametersService;
+  }
+
+  @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
   }
@@ -215,13 +232,19 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public FlexConfig flexConfig() {
-    return flexConfig;
+  public FlexParameters flexParameters() {
+    return flexParameters;
   }
 
   @Override
-  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
-    return vectorTileLayers;
+  public VectorTileConfig vectorTileConfig() {
+    return vectorTileConfig;
+  }
+
+  @Nullable
+  @Override
+  public LuceneIndex lucenceIndex() {
+    return luceneIndex;
   }
 
   @Override

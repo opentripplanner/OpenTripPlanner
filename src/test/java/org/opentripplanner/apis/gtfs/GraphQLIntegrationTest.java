@@ -43,6 +43,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
@@ -61,8 +62,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -74,8 +73,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -84,11 +85,15 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -110,12 +115,25 @@ class GraphQLIntegrationTest {
     .map(p -> (RegularStop) p.stop)
     .toList();
 
+  private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
+    .withVehicles(10)
+    .withSpaces(10)
+    .withVehicleTypeBicycle(5, 7)
+    .withVehicleTypeElectricBicycle(5, 3)
+    .withSystem("Network-1", "https://foo.bar")
+    .build();
+
+  private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+    .withSystem("Network-1", "https://foo.bar")
+    .build();
+
   static final Graph GRAPH = new Graph();
 
   static final Instant ALERT_START_TIME = OffsetDateTime
     .parse("2023-02-15T12:03:28+01:00")
     .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
+  private static final int TEN_MINUTES = 10 * 60;
 
   private static GraphQLRequestContext context;
 
@@ -130,6 +148,7 @@ class GraphQLIntegrationTest {
           VehicleParking
             .builder()
             .id(id("parking-1"))
+            .coordinate(WgsCoordinate.GREENWICH)
             .name(NonLocalizedString.ofNullable("parking"))
             .build()
         ),
@@ -149,6 +168,18 @@ class GraphQLIntegrationTest {
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
 
+    var feedId = "testfeed";
+    var feedInfo = FeedInfo.dummyForTest(feedId);
+    transitModel.addFeedInfo(feedInfo);
+
+    var agency = Agency
+      .of(new FeedScopedId(feedId, "agency-xx"))
+      .withName("speedtransit")
+      .withUrl("www.otp-foo.bar")
+      .withTimezone("Europe/Berlin")
+      .build();
+    transitModel.addAgency(agency);
+
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     var routes = Arrays
@@ -159,13 +190,27 @@ class GraphQLIntegrationTest {
           .route(m.name())
           .withMode(m)
           .withLongName(I18NString.of("Long name for %s".formatted(m)))
+          .withGtfsSortOrder(sortOrder(m))
+          .withBikesAllowed(bikesAllowed(m))
           .build()
       )
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+    TransitEditorService transitService = new DefaultTransitService(transitModel) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
 
-    routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
+    };
+    routes.forEach(transitService::addRoutes);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -180,15 +225,12 @@ class GraphQLIntegrationTest {
       .carHail(D10m, E)
       .build();
 
+    add10MinuteDelay(i1);
+
     var busLeg = i1.getTransitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(3.1f));
-    fares.addFareComponent(
-      FareType.regular,
-      List.of(new FareComponent(id("AB"), Money.euros(3.1f), List.of(busLeg)))
-    );
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
@@ -225,20 +267,6 @@ class GraphQLIntegrationTest {
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);
 
-    var transitService = new DefaultTransitService(transitModel) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
-
-      @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-    };
-
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
@@ -265,13 +293,8 @@ class GraphQLIntegrationTest {
     realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
-    VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
-      .withVehicles(10)
-      .withSpaces(10)
-      .withVehicleTypeBicycle(5, 7)
-      .withVehicleTypeElectricBicycle(5, 3)
-      .build();
-    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
+    defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE);
 
     context =
       new GraphQLRequestContext(
@@ -284,6 +307,39 @@ class GraphQLIntegrationTest {
         finder,
         new RouteRequest()
       );
+  }
+
+  private static BikeAccess bikesAllowed(TransitMode m) {
+    return switch (m.ordinal() % 3) {
+      case 0 -> BikeAccess.ALLOWED;
+      case 1 -> BikeAccess.NOT_ALLOWED;
+      default -> BikeAccess.UNKNOWN;
+    };
+  }
+
+  /**
+   * We want to provide a variety of numbers and null, so we cover all cases in the test output.
+   */
+  private static Integer sortOrder(TransitMode m) {
+    if (m.ordinal() == 0) {
+      return null;
+    } else {
+      return m.ordinal();
+    }
+  }
+
+  private static void add10MinuteDelay(Itinerary i1) {
+    i1.transformTransitLegs(tl -> {
+      if (tl instanceof ScheduledTransitLeg stl) {
+        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+
+        for (var i = 0; i < rtt.getNumStops(); i++) {
+          rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
+          rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+        }
+      }
+      return tl;
+    });
   }
 
   @FilePatternSource(pattern = "src/test/resources/org/opentripplanner/apis/gtfs/queries/*.graphql")
@@ -400,13 +456,15 @@ class GraphQLIntegrationTest {
       List<FeedScopedId> filterByStations,
       List<FeedScopedId> filterByRoutes,
       List<String> filterByBikeRentalStations,
+      List<String> filterByNetwork,
       TransitService transitService
     ) {
-      return List
-        .of(TransitModelForTest.of().stop("A").build())
-        .stream()
-        .map(stop -> new PlaceAtDistance(stop, 0))
-        .toList();
+      var stop = TransitModelForTest.of().stop("A").build();
+      return List.of(
+        new PlaceAtDistance(stop, 0),
+        new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
+        new PlaceAtDistance(RENTAL_VEHICLE, 50)
+      );
     }
   };
 }

@@ -1,14 +1,19 @@
 package org.opentripplanner.netex.loader.parser;
 
+import static org.opentripplanner.netex.config.IgnorableFeature.PARKING;
+
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.support.JAXBUtils;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
+import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
@@ -36,6 +41,14 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
   private final Collection<Quay> quays = new ArrayList<>();
 
+  private final Collection<Parking> parkings = new ArrayList<>(0);
+
+  private final Set<IgnorableFeature> ignoredFeatures;
+
+  SiteFrameParser(Set<IgnorableFeature> ignoredFeatures) {
+    this.ignoredFeatures = ignoredFeatures;
+  }
+
   @Override
   public void parse(Site_VersionFrameStructure frame) {
     if (frame.getStopPlaces() != null) {
@@ -51,6 +64,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     if (frame.getTariffZones() != null) {
       parseTariffZones(frame.getTariffZones().getTariffZone());
     }
+
+    if (!ignoredFeatures.contains(PARKING) && frame.getParkings() != null) {
+      parseParkings(frame.getParkings().getParking());
+    }
     // Keep list sorted alphabetically
     warnOnMissingMapping(LOG, frame.getAccesses());
     warnOnMissingMapping(LOG, frame.getAddresses());
@@ -59,7 +76,6 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     warnOnMissingMapping(LOG, frame.getCheckConstraintDelays());
     warnOnMissingMapping(LOG, frame.getCheckConstraintThroughputs());
     warnOnMissingMapping(LOG, frame.getNavigationPaths());
-    warnOnMissingMapping(LOG, frame.getParkings());
     warnOnMissingMapping(LOG, frame.getPathJunctions());
     warnOnMissingMapping(LOG, frame.getPathLinks());
     warnOnMissingMapping(LOG, frame.getPointsOfInterest());
@@ -79,6 +95,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     netexIndex.stopPlaceById.addAll(stopPlaces);
     netexIndex.tariffZonesById.addAll(tariffZones);
     netexIndex.quayById.addAll(quays);
+    netexIndex.parkings.addAll(parkings);
   }
 
   private void parseFlexibleStopPlaces(Collection<FlexibleStopPlace> flexibleStopPlacesList) {
@@ -87,6 +104,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
   private void parseGroupsOfStopPlaces(Collection<GroupOfStopPlaces> groupsOfStopPlacesList) {
     groupsOfStopPlaces.addAll(groupsOfStopPlacesList);
+  }
+
+  private void parseParkings(List<Parking> parking) {
+    parkings.addAll(parking);
   }
 
   private void parseStopPlaces(List<JAXBElement<? extends Site_VersionStructure>> stopPlaceList) {

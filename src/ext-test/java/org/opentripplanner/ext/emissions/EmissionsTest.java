@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 class EmissionsTest {
 
   private static DefaultEmissionsService eService;
-  private static EmissionsFilter emissionsFilter;
+  private static DecorateWithEmission decorateWithEmission;
 
   static final ZonedDateTime TIME = OffsetDateTime
     .parse("2023-07-20T17:49:06+03:00")
@@ -58,49 +58,42 @@ class EmissionsTest {
     emissions.put(new FeedScopedId("F", "2"), 0.0);
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
     eService = new DefaultEmissionsService(emissionsDataModel);
-    emissionsFilter = new EmissionsFilter(eService);
+    decorateWithEmission = new DecorateWithEmission(eService);
   }
 
   @Test
   void testGetEmissionsForItinerary() {
     Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)));
-    assertEquals(
-      new Grams(2223.902),
-      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
-    );
+    decorateWithEmission.decorate(i);
+    assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     Itinerary i = new Itinerary(List.of(STREET_LEG));
-    assertEquals(
-      new Grams(28.0864),
-      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
-    );
+    decorateWithEmission.decorate(i);
+    assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED)));
-    assertNull(emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
+    decorateWithEmission.decorate(i);
+    assertNull(i.getEmissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS)));
-    assertEquals(
-      new Grams(0.0),
-      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
-    );
+    decorateWithEmission.decorate(i);
+    assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG));
-    assertEquals(
-      new Grams(2251.9884),
-      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
-    );
+    decorateWithEmission.decorate(i);
+    assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
@@ -108,8 +101,9 @@ class EmissionsTest {
     Itinerary i = new Itinerary(
       List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
     );
-    var emissionsResult = emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson() != null
-      ? emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    decorateWithEmission.decorate(i);
+    var emissionsResult = i.getEmissionsPerPerson() != null
+      ? i.getEmissionsPerPerson().getCo2()
       : null;
     assertNull(emissionsResult);
   }

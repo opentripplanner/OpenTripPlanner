@@ -375,7 +375,10 @@ public class BikeWalkingTest extends GraphRoutingTest {
       preferences
         .withWalk(w -> w.withSpeed(10))
         .withBike(it ->
-          it.withSpeed(20d).withWalkingSpeed(5d).withSwitchTime(100).withSwitchCost(1000)
+          it
+            .withSpeed(20d)
+            .withWalking(w -> w.withSpeed(5d).withMountDismountTime(100).withMountDismountCost(1000)
+            )
         )
     );
     request.setArriveBy(arriveBy);

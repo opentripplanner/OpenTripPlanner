@@ -3,6 +3,7 @@ package org.opentripplanner.framework.io;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import org.apache.hc.core5.http.ContentType;
 
 public final class HttpUtils {
@@ -24,20 +25,28 @@ public final class HttpUtils {
   public static String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
     if (headers.getRequestHeader(HEADER_X_FORWARDED_PROTO) != null) {
-      protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).get(0);
+      protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).getFirst();
     } else {
       protocol = uri.getRequestUri().getScheme();
     }
 
     String host;
     if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
-      host = headers.getRequestHeader(HEADER_X_FORWARDED_HOST).get(0);
+      host = extractHost(headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst());
     } else if (headers.getRequestHeader(HEADER_HOST) != null) {
-      host = headers.getRequestHeader(HEADER_HOST).get(0);
+      host = headers.getRequestHeader(HEADER_HOST).getFirst();
     } else {
       host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
     }
 
     return protocol + "://" + host;
+  }
+
+  /**
+   * The X-Forwarded-Host header can contain a comma-separated list so we account for that.
+   * https://stackoverflow.com/questions/66042952/http-proxy-behavior-for-x-forwarded-host-header
+   */
+  private static String extractHost(String xForwardedFor) {
+    return Arrays.stream(xForwardedFor.split(",")).map(String::strip).findFirst().get();
   }
 }

@@ -61,13 +61,14 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                             | *Optional* | `"PT40M"`     |  2.2  |
 |       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                                | *Optional* | `10`          |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page.     | *Optional* |               |   na  |
-|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                                  | *Optional* |               |  2.0  |
+|    [stopBoardAlightDuringTransferCost](#transit_stopBoardAlightDuringTransferCost)        | `enum map of integer` | Costs for boarding and alighting during transfers at stops with a given transfer priority.            | *Optional* |               |  2.0  |
 |    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                              | *Optional* |               |  2.3  |
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                         | *Optional* |               |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                               | *Optional* | `false`       |   na  |
+|    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                      | *Optional* | `1000000`     |  2.6  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
-| [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                                   | *Optional* |               |  2.0  |
+| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                             | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -358,19 +359,23 @@ previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindo
 for more info."
 
 
-<h3 id="transit_stopTransferCost">stopTransferCost</h3>
+<h3 id="transit_stopBoardAlightDuringTransferCost">stopBoardAlightDuringTransferCost</h3>
 
 **Since version:** `2.0` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /transit   
-**Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
+**Enum keys:** `preferred` | `recommended` | `allowed` | `discouraged`
 
-Use this to set a stop transfer cost for the given transfer priority
+Costs for boarding and alighting during transfers at stops with a given transfer priority.
 
-The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority
-set, the default is `allowed`. The `stopTransferCost` parameter is optional, but if listed all
-values must be set.
+This cost is applied **both to boarding and alighting** at stops during transfers. All stops have a
+transfer cost priority set, the default is `allowed`. The `stopBoardAlightDuringTransferCost`
+parameter is optional, but if listed all values must be set.
 
-If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+When a transfer occurs at the same stop, the cost will be applied twice since the cost is both for
+boarding and alighting,
+
+If not set the `stopBoardAlightDuringTransferCost` is ignored. This is only available for NeTEx
+imported Stops.
 
 The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
 
@@ -382,7 +387,7 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 | `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
 
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the
-`stopTransferCost` is listed.**
+`stopBoardAlightDuringTransferCost` is listed.**
 
 
 <h3 id="transit_transferCacheRequests">transferCacheRequests</h3>
@@ -419,6 +424,15 @@ Hide the FeedId in all API output, and add it to input.
 
 Only turn this feature on if you have unique ids across all feeds, without the feedId prefix.
 
+<h3 id="transmodelApi_maxNumberOfResultFields">maxNumberOfResultFields</h3>
+
+**Since version:** `2.6` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000000`   
+**Path:** /transmodelApi 
+
+The maximum number of fields in a GraphQL result
+
+Enforce rate limiting based on query complexity; Queries that return too much data are cancelled.
+
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
 **Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
@@ -451,36 +465,74 @@ Used to group requests when monitoring OTP.
     ]
   },
   "routingDefaults" : {
-    "walkSpeed" : 1.3,
-    "bikeSpeed" : 5,
-    "carSpeed" : 40,
     "numItineraries" : 12,
     "transferPenalty" : 0,
-    "walkReluctance" : 4.0,
-    "bikeReluctance" : 5.0,
-    "bikeWalkingReluctance" : 10.0,
-    "bikeStairsReluctance" : 150.0,
-    "carReluctance" : 10.0,
-    "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
     "elevatorBoardTime" : 90,
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "escalatorReluctance" : 1.5,
-    "vehicleRental" : {
-      "pickupCost" : 120,
-      "dropOffTime" : 30,
-      "dropOffCost" : 30
+    "bicycle" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "boardCost" : 600,
+      "walk" : {
+        "reluctance" : 10.0,
+        "stairsReluctance" : 150.0
+      },
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "1m",
+        "cost" : 120
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
     },
-    "bikeParkTime" : "1m",
-    "bikeParkCost" : 120,
-    "carDropoffTime" : 120,
+    "car" : {
+      "reluctance" : 10,
+      "decelerationSpeed" : 2.9,
+      "accelerationSpeed" : 2.9,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "5m",
+        "cost" : 600
+      }
+    },
+    "scooter" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
+    },
+    "walk" : {
+      "speed" : 1.3,
+      "reluctance" : 4.0,
+      "stairsReluctance" : 1.65,
+      "boardCost" : 600,
+      "escalatorReluctance" : 1.5
+    },
     "waitReluctance" : 1.0,
-    "walkBoardCost" : 600,
-    "bikeBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
-    "transferSlack" : 120,
+    "transferSlack" : "2m",
     "boardSlackForMode" : {
       "AIRPLANE" : "35m"
     },
@@ -515,8 +567,6 @@ Used to group requests when monitoring OTP.
       "minBikeParkingDistance" : 300,
       "debug" : "limit-to-search-window"
     },
-    "carDecelerationSpeed" : 2.9,
-    "carAccelerationSpeed" : 2.9,
     "ignoreRealtimeUpdates" : false,
     "geoidElevation" : false,
     "maxJourneyDuration" : "36h",
@@ -572,7 +622,7 @@ Used to group requests when monitoring OTP.
       "minWindow" : "1h",
       "maxWindow" : "5h"
     },
-    "stopTransferCost" : {
+    "stopBoardAlightDuringTransferCost" : {
       "DISCOURAGED" : 1500,
       "ALLOWED" : 75,
       "RECOMMENDED" : 30,
@@ -602,58 +652,69 @@ Used to group requests when monitoring OTP.
   "transmodelApi" : {
     "hideFeedId" : true
   },
-  "vectorTileLayers" : [
-    {
-      "name" : "stops",
-      "type" : "Stop",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "stations",
-      "type" : "Station",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 12,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "rentalPlaces",
-      "type" : "VehicleRental",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    },
-    {
-      "name" : "rentalVehicle",
-      "type" : "VehicleRentalVehicle",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60
-    },
-    {
-      "name" : "rentalStation",
-      "type" : "VehicleRentalStation",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 600
-    },
-    {
-      "name" : "vehicleParking",
-      "type" : "VehicleParking",
-      "mapper" : "Digitransit",
-      "maxZoom" : 20,
-      "minZoom" : 14,
-      "cacheMaxSeconds" : 60,
-      "expansionFactor" : 0.25
-    }
-  ],
+  "vectorTiles" : {
+    "basePath" : "/otp_ct/vectorTiles",
+    "layers" : [
+      {
+        "name" : "stops",
+        "type" : "Stop",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "areaStops",
+        "type" : "AreaStop",
+        "mapper" : "OTPRR",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "stations",
+        "type" : "Station",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 12,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "rentalPlaces",
+        "type" : "VehicleRental",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      },
+      {
+        "name" : "rentalVehicle",
+        "type" : "VehicleRentalVehicle",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60
+      },
+      {
+        "name" : "rentalStation",
+        "type" : "VehicleRentalStation",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 600
+      },
+      {
+        "name" : "vehicleParking",
+        "type" : "VehicleParking",
+        "mapper" : "Digitransit",
+        "maxZoom" : 20,
+        "minZoom" : 14,
+        "cacheMaxSeconds" : 60,
+        "expansionFactor" : 0.25
+      }
+    ]
+  },
   "timetableUpdates" : {
     "purgeExpiredData" : false,
     "maxSnapshotFrequency" : "2s"
@@ -718,6 +779,12 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "vehicle-parking",
+      "feedId" : "noi",
+      "sourceType" : "noi-open-data-hub",
+      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
+    },
+    {
       "type" : "stop-time-updater",
       "frequency" : "1m",
       "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
@@ -726,6 +793,13 @@ Used to group requests when monitoring OTP.
       "headers" : {
         "Authorization" : "A-Token"
       }
+    },
+    {
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://pred.rt.hsl.fi",
+      "topic" : "gtfsrt/v2/fi/hsl/tu",
+      "feedId" : "HSL",
+      "fuzzyTripMatching" : true
     },
     {
       "type" : "vehicle-positions",
@@ -739,10 +813,6 @@ Used to group requests when monitoring OTP.
       "features" : [
         "position"
       ]
-    },
-    {
-      "type" : "websocket-gtfs-rt-updater",
-      "feedId" : "ov"
     },
     {
       "type" : "siri-et-updater",
@@ -774,6 +844,37 @@ Used to group requests when monitoring OTP.
         "toDateTime" : "P1D",
         "timeout" : 300000
       }
+    },
+    {
+      "type" : "siri-azure-et-updater",
+      "topic" : "some_topic",
+      "authenticationType" : "SharedAccessKey",
+      "fullyQualifiedNamespace" : "fully_qualified_namespace",
+      "servicebus-url" : "service_bus_url",
+      "feedId" : "feed_id",
+      "customMidnight" : 4,
+      "history" : {
+        "url" : "endpoint_url",
+        "fromDateTime" : "-P1D",
+        "timeout" : 300000
+      }
+    },
+    {
+      "type" : "siri-et-google-pubsub-updater",
+      "feedId" : "feed_id",
+      "reconnectPeriod" : "5s",
+      "initialGetDataTimeout" : "1m20s",
+      "topicProjectName" : "google_pubsub_topic_project_name",
+      "subscriptionProjectName" : "google_pubsub_subscription_project_name",
+      "topicName" : "estimated_timetables",
+      "dataInitializationUrl" : "https://example.com/some/path",
+      "fuzzyTripMatching" : true
+    },
+    {
+      "type" : "vehicle-parking",
+      "feedId" : "bikeep",
+      "sourceType" : "bikeep",
+      "url" : "https://services.bikeep.com/location/v1/public-areas/no-baia-mobility/locations"
     }
   ],
   "rideHailingServices" : [

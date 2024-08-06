@@ -1,37 +1,40 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
+
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
-/* Test data consists of one bigger graph and two small sub graphs. These are totally disconnected.
-   One small graphs is only at 5 meter distance from the big graph and another one 30 m away.
-   Adaptive pruning retains the distant island but removes the closer one which appears to be
-   disconnected part of the main graph.
+/**
+ * Test data consists of one bigger graph and two small sub graphs. These are totally disconnected.
+ * One small graphs is only at 5 meter distance from the big graph and another one 30 m away.
+ * Adaptive pruning retains the distant island but removes the closer one which appears to be
+ * disconnected part of the main graph.
  */
-
 public class AdaptivePruningTest {
 
   private static Graph graph;
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"));
+    graph =
+      buildOsmGraph(
+        ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"),
+        5,
+        0,
+        20,
+        30
+      );
   }
 
   @Test
   public void distantIslandIsRetained() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -55,7 +58,7 @@ public class AdaptivePruningTest {
 
   @Test
   public void mainGraphIsNotRemoved() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -63,43 +66,5 @@ public class AdaptivePruningTest {
         .collect(Collectors.toSet())
         .contains("73347312")
     );
-  }
-
-  private static Graph buildOsmGraph(File file) {
-    try {
-      var deduplicator = new Deduplicator();
-      var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(new StopModel(), deduplicator);
-      // Add street data from OSM
-      OsmProvider osmProvider = new OsmProvider(file, true);
-      OsmModule osmModule = OsmModule.of(osmProvider, graph).withEdgeNamer(new TestNamer()).build();
-
-      osmModule.buildGraph();
-
-      transitModel.index();
-      graph.index(transitModel.getStopModel());
-
-      // Prune floating islands and set noThru where necessary
-      PruneIslands pruneIslands = new PruneIslands(
-        graph,
-        transitModel,
-        DataImportIssueStore.NOOP,
-        null
-      );
-      // all 3 sub graphs are larger than 5 edges
-      pruneIslands.setPruningThresholdIslandWithoutStops(5);
-
-      //  up to 5*20 = 100 edge graphs get pruned if they are too close
-      pruneIslands.setAdaptivePruningFactor(20);
-
-      //  Distant island is 30 m away from main graph, let's keep it
-      pruneIslands.setAdaptivePruningDistance(30);
-
-      pruneIslands.buildGraph();
-
-      return graph;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 }

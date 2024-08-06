@@ -22,11 +22,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
@@ -53,6 +50,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PatternImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlaceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlaceInterfaceTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.PlanConnectionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlanImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.QueryTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleImpl;
@@ -76,19 +74,19 @@ import org.opentripplanner.apis.gtfs.datafetchers.TripOccupancyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.UnknownImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalNetworkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.fareComponentImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.fareImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.placeAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
+import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +96,6 @@ class GtfsGraphQLIndex {
 
   private static final GraphQLSchema indexSchema = buildSchema();
 
-  static final ExecutorService threadPool = Executors.newCachedThreadPool(
-    OtpRequestThreadFactory.of("gtfs-api-%d")
-  );
-
   protected static GraphQLSchema buildSchema() {
     try {
       URL url = Objects.requireNonNull(GtfsGraphQLIndex.class.getResource("schema.graphqls"));
@@ -109,12 +103,25 @@ class GtfsGraphQLIndex {
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
-        .scalar(GraphQLScalars.durationScalar)
-        .scalar(GraphQLScalars.polylineScalar)
-        .scalar(GraphQLScalars.geoJsonScalar)
-        .scalar(GraphQLScalars.graphQLIDScalar)
-        .scalar(GraphQLScalars.gramsScalar)
+        .scalar(GraphQLScalars.DURATION_SCALAR)
+        .scalar(GraphQLScalars.POLYLINE_SCALAR)
+        .scalar(GraphQLScalars.GEOJSON_SCALAR)
+        .scalar(GraphQLScalars.GRAPHQL_ID_SCALAR)
+        .scalar(GraphQLScalars.GRAMS_SCALAR)
+        .scalar(GraphQLScalars.OFFSET_DATETIME_SCALAR)
+        .scalar(GraphQLScalars.RATIO_SCALAR)
+        .scalar(GraphQLScalars.COORDINATE_VALUE_SCALAR)
+        .scalar(GraphQLScalars.COST_SCALAR)
+        .scalar(GraphQLScalars.RELUCTANCE_SCALAR)
+        .scalar(GraphQLScalars.LOCAL_DATE_SCALAR)
         .scalar(ExtendedScalars.GraphQLLong)
+        .scalar(ExtendedScalars.Locale)
+        .scalar(
+          ExtendedScalars
+            .newAliasedScalar("Speed")
+            .aliasedScalar(ExtendedScalars.NonNegativeFloat)
+            .build()
+        )
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
@@ -130,9 +137,6 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(debugOutputImpl.class))
         .type(typeWiring.build(DepartureRowImpl.class))
         .type(typeWiring.build(elevationProfileComponentImpl.class))
-        .type(typeWiring.build(fareComponentImpl.class))
-        .type(typeWiring.build(fareImpl.class))
-        .type(typeWiring.build(FeedImpl.class))
         .type(typeWiring.build(FeedImpl.class))
         .type(typeWiring.build(GeometryImpl.class))
         .type(typeWiring.build(ItineraryImpl.class))
@@ -140,6 +144,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(PatternImpl.class))
         .type(typeWiring.build(PlaceImpl.class))
         .type(typeWiring.build(placeAtDistanceImpl.class))
+        .type(typeWiring.build(PlanConnectionImpl.class))
         .type(typeWiring.build(PlanImpl.class))
         .type(typeWiring.build(QueryTypeImpl.class))
         .type(typeWiring.build(RouteImpl.class))
@@ -157,6 +162,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(BookingTimeImpl.class))
         .type(typeWiring.build(BookingInfoImpl.class))
         .type(typeWiring.build(VehicleRentalStationImpl.class))
+        .type(typeWiring.build(VehicleRentalNetworkImpl.class))
         .type(typeWiring.build(RentalVehicleImpl.class))
         .type(typeWiring.build(RentalVehicleTypeImpl.class))
         .type(typeWiring.build(StopOnRouteImpl.class))
@@ -203,7 +209,11 @@ class GtfsGraphQLIndex {
         );
     }
 
-    GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
+    GraphQL graphQL = GraphQL
+      .newGraphQL(indexSchema)
+      .instrumentation(instrumentation)
+      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
+      .build();
 
     if (variables == null) {
       variables = new HashMap<>();

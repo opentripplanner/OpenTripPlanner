@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
@@ -12,7 +13,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -25,7 +25,7 @@ public class FlexAccessEgressRouter {
     TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
-    FlexConfig config,
+    FlexParameters config,
     DataOverlayContext dataOverlayContext,
     boolean isEgress
   ) {
@@ -37,11 +37,10 @@ public class FlexAccessEgressRouter {
       ? AccessEgressRouter.streetSearch(
         request,
         verticesContainer,
-        transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         false,
-        serverContext.flexConfig().maxAccessWalkDuration(),
+        serverContext.flexParameters().maxAccessWalkDuration(),
         0
       )
       : List.of();
@@ -50,11 +49,10 @@ public class FlexAccessEgressRouter {
       ? AccessEgressRouter.streetSearch(
         request,
         verticesContainer,
-        transitService,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         true,
-        serverContext.flexConfig().maxEgressWalkDuration(),
+        serverContext.flexParameters().maxEgressWalkDuration(),
         0
       )
       : List.of();
@@ -64,7 +62,7 @@ public class FlexAccessEgressRouter {
       transitService,
       config,
       request.dateTime(),
-      request.arriveBy(),
+      request.bookingTime(),
       searchDays.additionalSearchDaysInPast(),
       searchDays.additionalSearchDaysInFuture(),
       accessStops,

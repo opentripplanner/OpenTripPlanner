@@ -33,12 +33,12 @@ public class GraphQLTutorialDocTest {
    */
   @Test
   public void updateTutorialDoc() throws IOException {
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 
-    var routeQuery = getGraphQlQuery("routes.graphql");
-    var planQuery = getGraphQlQuery("plan.graphql");
+    var routeQuery = getGraphQlQuery("routes-tutorial.graphql");
+    var planQuery = getGraphQlQuery("plan-tutorial.graphql");
 
     doc = replaceSection(doc, "route-query", routeQuery);
     doc = replaceSection(doc, "plan-query", planQuery);

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -64,7 +65,10 @@ public class SiriFuzzyTripMatcher {
     return instance;
   }
 
-  private SiriFuzzyTripMatcher(TransitService transitService) {
+  /**
+   * Constructor with public access for tests only.
+   */
+  public SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
     initCache(this.transitService);
   }
@@ -98,6 +102,7 @@ public class SiriFuzzyTripMatcher {
   /**
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
+  @Nullable
   public TripAndPattern match(
     EstimatedVehicleJourney journey,
     EntityResolver entityResolver,
@@ -110,6 +115,10 @@ public class SiriFuzzyTripMatcher {
       return null;
     }
 
+    if (calls.getFirst().getAimedDepartureTime() == null) {
+      return null;
+    }
+
     Set<Trip> trips = null;
     if (
       journey.getVehicleRef() != null &&
@@ -119,7 +128,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (trips == null || trips.isEmpty()) {
-      CallWrapper lastStop = calls.get(calls.size() - 1);
+      CallWrapper lastStop = calls.getLast();
       String lastStopPoint = lastStop.getStopPointRef();
       ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null
         ? lastStop.getAimedArrivalTime()
@@ -269,20 +278,21 @@ public class SiriFuzzyTripMatcher {
   /**
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
-  private TripAndPattern getTripAndPatternForJourney(
+  @Nullable
+  TripAndPattern getTripAndPatternForJourney(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
   ) {
-    var journeyFirstStop = entityResolver.resolveQuay(calls.get(0).getStopPointRef());
-    var journeyLastStop = entityResolver.resolveQuay(calls.get(calls.size() - 1).getStopPointRef());
+    var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
+    var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
     if (journeyFirstStop == null || journeyLastStop == null) {
       return null;
     }
 
-    ZonedDateTime date = calls.get(0).getAimedDepartureTime();
+    ZonedDateTime date = calls.getFirst().getAimedDepartureTime();
     LocalDate serviceDate = date.toLocalDate();
 
     int departureInSecondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
@@ -359,7 +369,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (results.size() == 1) {
-      return results.get(0);
+      return results.getFirst();
     } else if (results.size() > 1) {
       // Multiple possible matches - check if lineRef/routeId matches
       if (
@@ -376,7 +386,7 @@ public class SiriFuzzyTripMatcher {
       }
 
       // Line does not match any routeId - return first result.
-      return results.get(0);
+      return results.getFirst();
     }
 
     return null;

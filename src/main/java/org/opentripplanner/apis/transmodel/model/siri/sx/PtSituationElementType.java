@@ -327,6 +327,15 @@ public class PtSituationElementType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("version")
+          .type(Scalars.GraphQLInt)
+          .description("Operator's version number for the situation element.")
+          .dataFetcher(environment -> environment.<TransitAlert>getSource().version())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("participant")
           .type(Scalars.GraphQLString)
           .description("Codespace of the data source.")

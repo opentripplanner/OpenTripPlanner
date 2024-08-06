@@ -13,6 +13,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -69,7 +70,7 @@ public class NetexModule implements GraphBuilderModule {
         );
         transitBuilder.limitServiceDays(transitPeriodLimit);
         for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
-          transitModel.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
+          transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
         }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
@@ -100,6 +101,11 @@ public class NetexModule implements GraphBuilderModule {
         );
 
         transitModel.validateTimeZones();
+
+        var lots = transitBuilder.vehicleParkings();
+        graph.getVehicleParkingService().updateVehicleParking(lots, List.of());
+        var linker = new VehicleParkingHelper(graph);
+        lots.forEach(linker::linkVehicleParkingToGraph);
       }
 
       transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);

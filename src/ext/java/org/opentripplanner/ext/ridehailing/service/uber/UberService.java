@@ -25,6 +25,7 @@ import org.opentripplanner.ext.ridehailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.ridehailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class UberService extends CachingRideHailingService {
     this.timeEstimateUri = timeEstimateUri;
     this.bannedTypes = bannedTypes;
     this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
-    this.otpHttpClient = new OtpHttpClient();
+    this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
   }
 
   @Override

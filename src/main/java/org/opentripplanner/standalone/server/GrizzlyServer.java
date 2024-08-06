@@ -102,7 +102,7 @@ public class GrizzlyServer {
     httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
     /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
-    if (OTPFeature.DebugClient.isOn()) {
+    if (OTPFeature.DebugUi.isOn()) {
       CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(
         GrizzlyServer.class.getClassLoader(),
         "/client/"

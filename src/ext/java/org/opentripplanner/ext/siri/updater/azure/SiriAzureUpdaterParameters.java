@@ -1,9 +1,13 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
+import java.time.Duration;
+
 public abstract class SiriAzureUpdaterParameters {
 
   private String configRef;
   private String type;
+  private AuthenticationType authenticationType;
+  private String fullyQualifiedNamespace;
   private String serviceBusUrl;
   private String topicName;
   private String dataInitializationUrl;
@@ -11,6 +15,8 @@ public abstract class SiriAzureUpdaterParameters {
   private int timeout;
 
   private boolean fuzzyTripMatching;
+  private Duration autoDeleteOnIdle;
+  private int prefetchCount;
 
   public SiriAzureUpdaterParameters(String type) {
     this.type = type;
@@ -26,6 +32,22 @@ public abstract class SiriAzureUpdaterParameters {
 
   public String getType() {
     return type;
+  }
+
+  public AuthenticationType getAuthenticationType() {
+    return authenticationType;
+  }
+
+  public void setAuthenticationType(AuthenticationType authenticationType) {
+    this.authenticationType = authenticationType;
+  }
+
+  public String getFullyQualifiedNamespace() {
+    return fullyQualifiedNamespace;
+  }
+
+  public void setFullyQualifiedNamespace(String fullyQualifiedNamespace) {
+    this.fullyQualifiedNamespace = fullyQualifiedNamespace;
   }
 
   public String getServiceBusUrl() {
@@ -74,5 +96,21 @@ public abstract class SiriAzureUpdaterParameters {
 
   public void setFuzzyTripMatching(boolean fuzzyTripMatching) {
     this.fuzzyTripMatching = fuzzyTripMatching;
+  }
+
+  public Duration getAutoDeleteOnIdle() {
+    return autoDeleteOnIdle;
+  }
+
+  public void setAutoDeleteOnIdle(Duration autoDeleteOnIdle) {
+    this.autoDeleteOnIdle = autoDeleteOnIdle;
+  }
+
+  public int getPrefetchCount() {
+    return prefetchCount;
+  }
+
+  public void setPrefetchCount(int prefetchCount) {
+    this.prefetchCount = prefetchCount;
   }
 }

@@ -16,10 +16,11 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -36,6 +37,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +66,9 @@ public class RoutingWorker {
    */
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
+  private final TransitGroupPriorityService transitGroupPriorityService;
   private SearchParams raptorSearchParamsUsed = null;
-  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private PageCursorInput pageCursorInput = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -79,6 +82,12 @@ public class RoutingWorker {
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     this.additionalSearchDays =
       createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
+    this.transitGroupPriorityService =
+      TransitGroupPriorityService.of(
+        request.preferences().transit().relaxTransitGroupPriority(),
+        request.journey().transit().priorityGroupsByAgency(),
+        request.journey().transit().priorityGroupsGlobal()
+      );
   }
 
   public RoutingResponse route() {
@@ -122,6 +131,9 @@ public class RoutingWorker {
       routeTransit(itineraries, routingErrors);
     }
 
+    // Set C2 value for Street and FLEX if transit-group-priority is used
+    new TransitGroupPriorityItineraryDecorator(transitGroupPriorityService).decorate(itineraries);
+
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
@@ -137,7 +149,7 @@ public class RoutingWorker {
         searchWindowUsed(),
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> numItinerariesFilterResults = it
+        it -> pageCursorInput = it
       );
 
       filteredItineraries = filterChain.filter(itineraries);
@@ -258,6 +270,7 @@ public class RoutingWorker {
       var transitResults = TransitRouter.route(
         request,
         serverContext,
+        transitGroupPriorityService,
         transitSearchTimeZero,
         additionalSearchDays,
         debugTimingAggregator
@@ -283,7 +296,7 @@ public class RoutingWorker {
       serverContext.raptorTuningParameters(),
       request,
       raptorSearchParamsUsed,
-      numItinerariesFilterResults,
+      pageCursorInput,
       itineraries
     );
   }

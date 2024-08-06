@@ -1,5 +1,6 @@
 package org.opentripplanner.framework.logging;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -36,8 +37,8 @@ class ThrottleTest {
   @Test
   @Disabled("Run this test manually")
   void manualTest() {
-    double quietPeriodMs = 50.0;
-    var subject = new Throttle((int) quietPeriodMs);
+    var quietPeriod = Duration.ofMillis(50);
+    var subject = new Throttle(quietPeriod);
 
     List<Integer> events = createIntegerSequence(20_000_000);
     long start = System.currentTimeMillis();

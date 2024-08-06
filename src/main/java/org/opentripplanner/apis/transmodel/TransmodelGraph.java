@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.ExecutionStrategy;
 import graphql.execution.UnknownOperationException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
@@ -17,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.opentripplanner.apis.transmodel.support.AbortOnTimeoutExecutionStrategy;
+import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
+import org.opentripplanner.apis.transmodel.support.AbortOnUnprocessableRequestExecutionStrategy;
 import org.opentripplanner.apis.transmodel.support.ExecutionResultMapper;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -48,12 +48,12 @@ class TransmodelGraph {
     OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
-    int maxResolves,
+    int maxNumberOfResultFields,
     Iterable<Tag> tracingTags
   ) {
-    try (var executionStrategy = new AbortOnTimeoutExecutionStrategy()) {
+    try (var executionStrategy = new AbortOnUnprocessableRequestExecutionStrategy()) {
       variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
-      var instrumentation = createInstrumentation(maxResolves, tracingTags);
+      var instrumentation = createInstrumentation(maxNumberOfResultFields, tracingTags);
       var transmodelRequestContext = createRequestContext(serverContext);
       var executionInput = createExecutionInput(
         query,
@@ -70,6 +70,8 @@ class TransmodelGraph {
       return ExecutionResultMapper.okResponse(result);
     } catch (OTPRequestTimeoutException te) {
       return ExecutionResultMapper.timeoutResponse();
+    } catch (ResponseTooLargeException rtle) {
+      return ExecutionResultMapper.tooLargeResponse(rtle.getMessage());
     } catch (CoercingParseValueException | UnknownOperationException e) {
       return ExecutionResultMapper.badRequestResponse(e.getMessage());
     } catch (Exception systemError) {
@@ -78,8 +80,11 @@ class TransmodelGraph {
     }
   }
 
-  private static Instrumentation createInstrumentation(int maxResolves, Iterable<Tag> tracingTags) {
-    Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+  private static Instrumentation createInstrumentation(
+    int maxNumberOfResultFields,
+    Iterable<Tag> tracingTags
+  ) {
+    Instrumentation instrumentation = new MaxFieldsInResultInstrumentation(maxNumberOfResultFields);
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation =
@@ -126,6 +131,7 @@ class TransmodelGraph {
       .newGraphQL(indexSchema)
       .instrumentation(instrumentation)
       .queryExecutionStrategy(executionStrategy)
+      .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
       .build();
   }
 

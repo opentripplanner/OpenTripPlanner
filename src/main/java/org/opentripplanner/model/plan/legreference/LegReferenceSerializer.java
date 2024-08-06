@@ -51,8 +51,14 @@ public class LegReferenceSerializer {
       return null;
     }
 
-    var buf = Base64.getUrlDecoder().decode(legReference);
-    var input = new ByteArrayInputStream(buf);
+    byte[] serializedLegReference;
+    try {
+      serializedLegReference = Base64.getUrlDecoder().decode(legReference);
+    } catch (IllegalArgumentException e) {
+      LOG.info("Unable to decode leg reference (invalid base64 encoding): '{}'", legReference, e);
+      return null;
+    }
+    var input = new ByteArrayInputStream(serializedLegReference);
 
     try (var in = new ObjectInputStream(input)) {
       // The order must be the same in the encode and decode function
@@ -60,7 +66,11 @@ public class LegReferenceSerializer {
       var type = readEnum(in, LegReferenceType.class);
       return type.getDeserializer().read(in);
     } catch (IOException e) {
-      LOG.error("Unable to decode leg reference: '" + legReference + "'", e);
+      LOG.warn(
+        "Unable to decode leg reference (incompatible serialization format): '{}'",
+        legReference,
+        e
+      );
       return null;
     }
   }

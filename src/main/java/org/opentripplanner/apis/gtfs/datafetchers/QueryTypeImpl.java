@@ -22,17 +22,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
-import org.opentripplanner.apis.gtfs.mapping.RouteRequestMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
+import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -332,6 +334,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
         : DEFAULT_PLACE_TYPES;
+      List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
       try {
@@ -349,6 +352,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
                 filterByStations,
                 filterByRoutes,
                 filterByBikeRentalStations,
+                filterByNetwork,
                 getTransitService(environment)
               )
           );
@@ -489,13 +493,17 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
+      RouteRequest request = LegacyRouteRequestMapper.toRouteRequest(environment, context);
+      return getPlanResult(context, request);
+    };
+  }
+
+  @Override
+  public DataFetcher<DataFetcherResult<RoutingResponse>> planConnection() {
+    return environment -> {
+      GraphQLRequestContext context = environment.<GraphQLRequestContext>getContext();
       RouteRequest request = RouteRequestMapper.toRouteRequest(environment, context);
-      RoutingResponse res = context.routingService().route(request);
-      return DataFetcherResult
-        .<RoutingResponse>newResult()
-        .data(res)
-        .localContext(Map.of("locale", request.locale()))
-        .build();
+      return getPlanResult(context, request);
     };
   }
 
@@ -613,6 +621,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             GraphQLUtils.startsWith(route.getLongName(), name, environment.getLocale())
           );
       }
+
+      if (LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+        var filter = new PatternByServiceDatesFilter(args.getGraphQLServiceDates(), transitService);
+        routeStream = filter.filterRoutes(routeStream).stream();
+      }
       return routeStream.toList();
     };
   }
@@ -718,7 +731,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       );
 
       Stream<RegularStop> stopStream = getTransitService(environment)
-        .findRegularStop(envelope)
+        .findRegularStops(envelope)
         .stream()
         .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()));
 
@@ -952,6 +965,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   private GraphFinder getGraphFinder(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().graphFinder();
+  }
+
+  private DataFetcherResult getPlanResult(GraphQLRequestContext context, RouteRequest request) {
+    RoutingResponse res = context.routingService().route(request);
+    return DataFetcherResult
+      .<RoutingResponse>newResult()
+      .data(res)
+      .localContext(Map.of("locale", request.locale()))
+      .build();
   }
 
   protected static List<TransitAlert> filterAlerts(

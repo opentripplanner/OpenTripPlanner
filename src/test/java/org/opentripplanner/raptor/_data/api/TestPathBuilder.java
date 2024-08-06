@@ -122,8 +122,13 @@ public class TestPathBuilder implements RaptorTestConstants {
     );
   }
 
-  public RaptorPath<TestTripSchedule> egress(TestAccessEgress transfer) {
-    builder.egress(transfer);
+  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
+    builder.access(access);
+    return builder;
+  }
+
+  public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {
+    builder.egress(egress);
     builder.c2(c2);
     return builder.build();
   }

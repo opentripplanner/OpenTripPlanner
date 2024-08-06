@@ -7,7 +7,7 @@
     <url>https://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -56,21 +56,21 @@
 
 
     <properties>
-        <otp.serialization.version.id>134</otp.serialization.version.id>
+        <otp.serialization.version.id>156</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>30.1</geotools.version>
-        <google.dagger.version>2.49</google.dagger.version>
-        <jackson.version>2.16.0</jackson.version>
-        <jersey.version>3.1.5</jersey.version>
-        <junit.version>5.10.1</junit.version>
-        <micrometer.version>1.11.5</micrometer.version>
-        <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.4.14</logback.version>
-        <lucene.version>9.8.0</lucene.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <geotools.version>31.3</geotools.version>
+        <google.dagger.version>2.51.1</google.dagger.version>
+        <jackson.version>2.17.2</jackson.version>
+        <jersey.version>3.1.7</jersey.version>
+        <junit.version>5.10.3</junit.version>
+        <micrometer.version>1.13.2</micrometer.version>
+        <netcdf4.version>5.6.0</netcdf4.version>
+        <logback.version>1.5.6</logback.version>
+        <lucene.version>9.11.1</lucene.version>
+        <slf4j.version>2.0.13</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
-        <siri-java-model.version>1.26</siri-java-model.version>
-        <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
+        <siri-java-model.version>1.27</siri-java-model.version>
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -78,7 +78,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
-        <plugin.prettier.version>0.21</plugin.prettier.version>
+        <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
     </properties>
@@ -142,7 +142,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>3.13.0</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -158,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -185,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -209,7 +209,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-sources</id>
@@ -242,12 +242,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
                         <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
-                        <version>1.2.1</version>
+                        <version>1.3.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -282,7 +282,6 @@
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
-                        --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
@@ -313,7 +312,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.12</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -322,7 +321,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>7.0.0</version>
+                <version>9.0.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -364,7 +363,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -430,6 +429,7 @@
                         <inputGlob>src/test/java/**/*.java</inputGlob>
                         <inputGlob>src/ext/java/**/*.java</inputGlob>
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
+                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>
@@ -445,7 +445,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.3</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -546,21 +546,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.27.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!--
-                this is necessary because async-http-client uses an old netty version that can crash the
-                Java 21 JVM: https://github.com/netty/netty/pull/13640
-
-                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
-            -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>4.1.100.Final</version>
+                <version>26.40.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -599,20 +585,6 @@
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
             <version>${google.dagger.version}</version>
-        </dependency>
-
-        <!-- JSON AST, not used much and is a good candidate for removal -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-            <exclusions>
-                <!-- This includes a dependency on an ancient version of Junit which we want to exclude -->
-                <exclusion>
-                    <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
@@ -701,9 +673,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.entur.gbfs</groupId>
+            <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.16</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- TESTING -->
@@ -720,15 +692,21 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>1.4.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.2.1</version>
+            <version>1.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.8.0</version>
+            <version>5.12.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -754,7 +732,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.3-jre</version>
+            <version>33.2.1-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>
@@ -842,18 +820,11 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
-        <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
-        <dependency>
-            <groupId>org.asynchttpclient</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>2.12.3</version>
-        </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.10</version>
+            <version>1.4.17</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -888,17 +859,17 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>21.3</version>
+            <version>22.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>21.0</version>
+            <version>22.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3</version>
+            <version>5.3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -929,29 +900,30 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.45.0</version>
+            <version>1.46.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.14.5</version>
+            <version>7.15.0</version>
         </dependency>
         <dependency>
-            <groupId>com.azure.resourcemanager</groupId>
-            <artifactId>azure-resourcemanager-servicebus</artifactId>
-            <version>2.32.0</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.11.2</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.27.1</version>
+            <version>0.28.2</version>
         </dependency>
 
         <!-- create zip test files-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.25.0</version>
+            <version>1.26.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -1028,7 +1000,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.4</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -1048,7 +1020,7 @@
                         <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.13</version>
+                        <version>1.7.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>

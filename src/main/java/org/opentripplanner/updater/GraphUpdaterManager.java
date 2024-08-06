@@ -90,7 +90,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
 
     for (GraphUpdater updater : updaters) {
       updaterList.add(updater);
-      updater.setGraphUpdaterManager(this);
+      updater.setup(this);
     }
   }
 

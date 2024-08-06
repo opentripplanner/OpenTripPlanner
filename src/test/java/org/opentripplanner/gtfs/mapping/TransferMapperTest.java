@@ -46,14 +46,21 @@ public class TransferMapperTest {
   );
   private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
 
-  private static final LocationMapper LOCATION_MAPPER = new LocationMapper(STOP_MODEL_BUILDER);
+  private static final LocationMapper LOCATION_MAPPER = new LocationMapper(
+    STOP_MODEL_BUILDER,
+    ISSUE_STORE
+  );
 
   private static final LocationGroupMapper LOCATION_GROUP_MAPPER = new LocationGroupMapper(
     STOP_MAPPER,
     LOCATION_MAPPER,
     STOP_MODEL_BUILDER
   );
-
+  private static final StopAreaMapper STOP_AREA_MAPPER = new StopAreaMapper(
+    STOP_MAPPER,
+    LOCATION_MAPPER,
+    STOP_MODEL_BUILDER
+  );
   private static StopTimeMapper STOP_TIME_MAPPER;
 
   private static final Integer ID = 45;
@@ -92,6 +99,7 @@ public class TransferMapperTest {
         STOP_MAPPER,
         LOCATION_MAPPER,
         LOCATION_GROUP_MAPPER,
+        STOP_AREA_MAPPER,
         new TripMapper(
           new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, TRANSLATION_HELPER),
           new DirectionMapper(ISSUE_STORE),

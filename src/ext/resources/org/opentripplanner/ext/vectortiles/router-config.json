@@ -1,0 +1,16 @@
+{
+  "vectorTiles": {
+    "basePath": "/otp_ct/vectorTiles",
+    "layers": [
+      {
+        "name": "stops",
+        "type": "Stop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      }
+    ]
+  }
+}
+

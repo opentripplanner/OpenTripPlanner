@@ -58,8 +58,23 @@ public class WorldEnvelopeBuilder {
 
     var medianCalculator = new MedianCalcForDoubles(collection.size());
 
-    collection.forEach(v -> medianCalculator.add(lonProvider.apply(v)));
-    double lon = medianCalculator.median();
+    double lon = 0.0;
+    if (includeLongitude180()) {
+      collection.forEach(v -> {
+        double c = lonProvider.apply(v);
+        if (c < 0) {
+          c += 360.0;
+        }
+        medianCalculator.add(c);
+      });
+      lon = medianCalculator.median();
+      if (lon > 180.0) {
+        lon -= 180;
+      }
+    } else {
+      collection.forEach(v -> medianCalculator.add(lonProvider.apply(v)));
+      lon = medianCalculator.median();
+    }
 
     medianCalculator.reset();
     collection.forEach(v -> medianCalculator.add(latProvider.apply(v)));
@@ -79,17 +94,24 @@ public class WorldEnvelopeBuilder {
     if (minLonEast == MIN_NOT_SET) {
       return new WorldEnvelope(minLat, minLonWest, maxLat, maxLonWest, transitMedianCenter);
     }
-    // Envelope intersects with either 0º or 180º
+    if (includeLongitude180()) {
+      return new WorldEnvelope(minLat, minLonEast, maxLat, minLonWest, transitMedianCenter);
+    } else {
+      return new WorldEnvelope(minLat, minLonWest, maxLat, maxLonEast, transitMedianCenter);
+    }
+  }
+
+  /**
+   * A small gap between the east and west longitude at 180º degrees implies that the Envelope
+   * should include the 180º longitude, and be split at 0 degrees.
+   */
+  boolean includeLongitude180() {
+    if (minLonWest == MIN_NOT_SET || minLonEast == MIN_NOT_SET) {
+      return false;
+    }
     double dist0 = minLonEast - minLonWest;
     double dist180 = 360d - maxLonEast + minLonWest;
-
-    // A small gap between the east and west longitude at 0 degrees implies that the Envelope
-    // should include the 0 degrees longitude(meridian), and be split at 180 degrees.
-    if (dist0 < dist180) {
-      return new WorldEnvelope(minLat, maxLonWest, maxLat, maxLonEast, transitMedianCenter);
-    } else {
-      return new WorldEnvelope(minLat, minLonEast, maxLat, minLonWest, transitMedianCenter);
-    }
+    return dist180 < dist0;
   }
 
   private WorldEnvelopeBuilder expandToInclude(double latitude, double longitude) {

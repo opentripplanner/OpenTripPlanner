@@ -27,18 +27,12 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    return calculateEarliestDepartureTimeWithOpeningHours(
-      requestedDepartureTime,
-      v -> mapToRaptorTime(flexAccessEgress.earliestDepartureTime(v))
-    );
+    return mapToRaptorTime(flexAccessEgress.earliestDepartureTime(requestedDepartureTime));
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    return calculateLatestArrivalTimeWithOpeningHours(
-      requestedArrivalTime,
-      v -> mapToRaptorTime(flexAccessEgress.latestArrivalTime(v))
-    );
+    return mapToRaptorTime(flexAccessEgress.latestArrivalTime(requestedArrivalTime));
   }
 
   @Override
@@ -65,7 +59,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
   }
 
   @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
     return new FlexAccessEgressAdapter(this, penalty);
   }
 

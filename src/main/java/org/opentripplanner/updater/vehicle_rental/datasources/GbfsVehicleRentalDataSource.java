@@ -6,16 +6,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
-import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
-import org.entur.gbfs.v2_3.station_information.GBFSStationInformation;
-import org.entur.gbfs.v2_3.station_status.GBFSStation;
-import org.entur.gbfs.v2_3.station_status.GBFSStationStatus;
-import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
-import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
+import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
+import org.mobilitydata.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
+import org.mobilitydata.gbfs.v2_3.station_information.GBFSStationInformation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStation;
+import org.mobilitydata.gbfs.v2_3.station_status.GBFSStationStatus;
+import org.mobilitydata.gbfs.v2_3.system_information.GBFSSystemInformation;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -46,10 +47,10 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   public GbfsVehicleRentalDataSource(
     GbfsVehicleRentalDataSourceParameters parameters,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.params = parameters;
-    this.otpHttpClient = otpHttpClient;
+    this.otpHttpClient = otpHttpClientFactory.create(LOG);
   }
 
   @Override

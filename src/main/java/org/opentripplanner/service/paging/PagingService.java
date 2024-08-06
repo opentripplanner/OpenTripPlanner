@@ -11,8 +11,8 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.PagingSearchWindowAdjuster;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorFactory;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 public class PagingService {
@@ -24,7 +24,7 @@ public class PagingService {
   private final boolean arriveBy;
   private final int numberOfItineraries;
   private final PageCursor pageCursor;
-  private final NumItinerariesFilterResults numItinerariesFilterResults;
+  private final PageCursorInput pageCursorInput;
   private final PagingSearchWindowAdjuster searchWindowAdjuster;
   private final List<Itinerary> itineraries;
 
@@ -42,7 +42,7 @@ public class PagingService {
     boolean arriveBy,
     int numberOfItineraries,
     @Nullable PageCursor pageCursor,
-    NumItinerariesFilterResults numItinerariesFilterResults,
+    PageCursorInput pageCursorInput,
     List<Itinerary> itineraries
   ) {
     this.searchWindowUsed = searchWindowUsed;
@@ -53,7 +53,7 @@ public class PagingService {
     this.numberOfItineraries = numberOfItineraries;
     this.pageCursor = pageCursor;
 
-    this.numItinerariesFilterResults = numItinerariesFilterResults;
+    this.pageCursorInput = pageCursorInput;
     this.itineraries = Objects.requireNonNull(itineraries);
     this.searchWindowAdjuster =
       createSearchWindowAdjuster(
@@ -98,9 +98,9 @@ public class PagingService {
     }
 
     // SearchWindow cropped -> decrease search-window
-    if (numItinerariesFilterResults != null) {
+    if (pageCursorInput != null) {
       boolean cropSWHead = doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = numItinerariesFilterResults.pageCut().startTimeAsInstant();
+      Instant rmItineraryStartTime = pageCursorInput.pageCut().startTimeAsInstant();
 
       return searchWindowAdjuster.decreaseSearchWindow(
         searchWindowUsed,
@@ -125,15 +125,11 @@ public class PagingService {
   }
 
   private Instant lastKeptDepartureTime() {
-    return numItinerariesFilterResults == null
-      ? null
-      : numItinerariesFilterResults.pageCut().startTimeAsInstant();
+    return pageCursorInput == null ? null : pageCursorInput.pageCut().startTimeAsInstant();
   }
 
   private Instant firstKeptDepartureTime() {
-    return numItinerariesFilterResults == null
-      ? null
-      : numItinerariesFilterResults.pageCut().startTimeAsInstant();
+    return pageCursorInput == null ? null : pageCursorInput.pageCut().startTimeAsInstant();
   }
 
   private PagingSearchWindowAdjuster createSearchWindowAdjuster(
@@ -189,8 +185,8 @@ public class PagingService {
         searchWindowUsed
       );
 
-    if (numItinerariesFilterResults != null) {
-      factory = factory.withRemovedItineraries(numItinerariesFilterResults);
+    if (pageCursorInput != null) {
+      factory = factory.withRemovedItineraries(pageCursorInput);
     }
     return factory;
   }

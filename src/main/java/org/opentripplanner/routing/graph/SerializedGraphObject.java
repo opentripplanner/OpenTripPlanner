@@ -30,6 +30,7 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -77,6 +78,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final EmissionsDataModel emissionsDataModel;
+  public final StreetLimitationParameters streetLimitationParameters;
 
   public SerializedGraphObject(
     Graph graph,
@@ -86,7 +88,8 @@ public class SerializedGraphObject implements Serializable {
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
-    StopConsolidationRepository stopConsolidationRepository
+    StopConsolidationRepository stopConsolidationRepository,
+    StreetLimitationParameters streetLimitationParameters
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -99,6 +102,7 @@ public class SerializedGraphObject implements Serializable {
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
     this.stopConsolidationRepository = stopConsolidationRepository;
+    this.streetLimitationParameters = streetLimitationParameters;
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {

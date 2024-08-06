@@ -8,20 +8,20 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * This class generate a new id for new TripPatterns created real-time by the SIRI updaters. It is
- * important to creat only on instance of this class, and inject it where it is needed.
- * <p>
- * The id generation is thread-safe, even if that is probably not needed.
+ * This class generates new unique IDs for TripPatterns created in response to real-time updates
+ * from the SIRI updaters. In non-test usage it is important to create only one instance of this
+ * class, and inject that single instance wherever it is needed. However, this single-instance
+ * usage pattern is not enforced due to differing needs in tests.
+ * The ID generation is threadsafe, even if that is probably not needed.
  */
 class SiriTripPatternIdGenerator {
 
   private final AtomicInteger counter = new AtomicInteger(0);
 
   /**
-   * Generate unique trip pattern code for real-time added trip pattern. This function roughly
-   * follows the format of {@link GenerateTripPatternsOperation}.
-   * <p>
-   * The generator add a postfix 'RT' to indicate that this trip pattern is generated at REAL-TIME.
+   * Generate a unique ID for a trip pattern added in response to a realtime message. This function
+   * roughly follows the format of {@link GenerateTripPatternsOperation}. The generator suffixes the
+   * ID with 'RT' to indicate that this trip pattern is generated in response to a realtime message.
    */
   FeedScopedId generateUniqueTripPatternId(Trip trip) {
     Route route = trip.getRoute();

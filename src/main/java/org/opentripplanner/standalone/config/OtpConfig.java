@@ -71,4 +71,11 @@ public class OtpConfig {
       root.logAllWarnings(LOG::warn);
     }
   }
+
+  /**
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
+   */
+  public boolean hasUnknownParameters() {
+    return root.hasUnknownParameters();
+  }
 }

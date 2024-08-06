@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -25,7 +26,6 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -70,14 +70,16 @@ class RouteRequestTransitDataProviderFilterTest {
     .withElevator(RELAXED_ACCESSIBILITY_PREFERENCE)
     .build();
 
-  static Stream<Arguments> wheelchairCases = Stream.of(
-    Arguments.of(Accessibility.POSSIBLE, DEFAULT_ACCESSIBILITY),
-    Arguments.of(Accessibility.POSSIBLE, RELAXED_ACCESSIBILITY),
-    Arguments.of(Accessibility.NOT_POSSIBLE, DEFAULT_ACCESSIBILITY),
-    Arguments.of(Accessibility.NOT_POSSIBLE, RELAXED_ACCESSIBILITY),
-    Arguments.of(Accessibility.NO_INFORMATION, DEFAULT_ACCESSIBILITY),
-    Arguments.of(Accessibility.NO_INFORMATION, RELAXED_ACCESSIBILITY)
-  );
+  static Stream<Arguments> wheelchairCases() {
+    return Stream.of(
+      Arguments.of(Accessibility.POSSIBLE, DEFAULT_ACCESSIBILITY),
+      Arguments.of(Accessibility.POSSIBLE, RELAXED_ACCESSIBILITY),
+      Arguments.of(Accessibility.NOT_POSSIBLE, DEFAULT_ACCESSIBILITY),
+      Arguments.of(Accessibility.NOT_POSSIBLE, RELAXED_ACCESSIBILITY),
+      Arguments.of(Accessibility.NO_INFORMATION, DEFAULT_ACCESSIBILITY),
+      Arguments.of(Accessibility.NO_INFORMATION, RELAXED_ACCESSIBILITY)
+    );
+  }
 
   /**
    * Test filter for wheelchair access.
@@ -85,7 +87,7 @@ class RouteRequestTransitDataProviderFilterTest {
    * @param wheelchair Accessibility for stops
    */
   @ParameterizedTest
-  @VariableSource("wheelchairCases")
+  @MethodSource("wheelchairCases")
   void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
     var firstStop = stopForTest("TEST:START", wheelchair, 0.0, 0.0);
     var lastStop = stopForTest("TEST:END", wheelchair, 0.0, 0.0);

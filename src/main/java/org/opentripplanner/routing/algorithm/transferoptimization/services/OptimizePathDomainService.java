@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
@@ -16,6 +15,7 @@ import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -78,8 +78,11 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
 
+  /**
+   * @see TransitLayer#getStopBoardAlightTransferCosts()
+   */
   @Nullable
-  private final int[] stopBoardAlightCosts;
+  private final int[] stopBoardAlightTransferCosts;
 
   private final double extraStopBoardAlightCostsFactor;
 
@@ -88,7 +91,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     RaptorCostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider,
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
-    int[] stopBoardAlightCosts,
+    @Nullable int[] stopBoardAlightTransferCosts,
     double extraStopBoardAlightCostsFactor,
     PathTailFilter<T> filter,
     RaptorStopNameResolver stopNameTranslator
@@ -97,7 +100,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
     this.waitTimeCostCalculator = waitTimeCostCalculator;
-    this.stopBoardAlightCosts = stopBoardAlightCosts;
+    this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
     this.extraStopBoardAlightCostsFactor = extraStopBoardAlightCostsFactor;
     this.filter = filter;
     this.stopNameTranslator = stopNameTranslator;
@@ -139,7 +142,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
         costCalculator,
         iterationDepartureTime,
         waitTimeCostCalculator,
-        stopBoardAlightCosts,
+        stopBoardAlightTransferCosts,
         extraStopBoardAlightCostsFactor,
         stopNameTranslator
       )

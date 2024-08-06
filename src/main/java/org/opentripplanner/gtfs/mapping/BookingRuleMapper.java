@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
+import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 /** Responsible for mapping GTFS BookingRule into the OTP model. */
 class BookingRuleMapper {
@@ -26,17 +26,18 @@ class BookingRuleMapper {
     return cachedBookingInfos.computeIfAbsent(
       rule.getId(),
       k ->
-        new BookingInfo(
-          contactInfo(rule),
-          bookingMethods(),
-          earliestBookingTime(rule),
-          latestBookingTime(rule),
-          minimumBookingNotice(rule),
-          maximumBookingNotice(rule),
-          message(rule),
-          pickupMessage(rule),
-          dropOffMessage(rule)
-        )
+        BookingInfo
+          .of()
+          .withContactInfo(contactInfo(rule))
+          .withBookingMethods(bookingMethods())
+          .withEarliestBookingTime(earliestBookingTime(rule))
+          .withLatestBookingTime(latestBookingTime(rule))
+          .withMinimumBookingNotice(minimumBookingNotice(rule))
+          .withMaximumBookingNotice(maximumBookingNotice(rule))
+          .withMessage(message(rule))
+          .withPickupMessage(pickupMessage(rule))
+          .withDropOffMessage(dropOffMessage(rule))
+          .build()
     );
   }
 

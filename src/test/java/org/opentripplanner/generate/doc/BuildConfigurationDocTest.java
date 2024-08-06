@@ -49,7 +49,7 @@ public class BuildConfigurationDocTest {
   public void updateBuildConfigurationDoc() {
     NodeAdapter node = readBuildConfig();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.framework.Result;
@@ -29,13 +29,13 @@ public class RideHailingAccessShifter {
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
 
   /**
-   * Given a list of {@link DefaultAccessEgress} shift the access ones which contain driving
+   * Given a list of {@link RoutingAccessEgress}, shift the access ones that contain driving
    * so that they only start at the time when the ride hailing vehicle can actually be there
    * to pick up passengers.
    */
-  public static List<DefaultAccessEgress> shiftAccesses(
+  public static List<RoutingAccessEgress> shiftAccesses(
     boolean isAccess,
-    List<DefaultAccessEgress> results,
+    List<RoutingAccessEgress> results,
     List<RideHailingService> services,
     RouteRequest request,
     Instant now

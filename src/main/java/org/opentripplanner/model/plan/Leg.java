@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.Sandbox;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -25,6 +24,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -184,6 +184,7 @@ public interface Leg {
   /**
    * For transit legs, the trip. For non-transit legs, null.
    */
+  @Nullable
   default Trip getTrip() {
     return null;
   }
@@ -199,6 +200,16 @@ public interface Leg {
   default Accessibility getTripWheelchairAccessibility() {
     return null;
   }
+
+  /**
+   * The time (including realtime information) when the leg starts.
+   */
+  LegTime start();
+
+  /**
+   * The time (including realtime information) when the leg ends.
+   */
+  LegTime end();
 
   /**
    * The date and time this leg begins.

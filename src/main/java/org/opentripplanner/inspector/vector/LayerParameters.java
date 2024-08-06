@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector.vector;
 
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 
 /**
  * Configuration options for a single vector tile layer.
@@ -10,7 +10,6 @@ public interface LayerParameters<T extends Enum<T>> {
   int MAX_ZOOM = 20;
   int CACHE_MAX_SECONDS = -1;
   double EXPANSION_FACTOR = 0.25d;
-
   /**
    * User-visible name of the layer
    */

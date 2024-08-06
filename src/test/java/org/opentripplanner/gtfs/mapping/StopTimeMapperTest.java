@@ -76,8 +76,16 @@ public class StopTimeMapperTest {
     stopModelBuilder
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final LocationMapper locationMapper = new LocationMapper(stopModelBuilder);
+  private final LocationMapper locationMapper = new LocationMapper(
+    stopModelBuilder,
+    DataImportIssueStore.NOOP
+  );
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
+    stopMapper,
+    locationMapper,
+    stopModelBuilder
+  );
+  private final StopAreaMapper stopAreaMapper = new StopAreaMapper(
     stopMapper,
     locationMapper,
     stopModelBuilder
@@ -87,6 +95,7 @@ public class StopTimeMapperTest {
     stopMapper,
     locationMapper,
     locationGroupMapper,
+    stopAreaMapper,
     new TripMapper(
       new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
       new DirectionMapper(ISSUE_STORE),
@@ -228,6 +237,6 @@ public class StopTimeMapperTest {
     assertInstanceOf(GroupStop.class, mapped.getStop());
 
     var groupStop = (GroupStop) mapped.getStop();
-    assertEquals("[RegularStop{A:1 Stop}]", groupStop.getLocations().toString());
+    assertEquals("[RegularStop{A:1 Stop}]", groupStop.getChildLocations().toString());
   }
 }

@@ -37,37 +37,35 @@ public class DirectFlexRouter {
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
         request,
         temporaryVertices,
-        serverContext.transitService(),
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         false,
-        serverContext.flexConfig().maxAccessWalkDuration(),
+        serverContext.flexParameters().maxAccessWalkDuration(),
         0
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
         request,
         temporaryVertices,
-        serverContext.transitService(),
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         true,
-        serverContext.flexConfig().maxEgressWalkDuration(),
+        serverContext.flexParameters().maxEgressWalkDuration(),
         0
       );
 
-      FlexRouter flexRouter = new FlexRouter(
+      var flexRouter = new FlexRouter(
         serverContext.graph(),
         serverContext.transitService(),
-        serverContext.flexConfig(),
+        serverContext.flexParameters(),
         request.dateTime(),
-        request.arriveBy(),
+        request.bookingTime(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,
         egressStops
       );
 
-      return new ArrayList<>(flexRouter.createFlexOnlyItineraries());
+      return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
     }
   }
 }

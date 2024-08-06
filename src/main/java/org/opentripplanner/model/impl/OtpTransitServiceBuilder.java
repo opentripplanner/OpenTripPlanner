@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
@@ -92,6 +95,8 @@ public class OtpTransitServiceBuilder {
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
+  private final Map<Trip, TimePenalty> flexTimePenalties = new HashMap<>();
+
   private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
@@ -111,6 +116,8 @@ public class OtpTransitServiceBuilder {
   private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
   private final EntityById<GroupOfRoutes> groupOfRouteById = new DefaultEntityById<>();
+
+  private final List<VehicleParking> vehicleParkings = new ArrayList<>();
 
   private final DataImportIssueStore issueStore;
 
@@ -209,6 +216,10 @@ public class OtpTransitServiceBuilder {
     return stopTimesByTrip;
   }
 
+  public Map<Trip, TimePenalty> getFlexTimePenalty() {
+    return flexTimePenalties;
+  }
+
   public EntityById<FareZone> getFareZonesById() {
     return fareZonesById;
   }
@@ -254,6 +265,14 @@ public class OtpTransitServiceBuilder {
       getCalendarDates(),
       getCalendars()
     );
+  }
+
+  /**
+   * The list of parking lots contained in the transit data (so far only NeTEx).
+   * Note that parking lots can also be sourced from OSM data as well as realtime updaters.
+   */
+  public List<VehicleParking> vehicleParkings() {
+    return vehicleParkings;
   }
 
   public OtpTransitService build() {

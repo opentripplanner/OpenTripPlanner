@@ -9,7 +9,6 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
@@ -258,7 +257,7 @@ class FlexStopsMapperTest {
     assertNotNull(groupStop);
 
     // Only one of the stops should be inside the polygon
-    Set<StopLocation> locations = groupStop.getLocations();
+    List<StopLocation> locations = groupStop.getChildLocations();
     assertEquals(1, locations.size());
     assertEquals(stop1.getId(), locations.stream().findFirst().orElseThrow().getId());
   }

@@ -43,14 +43,14 @@ public class SystemErrDebugLogger implements DebugLogger {
   private final Table arrivalTable = Table
     .of()
     .withAlights(Center, Center, Right, Right, Right, Right, Left, Left)
-    .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "COST", "TRIP", "DETAILS")
+    .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "C₁", "TRIP", "DETAILS")
     .withMinWidths(9, 7, 3, 5, 8, 9, 24, 0)
     .build();
   private final Table pathTable = Table
     .of()
     .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
-    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "COST", "DETAILS")
-    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 6, 0)
+    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "C₁", "DETAILS")
+    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 9, 0)
     .build();
   private boolean forwardSearch = true;
   private int lastIterationTime = NOT_SET;
@@ -112,6 +112,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     RaptorPath<?> p = e.element();
     var aLeg = p.accessLeg();
     var eLeg = p.egressLeg();
+
     println(
       pathTable.rowAsText(
         e.action().toString(),

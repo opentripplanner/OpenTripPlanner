@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.LocalDateTime;
@@ -18,9 +17,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.flex.FlexIntegrationTestData;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -33,29 +33,27 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
- * contains both flex zones but also scheduled stops. Inside the zone passengers can get on or off
- * anywhere so there it works more like a taxi.
+ * contains both flex zones but also scheduled stops. Inside the zone, passengers can get on or off
+ * anywhere, so there it works more like a taxi.
  * <p>
  * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
  */
-public class ScheduledDeviatedTripTest extends FlexTest {
+class ScheduledDeviatedTripTest {
 
   static Graph graph;
   static TransitModel transitModel;
@@ -94,37 +92,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   }
 
   @Test
-  void calculateAccessTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
-
-    assertEquals(3, accesses.size());
-
-    var access = accesses.get(0);
-    assertEquals(1, access.fromStopIndex);
-    assertEquals(1, access.toStopIndex);
-  }
-
-  @Test
-  void calculateEgressTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
-
-    assertEquals(3, egresses.size());
-
-    var egress = egresses.get(0);
-    assertEquals(2, egress.fromStopIndex);
-    assertEquals(2, egress.toStopIndex);
-  }
-
-  @Test
   void calculateDirectFare() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     var trip = getFlexTrip();
@@ -135,23 +102,26 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var router = new FlexRouter(
       graph,
       new DefaultTransitService(transitModel),
-      FlexConfig.DEFAULT,
+      FlexParameters.defaultValues(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
-      false,
+      null,
       1,
       1,
       List.of(from),
       List.of(to)
     );
 
-    var filter = new FaresFilter(graph.getFareService());
+    var filter = new DecorateWithFare(graph.getFareService());
 
-    var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
+    var itineraries = router
+      .createFlexOnlyItineraries(false)
+      .stream()
+      .peek(filter::decorate)
+      .toList();
 
-    var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFares().getFareTypes().isEmpty());
+    var itinerary = itineraries.getFirst();
 
-    assertEquals(Money.usDollars(2.5f), itinerary.getFares().getFare(FareType.regular));
+    assertFalse(itinerary.getFares().getLegProducts().isEmpty());
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
@@ -218,18 +188,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertEquals(StopTime.MISSING_VALUE, arrivalTime);
   }
 
-  /**
-   * Checks that trips which have continuous pick up/drop off set are parsed correctly.
-   */
-  @Test
-  void parseContinuousPickup() {
-    var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GBFS);
-    assertNotNull(lincolnGraph);
-  }
-
   @BeforeAll
   static void setup() {
-    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
     transitModel = model.transitModel();
   }
@@ -252,6 +213,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var result = TransitRouter.route(
       request,
       serverContext,
+      TransitGroupPriorityService.empty(),
       transitStartOfTime,
       additionalSearchDays,
       new DebugTimingAggregator()

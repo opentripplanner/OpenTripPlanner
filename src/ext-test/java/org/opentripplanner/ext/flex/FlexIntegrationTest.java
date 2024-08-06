@@ -17,7 +17,6 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -32,6 +31,7 @@ import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
@@ -56,14 +56,18 @@ public class FlexIntegrationTest {
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(FlexTest.COBB_OSM);
+    TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     transitModel = model.transitModel();
 
     addGtfsToGraph(
       graph,
       transitModel,
-      List.of(FlexTest.COBB_BUS_30_GTFS, FlexTest.MARTA_BUS_856_GTFS, FlexTest.COBB_FLEX_GTFS)
+      List.of(
+        FlexIntegrationTestData.COBB_BUS_30_GTFS,
+        FlexIntegrationTestData.MARTA_BUS_856_GTFS,
+        FlexIntegrationTestData.COBB_FLEX_GTFS
+      )
     );
     service = TestServerContext.createServerContext(graph, transitModel).routingService();
   }
@@ -224,6 +228,11 @@ public class FlexIntegrationTest {
     request.setTo(to);
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
+    request.withPreferences(p ->
+      p.withStreet(s ->
+        s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+      )
+    );
 
     var modes = request.journey().modes().copyOf();
     modes.withEgressMode(FLEXIBLE);

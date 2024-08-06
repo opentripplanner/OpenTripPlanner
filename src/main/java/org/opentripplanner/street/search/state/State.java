@@ -214,7 +214,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         !stateData.insideNoRentalDropOffArea
       ) ||
       (
-        getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
+        getRequest()
+          .preferences()
+          .rental(getRequest().mode())
+          .allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
       )
@@ -503,7 +506,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   private State reversedClone() {
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
-      .withPreferences(p -> p.withRental(r -> r.withUseAvailabilityInformation(false)))
+      .withPreferences(p -> {
+        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
+        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
+      })
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;

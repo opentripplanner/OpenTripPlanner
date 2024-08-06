@@ -18,12 +18,12 @@ public class PickDropMapper {
    * The Siri ArrivalBoardingActivity includes less information than the pick drop type, therefore is it only
    * changed if routability has changed.
    *
-   * @param currentValue The current pick drop value on a stopTime
+   * @param plannedValue The current pick drop value on a stopTime
    * @param call The incoming call to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop currentValue) {
-    if (shouldBeCancelled(currentValue, call.isCancellation(), call.getArrivalStatus())) {
+  public static Optional<PickDrop> mapDropOffType(CallWrapper call, PickDrop plannedValue) {
+    if (shouldBeCancelled(plannedValue, call.isCancellation(), call.getArrivalStatus())) {
       return Optional.of(CANCELLED);
     }
 
@@ -33,7 +33,7 @@ public class PickDropMapper {
     }
 
     return switch (arrivalBoardingActivityEnumeration) {
-      case ALIGHTING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
+      case ALIGHTING -> plannedValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
       case NO_ALIGHTING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
@@ -45,12 +45,12 @@ public class PickDropMapper {
    * The Siri DepartureBoardingActivity includes less information than the planned data, therefore is it only
    * changed if routability has changed.
    *
-   * @param currentValue The current pick drop value on a stopTime
+   * @param plannedValue The current pick drop value on a stopTime
    * @param call The incoming call to be mapped
    * @return Mapped PickDrop type, empty if routability is not changed.
    */
-  public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop currentValue) {
-    if (shouldBeCancelled(currentValue, call.isCancellation(), call.getDepartureStatus())) {
+  public static Optional<PickDrop> mapPickUpType(CallWrapper call, PickDrop plannedValue) {
+    if (shouldBeCancelled(plannedValue, call.isCancellation(), call.getDepartureStatus())) {
       return Optional.of(CANCELLED);
     }
 
@@ -60,7 +60,7 @@ public class PickDropMapper {
     }
 
     return switch (departureBoardingActivityEnumeration) {
-      case BOARDING -> currentValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
+      case BOARDING -> plannedValue.isNotRoutable() ? Optional.of(SCHEDULED) : Optional.empty();
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
@@ -71,17 +71,16 @@ public class PickDropMapper {
    *
    * If the existing PickDrop is non-routable, the value is not changed.
    *
-   * @param currentValue The current pick drop value on a stopTime
+   * @param plannedValue The planned pick drop value on a stopTime
    * @param isCallCancellation The incoming call cancellation-flag
    * @param callStatus The incoming call arrival/departure status
-   * @return
    */
   private static boolean shouldBeCancelled(
-    PickDrop currentValue,
+    PickDrop plannedValue,
     Boolean isCallCancellation,
     CallStatusEnumeration callStatus
   ) {
-    if (currentValue.isNotRoutable()) {
+    if (plannedValue.isNotRoutable()) {
       return false;
     }
     return TRUE.equals(isCallCancellation) || callStatus == CallStatusEnumeration.CANCELLED;

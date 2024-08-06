@@ -42,8 +42,8 @@ class TransitLayerMapperTest {
   private final List<StopLocation> STOPS = Arrays.asList(STOP_0, STOP_1, STOP_2, STOP_3, STOP_4);
 
   @Test
-  public void createStopTransferCosts() {
-    int[] result = TransitLayerMapper.createStopTransferCosts(
+  public void createStopBoardAlightTransferCosts() {
+    int[] result = TransitLayerMapper.createStopBoardAlightTransferCosts(
       new StopModelMock(STOPS),
       TransitTuningParameters.FOR_TEST
     );

@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Objects;
-import java.util.function.IntUnaryOperator;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.street.search.state.State;
@@ -11,11 +9,14 @@ import org.opentripplanner.street.search.state.State;
 /**
  * Default implementation of the RaptorAccessEgress interface.
  */
-public class DefaultAccessEgress implements RaptorAccessEgress {
+public class DefaultAccessEgress implements RoutingAccessEgress {
 
   private final int stop;
   private final int durationInSeconds;
   private final int generalizedCost;
+  private final int timePenalty;
+
+  /** Keep this to be able to map back to itinerary */
   private final TimeAndCost penalty;
 
   /**
@@ -28,32 +29,33 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     this.durationInSeconds = (int) lastState.getElapsedTimeSeconds();
     this.generalizedCost = RaptorCostConverter.toRaptorCost(lastState.getWeight());
     this.lastState = lastState;
+    this.timePenalty = RaptorConstants.TIME_NOT_SET;
     this.penalty = TimeAndCost.ZERO;
   }
 
-  protected DefaultAccessEgress(DefaultAccessEgress other, TimeAndCost penalty) {
+  protected DefaultAccessEgress(RoutingAccessEgress other, TimeAndCost penalty) {
     if (other.hasPenalty()) {
       throw new IllegalStateException("Can not add penalty twice...");
     }
     this.stop = other.stop();
-    this.durationInSeconds = other.durationInSeconds() + (int) penalty.time().toSeconds();
+    this.durationInSeconds = other.durationInSeconds();
+    // In the API we have a cost associated with the time-penalty. In Raptor, there is no
+    // association between the time-penalty and the cost. So, we add the time-penalty cost to
+    // the generalized cost here. In logic later on, we will remove it.
     this.generalizedCost = other.c1() + penalty.cost().toCentiSeconds();
+    this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
     this.penalty = penalty;
     this.lastState = other.getLastState();
-  }
-
-  /**
-   * Return a new copy of this with the requested penalty.
-   * <p>
-   * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
-   */
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
-    return new DefaultAccessEgress(this, penalty);
   }
 
   @Override
   public int durationInSeconds() {
     return durationInSeconds;
+  }
+
+  @Override
+  public int timePenalty() {
+    return timePenalty;
   }
 
   @Override
@@ -71,20 +73,34 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return false;
   }
 
+  @Override
   public State getLastState() {
     return lastState;
   }
 
+  @Override
   public boolean isWalkOnly() {
     return lastState.containsOnlyWalkMode();
   }
 
+  @Override
   public boolean hasPenalty() {
     return !penalty.isZero();
   }
 
+  @Override
   public TimeAndCost penalty() {
     return penalty;
+  }
+
+  /**
+   * Return a new copy of this with the requested penalty.
+   * <p>
+   * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
+   */
+  @Override
+  public RoutingAccessEgress withPenalty(TimeAndCost penalty) {
+    return new DefaultAccessEgress(this, penalty);
   }
 
   @Override
@@ -95,10 +111,6 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
     return requestedArrivalTime;
-  }
-
-  public int timeShiftDepartureTimeToActualTime(int computedDepartureTimeIncludingPenalty) {
-    return computedDepartureTimeIncludingPenalty + penalty.timeInSeconds();
   }
 
   @Override
@@ -113,7 +125,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     }
     // We check the contract of DefaultAccessEgress used for routing for equality, we do not care
     // if the entries are different implementation or have different AStar paths(lastState).
-    if (!(o instanceof DefaultAccessEgress that)) {
+    if (!(o instanceof RoutingAccessEgress that)) {
       return false;
     }
     return (
@@ -127,48 +139,6 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   @Override
   public int hashCode() {
     return Objects.hash(stop, durationInSeconds, generalizedCost, penalty);
-  }
-
-  /**
-   * Allow a subclass to calculate the departureTime if it has opening hours. This method will
-   * adjust the times to apply the time penalty correct.
-   * <p>
-   * The penalty must be removed before calculating the departure with the opening hours.
-   * Then before returning, the penalty must be added back. If the departure is not possible,
-   * this "state" must be kept.
-   */
-  protected int calculateEarliestDepartureTimeWithOpeningHours(
-    int requestedDepartureTime,
-    IntUnaryOperator calculateFirstPossibleDeparture
-  ) {
-    int dt = penalty().timeInSeconds();
-    int actual = requestedDepartureTime + dt;
-    int adjusted = calculateFirstPossibleDeparture.applyAsInt(actual);
-    return ifNotSet(adjusted, v -> v - dt);
-  }
-
-  /**
-   * Allow a subclass to calculate the arrivalTime if it has opening hours. This method will adjust
-   * the times to apply the time penalty correct.
-   * <p>
-   * The penalty must be removed before calculating the arrival with the opening hours.
-   * Then before returning, the penalty must be added back. If the arrival is not possible,
-   * this "state" must be kept.
-   */
-  protected int calculateLatestArrivalTimeWithOpeningHours(
-    int requestedArrivalTime,
-    IntUnaryOperator calculateLatestPossibleArrival
-  ) {
-    int dt = penalty().timeInSeconds();
-    int actual = requestedArrivalTime - dt;
-    int adjusted = calculateLatestPossibleArrival.applyAsInt(actual);
-    return ifNotSet(adjusted, v -> v + dt);
-  }
-
-  protected int ifNotSet(int value, IntUnaryOperator body) {
-    return value == RaptorConstants.TIME_NOT_SET
-      ? RaptorConstants.TIME_NOT_SET
-      : body.applyAsInt(value);
   }
 
   /**

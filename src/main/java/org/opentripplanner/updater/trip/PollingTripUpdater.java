@@ -71,8 +71,8 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
-    this.saveResultOnGraph = saveResultOnGraph;
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   /**
@@ -83,7 +83,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   public void runPolling() {
     // Get update lists from update source
     List<TripUpdate> updates = updateSource.getUpdates();
-    boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+    var incrementality = updateSource.incrementalityOfLastUpdates();
 
     if (updates != null) {
       // Handle trip updates via graph writer runnable
@@ -91,7 +91,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         snapshotSource,
         fuzzyTripMatcher,
         backwardsDelayPropagationType,
-        fullDataset,
+        incrementality,
         updates,
         feedId,
         recordMetrics

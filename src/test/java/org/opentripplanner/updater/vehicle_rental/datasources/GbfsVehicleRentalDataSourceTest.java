@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.io.OtpHttpClient;
+import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -34,7 +34,7 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         false
       ),
-      new OtpHttpClient()
+      new OtpHttpClientFactory()
     );
 
     dataSource.setup();
@@ -125,7 +125,7 @@ class GbfsVehicleRentalDataSourceTest {
         true,
         false
       ),
-      new OtpHttpClient()
+      new OtpHttpClientFactory()
     );
 
     dataSource.setup();
@@ -167,7 +167,7 @@ class GbfsVehicleRentalDataSourceTest {
         false,
         true
       ),
-      new OtpHttpClient()
+      new OtpHttpClientFactory()
     );
 
     dataSource.setup();

@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -69,7 +72,7 @@ public class AtlantaFareService extends DefaultFareService {
   private static class ATLTransfer {
 
     List<Leg> legs = new ArrayList<>();
-    List<ItineraryFares> fares = new ArrayList<>();
+    Multimap<FareType, Money> fares = ArrayListMultimap.create();
     final FareType fareType;
     final Currency currency;
     Money lastFareWithTransfer;
@@ -89,12 +92,10 @@ public class AtlantaFareService extends DefaultFareService {
      */
     public boolean addLeg(Leg leg, Money defaultFare) {
       // A transfer will always contain at least one ride.
-      ItineraryFares fare = new ItineraryFares();
       RideType toRideType = classify(leg);
       if (legs.size() == 0) {
         legs.add(leg);
-        fare.addFare(fareType, defaultFare);
-        fares.add(fare);
+        fares.put(fareType, defaultFare);
         lastFareWithTransfer = defaultFare;
         maxRides = getMaxTransfers(toRideType);
         transferWindow = getTransferWindow(toRideType);
@@ -128,12 +129,8 @@ public class AtlantaFareService extends DefaultFareService {
         }
       }
 
-      // The transfer is valid for this ride, so create a fare object.
-      // TODO: Change this fare object out for the one on the Ride object when Fare-by-leg is added
-      fares.add(fare);
-
       if (transferClassification.type.equals(TransferType.NO_TRANSFER)) {
-        fare.addFare(fareType, defaultFare);
+        fares.put(fareType, defaultFare);
         // Full fare is charged, but transfer is still valid.
         // Ride is not added to rides list since it doesn't count towards transfer limit.
         // NOTE: Rides and fares list will not always be in sync because of this.
@@ -143,7 +140,7 @@ public class AtlantaFareService extends DefaultFareService {
       // All conditions below this point "use" the transfer, so we add the ride.
       legs.add(leg);
       if (transferClassification.type.equals(TransferType.FREE_TRANSFER)) {
-        fare.addFare(fareType, Money.ofFractionalAmount(currency, 0));
+        fares.put(fareType, Money.ofFractionalAmount(currency, 0));
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
@@ -151,11 +148,11 @@ public class AtlantaFareService extends DefaultFareService {
         if (defaultFare.greaterThan(lastFareWithTransfer)) {
           newCost = defaultFare.minus(lastFareWithTransfer);
         }
-        fare.addFare(fareType, newCost);
+        fares.put(fareType, newCost);
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
-        fare.addFare(fareType, transferClassification.upcharge);
+        fares.put(fareType, transferClassification.upcharge);
         lastFareWithTransfer = defaultFare;
         return true;
       }
@@ -163,11 +160,7 @@ public class AtlantaFareService extends DefaultFareService {
     }
 
     public Money getTotal() {
-      Money total = Money.ZERO_USD;
-      for (ItineraryFares f : fares) {
-        total = total.plus(f.getFare(fareType));
-      }
-      return total;
+      return fares.get(fareType).stream().reduce(ZERO_USD, Money::plus);
     }
   }
 
@@ -385,15 +378,14 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   @Override
-  public boolean populateFare(
-    ItineraryFares fare,
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
-    List<Leg> rides,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
     List<ATLTransfer> transfers = new ArrayList<>();
-    for (var ride : rides) {
+    for (var ride : legs) {
       Money defaultFare = getLegPrice(ride, fareType, fareRules);
       if (transfers.isEmpty()) {
         transfers.add(new ATLTransfer(currency, fareType));
@@ -419,9 +411,8 @@ public class AtlantaFareService extends DefaultFareService {
       null,
       null
     );
+    var fare = ItineraryFares.empty();
     fare.addItineraryProducts(List.of(fareProduct));
-    fare.addFare(fareType, cost);
-
-    return true;
+    return fare;
   }
 }

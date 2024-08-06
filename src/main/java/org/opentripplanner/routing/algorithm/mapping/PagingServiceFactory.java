@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.paging.PagingService;
@@ -19,7 +19,7 @@ public class PagingServiceFactory {
     RaptorTuningParameters raptorTuningParameters,
     RouteRequest request,
     SearchParams raptorSearchParamsUsed,
-    NumItinerariesFilterResults numItinerariesFilterResults,
+    PageCursorInput pageCursorInput,
     List<Itinerary> itineraries
   ) {
     return new PagingService(
@@ -33,7 +33,7 @@ public class PagingServiceFactory {
       request.arriveBy(),
       request.numItineraries(),
       request.pageCursor(),
-      numItinerariesFilterResults,
+      pageCursorInput,
       itineraries
     );
   }

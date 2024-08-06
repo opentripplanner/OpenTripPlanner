@@ -1,0 +1,10 @@
+fare_id,route_id,origin_id,destination_id,contains_id
+flex-adult,,Z4,Z3,
+flex-adult,,Z3,Z4,
+flex-adult,,Z3,Z3,
+flex-adult,,Z4,Z2,
+flex-adult,,Z2,Z4,
+flex-adult,,Z2,Z2,
+flex-adult,,Z4,Z1,
+flex-adult,,Z1,Z4,
+flex-adult,,Z1,Z1,

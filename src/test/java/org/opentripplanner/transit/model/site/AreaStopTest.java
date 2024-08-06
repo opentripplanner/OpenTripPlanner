@@ -7,7 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -25,19 +26,21 @@ class AreaStopTest {
 
   private static final String ZONE_ID = TransitModelForTest.TIME_ZONE_ID;
 
-  private static final LineString GEOMETRY = GeometryUtils.makeLineString(10, 0, 12, 4);
+  private static final Geometry GEOMETRY = Polygons.OSLO;
 
-  private static final WgsCoordinate COORDINATE = new WgsCoordinate(2, 11);
+  private static final WgsCoordinate COORDINATE = new WgsCoordinate(59.925, 10.7376);
 
-  private static final AreaStop subject = StopModel
-    .of()
-    .areaStop(TransitModelForTest.id(ID))
-    .withName(NAME)
-    .withDescription(DESCRIPTION)
-    .withUrl(URL)
-    .withZoneId(ZONE_ID)
-    .withGeometry(GEOMETRY)
-    .build();
+  private static final AreaStop subject = areaStopBuilder().withGeometry(GEOMETRY).build();
+
+  private static AreaStopBuilder areaStopBuilder() {
+    return StopModel
+      .of()
+      .areaStop(TransitModelForTest.id(ID))
+      .withName(NAME)
+      .withDescription(DESCRIPTION)
+      .withUrl(URL)
+      .withZoneId(ZONE_ID);
+  }
 
   @Test
   void copy() {
@@ -60,7 +63,7 @@ class AreaStopTest {
     assertEquals(URL, copy.getUrl());
     assertEquals(ZONE_ID, copy.getFirstZoneAsString());
     assertEquals(GEOMETRY, copy.getGeometry());
-    assertEquals(COORDINATE, copy.getCoordinate());
+    assertEquals(COORDINATE, copy.getCoordinate().roundToApproximate10m());
     assertEquals("v2", copy.getName().toString());
   }
 

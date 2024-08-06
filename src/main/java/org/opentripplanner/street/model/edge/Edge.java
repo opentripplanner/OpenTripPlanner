@@ -65,7 +65,7 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   /**
    * Returns true if this edge is the reverse of another.
    */
-  public boolean isReverseOf(Edge e) {
+  public final boolean isReverseOf(Edge e) {
     return (this.getFromVertex() == e.getToVertex() && this.getToVertex() == e.getFromVertex());
   }
 

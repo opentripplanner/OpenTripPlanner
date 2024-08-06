@@ -1,8 +1,14 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.Optional;
+import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.Siri;
 
+/**
+ * Interface for a blocking, polling approach to retrieving SIRI realtime timetable updates.
+ * TODO RT_AB: Clearly document whether the methods should return as fast as possible, or if they
+ *  should intentionally block and wait for refreshed data, and how this fits into the design.
+ */
 public interface EstimatedTimetableSource {
   /**
    * Wait for one message to arrive, and decode it into a List of TripUpdates. Blocking call.
@@ -13,10 +19,10 @@ public interface EstimatedTimetableSource {
   Optional<Siri> getUpdates();
 
   /**
-   * @return true iff the last list with updates represent all updates that are active right now,
-   * i.e. all previous updates should be disregarded
+   * @return The incrementality of the last collection of updates.
+   * {@link UpdateIncrementality}
    */
-  boolean getFullDatasetValueOfLastUpdates();
+  UpdateIncrementality incrementalityOfLastUpdates();
 
   String getFeedId();
 }

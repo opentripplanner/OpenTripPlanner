@@ -6,7 +6,6 @@
     "OptimizeTransfers": true,
     "TransferConstraints": true,
     "ParallelRouting": false,
-    "ReportApi" : true,
-    "VehicleToStopHeuristics": true
+    "ReportApi" : true
   }
 }

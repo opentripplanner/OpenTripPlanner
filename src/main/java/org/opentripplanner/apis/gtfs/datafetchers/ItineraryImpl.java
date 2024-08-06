@@ -2,13 +2,11 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -36,29 +34,19 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  public DataFetcher<OffsetDateTime> end() {
+    return environment -> getSource(environment).endTime().toOffsetDateTime();
+  }
+
+  @Deprecated
+  @Override
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).endTime().toInstant().toEpochMilli();
   }
 
   @Override
-  public DataFetcher<Iterable<Map<String, Object>>> fares() {
-    return environment -> {
-      ItineraryFares fare = getSource(environment).getFares();
-      if (fare == null) {
-        return null;
-      }
-      return fare
-        .getFareTypes()
-        .stream()
-        .map(fareKey -> {
-          Map<String, Object> result = new HashMap<>();
-          result.put("name", fareKey);
-          result.put("fare", fare.getFare(fareKey));
-          result.put("details", fare.getComponents(fareKey));
-          return result;
-        })
-        .collect(Collectors.toList());
-    };
+  public DataFetcher<Iterable<Object>> fares() {
+    return environment -> List.of();
   }
 
   @Override
@@ -77,6 +65,12 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  public DataFetcher<OffsetDateTime> start() {
+    return environment -> getSource(environment).startTime().toOffsetDateTime();
+  }
+
+  @Deprecated
+  @Override
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).startTime().toInstant().toEpochMilli();
   }
@@ -93,12 +87,12 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).getNonTransitDistanceMeters();
+    return environment -> getSource(environment).walkDistanceMeters();
   }
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).getNonTransitDuration().toSeconds();
+    return environment -> (long) getSource(environment).walkDuration().toSeconds();
   }
 
   @Override

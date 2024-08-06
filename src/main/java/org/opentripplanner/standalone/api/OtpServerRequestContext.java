@@ -7,9 +7,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -23,17 +24,22 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * The purpose of this class is to allow APIs (HTTP Resources) to access the OTP Server Context.
+ * The purpose of this class is to give APIs (HTTP Resources) read-only access to the OTP internal
+ * transit model. It allows individual API requests to use a limited number of methods and data
+ * structures without direct access to the internals of the server components.
+ *
  * By using an interface, and not injecting each service class we avoid giving the resources access
- * to the server implementation. The context is injected by Jersey. An alternative to injecting this
- * interface is to inject each individual component in the context - hence reducing the dependencies
- * further. But there is not a "real" need for this. For example, we do not have unit tests on the
+ * to the server implementation. The context is injected by Jersey. Instead of injecting this
+ * context interface, it is conceivable to inject each of the individual items within this context.
+ *
+ * But there is not a "real" need for this. For example, we do not have unit tests on the
  * Resources. If we in the future would decide to write unit tests for the APIs, then we could
  * eliminate this interface and just inject the components. See the bind method in OTPServer.
  * <p>
@@ -98,6 +104,8 @@ public interface OtpServerRequestContext {
   @Nullable
   StopConsolidationService stopConsolidationService();
 
+  StreetLimitationParametersService streetLimitationParametersService();
+
   MeterRegistry meterRegistry();
 
   @Nullable
@@ -114,12 +122,12 @@ public interface OtpServerRequestContext {
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
+    return GraphFinder.getInstance(graph(), transitService()::findRegularStops);
   }
 
-  FlexConfig flexConfig();
+  FlexParameters flexParameters();
 
-  VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers();
+  VectorTileConfig vectorTileConfig();
 
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->
@@ -129,4 +137,7 @@ public interface OtpServerRequestContext {
       )
     );
   }
+
+  @Nullable
+  LuceneIndex lucenceIndex();
 }

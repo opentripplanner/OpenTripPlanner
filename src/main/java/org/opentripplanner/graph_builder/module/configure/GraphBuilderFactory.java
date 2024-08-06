@@ -31,6 +31,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 @Singleton
@@ -55,6 +56,7 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+  StreetLimitationParameters streetLimitationParameters();
 
   @Nullable
   StopConsolidationModule stopConsolidationModule();
@@ -80,6 +82,9 @@ public interface GraphBuilderFactory {
     Builder stopConsolidationRepository(
       @Nullable StopConsolidationRepository stopConsolidationRepository
     );
+
+    @BindsInstance
+    Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);

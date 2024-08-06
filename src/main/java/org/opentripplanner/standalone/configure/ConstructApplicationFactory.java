@@ -6,6 +6,9 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
+import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
@@ -28,13 +31,16 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.standalone.server.MetricsLogging;
+import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
 /**
- * Dagger dependency injection Factory to create components for the OTP construct application phase.
+ * A Factory used by the Dagger dependency injection system to create the components of OTP, which
+ * are then wired up to construct the application.
  */
 @Singleton
 @Component(
@@ -50,6 +56,9 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
     StopConsolidationServiceModule.class,
+    InteractiveLauncherModule.class,
+    StreetLimitationParametersServiceModule.class,
+    GeocoderModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -79,6 +88,11 @@ public interface ConstructApplicationFactory {
   @Nullable
   StopConsolidationRepository stopConsolidationRepository();
 
+  StreetLimitationParameters streetLimitationParameters();
+
+  @Nullable
+  LuceneIndex luceneIndex();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -106,6 +120,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
+
+    @BindsInstance
+    Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
 
     ConstructApplicationFactory build();
   }

@@ -33,7 +33,8 @@
     {
       "type": "netex",
       "source": "gs://${OTP_GCS_BUCKET}/outbound/netex/rb_norway-aggregated-netex-otp2.zip",
-      "feedId": "EN"
+      "feedId": "EN",
+      "ignoreParking": true
     }
   ],
   "osm": [

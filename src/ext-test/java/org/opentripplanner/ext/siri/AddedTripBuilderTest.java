@@ -35,6 +35,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.UpdateError;
 import uk.org.siri.siri20.VehicleModesEnumeration;
@@ -77,6 +78,7 @@ class AddedTripBuilderTest {
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
   private final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, DEDUPLICATOR);
+  private TransitEditorService transitService;
   private EntityResolver ENTITY_RESOLVER;
 
   @BeforeEach
@@ -101,6 +103,7 @@ class AddedTripBuilderTest {
 
     // Create transit model index
     TRANSIT_MODEL.index();
+    transitService = new DefaultTransitService(TRANSIT_MODEL);
 
     // Create the entity resolver only after the model has been indexed
     ENTITY_RESOLVER =
@@ -110,7 +113,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTrip() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -151,37 +154,33 @@ class AddedTripBuilderTest {
     assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode should be mapped");
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
-    // Assert transit model index
-    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
-    assertNotNull(transitModelIndex);
     assertEquals(
       route,
-      transitModelIndex.getRouteForId(TransitModelForTest.id(LINE_REF)),
+      transitService.getRouteForId(TransitModelForTest.id(LINE_REF)),
       "Route should be added to transit index"
     );
     assertEquals(
       trip,
-      transitModelIndex.getTripForId().get(TRIP_ID),
+      transitService.getTripForId(TRIP_ID),
       "Route should be added to transit index"
     );
-    var pattern = transitModelIndex.getPatternForTrip().get(trip);
+    var pattern = transitService.getPatternForTrip(trip);
     assertNotNull(pattern);
     assertEquals(route, pattern.getRoute());
     assertTrue(
-      transitModelIndex
-        .getServiceCodesRunningForDate()
-        .get(SERVICE_DATE)
+      transitService
+        .getServiceCodesRunningForDate(SERVICE_DATE)
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
       "serviceId should be running on service date"
     );
     assertNotNull(
-      transitModelIndex.getTripOnServiceDateById().get(TRIP_ID),
+      transitService.getTripOnServiceDateById(TRIP_ID),
       "TripOnServiceDate should be added to transit index by id"
     );
     assertNotNull(
-      transitModelIndex
-        .getTripOnServiceDateForTripAndDay()
-        .get(new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)),
+      transitService.getTripOnServiceDateForTripAndDay(
+        new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)
+      ),
       "TripOnServiceDate should be added to transit index for trip and day"
     );
 
@@ -239,7 +238,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnAddedRoute() {
     var firstAddedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -265,7 +264,7 @@ class AddedTripBuilderTest {
     var tripId2 = TransitModelForTest.id("TRIP_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       tripId2,
@@ -296,10 +295,7 @@ class AddedTripBuilderTest {
     Route route = secondTrip.getRoute();
     assertSame(firstTrip.getRoute(), route, "route be reused from the first trip");
 
-    // Assert transit model index
-    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
-    assertNotNull(transitModelIndex);
-    assertEquals(2, transitModelIndex.getPatternsForRoute().get(route).size());
+    assertEquals(2, transitService.getPatternsForRoute(route).size());
 
     // Assert trip times
     var times = secondAddedTrip.successValue().tripTimes();
@@ -316,7 +312,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnExistingRoute() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -347,7 +343,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripWithoutReplacedRoute() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -390,7 +386,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnMissingServiceId() {
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -445,7 +441,7 @@ class AddedTripBuilderTest {
     );
 
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -484,7 +480,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,
@@ -531,7 +527,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      TRANSIT_MODEL,
+      transitService,
       ENTITY_RESOLVER,
       AbstractTransitEntity::getId,
       TRIP_ID,

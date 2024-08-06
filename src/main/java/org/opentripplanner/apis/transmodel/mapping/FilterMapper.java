@@ -83,7 +83,7 @@ class FilterMapper {
     List<MainAndSubMode> tModes = new ArrayList<>();
     if (GqlUtil.hasArgument(environment, "modes")) {
       Map<String, Object> modesInput = environment.getArgument("modes");
-      if (modesInput.containsKey("transportModes")) {
+      if (modesInput.get("transportModes") != null) {
         List<Map<String, ?>> transportModes = (List<Map<String, ?>>) modesInput.get(
           "transportModes"
         );

@@ -1,8 +1,10 @@
 package org.opentripplanner.apis.transmodel.mapping.preferences;
 
+import static org.opentripplanner.apis.transmodel.mapping.preferences.RentalPreferencesMapper.mapRentalPreferences;
+
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 public class BikePreferencesMapper {
 
@@ -25,7 +27,7 @@ public class BikePreferencesMapper {
       "walkReluctance",
       r -> {
         bike.withReluctance((double) r);
-        bike.withWalkingReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r);
+        bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r));
       }
     );
 
@@ -35,12 +37,14 @@ public class BikePreferencesMapper {
     //  bike.withWalkingReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double)r );
     //});
 
-    if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+    if (bike.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
       bike.withOptimizeTriangle(triangle -> {
         callWith.argument("triangleFactors.time", triangle::withTime);
         callWith.argument("triangleFactors.slope", triangle::withSlope);
         callWith.argument("triangleFactors.safety", triangle::withSafety);
       });
     }
+
+    bike.withRental(rental -> mapRentalPreferences(rental, callWith));
   }
 }

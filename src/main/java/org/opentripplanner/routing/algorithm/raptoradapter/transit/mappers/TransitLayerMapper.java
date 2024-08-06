@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
@@ -26,30 +27,34 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the TransitLayer object from the OTP Graph object. The ServiceDay hierarchy is reversed,
+ * Maps the TransitLayer object from the TransitModel object. The ServiceDay hierarchy is reversed,
  * with service days at the top level, which contains TripPatternForDate objects that contain only
  * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
  * when doing Range Raptor searches.
  * <p>
- * CONCURRENCY: This mapper run part of the mapping in parallel using parallel streams. This improve
- * startup time on the Norwegian graph by 20 seconds; reducing the this mapper from 36 seconds to 15
- * seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020, MacBook Pro, 3.1
- * GHz i7)
+ * CONCURRENCY: This mapper runs part of the mapping in parallel using parallel streams. This
+ * improves startup time on the Norwegian network by 20 seconds, by reducing this mapper from 36
+ * seconds to 15 seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020,
+ * MacBook Pro, 3.1 GHz i7)
  */
 public class TransitLayerMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerMapper.class);
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
+  private final StopModel stopModel;
 
   private TransitLayerMapper(TransitModel transitModel) {
-    this.transitModel = transitModel;
+    this.transitService = new DefaultTransitService(transitModel);
+    this.stopModel = transitModel.getStopModel();
   }
 
   public static TransitLayer map(
@@ -59,8 +64,8 @@ public class TransitLayerMapper {
     return new TransitLayerMapper(transitModel).map(tuningParameters);
   }
 
-  // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
-  //      optimized for sorting nearly sorted list
+  // TODO We could save time by either pre-sorting these, or by using a sorting algorithm that is
+  //      optimized for sorting nearly-sorted lists.
   static List<TripTimes> getSortedTripTimes(Timetable timetable) {
     return timetable
       .getTripTimes()
@@ -73,20 +78,19 @@ public class TransitLayerMapper {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
-    StopModel stopModel = transitModel.getStopModel();
 
-    LOG.info("Mapping transitLayer from Graph...");
+    LOG.info("Mapping transitLayer from TransitModel...");
 
-    Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
+    Collection<TripPattern> allTripPatterns = transitService.getAllTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(stopModel, transitModel);
+    transferByStopIndex = mapTransfers(stopModel, transitService);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator =
-        new TransferIndexGenerator(transitModel.getTransferService().listAll(), allTripPatterns);
+        new TransferIndexGenerator(transitService.getTransferService().listAll(), allTripPatterns);
       constrainedTransfers = transferIndexGenerator.generateTransfers();
     }
 
@@ -97,13 +101,13 @@ public class TransitLayerMapper {
     return new TransitLayer(
       tripPatternsByStopByDate,
       transferByStopIndex,
-      transitModel.getTransferService(),
+      transitService.getTransferService(),
       stopModel,
-      transitModel.getTimeZone(),
+      transitService.getTimeZone(),
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
-      createStopTransferCosts(stopModel, tuningParameters)
+      createStopBoardAlightTransferCosts(stopModel, tuningParameters)
     );
   }
 
@@ -117,13 +121,10 @@ public class TransitLayerMapper {
     Collection<TripPattern> allTripPatterns
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
+      transitService.getServiceCodesRunningForDate()
     );
 
-    Set<LocalDate> allServiceDates = transitModel
-      .getTransitModelIndex()
-      .getServiceCodesRunningForDate()
-      .keySet();
+    Set<LocalDate> allServiceDates = transitService.getAllServiceCodes();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 
@@ -179,19 +180,32 @@ public class TransitLayerMapper {
   }
 
   /**
-   * Create static board/alight cost for Raptor to include for each stop.
+   * Create static board/alight cost for Raptor to apply during transfer
    */
-  static int[] createStopTransferCosts(StopModel stops, TransitTuningParameters tuningParams) {
+  @Nullable
+  static int[] createStopBoardAlightTransferCosts(
+    StopModel stops,
+    TransitTuningParameters tuningParams
+  ) {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }
-    int[] stopTransferCosts = new int[stops.stopIndexSize()];
+    int defaultCost = RaptorCostConverter.toRaptorCost(
+      tuningParams.stopBoardAlightDuringTransferCost(StopTransferPriority.defaultValue())
+    );
+    int[] stopBoardAlightTransferCosts = new int[stops.stopIndexSize()];
 
     for (int i = 0; i < stops.stopIndexSize(); ++i) {
-      StopTransferPriority priority = stops.stopByIndex(i).getPriority();
-      int domainCost = tuningParams.stopTransferCost(priority);
-      stopTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+      // There can be holes in the stop index, so we need to account for 'null' here.
+      var stop = stops.stopByIndex(i);
+      if (stop == null) {
+        stopBoardAlightTransferCosts[i] = defaultCost;
+      } else {
+        var priority = stop.getPriority();
+        int domainCost = tuningParams.stopBoardAlightDuringTransferCost(priority);
+        stopBoardAlightTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+      }
     }
-    return stopTransferCosts;
+    return stopBoardAlightTransferCosts;
   }
 }

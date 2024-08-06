@@ -62,6 +62,7 @@ class FlexStopsMapper {
     List<StopLocation> stops = new ArrayList<>();
     TransitMode flexibleStopTransitMode = mapTransitMode(flexibleStopPlace);
     var areas = flexibleStopPlace.getAreas().getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea();
+    List<Geometry> areaGeometries = new ArrayList<>();
     for (var area : areas) {
       if (!(area instanceof FlexibleArea flexibleArea)) {
         issueStore.add(
@@ -76,6 +77,7 @@ class FlexStopsMapper {
       }
 
       Geometry flexibleAreaGeometry = mapGeometry(flexibleArea);
+      areaGeometries.add(flexibleAreaGeometry);
 
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
         stops.addAll(
@@ -100,7 +102,8 @@ class FlexStopsMapper {
       // get the ids for the area and stop place correct
       var builder = stopModelBuilder
         .groupStop(idFactory.createId(flexibleStopPlace.getId()))
-        .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
+        .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
+        .withEncompassingAreaGeometries(areaGeometries);
       stops.forEach(builder::addLocation);
       return builder.build();
     }

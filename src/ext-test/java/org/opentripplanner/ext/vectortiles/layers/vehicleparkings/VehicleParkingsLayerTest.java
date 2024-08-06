@@ -93,30 +93,32 @@ public class VehicleParkingsLayerTest {
     var config =
       """
       {
-        "vectorTileLayers": [
-          {
-            "name": "vehicleParking",
-            "type": "VehicleParking",
-            "mapper": "Stadtnavi",
-            "maxZoom": 20,
-            "minZoom": 14,
-            "cacheMaxSeconds": 60,
-            "expansionFactor": 0
-          }
-        ]
+        "vectorTiles": {
+          "layers" : [
+            {
+              "name": "vehicleParking",
+              "type": "VehicleParking",
+              "mapper": "Stadtnavi",
+              "maxZoom": 20,
+              "minZoom": 14,
+              "cacheMaxSeconds": 60,
+              "expansionFactor": 0
+            }
+          ]
+        }
       }
       """;
     var nodeAdapter = newNodeAdapterForTest(config);
-    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTileLayers");
+    var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
-    var builder = new VehicleParkingsLayerBuilder(graph, tiles.layers().get(0), Locale.US);
+    var builder = new VehicleParkingsLayerBuilder(graph, tiles.layers().getFirst(), Locale.US);
 
     List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 
     assertEquals("[POINT (1 2)]", geometries.toString());
     assertEquals(
-      "VehicleParking{name: 'default name', coordinate: (2.0, 1.0)}",
-      geometries.get(0).getUserData().toString()
+      "VehicleParking{id: 'F:id', name: 'default name', coordinate: (2.0, 1.0)}",
+      geometries.getFirst().getUserData().toString()
     );
   }
 

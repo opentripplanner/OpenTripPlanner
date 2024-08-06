@@ -23,7 +23,6 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private BikeAccess bikesAllowed;
   private Accessibility wheelchairBoarding;
   private String gtfsBlockId;
-  private String gtfsFareId;
   private String netexInternalPlanningCode;
   private TripAlteration netexAlteration;
 
@@ -47,7 +46,6 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     this.bikesAllowed = original.getBikesAllowed();
     this.wheelchairBoarding = original.getWheelchairBoarding();
     this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
-    this.gtfsFareId = original.getGtfsFareId();
   }
 
   public Operator getOperator() {
@@ -173,15 +171,6 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
 
   public TripBuilder withNetexAlteration(TripAlteration netexAlteration) {
     this.netexAlteration = netexAlteration;
-    return this;
-  }
-
-  public String getGtfsFareId() {
-    return gtfsFareId;
-  }
-
-  public TripBuilder withGtfsFareId(String gtfsFareId) {
-    this.gtfsFareId = gtfsFareId;
     return this;
   }
 

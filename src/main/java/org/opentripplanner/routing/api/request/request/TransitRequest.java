@@ -8,7 +8,7 @@ import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 // TODO VIA: Javadoc
@@ -31,8 +31,8 @@ public class TransitRequest implements Cloneable, Serializable {
 
   private List<FeedScopedId> unpreferredRoutes = List.of();
 
-  private List<TransitPriorityGroupSelect> priorityGroupsByAgency = new ArrayList<>();
-  private List<TransitPriorityGroupSelect> priorityGroupsGlobal = new ArrayList<>();
+  private List<TransitGroupSelect> priorityGroupsByAgency = new ArrayList<>();
+  private List<TransitGroupSelect> priorityGroupsGlobal = new ArrayList<>();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
   public void setBannedTripsFromString(String ids) {
@@ -64,16 +64,14 @@ public class TransitRequest implements Cloneable, Serializable {
    * <p>
    * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */
-  public List<TransitPriorityGroupSelect> priorityGroupsByAgency() {
+  public List<TransitGroupSelect> priorityGroupsByAgency() {
     return priorityGroupsByAgency;
   }
 
   /**
    * All patterns matching the same select will be assigned the same group-id.
    */
-  public void addPriorityGroupsByAgency(
-    Collection<TransitPriorityGroupSelect> priorityGroupsByAgency
-  ) {
+  public void addPriorityGroupsByAgency(Collection<TransitGroupSelect> priorityGroupsByAgency) {
     this.priorityGroupsByAgency.addAll(priorityGroupsByAgency);
   }
 
@@ -82,11 +80,11 @@ public class TransitRequest implements Cloneable, Serializable {
    * <p>
    * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */
-  public List<TransitPriorityGroupSelect> priorityGroupsGlobal() {
+  public List<TransitGroupSelect> priorityGroupsGlobal() {
     return priorityGroupsGlobal;
   }
 
-  public void addPriorityGroupsGlobal(Collection<TransitPriorityGroupSelect> priorityGroupsGlobal) {
+  public void addPriorityGroupsGlobal(Collection<TransitGroupSelect> priorityGroupsGlobal) {
     this.priorityGroupsGlobal.addAll(priorityGroupsGlobal);
   }
 

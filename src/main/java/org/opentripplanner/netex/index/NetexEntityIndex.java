@@ -28,6 +28,7 @@ import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.Operator;
+import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -97,8 +98,9 @@ public class NetexEntityIndex {
   public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
   public final HierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById;
   public final HierarchicalMapById<Branding> brandingById;
+  public final HierarchicalMapById<Parking> parkings;
 
-  // Relations between entities - The Netex XML sometimes rely on the the
+  // Relations between entities - The Netex XML sometimes relies on the
   // nested structure of the XML document, rater than explicit references.
   // Since we throw away the document we need to keep track of these.
 
@@ -142,6 +144,7 @@ public class NetexEntityIndex {
     this.tariffZonesById = new HierarchicalVersionMapById<>();
     this.brandingById = new HierarchicalMapById<>();
     this.timeZone = new HierarchicalElement<>();
+    this.parkings = new HierarchicalMapById<>();
   }
 
   /**
@@ -184,6 +187,7 @@ public class NetexEntityIndex {
     this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
     this.brandingById = new HierarchicalMapById<>(parent.brandingById);
     this.timeZone = new HierarchicalElement<>(parent.timeZone);
+    this.parkings = new HierarchicalMapById<>(parent.parkings);
   }
 
   /**
@@ -351,6 +355,11 @@ public class NetexEntityIndex {
       @Override
       public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
         return stopPlaceById;
+      }
+
+      @Override
+      public ReadOnlyHierarchicalMapById<Parking> getParkingsById() {
+        return parkings;
       }
 
       @Override

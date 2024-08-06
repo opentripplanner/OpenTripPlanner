@@ -87,16 +87,14 @@ class ScheduledTransitLegReferenceTest {
     calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
-    transitModel
-      .getTripOnServiceDates()
-      .put(
-        TRIP_ON_SERVICE_DATE_ID,
-        TripOnServiceDate
-          .of(TRIP_ON_SERVICE_DATE_ID)
-          .withTrip(trip)
-          .withServiceDate(SERVICE_DATE)
-          .build()
-      );
+    transitModel.addTripOnServiceDate(
+      TRIP_ON_SERVICE_DATE_ID,
+      TripOnServiceDate
+        .of(TRIP_ON_SERVICE_DATE_ID)
+        .withTrip(trip)
+        .withServiceDate(SERVICE_DATE)
+        .build()
+    );
 
     transitModel.index();
 

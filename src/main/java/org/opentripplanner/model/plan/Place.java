@@ -90,11 +90,7 @@ public class Place {
   }
 
   public static Place forStop(StopLocation stop) {
-    return forStop(stop, stop.getName());
-  }
-
-  public static Place forStop(StopLocation stop, I18NString nameOverride) {
-    return new Place(nameOverride, stop.getCoordinate(), VertexType.TRANSIT, stop, null, null);
+    return new Place(stop.getName(), stop.getCoordinate(), VertexType.TRANSIT, stop, null, null);
   }
 
   public static Place forFlexStop(StopLocation stop, Vertex vertex) {

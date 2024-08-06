@@ -13,6 +13,8 @@ class ItinerariesCalculateLegTotals {
   int nTransitLegs = 0;
   Duration nonTransitDuration = Duration.ZERO;
   double nonTransitDistanceMeters = 0.0;
+  Duration walkDuration = Duration.ZERO;
+  double walkDistanceMeters = 0.0;
   Duration waitingDuration = Duration.ZERO;
   boolean walkOnly = true;
   boolean streetOnly = true;
@@ -31,8 +33,7 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    totalDuration =
-      Duration.between(legs.get(0).getStartTime(), legs.get(legs.size() - 1).getEndTime());
+    totalDuration = Duration.between(legs.getFirst().getStartTime(), legs.getLast().getEndTime());
 
     for (Leg leg : legs) {
       Duration dt = leg.getDuration();
@@ -45,6 +46,11 @@ class ItinerariesCalculateLegTotals {
       } else if (leg.isStreetLeg()) {
         nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
+
+        if (leg.isWalkingLeg()) {
+          walkDuration = walkDuration.plus(leg.getDuration());
+          walkDistanceMeters = walkDistanceMeters + leg.getDistanceMeters();
+        }
       } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
         nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
       }

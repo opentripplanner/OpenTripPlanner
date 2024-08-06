@@ -6,7 +6,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.framework.doc.DocumentedEnum;
-import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
@@ -17,16 +16,18 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
+import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 
 public class EnumTypes {
 
@@ -64,11 +65,11 @@ public class EnumTypes {
   public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType
     .newEnum()
     .name("BicycleOptimisationMethod")
-    .value("quick", BicycleOptimizeType.QUICK)
-    .value("safe", BicycleOptimizeType.SAFE)
-    .value("flat", BicycleOptimizeType.FLAT)
-    .value("greenways", BicycleOptimizeType.GREENWAYS)
-    .value("triangle", BicycleOptimizeType.TRIANGLE)
+    .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)
+    .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS)
+    .value("flat", VehicleRoutingOptimizeType.FLAT_STREETS)
+    .value("greenways", VehicleRoutingOptimizeType.SAFEST_STREETS)
+    .value("triangle", VehicleRoutingOptimizeType.TRIANGLE)
     .build();
 
   public static final GraphQLEnumType BIKES_ALLOWED = GraphQLEnumType
@@ -133,11 +134,38 @@ public class EnumTypes {
 
   public static final GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType
     .newEnum()
+    .description("Deprecated. Use STOP_INTERCHANGE_PRIORITY")
     .name("InterchangeWeighting")
     .value("preferredInterchange", 2, "Highest priority interchange.")
     .value("recommendedInterchange", 1, "Second highest priority interchange.")
     .value("interchangeAllowed", 0, "Third highest priority interchange.")
     .value("noInterchange", -1, "Interchange not allowed.")
+    .build();
+
+  public static final GraphQLEnumType STOP_INTERCHANGE_PRIORITY = GraphQLEnumType
+    .newEnum()
+    .name("StopInterchangePriority")
+    .value(
+      "preferred",
+      StopTransferPriority.PREFERRED,
+      "Preferred place to transfer, strongly recommended. NeTEx equivalent is PREFERRED_INTERCHANGE."
+    )
+    .value(
+      "recommended",
+      StopTransferPriority.RECOMMENDED,
+      "Recommended stop place. NeTEx equivalent is RECOMMENDED_INTERCHANGE."
+    )
+    .value(
+      "allowed",
+      StopTransferPriority.ALLOWED,
+      "Allow transfers from/to this stop. This is the default. NeTEx equivalent is INTERCHANGE_ALLOWED."
+    )
+    .value(
+      "discouraged",
+      StopTransferPriority.DISCOURAGED,
+      "Block transfers from/to this stop. In OTP this is not a definitive block," +
+      " just a huge penalty is added to the cost function. NeTEx equivalent is NO_INTERCHANGE."
+    )
     .build();
 
   public static final GraphQLEnumType ITINERARY_FILTER_DEBUG_PROFILE = createFromDocumentedEnum(
@@ -405,6 +433,13 @@ public class EnumTypes {
       "Walk to a pickup point along " +
       "the road, drive to a drop-off point along the road, and walk the rest of the way. " +
       "This can include various taxi-services or kiss & ride."
+    )
+    .value(
+      "car_rental",
+      StreetMode.CAR_RENTAL,
+      "Walk to a car rental point along " +
+      "the road, drive to a drop-off point along the road, and walk the rest of the way. " +
+      "This can include car rentals at fixed locations or free-floating services."
     )
     .value(
       "flexible",

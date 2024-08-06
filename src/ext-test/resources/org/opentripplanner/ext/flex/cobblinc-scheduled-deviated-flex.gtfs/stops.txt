@@ -1,0 +1,5 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding,platform_code
+cujv,,Transfer Point for Route 30,,33.854650,-84.600390,Z4,,,,,,
+yz85,,Zone 1 - PUBLIX Super Market,Zone 1 Collection Point,33.864460,-84.674200,Z1,,,,,,
+7y7t,,Zone 2 - Horseshoe Bend Plaza,Zone 2 Collection Point,33.883320,-84.620270,Z2,,,,,,
+urnz,,Zone 3 - Downtown Austell,Zone 3 Collection Point,33.812190,-84.634500,Z3,,,,,,

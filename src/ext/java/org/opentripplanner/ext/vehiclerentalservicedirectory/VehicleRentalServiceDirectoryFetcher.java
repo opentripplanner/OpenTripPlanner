@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.JsonUtils;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -35,16 +35,16 @@ public class VehicleRentalServiceDirectoryFetcher {
 
   private final VertexLinker vertexLinker;
   private final VehicleRentalRepository repository;
-  private final OtpHttpClient otpHttpClient;
+  private final OtpHttpClientFactory otpHttpClientFactory;
 
   public VehicleRentalServiceDirectoryFetcher(
     VertexLinker vertexLinker,
     VehicleRentalRepository repository,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
     this.vertexLinker = vertexLinker;
     this.repository = repository;
-    this.otpHttpClient = otpHttpClient;
+    this.otpHttpClientFactory = otpHttpClientFactory;
   }
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
@@ -61,12 +61,12 @@ public class VehicleRentalServiceDirectoryFetcher {
     }
 
     int maxHttpConnections = sources.size();
-    var otpHttpClient = new OtpHttpClient(maxHttpConnections);
+    var otpHttpClientFactory = new OtpHttpClientFactory(maxHttpConnections);
 
     var serviceDirectory = new VehicleRentalServiceDirectoryFetcher(
       vertexLinker,
       repository,
-      otpHttpClient
+      otpHttpClientFactory
     );
     return serviceDirectory.createUpdatersFromEndpoint(parameters, sources);
   }
@@ -105,8 +105,7 @@ public class VehicleRentalServiceDirectoryFetcher {
             new GbfsVehicleRentalDataSourceParameters(
               updaterUrl.get(),
               parameters.getLanguage(),
-              // allowKeepingRentedVehicleAtDestination - not part of GBFS, not supported here
-              false,
+              networkParams.allowKeepingAtDestination(),
               parameters.getHeaders(),
               networkName,
               networkParams.geofencingZones(),
@@ -146,7 +145,7 @@ public class VehicleRentalServiceDirectoryFetcher {
 
     var dataSource = VehicleRentalDataSourceFactory.create(
       vehicleRentalParameters.sourceParameters(),
-      otpHttpClient
+      otpHttpClientFactory
     );
     return new VehicleRentalUpdater(vehicleRentalParameters, dataSource, vertexLinker, repository);
   }
@@ -154,7 +153,8 @@ public class VehicleRentalServiceDirectoryFetcher {
   private static JsonNode listSources(VehicleRentalServiceDirectoryFetcherParameters parameters) {
     JsonNode node;
     URI url = parameters.getUrl();
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
+      var otpHttpClient = new OtpHttpClientFactory().create(LOG);
       node = otpHttpClient.getAndMapAsJsonNode(url, Map.of(), new ObjectMapper());
     } catch (OtpHttpClientException e) {
       LOG.warn("Error fetching list of vehicle rental endpoints from {}", url, e);

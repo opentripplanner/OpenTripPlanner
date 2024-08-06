@@ -34,4 +34,11 @@ public interface OtpError {
   default String message() {
     return String.format(Locale.ROOT, messageTemplate(), messageArguments());
   }
+
+  /**
+   * Factory method to create an OTPError.
+   */
+  static OtpError of(String errorCode, String messageTemplate, Object... messageArguments) {
+    return new DefaultOtpError(errorCode, messageTemplate, messageArguments);
+  }
 }

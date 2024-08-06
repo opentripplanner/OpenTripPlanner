@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * A TripTimes represents the arrival and departure times for a single trip in a timetable. It is
- * one of the core class used for transit routing. This interface allow different kind of trip
+ * one of the core class used for transit routing. This interface allows different kind of trip
  * to implement their own trip times. Scheduled/planned trips should be immutable, real-time
  * trip times should allow updates and more info, frequency-based trips can use a more compact
  * implementation, and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop

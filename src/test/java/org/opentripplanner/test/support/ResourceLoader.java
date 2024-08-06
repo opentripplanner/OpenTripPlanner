@@ -1,6 +1,5 @@
 package org.opentripplanner.test.support;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -56,12 +55,25 @@ public class ResourceLoader {
   }
 
   /**
+   * Returns the string content of a file.
+   */
+  public String fileToString(String p) {
+    try {
+      return Files.readString(file(p).toPath());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
    * Return a URL for the given resource.
    */
   public URL url(String name) {
     var resource = clazz.getResource(name);
     var msg = "Resource '%s' not found in package '%s'".formatted(name, clazz.getPackageName());
-    assertNotNull(resource, msg);
+    if (resource == null) {
+      throw new IllegalArgumentException(msg);
+    }
     return resource;
   }
 

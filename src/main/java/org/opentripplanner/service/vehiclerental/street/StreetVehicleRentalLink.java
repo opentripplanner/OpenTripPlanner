@@ -52,7 +52,11 @@ public class StreetVehicleRentalLink extends Edge {
       return State.empty();
     }
 
-    if (vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(s0.getRequest().rental())) {
+    var preferences = s0.getPreferences().rental(s0.getRequest().mode());
+    // preferences will be null while finding nearest places with WALK mode
+    if (
+      preferences != null && vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(preferences)
+    ) {
       return State.empty();
     }
 

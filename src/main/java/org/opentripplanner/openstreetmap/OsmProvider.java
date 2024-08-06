@@ -12,6 +12,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
@@ -41,19 +42,26 @@ public class OsmProvider {
 
   /** For tests */
   public OsmProvider(File file, boolean cacheDataInMem) {
-    this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
+    this(
+      new FileDataSource(file, FileType.OSM),
+      OsmTagMapperSource.DEFAULT,
+      null,
+      cacheDataInMem,
+      DataImportIssueStore.NOOP
+    );
   }
 
   public OsmProvider(
     DataSource dataSource,
     OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
-    boolean cacheDataInMem
+    boolean cacheDataInMem,
+    DataImportIssueStore issueStore
   ) {
     this.source = dataSource;
     this.zoneId = zoneId;
     this.osmTagMapper = tagMapperSource.getInstance();
-    this.wayPropertySet = new WayPropertySet();
+    this.wayPropertySet = new WayPropertySet(issueStore);
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
   }

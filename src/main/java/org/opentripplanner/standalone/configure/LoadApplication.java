@@ -11,6 +11,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -57,7 +58,8 @@ public class LoadApplication {
       obj.worldEnvelopeRepository,
       obj.issueSummary,
       obj.emissionsDataModel,
-      obj.stopConsolidationRepository
+      obj.stopConsolidationRepository,
+      obj.streetLimitationParameters
     );
   }
 
@@ -69,7 +71,8 @@ public class LoadApplication {
       factory.emptyWorldEnvelopeRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
-      factory.emptyStopConsolidationRepository()
+      factory.emptyStopConsolidationRepository(),
+      factory.emptyStreetLimitationParameters()
     );
   }
 
@@ -90,7 +93,8 @@ public class LoadApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionsDataModel emissionsDataModel,
-    @Nullable StopConsolidationRepository stopConsolidationRepository
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
+    StreetLimitationParameters streetLimitationParameters
   ) {
     return new ConstructApplication(
       cli,
@@ -101,7 +105,8 @@ public class LoadApplication {
       graphBuilderDataSources(),
       issueSummary,
       emissionsDataModel,
-      stopConsolidationRepository
+      stopConsolidationRepository,
+      streetLimitationParameters
     );
   }
 }

@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 abstract class NetexParser<T> {
 
   /**
-   * Currently a lot of elements on a frame is skipped. If any of these elements are pressent we
+   * Currently a lot of elements on a frame is skipped. If any of these elements are present we
    * print a warning for elements that might be relevant for OTP and an info message for none
    * relevant elements.
    */
@@ -39,10 +39,10 @@ abstract class NetexParser<T> {
   /**
    * Log a warning for Netex elements which is not mapped. There might be something wrong with the
    * data or there might be something wrong with the Netex data import(ignoring these elements). The
-   * element should be relevant to OTP. OTP do not support Netex 100%, but elements in Nordic
+   * element should be relevant to OTP. OTP does not support NeTEx 100%, but elements in the Nordic
    * profile, see https://enturas.atlassian.net/wiki/spaces/PUBLIC/overview should be supported.
    * <p>
-   * If you get this warning and think the element should be mapped, please feel free to report an
+   * If you see this warning and think the element should be mapped, please feel free to report an
    * issue on GitHub.
    */
   static void warnOnMissingMapping(Logger log, Object rel) {

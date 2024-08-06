@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
 import org.rutebanken.netex.model.ContactStructure;
 import org.rutebanken.netex.model.FlexibleLine;

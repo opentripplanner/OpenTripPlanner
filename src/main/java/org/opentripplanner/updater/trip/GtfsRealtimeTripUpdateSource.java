@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
+import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
+
 import com.google.protobuf.ExtensionRegistry;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -10,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
@@ -24,7 +28,7 @@ public class GtfsRealtimeTripUpdateSource {
   private final String feedId;
   private final String url;
   private final HttpHeaders headers;
-  private boolean fullDataset = true;
+  private UpdateIncrementality updateIncrementality = FULL_DATASET;
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
   private final OtpHttpClient otpHttpClient;
 
@@ -33,14 +37,14 @@ public class GtfsRealtimeTripUpdateSource {
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
-    otpHttpClient = new OtpHttpClient();
+    otpHttpClient = new OtpHttpClientFactory().create(LOG);
   }
 
   public List<TripUpdate> getUpdates() {
     FeedMessage feedMessage;
     List<FeedEntity> feedEntityList;
     List<TripUpdate> updates = null;
-    fullDataset = true;
+    updateIncrementality = FULL_DATASET;
     try {
       // Decode message
       feedMessage =
@@ -60,7 +64,7 @@ public class GtfsRealtimeTripUpdateSource {
           .getIncrementality()
           .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
       ) {
-        fullDataset = false;
+        updateIncrementality = DIFFERENTIAL;
       }
 
       // Create List of TripUpdates
@@ -84,10 +88,10 @@ public class GtfsRealtimeTripUpdateSource {
   }
 
   /**
-   * @return true iff the last list with updates represent all updates that are active right now,
-   * i.e. all previous updates should be disregarded
+   * @return the incrementality of the last list with updates, i.e. if all previous updates
+   * should be disregarded
    */
-  public boolean getFullDatasetValueOfLastUpdates() {
-    return fullDataset;
+  public UpdateIncrementality incrementalityOfLastUpdates() {
+    return updateIncrementality;
   }
 }

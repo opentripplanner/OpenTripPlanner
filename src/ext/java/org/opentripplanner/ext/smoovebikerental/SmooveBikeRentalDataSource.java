@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
@@ -23,7 +25,7 @@ public class SmooveBikeRentalDataSource
   extends GenericJsonDataSource<VehicleRentalPlace>
   implements VehicleRentalDatasource {
 
-  private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
   public static final String DEFAULT_NETWORK_NAME = "smoove";
 
@@ -31,19 +33,38 @@ public class SmooveBikeRentalDataSource
 
   private final String networkName;
   private final RentalVehicleType vehicleType;
+  private final VehicleRentalSystem system;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    this(config, new OtpHttpClient());
+    this(config, new OtpHttpClientFactory());
   }
 
   public SmooveBikeRentalDataSource(
     SmooveBikeRentalDataSourceParameters config,
-    OtpHttpClient otpHttpClient
+    OtpHttpClientFactory otpHttpClientFactory
   ) {
-    super(config.url(), "result", config.httpHeaders(), otpHttpClient);
+    super(config.url(), "result", config.httpHeaders(), otpHttpClientFactory.create(LOG));
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     overloadingAllowed = config.overloadingAllowed();
+    system =
+      new VehicleRentalSystem(
+        networkName,
+        "fi",
+        "Helsinki/Espoo",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Europe/Helsinki",
+        null,
+        null,
+        null
+      );
   }
 
   /**
@@ -76,7 +97,7 @@ public class SmooveBikeRentalDataSource
       station.longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      log.warn("Error parsing bike rental station {}", station.id, e);
+      LOG.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
     if (!node.path("style").asText().equals("Station on")) {
@@ -93,6 +114,7 @@ public class SmooveBikeRentalDataSource
     station.vehicleTypesAvailable = Map.of(vehicleType, station.vehiclesAvailable);
     station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
     station.overloadingAllowed = overloadingAllowed;
+    station.system = system;
     return station;
   }
 }

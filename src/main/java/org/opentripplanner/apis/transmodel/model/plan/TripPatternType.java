@@ -16,6 +16,7 @@ public class TripPatternType {
   public static GraphQLObjectType create(
     GraphQLOutputType systemNoticeType,
     GraphQLObjectType legType,
+    GraphQLObjectType timePenaltyType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -136,8 +137,7 @@ public class TripPatternType {
           .name("walkTime")
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          // TODO This unfortunately include BIKE and CAR
-          .dataFetcher(env -> itinerary(env).getNonTransitDuration().toSeconds())
+          .dataFetcher(env -> itinerary(env).walkDuration().toSeconds())
           .build()
       )
       .field(
@@ -158,7 +158,7 @@ public class TripPatternType {
           .name("walkDistance")
           .deprecate("Replaced by `streetDistance`.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> itinerary(env).getNonTransitDistanceMeters())
+          .dataFetcher(env -> itinerary(env).walkDistanceMeters())
           .build()
       )
       .field(
@@ -190,7 +190,7 @@ public class TripPatternType {
           .name("generalizedCost")
           .description("Generalized cost or weight of the itinerary. Used for debugging.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getGeneralizedCost())
+          .dataFetcher(env -> itinerary(env).getGeneralizedCostIncludingPenalty())
           .build()
       )
       .field(
@@ -227,6 +227,23 @@ public class TripPatternType {
           )
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> itinerary(env).getTransferPriorityCost())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("timePenalty")
+          .description(
+            """
+              A time and cost penalty applied to access and egress to favor regular scheduled
+              transit over potentially faster options with FLEX, Car, bike and scooter.
+              
+              Note! This field is meant for debugging only. The field can be removed without notice
+              in the future.
+              """
+          )
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(timePenaltyType))))
+          .dataFetcher(env -> TripPlanTimePenaltyDto.of(itinerary(env)))
           .build()
       )
       .build();

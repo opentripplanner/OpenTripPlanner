@@ -133,6 +133,12 @@ public class CommandLineParameters {
   )
   public boolean visualize;
 
+  @Parameter(
+    names = { "--abortOnUnknownConfig" },
+    description = "Abort the startup if configuration files are found to contain unknown parameters."
+  )
+  public boolean abortOnUnknownConfig = false;
+
   /**
    * The remaining single parameter after the switches is the directory with the configuration
    * files. This directory may contain other files like the graph, input data and report files.

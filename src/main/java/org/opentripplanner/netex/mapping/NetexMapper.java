@@ -77,9 +77,9 @@ public class NetexMapper {
 
   /**
    * Shared/cached entity index, used by more than one mapper. This index provides alternative
-   * indexes to netex entites, as well as global indexes to OTP domain objects needed in the mapping
+   * indexes to netex entities, as well as global indexes to OTP domain objects needed in the mapping
    * process. Some of these indexes are feed scoped, and some are file group level scoped. As a rule
-   * of tomb the indexes for OTP Model entities are global(small memory overhead), while the indexes
+   * of thumb the indexes for OTP Model entities are global(small memory overhead), while the indexes
    * for the Netex entities follow the main index {@link  #currentNetexIndex}, hence sopped by file
    * group.
    */
@@ -158,7 +158,7 @@ public class NetexMapper {
 
   /**
    * <p>
-   * This method mapes the last Netex file imported using the *local* entities in the hierarchical
+   * This method maps the last Netex file imported using the *local* entities in the hierarchical
    * {@link NetexEntityIndexReadOnlyView}.
    * </p>
    * <p>
@@ -198,6 +198,8 @@ public class NetexMapper {
     mapGroupsOfLines();
     mapTripPatterns(serviceIds);
     mapNoticeAssignments();
+
+    mapVehicleParkings();
 
     addEntriesToGroupMapperForPostProcessingLater();
   }
@@ -332,8 +334,9 @@ public class NetexMapper {
         .getStationsByMultiModalStationRfs()
         .get(multiModalStopPlace.getId());
       var multiModalStation = mapper.map(multiModalStopPlace, stations);
-
-      transitBuilder.stopModel().withMultiModalStation(multiModalStation);
+      if (multiModalStation != null) {
+        transitBuilder.stopModel().withMultiModalStation(multiModalStation);
+      }
     }
   }
 
@@ -374,7 +377,7 @@ public class NetexMapper {
         transitBuilder.stopModel().withAreaStop(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.stopModel().withGroupStop(groupStop);
-        for (var child : groupStop.getLocations()) {
+        for (var child : groupStop.getChildLocations()) {
           if (child instanceof AreaStop areaStop) {
             transitBuilder.stopModel().withAreaStop(areaStop);
           }
@@ -460,19 +463,36 @@ public class NetexMapper {
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
       .getJourneyPatternsById()
       .localValues()) {
-      TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
-
-      for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {
-        transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
-        transitBuilder.getTripsById().add(it.getKey());
-      }
-      for (var it : result.tripPatterns.entries()) {
-        transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
-      }
-      currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId);
-      groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex));
-      transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates);
+      tripPatternMapper
+        .mapTripPattern(journeyPattern)
+        .ifPresent(this::applyTripPatternMapperResult);
     }
+  }
+
+  private void applyTripPatternMapperResult(TripPatternMapperResult result) {
+    var stopPattern = result.tripPattern().getStopPattern();
+    var journeyPatternExists = transitBuilder
+      .getTripPatterns()
+      .get(stopPattern)
+      .stream()
+      .anyMatch(tripPattern -> result.tripPattern().getId().equals(tripPattern.getId()));
+    if (journeyPatternExists) {
+      issueStore.add(
+        "DuplicateJourneyPattern",
+        "Duplicate of JourneyPattern %s found",
+        result.tripPattern().getId().getId()
+      );
+    }
+
+    for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes().entrySet()) {
+      transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
+      transitBuilder.getTripsById().add(it.getKey());
+    }
+
+    transitBuilder.getTripPatterns().put(stopPattern, result.tripPattern());
+    currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId());
+    groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex()));
+    transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates());
   }
 
   private void mapNoticeAssignments() {
@@ -500,6 +520,19 @@ public class NetexMapper {
         currentNetexIndex.getServiceJourneyInterchangeById().localValues()
       );
     }
+  }
+
+  private void mapVehicleParkings() {
+    var mapper = new VehicleParkingMapper(idFactory, issueStore);
+    currentNetexIndex
+      .getParkingsById()
+      .localKeys()
+      .forEach(id -> {
+        var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
+        if (parking != null) {
+          transitBuilder.vehicleParkings().add(parking);
+        }
+      });
   }
 
   /**

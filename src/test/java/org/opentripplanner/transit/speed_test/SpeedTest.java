@@ -29,6 +29,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -111,13 +112,15 @@ public class SpeedTest {
         graph,
         new DefaultTransitService(transitModel),
         timer.getRegistry(),
-        List::of,
+        VectorTileConfig.DEFAULT,
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
         TestServerContext.createEmissionsService(),
         config.flexConfig,
         List.of(),
+        null,
+        TestServerContext.createStreetLimitationParametersService(),
         null,
         null
       );

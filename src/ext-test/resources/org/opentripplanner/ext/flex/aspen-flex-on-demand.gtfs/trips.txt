@@ -1,0 +1,3 @@
+route_id,service_id,trip_id,trip_short_name,trip_headsign,direction_id,block_id,shape_id,bikes_allowed,wheelchair_accessible,trip_type
+17102,c_20806_b_28352_d_127,t_1289257_b_28352_tn_0,,,0,,,,,
+17102,c_20808_b_29084_d_127,t_1289262_b_29084_tn_0,,,0,,,,,

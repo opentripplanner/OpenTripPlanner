@@ -97,7 +97,7 @@ public class FrameworkArchitectureTest {
 
   @Test
   void enforceTimePackageDependencies() {
-    TIME.verify();
+    TIME.dependsOn(LOGGING).verify();
   }
 
   @Test

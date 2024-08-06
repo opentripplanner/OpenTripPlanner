@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
@@ -48,7 +48,7 @@ public class RouterConfig implements Serializable {
   private final RideHailingServicesConfig rideHailingConfig;
   private final FlexConfig flexConfig;
   private final TransmodelAPIConfig transmodelApi;
-  private final VectorTileConfig vectorTileLayers;
+  private final VectorTileConfig vectorTileConfig;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -72,7 +72,7 @@ public class RouterConfig implements Serializable {
     this.routingRequestDefaults.setMaxSearchWindow(transitConfig.maxSearchWindow());
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
-    this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
+    this.vectorTileConfig = VectorTileConfig.mapVectorTilesParameters(root, "vectorTiles");
     this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -124,11 +124,11 @@ public class RouterConfig implements Serializable {
     return rideHailingConfig.rideHailingServiceParameters();
   }
 
-  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
-    return vectorTileLayers;
+  public VectorTileConfig vectorTileConfig() {
+    return vectorTileConfig;
   }
 
-  public FlexConfig flexConfig() {
+  public FlexParameters flexParameters() {
     return flexConfig;
   }
 
@@ -150,5 +150,12 @@ public class RouterConfig implements Serializable {
   public String toString() {
     // Print ONLY the values set, not default values
     return root.toPrettyString();
+  }
+
+  /**
+   * Checks if any unknown or invalid parameters were encountered while loading the configuration.
+   */
+  public boolean hasUnknownParameters() {
+    return root.hasUnknownParameters();
   }
 }

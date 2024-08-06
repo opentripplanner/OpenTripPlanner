@@ -23,7 +23,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -41,6 +41,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 
 public class TransitRouter {
 
@@ -48,6 +49,7 @@ public class TransitRouter {
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
+  private final TransitGroupPriorityService transitGroupPriorityService;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
@@ -56,12 +58,14 @@ public class TransitRouter {
   private TransitRouter(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
   ) {
     this.request = request;
     this.serverContext = serverContext;
+    this.transitGroupPriorityService = transitGroupPriorityService;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
@@ -71,6 +75,7 @@ public class TransitRouter {
   public static TransitRouterResult route(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitGroupPriorityService priorityGroupConfigurator,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
@@ -78,6 +83,7 @@ public class TransitRouter {
     TransitRouter transitRouter = new TransitRouter(
       request,
       serverContext,
+      priorityGroupConfigurator,
       transitSearchTimeZero,
       additionalSearchDays,
       debugTimingAggregator
@@ -121,13 +127,12 @@ public class TransitRouter {
     );
 
     // Prepare transit search
-    var raptorRequest = RaptorRequestMapper.mapRequest(
+    var raptorRequest = RaptorRequestMapper.<TripSchedule>mapRequest(
       request,
       transitSearchTimeZero,
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
-      accessEgresses.calculateMaxAccessTimePenalty(),
       serverContext.meterRegistry()
     );
 
@@ -147,7 +152,7 @@ public class TransitRouter {
         requestTransitDataProvider.stopNameResolver(),
         serverContext.transitService().getTransferService(),
         requestTransitDataProvider,
-        transitLayer.getStopBoardAlightCosts(),
+        transitLayer.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
         raptorRequest.multiCriteria()
       );
@@ -172,8 +177,8 @@ public class TransitRouter {
   }
 
   private AccessEgresses fetchAccessEgresses() {
-    final var asyncAccessList = new ArrayList<DefaultAccessEgress>();
-    final var asyncEgressList = new ArrayList<DefaultAccessEgress>();
+    final var accessList = new ArrayList<RoutingAccessEgress>();
+    final var egressList = new ArrayList<RoutingAccessEgress>();
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
@@ -181,19 +186,19 @@ public class TransitRouter {
         //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture
           .allOf(
-            CompletableFuture.runAsync(() -> asyncAccessList.addAll(fetchAccess())),
-            CompletableFuture.runAsync(() -> asyncEgressList.addAll(fetchEgress()))
+            CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
+            CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
           )
           .join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
-      asyncAccessList.addAll(fetchAccess());
-      asyncEgressList.addAll(fetchEgress());
+      accessList.addAll(fetchAccess());
+      egressList.addAll(fetchEgress());
     }
 
-    verifyAccessEgress(asyncAccessList, asyncEgressList);
+    verifyAccessEgress(accessList, egressList);
 
     // Decorate access/egress with a penalty to make it less favourable than transit
     var penaltyDecorator = new AccessEgressPenaltyDecorator(
@@ -202,34 +207,39 @@ public class TransitRouter {
       request.preferences().street().accessEgress().penalty()
     );
 
-    var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
-    var egressList = penaltyDecorator.decorateEgress(asyncEgressList);
+    var accessListWithPenalty = penaltyDecorator.decorateAccess(accessList);
+    var egressListWithPenalty = penaltyDecorator.decorateEgress(egressList);
 
-    return new AccessEgresses(accessList, egressList);
+    return new AccessEgresses(accessListWithPenalty, egressListWithPenalty);
   }
 
-  private Collection<DefaultAccessEgress> fetchAccess() {
+  private Collection<? extends RoutingAccessEgress> fetchAccess() {
     debugTimingAggregator.startedAccessCalculating();
     var list = fetchAccessEgresses(ACCESS);
     debugTimingAggregator.finishedAccessCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchEgress() {
+  private Collection<? extends RoutingAccessEgress> fetchEgress() {
     debugTimingAggregator.startedEgressCalculating();
     var list = fetchAccessEgresses(EGRESS);
     debugTimingAggregator.finishedEgressCalculating();
     return list;
   }
 
-  private Collection<DefaultAccessEgress> fetchAccessEgresses(AccessEgressType type) {
+  private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.clone();
 
     if (type.isAccess()) {
-      accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
+      accessRequest.withPreferences(p -> {
+        p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+        p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+        p.withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
+        );
+      });
     }
 
     Duration durationLimit = accessRequest
@@ -243,7 +253,6 @@ public class TransitRouter {
     var nearbyStops = AccessEgressRouter.streetSearch(
       accessRequest,
       temporaryVerticesContainer,
-      serverContext.transitService(),
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
       type.isEgress(),
@@ -251,7 +260,7 @@ public class TransitRouter {
       stopCountLimit
     );
 
-    List<DefaultAccessEgress> results = new ArrayList<>(
+    List<RoutingAccessEgress> results = new ArrayList<>(
       AccessEgressMapper.mapNearbyStops(nearbyStops, type.isEgress())
     );
     results = timeshiftRideHailing(streetRequest, type, results);
@@ -263,7 +272,7 @@ public class TransitRouter {
         temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,
-        serverContext.flexConfig(),
+        serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
         type.isEgress()
       );
@@ -284,10 +293,10 @@ public class TransitRouter {
    * This method is a good candidate to be moved to the access/egress filter chain when that has
    * been added.
    */
-  private List<DefaultAccessEgress> timeshiftRideHailing(
+  private List<RoutingAccessEgress> timeshiftRideHailing(
     StreetRequest streetRequest,
     AccessEgressType type,
-    List<DefaultAccessEgress> accessEgressList
+    List<RoutingAccessEgress> accessEgressList
   ) {
     if (streetRequest.mode() != StreetMode.CAR_HAILING) {
       return accessEgressList;
@@ -306,6 +315,7 @@ public class TransitRouter {
   ) {
     return new RaptorRoutingRequestTransitData(
       transitLayer,
+      transitGroupPriorityService,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),

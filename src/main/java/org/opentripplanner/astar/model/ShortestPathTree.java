@@ -244,10 +244,6 @@ public class ShortestPathTree<
     aborted = true;
   }
 
-  public boolean isAborted() {
-    return aborted;
-  }
-
   public String toString() {
     return "ShortestPathTree(" + this.stateSets.size() + " vertices)";
   }

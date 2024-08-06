@@ -20,7 +20,7 @@ import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInput
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 public class TripQuery {
 
@@ -51,9 +51,26 @@ public class TripQuery {
           .newArgument()
           .name("dateTime")
           .description(
-            "Date and time for the earliest time the user is willing to start the journey " +
-            "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
-            "(arriveBy=true). Defaults to now"
+            "The date and time for the earliest time the user is willing to start the journey " +
+            "(if `false` or not set) or the latest acceptable time of arriving " +
+            "(`true`). Defaults to now."
+          )
+          .type(gqlUtil.dateTimeScalar)
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("bookingTime")
+          .description(
+            """
+            The date and time for the latest time the user is expected to book the journey.
+            Normally this is when the search is performed (now), plus a small grace period to
+            complete the booking. Services which must be booked before this time is excluded. The
+            `latestBookingTime` and `minimumBookingPeriod` in `BookingArrangement` (flexible
+            services only) is used to enforce this. If this parameter is _not set_, no booking-time
+            restrictions are applied - all journeys are listed.
+            """
           )
           .type(gqlUtil.dateTimeScalar)
           .build()
@@ -277,30 +294,30 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("relaxTransitPriorityGroup")
+          .name("relaxTransitGroupPriority")
           .description(
             """
             Relax generalized-cost when comparing trips with a different set of
-            transit-priority-groups. The groups are set server side for service-journey and
+            transit-group-priorities. The groups are set server side for service-journey and
             can not be configured in the API. This mainly helps to return competition neutral
-            services. Long distance authorities are put in different transit-priority-groups.
+            services. Long distance authorities are put in different transit-groups.
             
             This relaxes the comparison inside the routing engine for each stop-arrival. If two
-            paths have a different set of transit-priority-groups, then the generalized-cost
+            paths have a different set of transit-group-priorities, then the generalized-cost
             comparison is relaxed. The final set of paths are filtered through the normal
             itinerary-filters.
             
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
-            - The `slack` must be greater or equal to 0 and less then 3600.
+            - The `constant` must be greater or equal to '0s' and less then '1h'.
             
             THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
             """.stripIndent()
           )
           .type(RelaxCostType.INPUT_TYPE)
           .defaultValueLiteral(
-            preferences.transit().relaxTransitPriorityGroup().isNormal()
+            preferences.transit().relaxTransitGroupPriority().isNormal()
               ? NullValue.of()
-              : RelaxCostType.valueOf(preferences.transit().relaxTransitPriorityGroup())
+              : RelaxCostType.valueOf(preferences.transit().relaxTransitGroupPriority())
           )
           .build()
       )
@@ -371,7 +388,10 @@ public class TripQuery {
             "When setting the " +
             EnumTypes.BICYCLE_OPTIMISATION_METHOD.getName() +
             " to '" +
-            enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD, BicycleOptimizeType.TRIANGLE) +
+            enumValAsString(
+              EnumTypes.BICYCLE_OPTIMISATION_METHOD,
+              VehicleRoutingOptimizeType.TRIANGLE
+            ) +
             "', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
           )
           .type(TriangleFactorsInputType.INPUT_TYPE)
@@ -386,7 +406,7 @@ public class TripQuery {
             "rental trips."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.rental().useAvailabilityInformation())
+          .defaultValue(preferences.bike().rental().useAvailabilityInformation())
           .build()
       )
       .argument(
@@ -420,7 +440,7 @@ public class TripQuery {
             "This time is in addition to time it might take to walk between stops."
           )
           .type(Scalars.GraphQLInt)
-          .defaultValue(preferences.transfer().slack())
+          .defaultValue(preferences.transfer().slack().toSeconds())
           .build()
       )
       .argument(
@@ -523,7 +543,7 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("relaxTransitSearchGeneralizedCostAtDestination")
-          .deprecate("This is replaced by 'relaxTransitPriorityGroup'.")
+          .deprecate("This is replaced by 'relaxTransitGroupPriority'.")
           .description(
             """
               Whether non-optimal transit paths at the destination should be returned. Let c be the

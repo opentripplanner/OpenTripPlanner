@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -17,7 +18,7 @@ import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.lucene95.Lucene95Codec;
+import org.apache.lucene.codecs.lucene99.Lucene99Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StoredField;
@@ -33,40 +34,58 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.suggest.document.Completion90PostingsFormat;
+import org.apache.lucene.search.suggest.document.Completion99PostingsFormat;
 import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
 import org.apache.lucene.search.suggest.document.ContextQuery;
 import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
 
   private static final String TYPE = "type";
   private static final String ID = "id";
+  private static final String SECONDARY_IDS = "secondary_ids";
   private static final String SUGGEST = "suggest";
   private static final String NAME = "name";
   private static final String NAME_NGRAM = "name_ngram";
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
-  private static final String MODE = "mode";
 
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
+  private final StopClusterMapper stopClusterMapper;
 
-  public LuceneIndex(TransitService transitService) {
+  /**
+   * Since the {@link TransitService} is request scoped, we don't inject it into this class.
+   * However, we do need some methods in the service and that's why we instantiate it manually in this
+   * constructor.
+   */
+  public LuceneIndex(TransitModel transitModel, StopConsolidationService stopConsolidationService) {
+    this(new DefaultTransitService(transitModel), stopConsolidationService);
+  }
+
+  /**
+   * This method is only visible for testing.
+   */
+  LuceneIndex(
+    TransitService transitService,
+    @Nullable StopConsolidationService stopConsolidationService
+  ) {
     this.transitService = transitService;
+    this.stopClusterMapper = new StopClusterMapper(transitService, stopConsolidationService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -80,7 +99,6 @@ public class LuceneIndex implements Serializable {
 
     var directory = new ByteBuffersDirectory();
 
-    var stopClusterMapper = new StopClusterMapper(transitService);
     try {
       try (
         var directoryWriter = new IndexWriter(
@@ -95,11 +113,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocation.class,
               stopLocation.getId().toString(),
-              stopLocation.getName(),
-              stopLocation.getCode(),
+              List.of(),
+              ListUtils.ofNullable(stopLocation.getName()),
+              ListUtils.ofNullable(stopLocation.getCode()),
               stopLocation.getCoordinate().latitude(),
-              stopLocation.getCoordinate().longitude(),
-              Set.of()
+              stopLocation.getCoordinate().longitude()
             )
           );
 
@@ -110,11 +128,11 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopLocationsGroup.class,
               stopLocationsGroup.getId().toString(),
-              stopLocationsGroup.getName(),
-              null,
+              List.of(),
+              ListUtils.ofNullable(stopLocationsGroup.getName()),
+              List.of(),
               stopLocationsGroup.getCoordinate().latitude(),
-              stopLocationsGroup.getCoordinate().longitude(),
-              Set.of()
+              stopLocationsGroup.getCoordinate().longitude()
             )
           );
 
@@ -127,12 +145,12 @@ public class LuceneIndex implements Serializable {
             addToIndex(
               directoryWriter,
               StopCluster.class,
-              stopCluster.id().toString(),
-              new NonLocalizedString(stopCluster.name()),
-              stopCluster.code(),
+              stopCluster.primaryId(),
+              stopCluster.secondaryIds(),
+              stopCluster.names(),
+              stopCluster.codes(),
               stopCluster.coordinate().lat(),
-              stopCluster.coordinate().lon(),
-              stopCluster.modes()
+              stopCluster.coordinate().lon()
             )
           );
       }
@@ -142,18 +160,6 @@ public class LuceneIndex implements Serializable {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
-    var graph = serverContext.graph();
-    var existingIndex = graph.getLuceneIndex();
-    if (existingIndex != null) {
-      return existingIndex;
-    }
-
-    var newIndex = new LuceneIndex(serverContext.transitService());
-    graph.setLuceneIndex(newIndex);
-    return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
@@ -176,23 +182,26 @@ public class LuceneIndex implements Serializable {
    *    one of those is chosen at random and returned.
    */
   public Stream<StopCluster> queryStopClusters(String query) {
-    return matchingDocuments(StopCluster.class, query, false).map(LuceneIndex::toStopCluster);
+    return matchingDocuments(StopCluster.class, query, false).map(this::toStopCluster);
   }
 
-  private static StopCluster toStopCluster(Document document) {
-    var id = FeedScopedId.parse(document.get(ID));
-    var name = document.get(NAME);
-    var code = document.get(CODE);
-    var lat = document.getField(LAT).numericValue().doubleValue();
-    var lon = document.getField(LON).numericValue().doubleValue();
-    var modes = Arrays.asList(document.getValues(MODE));
-    return new StopCluster(id, code, name, new Coordinate(lat, lon), modes);
+  private StopCluster toStopCluster(Document document) {
+    var primaryId = FeedScopedId.parse(document.get(ID));
+    var primary = stopClusterMapper.toLocation(primaryId);
+
+    var secondaryIds = Arrays
+      .stream(document.getValues(SECONDARY_IDS))
+      .map(FeedScopedId::parse)
+      .map(stopClusterMapper::toLocation)
+      .toList();
+
+    return new StopCluster(primary, secondaryIds);
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-    Codec filterCodec = new Lucene95Codec() {
-      final PostingsFormat postingsFormat = new Completion90PostingsFormat();
+    Codec filterCodec = new Lucene99Codec() {
+      final PostingsFormat postingsFormat = new Completion99PostingsFormat();
 
       @Override
       public PostingsFormat getPostingsFormatForField(String field) {
@@ -210,30 +219,31 @@ public class LuceneIndex implements Serializable {
     IndexWriter writer,
     Class<?> type,
     String id,
-    I18NString name,
-    @Nullable String code,
+    Collection<String> secondaryIds,
+    Collection<I18NString> names,
+    Collection<String> codes,
     double latitude,
-    double longitude,
-    Collection<String> modes
+    double longitude
   ) {
     String typeName = type.getSimpleName();
 
     Document document = new Document();
     document.add(new StoredField(ID, id));
+    for (var secondaryId : secondaryIds) {
+      document.add(new StoredField(SECONDARY_IDS, secondaryId));
+    }
     document.add(new TextField(TYPE, typeName, Store.YES));
-    document.add(new TextField(NAME, Objects.toString(name), Store.YES));
-    document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
-    document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
+    for (var name : names) {
+      document.add(new TextField(NAME, Objects.toString(name), Store.YES));
+      document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
+      document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
+    }
     document.add(new StoredField(LAT, latitude));
     document.add(new StoredField(LON, longitude));
 
-    if (code != null) {
+    for (var code : codes) {
       document.add(new TextField(CODE, code, Store.YES));
       document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
-    }
-
-    for (var mode : modes) {
-      document.add(new TextField(MODE, mode, Store.YES));
     }
 
     try {
@@ -248,6 +258,7 @@ public class LuceneIndex implements Serializable {
     String searchTerms,
     boolean autocomplete
   ) {
+    searchTerms = searchTerms.strip();
     try {
       if (autocomplete) {
         var completionQuery = new FuzzyCompletionQuery(

@@ -5,9 +5,12 @@ import static org.opentripplanner.inspector.vector.LayerParameters.EXPANSION_FAC
 import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
 import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -15,12 +18,23 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class VectorTileConfig
   implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
 
-  List<LayerParameters<VectorTilesResource.LayerType>> layers;
+  public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null, null);
+  private final List<LayerParameters<VectorTilesResource.LayerType>> layers;
 
-  public VectorTileConfig(
-    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers
+  @Nullable
+  private final String basePath;
+
+  @Nullable
+  private final String attribution;
+
+  VectorTileConfig(
+    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers,
+    @Nullable String basePath,
+    @Nullable String attribution
   ) {
     this.layers = List.copyOf(layers);
+    this.basePath = basePath;
+    this.attribution = attribution;
   }
 
   @Override
@@ -28,16 +42,61 @@ public class VectorTileConfig
     return layers;
   }
 
-  public static VectorTileConfig mapVectorTilesParameters(
-    NodeAdapter root,
-    String vectorTileLayers
-  ) {
+  public Optional<String> basePath() {
+    return Optional.ofNullable(basePath);
+  }
+
+  public Optional<String> attribution() {
+    return Optional.ofNullable(attribution);
+  }
+
+  public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
+    var root = node.of(paramName).summary("Vector tile configuration").asObject();
     return new VectorTileConfig(
       root
-        .of(vectorTileLayers)
+        .of("layers")
         .since(V2_0)
         .summary("Configuration of the individual layers for the Mapbox vector tiles.")
-        .asObjects(VectorTileConfig::mapLayer)
+        .asObjects(VectorTileConfig::mapLayer),
+      root
+        .of("basePath")
+        .since(V2_5)
+        .summary("The path of the vector tile source URLs in `tilejson.json`.")
+        .description(
+          """
+          This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
+          
+          If you don't configure this optional value then the path returned in `tilejson.json` is in 
+          the format `/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. 
+          If you, for example, set a value of `/otp_test/tiles` then the returned path changes to 
+          `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
+          
+          The protocol and host are always read from the incoming HTTP request. If you run OTP behind 
+          a proxy then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
+          return the protocol and host for the original request and not the proxied one.
+          
+          **Note:** This does _not_ change the path that OTP itself serves the tiles or `tilejson.json`
+          responses but simply changes the URLs listed in `tilejson.json`. The rewriting of the path
+          is expected to be handled by a proxy.
+          """
+        )
+        .asString(DEFAULT.basePath),
+      root
+        .of("attribution")
+        .since(V2_5)
+        .summary("Custom attribution to be returned in `tilejson.json`")
+        .description(
+          """
+          By default the, `attribution` property in `tilejson.json` is computed from the names and 
+          URLs of the feed publishers.
+          If the OTP deployment contains many feeds, this can become very unwieldy. 
+          
+          This configuration parameter allows you to set the `attribution` to any string you wish 
+          including HTML tags,
+          for example `<a href='https://trimet.org/mod'>Regional Partners</a>`.
+          """
+        )
+        .asString(DEFAULT.attribution)
     );
   }
 

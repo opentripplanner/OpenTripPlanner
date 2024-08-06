@@ -11,10 +11,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingFilter;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
 
 /**
  * This class simulate/mock the context the paging is operating in.
@@ -29,7 +29,7 @@ final class TestDriver {
   private final Instant lat;
   private final SortOrder sortOrder;
   private final ListSection cropSection;
-  private final NumItinerariesFilterResults results;
+  private final PageCursorInput results;
 
   public TestDriver(
     int nResults,
@@ -40,7 +40,7 @@ final class TestDriver {
     Instant lat,
     SortOrder sortOrder,
     ListSection cropSection,
-    NumItinerariesFilterResults results
+    PageCursorInput results
   ) {
     this.nResults = nResults;
     this.searchWindow = searchWindow;
@@ -106,7 +106,7 @@ final class TestDriver {
     return !sortOrder.isSortedByAscendingArrivalTime();
   }
 
-  NumItinerariesFilterResults filterResults() {
+  PageCursorInput filterResults() {
     return results;
   }
 
@@ -163,7 +163,7 @@ final class TestDriver {
     }
 
     // Filter nResults
-    var filterResultBox = new Box<NumItinerariesFilterResults>();
+    var filterResultBox = new Box<PageCursorInput>();
     var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries, filterResultBox::set);
     kept = maxNumFilter.removeMatchesForTest(kept);
 

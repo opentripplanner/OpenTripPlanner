@@ -42,6 +42,11 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the
+ *   parameter, or building a concrete key-value pair for a parameter in a config file being read
+ *   at server startup, or both.
+ */
 public class ParameterBuilder {
 
   private static final Object UNDEFINED = new Object();
@@ -118,10 +123,6 @@ public class ParameterBuilder {
 
   public Boolean asBoolean(boolean defaultValue) {
     return ofOptional(BOOLEAN, defaultValue, JsonNode::asBoolean);
-  }
-
-  public Map<String, Boolean> asBooleanMap() {
-    return ofOptionalMap(BOOLEAN, JsonNode::asBoolean);
   }
 
   /** @throws OtpAppException if parameter is missing. */
@@ -303,14 +304,15 @@ public class ParameterBuilder {
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
     Class<E> enumType,
-    Function<NodeAdapter, T> typeMapper
+    Function<NodeAdapter, T> typeMapper,
+    Map<E, T> defaultValue
   ) {
     info.withOptional().withEnumMap(enumType, OBJECT);
 
     var mapNode = buildObject();
 
     if (mapNode.isEmpty()) {
-      return Map.of();
+      return defaultValue;
     }
     EnumMap<E, T> result = new EnumMap<>(enumType);
 
@@ -385,6 +387,22 @@ public class ParameterBuilder {
 
   public Duration asDuration() {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
+  }
+
+  /**
+   * Accepts both a string-formatted duration or a number of seconds as a number.
+   * In the documentation it will claim that it only accepts durations as the number is only for
+   * backwards compatibility.
+   */
+  public Duration asDurationOrSeconds(Duration defaultValue) {
+    info.withType(DURATION);
+    setInfoOptional(defaultValue.toString());
+    var node = build();
+    if (node.isTextual()) {
+      return asDuration(defaultValue);
+    } else {
+      return Duration.ofSeconds((long) asDouble(defaultValue.toSeconds()));
+    }
   }
 
   public List<Duration> asDurations(List<Duration> defaultValues) {

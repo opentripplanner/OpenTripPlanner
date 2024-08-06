@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -39,14 +40,16 @@ public class Itinerary implements ItinerarySortKey {
   private final boolean walkOnly;
   private final boolean streetOnly;
   private final Duration nonTransitDuration;
+  private final Duration walkDuration;
+  private final double walkDistanceMeters;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
   private Integer generalizedCost2 = null;
-  private TimeAndCost accessPenalty = null;
-  private TimeAndCost egressPenalty = null;
+  private TimeAndCost accessPenalty = TimeAndCost.ZERO;
+  private TimeAndCost egressPenalty = TimeAndCost.ZERO;
   private int waitTimeOptimizedCost = UNKNOWN;
   private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
@@ -75,6 +78,8 @@ public class Itinerary implements ItinerarySortKey {
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
+    this.walkDuration = totals.walkDuration;
+    this.walkDistanceMeters = totals.walkDistanceMeters;
     this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
@@ -172,11 +177,6 @@ public class Itinerary implements ItinerarySortKey {
     return getLegs().get(getLegs().size() - 1);
   }
 
-  /** Get the first transit leg if one exist */
-  public Optional<Leg> firstTransitLeg() {
-    return getLegs().stream().filter(TransitLeg.class::isInstance).findFirst();
-  }
-
   /**
    * An itinerary can be flagged for removal with a system notice.
    * <p>
@@ -218,105 +218,6 @@ public class Itinerary implements ItinerarySortKey {
     var newItin = new Itinerary(timeShiftedLegs);
     newItin.setGeneralizedCost(getGeneralizedCost());
     return newItin;
-  }
-
-  /** @see #equals(Object) */
-  @Override
-  public final int hashCode() {
-    return super.hashCode();
-  }
-
-  /**
-   * Return {@code true} it the other object is the same object using the {@link
-   * Object#equals(Object)}. An itinerary is a temporary object and the equals method should not be
-   * used for comparision of 2 instances, only to check that to objects are the same instance.
-   */
-  @Override
-  public final boolean equals(Object o) {
-    return super.equals(o);
-  }
-
-  /**
-   * Used to convert a list of itineraries to a SHORT human-readable string.
-   *
-   * @see #toStr()
-   * <p>
-   * It is great for comparing lists of itineraries in a test: {@code
-   * assertEquals(toStr(List.of(it1)), toStr(result))}.
-   */
-  public static String toStr(List<Itinerary> list) {
-    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(Itinerary.class)
-      .addStr("from", firstLeg().getFrom().toStringShort())
-      .addStr("to", lastLeg().getTo().toStringShort())
-      .addTime("start", firstLeg().getStartTime())
-      .addTime("end", lastLeg().getEndTime())
-      .addNum("nTransfers", numberOfTransfers)
-      .addDuration("duration", duration)
-      .addDuration("nonTransitTime", nonTransitDuration)
-      .addDuration("transitTime", transitDuration)
-      .addDuration("waitingTime", waitingDuration)
-      .addNum("generalizedCost", generalizedCost, UNKNOWN)
-      .addNum("generalizedCost2", generalizedCost2)
-      .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
-      .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
-      .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
-      .addBool("tooSloped", tooSloped)
-      .addNum("elevationLost", elevationLost, 0.0)
-      .addNum("elevationGained", elevationGained, 0.0)
-      .addCol("legs", legs)
-      .addObj("fare", fare)
-      .addObj("emissionsPerPerson", emissionsPerPerson)
-      .toString();
-  }
-
-  /**
-   * Used to convert an itinerary to a SHORT human readable string - including just a few of the
-   * most important fields. It is much shorter and easier to read then the {@link
-   * Itinerary#toString()}.
-   * <p>
-   * It is great for comparing to itineraries in a test: {@code assertEquals(toStr(it1),
-   * toStr(it2))}.
-   * <p>
-   * Example: {@code A ~ Walk 2m ~ B ~ BUS 55 12:04 12:14 ~ C [cost: 1066]}
-   * <p>
-   * Reads: Start at A, walk 2 minutes to stop B, take bus 55, board at 12:04 and alight at 12:14
-   * ...
-   */
-  public String toStr() {
-    // No translater needed, stop indexes are never passed to the builder
-    PathStringBuilder buf = new PathStringBuilder(null);
-    buf.stop(firstLeg().getFrom().name.toString());
-
-    for (Leg leg : legs) {
-      if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration().toSeconds());
-      } else if (leg instanceof TransitLeg transitLeg) {
-        buf.transit(
-          transitLeg.getMode().name(),
-          transitLeg.getTrip().logName(),
-          transitLeg.getStartTime(),
-          transitLeg.getEndTime()
-        );
-      } else if (leg instanceof StreetLeg streetLeg) {
-        buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
-      }
-      buf.stop(leg.getTo().name.toString());
-    }
-
-    // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
-    // use-case.
-    buf.summary(
-      RaptorCostConverter.toRaptorCost(generalizedCost),
-      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
-    );
-
-    return buf.toString();
   }
 
   /** Total duration of the itinerary in seconds */
@@ -388,7 +289,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * NOTE: The itinerary is mutable so the transformation is done in-place!
    */
-  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+  public void transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
     legs =
       legs
         .stream()
@@ -400,7 +301,6 @@ public class Itinerary implements ItinerarySortKey {
           }
         })
         .toList();
-    return this;
   }
 
   public Stream<StreetLeg> getStreetLegs() {
@@ -490,13 +390,26 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
-   * by the algorithm. This is relevant for anyone who want to debug an search and tuning the
+   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  /**
+   * If a generalized cost is used in the routing algorithm, this is the cost computed plus
+   * the artificial penalty added for access/egresses. This is useful so that itineraries
+   * using only on-street legs don't have an unfair advantage over those combining access/egress with
+   * transit and using a penalty when being processed by the itinerary filter chain.
+   *
+   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   */
+  @Override
+  public int getGeneralizedCostIncludingPenalty() {
+    return generalizedCost + penaltyCost(accessPenalty) + penaltyCost(egressPenalty);
   }
 
   public void setGeneralizedCost(int generalizedCost) {
@@ -527,6 +440,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setAccessPenalty(TimeAndCost accessPenalty) {
+    Objects.requireNonNull(accessPenalty);
     this.accessPenalty = accessPenalty;
   }
 
@@ -536,6 +450,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setEgressPenalty(TimeAndCost egressPenalty) {
+    Objects.requireNonNull(egressPenalty);
     this.egressPenalty = egressPenalty;
   }
 
@@ -663,5 +578,122 @@ public class Itinerary implements ItinerarySortKey {
   @Nullable
   public Emissions getEmissionsPerPerson() {
     return this.emissionsPerPerson;
+  }
+
+  /**
+   * How much walking this itinerary contains, in meters.
+   */
+  public double walkDistanceMeters() {
+    return walkDistanceMeters;
+  }
+
+  /**
+   * How long the walking is contained in this itinerary.
+   */
+  public Duration walkDuration() {
+    return walkDuration;
+  }
+
+  /** @see #equals(Object) */
+  @Override
+  public final int hashCode() {
+    return super.hashCode();
+  }
+
+  /**
+   * Return {@code true} it the other object is the same object using the {@link
+   * Object#equals(Object)}. An itinerary is a temporary object and the equals method should not be
+   * used for comparision of 2 instances, only to check that to objects are the same instance.
+   */
+  @Override
+  public final boolean equals(Object o) {
+    return super.equals(o);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(Itinerary.class)
+      .addStr("from", firstLeg().getFrom().toStringShort())
+      .addStr("to", lastLeg().getTo().toStringShort())
+      .addTime("start", firstLeg().getStartTime())
+      .addTime("end", lastLeg().getEndTime())
+      .addNum("nTransfers", numberOfTransfers)
+      .addDuration("duration", duration)
+      .addDuration("nonTransitTime", nonTransitDuration)
+      .addDuration("transitTime", transitDuration)
+      .addDuration("waitingTime", waitingDuration)
+      .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("generalizedCost2", generalizedCost2)
+      .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
+      .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
+      .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
+      .addBool("tooSloped", tooSloped)
+      .addNum("elevationLost", elevationLost, 0.0)
+      .addNum("elevationGained", elevationGained, 0.0)
+      .addCol("legs", legs)
+      .addObj("fare", fare)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
+      .toString();
+  }
+
+  /**
+   * Used to convert a list of itineraries to a SHORT human-readable string.
+   *
+   * @see #toStr()
+   * <p>
+   * It is great for comparing lists of itineraries in a test: {@code
+   * assertEquals(toStr(List.of(it1)), toStr(result))}.
+   */
+  public static String toStr(List<Itinerary> list) {
+    return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
+  }
+
+  /**
+   * Used to convert an itinerary to a SHORT human readable string - including just a few of the
+   * most important fields. It is much shorter and easier to read then the {@link
+   * Itinerary#toString()}.
+   * <p>
+   * It is great for comparing to itineraries in a test: {@code assertEquals(toStr(it1),
+   * toStr(it2))}.
+   * <p>
+   * Example: {@code A ~ Walk 2m ~ B ~ BUS 55 12:04 12:14 ~ C [cost: 1066]}
+   * <p>
+   * Reads: Start at A, walk 2 minutes to stop B, take bus 55, board at 12:04 and alight at 12:14
+   * ...
+   */
+  public String toStr() {
+    // No translater needed, stop indexes are never passed to the builder
+    PathStringBuilder buf = new PathStringBuilder(null);
+    buf.stop(firstLeg().getFrom().name.toString());
+
+    for (Leg leg : legs) {
+      if (leg.isWalkingLeg()) {
+        buf.walk((int) leg.getDuration().toSeconds());
+      } else if (leg instanceof TransitLeg transitLeg) {
+        buf.transit(
+          transitLeg.getMode().name(),
+          transitLeg.getTrip().logName(),
+          transitLeg.getStartTime(),
+          transitLeg.getEndTime()
+        );
+      } else if (leg instanceof StreetLeg streetLeg) {
+        buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
+      }
+      buf.stop(leg.getTo().name.toString());
+    }
+
+    // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
+    // use-case.
+    buf.summary(
+      RaptorCostConverter.toRaptorCost(generalizedCost),
+      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
+    );
+
+    return buf.toString();
+  }
+
+  private static int penaltyCost(TimeAndCost penalty) {
+    return penalty.cost().toSeconds();
   }
 }

@@ -38,7 +38,7 @@ class EgressPathsTest {
     // Number of rides, smallest is better
     flex(STOP_D, D1m, 2),
     flex(STOP_D, D1m, 3),
-    // Opening Hours dominate each other(no check on overlapping)
+    // Opening Hours dominate each other (no check on overlapping)
     walk(STOP_E, D2m),
     walk(STOP_E, D1m).openingHours("10:00", "11:45"),
     walk(STOP_E, D1m).openingHours("11:30", "12:30"),
@@ -83,18 +83,15 @@ class EgressPathsTest {
       """.strip(),
       subjectStd.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
     );
+
     assertEquals(
       """
       Flex 1m C₁120 1x ~ 3
       Flex 1m C₁120 1x ~ 4
       Flex 1m C₁120 2x ~ 5
-      Flex 1m C₁120 3x ~ 5
-      Flex 2m C₁240 1x ~ 3
-      Flex+Walk 1m C₁120 1x ~ 4
       Walk 1m C₁120 Open(10:00 11:45) ~ 6
       Walk 1m C₁120 Open(11:30 12:30) ~ 6
       Walk 1m C₁120 ~ 2
-      Walk 2m C₁240 Open(14:00 14:00) ~ 6
       Walk 2m C₁240 ~ 6
       """.strip(),
       subjectMc.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
@@ -107,8 +104,10 @@ class EgressPathsTest {
       toString(new int[] { STOP_A, STOP_E }),
       toString(subjectStd.egressesWitchStartByWalking())
     );
+
+    //[2, 6]
     assertEquals(
-      toString(new int[] { STOP_A, STOP_C, STOP_E }),
+      toString(new int[] { STOP_A, STOP_E }),
       toString(subjectMc.egressesWitchStartByWalking())
     );
   }

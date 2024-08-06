@@ -2,13 +2,15 @@ package org.opentripplanner.apis.transmodel.model.plan;
 
 import graphql.Scalars;
 import graphql.language.FloatValue;
-import graphql.language.IntValue;
 import graphql.language.ObjectField;
 import graphql.language.ObjectValue;
+import graphql.language.StringValue;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
+import java.util.Map;
+import org.opentripplanner.framework.graphql.scalar.CostScalarFactory;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class RelaxCostType {
@@ -26,8 +28,8 @@ public class RelaxCostType {
       with twice as high cost as another one, is accepted. A `constant=$300` means a "fixed"
       constant is added to the limit. A `{ratio=1.0, constant=0}` is said to be the NORMAL relaxed
       cost - the limit is the same as the cost used to calculate the limit. The NORMAL is usually
-      the default. We can express the RelaxCost as a function `f(x) = constant + ratio * x`.
-      `f(x)=x` is the NORMAL function.
+      the default. We can express the RelaxCost as a function `f(t) = constant + ratio * t`.
+      `f(t)=t` is the NORMAL function.
       """
     )
     .field(
@@ -44,11 +46,12 @@ public class RelaxCostType {
         .newInputObjectField()
         .name(CONSTANT)
         .description(
-          "The constant value to add to the limit. Must be a positive number. The unit" +
-          " is cost-seconds."
+          "The constant value to add to the limit. Must be a positive number. The value is " +
+          "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
+          "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
         )
-        .defaultValueLiteral(IntValue.of(0))
-        .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLID)))
+        .defaultValueProgrammatic("0s")
+        .type(CostScalarFactory.costScalar())
         .build()
     )
     .build();
@@ -63,9 +66,31 @@ public class RelaxCostType {
         ObjectField
           .newObjectField()
           .name(CONSTANT)
-          .value(IntValue.of(value.constant().toSeconds()))
+          // We only use this to display the default value (this is an input type), so using
+          // the lenient OTP version of duration is ok - it is slightly more readable.
+          .value(StringValue.of(DurationUtils.durationToStr(value.constant().asDuration())))
           .build()
       )
       .build();
+  }
+
+  public static CostLinearFunction mapToDomain(
+    Map<String, Object> input,
+    CostLinearFunction defaultValue
+  ) {
+    if (input == null || input.isEmpty()) {
+      return defaultValue;
+    }
+
+    double ratio = 1.0;
+    Cost constant = Cost.ZERO;
+
+    if (input.containsKey(RATIO)) {
+      ratio = (Double) input.get(RATIO);
+    }
+    if (input.containsKey(CONSTANT)) {
+      constant = (Cost) input.get(CONSTANT);
+    }
+    return CostLinearFunction.of(constant, ratio);
   }
 }

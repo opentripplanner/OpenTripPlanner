@@ -1,8 +1,21 @@
 package org.opentripplanner.raptor.util;
 
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 public class IntIterators {
+
+  private static final IntIterator EMPTY = new IntIterator() {
+    @Override
+    public int next() {
+      return RaptorConstants.NOT_FOUND;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return false;
+    }
+  };
 
   /** This is private to forbid construction. */
   private IntIterators() {
@@ -116,5 +129,12 @@ public class IntIterators {
   /** Return a single value once. */
   public static IntIterator singleValueIterator(final int value) {
     return intIncIterator(value, value + 1);
+  }
+
+  /**
+   * Return an empty iterator. All calls to {@link IntIterator#hasNext()} will return {@code false}.
+   */
+  public static IntIterator empty() {
+    return EMPTY;
   }
 }

@@ -43,16 +43,16 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
    */
   private final FrequencyEntry[] frequencies;
 
-  /** The date for which the filtering was performed. */
-  private final LocalDate localDate;
+  /** The service date of the trip pattern. */
+  private final LocalDate serviceDate;
 
   /**
-   * The date on which the first trip departs.
+   * The running date on which the first trip departs. Not necessarily the same as the service date.
    */
   private final LocalDate startOfRunningPeriod;
 
   /**
-   * The date on which the last trip arrives.
+   * The running date on which the last trip arrives.
    */
   private final LocalDate endOfRunningPeriod;
 
@@ -60,19 +60,19 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     RoutingTripPattern tripPattern,
     List<TripTimes> tripTimes,
     List<FrequencyEntry> frequencies,
-    LocalDate localDate
+    LocalDate serviceDate
   ) {
     this.tripPattern = tripPattern;
     this.tripTimes = tripTimes.toArray(new TripTimes[0]);
     this.frequencies = frequencies.toArray(new FrequencyEntry[0]);
-    this.localDate = localDate;
+    this.serviceDate = serviceDate;
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
     if (hasFrequencies()) {
       this.startOfRunningPeriod =
         ServiceDateUtils
           .asDateTime(
-            localDate,
+            serviceDate,
             frequencies
               .stream()
               .mapToInt(frequencyEntry -> frequencyEntry.startTime)
@@ -84,7 +84,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
       this.endOfRunningPeriod =
         ServiceDateUtils
           .asDateTime(
-            localDate,
+            serviceDate,
             frequencies
               .stream()
               .mapToInt(frequencyEntry -> frequencyEntry.endTime)
@@ -96,11 +96,11 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
       // These depend on the tripTimes array being sorted
       var first = tripTimes.get(0);
       this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(localDate, first.getDepartureTime(0)).toLocalDate();
+        ServiceDateUtils.asDateTime(serviceDate, first.getDepartureTime(0)).toLocalDate();
       var last = tripTimes.get(tripTimes.size() - 1);
       this.endOfRunningPeriod =
         ServiceDateUtils
-          .asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1))
+          .asDateTime(serviceDate, last.getArrivalTime(last.getNumStops() - 1))
           .toLocalDate();
       assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
@@ -126,18 +126,31 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return tripTimes[i];
   }
 
-  public LocalDate getLocalDate() {
-    return localDate;
+  /**
+   * The service date for which the trip pattern belongs to. Not necessarily the same as the start
+   * of the running period in cases where the trip pattern only runs after midnight.
+   */
+  public LocalDate getServiceDate() {
+    return serviceDate;
   }
 
   public int numberOfTripSchedules() {
     return tripTimes.length;
   }
 
+  /**
+   * The start of the running period. This is determined by the first departure time for this
+   * pattern. Not necessarily the same as the service date if the pattern runs after midnight.
+   */
   public LocalDate getStartOfRunningPeriod() {
     return startOfRunningPeriod;
   }
 
+  /**
+   * Returns the running dates. A Trip "runs through" a date if any of its arrivals or departures is
+   * happening on that date. The same trip pattern can therefore have multiple running dates and
+   * trip pattern is not required to "run" on its service date.
+   */
   public List<LocalDate> getRunningPeriodDates() {
     // Add one day to ensure last day is included
     return startOfRunningPeriod
@@ -151,14 +164,14 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   @Override
   public int compareTo(TripPatternForDate other) {
-    return localDate.compareTo(other.localDate);
+    return serviceDate.compareTo(other.serviceDate);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
       tripPattern,
-      localDate,
+      serviceDate,
       Arrays.hashCode(tripTimes),
       Arrays.hashCode(frequencies)
     );
@@ -176,7 +189,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
     return (
       tripPattern.equals(that.tripPattern) &&
-      localDate.equals(that.localDate) &&
+      serviceDate.equals(that.serviceDate) &&
       Arrays.equals(tripTimes, that.tripTimes) &&
       Arrays.equals(frequencies, that.frequencies)
     );
@@ -184,7 +197,9 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   @Override
   public String toString() {
-    return "TripPatternForDate{" + "tripPattern=" + tripPattern + ", localDate=" + localDate + '}';
+    return (
+      "TripPatternForDate{" + "tripPattern=" + tripPattern + ", serviceDate=" + serviceDate + '}'
+    );
   }
 
   @Nullable
@@ -214,7 +229,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
       return this;
     }
 
-    return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, localDate);
+    return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, serviceDate);
   }
 
   private static void assertValidRunningPeriod(

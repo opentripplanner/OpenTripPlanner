@@ -48,8 +48,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
    * additional free transfers from there.
    */
   @Override
-  protected boolean populateFare(
-    ItineraryFares fare,
+  protected ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -85,7 +84,6 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
     cost = cost.plus(currentTransferWindowCost);
-    fare.addFare(fareType, cost);
     var fp = new FareProduct(
       new FeedScopedId("fares", fareType.name()),
       fareType.name(),
@@ -94,9 +92,11 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       null,
       null
     );
-    fare.addItineraryProducts(List.of(fp));
-    fare.addFare(fareType, cost);
-    return cost.greaterThan(zero);
+    var fare = ItineraryFares.empty();
+    if (cost.greaterThan(zero)) {
+      fare.addItineraryProducts(List.of(fp));
+    }
+    return fare;
   }
 
   @Override

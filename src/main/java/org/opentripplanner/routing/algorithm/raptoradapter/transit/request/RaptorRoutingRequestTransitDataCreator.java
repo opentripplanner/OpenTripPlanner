@@ -19,6 +19,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +94,7 @@ class RaptorRoutingRequestTransitDataCreator {
     ZonedDateTime transitSearchTimeZero,
     List<TripPatternForDate> patternForDateList,
     TransitDataProviderFilter filter,
-    PriorityGroupConfigurator priorityGroupConfigurator
+    TransitGroupPriorityService transitGroupPriorityService
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
@@ -120,7 +121,7 @@ class RaptorRoutingRequestTransitDataCreator {
       // Calculate offsets per date
       int[] offsets = new int[patternsSorted.length];
       for (int i = 0; i < patternsSorted.length; i++) {
-        LocalDate serviceDate = patternsSorted[i].getLocalDate();
+        LocalDate serviceDate = patternsSorted[i].getServiceDate();
         if (offsetCache.containsKey(serviceDate)) {
           offsets[i] = offsetCache.get(serviceDate);
         } else {
@@ -147,7 +148,7 @@ class RaptorRoutingRequestTransitDataCreator {
             tripPattern.getAlightingPossible(),
             BoardAlight.ALIGHT
           ),
-          priorityGroupConfigurator.lookupTransitPriorityGroupId(tripPattern)
+          transitGroupPriorityService.lookupTransitGroupPriorityId(tripPattern.getPattern())
         )
       );
     }
@@ -159,7 +160,7 @@ class RaptorRoutingRequestTransitDataCreator {
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     TransitDataProviderFilter filter,
-    PriorityGroupConfigurator priorityGroupConfigurator
+    TransitGroupPriorityService transitGroupPriorityService
   ) {
     List<TripPatternForDate> tripPatternForDates = getTripPatternsForDateRange(
       additionalPastSearchDays,
@@ -167,7 +168,7 @@ class RaptorRoutingRequestTransitDataCreator {
       filter
     );
 
-    return merge(transitSearchTimeZero, tripPatternForDates, filter, priorityGroupConfigurator);
+    return merge(transitSearchTimeZero, tripPatternForDates, filter, transitGroupPriorityService);
   }
 
   private static List<TripPatternForDate> filterActiveTripPatterns(
@@ -185,7 +186,9 @@ class RaptorRoutingRequestTransitDataCreator {
       filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
     Predicate<TripTimes> tripTimesWithoutSubmodesPredicate = tripTimes ->
       filter.tripTimesPredicate(tripTimes, false);
-    Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForDate(date);
+    Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForRunningDate(
+      date
+    );
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {

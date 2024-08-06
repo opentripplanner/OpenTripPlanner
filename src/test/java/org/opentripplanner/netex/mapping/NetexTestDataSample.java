@@ -40,6 +40,7 @@ import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceJourneyRefStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
@@ -50,9 +51,11 @@ import org.rutebanken.netex.model.Vias_RelStructure;
 public class NetexTestDataSample {
 
   public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
+  public static final String DATED_SERVICE_JOURNEY_ID_1 = "RUT:DatedServiceJourney:1";
+  public static final String DATED_SERVICE_JOURNEY_ID_2 = "RUT:DatedServiceJourney:2";
   public static final List<String> DATED_SERVICE_JOURNEY_ID = List.of(
-    "RUT:DatedServiceJourney:1",
-    "RUT:DatedServiceJourney:2"
+    DATED_SERVICE_JOURNEY_ID_1,
+    DATED_SERVICE_JOURNEY_ID_2
   );
   public static final List<String> OPERATING_DAYS = List.of("2022-02-28", "2022-02-29");
   private static final DayType EVERYDAY = new DayType()
@@ -174,6 +177,11 @@ public class NetexTestDataSample {
 
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
           .withId(DATED_SERVICE_JOURNEY_ID.get(i))
+          .withJourneyRef(
+            List.of(
+              MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
+            )
+          )
           .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
           .withOperatingDayRef(new OperatingDayRefStructure().withRef(operatingDay.getId()));
 
@@ -216,6 +224,15 @@ public class NetexTestDataSample {
 
   public HierarchicalMapById<ServiceJourney> getServiceJourneyById() {
     return serviceJourneyById;
+  }
+
+  public DatedServiceJourney getDatedServiceJourneyById(String id) {
+    return datedServiceJourneyBySjId
+      .values()
+      .stream()
+      .filter(datedServiceJourney -> datedServiceJourney.getId().equals(id))
+      .findFirst()
+      .orElse(null);
   }
 
   public ServiceJourney getServiceJourney() {

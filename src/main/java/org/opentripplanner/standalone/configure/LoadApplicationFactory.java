@@ -16,6 +16,7 @@ import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeReposito
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.LoadConfigModule;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -53,6 +54,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   StopConsolidationRepository emptyStopConsolidationRepository();
+
+  @Singleton
+  StreetLimitationParameters emptyStreetLimitationParameters();
 
   @Component.Builder
   interface Builder {

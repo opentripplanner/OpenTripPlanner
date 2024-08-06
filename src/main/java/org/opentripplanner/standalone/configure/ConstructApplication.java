@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -31,7 +30,9 @@ import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -74,7 +75,8 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
-    @Nullable StopConsolidationRepository stopConsolidationRepository
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
+    StreetLimitationParameters streetLimitationParameters
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -94,6 +96,7 @@ public class ConstructApplication {
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
+        .streetLimitationParameters(streetLimitationParameters)
         .build();
   }
 
@@ -126,6 +129,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
+      factory.streetLimitationParameters(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -176,8 +180,9 @@ public class ConstructApplication {
     }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
-      LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(createServerContext());
+      LOG.info("Initializing geocoder");
+      // eagerly initialize the geocoder
+      this.factory.luceneIndex();
     }
   }
 
@@ -198,7 +203,7 @@ public class ConstructApplication {
     TransitModel transitModel,
     TransitTuningParameters tuningParameters
   ) {
-    if (!transitModel.hasTransit() || transitModel.getTransitModelIndex() == null) {
+    if (!transitModel.hasTransit() || !transitModel.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
@@ -207,10 +212,7 @@ public class ConstructApplication {
     transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
     transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
     transitModel.setTransitLayerUpdater(
-      new TransitLayerUpdater(
-        transitModel,
-        transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
-      )
+      new TransitLayerUpdater(new DefaultTransitService(transitModel))
     );
   }
 
@@ -229,7 +231,7 @@ public class ConstructApplication {
       LOG.info(progress.startMessage());
 
       transferCacheRequests.forEach(request -> {
-        transitModel.getTransitLayer().getRaptorTransfersForRequest(request);
+        transitModel.getTransitLayer().initTransferCacheForRequest(request);
 
         //noinspection Convert2MethodRef
         progress.step(s -> LOG.info(s));
@@ -303,5 +305,9 @@ public class ConstructApplication {
 
   public EmissionsDataModel emissionsDataModel() {
     return factory.emissionsDataModel();
+  }
+
+  public StreetLimitationParameters streetLimitationParameters() {
+    return factory.streetLimitationParameters();
   }
 }

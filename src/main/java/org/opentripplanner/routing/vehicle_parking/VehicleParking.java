@@ -120,9 +120,10 @@ public class VehicleParking implements Serializable {
     VehicleParkingSpaces availability,
     VehicleParkingGroup vehicleParkingGroup
   ) {
-    this.id = id;
+    this.id =
+      Objects.requireNonNull(id, "%s must have an ID".formatted(this.getClass().getSimpleName()));
     this.name = name;
-    this.coordinate = coordinate;
+    this.coordinate = Objects.requireNonNull(coordinate);
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
@@ -307,6 +308,7 @@ public class VehicleParking implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(VehicleParking.class)
+      .addStr("id", id.toString())
       .addStr("name", name.toString())
       .addObj("coordinate", coordinate)
       .toString();

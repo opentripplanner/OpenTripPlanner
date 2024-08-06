@@ -547,7 +547,9 @@ class DefaultMapper implements OsmTagMapper {
     props.setCarSpeed("highway=road", 11.2f); // ~= 25 mph
 
     // default ~= 25 mph
-    props.defaultSpeed = 11.2f;
+    props.defaultCarSpeed = 11.2f;
+    // 38 m/s ~= 85 mph ~= 137 kph
+    props.maxPossibleCarSpeed = 38f;
 
     /* special situations */
 
@@ -600,27 +602,11 @@ class DefaultMapper implements OsmTagMapper {
 
     /* Portland-local mixins */
 
-    /*
-     * the RLIS/CCGIS:bicycle=designated mixins are coded out as they are no longer neccessary because of of the bicycle=designated block of code
-     * above. This switch makes our weighting system less reliant on tags that aren't generally used by the OSM community, and prevents the double
-     * counting that was occuring on streets with both bicycle infrastructure and an RLIS:bicycle=designated tag
-     */
-
-    /*
-     * props.setProperties("RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
-     */
-    props.setMixinProperties("RLIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("RLIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("RLIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
-    /*
-     * props.setProperties("CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
-     */
-    props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
-    props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
-    props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
-
     props.setMixinProperties("foot=discouraged", ofWalkSafety(3));
     props.setMixinProperties("bicycle=discouraged", ofBicycleSafety(3));
+
+    props.setMixinProperties("foot=use_sidepath", ofWalkSafety(5));
+    props.setMixinProperties("bicycle=use_sidepath", ofBicycleSafety(5));
 
     populateNotesAndNames(props);
 
