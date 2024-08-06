@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -18,6 +17,7 @@ class EnglishNgramAnalyzerTest {
     var analyzer = new EnglishNGramAnalyzer();
     List<String> result = analyze("Alexanderplatz", analyzer);
 
+    //System.out.println(result.stream().collect(Collectors.joining("\",\"", "\"", "\"")));
     assertEquals(
       List.of(
         "Ale",
@@ -99,7 +99,6 @@ class EnglishNgramAnalyzerTest {
     var analyzer = new EnglishNGramAnalyzer();
     List<String> result = analyze("Meridian Ave N & N 148th St", analyzer);
 
-    System.out.println(result.stream().collect(Collectors.joining("\",\"", "\"", "\"")));
     assertEquals(
       List.of(
         "Mer",
