@@ -98,6 +98,10 @@ class LuceneIndexTest {
     .withCoordinate(52.52277, 13.41046)
     .build();
 
+  static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop("Meridian Ave N & N 148th").build();
+
+  static final RegularStop MERIDIAN_1 = TEST_MODEL.stop("Meridian N & Spencer").build();
+
   static LuceneIndex index;
 
   static StopClusterMapper mapper;
@@ -113,7 +117,9 @@ class LuceneIndexTest {
         LICHTERFELDE_OST_2,
         WESTHAFEN,
         ARTS_CENTER,
-        ARTHUR
+        ARTHUR,
+        MERIDIAN_AVE,
+        MERIDIAN_1
       )
       .forEach(stopModel::withRegularStop);
     List
@@ -294,6 +300,15 @@ class LuceneIndexTest {
       assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), cluster.primary().name());
       assertEquals(List.of(StopClusterMapper.toAgency(BVG)), cluster.primary().agencies());
       assertEquals("A Publisher", cluster.primary().feedPublisher().name());
+    }
+
+    @Test
+    void numbers() {
+      var result = index
+        .queryStopClusters("Meridian Ave N & N 148")
+        .map(s -> s.primary().name())
+        .toList();
+      assertEquals(List.of("Meridian Ave N & N 148th", "Meridian N & Spencer"), result);
     }
   }
 
