@@ -108,21 +108,21 @@ class LuceneIndexTest {
     .stop("Meridian N & Spencer")
     .withId(FeedScopedId.parse("pierce:13268"))
     .withCode("4168")
-    .withCoordinate(47.209366,-122.293999)
+    .withCoordinate(47.209366, -122.293999)
     .build();
 
   static final RegularStop MERIDIAN_N_2 = TEST_MODEL
     .stop("Meridian N & Spencer")
     .withId(FeedScopedId.parse("pierce:30976"))
     .withCode("4169")
-    .withCoordinate(47.209316,-122.293841)
+    .withCoordinate(47.209316, -122.293841)
     .build();
 
   static final RegularStop MERIDIAN_N_3 = TEST_MODEL
     .stop("N 205th St & Meridian Ave N")
     .withId(FeedScopedId.parse("commtrans:490"))
     .withCode("490")
-    .withCoordinate(47.209316,-122.293841)
+    .withCoordinate(47.777632, -122.3346)
     .build();
 
   static LuceneIndex index;
@@ -329,8 +329,14 @@ class LuceneIndexTest {
 
     @Test
     void number() {
-      var names = index.queryStopClusters("Meridian Ave N & N 148").map(c -> c.primary().name()).toList();
-      assertEquals(List.of(MERIDIAN_AVE.getName().toString(), MERIDIAN_N_1.getName().toString()), names);
+      var names = index
+        .queryStopClusters("Meridian Ave N & N 148")
+        .map(c -> c.primary().name())
+        .toList();
+      assertEquals(
+        List.of(MERIDIAN_AVE.getName().toString(), MERIDIAN_N_1.getName().toString()),
+        names
+      );
     }
   }
 

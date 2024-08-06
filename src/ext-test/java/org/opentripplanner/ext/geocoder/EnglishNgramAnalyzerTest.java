@@ -82,6 +82,40 @@ class EnglishNgramAnalyzerTest {
     );
   }
 
+  @Test
+  void ampersand() throws IOException {
+    var analyzer = new EnglishNGramAnalyzer();
+    List<String> result = analyze("Meridian Ave N & N 148th St", analyzer);
+
+    assertEquals(
+      List.of(
+        "Meri",
+        "Merid",
+        "Meridi",
+        "Meridia",
+        "Meridian",
+        "erid",
+        "eridi",
+        "eridia",
+        "eridian",
+        "ridi",
+        "ridia",
+        "ridian",
+        "idia",
+        "idian",
+        "dian",
+        "Av",
+        "N",
+        "N",
+        "148t",
+        "148th",
+        "48th",
+        "St"
+      ),
+      result
+    );
+  }
+
   public List<String> analyze(String text, Analyzer analyzer) throws IOException {
     List<String> result = new ArrayList<>();
     TokenStream tokenStream = analyzer.tokenStream("name", text);
