@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,8 +50,6 @@ public class TransitLayer {
 
   private final StopModel stopModel;
 
-  private final ZoneId transitDataZoneId;
-
   private final RaptorRequestTransferCache transferCache;
 
   private ConstrainedTransfersForPatterns constrainedTransfers;
@@ -73,7 +70,6 @@ public class TransitLayer {
       transitLayer.transfersByStopIndex,
       transitLayer.transferService,
       transitLayer.stopModel,
-      transitLayer.transitDataZoneId,
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
@@ -86,7 +82,6 @@ public class TransitLayer {
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,
     StopModel stopModel,
-    ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
@@ -96,7 +91,6 @@ public class TransitLayer {
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
     this.stopModel = stopModel;
-    this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
@@ -115,16 +109,6 @@ public class TransitLayer {
    */
   public Collection<TripPatternForDate> getTripPatternsForRunningDate(LocalDate date) {
     return tripPatternsRunningOnDate.getOrDefault(date, List.of());
-  }
-
-  /**
-   * This is the time zone which is used for interpreting all local "service" times (in transfers,
-   * trip schedules and so on). This is the time zone of the internal OTP time - which is used in
-   * logging and debugging. This is independent of the time zone of imported data and of the time
-   * zone used on any API - it can be the same, but it does not need to.
-   */
-  public ZoneId getTransitDataZoneId() {
-    return transitDataZoneId;
   }
 
   public int getStopCount() {

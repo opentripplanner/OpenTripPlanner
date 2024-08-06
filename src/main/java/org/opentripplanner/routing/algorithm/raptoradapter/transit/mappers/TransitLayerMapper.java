@@ -103,7 +103,6 @@ public class TransitLayerMapper {
       transferByStopIndex,
       transitService.getTransferService(),
       stopModel,
-      transitService.getTimeZone(),
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
