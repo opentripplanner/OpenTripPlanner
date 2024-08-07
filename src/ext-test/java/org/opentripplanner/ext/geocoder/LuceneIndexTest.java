@@ -305,7 +305,15 @@ class LuceneIndexTest {
 
     @ParameterizedTest
     @ValueSource(
-      strings = { "Meridian Ave N & N 148th", "Meridian Ave N & N 148", "Meridian Ave N N 148" }
+      strings = {
+        "Meridian Ave N & N 148th",
+        "Meridian Ave N & N 148",
+        "Meridian Ave N N 148",
+        "Meridian Ave N 148",
+        "Meridian & N 148",
+        "Meridian Ave 148",
+        "Meridian Av 148",
+      }
     )
     void shortTokens(String query) {
       var names = index.queryStopClusters(query).map(c -> c.primary().name()).toList();
