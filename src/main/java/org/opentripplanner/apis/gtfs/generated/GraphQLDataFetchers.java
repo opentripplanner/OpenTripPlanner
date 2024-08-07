@@ -317,11 +317,21 @@ public class GraphQLDataFetchers {
 
   /** Trip on a specific date */
   public interface GraphQLDatedTrip {
-    public DataFetcher<String> date();
+    public DataFetcher<java.time.LocalDate> date();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-    public DataFetcher<Trip> trip();
+    public DataFetcher<TripPattern> pattern();
+
+    public DataFetcher<Route> route();
+
+    public DataFetcher<Iterable<Object>> stops();
+
+    public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+
+    public DataFetcher<String> tripHeadsign();
+
+    public DataFetcher<String> tripShortName();
   }
 
   /** A connection to a list of dated trips */

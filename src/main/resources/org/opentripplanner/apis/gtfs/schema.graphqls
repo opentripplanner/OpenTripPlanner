@@ -386,9 +386,33 @@ type Currency {
 
 "Trip on a specific date"
 type DatedTrip implements Node {
-  date: String!
+  """
+  The service date when the trip occurs.
+  
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  date: LocalDate!
+  "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
-  trip: Trip!
+  "The pattern the trip is running on"
+  pattern: Pattern
+  "The route the trip is running on"
+  route: Route!
+  "List of stops this trip passes through"
+  stops: [Stop!]!
+  "List of times when this trip arrives to or departs from a stop"
+  stoptimes: [Stoptime]
+  "Headsign of the vehicle when running on this trip"
+  tripHeadsign(
+    """
+    If a translated headsign is found from GTFS translation.txt and wanted language is not same as
+    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+    """
+    language: String
+  ): String
+  tripShortName: String
 }
 
 "A connection to a list of dated trips"
