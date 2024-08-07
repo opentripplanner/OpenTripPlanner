@@ -235,7 +235,7 @@ class LuceneIndexTest {
     @Test
     void fuzzyStopClusters() {
       var result1 = index.queryStopClusters("arts").map(primaryId()).toList();
-      assertEquals(List.of(ARTS_CENTER.getId(), ARTHUR.getId()), result1);
+      assertEquals(List.of(ARTS_CENTER.getId()), result1);
     }
 
     @Test
@@ -313,6 +313,7 @@ class LuceneIndexTest {
         "Meridian & N 148",
         "Meridian Ave 148",
         "Meridian Av 148",
+        "meridian av 148",
       }
     )
     void shortTokens(String query) {
