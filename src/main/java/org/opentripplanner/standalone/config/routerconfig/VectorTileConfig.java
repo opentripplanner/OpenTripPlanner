@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerType;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class VectorTileConfig
-  implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
+public class VectorTileConfig implements VectorTilesResource.LayersParameters<LayerType> {
 
   public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null, null);
-  private final List<LayerParameters<VectorTilesResource.LayerType>> layers;
+  private final List<LayerParameters<LayerType>> layers;
 
   @Nullable
   private final String basePath;
@@ -28,7 +28,7 @@ public class VectorTileConfig
   private final String attribution;
 
   VectorTileConfig(
-    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers,
+    Collection<? extends LayerParameters<LayerType>> layers,
     @Nullable String basePath,
     @Nullable String attribution
   ) {
@@ -38,7 +38,7 @@ public class VectorTileConfig
   }
 
   @Override
-  public List<LayerParameters<VectorTilesResource.LayerType>> layers() {
+  public List<LayerParameters<LayerType>> layers() {
     return layers;
   }
 

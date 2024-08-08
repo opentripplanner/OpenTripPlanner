@@ -56,6 +56,14 @@ public class PatternByServiceDatesFilter {
     );
   }
 
+  public PatternByServiceDatesFilter(LocalDateRange range, TransitService transitService) {
+    this(
+      range,
+      transitService::getPatternsForRoute,
+      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
+    );
+  }
+
   /**
    * Filter the patterns by the service dates that it operates on.
    */
