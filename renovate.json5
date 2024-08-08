@@ -74,7 +74,6 @@
       "description": "Automerge Maven plugins in a single PR",
       "groupName": "Maven plugins",
       "matchPackageNames": [
-        "ch.qos.logback:logback-classic",
         "io.github.git-commit-id:git-commit-id-maven-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.codehaus.mojo:build-helper-maven-plugin",
@@ -124,7 +123,7 @@
       ]
     },
     {
-      "groupName": "Automerge mkdocs in a single PR",
+      "groupName": "mkdocs",
       "description": "automerge mkdocs-material every quarter",
       "matchPackageNames": [
         "mkdocs",
@@ -136,12 +135,14 @@
       "automerge": true
     },
     {
-      "description": "automatically merge slf4j",
+      "description": "Automerge logging dependencies in a single PR",
+      "groupName": "logging",
       "matchPackagePrefixes": [
-        "org.slf4j:"
+        "org.slf4j:",
+        "ch.qos.logback:"
       ],
       "automerge": true,
-      "schedule": "after 11pm and before 5am every weekday"
+      "schedule": "on the 4th day of the month"
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",
