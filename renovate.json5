@@ -103,17 +103,16 @@
         "org.onebusaway:onebusaway-gtfs",
         "com.google.cloud:libraries-bom",
         "com.google.guava:guava",
-        "@graphql-codegen/add",
-        "@graphql-codegen/cli",
-        "@graphql-codegen/java",
-        "@graphql-codegen/java-resolvers",
-        "graphql",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx"
       ],
-      // we don't use the 'monthly' preset because that only fires on the first day of the month
-      // when there might already other PRs open
       "schedule": "on the 7th through 8th day of the month"
+    },
+    {
+      "groupName": "Update GTFS API code generation in a single PR",
+      "matchFiles": ["src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
+      "reviewers": ["optionsome", "leonardehrenfried"],
+      "schedule": "on the 11th through 12th day of the month"
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
@@ -125,6 +124,7 @@
       ]
     },
     {
+      "groupName": "Automerge mkdocs in a single PR",
       "description": "automerge mkdocs-material every quarter",
       "matchPackageNames": [
         "mkdocs",
