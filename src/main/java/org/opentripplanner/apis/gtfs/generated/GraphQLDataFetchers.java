@@ -334,14 +334,20 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> tripShortName();
   }
 
-  /** A connection to a list of dated trips */
+  /**
+   * A connection to a list of dated trips that follows
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
   public interface GraphQLDatedTripConnection {
     public DataFetcher<Iterable<Edge<DatedTrip>>> edges();
 
     public DataFetcher<Object> pageInfo();
   }
 
-  /** An edge for DatedTrip connection */
+  /**
+   * An edge for DatedTrip connection. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
   public interface GraphQLDatedTripEdge {
     public DataFetcher<String> cursor();
 
