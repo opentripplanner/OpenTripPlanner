@@ -394,12 +394,16 @@ type DatedTrip implements Node {
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   date: LocalDate!
+  "The time when the trip ends including real-time information, if available."
+  end: DatedTripTime
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "The pattern the trip is running on"
   pattern: Pattern
   "The route the trip is running on"
   route: Route!
+  "The time when the trip starts including real-time information, if available."
+  start: DatedTripTime
   "List of stops this trip passes through"
   stops: [Stop!]!
   "List of times when this trip arrives to or departs from a stop"
@@ -447,6 +451,17 @@ type DatedTripEdge {
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   node: DatedTrip
+}
+
+"""
+Information about a dated trip's start or end times. May contain real-time information if
+available.
+"""
+type DatedTripTime {
+  "The estimated time of the event. If no real-time information is available, this is null."
+  estimated: RealTimeEstimate
+  "The scheduled time of the event."
+  scheduledTime: OffsetDateTime
 }
 
 """

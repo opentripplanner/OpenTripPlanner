@@ -124,6 +124,11 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   boolean isPredictionInaccurate(int stop);
 
   /**
+   * Return if trip has been updated and stop has not been given a NO_DATA update.
+   */
+  boolean isRealtimeUpdated(int stop);
+
+  /**
    * @return the whole trip's headsign. Individual stops can have different headsigns.
    */
   I18NString getTripHeadsign();

@@ -21,6 +21,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.DatedTripTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -319,11 +320,15 @@ public class GraphQLDataFetchers {
   public interface GraphQLDatedTrip {
     public DataFetcher<java.time.LocalDate> date();
 
+    public DataFetcher<DatedTripTime> end();
+
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
     public DataFetcher<TripPattern> pattern();
 
     public DataFetcher<Route> route();
+
+    public DataFetcher<DatedTripTime> start();
 
     public DataFetcher<Iterable<Object>> stops();
 
@@ -352,6 +357,16 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> cursor();
 
     public DataFetcher<DatedTrip> node();
+  }
+
+  /**
+   * Information about a dated trip's start or end times. May contain real-time information if
+   * available.
+   */
+  public interface GraphQLDatedTripTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
   /**

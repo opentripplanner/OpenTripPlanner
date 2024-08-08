@@ -62,6 +62,7 @@ config:
     DatedTrip: org.opentripplanner.transit.model.timetable.DatedTrip#DatedTrip
     DatedTripConnection: graphql.relay.Connection#Connection<DatedTrip>
     DatedTripEdge: graphql.relay.Edge#Edge<DatedTrip>
+    DatedTripTime: org.opentripplanner.apis.gtfs.model.DatedTripTime#DatedTripTime
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step

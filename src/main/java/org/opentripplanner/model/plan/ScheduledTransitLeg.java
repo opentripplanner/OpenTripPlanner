@@ -219,11 +219,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public boolean getRealTime() {
     return (
-      !tripTimes.isScheduled() &&
-      (
-        !tripTimes.isNoDataStop(boardStopPosInPattern) ||
-        !tripTimes.isNoDataStop(alightStopPosInPattern)
-      )
+      tripTimes.isRealtimeUpdated(boardStopPosInPattern) ||
+      tripTimes.isRealtimeUpdated(alightStopPosInPattern)
     );
   }
 
