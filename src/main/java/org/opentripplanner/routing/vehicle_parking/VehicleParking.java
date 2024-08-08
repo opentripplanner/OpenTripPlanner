@@ -257,7 +257,7 @@ public class VehicleParking implements Serializable {
    * The only mutable method in this class: it allows to update the available parking spaces during
    * real-time updates.
    * Since the entity is used both by writer threads (real-time updates) and reader threads
-   * (A* routing), the update process is synchronized.
+   * (A* routing), the variable holding the information is marked as volatile.
    */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
     this.availability = vehicleParkingSpaces;
