@@ -258,9 +258,7 @@ public class VehicleParking implements Serializable {
    * (A* routing), the update process is synchronized.
    */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
-    synchronized (this) {
-      this.availability = vehicleParkingSpaces;
-    }
+    this.availability = vehicleParkingSpaces;
   }
 
   @Override
