@@ -21,13 +21,17 @@ public class VehicleParkingService implements Serializable {
 
   /**
    * To ensure that his is thread-safe, the set stored here should always be immutable.
+   * <p>
+   * The volatile keyword is used to ensure safe publication by clearing CPU caches.
    */
-  private Set<VehicleParking> vehicleParkings = Set.of();
+  private volatile Set<VehicleParking> vehicleParkings = Set.of();
 
   /**
    * To ensure that his is thread-safe, {@link ImmutableListMultimap} is used.
+   * <p>
+   * The volatile keyword is used to ensure safe publication by clearing CPU caches.
    */
-  private ImmutableListMultimap<VehicleParkingGroup, VehicleParking> vehicleParkingGroups = ImmutableListMultimap.of();
+  private volatile ImmutableListMultimap<VehicleParkingGroup, VehicleParking> vehicleParkingGroups = ImmutableListMultimap.of();
 
   /**
    * Does atomic update of {@link VehicleParking} and index of {@link VehicleParkingGroup} in this

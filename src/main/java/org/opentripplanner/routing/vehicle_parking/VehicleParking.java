@@ -96,6 +96,8 @@ public class VehicleParking implements Serializable {
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
   /**
    * The currently available spaces at this vehicle parking.
+   * <p>
+   * The volatile keyword is used to ensure safe publication by clearing CPU caches.
    */
   private volatile VehicleParkingSpaces availability;
   /**
