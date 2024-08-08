@@ -79,7 +79,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
 
     private void handleUpdate(AvailabiltyUpdate update) {
       if (!parkingById.containsKey(update.vehicleParkingId())) {
-        LOG.error(
+        LOG.warn(
           "Parking with id {} does not exist. Skipping availability update.",
           update.vehicleParkingId()
         );

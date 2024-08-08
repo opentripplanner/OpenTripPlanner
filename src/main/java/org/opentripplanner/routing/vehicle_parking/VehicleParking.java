@@ -97,7 +97,7 @@ public class VehicleParking implements Serializable {
   /**
    * The currently available spaces at this vehicle parking.
    */
-  private VehicleParkingSpaces availability;
+  private volatile VehicleParkingSpaces availability;
   /**
    * The vehicle parking group this parking belongs to.
    */
@@ -254,9 +254,13 @@ public class VehicleParking implements Serializable {
   /**
    * The only mutable method in this class: it allows to update the available parking spaces during
    * real-time updates.
+   * Since the entity is used both by writer threads (real-time updates) and reader threads
+   * (A* routing), the update process is synchronized.
    */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
-    this.availability = vehicleParkingSpaces;
+    synchronized (this) {
+      this.availability = vehicleParkingSpaces;
+    }
   }
 
   @Override
