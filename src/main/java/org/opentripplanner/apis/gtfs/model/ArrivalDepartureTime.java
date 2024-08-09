@@ -6,21 +6,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * A scheduled time of a trip's start or end with an optional realtime information.
+ * Timing of an arrival or a departure to or from a stop. May contain real-time information
+ * if available.
  */
-public record DatedTripTime(
+public record ArrivalDepartureTime(
   @Nonnull ZonedDateTime scheduledTime,
   @Nullable RealTimeEstimate estimated
 ) {
   @Nonnull
-  public static DatedTripTime of(ZonedDateTime realtime, int delaySecs) {
+  public static ArrivalDepartureTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new DatedTripTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
+    return new ArrivalDepartureTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
   }
 
   @Nonnull
-  public static DatedTripTime ofStatic(ZonedDateTime staticTime) {
-    return new DatedTripTime(staticTime, null);
+  public static ArrivalDepartureTime ofStatic(ZonedDateTime staticTime) {
+    return new ArrivalDepartureTime(staticTime, null);
   }
 
   /**

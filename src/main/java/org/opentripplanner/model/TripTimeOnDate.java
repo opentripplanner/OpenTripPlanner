@@ -190,6 +190,14 @@ public class TripTimeOnDate {
     return tripTimes.isNoDataStop(stopIndex);
   }
 
+  /**
+   * Is the real-time time a recorded time (i.e. has the vehicle already passed the stop).
+   * This information is currently only available from SIRI feeds.
+   */
+  public boolean isRecordedStop() {
+    return tripTimes.isRecordedStop(stopIndex);
+  }
+
   public RealTimeState getRealTimeState() {
     return tripTimes.isNoDataStop(stopIndex)
       ? RealTimeState.SCHEDULED

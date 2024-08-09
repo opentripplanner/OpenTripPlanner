@@ -154,6 +154,17 @@ type Alert implements Node {
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
 }
 
+"""
+Timing of an arrival or a departure to or from a stop. May contain real-time information if
+available.
+"""
+type ArrivalDepartureTime {
+  "The estimated time of the event. If no real-time information is available, this is null."
+  estimated: RealTimeEstimate
+  "The scheduled time of the event."
+  scheduledTime: OffsetDateTime
+}
+
 "Bike park represents a location where bicycles can be parked."
 type BikePark implements Node & PlaceInterface {
   "ID of the bike park"
@@ -384,6 +395,55 @@ type Currency {
   digits: Int!
 }
 
+"Stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop."
+type DatedStopTime {
+  "Scheduled arrival time to the stop and a realtime estimate, if one exists."
+  arrival: ArrivalDepartureTime
+  "Scheduled departure time from the stop and a realtime estimate, if one exists."
+  departure: ArrivalDepartureTime
+  """
+  Whether the vehicle can be disembarked at this stop. This field can also be
+  used to indicate if disembarkation is possible only with special arrangements.
+  """
+  dropoffType: PickupDropoffType
+  """
+  Vehicle headsign of the trip on this stop. Trip headsigns can change during
+  the trip (e.g. on routes which run on loops), so this value should be used
+  instead of `tripHeadsign` to display the headsign relevant to the user.
+  """
+  headsign(
+    """
+    If translated headsign is found from gtfs translation.txt and wanted language is not same as
+    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+    """
+    language: String
+  ): String
+  """
+  Whether the vehicle can be boarded at this stop. This field can also be used
+  to indicate if boarding is possible only with special arrangements.
+  """
+  pickupType: PickupDropoffType
+  "Whether stop has been updated through a realtime update and if so, how."
+  realtimeState: StopRealTimeState!
+  "The stop where this arrival/departure happens"
+  stop: Stop
+  """
+  The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+  increasing integer sequence along the stops is valid.
+    
+  The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+  between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+  However, it should be noted that real-time updates can change the values, so don't store it for
+  longer amounts of time.
+    
+  Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+  even generated.
+  """
+  stopPosition: Int
+  "true, if this stop is used as a time equalization stop. false otherwise."
+  timepoint: Boolean
+}
+
 "Trip on a specific date"
 type DatedTrip implements Node {
   """
@@ -395,7 +455,7 @@ type DatedTrip implements Node {
   """
   date: LocalDate!
   "The time when the trip ends including real-time information, if available."
-  end: DatedTripTime
+  end: ArrivalDepartureTime
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "The pattern the trip is running on"
@@ -403,11 +463,11 @@ type DatedTrip implements Node {
   "The route the trip is running on"
   route: Route!
   "The time when the trip starts including real-time information, if available."
-  start: DatedTripTime
+  start: ArrivalDepartureTime
   "List of stops this trip passes through"
   stops: [Stop!]!
   "List of times when this trip arrives to or departs from a stop"
-  stoptimes: [Stoptime]
+  stoptimes: [DatedStopTime]
   "Headsign of the vehicle when running on this trip"
   tripHeadsign(
     """
@@ -451,17 +511,6 @@ type DatedTripEdge {
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   node: DatedTrip
-}
-
-"""
-Information about a dated trip's start or end times. May contain real-time information if
-available.
-"""
-type DatedTripTime {
-  "The estimated time of the event. If no real-time information is available, this is null."
-  estimated: RealTimeEstimate
-  "The scheduled time of the event."
-  scheduledTime: OffsetDateTime
 }
 
 """
@@ -3515,6 +3564,25 @@ enum StopAlertType {
   STOP_ON_TRIPS
   "Alerts affecting the trips that go through this stop"
   TRIPS
+}
+
+"Whether stop has been updated through a realtime update and if so, how."
+enum StopRealTimeState {
+  "The stop has been added through a realtime update."
+  ADDED
+  "The stop has been cancelled through a realtime update."
+  CANCELED
+  "The realtime feed has indicated that there is no data available for this stop."
+  NO_DATA
+  """
+  The vehicle has arrived to the stop or already visited it and the times are no longer estimates.
+  Note, not all realtime feeds indicate this information even if the vehicle has already passed the stop.
+  """
+  RECORDED
+  "There have been no realtime updates."
+  UNUPDATED
+  "The trip's arrival and/or departure time has been updated."
+  UPDATED
 }
 
 """

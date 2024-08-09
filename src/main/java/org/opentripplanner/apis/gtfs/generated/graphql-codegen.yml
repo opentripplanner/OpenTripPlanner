@@ -59,10 +59,11 @@ config:
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
+    DatedStopTime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     DatedTrip: org.opentripplanner.transit.model.timetable.DatedTrip#DatedTrip
     DatedTripConnection: graphql.relay.Connection#Connection<DatedTrip>
     DatedTripEdge: graphql.relay.Edge#Edge<DatedTrip>
-    DatedTripTime: org.opentripplanner.apis.gtfs.model.DatedTripTime#DatedTripTime
+    ArrivalDepartureTime: org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime#ArrivalDepartureTime
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
@@ -101,6 +102,7 @@ config:
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
     StopOnRoute: org.opentripplanner.apis.gtfs.model.StopOnRouteModel#StopOnRouteModel
     StopOnTrip: org.opentripplanner.apis.gtfs.model.StopOnTripModel#StopOnTripModel
+    StopRealTimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState#GraphQLStopRealTimeState
     Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet

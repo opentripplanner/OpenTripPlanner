@@ -12,7 +12,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.apis.gtfs.model.DatedTripTime;
+import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
@@ -32,7 +32,7 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
   }
 
   @Override
-  public DataFetcher<DatedTripTime> end() {
+  public DataFetcher<ArrivalDepartureTime> end() {
     return env -> {
       var tripTimes = getTripTimes(env);
       if (tripTimes == null) {
@@ -44,8 +44,8 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
         return null;
       }
       return tripTimes.isRealtimeUpdated(stopIndex)
-        ? DatedTripTime.of(scheduledTime, tripTimes.getArrivalDelay(stopIndex))
-        : DatedTripTime.ofStatic(scheduledTime);
+        ? ArrivalDepartureTime.of(scheduledTime, tripTimes.getArrivalDelay(stopIndex))
+        : ArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 
@@ -71,7 +71,7 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
   }
 
   @Override
-  public DataFetcher<DatedTripTime> start() {
+  public DataFetcher<ArrivalDepartureTime> start() {
     return env -> {
       var tripTimes = getTripTimes(env);
       if (tripTimes == null) {
@@ -82,8 +82,8 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
         return null;
       }
       return tripTimes.isRealtimeUpdated(0)
-        ? DatedTripTime.of(scheduledTime, tripTimes.getDepartureDelay(0))
-        : DatedTripTime.ofStatic(scheduledTime);
+        ? ArrivalDepartureTime.of(scheduledTime, tripTimes.getDepartureDelay(0))
+        : ArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 

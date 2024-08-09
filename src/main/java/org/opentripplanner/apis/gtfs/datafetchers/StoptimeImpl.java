@@ -5,6 +5,7 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.stopTimeToInt;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -24,14 +25,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<String> dropoffType() {
-    return environment ->
-      switch (getSource(environment).getDropoffType()) {
-        case SCHEDULED -> "SCHEDULED";
-        case NONE -> "NONE";
-        case CALL_AGENCY -> "CALL_AGENCY";
-        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
-        case CANCELLED -> null;
-      };
+    return environment -> PickDropMapper.map(getSource(environment).getDropoffType());
   }
 
   @Override
@@ -42,14 +36,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<String> pickupType() {
-    return environment ->
-      switch (getSource(environment).getPickupType()) {
-        case SCHEDULED -> "SCHEDULED";
-        case NONE -> "NONE";
-        case CALL_AGENCY -> "CALL_AGENCY";
-        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
-        case CANCELLED -> null;
-      };
+    return environment -> PickDropMapper.map(getSource(environment).getPickupType());
   }
 
   @Override

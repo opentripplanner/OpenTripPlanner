@@ -20,8 +20,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
-import org.opentripplanner.apis.gtfs.model.DatedTripTime;
+import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -140,6 +141,16 @@ public class GraphQLDataFetchers {
 
   /** Entity related to an alert */
   public interface GraphQLAlertEntity extends TypeResolver {}
+
+  /**
+   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
+   * available.
+   */
+  public interface GraphQLArrivalDepartureTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  }
 
   /** Bike park represents a location where bicycles can be parked. */
   public interface GraphQLBikePark {
@@ -316,11 +327,32 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
+  /** Stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop. */
+  public interface GraphQLDatedStopTime {
+    public DataFetcher<ArrivalDepartureTime> arrival();
+
+    public DataFetcher<ArrivalDepartureTime> departure();
+
+    public DataFetcher<String> dropoffType();
+
+    public DataFetcher<String> headsign();
+
+    public DataFetcher<String> pickupType();
+
+    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
+
+    public DataFetcher<Object> stop();
+
+    public DataFetcher<Integer> stopPosition();
+
+    public DataFetcher<Boolean> timepoint();
+  }
+
   /** Trip on a specific date */
   public interface GraphQLDatedTrip {
     public DataFetcher<java.time.LocalDate> date();
 
-    public DataFetcher<DatedTripTime> end();
+    public DataFetcher<ArrivalDepartureTime> end();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
@@ -328,7 +360,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Route> route();
 
-    public DataFetcher<DatedTripTime> start();
+    public DataFetcher<ArrivalDepartureTime> start();
 
     public DataFetcher<Iterable<Object>> stops();
 
@@ -357,16 +389,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> cursor();
 
     public DataFetcher<DatedTrip> node();
-  }
-
-  /**
-   * Information about a dated trip's start or end times. May contain real-time information if
-   * available.
-   */
-  public interface GraphQLDatedTripTime {
-    public DataFetcher<Object> estimated();
-
-    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
   /**

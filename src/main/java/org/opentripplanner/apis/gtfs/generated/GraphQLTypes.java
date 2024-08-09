@@ -611,6 +611,25 @@ public class GraphQLTypes {
     SHORTEST_DURATION,
   }
 
+  public static class GraphQLDatedStopTimeHeadsignArgs {
+
+    private String language;
+
+    public GraphQLDatedStopTimeHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public static class GraphQLDatedTripTripHeadsignArgs {
 
     private String language;
@@ -4582,6 +4601,16 @@ public class GraphQLTypes {
     STOP_ON_ROUTES,
     STOP_ON_TRIPS,
     TRIPS,
+  }
+
+  /** Whether stop has been updated through a realtime update and if so, how. */
+  public enum GraphQLStopRealTimeState {
+    ADDED,
+    CANCELED,
+    NO_DATA,
+    RECORDED,
+    UNUPDATED,
+    UPDATED,
   }
 
   public static class GraphQLStoptimeHeadsignArgs {
