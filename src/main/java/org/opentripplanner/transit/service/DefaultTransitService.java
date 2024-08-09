@@ -289,14 +289,14 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<DatedTrip> getCancelledTrips(List<String> feeds) {
+  public Collection<DatedTrip> getCanceledTrips(List<String> feeds) {
     OTPRequestTimeoutException.checkForTimeout();
-    List<DatedTrip> cancelledTrips = new ArrayList<>();
+    List<DatedTrip> canceledTrips = new ArrayList<>();
     Map<Trip, Integer> departures = new HashMap<>();
 
     var timetableSnapshot = lazyGetTimeTableSnapShot();
     if (timetableSnapshot == null) {
-      return cancelledTrips;
+      return canceledTrips;
     }
     var calendarService = getCalendarService();
     var patternMap = transitModelIndex.getPatternForTrip();
@@ -315,13 +315,13 @@ public class DefaultTransitService implements TransitEditorService {
         var timetable = timetableSnapshot.resolve(pattern, date);
         var tripTimes = timetable.getTripTimes(trip);
         if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) { // use UPDATED for faked testing
-          cancelledTrips.add(new DatedTrip(trip, date));
+          canceledTrips.add(new DatedTrip(trip, date));
           // store departure time from first stop
           departures.put(trip, tripTimes.sortIndex());
         }
       }
     }
-    cancelledTrips.sort((t1, t2) -> {
+    canceledTrips.sort((t1, t2) -> {
       if (t1.serviceDate().isBefore(t2.serviceDate())) {
         return -1;
       } else if (t2.serviceDate().isBefore(t1.serviceDate())) {
@@ -338,7 +338,7 @@ public class DefaultTransitService implements TransitEditorService {
         return t1.trip().getId().compareTo(t2.trip().getId());
       }
     });
-    return cancelledTrips;
+    return canceledTrips;
   }
 
   @Override

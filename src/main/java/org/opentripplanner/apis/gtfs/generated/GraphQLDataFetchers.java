@@ -840,9 +840,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
-    public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
+    public DataFetcher<Connection<DatedTrip>> canceledTrips();
 
-    public DataFetcher<Connection<DatedTrip>> cancelledTrips();
+    public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
     public DataFetcher<VehicleParking> carPark();
 

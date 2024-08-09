@@ -137,7 +137,12 @@ public interface TransitService {
 
   Collection<Trip> getAllTrips();
 
-  Collection<DatedTrip> getCancelledTrips(List<String> feeds);
+  /**
+   * Get canceled trips.
+   *
+   * @param feeds If not null, used for filtering.
+   */
+  Collection<DatedTrip> getCanceledTrips(List<String> feeds);
 
   Collection<Route> getAllRoutes();
 
