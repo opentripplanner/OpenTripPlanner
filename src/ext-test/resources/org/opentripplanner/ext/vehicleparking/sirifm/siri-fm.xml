@@ -1,0 +1,56 @@
+<Siri version="2.1"
+      xmlns="http://www.siri.org.uk/siri"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.siri.org.uk/siri">
+    <ServiceDelivery>
+        <ResponseTimestamp>2024-07-17T11:07:40Z</ResponseTimestamp>
+        <ProducerRef>RAP Alto Adige - Open Data Hub</ProducerRef>
+        <FacilityMonitoringDelivery>
+            <ResponseTimestamp>2024-07-17T11:07:40Z</ResponseTimestamp>
+            <ProducerRef>RAP Alto Adige - Open Data Hub</ProducerRef>
+            <FacilityCondition>
+                <FacilityRef>IT:ITH10:Parking:105</FacilityRef>
+                <FacilityStatus>
+                    <Status>available</Status>
+                </FacilityStatus>
+                <MonitoredCounting>
+                    <CountingType>presentCount</CountingType>
+                    <CountedFeatureUnit>bays</CountedFeatureUnit>
+                    <Count>33</Count>
+                </MonitoredCounting>
+            </FacilityCondition>
+            <FacilityCondition>
+                <FacilityRef>IT:ITH10:Parking:TRENTO_areaexsitviacanestrinip1</FacilityRef>
+                <FacilityStatus>
+                    <Status>notAvailable</Status>
+                </FacilityStatus>
+                <MonitoredCounting>
+                    <CountingType>presentCount</CountingType>
+                    <CountedFeatureUnit>bays</CountedFeatureUnit>
+                    <Count>300</Count>
+                </MonitoredCounting>
+            </FacilityCondition>
+            <FacilityCondition>
+                <FacilityRef>IT:ITH10:Parking:TRENTO_autosilobuonconsigliop3</FacilityRef>
+                <FacilityStatus>
+                    <Status>notAvailable</Status>
+                </FacilityStatus>
+                <MonitoredCounting>
+                    <CountingType>presentCount</CountingType>
+                    <CountedFeatureUnit>bays</CountedFeatureUnit>
+                    <Count>633</Count>
+                </MonitoredCounting>
+            </FacilityCondition>
+            <FacilityCondition>
+                <FacilityRef>IT:ITH10:Parking:TRENTO_cteviabomportop6</FacilityRef>
+                <FacilityStatus>
+                    <Status>notAvailable</Status>
+                </FacilityStatus>
+                <MonitoredCounting>
+                    <CountingType>presentCount</CountingType>
+                    <CountedFeatureUnit>bays</CountedFeatureUnit>
+                    <Count>250</Count>
+                </MonitoredCounting>
+            </FacilityCondition>
+        </FacilityMonitoringDelivery>
+    </ServiceDelivery>
+</Siri>

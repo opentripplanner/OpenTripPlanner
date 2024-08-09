@@ -8,4 +8,10 @@ import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
  */
 public interface VehicleParkingUpdaterParameters extends PollingGraphUpdaterParameters {
   VehicleParkingSourceType sourceType();
+  UpdateType updateType();
+
+  enum UpdateType {
+    FULL,
+    AVAILABILITY_ONLY,
+  }
 }

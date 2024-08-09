@@ -13,6 +13,7 @@ import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -29,7 +30,7 @@ public class VehicleParkingUpdaterConfig {
       .of("feedId")
       .since(V2_2)
       .summary("The id of the data source, which will be the prefix of the parking lot's id.")
-      .description("This will end up in the API responses as the feed id of of the parking lot.")
+      .description("This will end up in the API responses as the feed id of the parking lot.")
       .asString();
     return switch (sourceType) {
       case HSL_PARK -> new HslParkUpdaterParameters(
@@ -92,6 +93,30 @@ public class VehicleParkingUpdaterConfig {
       case BIKEEP -> new BikeepUpdaterParameters(
         updaterRef,
         c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
+        feedId,
+        c
+          .of("frequency")
+          .since(V2_6)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
+        HttpHeadersConfig.headers(c, V2_6)
+      );
+      case SIRI_FM -> new SiriFmUpdaterParameters(
+        updaterRef,
+        c
+          .of("url")
+          .since(V2_6)
+          .summary("URL of the SIRI-FM Light endpoint.")
+          .description(
+            """
+          SIRI Light means that it must be available as a HTTP GET request rather than the usual
+          SIRI request mechanism of HTTP POST.
+          
+          The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
+          which requires SIRI 2.1.
+          """
+          )
+          .asUri(),
         feedId,
         c
           .of("frequency")

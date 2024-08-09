@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vehicleparking.noi;
 
+import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.FULL;
+
 import java.net.URI;
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -21,5 +23,10 @@ public record NoiUpdaterParameters(
   @Override
   public VehicleParkingSourceType sourceType() {
     return VehicleParkingSourceType.NOI_OPEN_DATA_HUB;
+  }
+
+  @Override
+  public UpdateType updateType() {
+    return FULL;
   }
 }

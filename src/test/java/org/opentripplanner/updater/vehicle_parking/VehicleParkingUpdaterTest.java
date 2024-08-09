@@ -55,6 +55,11 @@ class VehicleParkingUpdaterTest {
       }
 
       @Override
+      public UpdateType updateType() {
+        return UpdateType.FULL;
+      }
+
+      @Override
       public Duration frequency() {
         return Duration.ZERO;
       }
