@@ -310,6 +310,8 @@ class LuceneIndexTest {
         "Meridian Ave N & N 148",
         "Meridian Ave N N 148",
         "Meridian Ave N 148",
+        "Meridian & 148 N",
+        "148 N & Meridian",
         "Meridian & N 148",
         "Meridian Ave 148",
         "Meridian Av 148",
