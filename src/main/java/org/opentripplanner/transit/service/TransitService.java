@@ -132,7 +132,17 @@ public interface TransitService {
 
   AreaStop getAreaStop(FeedScopedId id);
 
+  /**
+   * Return the trip for the given id, including trips created in real time.
+   */
+  @Nullable
   Trip getTripForId(FeedScopedId id);
+
+  /**
+   * Return the trip for the given id, not including trips created in real time.
+   */
+  @Nullable
+  Trip getScheduledTripForId(FeedScopedId id);
 
   Collection<Trip> getAllTrips();
 

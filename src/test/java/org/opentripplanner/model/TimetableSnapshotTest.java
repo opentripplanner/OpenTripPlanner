@@ -269,7 +269,7 @@ public class TimetableSnapshotTest {
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     assertThrows(
       ConcurrentModificationException.class,
-      () -> committedSnapshot.update(pattern, null, today)
+      () -> committedSnapshot.update(new RealtimeUpdate(pattern, null, today))
     );
   }
 
@@ -323,7 +323,9 @@ public class TimetableSnapshotTest {
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
     if (result.isSuccess()) {
-      return resolver.update(pattern, result.successValue().getTripTimes(), serviceDate);
+      return resolver.update(
+        new RealtimeUpdate(pattern, result.successValue().getTripTimes(), serviceDate)
+      );
     }
     throw new RuntimeException("createUpdatedTripTimes returned an error: " + result);
   }

@@ -190,12 +190,19 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Route getRouteForId(FeedScopedId id) {
-    return this.transitModelIndex.getRouteForId(id);
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      Route realtimeAddedRoute = currentSnapshot.getRealtimeAddedRoute(id);
+      if (realtimeAddedRoute != null) {
+        return realtimeAddedRoute;
+      }
+    }
+    return transitModelIndex.getRouteForId(id);
   }
 
   /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
+   * Add a route to the transit model.
+   * Used only in unit tests.
    */
   @Override
   public void addRoutes(Route route) {
@@ -272,16 +279,20 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Trip getTripForId(FeedScopedId id) {
-    return this.transitModelIndex.getTripForId().get(id);
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      Trip trip = currentSnapshot.getRealTimeAddedTrip(id);
+      if (trip != null) {
+        return trip;
+      }
+    }
+    return getScheduledTripForId(id);
   }
 
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
+  @Nullable
   @Override
-  public void addTripForId(FeedScopedId tripId, Trip trip) {
-    transitModelIndex.getTripForId().put(tripId, trip);
+  public Trip getScheduledTripForId(FeedScopedId id) {
+    return this.transitModelIndex.getTripForId().get(id);
   }
 
   @Override
@@ -298,16 +309,14 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripPattern getPatternForTrip(Trip trip) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      TripPattern realtimeAddedTripPattern = currentSnapshot.getRealTimeAddedPatternForTrip(trip);
+      if (realtimeAddedTripPattern != null) {
+        return realtimeAddedTripPattern;
+      }
+    }
     return this.transitModelIndex.getPatternForTrip().get(trip);
-  }
-
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  public void addPatternForTrip(Trip trip, TripPattern pattern) {
-    transitModelIndex.getPatternForTrip().put(trip, pattern);
   }
 
   @Override
@@ -322,16 +331,14 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<TripPattern> getPatternsForRoute(Route route) {
     OTPRequestTimeoutException.checkForTimeout();
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      Collection<TripPattern> tripPatterns = currentSnapshot.getRealTimeAddedPatternForRoute(route);
+      if (!tripPatterns.isEmpty()) {
+        return tripPatterns;
+      }
+    }
     return this.transitModelIndex.getPatternsForRoute().get(route);
-  }
-
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  public void addPatternsForRoute(Route route, TripPattern pattern) {
-    transitModelIndex.getPatternsForRoute().put(route, pattern);
   }
 
   @Override
@@ -524,16 +531,16 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateById(
+        datedServiceJourneyId
+      );
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
     return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
-  }
-
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  public void addTripOnServiceDateById(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
-    transitModelIndex.getTripOnServiceDateById().put(id, tripOnServiceDate);
   }
 
   @Override
@@ -545,21 +552,16 @@ public class DefaultTransitService implements TransitEditorService {
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(
+        tripIdAndServiceDate
+      );
+      if (tripOnServiceDate != null) {
+        return tripOnServiceDate;
+      }
+    }
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
-  }
-
-  /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   * this when doing the issue #3030.
-   */
-  @Override
-  public void addTripOnServiceDateForTripAndDay(
-    TripIdAndServiceDate tripIdAndServiceDate,
-    TripOnServiceDate tripOnServiceDate
-  ) {
-    transitModelIndex
-      .getTripOnServiceDateForTripAndDay()
-      .put(tripIdAndServiceDate, tripOnServiceDate);
   }
 
   /**
