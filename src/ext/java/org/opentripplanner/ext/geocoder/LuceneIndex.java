@@ -288,7 +288,7 @@ public class LuceneIndex implements Serializable {
             }
           });
       } else {
-        var nameParser = new QueryParser(NAME, analyzer);
+        var nameParser = new QueryParser(NAME_NGRAM, analyzer);
         var nameQuery = nameParser.parse(searchTerms);
 
         var ngramNameQuery = new TermQuery(
