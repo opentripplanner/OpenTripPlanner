@@ -53,6 +53,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Keep at least one result for min-transfers and each transit-group in itinerary-group-filter [#5919](https://github.com/opentripplanner/OpenTripPlanner/pull/5919)
 - Extract parking lots from NeTEx feeds [#5946](https://github.com/opentripplanner/OpenTripPlanner/pull/5946)
 - Filter routes and patterns by service date in GTFS GraphQL API [#5869](https://github.com/opentripplanner/OpenTripPlanner/pull/5869)
+- SIRI-FM vehicle parking updates [#5979](https://github.com/opentripplanner/OpenTripPlanner/pull/5979)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
