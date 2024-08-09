@@ -26,7 +26,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
 class EnglishNGramAnalyzer extends Analyzer {
 
   // matches one or more numbers followed by the English suffixes "st", "nd", "rd", "th"
-  private static final Pattern NUMBER_SUFFIX_PATTERN = Pattern.compile("(\\d+)[st|nd|rd|th]+");
+  private static final Pattern NUMBER_SUFFIX_PATTERN = Pattern.compile("(\\d+)(st|nd|rd|th)\\b");
 
   @Override
   protected TokenStreamComponents createComponents(String fieldName) {

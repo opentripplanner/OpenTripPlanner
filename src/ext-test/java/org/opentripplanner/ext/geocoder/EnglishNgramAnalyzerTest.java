@@ -135,7 +135,13 @@ class EnglishNgramAnalyzerTest {
     assertEquals(List.of(expected), result);
   }
 
-  public List<String> tokenize(String text) {
+  @Test
+  void wordBoundary() {
+    var result = tokenize("1stst");
+    assertEquals(List.of("1sts", "1stst", "stst"), result);
+  }
+
+  private List<String> tokenize(String text) {
     try (var analyzer = new EnglishNGramAnalyzer()) {
       List<String> result;
       TokenStream tokenStream;
