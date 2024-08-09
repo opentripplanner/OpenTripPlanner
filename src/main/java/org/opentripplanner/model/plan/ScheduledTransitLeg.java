@@ -219,8 +219,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public boolean isRealTimeUpdated() {
     return (
-      tripTimes.isRealtimeUpdated(boardStopPosInPattern) ||
-      tripTimes.isRealtimeUpdated(alightStopPosInPattern)
+      tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
+      tripTimes.isRealTimeUpdated(alightStopPosInPattern)
     );
   }
 

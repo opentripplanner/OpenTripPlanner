@@ -235,7 +235,7 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
-  public boolean isRealtimeUpdated(int stop) {
+  public boolean isRealTimeUpdated(int stop) {
     return false;
   }
 

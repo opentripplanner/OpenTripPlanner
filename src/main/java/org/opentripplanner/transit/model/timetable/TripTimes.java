@@ -126,7 +126,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * Return if trip has been updated and stop has not been given a NO_DATA update.
    */
-  boolean isRealtimeUpdated(int stop);
+  boolean isRealTimeUpdated(int stop);
 
   /**
    * @return the whole trip's headsign. Individual stops can have different headsigns.

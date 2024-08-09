@@ -43,7 +43,7 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
       if (scheduledTime == null) {
         return null;
       }
-      return tripTimes.isRealtimeUpdated(stopIndex)
+      return tripTimes.isRealTimeUpdated(stopIndex)
         ? ArrivalDepartureTime.of(scheduledTime, tripTimes.getArrivalDelay(stopIndex))
         : ArrivalDepartureTime.ofStatic(scheduledTime);
     };
@@ -81,7 +81,7 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
       if (scheduledTime == null) {
         return null;
       }
-      return tripTimes.isRealtimeUpdated(0)
+      return tripTimes.isRealTimeUpdated(0)
         ? ArrivalDepartureTime.of(scheduledTime, tripTimes.getDepartureDelay(0))
         : ArrivalDepartureTime.ofStatic(scheduledTime);
     };
