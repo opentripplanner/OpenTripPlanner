@@ -1,0 +1,129 @@
+{
+  "data": {
+    "canceledTrips": {
+      "pageInfo" : {
+        "hasNextPage" : false,
+        "hasPreviousPage" : false,
+        "startCursor" : "c2ltcGxlLWN1cnNvcjA=",
+        "endCursor" : "c2ltcGxlLWN1cnNvcjA="
+      },
+      "edges": [
+        {
+          "node": {
+            "date": "2024-08-09",
+            "end": {
+              "estimated": {
+                "delay": "PT0S",
+                "time": "2024-08-09T11:40:00+02:00"
+              },
+              "scheduledTime": "2024-08-09T11:40:00+02:00"
+            },
+            "start": {
+              "estimated": {
+                "delay": "PT0S",
+                "time": "2024-08-09T11:30:00+02:00"
+              },
+              "scheduledTime": "2024-08-09T11:30:00+02:00"
+            },
+            "pattern": {
+              "code": "F:BUS"
+            },
+            "route": {
+              "gtfsId": "F:R123"
+            },
+            "stops": [
+              {
+                "gtfsId": "F:Stop_0"
+              },
+              {
+                "gtfsId": "F:Stop_1"
+              },
+              {
+                "gtfsId": "F:Stop_2"
+              }
+            ],
+            "tripHeadsign": "Trip Headsign",
+            "tripShortName": null,
+            "stoptimes": [
+              {
+                "dropoffType": null,
+                "headsign": "Stop headsign at stop 10",
+                "pickupType": null,
+                "realtimeState": "CANCELED",
+                "stop": {
+                  "gtfsId": "F:Stop_0"
+                },
+                "stopPosition": 10,
+                "timepoint": false,
+                "arrival": {
+                  "scheduledTime": "2024-08-09T11:30:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:30:00+02:00"
+                  }
+                },
+                "departure": {
+                  "scheduledTime": "2024-08-09T11:30:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:30:00+02:00"
+                  }
+                }
+              },
+              {
+                "dropoffType": null,
+                "headsign": "Stop headsign at stop 20",
+                "pickupType": null,
+                "realtimeState": "CANCELED",
+                "stop": {
+                  "gtfsId": "F:Stop_1"
+                },
+                "stopPosition": 20,
+                "timepoint": false,
+                "arrival": {
+                  "scheduledTime": "2024-08-09T11:35:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:35:00+02:00"
+                  }
+                },
+                "departure": {
+                  "scheduledTime": "2024-08-09T11:35:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:35:00+02:00"
+                  }
+                }
+              },
+              {
+                "dropoffType": null,
+                "headsign": "Stop headsign at stop 30",
+                "pickupType": null,
+                "realtimeState": "CANCELED",
+                "stop": {
+                  "gtfsId": "F:Stop_2"
+                },
+                "stopPosition": 30,
+                "timepoint": false,
+                "arrival": {
+                  "scheduledTime": "2024-08-09T11:40:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:40:00+02:00"
+                  }
+                },
+                "departure": {
+                  "scheduledTime": "2024-08-09T11:40:00+02:00",
+                  "estimated": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:40:00+02:00"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

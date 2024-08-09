@@ -1,0 +1,80 @@
+{
+  canceledTrips(feeds: "F") {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        date
+        end {
+          estimated {
+            delay
+            time
+          }
+          scheduledTime
+        }
+        start {
+          estimated {
+            delay
+            time
+          }
+          scheduledTime
+        }
+        pattern {
+          code
+        }
+        route {
+          gtfsId
+        }
+        stops {
+          gtfsId
+        }
+        tripHeadsign
+        tripShortName
+        stoptimes {
+          dropoffType
+          headsign
+          pickupType
+          realtimeState
+          stop {
+            gtfsId
+          }
+          stopPosition
+          timepoint
+          arrival {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+          departure {
+            scheduledTime
+            estimated {
+              delay
+              time
+            }
+          }
+        }
+        date
+        start {
+          estimated {
+            time
+            delay
+          }
+          scheduledTime
+        }
+        end {
+          estimated {
+            time
+            delay
+          }
+          scheduledTime
+        }
+      }
+    }
+  }
+}
