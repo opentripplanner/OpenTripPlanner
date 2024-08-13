@@ -141,6 +141,16 @@ public class AccessPaths {
     };
   }
 
+  /** Raptor uses this information to optimize boarding of the first trip */
+  public boolean hasTimeDependentAccess() {
+    return (
+      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
+      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
+    );
+  }
+
+  /* private methods */
+
   private int maxTimePenalty(TIntObjectMap<List<RaptorAccessEgress>> col) {
     return col
       .valueCollection()
@@ -159,14 +169,6 @@ public class AccessPaths {
     Collection<RaptorAccessEgress> paths
   ) {
     return paths.stream().map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it).toList();
-  }
-
-  /** Raptor uses this information to optimize boarding of the first trip */
-  public boolean hasTimeDependentAccess() {
-    return (
-      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
-      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
-    );
   }
 
   private boolean hasTimePenalty() {
