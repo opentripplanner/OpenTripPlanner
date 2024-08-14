@@ -1,12 +1,15 @@
 package org.opentripplanner.updater.trip.moduletests.addition;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
+import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
+import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_A1_ID;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_B1_ID;
@@ -16,9 +19,12 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
@@ -118,6 +124,60 @@ class AddedTest {
 
     assertSame(firstRoute, secondRoute);
     assertNotNull(env.getTransitService().getRouteForId(firstRoute.getId()));
+  }
+
+  @Test
+  public void addedTripWithSkippedStop() {
+    var env = RealtimeTestEnvironment.gtfs();
+    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
+    builder
+      .addStopTime(STOP_A1_ID, 30)
+      .addStopTime(STOP_B1_ID, 40, SKIPPED)
+      .addStopTime(STOP_C1_ID, 55);
+    var tripUpdate = builder.build();
+
+    env.applyTripUpdate(tripUpdate);
+
+    // THEN
+    final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
+    assertEquals(PickDrop.SCHEDULED, tripPattern.getBoardType(0));
+    assertEquals(PickDrop.CANCELLED, tripPattern.getAlightType(1));
+    assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(1));
+    assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(2));
+    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    final int forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
+    final TripTimes tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
+    assertFalse(tripTimes.isCancelledStop(0));
+    assertTrue(tripTimes.isCancelledStop(1));
+  }
+
+  @Test
+  public void addedTripWithDelay() {
+    var env = RealtimeTestEnvironment.gtfs();
+    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
+
+    // A1: scheduled 08:30:00
+    // B1: scheduled 08:40:00, delay 300 seconds (actual 08:45:00)
+    // C1: scheduled 08:55:00
+    builder
+      .addStopTime(STOP_A1_ID, 30)
+      .addStopTime(STOP_B1_ID, 45, 300)
+      .addStopTime(STOP_C1_ID, 55);
+
+    var tripUpdate = builder.build();
+    env.applyTripUpdate(tripUpdate);
+
+    // THEN
+    final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
+    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
+    final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    final int forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
+    final TripTimes tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
+    assertEquals(0, tripTimes.getDepartureDelay(0));
+    assertEquals(30600, tripTimes.getDepartureTime(0)); // 08:30:00
+    assertEquals(300, tripTimes.getArrivalDelay(1));
+    assertEquals(31500, tripTimes.getArrivalTime(1)); // 08:45:00
   }
 
   private TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {

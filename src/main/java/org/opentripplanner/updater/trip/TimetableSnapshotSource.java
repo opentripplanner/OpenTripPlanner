@@ -781,7 +781,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stopTime.setStop(stop);
       // Set arrival time
       if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
-        final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
+        final int delay = stopTimeUpdate.getArrival().hasDelay()
+          ? stopTimeUpdate.getArrival().getDelay()
+          : 0;
+        final long arrivalTime =
+          stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch - delay;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
@@ -794,8 +798,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
       // Set departure time
       if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+        final int delay = stopTimeUpdate.getDeparture().hasDelay()
+          ? stopTimeUpdate.getDeparture().getDelay()
+          : 0;
         final long departureTime =
-          stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
+          stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch - delay;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
@@ -838,12 +845,30 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Update all times to mark trip times as realtime
-    // TODO: should we incorporate the delay field if present?
+    // TODO: This is based on the proposal at https://github.com/google/transit/issues/490
     for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
-      newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
+      final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(stopIndex);
+
+      if (
+        stopTimeUpdate.hasScheduleRelationship() &&
+        stopTimeUpdate.getScheduleRelationship() == StopTimeUpdate.ScheduleRelationship.SKIPPED
+      ) {
+        newTripTimes.setCancelled(stopIndex);
+      }
+
+      final int arrivalDelay = stopTimeUpdate.hasArrival()
+        ? stopTimeUpdate.getArrival().hasDelay() ? stopTimeUpdate.getArrival().getDelay() : 0
+        : 0;
+      final int departureDelay = stopTimeUpdate.hasDeparture()
+        ? stopTimeUpdate.getDeparture().hasDelay() ? stopTimeUpdate.getDeparture().getDelay() : 0
+        : 0;
+      newTripTimes.updateArrivalTime(
+        stopIndex,
+        newTripTimes.getScheduledArrivalTime(stopIndex) + arrivalDelay
+      );
       newTripTimes.updateDepartureTime(
         stopIndex,
-        newTripTimes.getScheduledDepartureTime(stopIndex)
+        newTripTimes.getScheduledDepartureTime(stopIndex) + departureDelay
       );
     }
 

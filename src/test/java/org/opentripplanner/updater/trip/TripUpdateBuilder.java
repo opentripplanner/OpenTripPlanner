@@ -49,6 +49,26 @@ public class TripUpdateBuilder {
     );
   }
 
+  public TripUpdateBuilder addStopTime(String stopId, int minutes, int delay) {
+    return addStopTime(
+      stopId,
+      minutes,
+      NO_VALUE,
+      delay,
+      delay,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null
+    );
+  }
+
+  public TripUpdateBuilder addStopTime(
+    String stopId,
+    int minutes,
+    StopTimeUpdate.ScheduleRelationship scheduleRelationship
+  ) {
+    return addStopTime(stopId, minutes, NO_VALUE, NO_DELAY, NO_DELAY, scheduleRelationship, null);
+  }
+
   public TripUpdateBuilder addStopTime(String stopId, int minutes, DropOffPickupType pickDrop) {
     return addStopTime(
       stopId,
