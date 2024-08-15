@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.RealtimeUpdate;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -303,7 +303,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
-    RealtimeUpdate realtimeUpdate = new RealtimeUpdate(
+    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
       pattern,
       tripUpdate.tripTimes(),
       serviceDate,
@@ -311,7 +311,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       tripUpdate.isAddedTrip(),
       tripUpdate.isAddedRoute()
     );
-    var result = snapshotManager.updateBuffer(realtimeUpdate);
+    var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;
   }
@@ -336,7 +336,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       } else {
         final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
-        snapshotManager.updateBuffer(new RealtimeUpdate(pattern, newTripTimes, serviceDate));
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         success = true;
       }
     }

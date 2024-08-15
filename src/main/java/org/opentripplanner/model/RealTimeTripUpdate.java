@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import java.time.LocalDate;
-import javax.annotation.Nonnull;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -16,18 +16,28 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * @param isAddedTrip true if this update creates a new trip, not present in scheduled data.
  * @param isAddedRoute true if an added trip cannot be registered under an existing route and a new route must be created.
  */
-public record RealtimeUpdate(
-  @Nonnull TripPattern pattern,
-  @Nonnull TripTimes updatedTripTimes,
-  @Nonnull LocalDate serviceDate,
+public record RealTimeTripUpdate(
+  TripPattern pattern,
+  TripTimes updatedTripTimes,
+  LocalDate serviceDate,
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   boolean isAddedTrip,
   boolean isAddedRoute
 ) {
+  public RealTimeTripUpdate {
+    Objects.requireNonNull(pattern);
+    Objects.requireNonNull(updatedTripTimes);
+    Objects.requireNonNull(serviceDate);
+  }
+
   /**
    * Create a real-time update for an existing trip.
    */
-  public RealtimeUpdate(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
+  public RealTimeTripUpdate(
+    TripPattern pattern,
+    TripTimes updatedTripTimes,
+    LocalDate serviceDate
+  ) {
     this(pattern, updatedTripTimes, serviceDate, null, false, false);
   }
 }

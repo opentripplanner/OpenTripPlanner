@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.model.RealtimeUpdate;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -86,7 +86,7 @@ class TimetableSnapshotManagerTest {
       clock::get
     );
 
-    var res1 = snapshotManager.updateBuffer(new RealtimeUpdate(PATTERN, TRIP_TIMES, YESTERDAY));
+    var res1 = snapshotManager.updateBuffer(new RealTimeTripUpdate(PATTERN, TRIP_TIMES, YESTERDAY));
     assertTrue(res1.isSuccess());
 
     snapshotManager.commitTimetableSnapshot(true);
@@ -95,7 +95,7 @@ class TimetableSnapshotManagerTest {
     // Turn the clock to tomorrow
     clock.set(TOMORROW);
 
-    var res2 = snapshotManager.updateBuffer(new RealtimeUpdate(PATTERN, TRIP_TIMES, TODAY));
+    var res2 = snapshotManager.updateBuffer(new RealTimeTripUpdate(PATTERN, TRIP_TIMES, TODAY));
     assertTrue(res2.isSuccess());
 
     snapshotManager.purgeAndCommit();

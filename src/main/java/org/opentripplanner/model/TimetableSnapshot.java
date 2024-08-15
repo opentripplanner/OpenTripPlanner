@@ -275,13 +275,13 @@ public class TimetableSnapshot {
    *
    * @return whether the update was actually applied
    */
-  public Result<UpdateSuccess, UpdateError> update(RealtimeUpdate realtimeUpdate) {
+  public Result<UpdateSuccess, UpdateError> update(RealTimeTripUpdate realTimeTripUpdate) {
     // Preconditions
-    TripPattern pattern = realtimeUpdate.pattern();
+    TripPattern pattern = realTimeTripUpdate.pattern();
     Objects.requireNonNull(pattern);
-    LocalDate serviceDate = realtimeUpdate.serviceDate();
+    LocalDate serviceDate = realTimeTripUpdate.serviceDate();
     Objects.requireNonNull(serviceDate);
-    TripTimes updatedTripTimes = realtimeUpdate.updatedTripTimes();
+    TripTimes updatedTripTimes = realTimeTripUpdate.updatedTripTimes();
 
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
@@ -315,15 +315,15 @@ public class TimetableSnapshot {
     addPatternToIndex(pattern);
 
     Route route = trip.getRoute();
-    if (realtimeUpdate.isAddedRoute()) {
+    if (realTimeTripUpdate.isAddedRoute()) {
       realtimeAddedRoutes.put(route.getId(), route);
     }
-    if (realtimeUpdate.isAddedTrip()) {
+    if (realTimeTripUpdate.isAddedTrip()) {
       FeedScopedId tripId = trip.getId();
       realTimeAddedTrips.put(tripId, trip);
       realTimeAddedPatternForTrip.put(trip, pattern);
       realTimeAddedPatternForRoute.put(route, pattern);
-      TripOnServiceDate tripOnServiceDate = realtimeUpdate.addedTripOnServiceDate();
+      TripOnServiceDate tripOnServiceDate = realTimeTripUpdate.addedTripOnServiceDate();
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
         realTimeAddedTripOnServiceDateForTripAndDay.put(

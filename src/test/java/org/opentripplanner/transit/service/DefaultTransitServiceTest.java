@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.RealtimeUpdate;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -69,7 +69,9 @@ class DefaultTransitServiceTest {
           .withDepartureTimes(new int[] { 0, 1 })
           .build()
       );
-      timetableSnapshot.update(new RealtimeUpdate(REAL_TIME_PATTERN, tripTimes, LocalDate.now()));
+      timetableSnapshot.update(
+        new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, LocalDate.now())
+      );
 
       return timetableSnapshot.commit();
     });

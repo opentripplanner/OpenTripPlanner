@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import java.time.LocalDate;
-import javax.annotation.Nonnull;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -19,13 +19,19 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * @param isAddedRoute true if an added trip cannot be registered under an existing route and a new route must be created.
  */
 record TripUpdate(
-  @Nonnull StopPattern stopPattern,
-  @Nonnull TripTimes tripTimes,
-  @Nonnull LocalDate serviceDate,
+  StopPattern stopPattern,
+  TripTimes tripTimes,
+  LocalDate serviceDate,
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   @Nullable TripPattern addedTripPattern,
   boolean isAddedRoute
 ) {
+  public TripUpdate {
+    Objects.requireNonNull(stopPattern);
+    Objects.requireNonNull(tripTimes);
+    Objects.requireNonNull(serviceDate);
+  }
+
   /**
    * Create a trip update for an existing trip.
    */

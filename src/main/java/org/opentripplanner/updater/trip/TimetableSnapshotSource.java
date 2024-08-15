@@ -41,7 +41,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
-import org.opentripplanner.model.RealtimeUpdate;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -426,12 +426,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
       return snapshotManager.updateBuffer(
-        new RealtimeUpdate(newPattern, updatedTripTimes, serviceDate)
+        new RealTimeTripUpdate(newPattern, updatedTripTimes, serviceDate)
       );
     } else {
       // Set the updated trip times in the buffer
       return snapshotManager.updateBuffer(
-        new RealtimeUpdate(pattern, updatedTripTimes, serviceDate)
+        new RealTimeTripUpdate(pattern, updatedTripTimes, serviceDate)
       );
     }
   }
@@ -876,7 +876,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add new trip times to the buffer
     // TODO add support for TripOnServiceDate for GTFS-RT
     return snapshotManager.updateBuffer(
-      new RealtimeUpdate(
+      new RealTimeTripUpdate(
         pattern,
         newTripTimes,
         serviceDate,
@@ -915,7 +915,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
         }
-        snapshotManager.updateBuffer(new RealtimeUpdate(pattern, newTripTimes, serviceDate));
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         success = true;
       }
     }
@@ -954,7 +954,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
         }
-        snapshotManager.updateBuffer(new RealtimeUpdate(pattern, newTripTimes, serviceDate));
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         cancelledAddedTrip = true;
       }
     }
