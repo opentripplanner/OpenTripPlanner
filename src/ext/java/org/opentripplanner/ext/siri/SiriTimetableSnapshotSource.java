@@ -294,7 +294,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LocalDate serviceDate = tripUpdate.serviceDate();
 
     final TripPattern pattern;
-    if (tripUpdate.isAddedTripPattern()) {
+    if (tripUpdate.tripPatternCreation()) {
       pattern = tripUpdate.addedTripPattern();
     } else {
       // Get cached trip pattern or create one if it doesn't exist yet
@@ -308,8 +308,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       tripUpdate.tripTimes(),
       serviceDate,
       tripUpdate.addedTripOnServiceDate(),
-      tripUpdate.isAddedTrip(),
-      tripUpdate.isAddedRoute()
+      tripUpdate.tripCreation(),
+      tripUpdate.routeCreation()
     );
     var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);

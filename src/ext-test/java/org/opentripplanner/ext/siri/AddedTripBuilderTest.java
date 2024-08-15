@@ -155,9 +155,9 @@ class AddedTripBuilderTest {
     assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode should be mapped");
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
-    assertTrue(tripUpdate.isAddedRoute(), "The route is marked as created by real time updater");
+    assertTrue(tripUpdate.routeCreation(), "The route is marked as created by real time updater");
 
-    assertTrue(tripUpdate.isAddedTrip(), "The trip is marked as created by real time updater");
+    assertTrue(tripUpdate.tripCreation(), "The trip is marked as created by real time updater");
 
     TripPattern pattern = tripUpdate.addedTripPattern();
     assertNotNull(pattern);
@@ -246,7 +246,7 @@ class AddedTripBuilderTest {
       .build();
 
     assertTrue(firstAddedTrip.isSuccess(), "Trip creation should succeed");
-    assertTrue(firstAddedTrip.successValue().isAddedRoute());
+    assertTrue(firstAddedTrip.successValue().routeCreation());
 
     var firstTrip = firstAddedTrip.successValue().tripTimes().getTrip();
 
@@ -323,7 +323,7 @@ class AddedTripBuilderTest {
     assertSame(REPLACED_ROUTE, trip.getRoute());
 
     // Assert route
-    assertFalse(addedTrip.successValue().isAddedRoute(), "The existing route should be reused");
+    assertFalse(addedTrip.successValue().routeCreation(), "The existing route should be reused");
   }
 
   @Test
@@ -356,7 +356,7 @@ class AddedTripBuilderTest {
     assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
 
     // Assert route
-    assertTrue(addedTrip.successValue().isAddedRoute(), "A new route should be created");
+    assertTrue(addedTrip.successValue().routeCreation(), "A new route should be created");
     Route route = trip.getRoute();
     assertEquals(LINE_REF, route.getId().getId(), "route should be mapped");
     assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");

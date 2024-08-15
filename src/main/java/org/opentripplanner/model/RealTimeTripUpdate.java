@@ -13,16 +13,16 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * @param updatedTripTimes the new trip times for the updated trip.
  * @param serviceDate the service date for which this update applies (updates are valid only for one service date)
  * @param addedTripOnServiceDate optionally if this trip update adds a new trip, the TripOnServiceDate corresponding to this new trip.
- * @param isAddedTrip true if this update creates a new trip, not present in scheduled data.
- * @param isAddedRoute true if an added trip cannot be registered under an existing route and a new route must be created.
+ * @param tripCreation true if this update creates a new trip, not present in scheduled data.
+ * @param routeCreation true if an added trip cannot be registered under an existing route and a new route must be created.
  */
 public record RealTimeTripUpdate(
   TripPattern pattern,
   TripTimes updatedTripTimes,
   LocalDate serviceDate,
   @Nullable TripOnServiceDate addedTripOnServiceDate,
-  boolean isAddedTrip,
-  boolean isAddedRoute
+  boolean tripCreation,
+  boolean routeCreation
 ) {
   public RealTimeTripUpdate {
     Objects.requireNonNull(pattern);

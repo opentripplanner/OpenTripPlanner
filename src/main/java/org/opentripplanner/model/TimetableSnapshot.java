@@ -315,10 +315,10 @@ public class TimetableSnapshot {
     addPatternToIndex(pattern);
 
     Route route = trip.getRoute();
-    if (realTimeTripUpdate.isAddedRoute()) {
+    if (realTimeTripUpdate.routeCreation()) {
       realtimeAddedRoutes.put(route.getId(), route);
     }
-    if (realTimeTripUpdate.isAddedTrip()) {
+    if (realTimeTripUpdate.tripCreation()) {
       FeedScopedId tripId = trip.getId();
       realTimeAddedTrips.put(tripId, trip);
       realTimeAddedPatternForTrip.put(trip, pattern);
