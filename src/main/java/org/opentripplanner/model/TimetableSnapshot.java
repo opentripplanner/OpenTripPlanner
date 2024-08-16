@@ -125,7 +125,7 @@ public class TimetableSnapshot {
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
   private final Map<Trip, TripPattern> realTimeAddedPatternForTrip;
-  private final Multimap<Route, TripPattern> realTimeAddedPatternForRoute;
+  private final Multimap<Route, TripPattern> realTimeAddedPatternsForRoute;
   private final Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById;
   private final Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay;
 
@@ -162,7 +162,7 @@ public class TimetableSnapshot {
     Map<FeedScopedId, Route> realtimeAddedRoutes,
     Map<FeedScopedId, Trip> realtimeAddedTrips,
     Map<Trip, TripPattern> realTimeAddedPatternForTrip,
-    Multimap<Route, TripPattern> realTimeAddedPatternForRoute,
+    Multimap<Route, TripPattern> realTimeAddedPatternsForRoute,
     Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById,
     Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay,
     SetMultimap<StopLocation, TripPattern> patternsForStop,
@@ -173,7 +173,7 @@ public class TimetableSnapshot {
     this.realtimeAddedRoutes = realtimeAddedRoutes;
     this.realTimeAddedTrips = realtimeAddedTrips;
     this.realTimeAddedPatternForTrip = realTimeAddedPatternForTrip;
-    this.realTimeAddedPatternForRoute = realTimeAddedPatternForRoute;
+    this.realTimeAddedPatternsForRoute = realTimeAddedPatternsForRoute;
     this.realTimeAddedTripOnServiceDateById = realTimeAddedTripOnServiceDateById;
     this.realTimeAddedTripOnServiceDateForTripAndDay = realTimeAddedTripOnServiceDateForTripAndDay;
     this.patternsForStop = patternsForStop;
@@ -246,7 +246,7 @@ public class TimetableSnapshot {
    */
   @Nullable
   public Collection<TripPattern> getRealTimeAddedPatternForRoute(Route route) {
-    return realTimeAddedPatternForRoute.get(route);
+    return realTimeAddedPatternsForRoute.get(route);
   }
 
   /**
@@ -322,7 +322,7 @@ public class TimetableSnapshot {
       FeedScopedId tripId = trip.getId();
       realTimeAddedTrips.put(tripId, trip);
       realTimeAddedPatternForTrip.put(trip, pattern);
-      realTimeAddedPatternForRoute.put(route, pattern);
+      realTimeAddedPatternsForRoute.put(route, pattern);
       TripOnServiceDate tripOnServiceDate = realTimeTripUpdate.addedTripOnServiceDate();
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
@@ -367,7 +367,7 @@ public class TimetableSnapshot {
       Map.copyOf(realtimeAddedRoutes),
       Map.copyOf(realTimeAddedTrips),
       Map.copyOf(realTimeAddedPatternForTrip),
-      ImmutableSetMultimap.copyOf(realTimeAddedPatternForRoute),
+      ImmutableSetMultimap.copyOf(realTimeAddedPatternsForRoute),
       Map.copyOf(realTimeAddedTripOnServiceDateById),
       Map.copyOf(realTimeAddedTripOnServiceDateForTripAndDay),
       ImmutableSetMultimap.copyOf(patternsForStop),
