@@ -298,13 +298,23 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Trip> getAllTrips() {
     OTPRequestTimeoutException.checkForTimeout();
-    return transitModelIndex.getTripForId().values();
+    Collection<Trip> trips = new HashSet<>(transitModelIndex.getTripForId().values());
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      trips.addAll(currentSnapshot.getAllRealTimeAddedTrips());
+    }
+    return trips;
   }
 
   @Override
   public Collection<Route> getAllRoutes() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.transitModelIndex.getAllRoutes();
+    Collection<Route> routes = new HashSet<>(transitModelIndex.getAllRoutes());
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      routes.addAll(currentSnapshot.getAllRealTimeAddedRoutes());
+    }
+    return routes;
   }
 
   @Override
@@ -545,7 +555,14 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
-    return transitModelIndex.getTripOnServiceDateForTripAndDay().values();
+    Collection<TripOnServiceDate> tripOnServiceDates = new HashSet<>(
+      transitModelIndex.getTripOnServiceDateForTripAndDay().values()
+    );
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      tripOnServiceDates.addAll(currentSnapshot.getAllRealTimeAddedTripOnServiceDate());
+    }
+    return tripOnServiceDates;
   }
 
   @Override

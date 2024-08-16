@@ -76,6 +76,11 @@ public interface TransitService {
 
   TripPattern getTripPatternForId(FeedScopedId id);
 
+  /**
+   * Return all scheduled trip patterns, not including real-time created trip patterns.
+   * TODO: verify this is the intended behavior and possibly change the method name to
+   *       getAllScheduledTripPatterns
+   */
   Collection<TripPattern> getAllTripPatterns();
 
   Collection<Notice> getNotices();

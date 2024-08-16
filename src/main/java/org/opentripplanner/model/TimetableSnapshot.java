@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -225,12 +226,20 @@ public class TimetableSnapshot {
     return realtimeAddedRoutes.get(id);
   }
 
+  public Collection<Route> getAllRealTimeAddedRoutes() {
+    return Collections.unmodifiableCollection(realtimeAddedRoutes.values());
+  }
+
   /**
    * Return the trip created by the updater for the given id.
    */
   @Nullable
   public Trip getRealTimeAddedTrip(FeedScopedId id) {
     return realTimeAddedTrips.get(id);
+  }
+
+  public Collection<Trip> getAllRealTimeAddedTrips() {
+    return Collections.unmodifiableCollection(realTimeAddedTrips.values());
   }
 
   /**
@@ -265,6 +274,10 @@ public class TimetableSnapshot {
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
     return realTimeAddedTripOnServiceDateForTripAndDay.get(tripIdAndServiceDate);
+  }
+
+  public Collection<? extends TripOnServiceDate> getAllRealTimeAddedTripOnServiceDate() {
+    return Collections.unmodifiableCollection(realTimeAddedTripOnServiceDateForTripAndDay.values());
   }
 
   /**

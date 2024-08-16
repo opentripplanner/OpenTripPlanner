@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -82,6 +83,7 @@ public final class RealtimeTestEnvironment {
   public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
   public final Trip trip1;
   public final Trip trip2;
+  public final Operator operator1;
   public final TransitModel transitModel;
   private final SiriTimetableSnapshotSource siriSource;
   private final TimetableSnapshotSource gtfsSource;
@@ -111,7 +113,10 @@ public final class RealtimeTestEnvironment {
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
 
-    Route route1 = TransitModelForTest.route(route1Id).build();
+    operator1 = Operator.of(operator1Id).withName("Operator 1").build();
+    transitModel.getOperators().add(operator1);
+
+    Route route1 = TransitModelForTest.route(route1Id).withOperator(operator1).build();
 
     trip1 =
       createTrip(
