@@ -223,7 +223,7 @@ public class TimetableSnapshot {
    */
   @Nullable
   public Route getRealtimeAddedRoute(FeedScopedId id) {
-    return realtimeAddedRoutes.get(id);
+    return getByNullableKey(id, realtimeAddedRoutes);
   }
 
   public Collection<Route> getAllRealTimeAddedRoutes() {
@@ -235,7 +235,7 @@ public class TimetableSnapshot {
    */
   @Nullable
   public Trip getRealTimeAddedTrip(FeedScopedId id) {
-    return realTimeAddedTrips.get(id);
+    return getByNullableKey(id, realTimeAddedTrips);
   }
 
   public Collection<Trip> getAllRealTimeAddedTrips() {
@@ -247,7 +247,7 @@ public class TimetableSnapshot {
    */
   @Nullable
   public TripPattern getRealTimeAddedPatternForTrip(Trip trip) {
-    return realTimeAddedPatternForTrip.get(trip);
+    return getByNullableKey(trip, realTimeAddedPatternForTrip);
   }
 
   /**
@@ -262,7 +262,7 @@ public class TimetableSnapshot {
    */
   @Nullable
   public TripOnServiceDate getRealTimeAddedTripOnServiceDateById(FeedScopedId id) {
-    return realTimeAddedTripOnServiceDateById.get(id);
+    return getByNullableKey(id, realTimeAddedTripOnServiceDateById);
   }
 
   /**
@@ -272,7 +272,7 @@ public class TimetableSnapshot {
   public TripOnServiceDate getRealTimeAddedTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
-    return realTimeAddedTripOnServiceDateForTripAndDay.get(tripIdAndServiceDate);
+    return getByNullableKey(tripIdAndServiceDate, realTimeAddedTripOnServiceDateForTripAndDay);
   }
 
   public Collection<? extends TripOnServiceDate> getAllRealTimeAddedTripOnServiceDate() {
@@ -609,6 +609,20 @@ public class TimetableSnapshot {
       dirty = true;
     }
     return tt;
+  }
+
+  /**
+   * Look up the given key in a Map, return null if the key is null.
+   * This prevents a NullPointerException if the underlying implementation of the map does not
+   * accept querying with null keys (e.g. ImmutableMap).
+   *
+   **/
+  @Nullable
+  private static <K, V> V getByNullableKey(K key, Map<K, ? extends V> map) {
+    if (key == null) {
+      return null;
+    }
+    return map.get(key);
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {
