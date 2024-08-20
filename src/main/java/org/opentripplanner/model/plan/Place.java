@@ -68,20 +68,13 @@ public class Place {
   }
 
   public static Place normal(Double lat, Double lon, I18NString name) {
-    return new Place(
-      name,
-      WgsCoordinate.creatOptionalCoordinate(lat, lon),
-      VertexType.NORMAL,
-      null,
-      null,
-      null
-    );
+    return new Place(name, creatOptionalCoordinate(lat, lon), VertexType.NORMAL, null, null, null);
   }
 
   public static Place normal(Vertex vertex, I18NString name) {
     return new Place(
       name,
-      WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
+      creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
       VertexType.NORMAL,
       null,
       null,
@@ -107,7 +100,7 @@ public class Place {
     // coordinates.
     return new Place(
       name,
-      WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
+      creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
       VertexType.TRANSIT,
       stop,
       null,
@@ -118,7 +111,7 @@ public class Place {
   public static Place forVehicleRentalPlace(VehicleRentalPlaceVertex vertex) {
     return new Place(
       vertex.getName(),
-      WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
+      creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
       VertexType.VEHICLERENTAL,
       null,
       vertex.getStation(),
@@ -140,7 +133,7 @@ public class Place {
       .hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
-      WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
+      creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
       VertexType.VEHICLEPARKING,
       null,
       null,
@@ -193,5 +186,23 @@ public class Place {
       .addObj("vehicleRentalPlace", vehicleRentalPlace)
       .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
       .toString();
+  }
+
+  /**
+   * Unlike the constructor this factory method retuns {@code null} if both {@code lat} and {@code
+   * lon} is {@code null}.
+   */
+  private static WgsCoordinate creatOptionalCoordinate(Double latitude, Double longitude) {
+    if (latitude == null && longitude == null) {
+      return null;
+    }
+
+    // Set coordinate is both lat and lon exist
+    if (latitude != null && longitude != null) {
+      return WgsCoordinate.normalized(latitude, longitude);
+    }
+    throw new IllegalArgumentException(
+      "Both 'latitude' and 'longitude' must have a value or both must be 'null'."
+    );
   }
 }

@@ -26,6 +26,9 @@ class WgsCoordinateMapper {
       throw new IllegalArgumentException("Coordinate is not valid: " + loc);
     }
     // Location is safe to process
-    return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
+    return WgsCoordinate.normalized(
+      loc.getLatitude().doubleValue(),
+      loc.getLongitude().doubleValue()
+    );
   }
 }

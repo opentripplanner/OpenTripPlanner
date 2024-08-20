@@ -29,43 +29,66 @@ public final class WgsCoordinate implements Serializable {
     DoubleUtils.requireInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
     DoubleUtils.requireInRange(longitude, LON_MIN, LON_MAX, "longitude");
 
-    // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
-    this.latitude = DoubleUtils.roundTo7Decimals(latitude);
-    this.longitude = DoubleUtils.roundTo7Decimals(longitude);
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   public WgsCoordinate(Point point) {
     Objects.requireNonNull(point);
-    this.latitude = DoubleUtils.roundTo7Decimals(point.getY());
-    this.longitude = DoubleUtils.roundTo7Decimals(point.getX());
+    DoubleUtils.requireInRange(point.getY(), LAT_MIN, LAT_MAX, "latitude");
+    DoubleUtils.requireInRange(point.getX(), LON_MIN, LON_MAX, "longitude");
+
+    this.latitude = point.getY();
+    this.longitude = point.getX();
   }
 
   public WgsCoordinate(Coordinate coordinate) {
     Objects.requireNonNull(coordinate);
-    this.latitude = DoubleUtils.roundTo7Decimals(coordinate.getY());
-    this.longitude = DoubleUtils.roundTo7Decimals(coordinate.getX());
+    DoubleUtils.requireInRange(coordinate.getY(), LAT_MIN, LAT_MAX, "latitude");
+    DoubleUtils.requireInRange(coordinate.getX(), LON_MIN, LON_MAX, "longitude");
+
+    this.latitude = coordinate.getY();
+    this.longitude = coordinate.getX();
   }
 
   /**
-   * Unlike the constructor this factory method retuns {@code null} if both {@code lat} and {@code
-   * lon} is {@code null}.
+   * Creates a coordinate where latitude/longitude are rounded to 7 decimal places. This gives a
+   * precicion of ~ 1 centimeters. Higher precision than this is generally not needed inside OTP.
    */
-  public static WgsCoordinate creatOptionalCoordinate(Double latitude, Double longitude) {
-    if (latitude == null && longitude == null) {
-      return null;
-    }
-
-    // Set coordinate is both lat and lon exist
-    if (latitude != null && longitude != null) {
-      return new WgsCoordinate(latitude, longitude);
-    }
-    throw new IllegalArgumentException(
-      "Both 'latitude' and 'longitude' must have a value or both must be 'null'."
+  public static WgsCoordinate normalized(double latitude, double longitude) {
+    return new WgsCoordinate(
+      DoubleUtils.roundTo7Decimals(latitude),
+      DoubleUtils.roundTo7Decimals(longitude)
     );
   }
 
   /**
-   * Find the mean coordinate between the given set of {@code coordinates}.
+   * Creates a coordinate where latitude/longitude are rounded to 7 decimal places. This gives a
+   * precicion of ~ 1 centimeters. Higher precision than this is generally not needed inside OTP.
+   */
+  public static WgsCoordinate normalized(Coordinate coordinate) {
+    Objects.requireNonNull(coordinate);
+    return new WgsCoordinate(
+      DoubleUtils.roundTo7Decimals(coordinate.getY()),
+      DoubleUtils.roundTo7Decimals(coordinate.getX())
+    );
+  }
+
+  /**
+   * Creates a coordinate where latitude/longitude are rounded to 7 decimal places. This gives a
+   * precicion of ~ 1 centimeters. Higher precision than this is generally not needed inside OTP.
+   */
+  public static WgsCoordinate normalized(Point point) {
+    Objects.requireNonNull(point);
+    return new WgsCoordinate(
+      DoubleUtils.roundTo7Decimals(point.getY()),
+      DoubleUtils.roundTo7Decimals(point.getX())
+    );
+  }
+
+  /**
+   * Find the mean coordinate between the given set of {@code coordinates}. Result will be normalized
+   * to 7 decimal places.
    */
   public static WgsCoordinate mean(Collection<WgsCoordinate> coordinates) {
     if (coordinates.isEmpty()) {
@@ -86,7 +109,7 @@ public final class WgsCoordinate implements Serializable {
       longitude += c.longitude();
     }
 
-    return new WgsCoordinate(latitude / n, longitude / n);
+    return WgsCoordinate.normalized(latitude / n, longitude / n);
   }
 
   public double latitude() {

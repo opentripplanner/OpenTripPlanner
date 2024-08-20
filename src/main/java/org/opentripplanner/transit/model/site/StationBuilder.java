@@ -70,7 +70,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
   }
 
   public StationBuilder withCoordinate(double latitude, double longitude) {
-    this.coordinate = new WgsCoordinate(latitude, longitude);
+    this.coordinate = WgsCoordinate.normalized(latitude, longitude);
     return this;
   }
 

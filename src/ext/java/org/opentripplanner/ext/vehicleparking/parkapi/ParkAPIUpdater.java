@@ -75,7 +75,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
         .name(new NonLocalizedString(jsonNode.path("name").asText()))
-        .coordinate(new WgsCoordinate(y, x))
+        .coordinate(WgsCoordinate.normalized(y, x))
         .walkAccessible(true)
         .carAccessible(true);
 
@@ -101,7 +101,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .id(vehicleParkId)
       .name(new NonLocalizedString(jsonNode.path("name").asText()))
       .state(state)
-      .coordinate(new WgsCoordinate(y, x))
+      .coordinate(WgsCoordinate.normalized(y, x))
       .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
       .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
       .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)

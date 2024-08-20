@@ -7,7 +7,7 @@ class WgsCoordinateMapper {
 
   static WgsCoordinate mapToDomain(Stop stop) {
     if (stop.isLatSet() && stop.isLonSet()) {
-      return new WgsCoordinate(stop.getLat(), stop.getLon());
+      return WgsCoordinate.normalized(stop.getLat(), stop.getLon());
     }
     if (!stop.isLatSet() && !stop.isLonSet()) {
       return null;

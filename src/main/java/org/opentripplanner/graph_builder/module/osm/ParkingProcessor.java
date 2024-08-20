@@ -84,7 +84,7 @@ class ParkingProcessor {
             )
           )
           .name(creativeName)
-          .coordinate(new WgsCoordinate(node.getCoordinate()))
+          .coordinate(WgsCoordinate.normalized(node.getCoordinate()))
           .walkAccessible(true)
           .carAccessible(isCarParkAndRide);
 
@@ -304,7 +304,7 @@ class ParkingProcessor {
           )
         )
         .name(vehicleParkingName)
-        .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
+        .coordinate(WgsCoordinate.normalized(group.union.getInteriorPoint()))
         // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
         .vertex(null)
         .walkAccessible(true)
@@ -383,7 +383,7 @@ class ParkingProcessor {
       .builder()
       .id(id)
       .name(creativeName)
-      .coordinate(new WgsCoordinate(coordinate))
+      .coordinate(WgsCoordinate.normalized(coordinate))
       .tags(tags)
       .detailsUrl(entity.getTag("website"))
       .openingHoursCalendar(openingHours)
@@ -464,7 +464,7 @@ class ParkingProcessor {
             )
           )
           .name(entranceName)
-          .coordinate(new WgsCoordinate(access.vertex().getCoordinate()))
+          .coordinate(WgsCoordinate.normalized(access.vertex().getCoordinate()))
           .vertex(access.vertex())
           .walkAccessible(access.vertex().isConnectedToWalkingEdge())
           .carAccessible(access.vertex().isConnectedToDriveableEdge())
