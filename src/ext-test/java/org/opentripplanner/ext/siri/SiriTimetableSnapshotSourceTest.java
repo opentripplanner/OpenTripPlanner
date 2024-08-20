@@ -93,7 +93,7 @@ class SiriTimetableSnapshotSourceTest {
       .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
-    assertEquals(1, env.getTransitService().getAllRoutes().size());
+    int numRoutes = env.getTransitService().getAllRoutes().size();
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
@@ -103,7 +103,7 @@ class SiriTimetableSnapshotSourceTest {
       env.getScheduledTimetable("newJourney")
     );
     TransitService transitService = env.getTransitService();
-    assertEquals(2, transitService.getAllRoutes().size());
+    assertEquals(numRoutes + 1, transitService.getAllRoutes().size());
     FeedScopedId newRouteId = TransitModelForTest.id(newRouteRef);
     Route newRoute = transitService.getRouteForId(newRouteId);
     assertNotNull(newRoute);
