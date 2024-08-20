@@ -341,14 +341,17 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<TripPattern> getPatternsForRoute(Route route) {
     OTPRequestTimeoutException.checkForTimeout();
+    Collection<TripPattern> tripPatterns = new HashSet<>(
+      transitModelIndex.getPatternsForRoute().get(route)
+    );
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
-      Collection<TripPattern> tripPatterns = currentSnapshot.getRealTimeAddedPatternForRoute(route);
-      if (!tripPatterns.isEmpty()) {
-        return tripPatterns;
-      }
+      Collection<TripPattern> realTimeAddedPatternForRoute = currentSnapshot.getRealTimeAddedPatternForRoute(
+        route
+      );
+      tripPatterns.addAll(realTimeAddedPatternForRoute);
     }
-    return this.transitModelIndex.getPatternsForRoute().get(route);
+    return tripPatterns;
   }
 
   @Override

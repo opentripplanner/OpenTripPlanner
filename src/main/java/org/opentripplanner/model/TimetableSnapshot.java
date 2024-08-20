@@ -253,7 +253,6 @@ public class TimetableSnapshot {
   /**
    * Return the trip patterns created by the updater for the given route.
    */
-  @Nullable
   public Collection<TripPattern> getRealTimeAddedPatternForRoute(Route route) {
     return realTimeAddedPatternsForRoute.get(route);
   }

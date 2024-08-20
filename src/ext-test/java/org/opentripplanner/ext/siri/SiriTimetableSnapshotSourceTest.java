@@ -37,15 +37,18 @@ class SiriTimetableSnapshotSourceTest {
   }
 
   @Test
-  void testAddJourney() {
+  void testAddJourneyWithExistingRoute() {
     var env = RealtimeTestEnvironment.siri();
+
+    Route route = env.getTransitService().getRouteForId(env.route1Id);
+    int numPatternForRoute = env.getTransitService().getPatternsForRoute(route).size();
 
     String newJourneyId = "newJourney";
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(newJourneyId)
       .withIsExtraJourney(true)
       .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
+      .withLineRef(route.getId().getId())
       .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
@@ -68,6 +71,11 @@ class SiriTimetableSnapshotSourceTest {
       transitService.getTripOnServiceDateForTripAndDay(
         new TripIdAndServiceDate(tripId, SERVICE_DATE)
       )
+    );
+    assertEquals(
+      numPatternForRoute + 1,
+      transitService.getPatternsForRoute(route).size(),
+      "The added trip should use a new pattern for this route"
     );
   }
 
@@ -99,7 +107,7 @@ class SiriTimetableSnapshotSourceTest {
     FeedScopedId newRouteId = TransitModelForTest.id(newRouteRef);
     Route newRoute = transitService.getRouteForId(newRouteId);
     assertNotNull(newRoute);
-    assertNotNull(transitService.getPatternsForRoute(newRoute));
+    assertEquals(1, transitService.getPatternsForRoute(newRoute).size());
   }
 
   @Test

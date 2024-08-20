@@ -74,6 +74,9 @@ public interface TransitService {
 
   Collection<Notice> getNoticesByEntity(AbstractTransitEntity<?, ?> entity);
 
+  /**
+   * Return a trip pattern by id, not including patterns created by real-time updates.
+   */
   TripPattern getTripPatternForId(FeedScopedId id);
 
   /**
@@ -97,8 +100,15 @@ public interface TransitService {
 
   Agency getAgencyForId(FeedScopedId id);
 
+  /**
+   * Return a route for a given id, including routes created by real-time updates.
+   *
+   */
   Route getRouteForId(FeedScopedId id);
 
+  /**
+   * Return the routes using the given stop, not including real-time updates.
+   */
   Set<Route> getRoutesForStop(StopLocation stop);
 
   /**
@@ -149,22 +159,31 @@ public interface TransitService {
   @Nullable
   Trip getScheduledTripForId(FeedScopedId id);
 
+  /**
+   * Return all trips, including those created by real-time updates.
+   */
   Collection<Trip> getAllTrips();
 
+  /**
+   * Return all routes, including those created by real-time updates.
+   */
   Collection<Route> getAllRoutes();
 
   /**
-   * Return the scheduled trip pattern for a given trip (not taking into account real-time updates)
+   * Return the scheduled trip pattern for a given trip.
+   * If the trip is an added trip (extra journey), return the initial trip pattern for this trip.
    */
   TripPattern getPatternForTrip(Trip trip);
 
   /**
    * Return the trip pattern for a given trip on a service date. The real-time updated version
    * is returned if it exists, otherwise the scheduled trip pattern is returned.
-   *
    */
   TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate);
 
+  /**
+   * Return all the trip patterns used in the given route, including those added by real-time updates
+   */
   Collection<TripPattern> getPatternsForRoute(Route route);
 
   MultiModalStation getMultiModalStationForStation(Station station);
@@ -208,12 +227,24 @@ public interface TransitService {
   @Nullable
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
+  /**
+   * Return the real-time added pattern for a given tripId and a given service date.
+   * Return null if the trip does not exist or if the trip has no real-time added pattern for
+   * this date (that is: it is still using its scheduled trip pattern for this date).
+   */
+  @Nullable
   TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
 
+  /**
+   * Return true if at least one trip pattern has been created by a real-time update.
+   */
   boolean hasRealtimeAddedTripPatterns();
 
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 
+  /**
+   * Return the TripOnServiceDate for a given id, including real-time updates.
+   */
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
 
   Collection<TripOnServiceDate> getAllTripOnServiceDates();
