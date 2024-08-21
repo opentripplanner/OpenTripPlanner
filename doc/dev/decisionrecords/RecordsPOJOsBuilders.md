@@ -13,10 +13,8 @@ Builder initStop(Stop stop) {
 
 ### Records
 
-You may use records, but avoid using records if you can not encapsulate it properly. Be especially
-aware of arrays fields (can not be protected) and collections (remember to make a defensive copy).
-If you need to override `equals` and `hashCode`, then it is probably not worth it.
-The default `equals()` and `hashCode()` implementation is shallow, so all nested fields need to be records or value-objects. Consider overriding `toString`.
+You may use records, but avoid using records if you cannot encapsulate them properly. Generally, records are considered appropriate and useful for throw-away compound types private to an implementation, such as hash table keys or compound values in a temporary list or set. On the other hand, records are generally not appropriate in the domain model where we insist on full encapsulation, which records cannot readily provide. Be especially
+aware of array fields (which can not be protected) and collections (remember to make a defensive copy). Consider overriding `toString`. But if you need to override `equals` and `hashCode`, then it is probably not worth using a record. The implicit `equals()` and `hashCode()` implementations for records behave as if they call `equals` and `hashCode` on each field of the record, so their behavior will depend heavily on the types of these fields.
 
 ### Builders
 
