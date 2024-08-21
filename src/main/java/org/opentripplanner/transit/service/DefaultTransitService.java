@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.framework.collection.CollectionsView;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -298,23 +299,27 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Trip> getAllTrips() {
     OTPRequestTimeoutException.checkForTimeout();
-    Collection<Trip> trips = new HashSet<>(transitModelIndex.getTripForId().values());
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
-      trips.addAll(currentSnapshot.getAllRealTimeAddedTrips());
+      return new CollectionsView<>(
+        transitModelIndex.getTripForId().values(),
+        currentSnapshot.getAllRealTimeAddedTrips()
+      );
     }
-    return trips;
+    return Collections.unmodifiableCollection(transitModelIndex.getTripForId().values());
   }
 
   @Override
   public Collection<Route> getAllRoutes() {
     OTPRequestTimeoutException.checkForTimeout();
-    Collection<Route> routes = new HashSet<>(transitModelIndex.getAllRoutes());
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
-      routes.addAll(currentSnapshot.getAllRealTimeAddedRoutes());
+      return new CollectionsView<>(
+        transitModelIndex.getAllRoutes(),
+        currentSnapshot.getAllRealTimeAddedRoutes()
+      );
     }
-    return routes;
+    return Collections.unmodifiableCollection(transitModelIndex.getAllRoutes());
   }
 
   @Override
@@ -558,14 +563,16 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
-    Collection<TripOnServiceDate> tripOnServiceDates = new HashSet<>(
-      transitModelIndex.getTripOnServiceDateForTripAndDay().values()
-    );
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
-      tripOnServiceDates.addAll(currentSnapshot.getAllRealTimeAddedTripOnServiceDate());
+      return new CollectionsView<>(
+        transitModelIndex.getTripOnServiceDateForTripAndDay().values(),
+        currentSnapshot.getAllRealTimeAddedTripOnServiceDate()
+      );
     }
-    return tripOnServiceDates;
+    return Collections.unmodifiableCollection(
+      transitModelIndex.getTripOnServiceDateForTripAndDay().values()
+    );
   }
 
   @Override
