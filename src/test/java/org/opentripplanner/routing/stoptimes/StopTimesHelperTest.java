@@ -42,7 +42,7 @@ class StopTimesHelperTest {
     pattern =
       originalPattern
         .copy()
-        .withScheduledTimeTableBuilder(builder -> builder.setTripTimes(0, newTripTimes))
+        .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
         .build();
     // replace the original pattern by the updated pattern in the transit model
     transitModel.addTripPattern(pattern.getId(), pattern);

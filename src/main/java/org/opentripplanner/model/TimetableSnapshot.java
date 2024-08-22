@@ -301,20 +301,12 @@ public class TimetableSnapshot {
     TimetableBuilder ttb = Timetable.of(tt).withServiceDate(serviceDate);
 
     // Assume all trips in a pattern are from the same feed, which should be the case.
-    // Find trip index
-    Trip trip = updatedTripTimes.getTrip();
-    int tripIndex = tt.getTripIndex(trip.getId());
-    if (tripIndex == -1) {
-      // Trip not found, add it
-      ttb.addTripTimes(updatedTripTimes);
-    } else {
-      // Set updated trip times of trip
-      ttb.setTripTimes(tripIndex, updatedTripTimes);
-    }
+    ttb.addOrUpdateTripTimes(updatedTripTimes);
 
     Timetable updated = ttb.build();
     swapTimetable(pattern, tt, updated);
 
+    Trip trip = updatedTripTimes.getTrip();
     if (pattern.isCreatedByRealtimeUpdater()) {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();

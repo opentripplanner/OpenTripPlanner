@@ -2,10 +2,13 @@ package org.opentripplanner.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.UnaryOperator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
@@ -16,7 +19,7 @@ public class TimetableBuilder {
 
   private TripPattern pattern;
   private LocalDate serviceDate;
-  private final List<TripTimes> tripTimes = new ArrayList<>();
+  private final Map<FeedScopedId, TripTimes> tripTimes = new HashMap<>();
   private final List<FrequencyEntry> frequencies = new ArrayList<>();
 
   TimetableBuilder() {}
@@ -24,8 +27,8 @@ public class TimetableBuilder {
   TimetableBuilder(Timetable tt) {
     pattern = tt.getPattern();
     serviceDate = tt.getServiceDate();
-    tripTimes.addAll(tt.getTripTimes());
     frequencies.addAll(tt.getFrequencyEntries());
+    addAllTripTimes(tt.getTripTimes());
   }
 
   public TimetableBuilder withTripPattern(TripPattern tripPattern) {
@@ -38,28 +41,47 @@ public class TimetableBuilder {
     return this;
   }
 
+  /**
+   * Add a new trip-times to the timetable. If the associated trip already exists, an exception is
+   * thrown. This is considered a programming error. Use {@link #addOrUpdateTripTimes(TripTimes)}
+   * if you want to replace an existing trip.
+   */
   public TimetableBuilder addTripTimes(TripTimes tripTimes) {
-    this.tripTimes.add(tripTimes);
+    var trip = tripTimes.getTrip();
+    if (this.tripTimes.containsKey(trip.getId())) {
+      throw new IllegalStateException(
+        "Error! TripTimes for the same trip is added twice. Trip: " + trip
+      );
+    }
+    return addOrUpdateTripTimes(tripTimes);
+  }
+
+  /**
+   * Add or update the trip-times. If the trip has an associated trip-times, then the trip-times
+   * are replaced. If not, the trip-times it is added. Consider using
+   * {@link #addTripTimes(TripTimes)}.
+   */
+  public TimetableBuilder addOrUpdateTripTimes(TripTimes tripTimes) {
+    this.tripTimes.put(tripTimes.getTrip().getId(), tripTimes);
     return this;
   }
 
   public TimetableBuilder addAllTripTimes(List<TripTimes> tripTimes) {
-    this.tripTimes.addAll(tripTimes);
-    return this;
-  }
-
-  public TimetableBuilder setTripTimes(int tripIndex, TripTimes tripTimes) {
-    this.tripTimes.set(tripIndex, tripTimes);
+    for (TripTimes it : tripTimes) {
+      addTripTimes(it);
+    }
     return this;
   }
 
   public TimetableBuilder removeTripTimes(TripTimes tripTimesToRemove) {
-    tripTimes.remove(tripTimesToRemove);
+    tripTimes.remove(tripTimesToRemove.getTrip().getId());
     return this;
   }
 
-  public TimetableBuilder removeAllTripTimes(Set<TripTimes> tripTimesToBeRemoved) {
-    tripTimes.removeAll(tripTimesToBeRemoved);
+  public TimetableBuilder removeAllTripTimes(Collection<TripTimes> tripTimesToBeRemoved) {
+    for (TripTimes it : tripTimesToBeRemoved) {
+      tripTimes.remove(it.getTrip().getId());
+    }
     return this;
   }
 
@@ -69,7 +91,7 @@ public class TimetableBuilder {
    * <p>
    */
   public TimetableBuilder updateAllTripTimes(UnaryOperator<TripTimes> update) {
-    tripTimes.replaceAll(update);
+    tripTimes.replaceAll((t, tt) -> update.apply(tt));
     frequencies.replaceAll(it ->
       new FrequencyEntry(
         it.startTime,
@@ -95,8 +117,8 @@ public class TimetableBuilder {
     return serviceDate;
   }
 
-  public List<TripTimes> getTripTimes() {
-    return tripTimes;
+  List<TripTimes> createImmutableOrderedListOfTripTimes() {
+    return tripTimes.values().stream().sorted().toList();
   }
 
   public List<FrequencyEntry> getFrequencies() {
@@ -116,7 +138,7 @@ public class TimetableBuilder {
 
   private TripTimes getRepresentativeTripTimes() {
     if (!tripTimes.isEmpty()) {
-      return tripTimes.getFirst();
+      return tripTimes.values().stream().findAny().get();
     } else if (!frequencies.isEmpty()) {
       return frequencies.getFirst().tripTimes;
     } else {

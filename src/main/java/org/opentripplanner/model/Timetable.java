@@ -64,8 +64,8 @@ public class Timetable implements Serializable {
   Timetable(TimetableBuilder timetableBuilder) {
     this.pattern = timetableBuilder.getPattern();
     this.serviceDate = timetableBuilder.getServiceDate();
-    tripTimes = List.copyOf(timetableBuilder.getTripTimes());
-    frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
+    this.tripTimes = timetableBuilder.createImmutableOrderedListOfTripTimes();
+    this.frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
   }
 
   /**
