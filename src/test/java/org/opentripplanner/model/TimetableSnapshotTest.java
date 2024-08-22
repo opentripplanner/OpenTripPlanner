@@ -54,8 +54,8 @@ public class TimetableSnapshotTest {
   @Test
   public void testCompare() {
     Timetable orig = Timetable.of().build();
-    Timetable a = Timetable.of(orig).withServiceDate(LocalDate.now(timeZone).minusDays(1)).build();
-    Timetable b = Timetable.of(orig).withServiceDate(LocalDate.now(timeZone)).build();
+    Timetable a = orig.copyOf().withServiceDate(LocalDate.now(timeZone).minusDays(1)).build();
+    Timetable b = orig.copyOf().withServiceDate(LocalDate.now(timeZone)).build();
     assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
   }
 

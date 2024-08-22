@@ -298,7 +298,7 @@ public class TimetableSnapshot {
     }
 
     Timetable tt = resolve(pattern, serviceDate);
-    TimetableBuilder ttb = Timetable.of(tt).withServiceDate(serviceDate);
+    TimetableBuilder ttb = tt.copyOf().withServiceDate(serviceDate);
 
     // Assume all trips in a pattern are from the same feed, which should be the case.
     ttb.addOrUpdateTripTimes(updatedTripTimes);
@@ -452,8 +452,8 @@ public class TimetableSnapshot {
         if (tripTimesToRemove != null) {
           for (Timetable originalTimetable : sortedTimetables) {
             if (originalTimetable.getTripTimes().contains(tripTimesToRemove)) {
-              Timetable updatedTimetable = Timetable
-                .of(originalTimetable)
+              Timetable updatedTimetable = originalTimetable
+                .copyOf()
                 .removeTripTimes(tripTimesToRemove)
                 .build();
               swapTimetable(pattern, originalTimetable, updatedTimetable);

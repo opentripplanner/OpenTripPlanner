@@ -68,17 +68,16 @@ public class Timetable implements Serializable {
     this.frequencyEntries = List.copyOf(timetableBuilder.getFrequencies());
   }
 
-  /**
-   * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified
-   * timetable.
-   */
-  public static TimetableBuilder of(Timetable tt) {
-    return new TimetableBuilder(tt);
-  }
-
   /** Construct an empty Timetable. */
   public static TimetableBuilder of() {
     return new TimetableBuilder();
+  }
+
+  /**
+   * Copy timetable into a builder witch can be used to modify the timetable.
+   */
+  public TimetableBuilder copyOf() {
+    return new TimetableBuilder(this);
   }
 
   /** @return the index of TripTimes for this trip ID in this particular Timetable */

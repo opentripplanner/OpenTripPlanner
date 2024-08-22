@@ -390,8 +390,9 @@ public class OtpTransitServiceBuilder {
         .collect(Collectors.toUnmodifiableSet());
       if (!tripTimesToBeRemoved.isEmpty()) {
         removePatterns.add(e);
-        Timetable updatedTimetable = Timetable
-          .of(ptn.getScheduledTimetable())
+        Timetable updatedTimetable = ptn
+          .getScheduledTimetable()
+          .copyOf()
           .removeAllTripTimes(tripTimesToBeRemoved)
           .build();
         TripPattern updatedPattern = ptn.copy().withScheduledTimeTable(updatedTimetable).build();

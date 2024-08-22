@@ -107,7 +107,7 @@ public final class TripPatternBuilder
     // create a builder for the scheduled timetable only if it needs to be modified.
     // otherwise reuse the existing timetable
     if (scheduledTimetableBuilder == null) {
-      scheduledTimetableBuilder = Timetable.of(scheduledTimetable);
+      scheduledTimetableBuilder = scheduledTimetable.copyOf();
       scheduledTimetable = null;
     }
     producer.apply(scheduledTimetableBuilder);
