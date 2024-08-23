@@ -4,9 +4,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -43,11 +40,10 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
-  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final boolean fuzzyTripMatching;
 
   public PollingTripUpdater(
     PollingTripUpdaterParameters parameters,
-    TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
     super(parameters);
@@ -56,10 +52,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     this.updateSource = new GtfsRealtimeTripUpdateSource(parameters);
     this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
-    if (parameters.fuzzyTripMatching()) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
+    this.fuzzyTripMatching = parameters.fuzzyTripMatching();
 
     this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);
 
@@ -89,7 +82,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
       // Handle trip updates via graph writer runnable
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
         snapshotSource,
-        fuzzyTripMatcher,
+        fuzzyTripMatching,
         backwardsDelayPropagationType,
         incrementality,
         updates,
@@ -106,7 +99,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
       .of(this.getClass())
       .addObj("updateSource", updateSource)
       .addStr("feedId", feedId)
-      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatcher != null)
+      .addBool("fuzzyTripMatching", fuzzyTripMatching)
       .toString();
   }
 }

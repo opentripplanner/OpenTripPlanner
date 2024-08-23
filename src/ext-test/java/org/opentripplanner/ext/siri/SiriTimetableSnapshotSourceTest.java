@@ -3,12 +3,13 @@ package org.opentripplanner.ext.siri;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
-import java.util.Set;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 class SiriTimetableSnapshotSourceTest {
 
@@ -32,16 +33,7 @@ class SiriTimetableSnapshotSourceTest {
   @Test
   void testAddJourney() {
     var env = RealtimeTestEnvironment.siri();
-
-    var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedVehicleJourneyCode("newJourney")
-      .withIsExtraJourney(true)
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
-      .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
-      .buildEstimatedTimetableDeliveries();
-
+    var updates = createValidAddedJourney(env);
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
@@ -50,6 +42,20 @@ class SiriTimetableSnapshotSourceTest {
       "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
       env.getScheduledTimetable("newJourney")
     );
+  }
+
+  @Test
+  void testAddJourneyMultipleTimes() {
+    var env = RealtimeTestEnvironment.siri();
+    var updates = createValidAddedJourney(env);
+
+    int numTrips = env.getTransitService().getAllTrips().size();
+    var result1 = env.applyEstimatedTimetable(updates);
+    assertEquals(1, result1.successful());
+    assertEquals(numTrips + 1, env.getTransitService().getAllTrips().size());
+    var result2 = env.applyEstimatedTimetable(updates);
+    assertEquals(1, result2.successful());
+    assertEquals(numTrips + 1, env.getTransitService().getAllTrips().size());
   }
 
   @Test
@@ -413,6 +419,19 @@ class SiriTimetableSnapshotSourceTest {
     var result = env.applyEstimatedTimetable(updates);
 
     assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
+  }
+
+  private static List<EstimatedTimetableDeliveryStructure> createValidAddedJourney(
+    RealtimeTestEnvironment env
+  ) {
+    return new SiriEtBuilder(env.getDateTimeHelper())
+      .withEstimatedVehicleJourneyCode("newJourney")
+      .withIsExtraJourney(true)
+      .withOperatorRef(env.operator1Id.getId())
+      .withLineRef(env.route1Id.getId())
+      .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
+      .buildEstimatedTimetableDeliveries();
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
