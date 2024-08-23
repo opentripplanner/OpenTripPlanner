@@ -176,8 +176,9 @@ class RealtimeResolverTest {
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
     transitModel.index();
 
-    var alertService = new TransitAlertServiceImpl(transitModel);
     return new DefaultTransitService(transitModel) {
+      final TransitAlertService alertService = new TransitAlertServiceImpl(this);
+
       @Override
       public TransitAlertService getTransitAlertService() {
         return alertService;

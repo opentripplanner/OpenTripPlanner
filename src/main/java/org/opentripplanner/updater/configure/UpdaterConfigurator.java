@@ -16,7 +16,9 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
@@ -156,32 +158,50 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
-      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitModel));
+      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, provideGtfsTransitService()));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(
-        new PollingTripUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+        new PollingTripUpdater(
+          configItem,
+          provideGtfsTransitService(),
+          provideGtfsTimetableSnapshot()
+        )
       );
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(
-        new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository, transitModel)
+        new PollingVehiclePositionUpdater(
+          configItem,
+          realtimeVehicleRepository,
+          provideGtfsTransitService()
+        )
       );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, transitModel, provideSiriTimetableSnapshot()));
+      updaters.add(
+        new SiriETUpdater(configItem, provideSiriTransitService(), provideSiriTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(
-        new SiriETGooglePubsubUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
+        new SiriETGooglePubsubUpdater(
+          configItem,
+          provideSiriTransitService(),
+          provideSiriTimetableSnapshot()
+        )
       );
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(new SiriSXUpdater(configItem, transitModel));
+      updaters.add(new SiriSXUpdater(configItem, provideSiriTransitService()));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(
-        new MqttGtfsRealtimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+        new MqttGtfsRealtimeUpdater(
+          configItem,
+          provideGtfsTransitService(),
+          provideGtfsTimetableSnapshot()
+        )
       );
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
@@ -214,11 +234,15 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
       updaters.add(
-        new SiriAzureETUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
+        new SiriAzureETUpdater(
+          configItem,
+          provideSiriTransitService(),
+          provideSiriTimetableSnapshot()
+        )
       );
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(new SiriAzureSXUpdater(configItem, transitModel));
+      updaters.add(new SiriAzureSXUpdater(configItem, provideSiriTransitService()));
     }
 
     return updaters;
@@ -236,12 +260,34 @@ public class UpdaterConfigurator {
     return siriTimetableSnapshotSource;
   }
 
+  /**
+   * Provide a TransitService aware of the latest (uncommitted) SIRI real-time updates.
+   * Should be injected only in SIRI updaters.
+   */
+  private TransitService provideSiriTransitService() {
+    return new DefaultTransitService(
+      transitModel,
+      provideSiriTimetableSnapshot().getTimetableSnapshotBuffer()
+    );
+  }
+
   private TimetableSnapshotSource provideGtfsTimetableSnapshot() {
     if (gtfsTimetableSnapshotSource == null) {
       this.gtfsTimetableSnapshotSource =
         new TimetableSnapshotSource(updatersParameters.timetableSnapshotParameters(), transitModel);
     }
     return gtfsTimetableSnapshotSource;
+  }
+
+  /**
+   * Provide a TransitService aware of the latest (uncommitted) GTFS real-time updates.
+   * Should be injected only in GTFS-RT updaters.
+   */
+  private TransitService provideGtfsTransitService() {
+    return new DefaultTransitService(
+      transitModel,
+      provideGtfsTimetableSnapshot().getTimetableSnapshotBuffer()
+    );
   }
 
   /**

@@ -11,8 +11,7 @@ import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -45,7 +44,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private final SiriHttpLoader siriHttpLoader;
   private final OtpRetry retry;
 
-  public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
+  public SiriSXUpdater(SiriSXUpdaterParameters config, TransitService transitService) {
     super(config);
     // TODO: add options to choose different patch services
     this.url = config.url();
@@ -58,13 +57,13 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
+    this.transitAlertService = new TransitAlertServiceImpl(transitService);
     this.updateHandler =
       new SiriAlertsUpdateHandler(
         config.feedId(),
-        transitModel,
+        transitService,
         transitAlertService,
-        SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
+        SiriFuzzyTripMatcher.of(transitService),
         config.earlyStart()
       );
     siriHttpLoader = new SiriHttpLoader(url, config.timeout(), config.requestHeaders());

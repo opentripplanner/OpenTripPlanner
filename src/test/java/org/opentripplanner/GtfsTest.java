@@ -39,6 +39,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -214,7 +215,7 @@ public abstract class GtfsTest {
           .withMaxSnapshotFrequency(Duration.ZERO),
         transitModel
       );
-    alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
+    alertPatchServiceImpl = new TransitAlertServiceImpl(new DefaultTransitService(transitModel));
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
 

@@ -65,8 +65,9 @@ public class RealtimeStopsLayerTest {
     var transitModel = new TransitModel(new StopModel(), deduplicator);
     transitModel.initTimeZone(ZoneIds.HELSINKI);
     transitModel.index();
-    var alertService = new TransitAlertServiceImpl(transitModel);
     var transitService = new DefaultTransitService(transitModel) {
+      final TransitAlertService alertService = new TransitAlertServiceImpl(this);
+
       @Override
       public TransitAlertService getTransitAlertService() {
         return alertService;

@@ -26,8 +26,6 @@ import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -69,7 +67,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    */
   protected final int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
+  public AbstractAzureSiriUpdater(
+    SiriAzureUpdaterParameters config,
+    TransitService transitService
+  ) {
     this.configRef = config.configRef();
     this.authenticationType = config.getAuthenticationType();
     this.fullyQualifiedNamespace = config.getFullyQualifiedNamespace();
@@ -80,7 +81,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.feedId = config.feedId();
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
-    TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
       config.isFuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;

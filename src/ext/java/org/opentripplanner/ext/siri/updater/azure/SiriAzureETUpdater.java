@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
@@ -40,10 +40,10 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
   public SiriAzureETUpdater(
     SiriAzureETUpdaterParameters config,
-    TransitModel transitModel,
+    TransitService transitService,
     SiriTimetableSnapshotSource snapshotSource
   ) {
-    super(config, transitModel);
+    super(config, transitService);
     this.fromDateTime = config.getFromDateTime();
     this.snapshotSource = snapshotSource;
     this.recordMetrics = TripUpdateMetrics.streaming(config);

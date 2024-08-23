@@ -198,7 +198,7 @@ class GraphQLIntegrationTest {
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
     TransitEditorService transitService = new DefaultTransitService(transitModel) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(this);
 
       @Override
       public List<TransitMode> getModesOfStopLocation(StopLocation stop) {

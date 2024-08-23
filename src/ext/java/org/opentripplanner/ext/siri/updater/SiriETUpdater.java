@@ -3,8 +3,7 @@ package org.opentripplanner.ext.siri.updater;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -41,7 +40,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   public SiriETUpdater(
     SiriETUpdaterParameters config,
-    TransitModel transitModel,
+    TransitService transitService,
     SiriTimetableSnapshotSource timetableSnapshotSource
   ) {
     super(config);
@@ -62,7 +61,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
       new EstimatedTimetableHandler(
         timetableSnapshotSource,
         config.fuzzyTripMatching(),
-        new DefaultTransitService(transitModel),
+        transitService,
         feedId
       );
 

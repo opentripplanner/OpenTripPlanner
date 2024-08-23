@@ -7,8 +7,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -33,15 +32,15 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   public GtfsRealtimeAlertsUpdater(
     GtfsRealtimeAlertsUpdaterParameters config,
-    TransitModel transitModel
+    TransitService transitService
   ) {
     super(config);
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
-    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitService);
 
     var fuzzyTripMatcher = config.fuzzyTripMatching()
-      ? new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel))
+      ? new GtfsRealtimeFuzzyTripMatcher(transitService)
       : null;
 
     this.transitAlertService = transitAlertService;

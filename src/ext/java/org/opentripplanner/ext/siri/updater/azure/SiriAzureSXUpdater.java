@@ -18,7 +18,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -35,15 +35,15 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   private final LocalDate fromDateTime;
   private final LocalDate toDateTime;
 
-  public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitModel transitModel) {
-    super(config, transitModel);
+  public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitService transitService) {
+    super(config, transitService);
     this.fromDateTime = config.getFromDateTime();
     this.toDateTime = config.getToDateTime();
-    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
+    this.transitAlertService = new TransitAlertServiceImpl(transitService);
     this.updateHandler =
       new SiriAlertsUpdateHandler(
         feedId,
-        transitModel,
+        transitService,
         transitAlertService,
         fuzzyTripMatcher(),
         Duration.ZERO

@@ -17,8 +17,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -66,7 +65,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   public MqttGtfsRealtimeUpdater(
     MqttGtfsRealtimeUpdaterParameters parameters,
-    TransitModel transitModel,
+    TransitService transitService,
     TimetableSnapshotSource snapshotSource
   ) {
     this.configRef = parameters.configRef();
@@ -78,8 +77,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     this.snapshotSource = snapshotSource;
     // Set properties of realtime data snapshot source
     if (parameters.getFuzzyTripMatching()) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
+      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(transitService);
     }
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
     LOG.info("Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url);

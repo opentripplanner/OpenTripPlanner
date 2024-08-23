@@ -13,7 +13,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This is the primary implementation of TransitAlertService, which actually retains its own set
@@ -32,12 +32,12 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
 
   private Multimap<EntityKey, TransitAlert> alerts = HashMultimap.create();
 
-  public TransitAlertServiceImpl(TransitModel transitModel) {
-    this.transitModel = transitModel;
+  public TransitAlertServiceImpl(TransitService transitService) {
+    this.transitService = transitService;
   }
 
   @Override
@@ -85,8 +85,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
-      if (transitModel != null) {
-        var quay = transitModel.getStopModel().getRegularStop(stopId);
+      if (transitService != null) {
+        var quay = transitService.getRegularStop(stopId);
         if (quay != null) {
           // TODO - SIRI: Add alerts from parent- and multimodal-stops
           /*

@@ -4,8 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -47,7 +46,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
   public PollingTripUpdater(
     PollingTripUpdaterParameters parameters,
-    TransitModel transitModel,
+    TransitService transitService,
     TimetableSnapshotSource snapshotSource
   ) {
     super(parameters);
@@ -57,8 +56,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
     if (parameters.fuzzyTripMatching()) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
+      this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(transitService);
     }
 
     this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);

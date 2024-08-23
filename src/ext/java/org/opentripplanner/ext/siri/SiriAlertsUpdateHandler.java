@@ -20,8 +20,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +65,7 @@ public class SiriAlertsUpdateHandler {
    */
   public SiriAlertsUpdateHandler(
     String feedId,
-    TransitModel transitModel,
+    TransitService transitService,
     TransitAlertService transitAlertService,
     SiriFuzzyTripMatcher siriFuzzyTripMatcher,
     Duration earlyStart
@@ -76,7 +74,6 @@ public class SiriAlertsUpdateHandler {
     this.transitAlertService = transitAlertService;
     this.earlyStart = earlyStart;
 
-    TransitService transitService = new DefaultTransitService(transitModel);
     this.affectsMapper = new AffectsMapper(feedId, siriFuzzyTripMatcher, transitService);
   }
 

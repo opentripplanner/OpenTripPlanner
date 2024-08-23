@@ -1,14 +1,9 @@
 package org.opentripplanner.updater.vehicle_position;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
-import java.time.LocalDate;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -40,14 +35,11 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   public PollingVehiclePositionUpdater(
     VehiclePositionsUpdaterParameters params,
     RealtimeVehicleRepository realtimeVehicleRepository,
-    TransitModel transitModel
+    TransitService transitService
   ) {
     super(params);
     this.vehiclePositionSource =
       new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
-    // TODO Inject TransitService, do not create it here. We currently do not
-    //      support dagger injection in updaters, so this is ok for now.
-    TransitService transitService = new DefaultTransitService(transitModel);
     var fuzzyTripMatcher = params.fuzzyTripMatching()
       ? new GtfsRealtimeFuzzyTripMatcher(transitService)
       : null;
@@ -56,7 +48,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         params.feedId(),
         transitService::getTripForId,
         transitService::getPatternForTrip,
-        (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
+        transitService::getPatternForTrip,
         realtimeVehicleRepository,
         transitService.getTimeZone(),
         fuzzyTripMatcher,
@@ -94,15 +86,5 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("source", vehiclePositionSource).toString();
-  }
-
-  private static TripPattern getPatternIncludingRealtime(
-    TransitModel transitModel,
-    Trip trip,
-    LocalDate sd
-  ) {
-    // a new instance of DefaultTransitService must be created to retrieve
-    // the current TimetableSnapshot
-    return (new DefaultTransitService(transitModel)).getPatternForTrip(trip, sd);
   }
 }

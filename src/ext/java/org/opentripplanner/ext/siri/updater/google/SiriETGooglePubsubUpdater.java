@@ -5,8 +5,7 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableProcessor;
 import org.opentripplanner.ext.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -27,7 +26,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
-    TransitModel transitModel,
+    TransitService transitService,
     SiriTimetableSnapshotSource timetableSnapshotSource
   ) {
     configRef = config.configRef();
@@ -46,7 +45,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       new EstimatedTimetableHandler(
         timetableSnapshotSource,
         config.fuzzyTripMatching(),
-        new DefaultTransitService(transitModel),
+        transitService,
         config.feedId()
       );
 
