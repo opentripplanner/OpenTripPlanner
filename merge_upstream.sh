@@ -207,9 +207,6 @@ function configDigitransitCI() {
     git checkout "${DEVBRANCH}"
     rm -rf .github
     git checkout origin/digitransit_ext_config .github
-    git checkout origin/digitransit_ext_config Dockerfile
-    git checkout origin/digitransit_ext_config Dockerfile.builder
-    git checkout origin/digitransit_ext_config run.sh
     git commit -a -m "Configure Digitransit CI actions"
     if [[ -z "${DRY_RUN}" ]] ; then
         git push -f
