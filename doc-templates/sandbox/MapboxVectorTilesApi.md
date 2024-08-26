@@ -220,3 +220,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
 - 2024-01-22: Make `basePath` configurable [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
 - 2024-02-27: Add layer for flex zones [#5704](https://github.com/opentripplanner/OpenTripPlanner/pull/5704)
 - 2024-03-25: Add layer for realtime stops [#5743](https://github.com/opentripplanner/OpenTripPlanner/pull/5743)
+- 2024-08-26: Add support for hardcoding tilejson tiles URL in requests [#6021](https://github.com/opentripplanner/OpenTripPlanner/pull/6021)
