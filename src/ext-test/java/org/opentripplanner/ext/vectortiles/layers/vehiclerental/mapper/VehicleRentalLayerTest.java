@@ -38,6 +38,7 @@ public class VehicleRentalLayerTest {
     assertEquals("A:B", map.get("id"));
     assertEquals("BICYCLE", map.get("formFactor"));
     assertEquals("A", map.get("network"));
+    assertEquals(true, map.get("pickupAllowed"));
     assertNull(map.get("name"));
   }
 
