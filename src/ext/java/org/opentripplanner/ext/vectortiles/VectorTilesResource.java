@@ -86,15 +86,19 @@ public class VectorTilesResource {
 
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
-    var url = serverContext
-      .vectorTileConfig()
-      .basePath()
-      .map(overrideBasePath ->
-        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
-      )
-      .orElseGet(() ->
-        TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
-      );
+    var hardcodedUrl = headers.getHeaderString("X-OTP-Tilejson-Url");
+
+    var url = hardcodedUrl != null
+      ? hardcodedUrl
+      : serverContext
+        .vectorTileConfig()
+        .basePath()
+        .map(overrideBasePath ->
+          TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
+        )
+        .orElseGet(() ->
+          TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
+        );
 
     return serverContext
       .vectorTileConfig()
