@@ -259,6 +259,13 @@ Currently `Digitransit` is supported for all layer types.
 
 <!-- parameters END -->
 
+### Configuring tilejson tiles URL
+
+Sometimes the requests to OTP come through a proxy which rewrites the request's host and/or path.
+Therefore, the tiles endpoint url in the TileJSON file can be configured to not just be derived from
+the request's URL seen by OTP by either configuring `basePath` in the router-config.json or by sending
+in a hardcoded URL in `X-OTP-Tilejson-Url` header in the requests which fetch the TileJSON file.
+
 ### Extending
 
 If more generic layers are created for this API, the code should be moved out from the sandbox, into 
