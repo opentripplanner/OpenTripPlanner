@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# This script can be used to delete routes from the Portland GTFS test data set.
+# The script can remove a singe route or a range. Run the script from the OTP root.
+# The script assume trip ida are constructed in a particular way; Hence can not
+# be ysed on other gtfs data-set.
+#
+# The the help function for user doc.
+
+set -e
+
+pushd src/test/resources/portland/gtfs > /dev/null || {
+  echo "ERROR! Please execute script in OTP root dir..."
+  exit 1
+}
+
+SERVICE_CODES="2fdkpABCKUPSWX"
+
+function help() {
+  echo "$1"
+  echo ""
+  echo "To remove a single route with ID 4 ues:"
+  echo ""
+  echo "    $ script/test-portland-gtfs-rm-routes 4"
+  echo ""
+  echo ""
+  echo "To remove all routes with ID 9(inclusive) to 73(exclusive) use:"
+  echo ""
+  echo "    $ script/test-portland-gtfs-rm-routes 9 73"
+  echo ""
+}
+
+
+# This function takes one argument, the route ID
+function removeRoute() {
+  TRIP_ID="${1}[01][${SERVICE_CODES}]"
+  echo "Remove route $1 and trips witch match: ${TRIP_ID}"
+
+  # Remove lines witch start with "route_id,"
+  grep -v -E "^${1}," routes.txt > routes2.txt
+  mv routes2.txt routes.txt
+
+  # Remove lines witch start with "route_id,"
+  grep -v -E "^$1," trips.txt > trips2.txt
+  mv trips2.txt trips.txt
+
+  # Remove lines witch start with partial "trip_id"
+  grep -v -E "^${TRIP_ID}" stop_times.txt > stop_times2.txt
+  mv stop_times2.txt stop_times.txt
+
+  # Remove lines witch start with "NUM,NUM,route_id," - transfers from_route
+  grep -v -E "^\d+,\d+,${1}," transfers.txt > transfers2.txt
+  # Remove lines witch start with "NUM,NUM,NUM,route_id," - transfers to_route
+  grep -v -E "^\d+,\d+,\d+,${1}," transfers2.txt > transfers3.txt
+  mv transfers3.txt transfers.txt
+  rm transfers2.txt
+
+  # Remove lines witch start with "NUM,route_id,"
+  grep -v -E "^\d+,${1}," fare_rules.txt > fare_rules2.txt
+  mv fare_rules2.txt fare_rules.txt
+}
+
+if (( $# == 0 ))
+then
+  help "Please specify a route id or an range"
+elif (( $# == 1 ))
+then
+  removeRoute $1
+elif (( $# == 2 ))
+then
+  for ((i=$1; i <$2; ++i))
+  do
+    removeRoute $i
+  done
+else
+  help "Too many arguments..."
+fi
+
+popd > /dev/null
