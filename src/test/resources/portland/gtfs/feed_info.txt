@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_timezone,feed_lang
+TriMet,http://trimet.org,America/Los_Angeles,en

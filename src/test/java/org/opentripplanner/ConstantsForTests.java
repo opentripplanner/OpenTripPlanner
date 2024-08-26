@@ -52,7 +52,7 @@ public class ConstantsForTests {
 
   public static final File CALTRAIN_GTFS = RES.file("/gtfs/caltrain_gtfs.zip");
 
-  private static final File PORTLAND_GTFS = RES.file("/portland/portland.gtfs.zip");
+  private static final File PORTLAND_GTFS = RES.file("/portland/gtfs");
 
   private static final File PORTLAND_CENTRAL_OSM = RES.file(
     "/portland/portland-central-filtered.osm.pbf"
