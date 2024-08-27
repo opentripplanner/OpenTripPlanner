@@ -29,6 +29,7 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
 {
   "routingDefaults": {
     "wheelchairAccessibility": {
+      "enabled": true,
       "trip": {
         "onlyConsiderAccessible": false,
         "unknownCost": 600,

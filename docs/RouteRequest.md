@@ -1255,6 +1255,7 @@ include stairs as a last result.
       "extraStopBoardAlightCostsFactor" : 8.0
     },
     "wheelchairAccessibility" : {
+      "enabled": true,
       "trip" : {
         "onlyConsiderAccessible" : false,
         "unknownCost" : 600,
