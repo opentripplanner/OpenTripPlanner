@@ -17,6 +17,7 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class TripPatternBuilder
@@ -139,7 +140,7 @@ public final class TripPatternBuilder
     return route.getMode().ordinal();
   }
 
-  public Object getDirection() {
+  public Direction getDirection() {
     if (scheduledTimetable != null) {
       return scheduledTimetable.getDirection();
     }

@@ -138,7 +138,7 @@ public class TimetableBuilder {
 
   private TripTimes getRepresentativeTripTimes() {
     if (!tripTimes.isEmpty()) {
-      return tripTimes.values().stream().findAny().get();
+      return tripTimes.values().stream().findFirst().get();
     } else if (!frequencies.isEmpty()) {
       return frequencies.getFirst().tripTimes;
     } else {
