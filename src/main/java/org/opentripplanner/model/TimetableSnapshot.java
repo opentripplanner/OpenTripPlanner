@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -288,11 +287,8 @@ public class TimetableSnapshot {
    * @return whether the update was actually applied
    */
   public Result<UpdateSuccess, UpdateError> update(RealTimeTripUpdate realTimeTripUpdate) {
-    // Preconditions
     TripPattern pattern = realTimeTripUpdate.pattern();
-    Objects.requireNonNull(pattern);
     LocalDate serviceDate = realTimeTripUpdate.serviceDate();
-    Objects.requireNonNull(serviceDate);
     TripTimes updatedTripTimes = realTimeTripUpdate.updatedTripTimes();
 
     if (readOnly) {
