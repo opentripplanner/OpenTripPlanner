@@ -5,8 +5,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
@@ -26,8 +26,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class VehicleRentalServiceDirectoryConfigDocTest {
 
   private static final String DOCUMENT = "sandbox/VehicleRentalServiceDirectory.md";
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, DOCUMENT);
-  private static final File OUT_FILE = new File(DOCS_ROOT, DOCUMENT);
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, DOCUMENT);
+  private static final File OUT_FILE = new File(USER_DOC_PATH, DOCUMENT);
   private static final String CONFIG_PATH =
     "org/opentripplanner/ext/vehiclerentalservicedirectory/generatedoc/" + ROUTER_CONFIG_FILENAME;
   private static final String CONFIG_TAG = "vehicleRentalServiceDirectory";

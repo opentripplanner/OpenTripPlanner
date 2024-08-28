@@ -5,8 +5,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
@@ -25,8 +25,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @GeneratesDocumentation
 public class UpdaterConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "UpdaterConfig.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "UpdaterConfig.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "UpdaterConfig.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "UpdaterConfig.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> SKIP_UPDATERS = Set.of(
@@ -41,7 +41,7 @@ public class UpdaterConfigDocTest {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
    * version of the code. The following is auto generated:
    * <ul>
    *   <li>The configuration type table</li>

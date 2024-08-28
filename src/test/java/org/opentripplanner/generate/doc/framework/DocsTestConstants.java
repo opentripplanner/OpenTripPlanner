@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
  */
 public interface DocsTestConstants {
   Logger LOG = LoggerFactory.getLogger(DocsTestConstants.class);
-  File TEMPLATE_ROOT = new File("doc-templates");
-  File DOCS_ROOT = new File("docs");
+  File DOC_ROOT = new File("doc");
+  File TEMPLATE_PATH = new File(DOC_ROOT, "templates");
+  File USER_DOC_PATH = new File(DOC_ROOT, "user");
 
   /**
    * This method return {@code true} if the /docs directory is available. If not, a warning is
@@ -18,14 +19,14 @@ public interface DocsTestConstants {
    * annotation.
    */
   static boolean docsExistOrWarn() {
-    if (DOCS_ROOT.exists()) {
+    if (USER_DOC_PATH.exists()) {
       return true;
     }
     LOG.warn(
       """
       SKIP TEST - '/docs' NOT FOUND
       
-          The docs/doc-templates directory might not be available if you run the tests outside the
+          The doc/templates directory might not be available if you run the tests outside the
           root of the projects. This may happen if the project root is not the working directory,
           if you run tests using jar files or in a Maven multi-module project.
           

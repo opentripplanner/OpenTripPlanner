@@ -3,8 +3,8 @@ package org.opentripplanner.generate.doc;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
@@ -21,8 +21,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 public class StopConsolidationDocTest {
 
   private static final String FILE_NAME = "StopConsolidation.md";
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, FILE_NAME);
-  private static final File OUT_FILE = new File(DOCS_ROOT + "/sandbox", FILE_NAME);
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, FILE_NAME);
+  private static final File OUT_FILE = new File(USER_DOC_PATH + "/sandbox", FILE_NAME);
 
   private static final String CONFIG_FILENAME = "standalone/config/build-config.json";
 

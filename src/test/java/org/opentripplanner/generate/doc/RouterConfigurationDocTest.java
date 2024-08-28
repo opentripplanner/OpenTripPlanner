@@ -5,8 +5,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
@@ -24,8 +24,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @GeneratesDocumentation
 public class RouterConfigurationDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "RouterConfiguration.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "RouterConfiguration.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "RouterConfiguration.md");
 
   private static final String CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes
@@ -40,7 +40,7 @@ public class RouterConfigurationDocTest {
     .build();
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
    * version of the code. The following is auto generated:
    * <ul>
    *   <li>The configuration type table</li>
