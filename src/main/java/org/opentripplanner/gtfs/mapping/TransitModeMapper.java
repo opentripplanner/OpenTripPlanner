@@ -70,6 +70,7 @@ public class TransitModeMapper {
       case 5 -> TransitMode.CABLE_CAR;
       case 6 -> TransitMode.GONDOLA;
       case 7 -> TransitMode.FUNICULAR;
+      case 8 -> TransitMode.AIRPLANE;
       case 11 -> TransitMode.TROLLEYBUS;
       case 12 -> TransitMode.MONORAIL;
       default -> throw new IllegalArgumentException("unknown gtfs route type " + routeType);
