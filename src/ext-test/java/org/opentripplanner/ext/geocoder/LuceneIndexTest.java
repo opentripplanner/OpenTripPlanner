@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -96,6 +98,10 @@ class LuceneIndexTest {
     .withCoordinate(52.52277, 13.41046)
     .build();
 
+  static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop("Meridian Ave N & N 148th St").build();
+  static final RegularStop MERIDIAN_N1 = TEST_MODEL.stop("Meridian N & Spencer").build();
+  static final RegularStop MERIDIAN_N2 = TEST_MODEL.stop("N 205th St & Meridian Ave N").build();
+
   static LuceneIndex index;
 
   static StopClusterMapper mapper;
@@ -111,7 +117,10 @@ class LuceneIndexTest {
         LICHTERFELDE_OST_2,
         WESTHAFEN,
         ARTS_CENTER,
-        ARTHUR
+        ARTHUR,
+        MERIDIAN_N1,
+        MERIDIAN_N2,
+        MERIDIAN_AVE
       )
       .forEach(stopModel::withRegularStop);
     List
@@ -160,8 +169,12 @@ class LuceneIndexTest {
         );
       }
     };
-    index = new LuceneIndex(transitService);
-    mapper = new StopClusterMapper(transitService);
+    var stopConsolidationService = new DefaultStopConsolidationService(
+      new DefaultStopConsolidationRepository(),
+      transitModel
+    );
+    index = new LuceneIndex(transitService, stopConsolidationService);
+    mapper = new StopClusterMapper(transitService, stopConsolidationService);
   }
 
   @Test
@@ -289,9 +302,32 @@ class LuceneIndexTest {
       assertEquals(List.of(StopClusterMapper.toAgency(BVG)), cluster.primary().agencies());
       assertEquals("A Publisher", cluster.primary().feedPublisher().name());
     }
+
+    @ParameterizedTest
+    @ValueSource(
+      strings = {
+        "Meridian Ave N & N 148th",
+        "Meridian Ave N & N 148",
+        "Meridian Ave N N 148",
+        "Meridian Ave N 148",
+        "Meridian & 148 N",
+        "148 N & Meridian",
+        "Meridian & N 148",
+        "Meridian Ave 148",
+        "Meridian Av 148",
+        "meridian av 148",
+      }
+    )
+    void numericAdjectives(String query) {
+      var names = index.queryStopClusters(query).map(c -> c.primary().name()).toList();
+      assertEquals(
+        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
+        names
+      );
+    }
   }
 
-  private static @Nonnull Function<StopCluster, FeedScopedId> primaryId() {
+  private static Function<StopCluster, FeedScopedId> primaryId() {
     return c -> c.primary().id();
   }
 }

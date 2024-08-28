@@ -1620,9 +1620,17 @@ type QueryType {
     "Only return routes with these feedIds"
     feeds: [String],
     "Only return routes with these ids"
-    ids: [String],
+    ids: [String] @deprecated(reason : "Since it is hard to reason about the ID filter being combined with others in this resolver, it will be moved to a separate one."),
     "Query routes by this name"
     name: String,
+    """
+    Only include routes whose pattern operates on at least one service date specified by this filter.
+        
+    **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+    """
+    serviceDates: LocalDateRangeInput,
     "Only include routes, which use one of these modes"
     transportModes: [Mode]
   ): [Route]
@@ -1847,7 +1855,16 @@ type Route implements Node {
   "Transport mode of this route, e.g. `BUS`"
   mode: TransitMode
   "List of patterns which operate on this route"
-  patterns: [Pattern]
+  patterns(
+    """
+    Filter patterns by the service dates they operate on.
+        
+    **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+    """
+    serviceDates: LocalDateRangeInput
+  ): [Pattern]
   "Short name of the route, usually a line number, e.g. 550"
   shortName: String
   """
@@ -3517,6 +3534,13 @@ scalar GeoJson @specifiedBy(url : "https://www.rfcreader.com/#rfc7946")
 
 scalar Grams
 
+"""
+An ISO-8601-formatted local date, i.e. `2024-05-24` for the 24th of May, 2024.
+
+ISO-8601 allows many different date formats, however only the most common one - `yyyy-MM-dd` - is accepted.
+"""
+scalar LocalDate @specifiedBy(url : "https://www.iso.org/standard/70907.html")
+
 "A IETF BCP 47 language tag"
 scalar Locale @specifiedBy(url : "https://www.rfcreader.com/#rfc5646")
 
@@ -3855,6 +3879,23 @@ input InputUnpreferred {
   Deprecated: Use `unpreferredCost` instead.
   """
   useUnpreferredRoutesPenalty: Int @deprecated(reason : "Use unpreferredCost instead")
+}
+
+"Filters an entity by a date range."
+input LocalDateRangeInput {
+  """
+  **Exclusive** end date of the filter. This means that if you want a time window from Sunday to
+  Sunday, `end` must be on Monday.
+    
+  If `null` this means that no end filter is applied and all entities that are after or on `start`
+  are selected.
+  """
+  end: LocalDate
+  """
+  **Inclusive** start date of the filter. If `null` this means that no `start` filter is applied and all
+  dates that are before `end` are selected.
+  """
+  start: LocalDate
 }
 
 """

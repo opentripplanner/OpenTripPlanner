@@ -42,6 +42,7 @@ public class VehicleParkingDataSourceFactory {
       case BIKELY -> new BikelyUpdater((BikelyUpdaterParameters) parameters);
       case NOI_OPEN_DATA_HUB -> new NoiUpdater((NoiUpdaterParameters) parameters);
       case BIKEEP -> new BikeepUpdater((BikeepUpdaterParameters) parameters);
+      case SIRI_FM -> throw new IllegalArgumentException("Cannot instantiate SIRI-FM data source");
     };
   }
 }

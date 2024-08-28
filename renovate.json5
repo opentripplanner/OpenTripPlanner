@@ -34,7 +34,7 @@
       "matchFiles": ["client/package.json"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Debug UI dependencies (non-major)",
-      "schedule": ["on the first day of the week"],
+      "schedule": ["on the 3rd and 17th day of the month"],
       "reviewers": ["testower"]
     },
     {
@@ -45,6 +45,24 @@
     // some dependencies that we auto-merge release very often and even the auto-merges create a lot of
     // noise, so we slow it down a bit
     {
+      "description": "Automerge test dependencies in a single PR",
+      "groupName": "Test dependencies",
+      "matchPackageNames": [
+        "org.mockito:mockito-core",
+        "com.tngtech.archunit:archunit",
+        "org.apache.maven.plugins:maven-surefire-plugin",
+        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
+        "com.google.truth:truth",
+        "org.jacoco:jacoco-maven-plugin", // coverage plugin
+        "org.apache.commons:commons-compress" // only used by tests
+      ],
+      "matchPackagePrefixes": [
+        "org.junit.jupiter:",
+      ],
+      "automerge": true,
+      "schedule": "on the 17th day of the month"
+    },
+    {
       "matchPackageNames": [
         "org.mobilitydata:gbfs-java-model"
       ],
@@ -53,12 +71,21 @@
       "automerge": true
     },
     {
+      "description": "Automerge Maven plugins in a single PR",
+      "groupName": "Maven plugins",
       "matchPackageNames": [
-        "ch.qos.logback:logback-classic",
         "io.github.git-commit-id:git-commit-id-maven-plugin",
-        "org.apache.maven.plugins:maven-gpg-plugin"
+        "org.apache.maven.plugins:maven-gpg-plugin",
+        "org.codehaus.mojo:build-helper-maven-plugin",
+        "org.apache.maven.plugins:maven-source-plugin",
+        "com.hubspot.maven.plugins:prettier-maven-plugin",
+        "com.google.cloud.tools:jib-maven-plugin",
+        "org.apache.maven.plugins:maven-shade-plugin",
+        "org.apache.maven.plugins:maven-compiler-plugin",
+        "org.apache.maven.plugins:maven-jar-plugin",
+        "org.sonatype.plugins:nexus-staging-maven-plugin"
       ],
-      "schedule": "on the 19th day of the month",
+      "schedule": "on the 23rd day of the month",
       "automerge": true
     },
     {
@@ -75,17 +102,16 @@
         "org.onebusaway:onebusaway-gtfs",
         "com.google.cloud:libraries-bom",
         "com.google.guava:guava",
-        "@graphql-codegen/add",
-        "@graphql-codegen/cli",
-        "@graphql-codegen/java",
-        "@graphql-codegen/java-resolvers",
-        "graphql",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx"
       ],
-      // we don't use the 'monthly' preset because that only fires on the first day of the month
-      // when there might already other PRs open
       "schedule": "on the 7th through 8th day of the month"
+    },
+    {
+      "groupName": "Update GTFS API code generation in a single PR",
+      "matchFiles": ["src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
+      "reviewers": ["optionsome", "leonardehrenfried"],
+      "schedule": "on the 11th through 12th day of the month"
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
@@ -97,6 +123,7 @@
       ]
     },
     {
+      "groupName": "mkdocs",
       "description": "automerge mkdocs-material every quarter",
       "matchPackageNames": [
         "mkdocs",
@@ -108,30 +135,14 @@
       "automerge": true
     },
     {
-      "description": "automatically merge test, logging and build dependencies",
-      "matchPackageNames": [
-        "org.mockito:mockito-core",
-        "com.tngtech.archunit:archunit",
-        "org.apache.maven.plugins:maven-surefire-plugin",
-        "me.fabriciorby:maven-surefire-junit5-tree-reporter",
-        "org.jacoco:jacoco-maven-plugin", // coverage plugin
-        "org.apache.commons:commons-compress", // only used by tests
-        // maven plugins
-        "org.codehaus.mojo:build-helper-maven-plugin",
-        "org.apache.maven.plugins:maven-source-plugin",
-        "com.hubspot.maven.plugins:prettier-maven-plugin",
-        "com.google.cloud.tools:jib-maven-plugin",
-        "org.apache.maven.plugins:maven-shade-plugin",
-        "org.apache.maven.plugins:maven-compiler-plugin",
-        "org.apache.maven.plugins:maven-jar-plugin",
-        "org.sonatype.plugins:nexus-staging-maven-plugin"
-      ],
+      "description": "Automerge logging dependencies in a single PR",
+      "groupName": "logging",
       "matchPackagePrefixes": [
-        "org.junit.jupiter:",
-        "org.slf4j:"
+        "org.slf4j:",
+        "ch.qos.logback:"
       ],
       "automerge": true,
-      "schedule": "after 11pm and before 5am every weekday"
+      "schedule": "on the 4th day of the month"
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",

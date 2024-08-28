@@ -2,7 +2,6 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -30,7 +29,7 @@ public class VehicleParkingHelper {
       .getEntrances()
       .stream()
       .map(vertexFactory::vehicleParkingEntrance)
-      .collect(Collectors.toList());
+      .toList();
   }
 
   public static void linkVehicleParkingEntrances(

@@ -145,6 +145,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           List.of(),
           null,
           new DefaultStreetLimitationParametersService(new StreetLimitationParameters()),
+          null,
           null
         ),
         null,

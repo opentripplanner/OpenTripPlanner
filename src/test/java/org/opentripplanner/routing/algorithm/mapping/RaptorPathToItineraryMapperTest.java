@@ -237,7 +237,6 @@ public class RaptorPathToItineraryMapperTest {
       null,
       null,
       null,
-      null,
       null
     );
   }

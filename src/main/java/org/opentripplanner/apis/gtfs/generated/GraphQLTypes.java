@@ -1268,6 +1268,35 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLLocalDateRangeInput {
+
+    private java.time.LocalDate end;
+    private java.time.LocalDate start;
+
+    public GraphQLLocalDateRangeInput(Map<String, Object> args) {
+      if (args != null) {
+        this.end = (java.time.LocalDate) args.get("end");
+        this.start = (java.time.LocalDate) args.get("start");
+      }
+    }
+
+    public java.time.LocalDate getGraphQLEnd() {
+      return this.end;
+    }
+
+    public java.time.LocalDate getGraphQLStart() {
+      return this.start;
+    }
+
+    public void setGraphQLEnd(java.time.LocalDate end) {
+      this.end = end;
+    }
+
+    public void setGraphQLStart(java.time.LocalDate start) {
+      this.start = start;
+    }
+  }
+
   /** Identifies whether this stop represents a stop or station. */
   public enum GraphQLLocationType {
     ENTRANCE,
@@ -3459,6 +3488,7 @@ public class GraphQLTypes {
     private List<String> feeds;
     private List<String> ids;
     private String name;
+    private GraphQLLocalDateRangeInput serviceDates;
     private List<GraphQLMode> transportModes;
 
     public GraphQLQueryTypeRoutesArgs(Map<String, Object> args) {
@@ -3466,6 +3496,8 @@ public class GraphQLTypes {
         this.feeds = (List<String>) args.get("feeds");
         this.ids = (List<String>) args.get("ids");
         this.name = (String) args.get("name");
+        this.serviceDates =
+          new GraphQLLocalDateRangeInput((Map<String, Object>) args.get("serviceDates"));
         if (args.get("transportModes") != null) {
           this.transportModes =
             ((List<Object>) args.get("transportModes")).stream()
@@ -3488,6 +3520,10 @@ public class GraphQLTypes {
       return this.name;
     }
 
+    public GraphQLLocalDateRangeInput getGraphQLServiceDates() {
+      return this.serviceDates;
+    }
+
     public List<GraphQLMode> getGraphQLTransportModes() {
       return this.transportModes;
     }
@@ -3502,6 +3538,10 @@ public class GraphQLTypes {
 
     public void setGraphQLName(String name) {
       this.name = name;
+    }
+
+    public void setGraphQLServiceDates(GraphQLLocalDateRangeInput serviceDates) {
+      this.serviceDates = serviceDates;
     }
 
     public void setGraphQLTransportModes(List<GraphQLMode> transportModes) {
@@ -3940,6 +3980,26 @@ public class GraphQLTypes {
 
     public void setGraphQLLanguage(String language) {
       this.language = language;
+    }
+  }
+
+  public static class GraphQLRoutePatternsArgs {
+
+    private GraphQLLocalDateRangeInput serviceDates;
+
+    public GraphQLRoutePatternsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDates =
+          new GraphQLLocalDateRangeInput((Map<String, Object>) args.get("serviceDates"));
+      }
+    }
+
+    public GraphQLLocalDateRangeInput getGraphQLServiceDates() {
+      return this.serviceDates;
+    }
+
+    public void setGraphQLServiceDates(GraphQLLocalDateRangeInput serviceDates) {
+      this.serviceDates = serviceDates;
     }
   }
 

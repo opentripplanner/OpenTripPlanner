@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -164,6 +165,14 @@ public class NetexConfig {
           .summary("Ignore contents of the FareFrame")
           .docDefaultValue(base.ignoreFareFrame())
           .asBoolean(base.ignoreFareFrame())
+      )
+      .withIgnoreParking(
+        config
+          .of("ignoreParking")
+          .since(V2_6)
+          .summary("Ignore Parking elements.")
+          .docDefaultValue(base.ignoreParking())
+          .asBoolean(base.ignoreParking())
       );
   }
 

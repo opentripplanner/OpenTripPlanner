@@ -12,6 +12,7 @@ import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile
@@ -192,9 +193,15 @@ public class StyleBuilder {
    */
   @SafeVarargs
   public final StyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
-    var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
-    filter = ListUtils.combine(List.of("in", "class"), clazzes);
-    return this;
+    return filterClasses(classToFilter);
+  }
+
+  /**
+   * Only apply the style to the given vertices.
+   */
+  @SafeVarargs
+  public final StyleBuilder vertexFilter(Class<? extends Vertex>... classToFilter) {
+    return filterClasses(classToFilter);
   }
 
   public JsonNode toJson() {
@@ -214,6 +221,12 @@ public class StyleBuilder {
       copy.put("line", line);
     }
     return OBJECT_MAPPER.valueToTree(copy);
+  }
+
+  private StyleBuilder filterClasses(Class... classToFilter) {
+    var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
+    filter = ListUtils.combine(List.of("in", "class"), clazzes);
+    return this;
   }
 
   private String validateColor(String color) {

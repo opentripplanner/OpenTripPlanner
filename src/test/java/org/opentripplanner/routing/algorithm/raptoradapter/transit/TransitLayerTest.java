@@ -65,7 +65,6 @@ class TransitLayerTest {
       null,
       null,
       null,
-      null,
       null
     );
     var runningOnDate = transitLayer.getTripPatternsRunningOnDateCopy(date);
@@ -89,7 +88,6 @@ class TransitLayerTest {
     var tripPatterns = List.of(tripPatternForDate);
     var transitLayer = new TransitLayer(
       Map.of(date, tripPatterns),
-      null,
       null,
       null,
       null,
@@ -124,7 +122,6 @@ class TransitLayerTest {
       null,
       null,
       null,
-      null,
       null
     );
     var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(date);
@@ -147,7 +144,6 @@ class TransitLayerTest {
     );
     var transitLayer = new TransitLayer(
       Map.of(runningDate, List.of(tripPatternForDate)),
-      null,
       null,
       null,
       null,
@@ -181,7 +177,6 @@ class TransitLayerTest {
         entry(firstRunningDate, List.of(tripPatternForDate)),
         entry(secondRunningDate, List.of(tripPatternForDate))
       ),
-      null,
       null,
       null,
       null,

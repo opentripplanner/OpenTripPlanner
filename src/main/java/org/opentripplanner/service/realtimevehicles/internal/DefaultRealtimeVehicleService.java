@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -33,8 +32,16 @@ public class DefaultRealtimeVehicleService
     this.transitService = transitService;
   }
 
+  /**
+   * Stores the relationship between a list of realtime vehicles with a pattern. If the pattern is
+   * a realtime-added one, then the original (scheduled) one is used as the key for the map storing
+   * the information.
+   */
   @Override
   public void setRealtimeVehicles(TripPattern pattern, List<RealtimeVehicle> updates) {
+    if (pattern.getOriginalTripPattern() != null) {
+      pattern = pattern.getOriginalTripPattern();
+    }
     vehicles.put(pattern, List.copyOf(updates));
   }
 
@@ -43,8 +50,18 @@ public class DefaultRealtimeVehicleService
     vehicles.remove(pattern);
   }
 
+  /**
+   * Gets the realtime vehicles for a given pattern. If the pattern is a realtime-added one
+   * then the original (scheduled) one is used for the lookup instead, so you receive the correct
+   * result no matter if you use the realtime or static information.
+   *
+   * @see DefaultRealtimeVehicleService#setRealtimeVehicles(TripPattern, List)
+   */
   @Override
   public List<RealtimeVehicle> getRealtimeVehicles(@Nonnull TripPattern pattern) {
+    if (pattern.getOriginalTripPattern() != null) {
+      pattern = pattern.getOriginalTripPattern();
+    }
     // the list is made immutable during insertion, so we can safely return them
     return vehicles.getOrDefault(pattern, List.of());
   }

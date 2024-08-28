@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -40,12 +41,14 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -65,9 +68,24 @@ public class LuceneIndex implements Serializable {
   private final SuggestIndexSearcher searcher;
   private final StopClusterMapper stopClusterMapper;
 
-  public LuceneIndex(TransitService transitService) {
+  /**
+   * Since the {@link TransitService} is request scoped, we don't inject it into this class.
+   * However, we do need some methods in the service and that's why we instantiate it manually in this
+   * constructor.
+   */
+  public LuceneIndex(TransitModel transitModel, StopConsolidationService stopConsolidationService) {
+    this(new DefaultTransitService(transitModel), stopConsolidationService);
+  }
+
+  /**
+   * This method is only visible for testing.
+   */
+  LuceneIndex(
+    TransitService transitService,
+    @Nullable StopConsolidationService stopConsolidationService
+  ) {
     this.transitService = transitService;
-    this.stopClusterMapper = new StopClusterMapper(transitService);
+    this.stopClusterMapper = new StopClusterMapper(transitService, stopConsolidationService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -142,18 +160,6 @@ public class LuceneIndex implements Serializable {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
-    var graph = serverContext.graph();
-    var existingIndex = graph.getLuceneIndex();
-    if (existingIndex != null) {
-      return existingIndex;
-    }
-
-    var newIndex = new LuceneIndex(serverContext.transitService());
-    graph.setLuceneIndex(newIndex);
-    return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
@@ -252,6 +258,7 @@ public class LuceneIndex implements Serializable {
     String searchTerms,
     boolean autocomplete
   ) {
+    searchTerms = searchTerms.strip();
     try {
       if (autocomplete) {
         var completionQuery = new FuzzyCompletionQuery(
@@ -281,7 +288,7 @@ public class LuceneIndex implements Serializable {
             }
           });
       } else {
-        var nameParser = new QueryParser(NAME, analyzer);
+        var nameParser = new QueryParser(NAME_NGRAM, analyzer);
         var nameQuery = nameParser.parse(searchTerms);
 
         var ngramNameQuery = new TermQuery(

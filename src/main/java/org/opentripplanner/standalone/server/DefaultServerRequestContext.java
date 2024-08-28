@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -49,6 +50,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final EmissionsService emissionsService;
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final LuceneIndex luceneIndex;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -70,7 +72,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
-    TraverseVisitor traverseVisitor
+    TraverseVisitor traverseVisitor,
+    @Nullable LuceneIndex luceneIndex
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -89,6 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.emissionsService = emissionsService;
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.luceneIndex = luceneIndex;
   }
 
   /**
@@ -110,7 +114,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
-    @Nullable TraverseVisitor traverseVisitor
+    @Nullable TraverseVisitor traverseVisitor,
+    @Nullable LuceneIndex luceneIndex
   ) {
     return new DefaultServerRequestContext(
       graph,
@@ -129,7 +134,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       stopConsolidationService,
       streetLimitationParametersService,
       flexParameters,
-      traverseVisitor
+      traverseVisitor,
+      luceneIndex
     );
   }
 
@@ -233,6 +239,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VectorTileConfig vectorTileConfig() {
     return vectorTileConfig;
+  }
+
+  @Nullable
+  @Override
+  public LuceneIndex lucenceIndex() {
+    return luceneIndex;
   }
 
   @Override

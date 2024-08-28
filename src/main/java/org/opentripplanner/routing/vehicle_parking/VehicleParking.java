@@ -96,8 +96,10 @@ public class VehicleParking implements Serializable {
   private final List<VehicleParkingEntrance> entrances = new ArrayList<>();
   /**
    * The currently available spaces at this vehicle parking.
+   * <p>
+   * The volatile keyword is used to ensure safe publication by clearing CPU caches.
    */
-  private VehicleParkingSpaces availability;
+  private volatile VehicleParkingSpaces availability;
   /**
    * The vehicle parking group this parking belongs to.
    */
@@ -239,19 +241,24 @@ public class VehicleParking implements Serializable {
       return false;
     }
 
-    switch (traverseMode) {
-      case BICYCLE:
-        return availability.getBicycleSpaces() != null;
-      case CAR:
+    return switch (traverseMode) {
+      case BICYCLE -> availability.getBicycleSpaces() != null;
+      case CAR -> {
         var places = wheelchairAccessibleCarPlaces
           ? availability.getWheelchairAccessibleCarSpaces()
           : availability.getCarSpaces();
-        return places != null;
-      default:
-        return false;
-    }
+        yield places != null;
+      }
+      default -> false;
+    };
   }
 
+  /**
+   * The only mutable method in this class: it allows to update the available parking spaces during
+   * real-time updates.
+   * Since the entity is used both by writer threads (real-time updates) and reader threads
+   * (A* routing), the variable holding the information is marked as volatile.
+   */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
     this.availability = vehicleParkingSpaces;
   }
@@ -308,6 +315,7 @@ public class VehicleParking implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(VehicleParking.class)
+      .addStr("id", id.toString())
       .addStr("name", name.toString())
       .addObj("coordinate", coordinate)
       .toString();

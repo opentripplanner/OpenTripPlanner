@@ -51,6 +51,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add debug information for stop/quay ID and stay-seated transfers [#5962](https://github.com/opentripplanner/OpenTripPlanner/pull/5962)
 - Handle NeTEx `any` version [#5983](https://github.com/opentripplanner/OpenTripPlanner/pull/5983)
 - Keep at least one result for min-transfers and each transit-group in itinerary-group-filter [#5919](https://github.com/opentripplanner/OpenTripPlanner/pull/5919)
+- Extract parking lots from NeTEx feeds [#5946](https://github.com/opentripplanner/OpenTripPlanner/pull/5946)
+- Filter routes and patterns by service date in GTFS GraphQL API [#5869](https://github.com/opentripplanner/OpenTripPlanner/pull/5869)
+- SIRI-FM vehicle parking updates [#5979](https://github.com/opentripplanner/OpenTripPlanner/pull/5979)
+- Take realtime patterns into account when storing realtime vehicles [#5994](https://github.com/opentripplanner/OpenTripPlanner/pull/5994)
+- Debug client itinerary list style improvements [#6012](https://github.com/opentripplanner/OpenTripPlanner/pull/6012)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)

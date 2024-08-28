@@ -514,7 +514,7 @@ This is a performance limit and should therefore be set high. Results close to t
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
 duration can be set per mode(`maxDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
-do not exist.
+does not exist.
 """
               )
               .asDuration(dftAccessEgress.maxDuration().defaultValue()),
@@ -554,7 +554,7 @@ This is a performance limit and should therefore be set high. Results close to t
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
 duration can be set per mode(`maxDirectStreetDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
-do not exist."
+does not exist."
 """
           )
           .asDuration(dft.maxDirectDuration().defaultValue()),

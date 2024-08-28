@@ -127,7 +127,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.osmBoardingLocationsModule());
     }
 
-    // This module is outside the hasGTFS conditional block because it also links things like bike rental
+    // This module is outside the hasGTFS conditional block because it also links things like parking
     // which need to be handled even when there's no transit.
     graphBuilder.addModule(factory.streetLinkerModule());
 

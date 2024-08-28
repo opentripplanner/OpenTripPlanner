@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -181,8 +180,9 @@ public class ConstructApplication {
     }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
-      LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(createServerContext());
+      LOG.info("Initializing geocoder");
+      // eagerly initialize the geocoder
+      this.factory.luceneIndex();
     }
   }
 
