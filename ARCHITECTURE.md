@@ -11,7 +11,7 @@ This document is far from complete. Hopefully it can evolve over time and become
 introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
 detailed discussions on many design decisions.
 
-We document [Decision Records](DECISION_RECORDS.md) in a log. Make sure you as a developer are familiar 
+We document [Decision Records](DEVELOPMENT_DECISION_RECORDS.md) in a log. Make sure you as a developer are familiar 
 with the decisions and follow them. Reviewers should use them actively when reviewing code and may
 use them to ask for changes.
 
@@ -22,7 +22,7 @@ Be sure to also read the [developer documentation](doc/user/Developers-Guide.md)
 The diagram shows a simplified/generic version on how we want to model the OTP components with 2 
 examples. The Transit model is more complex than the VehiclePosition model.   
 
-![MainModelOverview](doc/user/images/ServiceModelOverview.png)
+![MainModelOverview](doc/dev/images/ServiceModelOverview.png)
 
  - `Use Case Service` A service which combine the functionality in many `Domain Services` to fulfill
    a use-case or set of features. It may have an api with request/response classes. These are 
@@ -44,10 +44,6 @@ but this is a start and we would like to expand this list in the future.
 
 The Configuration module is responsible for loading and parsing OTP configuration files and map them
 into Plan Old Java Objects (POJOs). These POJOs are injected into the other components.
-
-### [REST API](src/main/java/org/opentripplanner/api/package.md)
-
-Short introduction to the REST API.
 
 ### [GTFS import module](src/main/java/org/opentripplanner/gtfs/package.md)
 
