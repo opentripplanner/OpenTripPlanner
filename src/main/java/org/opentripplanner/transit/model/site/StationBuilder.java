@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,6 +17,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
   private I18NString url;
   private ZoneId timezone;
   private boolean transfersNotAllowed = false;
+  private Accessibility wheelchairAccessibility = Accessibility.NO_INFORMATION;
 
   StationBuilder(FeedScopedId id) {
     super(id);
@@ -31,6 +33,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
     this.url = original.getUrl();
     this.timezone = original.getTimezone();
     this.transfersNotAllowed = original.isTransfersNotAllowed();
+    this.wheelchairAccessibility = original.getWheelchairAccessibility();
   }
 
   public I18NString getName() {
@@ -107,6 +110,15 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
 
   public StationBuilder withTransfersNotAllowed(boolean transfersNotAllowed) {
     this.transfersNotAllowed = transfersNotAllowed;
+    return this;
+  }
+
+  public Accessibility getWheelchairAccessibility() {
+    return wheelchairAccessibility;
+  }
+
+  public StationBuilder withWheelchairAccessibility(Accessibility wheelchairAccessibility) {
+    this.wheelchairAccessibility = wheelchairAccessibility;
     return this;
   }
 
