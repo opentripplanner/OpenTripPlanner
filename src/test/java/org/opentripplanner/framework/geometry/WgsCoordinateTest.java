@@ -107,7 +107,7 @@ public class WgsCoordinateTest {
 
   @Test
   void roundingTo10m() {
-    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var hamburg = WgsCoordinate.of(Coordinates.HAMBURG);
     var rounded = hamburg.roundToApproximate10m();
     assertEquals(10.0003, rounded.longitude());
     assertEquals(53.5566, rounded.latitude());
@@ -115,7 +115,7 @@ public class WgsCoordinateTest {
 
   @Test
   void roundingTo100m() {
-    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var hamburg = WgsCoordinate.of(Coordinates.HAMBURG);
     var rounded = hamburg.roundToApproximate100m();
     assertEquals(10, rounded.longitude());
     assertEquals(53.557, rounded.latitude());

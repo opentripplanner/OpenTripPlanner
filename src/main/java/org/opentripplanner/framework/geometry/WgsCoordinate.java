@@ -13,42 +13,26 @@ import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
  * <p>
  * This is a ValueObject (design pattern).
  */
-public final class WgsCoordinate implements Serializable {
-
+public record WgsCoordinate(double latitude, double longitude) implements Serializable {
   public static final WgsCoordinate GREENWICH = new WgsCoordinate(51.48, 0d);
   private static final double LAT_MIN = -90;
   private static final double LAT_MAX = 90;
   private static final double LON_MIN = -180;
   private static final double LON_MAX = 180;
 
-  private final double latitude;
-  private final double longitude;
-
-  public WgsCoordinate(double latitude, double longitude) {
+  public WgsCoordinate {
     // Verify coordinates are in range
     DoubleUtils.requireInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
     DoubleUtils.requireInRange(longitude, LON_MIN, LON_MAX, "longitude");
-
-    this.latitude = latitude;
-    this.longitude = longitude;
   }
 
-  public WgsCoordinate(Point point) {
-    Objects.requireNonNull(point);
-    DoubleUtils.requireInRange(point.getY(), LAT_MIN, LAT_MAX, "latitude");
-    DoubleUtils.requireInRange(point.getX(), LON_MIN, LON_MAX, "longitude");
-
-    this.latitude = point.getY();
-    this.longitude = point.getX();
-  }
-
-  public WgsCoordinate(Coordinate coordinate) {
+  /**
+   * Create a WgsCoordinate from a given jts Coordinate. There is no rounding of the latitude or
+   * longitude values.
+   */
+  public static WgsCoordinate of(Coordinate coordinate) {
     Objects.requireNonNull(coordinate);
-    DoubleUtils.requireInRange(coordinate.getY(), LAT_MIN, LAT_MAX, "latitude");
-    DoubleUtils.requireInRange(coordinate.getX(), LON_MIN, LON_MAX, "longitude");
-
-    this.latitude = coordinate.getY();
-    this.longitude = coordinate.getX();
+    return new WgsCoordinate(coordinate.getY(), coordinate.getX());
   }
 
   /**
@@ -110,14 +94,6 @@ public final class WgsCoordinate implements Serializable {
     }
 
     return WgsCoordinate.normalized(latitude / n, longitude / n);
-  }
-
-  public double latitude() {
-    return latitude;
-  }
-
-  public double longitude() {
-    return longitude;
   }
 
   /** Return OTP domain coordinate as JTS GeoTools Library coordinate. */

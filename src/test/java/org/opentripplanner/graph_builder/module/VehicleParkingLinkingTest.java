@@ -48,7 +48,7 @@ public class VehicleParkingLinkingTest {
     var parking = StreetModelForTest
       .vehicleParking()
       .entrance(builder ->
-        builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
+        builder.entranceId(id("1")).coordinate(WgsCoordinate.of(A.getCoordinate())).vertex(A)
       )
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
@@ -128,14 +128,14 @@ public class VehicleParkingLinkingTest {
       .entrance(builder ->
         builder
           .entranceId(id("Entrance-1"))
-          .coordinate(new WgsCoordinate(A.getCoordinate()))
+          .coordinate(WgsCoordinate.of(A.getCoordinate()))
           .vertex(A)
           .walkAccessible(true)
       )
       .entrance(builder ->
         builder
           .entranceId(id("Entrance-2"))
-          .coordinate(new WgsCoordinate(B.getCoordinate()))
+          .coordinate(WgsCoordinate.of(B.getCoordinate()))
           .vertex(B)
           .walkAccessible(true)
       )
@@ -163,7 +163,7 @@ public class VehicleParkingLinkingTest {
       .entrance(builder ->
         builder
           .entranceId(id("Entrance-1"))
-          .coordinate(new WgsCoordinate(A.getCoordinate()))
+          .coordinate(WgsCoordinate.of(A.getCoordinate()))
           .vertex(A)
           .walkAccessible(true)
       )
