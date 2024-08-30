@@ -15,6 +15,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
 import { useRef, useState } from 'react';
 import logo from '../../static/img/otp-logo.svg';
+import GraphiQLRouteButton from './GraphiQLRouteButton.tsx';
 
 type SearchBarProps = {
   onRoute: () => void;
@@ -61,6 +62,7 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
           Route
         </Button>
       </div>
+      <GraphiQLRouteButton tripQueryVariables={tripQueryVariables}></GraphiQLRouteButton>
     </div>
   );
 }
