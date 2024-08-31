@@ -59,6 +59,7 @@ public final class RealtimeTestEnvironment {
   public static final String STOP_A1_ID = "A1";
   public static final String STOP_B1_ID = "B1";
   public static final String STOP_C1_ID = "C1";
+  public static final String STOP_D1_ID = "D1";
   private final TransitModelForTest testModel = TransitModelForTest.of();
   public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   public final Station stationA = testModel.station("A").build();
@@ -69,7 +70,7 @@ public final class RealtimeTestEnvironment {
   public final RegularStop stopB1 = testModel.stop(STOP_B1_ID).withParentStation(stationB).build();
   public final RegularStop stopB2 = testModel.stop("B2").withParentStation(stationB).build();
   public final RegularStop stopC1 = testModel.stop(STOP_C1_ID).withParentStation(stationC).build();
-  public final RegularStop stopD1 = testModel.stop("D1").withParentStation(stationD).build();
+  public final RegularStop stopD1 = testModel.stop(STOP_D1_ID).withParentStation(stationD).build();
   public final StopModel stopModel = testModel
     .stopModelBuilder()
     .withRegularStop(stopA1)

@@ -14,6 +14,7 @@ import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_D
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_A1_ID;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_B1_ID;
 import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_C1_ID;
+import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_D1_ID;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
@@ -131,25 +132,30 @@ class AddedTest {
     var env = RealtimeTestEnvironment.gtfs();
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
     builder
-      .addStopTime(STOP_A1_ID, 30)
-      .addStopTime(STOP_B1_ID, 40, SKIPPED)
-      .addStopTime(STOP_C1_ID, 55);
+      .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
+      .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER, SKIPPED)
+      .addStopTime(STOP_C1_ID, 48, SKIPPED)
+      .addStopTime(STOP_D1_ID, 55);
     var tripUpdate = builder.build();
 
     env.applyTripUpdate(tripUpdate);
 
     // THEN
     final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
-    assertEquals(PickDrop.SCHEDULED, tripPattern.getBoardType(0));
+    assertEquals(PickDrop.CALL_AGENCY, tripPattern.getBoardType(0));
     assertEquals(PickDrop.CANCELLED, tripPattern.getAlightType(1));
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(1));
-    assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(2));
+    assertEquals(PickDrop.CANCELLED, tripPattern.getAlightType(2));
+    assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
+    assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
     final TimetableSnapshot snapshot = env.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
     final int forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
     final TripTimes tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
     assertFalse(tripTimes.isCancelledStop(0));
     assertTrue(tripTimes.isCancelledStop(1));
+    assertTrue(tripTimes.isCancelledStop(2));
+    assertFalse(tripTimes.isCancelledStop(3));
   }
 
   @Test
