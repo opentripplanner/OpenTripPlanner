@@ -35,19 +35,22 @@ final class AddedStopTime {
   }
 
   static AddedStopTime ofStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate props) {
-    if (props.getStopTimeProperties().hasExtension(MfdzRealtimeExtensions.stopTimeProperties)) {
+    final var scheduleRelationship = props.getScheduleRelationship();
+    var pickupType = toPickDrop(scheduleRelationship);
+    var dropOffType = pickupType;
+    if (
+      scheduleRelationship != GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED &&
+      props.getStopTimeProperties().hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
+    ) {
       var ext = props
         .getStopTimeProperties()
         .getExtension(MfdzRealtimeExtensions.stopTimeProperties);
       var pickup = ext.getPickupType();
       var dropOff = ext.getDropoffType();
-      var dropOffType = PickDropMapper.map(dropOff.getNumber());
-      var pickupType = PickDropMapper.map(pickup.getNumber());
-      return new AddedStopTime(pickupType, dropOffType);
-    } else {
-      var pickDrop = toPickDrop(props.getScheduleRelationship());
-      return new AddedStopTime(pickDrop, pickDrop);
+      dropOffType = PickDropMapper.map(dropOff.getNumber());
+      pickupType = PickDropMapper.map(pickup.getNumber());
     }
+    return new AddedStopTime(pickupType, dropOffType);
   }
 
   private static PickDrop toPickDrop(
