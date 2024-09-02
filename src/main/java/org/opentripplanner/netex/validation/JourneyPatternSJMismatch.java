@@ -2,7 +2,10 @@ package org.opentripplanner.netex.validation;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
+import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.StopUseEnumeration;
 
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 
@@ -12,14 +15,23 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
       .getJourneyPatternsById()
       .lookup(getPatternId(sj));
 
-    int nStopPointsInJourneyPattern = journeyPattern
+    int nStopPointsInJourneyPattern = (int) journeyPattern
       .getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-      .size();
+      .stream()
+      .filter(JourneyPatternSJMismatch::stopsAtQuay)
+      .count();
 
     int nTimetablePassingTimes = sj.getPassingTimes().getTimetabledPassingTime().size();
 
     return nStopPointsInJourneyPattern != nTimetablePassingTimes ? Status.DISCARD : Status.OK;
+  }
+
+  private static boolean stopsAtQuay(PointInLinkSequence_VersionedChildStructure point) {
+    return switch (point) {
+      case StopPointInJourneyPattern spijp -> spijp.getStopUse() != StopUseEnumeration.PASSTHROUGH;
+      default -> true;
+    };
   }
 
   @Override
