@@ -136,7 +136,7 @@
     },
     {
       "description": "Automerge logging dependencies in a single PR",
-      "groupName": "logging",
+      "groupName": "logging dependencies",
       "matchPackagePrefixes": [
         "org.slf4j:",
         "ch.qos.logback:"
