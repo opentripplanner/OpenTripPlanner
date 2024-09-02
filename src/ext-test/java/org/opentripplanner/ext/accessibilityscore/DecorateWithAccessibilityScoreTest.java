@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.FieldSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -63,15 +62,17 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
     itinerary.getLegs().forEach(l -> assertNotNull(l.accessibilityScore()));
   }
 
-  private static final List<Function<TestItineraryBuilder, TestItineraryBuilder>> nonWalkingCases = List.of(
-    b -> b.bicycle(10, 20, B),
-    b -> b.drive(10, 20, B),
-    b -> b.rentedBicycle(10, 20, B)
-  );
+  private static List<Function<TestItineraryBuilder, TestItineraryBuilder>> nonWalkingCases() {
+    return List.of(
+      b -> b.bicycle(10, 20, B),
+      b -> b.drive(10, 20, B),
+      b -> b.rentedBicycle(10, 20, B)
+    );
+  }
 
-  @FieldSource("nonWalkingCases")
+  @MethodSource("nonWalkingCases")
   @ParameterizedTest
-  void onlyWalking(Function<TestItineraryBuilder, TestItineraryBuilder> modifier) {
+  void noScoreForNonWalking(Function<TestItineraryBuilder, TestItineraryBuilder> modifier) {
     var itinerary = modifier.apply(newItinerary(A, 0)).build();
     DECORATOR.decorate(itinerary);
     assertNull(itinerary.getAccessibilityScore());
