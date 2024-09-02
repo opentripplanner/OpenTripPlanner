@@ -482,6 +482,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> headsign();
 
+    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
     public DataFetcher<Boolean> interlineWithPreviousLeg();
 
     public DataFetcher<Boolean> intermediatePlace();

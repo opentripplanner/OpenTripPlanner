@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
@@ -323,5 +325,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Double> accessibilityScore() {
     return environment -> NumberMapper.toDouble(getSource(environment).accessibilityScore());
+  }
+
+  @Override
+  public DataFetcher<Relay.ResolvedGlobalId> id() {
+    return environment ->
+      new Relay.ResolvedGlobalId(
+        "Leg",
+        LegReferenceSerializer.encode(getSource(environment).getLegReference())
+      );
   }
 }
