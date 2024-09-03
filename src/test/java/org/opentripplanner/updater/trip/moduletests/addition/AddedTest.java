@@ -148,10 +148,10 @@ class AddedTest {
     assertEquals(PickDrop.CANCELLED, tripPattern.getAlightType(2));
     assertEquals(PickDrop.CANCELLED, tripPattern.getBoardType(2));
     assertEquals(PickDrop.SCHEDULED, tripPattern.getAlightType(3));
-    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
-    final int forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
-    final TripTimes tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
+    var snapshot = env.getTimetableSnapshot();
+    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
+    var tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
     assertFalse(tripTimes.isCancelledStop(0));
     assertTrue(tripTimes.isCancelledStop(1));
     assertTrue(tripTimes.isCancelledStop(2));
@@ -175,11 +175,11 @@ class AddedTest {
     env.applyTripUpdate(tripUpdate);
 
     // THEN
-    final TripPattern tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
-    final TimetableSnapshot snapshot = env.getTimetableSnapshot();
-    final Timetable forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
-    final int forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
-    final TripTimes tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
+    var tripPattern = assertAddedTrip(ADDED_TRIP_ID, env);
+    var snapshot = env.getTimetableSnapshot();
+    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
+    var forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
+    var tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
     assertEquals(0, tripTimes.getDepartureDelay(0));
     assertEquals(30600, tripTimes.getDepartureTime(0)); // 08:30:00
     assertEquals(300, tripTimes.getArrivalDelay(1));
