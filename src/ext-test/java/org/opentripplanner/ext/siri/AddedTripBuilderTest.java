@@ -154,37 +154,33 @@ class AddedTripBuilderTest {
     assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode should be mapped");
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
-    // Assert transit model index
-    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
-    assertNotNull(transitModelIndex);
     assertEquals(
       route,
-      transitModelIndex.getRouteForId(TransitModelForTest.id(LINE_REF)),
+      transitService.getRouteForId(TransitModelForTest.id(LINE_REF)),
       "Route should be added to transit index"
     );
     assertEquals(
       trip,
-      transitModelIndex.getTripForId().get(TRIP_ID),
+      transitService.getTripForId(TRIP_ID),
       "Route should be added to transit index"
     );
-    var pattern = transitModelIndex.getPatternForTrip().get(trip);
+    var pattern = transitService.getPatternForTrip(trip);
     assertNotNull(pattern);
     assertEquals(route, pattern.getRoute());
     assertTrue(
-      transitModelIndex
-        .getServiceCodesRunningForDate()
-        .get(SERVICE_DATE)
+      transitService
+        .getServiceCodesRunningForDate(SERVICE_DATE)
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
       "serviceId should be running on service date"
     );
     assertNotNull(
-      transitModelIndex.getTripOnServiceDateById().get(TRIP_ID),
+      transitService.getTripOnServiceDateById(TRIP_ID),
       "TripOnServiceDate should be added to transit index by id"
     );
     assertNotNull(
-      transitModelIndex
-        .getTripOnServiceDateForTripAndDay()
-        .get(new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)),
+      transitService.getTripOnServiceDateForTripAndDay(
+        new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)
+      ),
       "TripOnServiceDate should be added to transit index for trip and day"
     );
 
@@ -299,10 +295,7 @@ class AddedTripBuilderTest {
     Route route = secondTrip.getRoute();
     assertSame(firstTrip.getRoute(), route, "route be reused from the first trip");
 
-    // Assert transit model index
-    var transitModelIndex = TRANSIT_MODEL.getTransitModelIndex();
-    assertNotNull(transitModelIndex);
-    assertEquals(2, transitModelIndex.getPatternsForRoute().get(route).size());
+    assertEquals(2, transitService.getPatternsForRoute(route).size());
 
     // Assert trip times
     var times = secondAddedTrip.successValue().tripTimes();

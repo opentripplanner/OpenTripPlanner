@@ -1,6 +1,8 @@
 package org.opentripplanner.netex.config;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentripplanner.netex.config.IgnorableFeature.FARE_FRAME;
+import static org.opentripplanner.netex.config.IgnorableFeature.PARKING;
 
 import java.net.URI;
 import java.util.Collection;
@@ -29,7 +31,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final String SHARED_GROUP_FILE_PATTERN = "(\\w{3})-.*-shared\\.xml";
   private static final String GROUP_FILE_PATTERN = "(\\w{3})-.*\\.xml";
   private static final boolean NO_TRANSFERS_ON_ISOLATED_STOPS = false;
-  private static final boolean IGNORE_FARE_FRAME = false;
+  private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
@@ -48,7 +50,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private final String ignoreFilePattern;
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final boolean noTransfersOnIsolatedStops;
-  private final boolean ignoreFareFrame;
+  private final Set<IgnorableFeature> ignoredFeatures;
 
   private NetexFeedParameters() {
     this.source = null;
@@ -63,7 +65,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     }
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
     this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
-    this.ignoreFareFrame = IGNORE_FARE_FRAME;
+    this.ignoredFeatures = IGNORED_FEATURES;
   }
 
   private NetexFeedParameters(Builder builder) {
@@ -75,7 +77,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.ignoreFilePattern = requireNonNull(builder.ignoreFilePattern);
     this.ferryIdsNotAllowedForBicycle = Set.copyOf(builder.ferryIdsNotAllowedForBicycle);
     this.noTransfersOnIsolatedStops = builder.noTransfersOnIsolatedStops;
-    this.ignoreFareFrame = builder.ignoreFareFrame;
+    this.ignoredFeatures = Set.copyOf(builder.ignoredFeatures);
   }
 
   public static Builder of() {
@@ -127,7 +129,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public boolean ignoreFareFrame() {
-    return ignoreFareFrame;
+    return ignoredFeatures.contains(FARE_FRAME);
+  }
+
+  public boolean ignoreParking() {
+    return ignoredFeatures.contains(PARKING);
   }
 
   @Override
@@ -142,7 +148,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedFilePattern.equals(that.sharedFilePattern) &&
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
-      ignoreFareFrame == that.ignoreFareFrame &&
+      ignoredFeatures.equals(that.ignoredFeatures) &&
       ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
     );
   }
@@ -156,7 +162,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       sharedFilePattern,
       sharedGroupFilePattern,
       groupFilePattern,
-      ignoreFareFrame,
+      ignoredFeatures,
       ferryIdsNotAllowedForBicycle
     );
   }
@@ -171,9 +177,13 @@ public class NetexFeedParameters implements DataSourceConfig {
       .addStr("sharedGroupFilePattern", sharedGroupFilePattern, DEFAULT.sharedGroupFilePattern)
       .addStr("groupFilePattern", groupFilePattern, DEFAULT.groupFilePattern)
       .addStr("ignoreFilePattern", ignoreFilePattern, DEFAULT.ignoreFilePattern)
-      .addBoolIfTrue("ignoreFareFrame", ignoreFareFrame)
+      .addCol("ignoredFeatures", ignoredFeatures)
       .addCol("ferryIdsNotAllowedForBicycle", ferryIdsNotAllowedForBicycle, Set.of())
       .toString();
+  }
+
+  public Set<IgnorableFeature> ignoredFeatures() {
+    return ignoredFeatures;
   }
 
   public static class Builder {
@@ -187,7 +197,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private String ignoreFilePattern;
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
     private boolean noTransfersOnIsolatedStops;
-    private boolean ignoreFareFrame;
+    private final Set<IgnorableFeature> ignoredFeatures;
 
     private Builder(NetexFeedParameters original) {
       this.original = original;
@@ -199,7 +209,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ignoreFilePattern = original.ignoreFilePattern;
       this.ferryIdsNotAllowedForBicycle.addAll(original.ferryIdsNotAllowedForBicycle);
       this.noTransfersOnIsolatedStops = original.noTransfersOnIsolatedStops;
-      this.ignoreFareFrame = original.ignoreFareFrame;
+      this.ignoredFeatures = new HashSet<>(original.ignoredFeatures);
     }
 
     public URI source() {
@@ -247,7 +257,19 @@ public class NetexFeedParameters implements DataSourceConfig {
     }
 
     public Builder withIgnoreFareFrame(boolean ignoreFareFrame) {
-      this.ignoreFareFrame = ignoreFareFrame;
+      return applyIgnore(ignoreFareFrame, FARE_FRAME);
+    }
+
+    public Builder withIgnoreParking(boolean ignoreParking) {
+      return applyIgnore(ignoreParking, PARKING);
+    }
+
+    private Builder applyIgnore(boolean ignore, IgnorableFeature feature) {
+      if (ignore) {
+        ignoredFeatures.add(feature);
+      } else {
+        ignoredFeatures.remove(feature);
+      }
       return this;
     }
 

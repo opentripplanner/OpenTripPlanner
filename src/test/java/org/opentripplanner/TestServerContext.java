@@ -55,6 +55,7 @@ public class TestServerContext {
       List.of(),
       null,
       createStreetLimitationParametersService(),
+      null,
       null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());

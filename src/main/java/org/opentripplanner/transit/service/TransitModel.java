@@ -539,8 +539,13 @@ public class TransitModel implements Serializable {
    * The caller is responsible for calling the {@link #index()} method if it is a
    * possibility that the index is not initialized (during graph build).
    */
-  public @Nullable TransitModelIndex getTransitModelIndex() {
+  @Nullable
+  TransitModelIndex getTransitModelIndex() {
     return index;
+  }
+
+  public boolean isIndexed() {
+    return index != null;
   }
 
   public boolean hasFlexTrips() {

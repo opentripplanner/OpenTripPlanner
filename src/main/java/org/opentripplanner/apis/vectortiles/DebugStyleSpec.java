@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 
 /**
  *  A Mapbox/Mapblibre style specification for rendering debug information about transit and
@@ -38,7 +39,8 @@ public class DebugStyleSpec {
     "© OpenStreetMap Contributors"
   );
   private static final String MAGENTA = "#f21d52";
-  private static final String GREEN = "#22DD9E";
+  private static final String BRIGHT_GREEN = "#22DD9E";
+  private static final String DARK_GREEN = "#136b04";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
   private static final int MAX_ZOOM = 23;
@@ -101,7 +103,7 @@ public class DebugStyleSpec {
           .ofId("link")
           .typeLine()
           .vectorSourceLayer(edges)
-          .lineColor(GREEN)
+          .lineColor(BRIGHT_GREEN)
           .edgeFilter(
             StreetTransitStopLink.class,
             StreetTransitEntranceLink.class,
@@ -126,10 +128,23 @@ public class DebugStyleSpec {
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder
+          .ofId("parking-vertex")
+          .typeCircle()
+          .vectorSourceLayer(vertices)
+          .vertexFilter(VehicleParkingEntranceVertex.class)
+          .circleStroke(BLACK, CIRCLE_STROKE)
+          .circleRadius(
+            new ZoomDependentNumber(1, List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10)))
+          )
+          .circleColor(DARK_GREEN)
+          .minZoom(13)
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
+        StyleBuilder
           .ofId("area-stop")
           .typeFill()
           .vectorSourceLayer(areaStops)
-          .fillColor(GREEN)
+          .fillColor(BRIGHT_GREEN)
           .fillOpacity(0.5f)
           .fillOutlineColor(BLACK)
           .minZoom(6)
@@ -138,7 +153,7 @@ public class DebugStyleSpec {
           .ofId("group-stop")
           .typeFill()
           .vectorSourceLayer(groupStops)
-          .fillColor(GREEN)
+          .fillColor(BRIGHT_GREEN)
           .fillOpacity(0.5f)
           .fillOutlineColor(BLACK)
           .minZoom(6)

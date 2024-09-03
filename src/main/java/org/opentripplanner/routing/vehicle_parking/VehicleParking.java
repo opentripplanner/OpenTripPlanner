@@ -308,6 +308,7 @@ public class VehicleParking implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(VehicleParking.class)
+      .addStr("id", id.toString())
       .addStr("name", name.toString())
       .addObj("coordinate", coordinate)
       .toString();

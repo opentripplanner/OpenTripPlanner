@@ -1,8 +1,12 @@
 package org.opentripplanner.netex.loader.parser;
 
+import static org.opentripplanner.netex.config.IgnorableFeature.FARE_FRAME;
+
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import org.opentripplanner.netex.config.IgnorableFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
@@ -30,11 +34,11 @@ public class NetexDocumentParser {
   private static final Logger LOG = LoggerFactory.getLogger(NetexDocumentParser.class);
 
   private final NetexEntityIndex netexIndex;
-  private final boolean ignoreFareFrame;
+  private final Set<IgnorableFeature> ignoredFeatures;
 
-  private NetexDocumentParser(NetexEntityIndex netexIndex, boolean ignoreFareFrame) {
+  private NetexDocumentParser(NetexEntityIndex netexIndex, Set<IgnorableFeature> ignoredFeatures) {
     this.netexIndex = netexIndex;
-    this.ignoreFareFrame = ignoreFareFrame;
+    this.ignoredFeatures = ignoredFeatures;
   }
 
   /**
@@ -44,12 +48,12 @@ public class NetexDocumentParser {
   public static void parseAndPopulateIndex(
     NetexEntityIndex index,
     PublicationDeliveryStructure doc,
-    boolean ignoreFareFrame
+    Set<IgnorableFeature> ignoredFeatures
   ) {
-    new NetexDocumentParser(index, ignoreFareFrame).parse(doc);
+    new NetexDocumentParser(index, ignoredFeatures).parse(doc);
   }
 
-  public static void finnishUp() {
+  public static void finishUp() {
     ServiceFrameParser.logSummary();
   }
 
@@ -74,8 +78,8 @@ public class NetexDocumentParser {
     } else if (value instanceof ServiceFrame) {
       parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
     } else if (value instanceof SiteFrame) {
-      parse((SiteFrame) value, new SiteFrameParser());
-    } else if (!ignoreFareFrame && value instanceof FareFrame) {
+      parse((SiteFrame) value, new SiteFrameParser(ignoredFeatures));
+    } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame) {
       parse((FareFrame) value, new FareFrameParser());
     } else if (value instanceof CompositeFrame) {
       // We recursively parse composite frames and content until there

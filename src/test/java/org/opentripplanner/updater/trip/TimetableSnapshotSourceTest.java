@@ -33,7 +33,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 
@@ -48,6 +50,7 @@ public class TimetableSnapshotSourceTest {
   )
     .build();
   private TransitModel transitModel;
+  private TransitService transitService;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
@@ -57,8 +60,9 @@ public class TimetableSnapshotSourceTest {
   public void setUp() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     transitModel = model.transitModel();
+    transitService = new DefaultTransitService(transitModel);
 
-    feedId = transitModel.getFeedIds().stream().findFirst().get();
+    feedId = transitService.getFeedIds().stream().findFirst().get();
   }
 
   @Test
@@ -79,28 +83,6 @@ public class TimetableSnapshotSourceTest {
   }
 
   @Test
-  public void testGetSnapshotWithMaxSnapshotFrequencyCleared() {
-    var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequency(Duration.ofMillis(-1)),
-      transitModel
-    );
-
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      DIFFERENTIAL,
-      List.of(CANCELLATION),
-      feedId
-    );
-
-    final TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
-    assertNotNull(newSnapshot);
-    assertNotSame(snapshot, newSnapshot);
-  }
-
-  @Test
   public void testHandleModifiedTrip() {
     // GIVEN
 
@@ -115,7 +97,7 @@ public class TimetableSnapshotSourceTest {
       tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
 
       final long midnightSecondsSinceEpoch = ServiceDateUtils
-        .asStartOfService(SERVICE_DATE, transitModel.getTimeZone())
+        .asStartOfService(SERVICE_DATE, transitService.getTimeZone())
         .toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -217,6 +199,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdate),
       feedId
     );
+    updater.flushBuffer();
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -224,11 +207,8 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-      final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
-      final TripPattern originalTripPattern = transitModel
-        .getTransitModelIndex()
-        .getPatternForTrip()
-        .get(trip);
+      final Trip trip = transitService.getTripForId(tripId);
+      final TripPattern originalTripPattern = transitService.getPatternForTrip(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,

@@ -19,6 +19,7 @@ import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.Operator;
+import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -79,6 +80,8 @@ public interface NetexEntityIndexReadOnlyView {
   ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
 
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
+
+  ReadOnlyHierarchicalMapById<Parking> getParkingsById();
 
   ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
 

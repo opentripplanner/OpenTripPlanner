@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -40,7 +41,8 @@ public class ConstructApplicationModule {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
-    LauncherRequestDecorator launcherRequestDecorator
+    LauncherRequestDecorator launcherRequestDecorator,
+    @Nullable LuceneIndex luceneIndex
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
@@ -60,7 +62,8 @@ public class ConstructApplicationModule {
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
-      traverseVisitor
+      traverseVisitor,
+      luceneIndex
     );
   }
 

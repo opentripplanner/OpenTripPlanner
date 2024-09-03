@@ -86,10 +86,7 @@ class DelayedTest {
 
     var snapshot = env.getTimetableSnapshot();
 
-    final TripPattern originalTripPattern = env.transitModel
-      .getTransitModelIndex()
-      .getPatternForTrip()
-      .get(env.trip2);
+    final TripPattern originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2);
 
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);

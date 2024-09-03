@@ -27,8 +27,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +49,12 @@ public class TransitLayerMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerMapper.class);
 
-  private final TransitModel transitModel;
+  private final TransitService transitService;
+  private final StopModel stopModel;
 
   private TransitLayerMapper(TransitModel transitModel) {
-    this.transitModel = transitModel;
+    this.transitService = new DefaultTransitService(transitModel);
+    this.stopModel = transitModel.getStopModel();
   }
 
   public static TransitLayer map(
@@ -74,20 +78,19 @@ public class TransitLayerMapper {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
-    StopModel stopModel = transitModel.getStopModel();
 
     LOG.info("Mapping transitLayer from TransitModel...");
 
-    Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
+    Collection<TripPattern> allTripPatterns = transitService.getAllTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(stopModel, transitModel);
+    transferByStopIndex = mapTransfers(stopModel, transitService);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator =
-        new TransferIndexGenerator(transitModel.getTransferService().listAll(), allTripPatterns);
+        new TransferIndexGenerator(transitService.getTransferService().listAll(), allTripPatterns);
       constrainedTransfers = transferIndexGenerator.generateTransfers();
     }
 
@@ -98,9 +101,9 @@ public class TransitLayerMapper {
     return new TransitLayer(
       tripPatternsByStopByDate,
       transferByStopIndex,
-      transitModel.getTransferService(),
+      transitService.getTransferService(),
       stopModel,
-      transitModel.getTimeZone(),
+      transitService.getTimeZone(),
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
@@ -118,13 +121,10 @@ public class TransitLayerMapper {
     Collection<TripPattern> allTripPatterns
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
+      transitService.getServiceCodesRunningForDate()
     );
 
-    Set<LocalDate> allServiceDates = transitModel
-      .getTransitModelIndex()
-      .getServiceCodesRunningForDate()
-      .keySet();
+    Set<LocalDate> allServiceDates = transitService.getAllServiceCodes();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 
