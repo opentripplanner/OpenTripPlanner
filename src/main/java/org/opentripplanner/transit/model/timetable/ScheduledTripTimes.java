@@ -34,6 +34,7 @@ public final class ScheduledTripTimes implements TripTimes {
    * When time-shifting from one time-zone to another negative times may occur.
    */
   private static final int MIN_TIME = DurationUtils.durationInSeconds("-12h");
+
   /**
    * We allow a trip to last for maximum 20 days. In Norway the longest trip is 6 days.
    */
@@ -54,9 +55,8 @@ public final class ScheduledTripTimes implements TripTimes {
   private final List<BookingInfo> pickupBookingInfos;
 
   /**
-   * The headsign displayed by the vehicle at each stop along this trip. The array index is the
-   * stop index within this trip's TripPattern. Any number of array elements may point to the same
-   * I18NString instance if the headsign remains unchanged between stops.
+   * Any number of array elements may point to the same I18NString instance if the headsign remains
+   * unchanged between stops.
    */
   @Nullable
   private final I18NString[] headsigns;
@@ -71,8 +71,8 @@ public final class ScheduledTripTimes implements TripTimes {
   @Nullable
   private final String[][] headsignVias;
 
-  /** This is for matching stops with external services, in the realtime-updaters for example. */
-  private final int[] originalGtfsStopSequence;
+  /** @see TripTimes#gtfsSequenceOfStopIndex(int) */
+  private final int[] gtfsSequenceOfStopIndex;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift();
@@ -85,7 +85,7 @@ public final class ScheduledTripTimes implements TripTimes {
     this.dropOffBookingInfos = Objects.requireNonNull(builder.dropOffBookingInfos());
     this.headsigns = builder.headsigns();
     this.headsignVias = builder.headsignVias();
-    this.originalGtfsStopSequence = builder.originalGtfsStopSequence();
+    this.gtfsSequenceOfStopIndex = builder.gtfsSequenceOfStopIndex();
     validate();
   }
 
@@ -114,7 +114,7 @@ public final class ScheduledTripTimes implements TripTimes {
       pickupBookingInfos,
       headsigns,
       headsignVias,
-      originalGtfsStopSequence,
+      gtfsSequenceOfStopIndex,
       deduplicator
     );
   }
@@ -279,16 +279,16 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int gtfsSequenceOfStopIndex(final int stop) {
-    return originalGtfsStopSequence[stop];
+    return gtfsSequenceOfStopIndex[stop];
   }
 
   @Override
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
-    if (originalGtfsStopSequence == null) {
+    if (gtfsSequenceOfStopIndex == null) {
       return OptionalInt.empty();
     }
-    for (int i = 0; i < originalGtfsStopSequence.length; i++) {
-      var sequence = originalGtfsStopSequence[i];
+    for (int i = 0; i < gtfsSequenceOfStopIndex.length; i++) {
+      var sequence = gtfsSequenceOfStopIndex[i];
       if (sequence == stopSequence) {
         return OptionalInt.of(i);
       }

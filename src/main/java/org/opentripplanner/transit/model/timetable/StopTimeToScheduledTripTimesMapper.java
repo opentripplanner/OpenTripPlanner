@@ -58,7 +58,7 @@ class StopTimeToScheduledTripTimesMapper {
     builder
       .withDepartureTimes(departures)
       .withArrivalTimes(arrivals)
-      .withOriginalGtfsStopSequence(sequences)
+      .withGtfsSequenceOfStopIndex(sequences)
       .withHeadsigns(makeHeadsignsArray(stopTimes))
       .withHeadsignVias(makeHeadsignViasArray(stopTimes))
       .withDropOffBookingInfos(dropOffBookingInfos)
