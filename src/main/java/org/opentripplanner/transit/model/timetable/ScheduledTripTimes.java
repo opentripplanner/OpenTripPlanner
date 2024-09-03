@@ -71,7 +71,6 @@ public final class ScheduledTripTimes implements TripTimes {
   @Nullable
   private final String[][] headsignVias;
 
-  /** @see TripTimes#gtfsSequenceOfStopIndex(int) */
   private final int[] gtfsSequenceOfStopIndex;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
