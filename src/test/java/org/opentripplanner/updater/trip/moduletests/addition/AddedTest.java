@@ -133,8 +133,8 @@ class AddedTest {
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
     builder
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
-      .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER, SKIPPED)
-      .addStopTime(STOP_C1_ID, 48, SKIPPED)
+      .addSkippedStop(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addSkippedStop(STOP_C1_ID, 48)
       .addStopTime(STOP_D1_ID, 55);
     var tripUpdate = builder.build();
 

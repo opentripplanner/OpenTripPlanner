@@ -61,14 +61,6 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(
-    String stopId,
-    int minutes,
-    StopTimeUpdate.ScheduleRelationship scheduleRelationship
-  ) {
-    return addStopTime(stopId, minutes, NO_VALUE, NO_DELAY, NO_DELAY, scheduleRelationship, null);
-  }
-
   public TripUpdateBuilder addStopTime(String stopId, int minutes, DropOffPickupType pickDrop) {
     return addStopTime(
       stopId,
@@ -77,23 +69,6 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
-      pickDrop
-    );
-  }
-
-  public TripUpdateBuilder addStopTime(
-    String stopId,
-    int minutes,
-    DropOffPickupType pickDrop,
-    StopTimeUpdate.ScheduleRelationship scheduleRelationship
-  ) {
-    return addStopTime(
-      stopId,
-      minutes,
-      NO_VALUE,
-      NO_DELAY,
-      NO_DELAY,
-      scheduleRelationship,
       pickDrop
     );
   }
@@ -145,6 +120,30 @@ public class TripUpdateBuilder {
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
       null
+    );
+  }
+
+  public TripUpdateBuilder addSkippedStop(String stopId, int minutes) {
+    return addStopTime(
+      stopId,
+      minutes,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null
+    );
+  }
+
+  public TripUpdateBuilder addSkippedStop(String stopId, int minutes, DropOffPickupType pickDrop) {
+    return addStopTime(
+      stopId,
+      minutes,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      pickDrop
     );
   }
 
