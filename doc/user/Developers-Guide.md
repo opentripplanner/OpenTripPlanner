@@ -206,7 +206,7 @@ that have the code checked out locally.
 
  - [Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
  - [Code Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
- - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DECISION_RECORDS.md)
+ - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DEVELOPMENT_DECISION_RECORDS.md)
 
 
 ## Continuous Integration
