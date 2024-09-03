@@ -20,7 +20,9 @@ import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.CarsAllowedMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -170,6 +172,11 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   @Override
   public DataFetcher<GraphQLBikesAllowed> bikesAllowed() {
     return environment -> BikesAllowedMapper.map(getSource(environment).getBikesAllowed());
+  }
+
+  @Override
+  public DataFetcher<GraphQLCarsAllowed> carsAllowed() {
+    return environment -> CarsAllowedMapper.map(getSource(environment).getCarsAllowed());
   }
 
   @Override
