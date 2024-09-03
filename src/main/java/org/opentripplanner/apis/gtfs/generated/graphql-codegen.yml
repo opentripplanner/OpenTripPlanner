@@ -53,6 +53,7 @@ config:
     RentalVehicle: org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle#VehicleRentalVehicle
     VehicleRentalUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed#GraphQLBikesAllowed
+    CarsAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed#GraphQLCarsAllowed
     BookingInfo: org.opentripplanner.transit.model.timetable.booking.BookingInfo#BookingInfo
     BookingTime: org.opentripplanner.transit.model.timetable.booking.BookingTime#BookingTime
     CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
