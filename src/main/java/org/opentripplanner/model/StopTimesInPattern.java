@@ -5,7 +5,7 @@ import java.util.List;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * Some stopTimes all in the same pattern. TripTimeShort should probably be renamed StopTimeShort
+ * Some stopTimes all in the same pattern.
  */
 public class StopTimesInPattern {
 
