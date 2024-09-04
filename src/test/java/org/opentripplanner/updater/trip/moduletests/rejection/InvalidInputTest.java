@@ -29,7 +29,7 @@ class InvalidInputTest {
   void invalidTripDate(LocalDate date) {
     var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.timeZone)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, env.TIME_ZONE)
       .addDelayedStopTime(2, 60, 80)
       .build();
 

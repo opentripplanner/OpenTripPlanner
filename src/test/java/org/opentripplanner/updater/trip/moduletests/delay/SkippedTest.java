@@ -27,7 +27,7 @@ public class SkippedTest {
   void scheduledTripWithSkippedAndScheduled() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -59,7 +59,7 @@ public class SkippedTest {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
     var tripId = env.trip2().getId();
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -72,7 +72,7 @@ public class SkippedTest {
       tripId.getId(),
       SERVICE_DATE,
       SCHEDULED,
-      env.timeZone
+      env.TIME_ZONE
     )
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
@@ -110,7 +110,7 @@ public class SkippedTest {
 
     final FeedScopedId tripId = env.trip2().getId();
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)

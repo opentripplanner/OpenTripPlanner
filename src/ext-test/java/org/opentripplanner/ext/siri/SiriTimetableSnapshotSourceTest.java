@@ -2,19 +2,15 @@ package org.opentripplanner.ext.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.OPERATOR_1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.ROUTE_1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_2_ID;
 
-import java.util.Set;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 
-class SiriTimetableSnapshotSourceTest {
+class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTrip() {
@@ -42,8 +38,8 @@ class SiriTimetableSnapshotSourceTest {
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
-      .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
+      .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
@@ -69,9 +65,9 @@ class SiriTimetableSnapshotSourceTest {
       .withLineRef(ROUTE_1_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("10:58", "10:48")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedExpected("10:08", "10:58")
       )
       .buildEstimatedTimetableDeliveries();
@@ -83,7 +79,7 @@ class SiriTimetableSnapshotSourceTest {
 
   @Test
   void testAddedJourneyWithUnresolvableAgency() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().build();
 
     // Create an extra journey with unknown line and operator
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
@@ -93,9 +89,9 @@ class SiriTimetableSnapshotSourceTest {
       .withLineRef("unknown line")
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("10:58", "10:48")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedExpected("10:08", "10:58")
       )
       .buildEstimatedTimetableDeliveries();
@@ -116,8 +112,9 @@ class SiriTimetableSnapshotSourceTest {
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
-      .withRecordedCalls(builder -> builder.call(env.stopA1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(env.stopC1).arriveAimedExpected("00:03", "00:04"))
+      .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(env.STOP_C1).arriveAimedExpected("00:03", "00:04")
+      )
       .buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
@@ -213,9 +210,9 @@ class SiriTimetableSnapshotSourceTest {
       )
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected(null, "00:00:12")
-          .call(env.stopB1)
+          .call(env.STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:22")
       )
       .buildEstimatedTimetableDeliveries();
@@ -234,11 +231,9 @@ class SiriTimetableSnapshotSourceTest {
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
-      )
+      .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
-        builder.call(env.stopB2).arriveAimedExpected("00:00:20", "00:00:33")
+        builder.call(env.STOP_B2).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -259,11 +254,11 @@ class SiriTimetableSnapshotSourceTest {
       .withDatedVehicleJourneyRef(TRIP_2_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("00:01:01", "00:01:01")
-          .call(env.stopB1)
+          .call(env.STOP_B1)
           .withIsCancellation(true)
-          .call(env.stopC1)
+          .call(env.STOP_C1)
           .arriveAimedExpected("00:01:30", "00:01:30")
       )
       .buildEstimatedTimetableDeliveries();
@@ -285,16 +280,14 @@ class SiriTimetableSnapshotSourceTest {
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder.call(env.stopA1).departAimedActual("00:00:11", "00:00:15")
-      )
+      .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopD1)
+          .call(env.STOP_D1)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:19", "00:00:20")
           .departAimedExpected("00:00:24", "00:00:25")
-          .call(env.stopB1)
+          .call(env.STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
@@ -337,9 +330,9 @@ class SiriTimetableSnapshotSourceTest {
       .withLineRef(ROUTE_1_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("00:01", "00:02")
-          .call(env.stopC1)
+          .call(env.STOP_C1)
           .arriveAimedExpected("00:03", "00:04")
       )
       .buildEstimatedTimetableDeliveries();
@@ -358,9 +351,9 @@ class SiriTimetableSnapshotSourceTest {
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedActual("00:00:11", "00:00:15")
-          .call(env.stopB1)
+          .call(env.STOP_B1)
           .arriveAimedActual("00:00:20", "00:00:14")
       )
       .buildEstimatedTimetableDeliveries();
@@ -378,12 +371,12 @@ class SiriTimetableSnapshotSourceTest {
       .withDatedVehicleJourneyRef(TRIP_2_ID)
       .withRecordedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedActual("00:01:01", "00:01:01")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedActual("00:01:10", "00:01:13")
           .departAimedActual("00:01:11", "00:01:12")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedActual("00:01:20", "00:01:20")
       )
       .buildEstimatedTimetableDeliveries();
@@ -403,13 +396,13 @@ class SiriTimetableSnapshotSourceTest {
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("00:00:11", "00:00:15")
           // Unexpected extra stop without isExtraCall flag
-          .call(env.stopD1)
+          .call(STOP_D1)
           .arriveAimedExpected("00:00:19", "00:00:20")
           .departAimedExpected("00:00:24", "00:00:25")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
@@ -423,9 +416,9 @@ class SiriTimetableSnapshotSourceTest {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
         builder
-          .call(env.stopA1)
+          .call(STOP_A1)
           .departAimedExpected("00:00:11", "00:00:15")
-          .call(env.stopB1)
+          .call(STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:25")
       );
   }

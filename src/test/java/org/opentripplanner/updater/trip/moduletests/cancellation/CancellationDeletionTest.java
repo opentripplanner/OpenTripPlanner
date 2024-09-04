@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_1_ID;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
@@ -15,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -22,7 +21,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * Cancellations and deletions should end up in the internal data model and make trips unavailable
  * for routing.
  */
-public class CancellationDeletionTest {
+public class CancellationDeletionTest implements RealtimeTestConstants {
 
   static List<Arguments> cases() {
     return List.of(
@@ -39,7 +38,7 @@ public class CancellationDeletionTest {
 
     final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, env.timeZone).build();
+    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
     assertSuccess(env.applyTripUpdate(update));
 
     var snapshot = env.getTimetableSnapshot();
@@ -74,22 +73,22 @@ public class CancellationDeletionTest {
       addedTripId,
       SERVICE_DATE,
       ScheduleRelationship.ADDED,
-      env.timeZone
+      TIME_ZONE
     )
-      .addStopTime(env.stopA1.getId().getId(), 30)
-      .addStopTime(env.stopB1.getId().getId(), 40)
-      .addStopTime(env.stopC1.getId().getId(), 55)
+      .addStopTime(STOP_A1.getId().getId(), 30)
+      .addStopTime(STOP_B1.getId().getId(), 40)
+      .addStopTime(STOP_C1.getId().getId(), 55)
       .build();
 
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     // Cancel or delete the added trip
-    update = new TripUpdateBuilder(addedTripId, SERVICE_DATE, relationship, env.timeZone).build();
+    update = new TripUpdateBuilder(addedTripId, SERVICE_DATE, relationship, TIME_ZONE).build();
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));
 
     var snapshot = env.getTimetableSnapshot();
     // Get the trip pattern of the added trip which goes through stopA
-    var patternsAtA = snapshot.getPatternsForStop(env.stopA1);
+    var patternsAtA = snapshot.getPatternsForStop(STOP_A1);
 
     assertNotNull(patternsAtA, "Added trip pattern should be found");
     var tripPattern = patternsAtA.stream().findFirst().get();

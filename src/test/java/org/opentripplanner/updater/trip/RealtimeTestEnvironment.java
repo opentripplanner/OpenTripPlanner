@@ -6,7 +6,6 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,7 +25,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -34,7 +32,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -48,45 +45,13 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  * <p>
  * It is however a goal to change that and then these two can be combined.
  */
-public final class RealtimeTestEnvironment {
+public final class RealtimeTestEnvironment implements RealtimeTestConstants {
 
   // static constants
   private static final TimetableSnapshotSourceParameters PARAMETERS = new TimetableSnapshotSourceParameters(
     Duration.ZERO,
     false
   );
-  public static final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
-  public static final FeedScopedId SERVICE_ID = TransitModelForTest.id("CAL_1");
-  public static final String STOP_A1_ID = "A1";
-  public static final String STOP_B1_ID = "B1";
-  public static final String STOP_C1_ID = "C1";
-  public static final String TRIP_1_ID = "TestTrip1";
-  public static final String TRIP_2_ID = "TestTrip2";
-  public static final String OPERATOR_1_ID = "TestOperator1";
-  public static final String ROUTE_1_ID = "TestRoute1";
-
-  // instance variables
-  private final TransitModelForTest testModel = TransitModelForTest.of();
-  public final ZoneId timeZone = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
-  public final Station stationA = testModel.station("A").build();
-  public final Station stationB = testModel.station("B").build();
-  public final Station stationC = testModel.station("C").build();
-  public final Station stationD = testModel.station("D").build();
-  public final RegularStop stopA1 = testModel.stop(STOP_A1_ID).withParentStation(stationA).build();
-  public final RegularStop stopB1 = testModel.stop(STOP_B1_ID).withParentStation(stationB).build();
-  public final RegularStop stopB2 = testModel.stop("B2").withParentStation(stationB).build();
-  public final RegularStop stopC1 = testModel.stop(STOP_C1_ID).withParentStation(stationC).build();
-  public final RegularStop stopD1 = testModel.stop("D1").withParentStation(stationD).build();
-  public final StopModel stopModel = testModel
-    .stopModelBuilder()
-    .withRegularStop(stopA1)
-    .withRegularStop(stopB1)
-    .withRegularStop(stopB2)
-    .withRegularStop(stopC1)
-    .withRegularStop(stopD1)
-    .build();
-
-  public final Route route1 = TransitModelForTest.route(ROUTE_1_ID).build();
 
   public final TransitModel transitModel;
   private final SiriTimetableSnapshotSource siriSource;
@@ -116,8 +81,8 @@ public final class RealtimeTestEnvironment {
   }
 
   RealtimeTestEnvironment(SourceType sourceType, boolean withTrip1, boolean withTrip2) {
-    transitModel = new TransitModel(stopModel, new Deduplicator());
-    transitModel.initTimeZone(timeZone);
+    transitModel = new TransitModel(STOP_MODEL, new Deduplicator());
+    transitModel.initTimeZone(TIME_ZONE);
     transitModel.addAgency(TransitModelForTest.AGENCY);
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -146,7 +111,7 @@ public final class RealtimeTestEnvironment {
       gtfsSource = new TimetableSnapshotSource(PARAMETERS, transitModel);
       siriSource = null;
     }
-    dateTimeHelper = new DateTimeHelper(timeZone, RealtimeTestEnvironment.SERVICE_DATE);
+    dateTimeHelper = new DateTimeHelper(TIME_ZONE, RealtimeTestEnvironment.SERVICE_DATE);
   }
 
   private RealtimeTestEnvironment withTrip1() {
@@ -154,7 +119,7 @@ public final class RealtimeTestEnvironment {
       createTrip(
         TRIP_1_ID,
         route1,
-        List.of(new StopCall(stopA1, 10, 11), new StopCall(stopB1, 20, 21))
+        List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
       );
     transitModel.index();
     return this;
@@ -166,9 +131,9 @@ public final class RealtimeTestEnvironment {
         TRIP_2_ID,
         route1,
         List.of(
-          new StopCall(stopA1, 60, 61),
-          new StopCall(stopB1, 70, 71),
-          new StopCall(stopC1, 80, 81)
+          new StopCall(STOP_A1, 60, 61),
+          new StopCall(STOP_B1, 70, 71),
+          new StopCall(STOP_C1, 80, 81)
         )
       );
 

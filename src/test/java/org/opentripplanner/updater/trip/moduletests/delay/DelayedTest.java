@@ -6,19 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * Delays should be applied to the first trip but should leave the second trip untouched.
  */
-class DelayedTest {
+class DelayedTest implements RealtimeTestConstants {
 
   private static final int DELAY = 1;
   private static final int STOP_SEQUENCE = 1;
@@ -31,7 +31,7 @@ class DelayedTest {
       RealtimeTestEnvironment.TRIP_1_ID,
       RealtimeTestEnvironment.SERVICE_DATE,
       SCHEDULED,
-      env.timeZone
+      TIME_ZONE
     )
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
@@ -76,7 +76,7 @@ class DelayedTest {
 
     var tripId = RealtimeTestEnvironment.TRIP_2_ID;
 
-    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60, 80)
       .addDelayedStopTime(2, 90, 90)
