@@ -1,14 +1,10 @@
 package org.opentripplanner.updater.trip;
 
-import com.esotericsoftware.kryo.util.Null;
 import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
-import gnu.trove.set.hash.TIntHashSet;
-import io.grpc.netty.shaded.io.netty.util.concurrent.ProgressivePromise;
-import java.sql.Time;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Future;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import javax.annotation.Nullable;
 import org.opentripplanner.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.model.PickDrop;
@@ -19,111 +15,105 @@ import org.opentripplanner.model.PickDrop;
  */
 final class AddedStopTime {
 
-  @Nullable
-  private final PickDrop pickup;
+  private final GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate;
 
-  @Nullable
-  private final PickDrop dropOff;
-
-  @Nullable
-  public final String stopId;
-
-  @Nullable
-  private final GtfsRealtime.TripUpdate.StopTimeEvent arrival;
-
-  @Nullable
-  private final GtfsRealtime.TripUpdate.StopTimeEvent departure;
-
-  @Nullable
-  public final Integer stopSequence;
-
-  public final GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship;
-
-  public static final PickDrop DEFAULT_PICK_DROP = PickDrop.SCHEDULED;
-
-  AddedStopTime(
-    @Nullable PickDrop pickup,
-    @Nullable PickDrop dropOff,
-    @Nullable String stopId,
-    @Nullable GtfsRealtime.TripUpdate.StopTimeEvent arrival,
-    @Nullable GtfsRealtime.TripUpdate.StopTimeEvent departure,
-    @Nullable Integer stopSequence,
-    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship
-  ) {
-    this.pickup = pickup;
-    this.dropOff = dropOff;
-    this.stopId = stopId;
-    this.arrival = arrival;
-    this.departure = departure;
-    this.stopSequence = stopSequence;
-    this.scheduleRelationship = scheduleRelationship;
+  AddedStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
+    this.stopTimeUpdate = stopTimeUpdate;
   }
 
   PickDrop pickup() {
-    return Objects.requireNonNullElse(pickup, DEFAULT_PICK_DROP);
+    return getPickDrop(
+      getStopTimePropertiesExtension()
+        .map(MfdzRealtimeExtensions.StopTimePropertiesExtension::getPickupType)
+        .orElse(null)
+    );
   }
 
   PickDrop dropOff() {
-    return Objects.requireNonNullElse(dropOff, DEFAULT_PICK_DROP);
-  }
-
-  @Nullable
-  Long getArrivalTime() {
-    if (arrival == null) {
-      return null;
-    }
-    return arrival.hasTime() ? arrival.getTime() : null;
-  }
-
-  @Nullable
-  Long getDepartureTime() {
-    if (departure == null) {
-      return null;
-    }
-    return departure.hasTime() ? departure.getTime() : null;
-  }
-
-  @Nullable
-  Integer getArrivalDelay() {
-    if (arrival == null) {
-      return null;
-    }
-    return arrival.hasDelay() ? arrival.getDelay() : null;
-  }
-
-  @Nullable
-  Integer getDepartureDelay() {
-    if (departure == null) {
-      return null;
-    }
-    return departure.hasDelay() ? departure.getDelay() : null;
-  }
-
-  static AddedStopTime ofStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate props) {
-    final var scheduleRelationship = props.getScheduleRelationship();
-    var pickupType = toPickDrop(scheduleRelationship);
-    var dropOffType = pickupType;
-    if (
-      scheduleRelationship != GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED &&
-      props.getStopTimeProperties().hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
-    ) {
-      var ext = props
-        .getStopTimeProperties()
-        .getExtension(MfdzRealtimeExtensions.stopTimeProperties);
-      var pickup = ext.getPickupType();
-      var dropOff = ext.getDropoffType();
-      dropOffType = PickDropMapper.map(dropOff.getNumber());
-      pickupType = PickDropMapper.map(pickup.getNumber());
-    }
-    return new AddedStopTime(
-      pickupType,
-      dropOffType,
-      props.hasStopId() ? props.getStopId() : null,
-      props.hasArrival() ? props.getArrival() : null,
-      props.hasDeparture() ? props.getDeparture() : null,
-      props.hasStopSequence() ? props.getStopSequence() : null,
-      scheduleRelationship
+    return getPickDrop(
+      getStopTimePropertiesExtension()
+        .map(MfdzRealtimeExtensions.StopTimePropertiesExtension::getDropoffType)
+        .orElse(null)
     );
+  }
+
+  private PickDrop getPickDrop(
+    @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
+  ) {
+    if (isSkipped()) {
+      return PickDrop.CANCELLED;
+    }
+
+    if (extensionDropOffPickup == null) {
+      return toPickDrop(stopTimeUpdate.getScheduleRelationship());
+    }
+
+    return PickDropMapper.map(extensionDropOffPickup.getNumber());
+  }
+
+  private Optional<MfdzRealtimeExtensions.StopTimePropertiesExtension> getStopTimePropertiesExtension() {
+    return stopTimeUpdate
+        .getStopTimeProperties()
+        .hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
+      ? Optional.of(
+        stopTimeUpdate
+          .getStopTimeProperties()
+          .getExtension(MfdzRealtimeExtensions.stopTimeProperties)
+      )
+      : Optional.empty();
+  }
+
+  OptionalLong getArrivalTime() {
+    return stopTimeUpdate.hasArrival()
+      ? getTime(stopTimeUpdate.getArrival())
+      : OptionalLong.empty();
+  }
+
+  OptionalLong getDepartureTime() {
+    return stopTimeUpdate.hasDeparture()
+      ? getTime(stopTimeUpdate.getDeparture())
+      : OptionalLong.empty();
+  }
+
+  private OptionalLong getTime(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+    return stopTimeEvent.hasTime()
+      ? OptionalLong.of(stopTimeEvent.getTime())
+      : OptionalLong.empty();
+  }
+
+  OptionalInt getArrivalDelay() {
+    return stopTimeUpdate.hasArrival()
+      ? getDelay(stopTimeUpdate.getArrival())
+      : OptionalInt.empty();
+  }
+
+  OptionalInt getDepartureDelay() {
+    return stopTimeUpdate.hasDeparture()
+      ? getDelay(stopTimeUpdate.getDeparture())
+      : OptionalInt.empty();
+  }
+
+  private OptionalInt getDelay(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+    return stopTimeEvent.hasDelay()
+      ? OptionalInt.of(stopTimeEvent.getDelay())
+      : OptionalInt.empty();
+  }
+
+  boolean isSkipped() {
+    return (
+      stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
+    );
+  }
+
+  OptionalInt getStopSequence() {
+    return stopTimeUpdate.hasStopSequence()
+      ? OptionalInt.of(stopTimeUpdate.getStopSequence())
+      : OptionalInt.empty();
+  }
+
+  Optional<String> getStopId() {
+    return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
   }
 
   private static PickDrop toPickDrop(

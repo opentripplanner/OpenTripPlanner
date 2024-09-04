@@ -531,11 +531,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
-      final var addedStopTime = AddedStopTime.ofStopTime(stopTimeUpdates.get(index));
+      final var addedStopTime = new AddedStopTime(stopTimeUpdates.get(index));
 
       // Check stop sequence
-      final var stopSequence = addedStopTime.stopSequence;
-      if (stopSequence != null) {
+      final var optionalStopSequence = addedStopTime.getStopSequence();
+      if (optionalStopSequence.isPresent()) {
+        final var stopSequence = optionalStopSequence.getAsInt();
+
         // Check non-negative
         if (stopSequence < 0) {
           debug(tripId, "Trip update contains negative stop sequence, skipping.");
@@ -553,8 +555,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       // Find stops
-      final var stopId = addedStopTime.stopId;
-      if (stopId != null) {
+      final var optionalStopId = addedStopTime.getStopId();
+      if (optionalStopId.isPresent()) {
+        final var stopId = optionalStopId.get();
         // Find stop
         final var stop = transitEditorService.getRegularStop(
           new FeedScopedId(tripId.getFeedId(), stopId)
@@ -573,13 +576,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       // Check arrival time
       final var arrival = addedStopTime.getArrivalTime();
-      if (arrival != null) {
+      if (arrival.isPresent()) {
+        final var time = arrival.getAsLong();
         // Check for increasing time
-        if (previousTime != null && previousTime > arrival) {
+        if (previousTime != null && previousTime > time) {
           debug(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
-        previousTime = arrival;
+        previousTime = time;
       } else {
         debug(tripId, "Trip update misses arrival time, skipping.");
         return null;
@@ -587,13 +591,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       // Check departure time
       final var departure = addedStopTime.getDepartureTime();
-      if (departure != null) {
+      if (departure.isPresent()) {
+        final var time = departure.getAsLong();
         // Check for increasing time
-        if (previousTime != null && previousTime > departure) {
+        if (previousTime != null && previousTime > time) {
           debug(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
-        previousTime = departure;
+        previousTime = time;
       } else {
         debug(tripId, "Trip update misses departure time, skipping.");
         return null;
@@ -768,7 +773,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Create StopTimes
     final List<StopTime> stopTimes = new ArrayList<>(stopTimeUpdates.size());
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
-      final var added = AddedStopTime.ofStopTime(stopTimeUpdates.get(index));
+      final var added = new AddedStopTime(stopTimeUpdates.get(index));
       final var stop = stops.get(index);
 
       // Create stop time
@@ -776,10 +781,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stopTime.setTrip(trip);
       stopTime.setStop(stop);
       // Set arrival time
-      final var arrivalSecondsSinceEpoch = added.getArrivalTime();
-      if (arrivalSecondsSinceEpoch != null) {
-        final int delay = Objects.requireNonNullElse(added.getArrivalDelay(), 0);
-        final long arrivalTime = arrivalSecondsSinceEpoch - midnightSecondsSinceEpoch - delay;
+      final var arrival = added.getArrivalTime();
+      if (arrival.isPresent()) {
+        final var delay = added.getArrivalDelay().orElse(0);
+        final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
@@ -791,10 +796,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         stopTime.setArrivalTime((int) arrivalTime);
       }
       // Set departure time
-      final var departureSecondsSinceEpoch = added.getDepartureTime();
-      if (departureSecondsSinceEpoch != null) {
-        final int delay = Objects.requireNonNullElse(added.getDepartureDelay(), 0);
-        final long departureTime = departureSecondsSinceEpoch - midnightSecondsSinceEpoch - delay;
+      final var departure = added.getDepartureTime();
+      if (departure.isPresent()) {
+        final var delay = added.getDepartureDelay().orElse(0);
+        final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
@@ -806,9 +811,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         stopTime.setDepartureTime((int) departureTime);
       }
       stopTime.setTimepoint(1); // Exact time
-      if (added.stopSequence != null) {
-        stopTime.setStopSequence(added.stopSequence);
-      }
+      added.getStopSequence().ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(added.pickup());
       stopTime.setDropOffType(added.dropOff());
       // Add stop time to list
@@ -838,14 +841,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Update all times to mark trip times as realtime
     // TODO: This is based on the proposal at https://github.com/google/transit/issues/490
     for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
-      final var addedStopTime = AddedStopTime.ofStopTime(stopTimeUpdates.get(stopIndex));
+      final var addedStopTime = new AddedStopTime(stopTimeUpdates.get(stopIndex));
 
-      if (addedStopTime.scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
+      if (addedStopTime.isSkipped()) {
         newTripTimes.setCancelled(stopIndex);
       }
 
-      final int arrivalDelay = Objects.requireNonNullElse(addedStopTime.getArrivalDelay(), 0);
-      final int departureDelay = Objects.requireNonNullElse(addedStopTime.getDepartureDelay(), 0);
+      final int arrivalDelay = addedStopTime.getArrivalDelay().orElse(0);
+      final int departureDelay = addedStopTime.getDepartureDelay().orElse(0);
       newTripTimes.updateArrivalTime(
         stopIndex,
         newTripTimes.getScheduledArrivalTime(stopIndex) + arrivalDelay
