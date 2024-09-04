@@ -70,7 +70,7 @@
         "maxZoom": 20,
         "minZoom": 14,
         "cacheMaxSeconds": 600,
-        "filter": "CURRENT_TRIMET_SERVICE_WEEK"
+        "filter": "current-trimet-service-week"
       },
       {
         "name": "areaStops",
