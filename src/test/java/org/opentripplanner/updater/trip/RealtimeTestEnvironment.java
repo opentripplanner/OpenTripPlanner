@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
@@ -16,7 +17,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -66,6 +66,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   RealtimeTestEnvironment(SourceType sourceType, TransitModel transitModel) {
+    Objects.requireNonNull(sourceType);
     this.transitModel = transitModel;
 
     this.transitModel.index();
@@ -80,10 +81,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
-  }
-
-  public static FeedScopedId id(String id) {
-    return TransitModelForTest.id(id);
   }
 
   /**
@@ -134,23 +131,12 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   /**
    * Find the current TripTimes for a trip id on the default serviceDate
    */
-  public TripTimes getTripTimesForTrip(Trip trip) {
-    return getTripTimesForTrip(trip.getId(), SERVICE_DATE);
-  }
-
-  /**
-   * Find the current TripTimes for a trip id on the default serviceDate
-   */
   public TripTimes getTripTimesForTrip(String id) {
     return getTripTimesForTrip(id(id), SERVICE_DATE);
   }
 
   public DateTimeHelper getDateTimeHelper() {
     return dateTimeHelper;
-  }
-
-  public TripPattern getPatternForTrip(Trip trip) {
-    return getTransitService().getPatternForTrip(trip);
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
@@ -163,10 +149,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
 
   public String getRealtimeTimetable(String tripId) {
     return getRealtimeTimetable(id(tripId), SERVICE_DATE);
-  }
-
-  public String getRealtimeTimetable(Trip trip) {
-    return getRealtimeTimetable(trip.getId(), SERVICE_DATE);
   }
 
   public String getRealtimeTimetable(FeedScopedId tripId, LocalDate serviceDate) {
