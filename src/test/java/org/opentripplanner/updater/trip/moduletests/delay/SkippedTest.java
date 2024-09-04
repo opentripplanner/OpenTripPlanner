@@ -7,27 +7,26 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.TRIP_2_ID;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
  * A mixture of delayed and skipped stops should result in both delayed and cancelled stops.
  */
-public class SkippedTest {
+public class SkippedTest implements RealtimeTestConstants {
 
   @Test
   void scheduledTripWithSkippedAndScheduled() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
-    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -59,7 +58,7 @@ public class SkippedTest {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
     var tripId = env.trip2().getId();
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -68,12 +67,7 @@ public class SkippedTest {
     assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Create update to the same trip but now the skipped stop is no longer skipped
-    var scheduledBuilder = new TripUpdateBuilder(
-      tripId.getId(),
-      SERVICE_DATE,
-      SCHEDULED,
-      env.TIME_ZONE
-    )
+    var scheduledBuilder = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
       .addDelayedStopTime(2, 90);
@@ -110,7 +104,7 @@ public class SkippedTest {
 
     final FeedScopedId tripId = env.trip2().getId();
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, env.TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)

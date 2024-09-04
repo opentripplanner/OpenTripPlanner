@@ -111,7 +111,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       gtfsSource = new TimetableSnapshotSource(PARAMETERS, transitModel);
       siriSource = null;
     }
-    dateTimeHelper = new DateTimeHelper(TIME_ZONE, RealtimeTestEnvironment.SERVICE_DATE);
+    dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
   }
 
   private RealtimeTestEnvironment withTrip1() {
@@ -193,7 +193,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, RealtimeTestEnvironment.SERVICE_DATE);
+    return getPatternForTrip(tripId, SERVICE_DATE);
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {

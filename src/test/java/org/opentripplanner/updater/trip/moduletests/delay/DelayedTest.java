@@ -27,12 +27,7 @@ class DelayedTest implements RealtimeTestConstants {
   void singleStopDelay() {
     var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
 
-    var tripUpdate = new TripUpdateBuilder(
-      RealtimeTestEnvironment.TRIP_1_ID,
-      RealtimeTestEnvironment.SERVICE_DATE,
-      SCHEDULED,
-      TIME_ZONE
-    )
+    var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
       .build();
 
@@ -44,7 +39,7 @@ class DelayedTest implements RealtimeTestConstants {
     int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
 
     var snapshot = env.getTimetableSnapshot();
-    var trip1Realtime = snapshot.resolve(pattern1, RealtimeTestEnvironment.SERVICE_DATE);
+    var trip1Realtime = snapshot.resolve(pattern1, SERVICE_DATE);
     var trip1Scheduled = snapshot.resolve(pattern1, null);
 
     assertNotSame(trip1Realtime, trip1Scheduled);
@@ -63,7 +58,7 @@ class DelayedTest implements RealtimeTestConstants {
     );
     assertEquals(
       "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
-      env.getRealtimeTimetable(RealtimeTestEnvironment.TRIP_1_ID)
+      env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
 
@@ -74,7 +69,7 @@ class DelayedTest implements RealtimeTestConstants {
   void complexDelay() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
-    var tripId = RealtimeTestEnvironment.TRIP_2_ID;
+    var tripId = TRIP_2_ID;
 
     var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)

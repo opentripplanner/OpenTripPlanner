@@ -160,9 +160,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
-        builder
-          .withServiceDate(RealtimeTestEnvironment.SERVICE_DATE)
-          .withVehicleJourneyRef(TRIP_1_ID)
+        builder.withServiceDate(SERVICE_DATE).withVehicleJourneyRef(TRIP_1_ID)
       )
       .buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -206,7 +204,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(RealtimeTestEnvironment.SERVICE_DATE).withVehicleJourneyRef("XXX")
+        builder.withServiceDate(SERVICE_DATE).withVehicleJourneyRef("XXX")
       )
       .withEstimatedCalls(builder ->
         builder
