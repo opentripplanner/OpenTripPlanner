@@ -118,7 +118,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     trip1 =
       createTrip(
         TRIP_1_ID,
-        route1,
+        ROUTE_1,
         List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
       );
     transitModel.index();
@@ -129,7 +129,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     trip2 =
       createTrip(
         TRIP_2_ID,
-        route1,
+        ROUTE_1,
         List.of(
           new StopCall(STOP_A1, 60, 61),
           new StopCall(STOP_B1, 70, 71),

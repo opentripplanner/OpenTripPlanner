@@ -20,18 +20,18 @@ public interface RealtimeTestConstants {
   String OPERATOR_1_ID = "TestOperator1";
   String ROUTE_1_ID = "TestRoute1";
 
-  TransitModelForTest testModel = TransitModelForTest.of();
+  TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   ZoneId TIME_ZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
-  Station STATION_A = testModel.station("A").build();
-  Station stationB = testModel.station("B").build();
-  Station stationC = testModel.station("C").build();
-  Station stationD = testModel.station("D").build();
-  RegularStop STOP_A1 = testModel.stop(STOP_A1_ID).withParentStation(STATION_A).build();
-  RegularStop STOP_B1 = testModel.stop(STOP_B1_ID).withParentStation(stationB).build();
-  RegularStop STOP_B2 = testModel.stop("B2").withParentStation(stationB).build();
-  RegularStop STOP_C1 = testModel.stop(STOP_C1_ID).withParentStation(stationC).build();
-  RegularStop STOP_D1 = testModel.stop("D1").withParentStation(stationD).build();
-  StopModel STOP_MODEL = testModel
+  Station STATION_A = TEST_MODEL.station("A").build();
+  Station STATION_B = TEST_MODEL.station("B").build();
+  Station STATION_C = TEST_MODEL.station("C").build();
+  Station STATION_D = TEST_MODEL.station("D").build();
+  RegularStop STOP_A1 = TEST_MODEL.stop(STOP_A1_ID).withParentStation(STATION_A).build();
+  RegularStop STOP_B1 = TEST_MODEL.stop(STOP_B1_ID).withParentStation(STATION_B).build();
+  RegularStop STOP_B2 = TEST_MODEL.stop("B2").withParentStation(STATION_B).build();
+  RegularStop STOP_C1 = TEST_MODEL.stop(STOP_C1_ID).withParentStation(STATION_C).build();
+  RegularStop STOP_D1 = TEST_MODEL.stop("D1").withParentStation(STATION_D).build();
+  StopModel STOP_MODEL = TEST_MODEL
     .stopModelBuilder()
     .withRegularStop(STOP_A1)
     .withRegularStop(STOP_B1)
@@ -40,5 +40,5 @@ public interface RealtimeTestConstants {
     .withRegularStop(STOP_D1)
     .build();
 
-  Route route1 = TransitModelForTest.route(ROUTE_1_ID).build();
+  Route ROUTE_1 = TransitModelForTest.route(ROUTE_1_ID).build();
 }
