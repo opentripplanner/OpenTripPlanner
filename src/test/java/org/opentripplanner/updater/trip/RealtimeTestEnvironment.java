@@ -8,27 +8,16 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -57,9 +46,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   private final TimetableSnapshotSource gtfsSource;
   private final DateTimeHelper dateTimeHelper;
 
-  private Trip trip1;
-  private Trip trip2;
-
   enum SourceType {
     GTFS_RT,
     SIRI,
@@ -79,27 +65,10 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.GTFS_RT);
   }
 
-  RealtimeTestEnvironment(SourceType sourceType, boolean withTrip1, boolean withTrip2) {
-    transitModel = new TransitModel(STOP_MODEL, new Deduplicator());
-    transitModel.initTimeZone(TIME_ZONE);
-    transitModel.addAgency(TransitModelForTest.AGENCY);
+  RealtimeTestEnvironment(SourceType sourceType, TransitModel transitModel) {
+    this.transitModel = transitModel;
 
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    calendarServiceData.putServiceDatesForServiceId(
-      SERVICE_ID,
-      List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
-    );
-    transitModel.getServiceCodes().put(SERVICE_ID, 0);
-    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
-
-    if (withTrip1) {
-      withTrip1();
-    }
-    if (withTrip2) {
-      withTrip2();
-    }
-
-    transitModel.index();
+    this.transitModel.index();
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
     // we are actively refactoring to remove this restriction
     // for the time being you cannot run a SIRI and GTFS-RT test at the same time
@@ -111,49 +80,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
-  }
-
-  private RealtimeTestEnvironment withTrip1() {
-    trip1 =
-      createTrip(
-        TRIP_1_ID,
-        ROUTE_1,
-        List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
-      );
-    transitModel.index();
-    return this;
-  }
-
-  private RealtimeTestEnvironment withTrip2() {
-    trip2 =
-      createTrip(
-        TRIP_2_ID,
-        ROUTE_1,
-        List.of(
-          new StopCall(STOP_A1, 60, 61),
-          new StopCall(STOP_B1, 70, 71),
-          new StopCall(STOP_C1, 80, 81)
-        )
-      );
-
-    transitModel.index();
-    return this;
-  }
-
-  public Trip trip1() {
-    Objects.requireNonNull(
-      trip1,
-      "trip1 was not added to the test environment. Call withTrip1() to add it."
-    );
-    return trip1;
-  }
-
-  public Trip trip2() {
-    Objects.requireNonNull(
-      trip2,
-      "trip2 was not added to the test environment. Call withTrip2() to add it."
-    );
-    return trip2;
   }
 
   public static FeedScopedId id(String id) {
@@ -193,6 +119,10 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
     return getPatternForTrip(tripId, SERVICE_DATE);
+  }
+
+  public TripPattern getPatternForTrip(String id) {
+    return getPatternForTrip(id(id));
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
@@ -319,59 +249,4 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       gtfsSource.flushBuffer();
     }
   }
-
-  private Trip createTrip(String id, Route route, List<StopCall> stops) {
-    var trip = Trip
-      .of(id(id))
-      .withRoute(route)
-      .withHeadsign(I18NString.of("Headsign of %s".formatted(id)))
-      .withServiceId(SERVICE_ID)
-      .build();
-
-    var tripOnServiceDate = TripOnServiceDate
-      .of(trip.getId())
-      .withTrip(trip)
-      .withServiceDate(SERVICE_DATE)
-      .build();
-
-    transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
-
-    var stopTimes = IntStream
-      .range(0, stops.size())
-      .mapToObj(i -> {
-        var stop = stops.get(i);
-        return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
-      })
-      .toList();
-
-    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
-
-    final TripPattern pattern = TransitModelForTest
-      .tripPattern(id + "Pattern", route)
-      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(StopCall::stop).toList()))
-      .build();
-    pattern.add(tripTimes);
-
-    transitModel.addTripPattern(pattern.getId(), pattern);
-
-    return trip;
-  }
-
-  private StopTime createStopTime(
-    Trip trip,
-    int stopSequence,
-    StopLocation stop,
-    int arrivalTime,
-    int departureTime
-  ) {
-    var st = new StopTime();
-    st.setTrip(trip);
-    st.setStopSequence(stopSequence);
-    st.setStop(stop);
-    st.setArrivalTime(arrivalTime);
-    st.setDepartureTime(departureTime);
-    return st;
-  }
-
-  private record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
 }

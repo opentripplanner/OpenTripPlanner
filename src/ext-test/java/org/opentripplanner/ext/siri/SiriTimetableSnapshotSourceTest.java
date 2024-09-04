@@ -16,7 +16,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   void testCancelTrip() {
     var env = RealtimeTestEnvironment.siri().withTrip1().build();
 
-    assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(env.trip1()).getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -26,7 +26,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(env.trip1()).getRealTimeState());
+    assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
   }
 
   @Test
@@ -127,7 +127,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     );
 
     // Original trip should not get canceled
-    var originalTripTimes = env.getTripTimesForTrip(env.trip1());
+    var originalTripTimes = env.getTripTimesForTrip(TRIP_1_ID);
     assertEquals(RealTimeState.SCHEDULED, originalTripTimes.getRealTimeState());
   }
 
@@ -146,7 +146,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     assertTripUpdated(env);
     assertEquals(
       "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
-      env.getRealtimeTimetable(env.trip1())
+      env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
 
@@ -239,7 +239,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 [R] 0:00:15 0:00:15 | B2 0:00:33 0:00:33",
-      env.getRealtimeTimetable(env.trip1())
+      env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
 
@@ -265,7 +265,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 0:01:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 0:01:30 0:01:30",
-      env.getRealtimeTimetable(env.trip2())
+      env.getRealtimeTimetable(TRIP_2_ID)
     );
   }
 
@@ -294,7 +294,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     assertEquals(1, result.successful());
     assertEquals(
       "MODIFIED | A1 0:00:15 0:00:15 | D1 [C] 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
-      env.getRealtimeTimetable(env.trip1())
+      env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
 
@@ -423,7 +423,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   private static void assertTripUpdated(RealtimeTestEnvironment env) {
     assertEquals(
       "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
-      env.getRealtimeTimetable(env.trip1())
+      env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
 }

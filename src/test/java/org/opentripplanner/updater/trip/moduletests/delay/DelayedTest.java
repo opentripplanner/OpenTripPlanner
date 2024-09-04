@@ -5,12 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
@@ -35,8 +34,8 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
 
-    var pattern1 = env.getPatternForTrip(env.trip1());
-    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
+    var pattern1 = env.getPatternForTrip(TRIP_1_ID);
+    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(id(TRIP_1_ID));
 
     var snapshot = env.getTimetableSnapshot();
     var trip1Realtime = snapshot.resolve(pattern1, SERVICE_DATE);
@@ -54,7 +53,7 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
-      env.getScheduledTimetable(env.trip1().getId())
+      env.getScheduledTimetable(id(TRIP_1_ID))
     );
     assertEquals(
       "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
@@ -81,7 +80,8 @@ class DelayedTest implements RealtimeTestConstants {
 
     var snapshot = env.getTimetableSnapshot();
 
-    final TripPattern originalTripPattern = env.getTransitService().getPatternForTrip(env.trip2());
+    var trip2 = env.getTransitService().getTripForId(id(tripId));
+    var originalTripPattern = env.getTransitService().getPatternForTrip(trip2);
 
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -93,7 +93,7 @@ class DelayedTest implements RealtimeTestConstants {
       originalTripIndexScheduled > -1,
       "Original trip should be found in scheduled time table"
     );
-    final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
+    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
       originalTripIndexScheduled
     );
     assertFalse(
@@ -110,11 +110,11 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
-      env.getScheduledTimetable(env.trip2().getId())
+      env.getScheduledTimetable(TRIP_2_ID)
     );
     assertEquals(
       "UPDATED | A1 0:01 0:01:01 | B1 0:02:10 0:02:31 | C1 0:02:50 0:02:51",
-      env.getRealtimeTimetable(env.trip2())
+      env.getRealtimeTimetable(TRIP_2_ID)
     );
   }
 }

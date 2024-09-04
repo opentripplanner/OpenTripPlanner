@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
@@ -34,9 +35,9 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
-    var pattern1 = env.getPatternForTrip(env.trip1());
+    var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
-    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(env.trip1().getId());
+    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(id(TRIP_1_ID));
 
     var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
     assertSuccess(env.applyTripUpdate(update));
