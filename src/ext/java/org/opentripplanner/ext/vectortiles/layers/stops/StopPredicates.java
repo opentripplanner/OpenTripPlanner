@@ -9,7 +9,7 @@ import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class Predicates {
+public class StopPredicates {
 
   public static final Predicate<RegularStop> NO_FILTER = x -> true;
 
@@ -27,5 +27,17 @@ public class Predicates {
       var patternsInCurrentWeek = filter.filterPatterns(patterns);
       return !patternsInCurrentWeek.isEmpty();
     };
+  }
+
+  public static Predicate<RegularStop> forType(FilterType type, TransitService transitService) {
+    return switch (type) {
+      case NONE -> NO_FILTER;
+      case CURRENT_TRIMET_SERVICE_WEEK -> currentServiceWeek(transitService);
+    };
+  }
+
+  public enum FilterType {
+    NONE,
+    CURRENT_TRIMET_SERVICE_WEEK,
   }
 }

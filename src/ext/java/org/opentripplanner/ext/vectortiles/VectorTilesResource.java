@@ -20,7 +20,6 @@ import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.ext.vectortiles.layers.areastops.AreaStopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.stops.Predicates;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
@@ -123,18 +122,7 @@ public class VectorTilesResource {
     OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case Stop -> new StopsLayerBuilder(
-        context.transitService(),
-        layerParameters,
-        locale,
-        Predicates.NO_FILTER
-      );
-      case CurrentServiceWeekStop -> new StopsLayerBuilder(
-        context.transitService(),
-        layerParameters,
-        locale,
-        Predicates.currentServiceWeek(context.transitService())
-      );
+      case Stop -> new StopsLayerBuilder(context.transitService(), layerParameters, locale);
       case Station -> new StationsLayerBuilder(context.transitService(), layerParameters, locale);
       case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case VehicleRental -> new VehicleRentalPlacesLayerBuilder(
@@ -166,7 +154,6 @@ public class VectorTilesResource {
 
   public enum LayerType {
     Stop,
-    CurrentServiceWeekStop,
     Station,
     AreaStop,
     VehicleRental,

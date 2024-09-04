@@ -22,8 +22,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
   public StopsLayerBuilder(
     TransitService transitService,
     LayerParameters<VectorTilesResource.LayerType> layerParameters,
-    Locale locale,
-    Predicate<RegularStop> filter
+    Locale locale
   ) {
     super(
       Map
@@ -39,7 +38,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
       layerParameters.expansionFactor()
     );
     this.transitService = transitService;
-    this.filter = filter;
+    this.filter = StopPredicates.forType(layerParameters.filterType(), transitService);
   }
 
   protected List<Geometry> getGeometries(Envelope query) {

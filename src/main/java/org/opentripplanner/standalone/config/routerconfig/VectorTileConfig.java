@@ -6,6 +6,7 @@ import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
 import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerType;
+import org.opentripplanner.ext.vectortiles.layers.stops.StopPredicates;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -144,7 +146,18 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
           "The value is a fraction of the tile size. If you are having problem with icons and " +
           "shapes being clipped at tile edges, then increase this number."
         )
-        .asDouble(EXPANSION_FACTOR)
+        .asDouble(EXPANSION_FACTOR),
+      node
+        .of("filter")
+        .since(V2_6)
+        .summary("Reduce the result set of a layer further by a specific filter.")
+        .description(
+          """
+          This is useful for when the schema of a layer, say stops, should remain unchanged but some
+          elements should not be included in the result.
+          """
+        )
+        .asEnum(StopPredicates.FilterType.NONE)
     );
   }
 
@@ -155,7 +168,8 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
     int maxZoom,
     int minZoom,
     int cacheMaxSeconds,
-    double expansionFactor
+    double expansionFactor,
+    StopPredicates.FilterType filterType
   )
     implements LayerParameters<VectorTilesResource.LayerType> {}
 }

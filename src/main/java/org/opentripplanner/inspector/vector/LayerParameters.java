@@ -1,6 +1,7 @@
 package org.opentripplanner.inspector.vector;
 
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
+import org.opentripplanner.ext.vectortiles.layers.stops.StopPredicates;
 
 /**
  * Configuration options for a single vector tile layer.
@@ -52,5 +53,9 @@ public interface LayerParameters<T extends Enum<T>> {
    */
   default double expansionFactor() {
     return EXPANSION_FACTOR;
+  }
+
+  default StopPredicates.FilterType filterType() {
+    return StopPredicates.FilterType.NONE;
   }
 }
