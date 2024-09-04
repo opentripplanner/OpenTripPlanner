@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -343,7 +342,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
         var stop = stops.get(i);
         return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
       })
-      .collect(Collectors.toList());
+      .toList();
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 

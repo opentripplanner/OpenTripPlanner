@@ -113,8 +113,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(env.STOP_C1).arriveAimedExpected("00:03", "00:04")
-      )
+      .withEstimatedCalls(builder -> builder.call(STOP_C1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
@@ -210,7 +209,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
         builder
           .call(STOP_A1)
           .departAimedExpected(null, "00:00:12")
-          .call(env.STOP_B1)
+          .call(STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:22")
       )
       .buildEstimatedTimetableDeliveries();
@@ -231,7 +230,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
-        builder.call(env.STOP_B2).arriveAimedExpected("00:00:20", "00:00:33")
+        builder.call(STOP_B2).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -254,9 +253,9 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
         builder
           .call(STOP_A1)
           .departAimedExpected("00:01:01", "00:01:01")
-          .call(env.STOP_B1)
+          .call(STOP_B1)
           .withIsCancellation(true)
-          .call(env.STOP_C1)
+          .call(STOP_C1)
           .arriveAimedExpected("00:01:30", "00:01:30")
       )
       .buildEstimatedTimetableDeliveries();
@@ -281,11 +280,11 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
         builder
-          .call(env.STOP_D1)
+          .call(STOP_D1)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:19", "00:00:20")
           .departAimedExpected("00:00:24", "00:00:25")
-          .call(env.STOP_B1)
+          .call(STOP_B1)
           .arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
@@ -330,7 +329,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
         builder
           .call(STOP_A1)
           .departAimedExpected("00:01", "00:02")
-          .call(env.STOP_C1)
+          .call(STOP_C1)
           .arriveAimedExpected("00:03", "00:04")
       )
       .buildEstimatedTimetableDeliveries();
@@ -351,7 +350,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
         builder
           .call(STOP_A1)
           .departAimedActual("00:00:11", "00:00:15")
-          .call(env.STOP_B1)
+          .call(STOP_B1)
           .arriveAimedActual("00:00:20", "00:00:14")
       )
       .buildEstimatedTimetableDeliveries();
