@@ -1,9 +1,19 @@
 package org.opentripplanner.netex.validation;
 
+import java.util.function.Predicate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
+import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.StopUseEnumeration;
 
+/**
+ * Validates that the number of passing times in the journey and the number of stop points in the
+ * pattern are equal.
+ * It also takes into account that some points in the pattern can be set to stopUse=passthrough
+ * which means that those must not be referenced in the journey.
+ */
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
@@ -12,14 +22,27 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
       .getJourneyPatternsById()
       .lookup(getPatternId(sj));
 
-    int nStopPointsInJourneyPattern = journeyPattern
+    int nStopPointsInJourneyPattern = (int) journeyPattern
       .getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-      .size();
+      .stream()
+      .filter(Predicate.not(JourneyPatternSJMismatch::isPassThrough))
+      .count();
 
     int nTimetablePassingTimes = sj.getPassingTimes().getTimetabledPassingTime().size();
 
     return nStopPointsInJourneyPattern != nTimetablePassingTimes ? Status.DISCARD : Status.OK;
+  }
+
+  /**
+   * Does the stop point in the sequence represent a stop where the vehicle passes through without
+   * stopping?
+   */
+  private static boolean isPassThrough(PointInLinkSequence_VersionedChildStructure point) {
+    return (
+      point instanceof StopPointInJourneyPattern spijp &&
+      spijp.getStopUse() == StopUseEnumeration.PASSTHROUGH
+    );
   }
 
   @Override
