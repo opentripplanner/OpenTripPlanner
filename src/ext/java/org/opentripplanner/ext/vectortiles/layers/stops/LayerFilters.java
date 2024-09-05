@@ -3,10 +3,16 @@ package org.opentripplanner.ext.vectortiles.layers.stops;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -24,17 +30,24 @@ public class LayerFilters {
    * Returns a predicate which only includes stop which are visited by a pattern that is in the current
    * TriMet service week, namely from Sunday to Sunday.
    */
-  public static Predicate<RegularStop> currentServiceWeek(TransitService transitService) {
-    var serviceDate = LocalDate.now(transitService.getTimeZone());
+  public static Predicate<RegularStop> currentServiceWeek(
+    Function<RegularStop, Collection<TripPattern>> getPatternsForStop,
+    Function<Trip, Collection<LocalDate>> getServiceDatesForTrip,
+    Supplier<LocalDate> nowSupplier
+  ) {
+    var serviceDate = nowSupplier.get();
     var lastSunday = serviceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
     var nextSunday = serviceDate.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).plusDays(1);
+
     var filter = new PatternByServiceDatesFilter(
       new LocalDateRange(lastSunday, nextSunday),
-      transitService
+      // not used
+      route -> List.of(),
+      getServiceDatesForTrip
     );
 
     return regularStop -> {
-      var patterns = transitService.getPatternsForStop(regularStop);
+      var patterns = getPatternsForStop.apply(regularStop);
       var patternsInCurrentWeek = filter.filterPatterns(patterns);
       return !patternsInCurrentWeek.isEmpty();
     };
@@ -43,7 +56,12 @@ public class LayerFilters {
   public static Predicate<RegularStop> forType(FilterType type, TransitService transitService) {
     return switch (type) {
       case NONE -> NO_FILTER;
-      case CURRENT_TRIMET_SERVICE_WEEK -> currentServiceWeek(transitService);
+      case CURRENT_TRIMET_SERVICE_WEEK -> currentServiceWeek(
+        transitService::getPatternsForStop,
+        trip ->
+          transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId()),
+        () -> LocalDate.now(transitService.getTimeZone())
+      );
     };
   }
 

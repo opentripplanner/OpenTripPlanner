@@ -29,7 +29,7 @@ public class PatternByServiceDatesFilter {
    * This method is not private to enable unit testing.
    * <p>
    */
-  PatternByServiceDatesFilter(
+  public PatternByServiceDatesFilter(
     LocalDateRange range,
     Function<Route, Collection<TripPattern>> getPatternsForRoute,
     Function<Trip, Collection<LocalDate>> getServiceDatesForTrip
@@ -51,14 +51,6 @@ public class PatternByServiceDatesFilter {
   ) {
     this(
       new LocalDateRange(filterInput.getGraphQLStart(), filterInput.getGraphQLEnd()),
-      transitService::getPatternsForRoute,
-      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
-    );
-  }
-
-  public PatternByServiceDatesFilter(LocalDateRange range, TransitService transitService) {
-    this(
-      range,
       transitService::getPatternsForRoute,
       trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
     );
