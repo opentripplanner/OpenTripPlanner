@@ -8,6 +8,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -84,6 +85,9 @@ public class NodeTypeResolver implements TypeResolver {
     }
     if (o instanceof Trip) {
       return schema.getObjectType("Trip");
+    }
+    if (o instanceof Leg) {
+      return schema.getObjectType("Leg");
     }
     return null;
   }
