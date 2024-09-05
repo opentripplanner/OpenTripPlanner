@@ -38,7 +38,7 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
       layerParameters.expansionFactor()
     );
     this.transitService = transitService;
-    this.filter = StopPredicates.forType(layerParameters.filterType(), transitService);
+    this.filter = LayerFilters.forType(layerParameters.filterType(), transitService);
   }
 
   protected List<Geometry> getGeometries(Envelope query) {

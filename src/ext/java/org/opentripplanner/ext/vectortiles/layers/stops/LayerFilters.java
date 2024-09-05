@@ -9,10 +9,21 @@ import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class StopPredicates {
+/**
+ * Predicates for filtering elements of vector tile layers. Currently only contains predicates
+ * for {@link RegularStop}. Once more types need to be filtered, this may need some refactoring.
+ */
+public class LayerFilters {
 
+  /**
+   * No filter is applied: all stops are included in the result.
+   */
   public static final Predicate<RegularStop> NO_FILTER = x -> true;
 
+  /**
+   * Returns a predicate which only includes stop which are visited by a pattern that is in the current
+   * TriMet service week, namely from Sunday to Sunday.
+   */
   public static Predicate<RegularStop> currentServiceWeek(TransitService transitService) {
     var serviceDate = LocalDate.now(transitService.getTimeZone());
     var lastSunday = serviceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));

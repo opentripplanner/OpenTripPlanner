@@ -14,7 +14,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerType;
-import org.opentripplanner.ext.vectortiles.layers.stops.StopPredicates;
+import org.opentripplanner.ext.vectortiles.layers.stops.LayerFilters;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -157,7 +157,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
           elements should not be included in the result.
           """
         )
-        .asEnum(StopPredicates.FilterType.NONE)
+        .asEnum(LayerFilters.FilterType.NONE)
     );
   }
 
@@ -169,7 +169,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
     int minZoom,
     int cacheMaxSeconds,
     double expansionFactor,
-    StopPredicates.FilterType filterType
+    LayerFilters.FilterType filterType
   )
     implements LayerParameters<VectorTilesResource.LayerType> {}
 }
