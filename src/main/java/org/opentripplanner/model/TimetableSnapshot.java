@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import static org.opentripplanner.framework.collection.CollectionUtils.getByNullableKey;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -323,6 +325,7 @@ public class TimetableSnapshot {
     addPatternToIndex(pattern);
 
     Route route = trip.getRoute();
+
     if (realTimeTripUpdate.routeCreation()) {
       realtimeAddedRoutes.put(route.getId(), route);
     }
@@ -332,6 +335,7 @@ public class TimetableSnapshot {
       realTimeAddedPatternForTrip.put(trip, pattern);
       realTimeAddedPatternsForRoute.put(route, pattern);
       TripOnServiceDate tripOnServiceDate = realTimeTripUpdate.addedTripOnServiceDate();
+
       if (tripOnServiceDate != null) {
         realTimeAddedTripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
         realTimeAddedTripOnServiceDateForTripAndDay.put(
@@ -605,20 +609,6 @@ public class TimetableSnapshot {
       dirty = true;
     }
     return tt;
-  }
-
-  /**
-   * Look up the given key in a Map, return null if the key is null.
-   * This prevents a NullPointerException if the underlying implementation of the map does not
-   * accept querying with null keys (e.g. ImmutableMap).
-   *
-   **/
-  @Nullable
-  private static <K, V> V getByNullableKey(K key, Map<K, ? extends V> map) {
-    if (key == null) {
-      return null;
-    }
-    return map.get(key);
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {
