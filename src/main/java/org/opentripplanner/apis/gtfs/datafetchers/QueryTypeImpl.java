@@ -75,7 +75,6 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
-
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
     DataImportIssueStore.NOOP
@@ -448,7 +447,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
           }
         case "Leg":
-          if (id.isBlank()) {
+          if (id.equals("null") || id.isBlank()) {
             return null;
           }
           LegReference ref = LegReferenceSerializer.decode(id);
