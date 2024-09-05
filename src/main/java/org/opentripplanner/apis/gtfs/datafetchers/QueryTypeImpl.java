@@ -75,6 +75,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
+
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
     DataImportIssueStore.NOOP
