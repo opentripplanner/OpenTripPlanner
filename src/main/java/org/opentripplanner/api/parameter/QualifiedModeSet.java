@@ -126,10 +126,9 @@ public class QualifiedModeSet implements Serializable {
             mBuilder.withEgressMode(StreetMode.CAR_HAILING);
             mBuilder.withDirectMode(StreetMode.WALK);
           } else {
-            // Cars can use transit, for example, with car ferries.
-            mBuilder.withAccessMode(StreetMode.CAR);
-            mBuilder.withTransferMode(StreetMode.CAR);
-            mBuilder.withEgressMode(StreetMode.CAR);
+            mBuilder.withAccessMode(StreetMode.WALK);
+            mBuilder.withTransferMode(StreetMode.WALK);
+            mBuilder.withEgressMode(StreetMode.WALK);
             mBuilder.withDirectMode(StreetMode.CAR);
           }
         }
