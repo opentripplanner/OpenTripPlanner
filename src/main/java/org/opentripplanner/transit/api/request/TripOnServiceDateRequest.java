@@ -2,6 +2,7 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 
@@ -33,13 +34,13 @@ public class TripOnServiceDateRequest {
     if (operatingDays == null || operatingDays.isEmpty()) {
       throw new IllegalArgumentException("operatingDays must have at least one date");
     }
-    this.operatingDays = List.copyOf(operatingDays);
-    this.authorities = List.copyOf(authorities);
-    this.lines = List.copyOf(lines);
-    this.serviceJourneys = List.copyOf(serviceJourneys);
-    this.replacementFor = List.copyOf(replacementFor);
-    this.privateCodes = List.copyOf(privateCodes);
-    this.alterations = List.copyOf(alterations);
+    this.operatingDays = ListUtils.nullSafeImmutableList(operatingDays);
+    this.authorities = ListUtils.nullSafeImmutableList(authorities);
+    this.lines = ListUtils.nullSafeImmutableList(lines);
+    this.serviceJourneys = ListUtils.nullSafeImmutableList(serviceJourneys);
+    this.replacementFor = ListUtils.nullSafeImmutableList(replacementFor);
+    this.privateCodes = ListUtils.nullSafeImmutableList(privateCodes);
+    this.alterations = ListUtils.nullSafeImmutableList(alterations);
   }
 
   public static TripOnServiceDateRequestBuilder of() {

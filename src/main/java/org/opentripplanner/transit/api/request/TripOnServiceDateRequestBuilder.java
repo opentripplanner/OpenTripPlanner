@@ -7,12 +7,12 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class TripOnServiceDateRequestBuilder {
 
-  private List<FeedScopedId> authorities = List.of();
-  private List<FeedScopedId> lines = List.of();
-  private List<FeedScopedId> serviceJourneys = List.of();
-  private List<FeedScopedId> replacementFor = List.of();
-  private List<String> privateCodes = List.of();
-  private List<TripAlteration> alterations = List.of();
+  private List<FeedScopedId> authorities;
+  private List<FeedScopedId> lines;
+  private List<FeedScopedId> serviceJourneys;
+  private List<FeedScopedId> replacementFor;
+  private List<String> privateCodes;
+  private List<TripAlteration> alterations;
   private List<LocalDate> operatingDays;
 
   protected TripOnServiceDateRequestBuilder() {}

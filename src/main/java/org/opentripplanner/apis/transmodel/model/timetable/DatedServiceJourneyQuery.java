@@ -13,7 +13,6 @@ import java.util.List;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.collection.CollectionUtils;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -94,6 +93,9 @@ public class DatedServiceJourneyQuery {
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .dataFetcher(environment -> {
+        // The null safety checks are not needed here - they are taken care of by the request
+        // object, but reuse let's use the mapping method and leave this improvement until all APIs
+        // are pushing this check into the domain request.
         var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
         var serviceJourneys = mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"));
@@ -101,10 +103,6 @@ public class DatedServiceJourneyQuery {
         var privateCodes = environment.<List<String>>getArgument("privateCodes");
         var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
-
-        if (CollectionUtils.isEmpty(operatingDays)) {
-          throw new IllegalArgumentException("At least one operatingDay must be provided.");
-        }
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
           .of()
@@ -114,15 +112,11 @@ public class DatedServiceJourneyQuery {
           .withServiceJourneys(serviceJourneys)
           .withReplacementFor(replacementFor);
 
-        if (!CollectionUtils.isEmpty(privateCodes)) {
-          tripOnServiceDateRequestBuilder =
-            tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
-        }
+        tripOnServiceDateRequestBuilder =
+          tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
 
-        if (!CollectionUtils.isEmpty(alterations)) {
-          tripOnServiceDateRequestBuilder =
-            tripOnServiceDateRequestBuilder.withAlterations(alterations);
-        }
+        tripOnServiceDateRequestBuilder =
+          tripOnServiceDateRequestBuilder.withAlterations(alterations);
 
         return GqlUtil
           .getTransitService(environment)
