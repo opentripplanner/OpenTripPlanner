@@ -448,7 +448,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
           }
         case "Leg":
-          if (id.equals("null") || id.isBlank()) {
+          if (id.isBlank()) {
             return null;
           }
           LegReference ref = LegReferenceSerializer.decode(id);
