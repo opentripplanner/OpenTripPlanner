@@ -1,22 +1,23 @@
 package org.opentripplanner.openstreetmap.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class FloorNumberUnknownAssumedGroundLevel implements DataImportIssue {
+public record FloorNumberUnknownAssumedGroundLevel(String layer, OSMWithTags entity)
+  implements DataImportIssue {
+  private static final String FMT =
+    "%s : could not determine floor number for layer %s, assumed to be ground-level.";
 
-  public static final String FMT =
-    "Could not determine floor number for layer %s, assumed to be ground-level.";
-
-  final String layer;
-  final Integer floorNumber;
-
-  public FloorNumberUnknownAssumedGroundLevel(String layer, Integer floorNumber) {
-    this.layer = layer;
-    this.floorNumber = floorNumber;
-  }
+  private static final String HTMLFMT =
+    "<a href='%s'>'%s'</a> : could not determine floor number for layer %s, assumed to be ground-level.";
 
   @Override
   public String getMessage() {
-    return String.format(FMT, layer, floorNumber);
+    return String.format(FMT, entity.getId(), layer);
+  }
+
+  @Override
+  public String getHTMLMessage() {
+    return String.format(HTMLFMT, entity.url(), entity.getId(), layer);
   }
 }
