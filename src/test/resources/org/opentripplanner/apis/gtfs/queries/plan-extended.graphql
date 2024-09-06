@@ -151,6 +151,7 @@
           arrival
         }
         accessibilityScore
+        id
       }
     }
   }
