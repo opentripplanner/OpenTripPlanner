@@ -228,7 +228,7 @@ public class TransitRouter {
   }
 
   private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
-    var streetRequest = request.journey().accessOrEgress(type);
+    var streetRequest = type.isEgress() ? request.journey().egress() : request.journey().access();
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.clone();
