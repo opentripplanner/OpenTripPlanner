@@ -669,7 +669,7 @@ type Leg implements Node {
   For non-transit legs, null.
   """
   headsign: String
-  "An identifier for the leg, which can be used to re-fetch the information."
+  "An identifier for the leg, which can be used to re-fetch transit leg information."
   id: ID!
   """
   Interlines with previous leg.
