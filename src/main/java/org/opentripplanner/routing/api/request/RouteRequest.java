@@ -56,7 +56,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private GenericLocation to;
 
-  private List<PassThroughPoint> passThroughPoints = Collections.emptyList();
+  private List<ViaLocation> via = Collections.emptyList();
 
   private Instant dateTime = Instant.now();
 
@@ -278,12 +278,12 @@ public class RouteRequest implements Cloneable, Serializable {
     this.to = to;
   }
 
-  public List<PassThroughPoint> getPassThroughPoints() {
-    return passThroughPoints;
+  public List<ViaLocation> getPassThroughPoints() {
+    return via;
   }
 
-  public void setPassThroughPoints(final List<PassThroughPoint> passThroughPoints) {
-    this.passThroughPoints = passThroughPoints;
+  public void setPassThroughPoints(final List<ViaLocation> via) {
+    this.via = via;
   }
 
   /**

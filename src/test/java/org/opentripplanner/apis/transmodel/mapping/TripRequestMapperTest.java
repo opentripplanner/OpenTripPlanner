@@ -39,9 +39,9 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.api.request.PassThroughPoint;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
@@ -321,7 +321,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
     );
 
-    final List<PassThroughPoint> points = TripRequestMapper
+    final List<ViaLocation> points = TripRequestMapper
       .createRequest(executionContext(arguments))
       .getPassThroughPoints();
     assertEquals(PTP1, points.get(0).locations().stream().map(STOP_TO_ID).toList());

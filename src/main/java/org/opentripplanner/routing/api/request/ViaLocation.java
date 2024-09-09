@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * Defines one pass-through point which the journey must pass through.
  */
-public record PassThroughPoint(@Nullable String label, List<StopLocation> locations) {
+public record ViaLocation(@Nullable String label, List<StopLocation> locations) {
   /**
    * Get the one or multiple stops of the pass-through point, of which only one is required to be
    * passed through.

@@ -6,12 +6,12 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.routing.api.request.PassThroughPoint;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 class PassThroughLocationMapper {
 
-  static List<PassThroughPoint> toLocations(
+  static List<ViaLocation> toLocations(
     final TransitService transitService,
     final List<Map<String, Object>> passThroughPoints
   ) {
@@ -23,7 +23,7 @@ class PassThroughLocationMapper {
     // TODO Propagate an error if a stopplace is unknown and fails lookup.
   }
 
-  private static PassThroughPoint handlePoint(
+  private static ViaLocation handlePoint(
     final TransitService transitService,
     Map<String, Object> map
   ) {
@@ -43,6 +43,6 @@ class PassThroughLocationMapper {
         }
         return stopLocations.stream();
       })
-      .collect(collectingAndThen(toList(), sls -> new PassThroughPoint(name, sls)));
+      .collect(collectingAndThen(toList(), sls -> new ViaLocation(name, sls)));
   }
 }

@@ -14,8 +14,8 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
-import org.opentripplanner.routing.api.request.PassThroughPoint;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -56,7 +56,7 @@ class RaptorRequestMapperTest {
   void testPassThroughPoints() {
     var req = new RouteRequest();
 
-    req.setPassThroughPoints(List.of(new PassThroughPoint("Via A", List.of(STOP_A))));
+    req.setPassThroughPoints(List.of(new ViaLocation("Via A", List.of(STOP_A))));
 
     var result = map(req);
 
@@ -72,7 +72,7 @@ class RaptorRequestMapperTest {
     var req = new RouteRequest();
 
     // Set pass-through and relax transit-group-priority
-    req.setPassThroughPoints(List.of(new PassThroughPoint("Via A", List.of(STOP_A))));
+    req.setPassThroughPoints(List.of(new ViaLocation("Via A", List.of(STOP_A))));
     req.withPreferences(p ->
       p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
     );
