@@ -32,6 +32,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
             <a
               title={leg.line?.id}
               target={'_blank'}
+              rel={'noreferrer'}
               href={graphiQLUrl + '&query=' + formattedLineQuery + '&variables=' + formattedLineID}
             >
               {leg.line.publicCode} {leg.toEstimatedCall?.destinationDisplay?.frontText}
@@ -45,6 +46,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
             <a
               title={leg.fromPlace.quay?.id}
               target={'_blank'}
+              rel={'noreferrer'}
               href={
                 graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedFromPlaceID
               }
@@ -58,6 +60,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
           <a
             title={leg.toPlace.quay?.id}
             target={'_blank'}
+            rel={'noreferrer'}
             href={graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedToPlaceID}
           >
             {leg.toPlace.name}
