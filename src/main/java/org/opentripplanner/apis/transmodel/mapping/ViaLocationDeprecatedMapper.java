@@ -10,7 +10,8 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 
-class ViaLocationMapper {
+@Deprecated
+class ViaLocationDeprecatedMapper {
 
   static ViaLocationDeprecated mapViaLocation(Map<String, Object> viaLocation) {
     try {

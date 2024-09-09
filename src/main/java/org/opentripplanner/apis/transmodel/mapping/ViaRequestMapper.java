@@ -29,7 +29,7 @@ public class ViaRequestMapper {
     List<Map<String, Object>> viaInput = environment.getArgument("via");
     List<ViaLocationDeprecated> vias = viaInput
       .stream()
-      .map(ViaLocationMapper::mapViaLocation)
+      .map(ViaLocationDeprecatedMapper::mapViaLocation)
       .toList();
 
     List<JourneyRequest> requests;
