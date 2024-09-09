@@ -65,9 +65,9 @@
         <junit.version>5.11.0</junit.version>
         <micrometer.version>1.13.2</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.6</logback.version>
+        <logback.version>1.5.7</logback.version>
         <lucene.version>9.11.1</lucene.version>
-        <slf4j.version>2.0.14</slf4j.version>
+        <slf4j.version>2.0.16</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.27</siri-java-model.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
@@ -533,11 +533,6 @@
             <name>Open Source Geospatial Foundation Repository</name>
             <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
-        <repository>
-            <id>onebusaway-releases</id>
-            <name>Onebusaway Releases Repo</name>
-            <url>https://repo.camsys-apps.com/releases/</url>
-        </repository>
     </repositories>
 
     <dependencyManagement>
@@ -824,13 +819,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.17</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>3.2.3</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>

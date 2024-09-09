@@ -98,13 +98,6 @@ public final class RealTimeTripTimes implements TripTimes {
       : scheduledTripTimes.getHeadsign(stop);
   }
 
-  /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
-   */
   @Override
   public List<String> getHeadsignVias(final int stop) {
     return scheduledTripTimes.getHeadsignVias(stop);
