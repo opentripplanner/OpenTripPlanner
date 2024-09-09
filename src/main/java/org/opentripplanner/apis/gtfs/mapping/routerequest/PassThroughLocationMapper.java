@@ -22,8 +22,8 @@ class PassThroughLocationMapper {
     final TransitService transitService,
     Map<String, Object> map
   ) {
-    Map<String, Object> element = (Map<String, Object>) map.get("element");
-    List<String> stops = (List<String>) element.get("placeIds");
+    Map<String, Object> element = (Map<String, Object>) map.get("place");
+    List<String> stops = (List<String>) element.get("locationIds");
 
     final String name = (String) element.get("name");
     if (stops == null || stops.isEmpty()) {

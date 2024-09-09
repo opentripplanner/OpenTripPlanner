@@ -16,11 +16,11 @@ class PassThroughLocationMapperTest {
 
   public static List<List<Map<?, ?>>> failureCases() {
     return List.of(
-      List.of(Map.of("element", Map.of("placeIds", List.of("fantasy:id")))),
-      List.of(Map.of("element", Map.of("placeIds", List.of()))),
+      List.of(Map.of("place", Map.of("locationIds", List.of("fantasy:id")))),
+      List.of(Map.of("place", Map.of("locationIds", List.of()))),
       List.of(
-        Map.of("element", Map.of("placeIds", List.of())),
-        Map.of("element", Map.of("placeIds", List.of()))
+        Map.of("place", Map.of("locationIds", List.of())),
+        Map.of("place", Map.of("locationIds", List.of()))
       )
     );
   }

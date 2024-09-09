@@ -5073,51 +5073,51 @@ public class GraphQLTypes {
     TRANSIT,
   }
 
-  public static class GraphQLViaElementInput {
+  public static class GraphQLViaLocationInput {
 
-    private List<String> placeIds;
+    private List<String> locationIds;
 
-    public GraphQLViaElementInput(Map<String, Object> args) {
+    public GraphQLViaLocationInput(Map<String, Object> args) {
       if (args != null) {
-        this.placeIds = (List<String>) args.get("placeIds");
+        this.locationIds = (List<String>) args.get("locationIds");
       }
     }
 
-    public List<String> getGraphQLPlaceIds() {
-      return this.placeIds;
+    public List<String> getGraphQLLocationIds() {
+      return this.locationIds;
     }
 
-    public void setGraphQLPlaceIds(List<String> placeIds) {
-      this.placeIds = placeIds;
+    public void setGraphQLLocationIds(List<String> locationIds) {
+      this.locationIds = locationIds;
     }
   }
 
   public static class GraphQLViaPointInput {
 
-    private GraphQLViaElementInput element;
-    private String name;
+    private String label;
+    private GraphQLViaLocationInput place;
 
     public GraphQLViaPointInput(Map<String, Object> args) {
       if (args != null) {
-        this.element = new GraphQLViaElementInput((Map<String, Object>) args.get("element"));
-        this.name = (String) args.get("name");
+        this.label = (String) args.get("label");
+        this.place = new GraphQLViaLocationInput((Map<String, Object>) args.get("place"));
       }
     }
 
-    public GraphQLViaElementInput getGraphQLElement() {
-      return this.element;
+    public String getGraphQLLabel() {
+      return this.label;
     }
 
-    public String getGraphQLName() {
-      return this.name;
+    public GraphQLViaLocationInput getGraphQLPlace() {
+      return this.place;
     }
 
-    public void setGraphQLElement(GraphQLViaElementInput element) {
-      this.element = element;
+    public void setGraphQLLabel(String label) {
+      this.label = label;
     }
 
-    public void setGraphQLName(String name) {
-      this.name = name;
+    public void setGraphQLPlace(GraphQLViaLocationInput place) {
+      this.place = place;
     }
   }
 
