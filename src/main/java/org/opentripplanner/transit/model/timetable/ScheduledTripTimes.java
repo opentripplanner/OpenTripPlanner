@@ -34,14 +34,15 @@ public final class ScheduledTripTimes implements TripTimes {
    * When time-shifting from one time-zone to another negative times may occur.
    */
   private static final int MIN_TIME = DurationUtils.durationInSeconds("-12h");
+
   /**
    * We allow a trip to last for maximum 20 days. In Norway the longest trip is 6 days.
    */
   private static final int MAX_TIME = DurationUtils.durationInSeconds("20d");
 
   /**
-   * Implementation notes: This allows re-using the same scheduled arrival and departure time
-   * arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
+   * Implementation notes: This timeShift allows re-using the same scheduled arrival and departure
+   * time arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
    * ScheduledTripTimes.
    */
   private final int timeShift;
@@ -53,19 +54,24 @@ public final class ScheduledTripTimes implements TripTimes {
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
 
+  /**
+   * Any number of array elements may point to the same I18NString instance if the headsign remains
+   * unchanged between stops.
+   */
   @Nullable
   private final I18NString[] headsigns;
 
   /**
-   * Implementation notes: This is 2D array since there can be more than one via name/stop per each
-   * record in stop sequence). Outer array may be null if there are no vias in stop sequence. Inner
-   * array may be null if there are no vias for particular stop. This is done in order to save
-   * space.
+   * A 2D array of String containing zero or more Via messages displayed at each stop in the
+   * stop sequence. This reference be null if no stop in the entire sequence of stops has any via
+   * strings. Any subarray may also be null or empty if no Via strings are displayed at that
+   * particular stop. These nulls are allowed to conserve memory in the common case where there are
+   * few or no via messages.
    */
   @Nullable
   private final String[][] headsignVias;
 
-  private final int[] originalGtfsStopSequence;
+  private final int[] gtfsSequenceOfStopIndex;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift();
@@ -78,7 +84,7 @@ public final class ScheduledTripTimes implements TripTimes {
     this.dropOffBookingInfos = Objects.requireNonNull(builder.dropOffBookingInfos());
     this.headsigns = builder.headsigns();
     this.headsignVias = builder.headsignVias();
-    this.originalGtfsStopSequence = builder.originalGtfsStopSequence();
+    this.gtfsSequenceOfStopIndex = builder.gtfsSequenceOfStopIndex();
     validate();
   }
 
@@ -107,7 +113,7 @@ public final class ScheduledTripTimes implements TripTimes {
       pickupBookingInfos,
       headsigns,
       headsignVias,
-      originalGtfsStopSequence,
+      gtfsSequenceOfStopIndex,
       deduplicator
     );
   }
@@ -272,16 +278,16 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int gtfsSequenceOfStopIndex(final int stop) {
-    return originalGtfsStopSequence[stop];
+    return gtfsSequenceOfStopIndex[stop];
   }
 
   @Override
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
-    if (originalGtfsStopSequence == null) {
+    if (gtfsSequenceOfStopIndex == null) {
       return OptionalInt.empty();
     }
-    for (int i = 0; i < originalGtfsStopSequence.length; i++) {
-      var sequence = originalGtfsStopSequence[i];
+    for (int i = 0; i < gtfsSequenceOfStopIndex.length; i++) {
+      var sequence = gtfsSequenceOfStopIndex[i];
       if (sequence == stopSequence) {
         return OptionalInt.of(i);
       }
