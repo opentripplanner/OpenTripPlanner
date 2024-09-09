@@ -8,10 +8,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +52,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.DatedTrip;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -288,47 +285,25 @@ public class DefaultTransitService implements TransitEditorService {
     transitModelIndex.getTripForId().put(tripId, trip);
   }
 
+  /**
+   * TODO This only supports realtime cancelled trips for now.
+   */
   @Override
   public Collection<DatedTrip> getCanceledTrips(List<String> feeds) {
     OTPRequestTimeoutException.checkForTimeout();
-    List<DatedTrip> canceledTrips = new ArrayList<>();
-    Map<Trip, Integer> departures = new HashMap<>();
-
     var timetableSnapshot = lazyGetTimeTableSnapShot();
     if (timetableSnapshot == null) {
-      return canceledTrips;
+      return List.of();
     }
-    var calendarService = getCalendarService();
-    var patternMap = transitModelIndex.getPatternForTrip();
-    var trips = transitModelIndex.getTripForId();
-
-    for (Map.Entry<FeedScopedId, Trip> entry : trips.entrySet()) {
-      var trip = entry.getValue();
-      if (feeds != null && !feeds.contains(trip.getId().getFeedId())) {
-        continue;
-      }
-      Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
-        trip.getServiceId()
-      );
-      var pattern = patternMap.get(trip);
-      for (LocalDate date : serviceDates) {
-        var timetable = timetableSnapshot.resolve(pattern, date);
-        var tripTimes = timetable.getTripTimes(trip);
-        if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) { // use UPDATED for faked testing
-          canceledTrips.add(new DatedTrip(trip, date));
-          // store departure time from first stop
-          departures.put(trip, tripTimes.sortIndex());
-        }
-      }
-    }
+    List<DatedTrip> canceledTrips = timetableSnapshot.getCanceledTrips(feeds);
     canceledTrips.sort((t1, t2) -> {
       if (t1.serviceDate().isBefore(t2.serviceDate())) {
         return -1;
       } else if (t2.serviceDate().isBefore(t1.serviceDate())) {
         return 1;
       }
-      var departure1 = departures.get(t1.trip());
-      var departure2 = departures.get(t2.trip());
+      var departure1 = getDepartureTime(t1);
+      var departure2 = getDepartureTime(t2);
       if (departure1 < departure2) {
         return -1;
       } else if (departure1 > departure2) {
@@ -779,5 +754,11 @@ public class DefaultTransitService implements TransitEditorService {
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
       .map(Map.Entry::getKey);
+  }
+
+  private int getDepartureTime(DatedTrip datedTrip) {
+    var pattern = getPatternForTrip(datedTrip.trip());
+    var timetable = timetableSnapshot.resolve(pattern, datedTrip.serviceDate());
+    return timetable.getTripTimes(datedTrip.trip()).getDepartureTime(0);
   }
 }

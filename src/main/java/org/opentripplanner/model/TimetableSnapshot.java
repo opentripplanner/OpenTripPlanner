@@ -5,24 +5,28 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -174,6 +178,32 @@ public class TimetableSnapshot {
   public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return realtimeAddedTripPattern.get(tripIdAndServiceDate);
+  }
+
+  /**
+   * Get trips which have been canceled.
+   *
+   * @param feeds if not null, only return trips from these feeds
+   */
+  public ArrayList<DatedTrip> getCanceledTrips(List<String> feeds) {
+    return timetables
+      .values()
+      .stream()
+      .flatMap(timetables ->
+        timetables
+          .stream()
+          .flatMap(timetable ->
+            timetable
+              .getTripTimes()
+              .stream()
+              .filter(tripTimes ->
+                tripTimes.isCanceled() &&
+                (feeds == null || feeds.contains(tripTimes.getTrip().getId().getFeedId()))
+              )
+              .map(tripTimes -> new DatedTrip(tripTimes.getTrip(), timetable.getServiceDate()))
+          )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
