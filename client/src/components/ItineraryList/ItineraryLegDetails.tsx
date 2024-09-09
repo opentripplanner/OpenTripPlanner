@@ -47,9 +47,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
               title={leg.fromPlace.quay?.id}
               target={'_blank'}
               rel={'noreferrer'}
-              href={
-                graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedFromPlaceID
-              }
+              href={graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedFromPlaceID}
             >
               {leg.fromPlace.name}
             </a>{' '}
