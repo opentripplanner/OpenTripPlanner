@@ -35,27 +35,29 @@
         tripHeadsign
         tripShortName
         stoptimes {
-          dropoffType
-          headsign
-          pickupType
-          realtimeState
-          stop {
-            gtfsId
-          }
-          stopPosition
-          timepoint
-          arrival {
-            scheduledTime
-            estimated {
-              delay
-              time
+          ... on ExactDatedStopTime {
+            dropoffType
+            headsign
+            pickupType
+            realtimeState
+            stop {
+              gtfsId
             }
-          }
-          departure {
-            scheduledTime
-            estimated {
-              delay
-              time
+            stopPosition
+            timepoint
+            arrival {
+              scheduledTime
+              estimated {
+                delay
+                time
+              }
+            }
+            departure {
+              scheduledTime
+              estimated {
+                delay
+                time
+              }
             }
           }
         }

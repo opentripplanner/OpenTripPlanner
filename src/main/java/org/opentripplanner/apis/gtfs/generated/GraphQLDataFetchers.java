@@ -327,26 +327,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
-  /** Stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop. */
-  public interface GraphQLDatedStopTime {
-    public DataFetcher<ArrivalDepartureTime> arrival();
-
-    public DataFetcher<ArrivalDepartureTime> departure();
-
-    public DataFetcher<String> dropoffType();
-
-    public DataFetcher<String> headsign();
-
-    public DataFetcher<String> pickupType();
-
-    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
-
-    public DataFetcher<Object> stop();
-
-    public DataFetcher<Integer> stopPosition();
-
-    public DataFetcher<Boolean> timepoint();
-  }
+  /** Departure and/or arrival times to or from a stop on a specific date. */
+  public interface GraphQLDatedStopTime extends TypeResolver {}
 
   /** Trip on a specific date */
   public interface GraphQLDatedTrip {
@@ -364,7 +346,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Object>> stops();
 
-    public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+    public DataFetcher<Iterable<Object>> stoptimes();
 
     public DataFetcher<String> tripHeadsign();
 
@@ -431,6 +413,30 @@ public class GraphQLDataFetchers {
 
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+  }
+
+  /**
+   * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+   * This can include realtime estimates.
+   */
+  public interface GraphQLExactDatedStopTime {
+    public DataFetcher<ArrivalDepartureTime> arrival();
+
+    public DataFetcher<ArrivalDepartureTime> departure();
+
+    public DataFetcher<String> dropoffType();
+
+    public DataFetcher<String> headsign();
+
+    public DataFetcher<String> pickupType();
+
+    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
+
+    public DataFetcher<Object> stop();
+
+    public DataFetcher<Integer> stopPosition();
+
+    public DataFetcher<Boolean> timepoint();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */

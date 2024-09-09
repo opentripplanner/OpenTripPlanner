@@ -611,25 +611,6 @@ public class GraphQLTypes {
     SHORTEST_DURATION,
   }
 
-  public static class GraphQLDatedStopTimeHeadsignArgs {
-
-    private String language;
-
-    public GraphQLDatedStopTimeHeadsignArgs(Map<String, Object> args) {
-      if (args != null) {
-        this.language = (String) args.get("language");
-      }
-    }
-
-    public String getGraphQLLanguage() {
-      return this.language;
-    }
-
-    public void setGraphQLLanguage(String language) {
-      this.language = language;
-    }
-  }
-
   public static class GraphQLDatedTripTripHeadsignArgs {
 
     private String language;
@@ -763,6 +744,25 @@ public class GraphQLTypes {
 
     public void setGraphQLKeepingCost(org.opentripplanner.framework.model.Cost keepingCost) {
       this.keepingCost = keepingCost;
+    }
+  }
+
+  public static class GraphQLExactDatedStopTimeHeadsignArgs {
+
+    private String language;
+
+    public GraphQLExactDatedStopTimeHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
     }
   }
 

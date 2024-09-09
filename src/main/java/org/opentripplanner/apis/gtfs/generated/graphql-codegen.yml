@@ -59,7 +59,7 @@ config:
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
-    DatedStopTime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
+    ExactDatedStopTime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     DatedTrip: org.opentripplanner.transit.model.timetable.DatedTrip#DatedTrip
     DatedTripConnection: graphql.relay.Connection#Connection<DatedTrip>
     DatedTripEdge: graphql.relay.Edge#Edge<DatedTrip>

@@ -92,8 +92,9 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
     return this::getStops;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
+  public DataFetcher<Iterable<Object>> stoptimes() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getSource(environment).trip();
@@ -106,7 +107,12 @@ public class DatedTripImpl implements GraphQLDataFetchers.GraphQLDatedTrip {
       if (timetable == null) {
         return List.of();
       }
-      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
+      return (Iterable<Object>) (List<?>) TripTimeOnDate.fromTripTimes(
+        timetable,
+        trip,
+        serviceDate,
+        midnight
+      );
     };
   }
 

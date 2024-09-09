@@ -82,10 +82,7 @@ class DefaultTransitServiceTest {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(
-      CALENDAR_ID,
-      List.of(firstDate, secondDate)
-    );
+    calendarServiceData.putServiceDatesForServiceId(CALENDAR_ID, List.of(firstDate, secondDate));
     transitModel.getServiceCodes().put(CALENDAR_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 

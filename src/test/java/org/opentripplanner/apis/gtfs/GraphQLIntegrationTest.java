@@ -234,10 +234,7 @@ class GraphQLIntegrationTest {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(
-      cal_id,
-      List.of(firstDate, secondDate)
-    );
+    calendarServiceData.putServiceDatesForServiceId(cal_id, List.of(firstDate, secondDate));
     transitModel.getServiceCodes().put(cal_id, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
     transitModel.initTimetableSnapshotProvider(() -> {

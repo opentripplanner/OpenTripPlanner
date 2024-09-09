@@ -35,10 +35,11 @@ import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ContactInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.DatedStopTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.DatedStopTimeTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.DatedTripImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.ExactDatedStopTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
@@ -128,6 +129,7 @@ class GtfsGraphQLIndex {
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
+        .type("DatedStopTime", type -> type.typeResolver(new DatedStopTimeTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
         .type(typeWiring.build(BikeParkImpl.class))
@@ -181,7 +183,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
         .type(typeWiring.build(DatedTripImpl.class))
-        .type(typeWiring.build(DatedStopTimeImpl.class))
+        .type(typeWiring.build(ExactDatedStopTimeImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
