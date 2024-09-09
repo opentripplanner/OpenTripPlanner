@@ -17,7 +17,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
-import org.opentripplanner.routing.api.request.ViaLocation;
+import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
@@ -136,7 +136,7 @@ public class ViaRoutingWorkerTest {
     int minSlack = 10;
     int maxSlack = 45;
     var viaLocations = List.of(
-      new ViaLocation(
+      new ViaLocationDeprecated(
         location(viaC),
         false,
         Duration.ofMinutes(minSlack),

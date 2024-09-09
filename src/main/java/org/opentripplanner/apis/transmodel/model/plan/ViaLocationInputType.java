@@ -5,7 +5,7 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.routing.api.request.ViaLocation;
+import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 
 public class ViaLocationInputType {
 
@@ -57,7 +57,7 @@ public class ViaLocationInputType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name("minSlack")
-          .defaultValue(ViaLocation.DEFAULT_MIN_SLACK)
+          .defaultValue(ViaLocationDeprecated.DEFAULT_MIN_SLACK)
           .description(
             "The minimum time the user wants to stay in the via location before continuing his journey"
           )
@@ -67,7 +67,7 @@ public class ViaLocationInputType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name("maxSlack")
-          .defaultValue(ViaLocation.DEFAULT_MAX_SLACK)
+          .defaultValue(ViaLocationDeprecated.DEFAULT_MAX_SLACK)
           .description(
             "The maximum time the user wants to stay in the via location before continuing his journey"
           )

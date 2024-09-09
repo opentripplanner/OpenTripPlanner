@@ -17,7 +17,7 @@ import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
-class ViaLocationTest {
+class ViaLocationDeprecatedTest {
 
   private static final int STOP_A = 12;
   private static final int STOP_B = 13;
@@ -37,7 +37,7 @@ class ViaLocationTest {
     assertEquals(RaptorConstants.ZERO, subject.minimumWaitTime());
     assertEquals(
       "Via{label: PassThrough A, allowPassThrough, connections: [C]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
     assertEquals(
       "Via{label: PassThrough A, allowPassThrough, connections: [14]}",
@@ -61,7 +61,10 @@ class ViaLocationTest {
     assertEquals("Tx A", subject.label());
     assertFalse(subject.allowPassThrough());
     assertEquals(RaptorConstants.ZERO, subject.minimumWaitTime());
-    assertEquals("Via{label: Tx A, connections: [B]}", subject.toString(ViaLocationTest::stopName));
+    assertEquals(
+      "Via{label: Tx A, connections: [B]}",
+      subject.toString(ViaLocationDeprecatedTest::stopName)
+    );
     assertEquals("Via{label: Tx A, connections: [13]}", subject.toString());
     assertEquals(1, subject.connections().size());
 
@@ -86,7 +89,7 @@ class ViaLocationTest {
     assertEquals(RaptorConstants.ZERO, subject.minimumWaitTime());
     assertEquals(
       "Via{label: PassThrough A, allowPassThrough, connections: [C, A~B 35s]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
     assertEquals(2, subject.connections().size());
 
@@ -118,7 +121,7 @@ class ViaLocationTest {
     assertEquals(WAIT_TIME_SEC, subject.minimumWaitTime());
     assertEquals(
       "Via{label: Plaza, minWaitTime: 3m, connections: [C 3m, A~B 3m35s]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
     assertEquals(2, subject.connections().size());
 
@@ -215,25 +218,28 @@ class ViaLocationTest {
     assertEquals("Via{label: A|B, connections: [12, 13]}", subject.toString());
     assertEquals(
       "Via{label: A|B, connections: [A, B]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
 
     subject = ViaLocation.via(null, WAIT_TIME).addViaStop(STOP_B).build();
     assertEquals("Via{minWaitTime: 3m, connections: [13 3m]}", subject.toString());
     assertEquals(
       "Via{minWaitTime: 3m, connections: [B 3m]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
 
     subject = ViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
     assertEquals("Via{connections: [12~13 35s]}", subject.toString());
-    assertEquals("Via{connections: [A~B 35s]}", subject.toString(ViaLocationTest::stopName));
+    assertEquals(
+      "Via{connections: [A~B 35s]}",
+      subject.toString(ViaLocationDeprecatedTest::stopName)
+    );
 
     subject = ViaLocation.allowPassThrough(null).addViaStop(STOP_C).build();
     assertEquals("Via{allowPassThrough, connections: [14]}", subject.toString());
     assertEquals(
       "Via{allowPassThrough, connections: [C]}",
-      subject.toString(ViaLocationTest::stopName)
+      subject.toString(ViaLocationDeprecatedTest::stopName)
     );
   }
 

@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
-import org.opentripplanner.routing.api.request.ViaLocation;
+import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -121,7 +121,7 @@ public class ViaRoutingWorker {
   private List<Itinerary> filterTransits(
     Itinerary i,
     List<Itinerary> itineraries,
-    ViaLocation viaLocation
+    ViaLocationDeprecated viaLocation
   ) {
     return itineraries.stream().filter(withinSlackTest(i, viaLocation)).toList();
   }
@@ -129,7 +129,7 @@ public class ViaRoutingWorker {
   /**
    * Only allow departures within min/max slack time.
    */
-  private Predicate<Itinerary> withinSlackTest(Itinerary i, ViaLocation v) {
+  private Predicate<Itinerary> withinSlackTest(Itinerary i, ViaLocationDeprecated v) {
     var earliestDeparturetime = i.endTime().plus(v.minSlack());
     var latestDeparturetime = i.endTime().plus(v.maxSlack());
 
