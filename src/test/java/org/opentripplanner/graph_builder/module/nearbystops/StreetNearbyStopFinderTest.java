@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.nearbystops;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -68,15 +69,15 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var maxStopCount = 0;
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
-    var simple = finder.findNearbyStops(
+    var nearbyStops = finder.findNearbyStops(
       isolatedStop,
       new RouteRequest(),
       new StreetRequest(),
       false
     );
 
-    assertEquals(1, simple.size());
-    var nearbyStop = simple.stream().findFirst().get();
+    assertThat(nearbyStops).hasSize(1);
+    var nearbyStop = nearbyStops.stream().findFirst().get();
     assertZeroDistanceStop(isolatedStop, nearbyStop);
   }
 
@@ -90,7 +91,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
     );
 
-    assertEquals(4, sortedNearbyStops.size());
+    assertThat(sortedNearbyStops).hasSize(4);
     assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
     assertStopAtDistance(stopB, 100, sortedNearbyStops.get(1));
     assertStopAtDistance(stopC, 200, sortedNearbyStops.get(2));
@@ -108,7 +109,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
     );
 
-    assertEquals(2, sortedNearbyStops.size());
+    assertThat(sortedNearbyStops).hasSize(2);
     assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
     assertStopAtDistance(stopB, 100, sortedNearbyStops.get(1));
   }
@@ -127,7 +128,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       finder.findNearbyStops(stopA, routeRequest, new StreetRequest(), false)
     );
 
-    assertEquals(2, sortedNearbyStops.size());
+    assertThat(sortedNearbyStops).hasSize(2);
     assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
     assertStopAtDistance(stopB, 100, sortedNearbyStops.get(1));
   }
@@ -143,7 +144,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       finder.findNearbyStops(Set.of(stopA), new RouteRequest(), new StreetRequest(), false)
     );
 
-    assertEquals(2, sortedNearbyStops.size());
+    assertThat(sortedNearbyStops).hasSize(2);
     assertStopAtDistance(stopC, 200, sortedNearbyStops.get(0));
     assertStopAtDistance(stopD, 300, sortedNearbyStops.get(1));
   }
@@ -160,7 +161,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       finder.findNearbyStops(Set.of(stopA), new RouteRequest(), new StreetRequest(), false)
     );
 
-    assertEquals(1, sortedNearbyStops.size());
+    assertThat(sortedNearbyStops).hasSize(1);
     assertStopAtDistance(stopC, 200, sortedNearbyStops.get(0));
   }
 

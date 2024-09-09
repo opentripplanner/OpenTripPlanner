@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -305,7 +306,7 @@ class StopAndStationMapperTest {
     );
 
     var stations = stopMapper.resultStations;
-    assertEquals(2, stations.size());
+    assertThat(stations).hasSize(2);
     assertTrue(stations.get(0).shouldRouteToCentroid());
     assertFalse(stations.get(1).shouldRouteToCentroid());
   }
