@@ -65,7 +65,7 @@
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
-              "id" : "TGVnOg"
+              "id" : "TGVnOk5vdEF2YWlsYWJsZQ"
             },
             {
               "mode" : "BUS",
@@ -338,7 +338,7 @@
                 "arrival" : "PT10M"
               },
               "accessibilityScore" : null,
-	      "id" : "TGVnOg"
+              "id": "TGVnOk5vdEF2YWlsYWJsZQ"
             }
           ]
         }

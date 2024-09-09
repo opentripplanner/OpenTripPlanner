@@ -331,7 +331,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
       var ref = getSource(environment).getLegReference();
-      var id = (ref == null) ? "" : LegReferenceSerializer.encode(ref);
+      var id = LegReferenceSerializer.encode(ref);
       return new Relay.ResolvedGlobalId("Leg", id);
     };
   }

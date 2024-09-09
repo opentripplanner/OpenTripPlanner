@@ -89,8 +89,8 @@ class LegReferenceSerializerTest {
   }
 
   @Test
-  void testNullSerializedLegReference() {
-    assertNull(LegReferenceSerializer.decode(null));
+  void testUnresolvedSerializedLegReference() {
+    assertNull(LegReferenceSerializer.decode(LegReferenceSerializer.notAvailable));
   }
 
   @Test

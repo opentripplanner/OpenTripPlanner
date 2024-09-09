@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
  */
 public class LegReferenceSerializer {
 
+  public static final String notAvailable = "NotAvailable";
+
   private static final Logger LOG = LoggerFactory.getLogger(LegReferenceSerializer.class);
 
   /** private constructor to prevent instantiating this utility class */
@@ -26,7 +28,7 @@ public class LegReferenceSerializer {
   @Nullable
   public static String encode(LegReference legReference) {
     if (legReference == null) {
-      return null;
+      return notAvailable;
     }
     LegReferenceType typeEnum = LegReferenceType
       .forClass(legReference.getClass())
@@ -47,7 +49,7 @@ public class LegReferenceSerializer {
 
   @Nullable
   public static LegReference decode(String legReference) {
-    if (legReference == null) {
+    if (legReference.equals(notAvailable)) {
       return null;
     }
 
