@@ -53,7 +53,7 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertEquals(
       "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
-      env.getScheduledTimetable(id(TRIP_1_ID))
+      env.getScheduledTimetable(TRIP_1_ID)
     );
     assertEquals(
       "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
