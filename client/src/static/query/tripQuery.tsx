@@ -63,6 +63,7 @@ export const query = graphql(`
           line {
             publicCode
             name
+            id
           }
           authority {
             name

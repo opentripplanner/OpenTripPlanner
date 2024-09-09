@@ -1,6 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
 import { queryAsString } from '../../static/query/tripQuery.tsx';
+const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
 
 function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQueryVariables }) {
   const formattedVariables = encodeURIComponent(JSON.stringify(tripQueryVariables));
@@ -9,12 +10,7 @@ function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQ
   return (
     <div className="search-bar-route-button-wrapper">
       <Button
-        href={
-          'https://otp2debug.dev.entur.org/graphiql?flavor=transmodel&query=' +
-          formattedQuery +
-          '&variables=' +
-          formattedVariables
-        }
+        href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedVariables}
         target={'_blank'}
       >
         GraphQL
