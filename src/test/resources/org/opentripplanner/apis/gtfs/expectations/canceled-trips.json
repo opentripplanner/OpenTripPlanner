@@ -1,11 +1,11 @@
 {
   "data": {
     "canceledTrips": {
-      "pageInfo" : {
-        "hasNextPage" : false,
-        "hasPreviousPage" : false,
-        "startCursor" : "c2ltcGxlLWN1cnNvcjA=",
-        "endCursor" : "c2ltcGxlLWN1cnNvcjA="
+      "pageInfo": {
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "c2ltcGxlLWN1cnNvcjA=",
+        "endCursor": "c2ltcGxlLWN1cnNvcjA="
       },
       "edges": [
         {
@@ -29,7 +29,7 @@
               "code": "F:BUS"
             },
             "route": {
-              "gtfsId": "F:R123"
+              "gtfsId": "F:R321Canceled"
             },
             "stops": [
               {

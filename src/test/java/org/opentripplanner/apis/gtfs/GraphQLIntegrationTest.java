@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner._support.time.ZoneIds.BERLIN;
 import static org.opentripplanner.model.plan.PlanTestConstants.D10m;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
@@ -36,7 +37,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.collection.ListUtils;
@@ -175,6 +175,15 @@ class GraphQLIntegrationTest {
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
     pattern.add(tripTimes);
 
+    var trip2 = TransitModelForTest
+      .trip("321Canceled")
+      .withHeadsign(I18NString.of("Trip Headsign"))
+      .withServiceId(cal_id)
+      .build();
+    var stopTimes2 = TEST_MODEL.stopTimesEvery5Minutes(3, trip2, T11_30);
+    var tripTimes2 = TripTimesFactory.tripTimes(trip2, stopTimes2, DEDUPLICATOR);
+    pattern.add(tripTimes2);
+
     transitModel.addTripPattern(id("pattern-1"), pattern);
 
     var feedId = "testfeed";
@@ -189,7 +198,7 @@ class GraphQLIntegrationTest {
       .build();
     transitModel.addAgency(agency);
 
-    transitModel.initTimeZone(ZoneIds.BERLIN);
+    transitModel.initTimeZone(BERLIN);
     transitModel.index();
     var routes = Arrays
       .stream(TransitMode.values())
@@ -223,19 +232,18 @@ class GraphQLIntegrationTest {
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
     calendarServiceData.putServiceDatesForServiceId(
       cal_id,
-      List.of(LocalDate.of(2024, 8, 8), LocalDate.of(2024, 8, 9))
+      List.of(firstDate, secondDate)
     );
     transitModel.getServiceCodes().put(cal_id, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
     transitModel.initTimetableSnapshotProvider(() -> {
       TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-      var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_30);
-      var canceledTripTimes = TripTimesFactory.tripTimes(trip, canceledStopTimes, DEDUPLICATOR);
-      pattern.add(canceledTripTimes);
-      canceledTripTimes.cancelTrip();
-      timetableSnapshot.update(pattern, canceledTripTimes, LocalDate.now());
+      tripTimes2.cancelTrip();
+      timetableSnapshot.update(pattern, tripTimes2, secondDate);
 
       return timetableSnapshot.commit();
     });

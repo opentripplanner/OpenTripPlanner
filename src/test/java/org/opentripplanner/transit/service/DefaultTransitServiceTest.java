@@ -80,9 +80,11 @@ class DefaultTransitServiceTest {
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
     calendarServiceData.putServiceDatesForServiceId(
       CALENDAR_ID,
-      List.of(LocalDate.of(2024, 8, 8), LocalDate.of(2024, 8, 9))
+      List.of(firstDate, secondDate)
     );
     transitModel.getServiceCodes().put(CALENDAR_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
@@ -98,8 +100,9 @@ class DefaultTransitServiceTest {
           .withDepartureTimes(new int[] { 0, 1 })
           .build()
       );
-      timetableSnapshot.update(REAL_TIME_PATTERN, tripTimes, LocalDate.now());
-      timetableSnapshot.update(RAIL_PATTERN, canceledTripTimes, LocalDate.now());
+      timetableSnapshot.update(REAL_TIME_PATTERN, tripTimes, firstDate);
+      timetableSnapshot.update(RAIL_PATTERN, canceledTripTimes, firstDate);
+      timetableSnapshot.update(RAIL_PATTERN, canceledTripTimes, secondDate);
 
       return timetableSnapshot.commit();
     });
