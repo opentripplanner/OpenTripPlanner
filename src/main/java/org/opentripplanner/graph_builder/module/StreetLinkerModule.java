@@ -261,7 +261,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkTransitStationCentroids(Graph graph) {
-    LOG.info("Linking TransitStationCentroidVertices to graph...");
+    LOG.info(
+      "Linking instances of {} to graph...",
+      TransitStationCentroidVertex.class.getSimpleName()
+    );
     for (TransitStationCentroidVertex tVertex : graph.getVerticesOfType(
       TransitStationCentroidVertex.class
     )) {

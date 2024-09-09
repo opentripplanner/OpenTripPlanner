@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.CoordinateHelper;
+import org.opentripplanner._support.geometry.CoordinateHelper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;

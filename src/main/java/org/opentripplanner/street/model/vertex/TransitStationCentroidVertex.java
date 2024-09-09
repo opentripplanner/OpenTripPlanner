@@ -4,6 +4,9 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.site.Station;
 
+/**
+ * A vertex representing a station centroid. This can be used as a source/destination for routing.
+ */
 public class TransitStationCentroidVertex extends Vertex {
 
   private final Station station;

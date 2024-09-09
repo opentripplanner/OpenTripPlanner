@@ -155,6 +155,9 @@ public class Station
     return timezone;
   }
 
+  /**
+   * Whether this station is accessible by wheelchair or not.
+   */
   public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }

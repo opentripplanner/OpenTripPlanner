@@ -1,4 +1,4 @@
-package org.opentripplanner;
+package org.opentripplanner._support.geometry;
 
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;

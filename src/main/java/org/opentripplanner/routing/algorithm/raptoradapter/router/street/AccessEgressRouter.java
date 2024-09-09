@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.graph_builder.module.nearbystops.DirectlyConnectedStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -77,12 +78,8 @@ public class AccessEgressRouter {
     )
       .findNearbyStops(originVertices, request, streetRequest, accessOrEgress.isEgress());
 
-    List<NearbyStop> results = Stream
-      .concat(directAccessEgress.stream(), streetAccessEgress.stream())
-      .toList();
-
+    var results = ListUtils.combine(directAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);
-
     return results;
   }
 

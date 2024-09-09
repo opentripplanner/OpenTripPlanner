@@ -16,7 +16,7 @@ import org.opentripplanner.street.search.state.State;
 public class DirectlyConnectedStopFinder {
 
   /**
-   * Given a list of vertices, find the ones that corresponds to stops and return them as NearbyStops
+   * Given a list of vertices, find the ones that correspond to stops and return them as NearbyStops
    */
   public static List<NearbyStop> findDirectlyConnectedStops(
     Set<Vertex> originVertices,
