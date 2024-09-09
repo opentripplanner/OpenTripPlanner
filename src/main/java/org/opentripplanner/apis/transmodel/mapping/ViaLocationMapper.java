@@ -9,7 +9,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-class PassThroughLocationMapper {
+class ViaLocationMapper {
 
   static List<ViaLocation> toLocations(
     final TransitService transitService,

@@ -44,7 +44,7 @@ public class TripRequestMapper {
     callWith.argument(
       "passThroughPoints",
       (List<Map<String, Object>> v) -> {
-        request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v));
+        request.setPassThroughPoints(ViaLocationMapper.toLocations(transitService, v));
       }
     );
 
