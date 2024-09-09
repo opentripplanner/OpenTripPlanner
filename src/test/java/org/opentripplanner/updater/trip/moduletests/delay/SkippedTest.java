@@ -167,10 +167,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
   }
 
-  private static void assertNewTripTimesIsUpdated(
-    RealtimeTestEnvironment env,
-    String tripId
-  ) {
+  private static void assertNewTripTimesIsUpdated(RealtimeTestEnvironment env, String tripId) {
     var trip = env.getTransitService().getTripForId(id(tripId));
     var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
     var snapshot = env.getTimetableSnapshot();
