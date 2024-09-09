@@ -23,7 +23,8 @@ import org.opentripplanner.transit.model.organization.Operator;
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
  * given {@link TransitMode}, on a given sequence of stops served at given passing times.
- * <p>A Trip can run at most once per service date.
+ * <p>A scheduled Trip can run at most once per service date,
+ * while a frequency-based Trip runs several times on a given service date.
  * <p>A Trip can run on multiple service dates.
  * <p>The service dates on which a trip is running are identified
  * by its service id and can be looked up with
