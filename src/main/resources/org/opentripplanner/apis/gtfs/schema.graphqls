@@ -4323,24 +4323,24 @@ Represents an element that must be visited by the routing result.
 Right now only stop or station IDs are supported but this will be extended to support via point
 coordinates as well.
 """
-input ViaElementInput {
+input ViaLocationInput {
   """
   The list of *stop location ids* which define the pass-through point. At least one id is required.
   Stop and Station are supported location types.
   The journey must pass through at least one of these entities - not all of them.
   """
-  placeIds: [String!]
+  locationIds: [String!]
 }
 
 "Defines a point which the routing result must visit."
 input ViaPointInput {
+  "Optional label of the via point for debugging and logging. It is not used in routing."
+  label: String
   """
   The place that must be visited by the via routing result. Right now only stops and stations are
   supported but this will be extended to cover coordinates as well.
   """
-  element: ViaElementInput!
-  "Optional name of the via point for debugging and logging. It is not used in routing."
-  name: String
+  place: ViaLocationInput!
 }
 
 "Preferences related to walking (excluding walking a bicycle or a scooter)."
