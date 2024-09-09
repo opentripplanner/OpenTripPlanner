@@ -11,7 +11,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -35,10 +34,9 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
 
-    var trip2Id = id(TRIP_2_ID);
-    assertOriginalTripPatternIsDeleted(env, trip2Id);
+    assertOriginalTripPatternIsDeleted(env, TRIP_2_ID);
 
-    assertNewTripTimesIsUpdated(env, trip2Id);
+    assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
     assertEquals(
       "UPDATED | A1 0:01 0:01:01 | B1 [C] 0:01:52 0:01:58 | C1 0:02:50 0:02:51",
@@ -58,9 +56,8 @@ class SkippedTest implements RealtimeTestConstants {
   @Test
   void scheduledTripWithPreviouslySkipped() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
-    var tripId = id(TRIP_2_ID);
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -69,7 +66,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertSuccess(env.applyTripUpdate(tripUpdate, DIFFERENTIAL));
 
     // Create update to the same trip but now the skipped stop is no longer skipped
-    var scheduledBuilder = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var scheduledBuilder = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
       .addDelayedStopTime(2, 90);
@@ -83,17 +80,17 @@ class SkippedTest implements RealtimeTestConstants {
     // stoptime updates have gone through
     var snapshot = env.getTimetableSnapshot();
 
-    assertNull(snapshot.getRealtimeAddedTripPattern(tripId, SERVICE_DATE));
+    assertNull(snapshot.getRealtimeAddedTripPattern(id(TRIP_2_ID), SERVICE_DATE));
 
-    assertNewTripTimesIsUpdated(env, tripId);
+    assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
     assertEquals(
       "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
-      env.getScheduledTimetable(tripId)
+      env.getScheduledTimetable(TRIP_2_ID)
     );
     assertEquals(
       "UPDATED | A1 0:01 0:01:01 | B1 0:02 0:02:01 | C1 0:02:50 0:02:51",
-      env.getRealtimeTimetable(tripId, SERVICE_DATE)
+      env.getRealtimeTimetable(id(TRIP_2_ID), SERVICE_DATE)
     );
   }
 
@@ -104,9 +101,9 @@ class SkippedTest implements RealtimeTestConstants {
   void skippedNoData() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
-    final FeedScopedId tripId = id(TRIP_2_ID);
+    String tripId = TRIP_2_ID;
 
-    var tripUpdate = new TripUpdateBuilder(tripId.getId(), SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)
@@ -120,15 +117,15 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertEquals(
       "UPDATED | A1 [ND] 0:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 [ND] 0:01:20 0:01:21",
-      env.getRealtimeTimetable(tripId.getId())
+      env.getRealtimeTimetable(tripId)
     );
   }
 
   private static void assertOriginalTripPatternIsDeleted(
     RealtimeTestEnvironment env,
-    FeedScopedId tripId
+    String tripId
   ) {
-    var trip = env.getTransitService().getTripForId(tripId);
+    var trip = env.getTransitService().getTripForId(id(tripId));
     var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
@@ -172,9 +169,9 @@ class SkippedTest implements RealtimeTestConstants {
 
   private static void assertNewTripTimesIsUpdated(
     RealtimeTestEnvironment env,
-    FeedScopedId tripId
+    String tripId
   ) {
-    var trip = env.getTransitService().getTripForId(tripId);
+    var trip = env.getTransitService().getTripForId(id(tripId));
     var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);

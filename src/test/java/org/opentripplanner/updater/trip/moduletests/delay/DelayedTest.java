@@ -68,9 +68,7 @@ class DelayedTest implements RealtimeTestConstants {
   void complexDelay() {
     var env = RealtimeTestEnvironment.gtfs().withTrip2().build();
 
-    var tripId = TRIP_2_ID;
-
-    var tripUpdate = new TripUpdateBuilder(tripId, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60, 80)
       .addDelayedStopTime(2, 90, 90)
@@ -80,7 +78,7 @@ class DelayedTest implements RealtimeTestConstants {
 
     var snapshot = env.getTimetableSnapshot();
 
-    var trip2 = env.getTransitService().getTripForId(id(tripId));
+    var trip2 = env.getTransitService().getTripForId(id(TRIP_2_ID));
     var originalTripPattern = env.getTransitService().getPatternForTrip(trip2);
 
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
@@ -88,7 +86,7 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-    final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(tripId);
+    final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(TRIP_2_ID);
     assertTrue(
       originalTripIndexScheduled > -1,
       "Original trip should be found in scheduled time table"
@@ -102,7 +100,7 @@ class DelayedTest implements RealtimeTestConstants {
     );
     assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
 
-    final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(tripId);
+    final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(TRIP_2_ID);
     assertTrue(
       originalTripIndexForToday > -1,
       "Original trip should be found in time table for service date"
