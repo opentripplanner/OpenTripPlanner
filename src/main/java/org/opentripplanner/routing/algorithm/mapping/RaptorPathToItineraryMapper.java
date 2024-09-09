@@ -287,8 +287,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   /**
-   * If a routing result transfers at the very same stop RAPTOR doesn't add a path leg. However,
-   * sometimes we want to create a zero distance leg so the UI can show a transfer. Since it would
+   * If a routing result transfers at the very same stop, RAPTOR doesn't add a path leg. However,
+   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would
    * be considered backwards-incompatible, this is an opt-in feature.
    */
   private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
