@@ -2,29 +2,33 @@ package org.opentripplanner.raptor.util.paretoset;
 
 import java.util.Objects;
 
-class Vector {
+/**
+ * Create a value object type to test the ParetoSet "generic" type criteria. We create a new type
+ * to isolate the tests in this package from any other randomly chosen type.
+ */
+class TestVector {
 
   private static final int NOT_SET = -999;
   final String name;
   final int v1, v2, v3, v4;
 
-  Vector(Vector o) {
+  TestVector(TestVector o) {
     this(o.name, o.v1, o.v2, o.v3, o.v4);
   }
 
-  Vector(String name, int v1) {
+  TestVector(String name, int v1) {
     this(name, v1, NOT_SET, NOT_SET, NOT_SET);
   }
 
-  Vector(String name, int v1, int v2) {
+  TestVector(String name, int v1, int v2) {
     this(name, v1, v2, NOT_SET, NOT_SET);
   }
 
-  Vector(String name, int v1, int v2, int v3) {
+  TestVector(String name, int v1, int v2, int v3) {
     this(name, v1, v2, v3, NOT_SET);
   }
 
-  Vector(String name, int v1, int v2, int v3, int v4) {
+  TestVector(String name, int v1, int v2, int v3, int v4) {
     this.name = name;
     this.v1 = v1;
     this.v2 = v2;
@@ -45,7 +49,7 @@ class Vector {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Vector v = (Vector) o;
+    TestVector v = (TestVector) o;
     return v1 == v.v1 && v2 == v.v2 && v3 == v.v3 && v4 == v.v4 && name.equals(v.name);
   }
 
