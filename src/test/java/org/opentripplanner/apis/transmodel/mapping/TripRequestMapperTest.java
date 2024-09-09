@@ -324,10 +324,10 @@ public class TripRequestMapperTest implements PlanTestConstants {
     final List<PassThroughPoint> points = TripRequestMapper
       .createRequest(executionContext(arguments))
       .getPassThroughPoints();
-    assertEquals(PTP1, points.get(0).stopLocations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP1", points.get(0).name());
-    assertEquals(PTP2, points.get(1).stopLocations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP2", points.get(1).name());
+    assertEquals(PTP1, points.get(0).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP1", points.get(0).label());
+    assertEquals(PTP2, points.get(1).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP2", points.get(1).label());
   }
 
   @Test

@@ -7,14 +7,14 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * Defines one pass-through point which the journey must pass through.
  */
-public record PassThroughPoint(List<StopLocation> stopLocations, @Nullable String name) {
+public record PassThroughPoint(@Nullable String label, List<StopLocation> locations) {
   /**
    * Get the one or multiple stops of the pass-through point, of which only one is required to be
    * passed through.
    */
   @Override
-  public List<StopLocation> stopLocations() {
-    return stopLocations;
+  public List<StopLocation> locations() {
+    return locations;
   }
 
   /**
@@ -22,7 +22,7 @@ public record PassThroughPoint(List<StopLocation> stopLocations, @Nullable Strin
    */
   @Override
   @Nullable
-  public String name() {
-    return name;
+  public String label() {
+    return label;
   }
 }

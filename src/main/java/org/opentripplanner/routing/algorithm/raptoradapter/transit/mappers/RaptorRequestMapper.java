@@ -184,8 +184,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       .getPassThroughPoints()
       .stream()
       .map(p -> {
-        final int[] stops = p.stopLocations().stream().mapToInt(StopLocation::getIndex).toArray();
-        return new PassThroughPoint(p.name(), stops);
+        final int[] stops = p.locations().stream().mapToInt(StopLocation::getIndex).toArray();
+        return new PassThroughPoint(p.label(), stops);
       })
       .toList();
   }

@@ -43,6 +43,6 @@ class PassThroughLocationMapper {
         }
         return stopLocations.stream();
       })
-      .collect(collectingAndThen(toList(), sls -> new PassThroughPoint(sls, name)));
+      .collect(collectingAndThen(toList(), sls -> new PassThroughPoint(name, sls)));
   }
 }
