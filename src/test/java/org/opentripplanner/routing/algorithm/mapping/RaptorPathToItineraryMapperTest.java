@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,12 +20,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestRoute;
@@ -113,6 +117,15 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   @Test
+  void noExtraLegWhenTransferringAtSameStop() {
+    var mapper = getRaptorPathToItineraryMapper();
+
+    var path = transferAtSameStopPath();
+    var itinerary = mapper.createItinerary(path);
+    assertThat(itinerary.getLegs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
+  }
+
+  @Test
   void extraLegWhenTransferringAtSameStop() {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
@@ -122,9 +135,14 @@ public class RaptorPathToItineraryMapperTest {
       .bus(schedule, 2)
       .bus(schedule, 1)
       .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
-    var itinerary = mapper.createItinerary(path);
 
-    assertEquals(3, itinerary.getLegs().size());
+    OTPFeature.ExtraTransferLegOnSameStop.testOn(() -> {
+      var itinerary = mapper.createItinerary(path);
+      assertEquals(
+        List.of(TransitLeg.class, StreetLeg.class, TransitLeg.class),
+        itinerary.getLegs().stream().map(Leg::getClass)
+      );
+    });
   }
 
   @Test
@@ -196,15 +214,6 @@ public class RaptorPathToItineraryMapperTest {
     // Assert
     assertNotNull(itinerary);
     assertEquals(3, itinerary.getLegs().size(), "The wrong number of legs was returned");
-  }
-
-  @Test
-  void noExtraLegWhenTransferringAtSameStop() {
-    var mapper = getRaptorPathToItineraryMapper();
-
-    var path = transferAtSameStopPath();
-    var itinerary = mapper.createItinerary(path);
-    assertThat(itinerary.getLegs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
   }
 
   private RaptorPath<TestTripSchedule> transferAtSameStopPath() {
