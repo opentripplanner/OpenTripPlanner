@@ -11,9 +11,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -33,9 +31,11 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder withTrip1() {
     createTrip(
-      TRIP_1_ID,
-      ROUTE_1,
-      List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
+      new RealtimeTripInput(
+        TRIP_1_ID,
+        ROUTE_1,
+        List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
+      )
     );
     transitModel.index();
     return this;
@@ -43,12 +43,14 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder withTrip2() {
     createTrip(
-      TRIP_2_ID,
-      ROUTE_1,
-      List.of(
-        new StopCall(STOP_A1, 60, 61),
-        new StopCall(STOP_B1, 70, 71),
-        new StopCall(STOP_C1, 80, 81)
+      new RealtimeTripInput(
+        TRIP_2_ID,
+        ROUTE_1,
+        List.of(
+          new StopCall(STOP_A1, 60, 61),
+          new StopCall(STOP_B1, 70, 71),
+          new StopCall(STOP_C1, 80, 81)
+        )
       )
     );
 
@@ -72,11 +74,11 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     return new RealtimeTestEnvironment(sourceType, transitModel);
   }
 
-  private Trip createTrip(String id, Route route, List<StopCall> stops) {
+  private Trip createTrip(RealtimeTripInput tripInput) {
     var trip = Trip
-      .of(id(id))
-      .withRoute(route)
-      .withHeadsign(I18NString.of("Headsign of %s".formatted(id)))
+      .of(id(tripInput.id()))
+      .withRoute(tripInput.route())
+      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
       .withServiceId(SERVICE_ID)
       .build();
 
@@ -89,9 +91,9 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
 
     var stopTimes = IntStream
-      .range(0, stops.size())
+      .range(0, tripInput.stops().size())
       .mapToObj(i -> {
-        var stop = stops.get(i);
+        var stop = tripInput.stops().get(i);
         return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
       })
       .toList();
@@ -99,8 +101,10 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
     final TripPattern pattern = TransitModelForTest
-      .tripPattern(id + "Pattern", route)
-      .withStopPattern(TransitModelForTest.stopPattern(stops.stream().map(StopCall::stop).toList()))
+      .tripPattern(tripInput.id() + "Pattern", tripInput.route())
+      .withStopPattern(
+        TransitModelForTest.stopPattern(tripInput.stops().stream().map(StopCall::stop).toList())
+      )
       .build();
     pattern.add(tripTimes);
 
@@ -124,6 +128,4 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     st.setDepartureTime(departureTime);
     return st;
   }
-
-  private record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
 }
