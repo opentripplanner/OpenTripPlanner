@@ -10,6 +10,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTripInput;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
@@ -45,7 +46,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourney() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().build();
     var updates = createValidAddedJourney(env);
     var result = env.applyEstimatedTimetable(updates);
 
@@ -59,7 +60,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourneyMultipleTimes() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().build();
     var updates = createValidAddedJourney(env);
 
     int numTrips = env.getTransitService().getAllTrips().size();
@@ -434,10 +435,10 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
       .withIsExtraJourney(true)
-      .withOperatorRef(env.operator1Id.getId())
-      .withLineRef(env.route1Id.getId())
-      .withRecordedCalls(builder -> builder.call(env.stopC1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(env.stopD1).arriveAimedExpected("00:03", "00:04"))
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
+      .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
   }
 
