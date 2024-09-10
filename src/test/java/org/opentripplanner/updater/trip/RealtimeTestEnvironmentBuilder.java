@@ -43,7 +43,6 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder addTrip(RealtimeTripInput trip) {
     createTrip(trip);
-
     transitModel.index();
     return this;
   }
