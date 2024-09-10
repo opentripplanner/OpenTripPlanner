@@ -10,7 +10,7 @@ function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQ
   return (
     <div className="search-bar-route-button-wrapper">
       <Button href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedVariables} target={'_blank'}>
-        GraphQL
+        GraphiQL
       </Button>
     </div>
   );
