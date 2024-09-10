@@ -1,18 +1,19 @@
-package org.opentripplanner.apis.gtfs;
+package org.opentripplanner.transit.service;
 
 import static java.time.LocalDate.parse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
 import static org.opentripplanner.apis.gtfs.PatternTestModel.ROUTE_1;
+import static org.opentripplanner.transit.service.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
+import static org.opentripplanner.transit.service.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
 
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.apis.gtfs.PatternTestModel;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.network.TripPattern;
 

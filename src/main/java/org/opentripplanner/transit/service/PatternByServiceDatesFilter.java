@@ -1,16 +1,14 @@
-package org.opentripplanner.apis.gtfs;
+package org.opentripplanner.transit.service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Encapsulates the logic to filter patterns by the service dates that they operate on. It also
@@ -43,17 +41,6 @@ public class PatternByServiceDatesFilter {
     } else if (range.startBeforeEnd()) {
       throw new IllegalArgumentException("start must be before end");
     }
-  }
-
-  public PatternByServiceDatesFilter(
-    GraphQLTypes.GraphQLLocalDateRangeInput filterInput,
-    TransitService transitService
-  ) {
-    this(
-      new LocalDateRange(filterInput.getGraphQLStart(), filterInput.getGraphQLEnd()),
-      transitService::getPatternsForRoute,
-      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
-    );
   }
 
   /**
