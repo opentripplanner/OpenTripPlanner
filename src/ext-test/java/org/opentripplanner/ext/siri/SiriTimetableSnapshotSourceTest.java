@@ -14,6 +14,7 @@ import org.opentripplanner.updater.trip.RealtimeTripInput;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
+
   private static final RealtimeTripInput TRIP_1_INPUT = RealtimeTripInput
     .of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -46,7 +47,8 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourney() {
-    var env = RealtimeTestEnvironment.siri().build();
+    // we actually don't need the trip, but it's the only way to add a route to the index
+    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
     var updates = createValidAddedJourney(env);
     var result = env.applyEstimatedTimetable(updates);
 
@@ -60,7 +62,8 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourneyMultipleTimes() {
-    var env = RealtimeTestEnvironment.siri().build();
+    // we actually don't need the trip, but it's the only way to add a route to the index
+    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
     var updates = createValidAddedJourney(env);
 
     int numTrips = env.getTransitService().getAllTrips().size();
@@ -74,6 +77,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
+    // we actually don't need the trip, but it's the only way to add a route to the index
     var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
 
     // Create an extra journey with invalid planned data (travel back in time)

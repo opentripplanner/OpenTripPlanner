@@ -38,5 +38,5 @@ public record RealtimeTripInput(String id, Route route, List<StopCall> stops) {
     }
   }
 
-  static record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
+  record StopCall(RegularStop stop, int arrivalTime, int departureTime) {}
 }
