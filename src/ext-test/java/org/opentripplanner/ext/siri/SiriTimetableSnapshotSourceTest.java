@@ -12,6 +12,7 @@ import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.RealtimeTripInput;
 
 class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
+
   private static final RealtimeTripInput TRIP_1_INPUT = RealtimeTripInput
     .of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -24,7 +25,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     .addStop(STOP_B1, "0:01:10", "0:01:11")
     .addStop(STOP_C1, "0:01:20", "0:01:21")
     .build();
-  
+
   @Test
   void testCancelTrip() {
     var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();

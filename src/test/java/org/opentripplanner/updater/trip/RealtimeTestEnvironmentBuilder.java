@@ -29,18 +29,6 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     return this;
   }
 
-  public RealtimeTestEnvironmentBuilder withTrip1() {
-    createTrip(
-      RealtimeTripInput
-        .of(TRIP_1_ID)
-        .addStop(STOP_A1, "0:00:10", "0:00:11")
-        .addStop(STOP_B1, "0:00:20", "0:00:21")
-        .build()
-    );
-    transitModel.index();
-    return this;
-  }
-
   public RealtimeTestEnvironmentBuilder addTrip(RealtimeTripInput trip) {
     createTrip(trip);
     transitModel.index();

@@ -25,7 +25,12 @@ class DelayedTest implements RealtimeTestConstants {
 
   @Test
   void singleStopDelay() {
-    var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
+    var TRIP_INPUT = RealtimeTripInput
+      .of(TRIP_1_ID)
+      .addStop(STOP_A1, "0:00:10", "0:00:11")
+      .addStop(STOP_B1, "0:00:20", "0:00:21")
+      .build();
+    var env = RealtimeTestEnvironment.gtfs().addTrip(TRIP_INPUT).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)

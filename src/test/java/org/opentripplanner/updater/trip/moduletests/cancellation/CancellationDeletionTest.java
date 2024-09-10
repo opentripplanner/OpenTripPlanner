@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -34,7 +35,16 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.gtfs().withTrip1().build();
+    var env = RealtimeTestEnvironment
+      .gtfs()
+      .addTrip(
+        RealtimeTripInput
+          .of(TRIP_1_ID)
+          .addStop(STOP_A1, "0:00:10", "0:00:11")
+          .addStop(STOP_B1, "0:00:20", "0:00:21")
+          .build()
+      )
+      .build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
     final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(id(TRIP_1_ID));
