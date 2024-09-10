@@ -1,7 +1,10 @@
 package org.opentripplanner.framework.collection.snapshot.impl;
 
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.framework.collection.snapshot.MutableSnapMultimap;
@@ -14,8 +17,10 @@ public class MutableHashSnapMultimap<K, V>
   extends ImmutableHashSnapMultimap<K, V>
   implements MutableSnapMultimap<K, V> {
 
-  // Track which lists we created, to avoid redundant copy-on-write between snapshots.
-  private Set<List<V>> ownedLists = new HashSet<>();
+  // Track which lists we created, to avoid redundant copy-on-write between snapshots. This is
+  // intentionally using identity (reference) equality instead of Set's default semantic equality.
+  // Guava Sets.newIdentityHashSet is just a facade for the approach here.
+  private Set<List<V>> ownedLists = Collections.newSetFromMap(new IdentityHashMap<>());
 
   /// Private and protected constructors. Called from public factory methods.
 
