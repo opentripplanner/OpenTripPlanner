@@ -10,8 +10,13 @@
       filters: [{ select: [{ tags: ["e"] }] }]
     }
     transportModes: [{ mode: CAR, qualifier: HAIL }]
-    viaPoints: [
-      { label: "Flower shop", place: { locationIds: ["F:A", "F:B"] } }
+    via: [
+      {
+        passThroughLocation: {
+          label: "A stop that you want to visit along the route"
+          stopLocationId: "F:A"
+        }
+      }
     ]
   ) {
     itineraries {

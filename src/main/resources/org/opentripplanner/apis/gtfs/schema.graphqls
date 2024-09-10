@@ -1473,7 +1473,7 @@ type QueryType {
     "List of routes and agencies which are given lower preference when planning the itinerary"
     unpreferred: InputUnpreferred,
     "The list of points the journey is required to pass through."
-    viaPoints: [ViaPointInput!],
+    via: [ViaLocationInput!],
     """
     How much less bad is waiting at the beginning of the trip (replaces
     `waitReluctance` on the first boarding). Default value: 0.4
@@ -3945,6 +3945,14 @@ input ParkingFilterOperation {
   tags: [String]
 }
 
+"A stop that must be visited by the routing result."
+input PassThroughLocationInput {
+  "Optional label of the via point for debugging and logging. It is not used in routing."
+  label: String
+  "The ID of the stop or station to visit. Should be in the format <FeedId>:<LocationId>."
+  stopLocationId: String!
+}
+
 "A coordinate used for a location in a plan query."
 input PlanCoordinateInput {
   "Latitude as a WGS84 format number."
@@ -4324,23 +4332,7 @@ Right now only stop or station IDs are supported but this will be extended to su
 coordinates as well.
 """
 input ViaLocationInput {
-  """
-  The list of *stop location ids* which define the pass-through point. At least one id is required.
-  Stop and Station are supported location types.
-  The journey must pass through at least one of these entities - not all of them.
-  """
-  locationIds: [String!]
-}
-
-"Defines a point which the routing result must visit."
-input ViaPointInput {
-  "Optional label of the via point for debugging and logging. It is not used in routing."
-  label: String
-  """
-  The place that must be visited by the via routing result. Right now only stops and stations are
-  supported but this will be extended to cover coordinates as well.
-  """
-  place: ViaLocationInput!
+  passThroughLocation: PassThroughLocationInput
 }
 
 "Preferences related to walking (excluding walking a bicycle or a scooter)."

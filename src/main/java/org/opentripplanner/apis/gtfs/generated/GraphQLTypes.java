@@ -1421,6 +1421,35 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPassThroughLocationInput {
+
+    private String label;
+    private String stopLocationId;
+
+    public GraphQLPassThroughLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.label = (String) args.get("label");
+        this.stopLocationId = (String) args.get("stopLocationId");
+      }
+    }
+
+    public String getGraphQLLabel() {
+      return this.label;
+    }
+
+    public String getGraphQLStopLocationId() {
+      return this.stopLocationId;
+    }
+
+    public void setGraphQLLabel(String label) {
+      this.label = label;
+    }
+
+    public void setGraphQLStopLocationId(String stopLocationId) {
+      this.stopLocationId = stopLocationId;
+    }
+  }
+
   public static class GraphQLPatternAlertsArgs {
 
     private List<GraphQLPatternAlertType> types;
@@ -2673,7 +2702,7 @@ public class GraphQLTypes {
     private List<GraphQLTransportModeInput> transportModes;
     private GraphQLInputTriangleInput triangle;
     private GraphQLInputUnpreferredInput unpreferred;
-    private List<GraphQLViaPointInput> viaPoints;
+    private List<GraphQLViaLocationInput> via;
     private Double waitAtBeginningFactor;
     private Double waitReluctance;
     private Integer walkBoardCost;
@@ -2755,8 +2784,8 @@ public class GraphQLTypes {
         this.triangle = new GraphQLInputTriangleInput((Map<String, Object>) args.get("triangle"));
         this.unpreferred =
           new GraphQLInputUnpreferredInput((Map<String, Object>) args.get("unpreferred"));
-        if (args.get("viaPoints") != null) {
-          this.viaPoints = (List<GraphQLViaPointInput>) args.get("viaPoints");
+        if (args.get("via") != null) {
+          this.via = (List<GraphQLViaLocationInput>) args.get("via");
         }
         this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
         this.waitReluctance = (Double) args.get("waitReluctance");
@@ -2989,8 +3018,8 @@ public class GraphQLTypes {
       return this.unpreferred;
     }
 
-    public List<GraphQLViaPointInput> getGraphQLViaPoints() {
-      return this.viaPoints;
+    public List<GraphQLViaLocationInput> getGraphQLVia() {
+      return this.via;
     }
 
     public Double getGraphQLWaitAtBeginningFactor() {
@@ -3251,8 +3280,8 @@ public class GraphQLTypes {
       this.unpreferred = unpreferred;
     }
 
-    public void setGraphQLViaPoints(List<GraphQLViaPointInput> viaPoints) {
-      this.viaPoints = viaPoints;
+    public void setGraphQLVia(List<GraphQLViaLocationInput> via) {
+      this.via = via;
     }
 
     public void setGraphQLWaitAtBeginningFactor(Double waitAtBeginningFactor) {
@@ -5075,49 +5104,23 @@ public class GraphQLTypes {
 
   public static class GraphQLViaLocationInput {
 
-    private List<String> locationIds;
+    private GraphQLPassThroughLocationInput passThroughLocation;
 
     public GraphQLViaLocationInput(Map<String, Object> args) {
       if (args != null) {
-        this.locationIds = (List<String>) args.get("locationIds");
+        this.passThroughLocation =
+          new GraphQLPassThroughLocationInput(
+            (Map<String, Object>) args.get("passThroughLocation")
+          );
       }
     }
 
-    public List<String> getGraphQLLocationIds() {
-      return this.locationIds;
+    public GraphQLPassThroughLocationInput getGraphQLPassThroughLocation() {
+      return this.passThroughLocation;
     }
 
-    public void setGraphQLLocationIds(List<String> locationIds) {
-      this.locationIds = locationIds;
-    }
-  }
-
-  public static class GraphQLViaPointInput {
-
-    private String label;
-    private GraphQLViaLocationInput place;
-
-    public GraphQLViaPointInput(Map<String, Object> args) {
-      if (args != null) {
-        this.label = (String) args.get("label");
-        this.place = new GraphQLViaLocationInput((Map<String, Object>) args.get("place"));
-      }
-    }
-
-    public String getGraphQLLabel() {
-      return this.label;
-    }
-
-    public GraphQLViaLocationInput getGraphQLPlace() {
-      return this.place;
-    }
-
-    public void setGraphQLLabel(String label) {
-      this.label = label;
-    }
-
-    public void setGraphQLPlace(GraphQLViaLocationInput place) {
-      this.place = place;
+    public void setGraphQLPassThroughLocation(GraphQLPassThroughLocationInput passThroughLocation) {
+      this.passThroughLocation = passThroughLocation;
     }
   }
 

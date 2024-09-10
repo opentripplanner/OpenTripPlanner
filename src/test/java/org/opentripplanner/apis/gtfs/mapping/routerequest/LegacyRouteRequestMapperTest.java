@@ -264,8 +264,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @Test
   void passThroughPoints() {
     Map<String, Object> arguments = Map.of(
-      "viaPoints",
-      List.of(Map.of("place", Map.of("locationIds", List.of("F:stop1"))))
+      "via",
+      List.of(Map.of("passThroughLocation", Map.of("stopLocationId", "F:stop1")))
     );
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(

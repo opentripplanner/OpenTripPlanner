@@ -266,7 +266,7 @@ public class LegacyRouteRequestMapper {
     TransitService transitService
   ) {
     callWith.argument(
-      "viaPoints",
+      "via",
       (List<Map<String, Object>> v) ->
         request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v))
     );
