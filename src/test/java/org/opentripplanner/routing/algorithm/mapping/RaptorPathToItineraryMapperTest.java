@@ -27,8 +27,8 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestRoute;
@@ -139,8 +139,8 @@ public class RaptorPathToItineraryMapperTest {
     OTPFeature.ExtraTransferLegOnSameStop.testOn(() -> {
       var itinerary = mapper.createItinerary(path);
       assertEquals(
-        List.of(TransitLeg.class, StreetLeg.class, TransitLeg.class),
-        itinerary.getLegs().stream().map(Leg::getClass)
+        List.of(ScheduledTransitLeg.class, StreetLeg.class, ScheduledTransitLeg.class),
+        itinerary.getLegs().stream().map(Leg::getClass).toList()
       );
     });
   }
