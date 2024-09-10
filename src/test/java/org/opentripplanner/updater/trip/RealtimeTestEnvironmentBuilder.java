@@ -80,7 +80,9 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     final TripPattern pattern = TransitModelForTest
       .tripPattern(tripInput.id() + "Pattern", tripInput.route())
       .withStopPattern(
-        TransitModelForTest.stopPattern(tripInput.stops().stream().map(StopCall::stop).toList())
+        TransitModelForTest.stopPattern(
+          tripInput.stops().stream().map(RealtimeTripInput.StopCall::stop).toList()
+        )
       )
       .build();
     pattern.add(tripTimes);
