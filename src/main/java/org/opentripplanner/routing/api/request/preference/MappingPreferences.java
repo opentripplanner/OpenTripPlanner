@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
+ * Contains preferences for mapping results of the A* and/or RAPTOR algorithms to itineraries.
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class MappingPreferences implements Serializable {
@@ -60,7 +61,7 @@ public final class MappingPreferences implements Serializable {
   public static class Builder {
 
     private final MappingPreferences original;
-    private Set<MappingFeature> optInFeatures = EnumSet.noneOf(MappingFeature.class);
+    private Set<MappingFeature> optInFeatures;
 
     public Builder(MappingPreferences original) {
       this.original = original;

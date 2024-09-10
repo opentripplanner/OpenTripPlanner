@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import org.opentripplanner.framework.doc.DocumentedEnum;
-import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 
 /**
- * Opt-in features for {@link RaptorPathToItineraryMapper}.
+ * Opt-in features for {@link org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper}.
  */
 public enum MappingFeature implements DocumentedEnum {
   /**
@@ -21,7 +20,7 @@ public enum MappingFeature implements DocumentedEnum {
   @Override
   public String enumValueDescription() {
     return switch (this) {
-      case TRANSFER_LEG_ON_SAME_STOP -> "When a transfer happens at the exact same stop, should a leg be inserted between the transit legs?";
+      case TRANSFER_LEG_ON_SAME_STOP -> "Inserts a zero distance walking leg when the transfer starts and ends at the exact same stop.";
     };
   }
 }
