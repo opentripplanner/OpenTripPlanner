@@ -6,12 +6,12 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-record RealtimeTripInput(String id, Route route, List<StopCall> stops) {
-  static RealtimeTripInputBuilder of(String id) {
+public record RealtimeTripInput(String id, Route route, List<StopCall> stops) {
+  public static RealtimeTripInputBuilder of(String id) {
     return new RealtimeTripInputBuilder(id);
   }
 
-  static class RealtimeTripInputBuilder implements RealtimeTestConstants {
+  public static class RealtimeTripInputBuilder implements RealtimeTestConstants {
 
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
@@ -22,14 +22,18 @@ record RealtimeTripInput(String id, Route route, List<StopCall> stops) {
       this.id = id;
     }
 
-    RealtimeTripInputBuilder addStop(RegularStop stopId, String arrivalTime, String departureTime) {
+    public RealtimeTripInputBuilder addStop(
+      RegularStop stopId,
+      String arrivalTime,
+      String departureTime
+    ) {
       this.stops.add(
           new StopCall(stopId, TimeUtils.time(arrivalTime), TimeUtils.time(departureTime))
         );
       return this;
     }
 
-    RealtimeTripInput build() {
+    public RealtimeTripInput build() {
       return new RealtimeTripInput(id, route, stops);
     }
   }

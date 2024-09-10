@@ -9,8 +9,16 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTripInput;
 
 class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
+
+  private static final RealtimeTripInput TRIP2_INPUT = RealtimeTripInput
+    .of(TRIP_2_ID)
+    .addStop(STOP_A1, "0:01:00", "0:01:01")
+    .addStop(STOP_B1, "0:01:10", "0:01:11")
+    .addStop(STOP_C1, "0:01:20", "0:01:21")
+    .build();
 
   @Test
   void testCancelTrip() {
@@ -245,7 +253,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testCancelStop() {
-    var env = RealtimeTestEnvironment.siri().withTrip2().build();
+    var env = RealtimeTestEnvironment.siri().addTrip(TRIP2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)
@@ -362,7 +370,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testNegativeDwellTime() {
-    var env = RealtimeTestEnvironment.siri().withTrip2().build();
+    var env = RealtimeTestEnvironment.siri().addTrip(TRIP2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)
