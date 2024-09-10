@@ -15,6 +15,7 @@ public class DigitransitRentalVehiclePropertyMapper extends PropertyMapper<Vehic
     var items = new ArrayList<KeyValue>();
     items.addAll(getFeedScopedIdAndNetwork(place));
     items.add(new KeyValue("formFactor", place.vehicleType.formFactor.toString()));
+    items.add(new KeyValue("pickupAllowed", place.isAllowPickup()));
     return items;
   }
 }

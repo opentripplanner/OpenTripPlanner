@@ -30,7 +30,7 @@ o_o_standalone_config_IncludeFileDirectiveTest_part.json
 _site/
 build/
 dist/
-docs/_build/
+doc/user/_build/
 gen-java/
 gen-javabean/
 gen-py/

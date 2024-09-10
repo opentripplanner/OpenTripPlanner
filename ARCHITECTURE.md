@@ -1,24 +1,28 @@
 # OTP Architecture
 
-OTP is developed over more than 10 years, and most of the design documentation is in the code as
+OTP has been developed for more than 15 years, and most of the design documentation is in the code as
 comments and JavaDoc. Over the years the complexity have increased, and the natural developer
 turnover creates a demand for more architecture and design documentation. The new OTP2 documentation
 is put together with the source; hopefully making it easier to maintain. Instead of documenting
 modules in old style _package-info.java_ files we use _package.md_ files. This document should serve
 as an index to all existing top-level documented components.
 
-This document is far from complete - hopefully it can evolve over time and become a good
+This document is far from complete. Hopefully it can evolve over time and become a good
 introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
 detailed discussions on many design decisions.
 
-Be sure to also read the [developer documentation](docs/Developers-Guide.md).
+We document [Decision Records](DEVELOPMENT_DECISION_RECORDS.md) in a log. Make sure you as a developer are familiar 
+with the decisions and follow them. Reviewers should use them actively when reviewing code and may
+use them to ask for changes.
+
+Be sure to also read the [developer documentation](doc/user/Developers-Guide.md).
 
 ## Modules/Components
 
 The diagram shows a simplified/generic version on how we want to model the OTP components with 2 
 examples. The Transit model is more complex than the VehiclePosition model.   
 
-![MainModelOverview](docs/images/ServiceModelOverview.png)
+![MainModelOverview](doc/dev/images/ServiceModelOverview.png)
 
  - `Use Case Service` A service which combine the functionality in many `Domain Services` to fulfill
    a use-case or set of features. It may have an api with request/response classes. These are 
@@ -26,7 +30,7 @@ examples. The Transit model is more complex than the VehiclePosition model.
    class has the same name as the interface with prefix `Default`.
  - `Domain Model` A model which encapsulate a business area. In the drawing two examples are shown,
    the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
-   implementation have a separate `Service` and `Repository`. Almost all http endpoints are , 
+   implementation has a separate `Service` and `Repository`. Almost all http endpoints are, 
    read-only so the `Service` can focus on serving the http API endpoints, while the repository
    is used to maintain the model by the updaters. 
 
@@ -40,10 +44,6 @@ but this is a start and we would like to expand this list in the future.
 
 The Configuration module is responsible for loading and parsing OTP configuration files and map them
 into Plan Old Java Objects (POJOs). These POJOs are injected into the other components.
-
-### [REST API](src/main/java/org/opentripplanner/api/package.md)
-
-Short introduction to the REST API.
 
 ### [GTFS import module](src/main/java/org/opentripplanner/gtfs/package.md)
 

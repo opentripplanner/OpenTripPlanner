@@ -4,8 +4,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromPath;
 
@@ -24,8 +24,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 public class VectorTilesConfigDocTest {
 
   private static final String DOCUMENT = "sandbox/MapboxVectorTilesApi.md";
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, DOCUMENT);
-  private static final File OUT_FILE = new File(DOCS_ROOT, DOCUMENT);
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, DOCUMENT);
+  private static final File OUT_FILE = new File(USER_DOC_PATH, DOCUMENT);
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test

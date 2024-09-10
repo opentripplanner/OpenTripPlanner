@@ -5,8 +5,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
@@ -23,8 +23,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @GeneratesDocumentation
 public class VehicleParkingDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "VehicleParking.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT + "/sandbox", "VehicleParking.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "VehicleParking.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH + "/sandbox", "VehicleParking.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();

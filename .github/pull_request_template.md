@@ -47,7 +47,7 @@ Write a few words on how the new code is tested.
 - Was the code designed so it is unit testable?
 - Were any tests applied to the smallest appropriate unit?
 - Do all tests
-  pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#continuous-integration)
+  pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/user/Developers-Guide.md#continuous-integration)
   ?
 
 ### Documentation
@@ -59,7 +59,7 @@ Write a few words on how the new code is tested.
 
 ### Changelog
 
-The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Changelog.md)
+The [changelog file](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/user/Changelog.md)
 is generated from the pull-request title, make sure the title describe the feature or issue fixed.
 To exclude the PR from the changelog add the label `skip changelog` to the PR.
 

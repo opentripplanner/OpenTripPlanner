@@ -23,8 +23,8 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -98,14 +98,14 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(Graph graph, TransitModel transitModel) {
+    public void run(RealTimeUpdateContext context) {
       // Apply stations to graph
       /* Add any new park and update space available for existing parks */
       Set<VehicleParking> toAdd = new HashSet<>();
       Set<VehicleParking> toLink = new HashSet<>();
       Set<VehicleParking> toRemove = new HashSet<>();
 
-      var vehicleParkingHelper = new VehicleParkingHelper(graph);
+      var vehicleParkingHelper = new VehicleParkingHelper(context.graph());
 
       for (VehicleParking updatedVehicleParking : updatedVehicleParkings) {
         var operational = updatedVehicleParking.getState().equals(VehicleParkingState.OPERATIONAL);
@@ -133,7 +133,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
           tempEdgesByPark.get(oldVehicleParking).forEach(DisposableEdgeCollection::disposeEdges);
           verticesByPark
             .get(oldVehicleParking)
-            .forEach(v -> removeVehicleParkingEdgesFromGraph(v, graph));
+            .forEach(v -> removeVehicleParkingEdgesFromGraph(v, context.graph()));
           verticesByPark.remove(oldVehicleParking);
         }
 

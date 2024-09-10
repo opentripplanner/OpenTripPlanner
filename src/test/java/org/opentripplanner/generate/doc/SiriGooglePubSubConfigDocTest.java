@@ -5,8 +5,8 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
@@ -26,11 +26,11 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class SiriGooglePubSubConfigDocTest {
 
   private static final File TEMPLATE = new File(
-    TEMPLATE_ROOT,
+    TEMPLATE_PATH,
     "sandbox/siri/SiriGooglePubSubUpdater.md"
   );
   private static final File OUT_FILE = new File(
-    DOCS_ROOT,
+    USER_DOC_PATH,
     "sandbox/siri/SiriGooglePubSubUpdater.md"
   );
 
@@ -40,7 +40,7 @@ public class SiriGooglePubSubConfigDocTest {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/sandbox/SiriGooglePubSubUpdater.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/sandbox/SiriGooglePubSubUpdater.md} document based on the latest
    * version of the code.
    */
   @Test
