@@ -3,20 +3,11 @@ import { LegTime } from './LegTime.tsx';
 import { formatDistance } from '../../util/formatDistance.ts';
 import { formatDuration } from '../../util/formatDuration.ts';
 import { InterchangeInfo } from './InterchangeInfo.tsx';
-import { quayQueryAsString } from '../../static/query/quayQuery.tsx';
-import { lineQueryAsString } from '../../static/query/lineQuery.tsx';
-const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
+import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';
+import { ItineraryGraphiQLQuayLink } from './ItineraryGraphiQLQuayLink.tsx';
+import { ItineraryGraphiQLAuthorityLink } from './ItineraryGraphiQLAuthorityLink.tsx';
 
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
-  const lineID = { id: leg.line?.id };
-  const fromPlaceID = { id: leg.fromPlace.quay?.id };
-  const toPlaceID = { id: leg.toPlace.quay?.id };
-  const formattedQuayQuery = encodeURIComponent(quayQueryAsString);
-  const formattedLineQuery = encodeURIComponent(lineQueryAsString);
-  const formattedLineID = encodeURIComponent(JSON.stringify(lineID));
-  const formattedFromPlaceID = encodeURIComponent(JSON.stringify(fromPlaceID));
-  const formattedToPlaceID = encodeURIComponent(JSON.stringify(toPlaceID));
-
   return (
     <div className="itinerary-leg-details">
       <div className="times">
@@ -29,41 +20,20 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         <b>{leg.mode}</b>{' '}
         {leg.line && (
           <>
-            <a
-              title={leg.line?.id}
-              target={'_blank'}
-              rel={'noreferrer'}
-              href={graphiQLUrl + '&query=' + formattedLineQuery + '&variables=' + formattedLineID}
-            >
-              {leg.line.publicCode} {leg.toEstimatedCall?.destinationDisplay?.frontText}
-            </a>
-            , {leg.authority?.name}
+            <ItineraryGraphiQLLineLink
+              legId={leg.line?.id}
+              legName={leg.line.publicCode + ' ' + leg.toEstimatedCall?.destinationDisplay?.frontText}
+            />
+            , <ItineraryGraphiQLAuthorityLink legId={leg.authority?.id} legName={leg.authority?.name} />
           </>
         )}{' '}
         {leg.mode !== Mode.Foot && (
           <>
             <br />
-            <a
-              title={leg.fromPlace.quay?.id}
-              target={'_blank'}
-              rel={'noreferrer'}
-              href={graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedFromPlaceID}
-            >
-              {leg.fromPlace.name}
-            </a>{' '}
-            →{' '}
+            <ItineraryGraphiQLQuayLink legId={leg.fromPlace.quay?.id} legName={leg.fromPlace.name} /> →{' '}
           </>
         )}{' '}
-        {!isLast && (
-          <a
-            title={leg.toPlace.quay?.id}
-            target={'_blank'}
-            rel={'noreferrer'}
-            href={graphiQLUrl + '&query=' + formattedQuayQuery + '&variables=' + formattedToPlaceID}
-          >
-            {leg.toPlace.name}
-          </a>
-        )}
+        {!isLast && <ItineraryGraphiQLQuayLink legId={leg.toPlace.quay?.id} legName={leg.toPlace.name} />}
       </div>
     </div>
   );

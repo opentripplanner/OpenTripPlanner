@@ -67,6 +67,7 @@ export const query = graphql(`
           }
           authority {
             name
+            id
           }
           pointsOnLink {
             points
