@@ -7,7 +7,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
-import static org.opentripplanner.standalone.config.routerequest.MappingConfig.mapMappingParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.TriangleOptimizationConfig.mapOptimizationTriangle;
 import static org.opentripplanner.standalone.config.routerequest.VehicleParkingConfig.mapParking;
@@ -192,7 +191,6 @@ travel time `x` (in seconds).
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
-    preferences.withMapping(it -> mapMappingParams("mapping", c, it));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {

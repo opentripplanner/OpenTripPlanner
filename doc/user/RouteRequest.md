@@ -123,8 +123,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                             | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`            |  2.2  |
-| mapping                                                                                                      |        `object`        | Configure mapping of the internal data structures into itineraries.                                                                            | *Optional* |                  |  2.6  |
-|    [optInFeatures](#rd_mapping_optInFeatures)                                                                |       `enum set`       | Feature of the mapping of the internal data structures into the final itinerary that are output by the APIs.                                   | *Optional* |                  |  2.6  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                         | `enum map of duration` | Limit direct route duration per street mode.                                                                                                   | *Optional* |                  |  2.2  |
 | scooter                                                                                                      |        `object`        | Scooter preferences.                                                                                                                           | *Optional* |                  |  2.5  |
 |    [optimization](#rd_scooter_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe-streets"` |  2.0  |
@@ -857,17 +855,6 @@ This value is used to increase the filter threshold for itineraries further away
 time, compared to those, that have exactly the same arrival and departure times.
 
 The unit is cost unit per second of time difference.
-
-<h3 id="rd_mapping_optInFeatures">optInFeatures</h3>
-
-**Since version:** `2.6` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
-**Path:** /routingDefaults/mapping   
-**Enum values:** `transfer-leg-on-same-stop`
-
-Feature of the mapping of the internal data structures into the final itinerary that are output by the APIs.
-
- - `transfer-leg-on-same-stop` Inserts a zero distance walking leg when the transfer starts and ends at the exact same stop.
-
 
 <h3 id="rd_maxDirectStreetDurationForMode">maxDirectStreetDurationForMode</h3>
 
