@@ -31,11 +31,11 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder withTrip1() {
     createTrip(
-      new RealtimeTripInput(
-        TRIP_1_ID,
-        ROUTE_1,
-        List.of(new StopCall(STOP_A1, 10, 11), new StopCall(STOP_B1, 20, 21))
-      )
+      RealtimeTripInput
+        .of(TRIP_1_ID)
+        .addStop(STOP_A1, "0:00:10", "0:00:11")
+        .addStop(STOP_B1, "0:00:20", "0:00:21")
+        .build()
     );
     transitModel.index();
     return this;
@@ -43,15 +43,12 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder withTrip2() {
     createTrip(
-      new RealtimeTripInput(
-        TRIP_2_ID,
-        ROUTE_1,
-        List.of(
-          new StopCall(STOP_A1, 60, 61),
-          new StopCall(STOP_B1, 70, 71),
-          new StopCall(STOP_C1, 80, 81)
-        )
-      )
+      RealtimeTripInput
+        .of(TRIP_2_ID)
+        .addStop(STOP_A1, "0:01:00", "0:01:01")
+        .addStop(STOP_B1, "0:01:10", "0:01:11")
+        .addStop(STOP_C1, "0:01:20", "0:01:21")
+        .build()
     );
 
     transitModel.index();
