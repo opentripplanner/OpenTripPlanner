@@ -31,6 +31,11 @@ public enum OTPFeature {
       Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.
       """
   ),
+  ExtraTransferLegOnSameStop(
+    false,
+    false,
+    "Should there be a transfer leg when transferring on the very same stop. Note that for in-seat/interlined transfers no transfer leg will be generated."
+  ),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
   GtfsGraphQlApiRentalStationFuzzyMatching(

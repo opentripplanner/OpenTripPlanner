@@ -5,19 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
-import static org.opentripplanner.routing.api.request.preference.MappingFeature.TRANSFER_LEG_ON_SAME_STOP;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,7 +24,6 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -55,7 +49,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.MappingFeature;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -117,6 +110,21 @@ public class RaptorPathToItineraryMapperTest {
       itinerary.getLegs().get(0).getGeneralizedCost(),
       "Incorrect cost returned"
     );
+  }
+
+  @Test
+  void extraLegWhenTransferringAtSameStop() {
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
+
+    var schedule = getTestTripSchedule2();
+    var path = new TestPathBuilder(COST_CALCULATOR)
+      .access(TRANSIT_START - BOARD_SLACK, 1)
+      .bus(schedule, 2)
+      .bus(schedule, 1)
+      .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
+    var itinerary = mapper.createItinerary(path);
+
+    assertEquals(3, itinerary.getLegs().size());
   }
 
   @Test
@@ -190,60 +198,43 @@ public class RaptorPathToItineraryMapperTest {
     assertEquals(3, itinerary.getLegs().size(), "The wrong number of legs was returned");
   }
 
-  @Nested
-  class OptInFeatures {
+  @Test
+  void noExtraLegWhenTransferringAtSameStop() {
+    var mapper = getRaptorPathToItineraryMapper();
 
-    @Test
-    void noExtraLegWhenTransferringAtSameStop() {
-      var mapper = getRaptorPathToItineraryMapper();
+    var path = transferAtSameStopPath();
+    var itinerary = mapper.createItinerary(path);
+    assertThat(itinerary.getLegs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
+  }
 
-      var path = transferAtSameStopPath();
-      var itinerary = mapper.createItinerary(path);
-      assertThat(itinerary.getLegs().stream().map(Object::getClass))
-        .doesNotContain(StreetLeg.class);
-    }
+  private RaptorPath<TestTripSchedule> transferAtSameStopPath() {
+    var schedule = transferAtSameStopSchedule();
+    return new TestPathBuilder(COST_CALCULATOR)
+      .access(TRANSIT_START, 1)
+      .bus(schedule, 2)
+      .bus(schedule, 1)
+      .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
+  }
 
-    @Test
-    void extraLegWhenTransferringAtSameStop() {
-      var mapper = getRaptorPathToItineraryMapper(TRANSFER_LEG_ON_SAME_STOP);
+  private TestTripSchedule transferAtSameStopSchedule() {
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
 
-      var path = transferAtSameStopPath();
-      var itinerary = mapper.createItinerary(path);
-      assertThat(itinerary.getLegs().stream().map(Object::getClass).toList())
-        .isEqualTo(List.of(ScheduledTransitLeg.class, StreetLeg.class, ScheduledTransitLeg.class));
-    }
+    var timetable = new TestTripSchedule.Builder()
+      .times(
+        TimeUtils.time("10:00"),
+        TimeUtils.time("10:05"),
+        TimeUtils.time("10:10"),
+        TimeUtils.time("10:15"),
+        TimeUtils.time("10:20")
+      )
+      .pattern(pattern)
+      .originalPattern(getOriginalPattern(pattern))
+      .build();
 
-    private RaptorPath<TestTripSchedule> transferAtSameStopPath() {
-      var schedule = transferAtSameStopSchedule();
-      return new TestPathBuilder(COST_CALCULATOR)
-        .access(TRANSIT_START, 1)
-        .bus(schedule, 2)
-        .bus(schedule, 1)
-        .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
-    }
+    data.withRoutes(TestRoute.route("TransferAtSameStop", 1, 2, 3, 2, 1).withTimetable(timetable));
 
-    private TestTripSchedule transferAtSameStopSchedule() {
-      TestTransitData data = new TestTransitData();
-      var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
-
-      var timetable = new TestTripSchedule.Builder()
-        .times(
-          TimeUtils.time("10:00"),
-          TimeUtils.time("10:05"),
-          TimeUtils.time("10:10"),
-          TimeUtils.time("10:15"),
-          TimeUtils.time("10:20")
-        )
-        .pattern(pattern)
-        .originalPattern(getOriginalPattern(pattern))
-        .build();
-
-      data.withRoutes(
-        TestRoute.route("TransferAtSameStop", 1, 2, 3, 2, 1).withTimetable(timetable)
-      );
-
-      return data.getRoute(0).getTripSchedule(0);
-    }
+    return data.getRoute(0).getTripSchedule(0);
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
@@ -262,11 +253,11 @@ public class RaptorPathToItineraryMapperTest {
       stopTimes.add(stopTime);
     }
 
-    return TripPattern
+    var builder = TripPattern
       .of(new FeedScopedId("TestFeed", "TestId"))
       .withRoute(pattern.route())
-      .withStopPattern(new StopPattern(stopTimes))
-      .build();
+      .withStopPattern(new StopPattern(stopTimes));
+    return builder.build();
   }
 
   private TestPathBuilder createTestTripSchedulePath(TestTripSchedule testTripSchedule) {
@@ -274,29 +265,19 @@ public class RaptorPathToItineraryMapperTest {
     return pathBuilder.access(TRANSIT_START - BOARD_SLACK, 1).bus(testTripSchedule, 2);
   }
 
-  private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper(
-    MappingFeature... featureSwitches
-  ) {
+  private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
     Instant dateTime = LocalDateTime
       .of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
     TransitModel transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.CET);
-    final RouteRequest request = new RouteRequest();
-    request.withPreferences(p ->
-      p.withMapping(m ->
-        m.apply(mp ->
-          mp.withOptInFeatures(Arrays.stream(featureSwitches).collect(Collectors.toSet()))
-        )
-      )
-    );
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(transitModel),
       getTransitLayer(),
       dateTime.atZone(ZoneIds.CET),
-      request
+      new RouteRequest()
     );
   }
 
@@ -316,6 +297,27 @@ public class RaptorPathToItineraryMapperTest {
       null,
       null
     );
+  }
+
+  private TestTripSchedule getTestTripSchedule2() {
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+
+    var timetable = new TestTripSchedule.Builder()
+      .times(
+        TimeUtils.time("10:00"),
+        TimeUtils.time("10:05"),
+        TimeUtils.time("10:10"),
+        TimeUtils.time("10:15"),
+        TimeUtils.time("10:20")
+      )
+      .pattern(pattern)
+      .originalPattern(getOriginalPattern(pattern))
+      .build();
+
+    data.withRoutes(TestRoute.route("TestRoute_1", 1, 2, 3, 2, 1).withTimetable(timetable));
+
+    return data.getRoute(0).getTripSchedule(0);
   }
 
   private TestTripSchedule getTestTripSchedule() {
