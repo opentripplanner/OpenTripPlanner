@@ -240,7 +240,7 @@ public interface Leg {
   /**
    * Whether there is real-time data about this Leg
    */
-  default boolean getRealTime() {
+  default boolean isRealTimeUpdated() {
     return false;
   }
 

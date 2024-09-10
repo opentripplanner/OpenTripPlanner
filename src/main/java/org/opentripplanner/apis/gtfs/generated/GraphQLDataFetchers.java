@@ -20,7 +20,9 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -64,6 +66,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingTime;
@@ -138,6 +141,16 @@ public class GraphQLDataFetchers {
 
   /** Entity related to an alert */
   public interface GraphQLAlertEntity extends TypeResolver {}
+
+  /**
+   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
+   * available.
+   */
+  public interface GraphQLArrivalDepartureTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  }
 
   /** Bike park represents a location where bicycles can be parked. */
   public interface GraphQLBikePark {
@@ -314,6 +327,52 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
+  /** Departure and/or arrival times to or from a stop on a specific date. */
+  public interface GraphQLDatedStopTime extends TypeResolver {}
+
+  /** Trip on a specific date */
+  public interface GraphQLDatedTrip {
+    public DataFetcher<java.time.LocalDate> date();
+
+    public DataFetcher<ArrivalDepartureTime> end();
+
+    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+    public DataFetcher<TripPattern> pattern();
+
+    public DataFetcher<Route> route();
+
+    public DataFetcher<ArrivalDepartureTime> start();
+
+    public DataFetcher<Iterable<Object>> stops();
+
+    public DataFetcher<Iterable<Object>> stoptimes();
+
+    public DataFetcher<String> tripHeadsign();
+
+    public DataFetcher<String> tripShortName();
+  }
+
+  /**
+   * A connection to a list of dated trips that follows
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLDatedTripConnection {
+    public DataFetcher<Iterable<Edge<DatedTrip>>> edges();
+
+    public DataFetcher<Object> pageInfo();
+  }
+
+  /**
+   * An edge for DatedTrip connection. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLDatedTripEdge {
+    public DataFetcher<String> cursor();
+
+    public DataFetcher<DatedTrip> node();
+  }
+
   /**
    * The standard case of a fare product: it only has a single price to be paid by the passenger
    * and no discounts are applied.
@@ -354,6 +413,30 @@ public class GraphQLDataFetchers {
 
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+  }
+
+  /**
+   * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+   * This can include realtime estimates.
+   */
+  public interface GraphQLExactDatedStopTime {
+    public DataFetcher<ArrivalDepartureTime> arrival();
+
+    public DataFetcher<ArrivalDepartureTime> departure();
+
+    public DataFetcher<String> dropoffType();
+
+    public DataFetcher<String> headsign();
+
+    public DataFetcher<String> pickupType();
+
+    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
+
+    public DataFetcher<Object> stop();
+
+    public DataFetcher<Integer> stopPosition();
+
+    public DataFetcher<Boolean> timepoint();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
@@ -762,6 +845,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
+
+    public DataFetcher<Connection<DatedTrip>> canceledTrips();
 
     public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
