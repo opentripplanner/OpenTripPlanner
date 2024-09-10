@@ -17,7 +17,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * trip times should allow updates and more info, frequency-based trips can use a more compact
  * implementation, and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop
  * trip using this interface. All times are expressed as seconds since midnight (as in
- * GTFS).
+ * GTFS). Unless stated otherwise, accessor methods which take an integer stop parameter refer to
+ * the position within the trip's TripPattern (not its GTFS stop sequence for example).
  */
 public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
@@ -129,6 +130,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   I18NString getTripHeadsign();
 
   /**
+   * The headsign displayed by the vehicle, which may change at each stop along the trip.
    * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
    * A trip may not have a headsign, in which case we should fall back on a Timetable or
    * Pattern-level headsign. Such a string will be available when we give TripPatterns or
@@ -139,11 +141,11 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   I18NString getHeadsign(int stop);
 
   /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
+   * Vias are an additional intermediate destinations between the given stop and the terminus, which
+   * are displayed alongside the terminus headsign. Vias often change or are displayed only at
+   * certain stops along the way. While the concept of Headsigns exists in both GTFS (Headsign) and
+   * Netex (DestinationDisplay), the Via concept is only present in Transmodel.
+   * @return a list of via names visible at the given stop, or an empty list if there are no vias.
    */
   List<String> getHeadsignVias(int stop);
 
@@ -157,7 +159,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   OccupancyStatus getOccupancyStatus(int stop);
 
   /**
-   * Returns the GTFS sequence number of the given 0-based stop position.
+   * Returns the GTFS sequence number of the given 0-based stop position within the pattern.
    * <p>
    * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
    * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides an

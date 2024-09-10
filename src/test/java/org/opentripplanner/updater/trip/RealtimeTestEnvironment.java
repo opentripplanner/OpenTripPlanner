@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -106,12 +107,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
-    return new EstimatedTimetableHandler(
-      siriSource,
-      fuzzyMatching ? new SiriFuzzyTripMatcher(getTransitService()) : null,
-      getTransitService(),
-      getFeedId()
-    );
+    return new EstimatedTimetableHandler(siriSource, fuzzyMatching, getFeedId());
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
@@ -218,7 +214,15 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   ) {
     Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
     UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
-      .applyUpdate(updates, DIFFERENTIAL);
+      .applyUpdate(
+        updates,
+        DIFFERENTIAL,
+        new DefaultRealTimeUpdateContext(
+          new Graph(),
+          transitModel,
+          siriSource.getTimetableSnapshotBuffer()
+        )
+      );
     commitTimetableSnapshot();
     return updateResult;
   }

@@ -23,7 +23,7 @@ public class ScheduledTripTimesBuilder {
   private List<BookingInfo> pickupBookingInfos;
   private I18NString[] headsigns;
   private String[][] headsignVias;
-  private int[] originalGtfsStopSequence;
+  private int[] gtfsSequenceOfStopIndex;
   private final DeduplicatorService deduplicator;
 
   ScheduledTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
@@ -41,7 +41,7 @@ public class ScheduledTripTimesBuilder {
     List<BookingInfo> pickupBookingInfos,
     I18NString[] headsigns,
     String[][] headsignVias,
-    int[] originalGtfsStopSequence,
+    int[] gtfsSequenceOfStopIndex,
     DeduplicatorService deduplicator
   ) {
     this.timeShift = timeShift;
@@ -54,7 +54,7 @@ public class ScheduledTripTimesBuilder {
     this.pickupBookingInfos = pickupBookingInfos;
     this.headsigns = headsigns;
     this.headsignVias = headsignVias;
-    this.originalGtfsStopSequence = originalGtfsStopSequence;
+    this.gtfsSequenceOfStopIndex = gtfsSequenceOfStopIndex;
     this.deduplicator = deduplicator == null ? DeduplicatorService.NOOP : deduplicator;
   }
 
@@ -169,12 +169,12 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
-  public int[] originalGtfsStopSequence() {
-    return originalGtfsStopSequence;
+  public int[] gtfsSequenceOfStopIndex() {
+    return gtfsSequenceOfStopIndex;
   }
 
-  public ScheduledTripTimesBuilder withOriginalGtfsStopSequence(int[] originalGtfsStopSequence) {
-    this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(originalGtfsStopSequence);
+  public ScheduledTripTimesBuilder withGtfsSequenceOfStopIndex(int[] gtfsSequenceOfStopIndex) {
+    this.gtfsSequenceOfStopIndex = deduplicator.deduplicateIntArray(gtfsSequenceOfStopIndex);
     return this;
   }
 

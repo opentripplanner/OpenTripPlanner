@@ -7,9 +7,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -40,17 +38,12 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
 
-    var fuzzyTripMatcher = config.fuzzyTripMatching()
-      ? new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel))
-      : null;
-
     this.transitAlertService = transitAlertService;
 
-    this.updateHandler = new AlertsUpdateHandler();
+    this.updateHandler = new AlertsUpdateHandler(config.fuzzyTripMatching());
     this.updateHandler.setEarlyStart(config.earlyStartSec());
     this.updateHandler.setFeedId(config.feedId());
     this.updateHandler.setTransitAlertService(transitAlertService);
-    this.updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
     LOG.info("Creating real-time alert updater running every {}: {}", pollingPeriod(), url);
   }
@@ -89,7 +82,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
       }
 
       // Handle update in graph writer runnable
-      saveResultOnGraph.execute((graph, transitModel) -> updateHandler.update(feed));
+      saveResultOnGraph.execute(context ->
+        updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher())
+      );
 
       lastTimestamp = feedTimestamp;
     } catch (Exception e) {

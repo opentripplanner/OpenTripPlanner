@@ -18,6 +18,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.DataSource;
@@ -118,14 +119,18 @@ class VehicleParkingAvailabilityUpdaterTest {
 
       private static final Graph GRAPH = new Graph();
       private static final TransitModel TRANSIT_MODEL = new TransitModel();
+      public static final DefaultRealTimeUpdateContext REAL_TIME_UPDATE_CONTEXT = new DefaultRealTimeUpdateContext(
+        GRAPH,
+        TRANSIT_MODEL
+      );
 
       public GraphUpdaterMock(List<GraphUpdater> updaters) {
-        super(GRAPH, TRANSIT_MODEL, updaters);
+        super(REAL_TIME_UPDATE_CONTEXT, updaters);
       }
 
       @Override
       public Future<?> execute(GraphWriterRunnable runnable) {
-        runnable.run(GRAPH, TRANSIT_MODEL);
+        runnable.run(REAL_TIME_UPDATE_CONTEXT);
         return Futures.immediateVoidFuture();
       }
     }

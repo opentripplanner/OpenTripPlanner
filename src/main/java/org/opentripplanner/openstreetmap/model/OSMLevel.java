@@ -53,7 +53,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
     String spec,
     Source source,
     boolean incrementNonNegative,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    OSMWithTags osmObj
   ) {
     /*  extract any altitude information after the @ character */
     Double altitude = null;
@@ -111,7 +112,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     /* fall back on altitude when necessary */
     if (floorNumber == null && altitude != null) {
       floorNumber = (int) (altitude / METERS_PER_FLOOR);
-      issueStore.add(new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber));
+      issueStore.add(new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber, osmObj));
       reliable = false;
     }
 
@@ -122,7 +123,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     /* signal failure to extract any useful level information */
     if (floorNumber == null) {
       floorNumber = 0;
-      issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, floorNumber));
+      issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
     return new OSMLevel(floorNumber, altitude, shortName, longName, source, reliable);
@@ -132,7 +133,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
     String specList,
     Source source,
     boolean incrementNonNegative,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    OSMWithTags osmObj
   ) {
     List<String> levelSpecs = new ArrayList<>();
 
@@ -153,7 +155,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     /* build an OSMLevel for each level spec in the list */
     List<OSMLevel> levels = new ArrayList<>();
     for (String spec : levelSpecs) {
-      levels.add(fromString(spec, source, incrementNonNegative, issueStore));
+      levels.add(fromString(spec, source, incrementNonNegative, issueStore, osmObj));
     }
     return levels;
   }
@@ -162,10 +164,17 @@ public class OSMLevel implements Comparable<OSMLevel> {
     String specList,
     Source source,
     boolean incrementNonNegative,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    OSMWithTags osmObj
   ) {
     Map<String, OSMLevel> map = new HashMap<>();
-    for (OSMLevel level : fromSpecList(specList, source, incrementNonNegative, issueStore)) {
+    for (OSMLevel level : fromSpecList(
+      specList,
+      source,
+      incrementNonNegative,
+      issueStore,
+      osmObj
+    )) {
       map.put(level.shortName, level);
     }
     return map;

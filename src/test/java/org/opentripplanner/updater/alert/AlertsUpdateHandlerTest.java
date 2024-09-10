@@ -35,7 +35,7 @@ public class AlertsUpdateHandlerTest {
 
   @BeforeEach
   public void setUp() {
-    handler = new AlertsUpdateHandler();
+    handler = new AlertsUpdateHandler(false);
     handler.setFeedId("1");
     handler.setEarlyStart(5);
     handler.setTransitAlertService(service);
@@ -531,7 +531,7 @@ public class AlertsUpdateHandlerTest {
       .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))
       .addEntity(GtfsRealtime.FeedEntity.newBuilder().setAlert(alert).setId("1"))
       .build();
-    handler.update(message);
+    handler.update(message, null);
     Collection<TransitAlert> alerts = service.getAllAlerts();
     assertEquals(1, alerts.size());
     return alerts.iterator().next();
