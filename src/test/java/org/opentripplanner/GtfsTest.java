@@ -191,7 +191,7 @@ public abstract class GtfsTest {
     gtfsBundle.setFeedId(feedId);
     List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
 
-    alertsUpdateHandler = new AlertsUpdateHandler();
+    alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
     transitModel = new TransitModel(new StopModel(), deduplicator);
@@ -234,7 +234,7 @@ public abstract class GtfsTest {
         feedId.getId()
       );
       timetableSnapshotSource.flushBuffer();
-      alertsUpdateHandler.update(feedMessage);
+      alertsUpdateHandler.update(feedMessage, null);
     } catch (Exception exception) {}
   }
 }

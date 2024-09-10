@@ -20,9 +20,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.DefaultedTextStructure;
@@ -57,30 +55,19 @@ public class SiriAlertsUpdateHandler {
   private final Duration earlyStart;
 
   /**
-   * This takes the parts of the SIRI SX message saying which transit entities are affected and
-   * maps them to the corresponding OTP internal model entity or entities.
-   */
-  private final AffectsMapper affectsMapper;
-
-  /**
    * @param earlyStart display the alerts to users this long before their activePeriod begins
    */
   public SiriAlertsUpdateHandler(
     String feedId,
-    TransitModel transitModel,
     TransitAlertService transitAlertService,
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher,
     Duration earlyStart
   ) {
     this.feedId = feedId;
     this.transitAlertService = transitAlertService;
     this.earlyStart = earlyStart;
-
-    TransitService transitService = new DefaultTransitService(transitModel);
-    this.affectsMapper = new AffectsMapper(feedId, siriFuzzyTripMatcher, transitService);
   }
 
-  public void update(ServiceDelivery delivery) {
+  public void update(ServiceDelivery delivery, RealTimeUpdateContext context) {
     for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
       if (situations != null) {
@@ -106,7 +93,7 @@ public class SiriAlertsUpdateHandler {
           } else {
             TransitAlert alert = null;
             try {
-              alert = mapSituationToAlert(sxElement);
+              alert = mapSituationToAlert(sxElement, context);
               addedCounter++;
             } catch (Exception e) {
               LOG.info(
@@ -141,7 +128,10 @@ public class SiriAlertsUpdateHandler {
    * May return null if the header, description, and detail text are all empty or missing in the
    * SIRI message. In all other cases it will return a valid TransitAlert instance.
    */
-  private TransitAlert mapSituationToAlert(PtSituationElement situation) {
+  private TransitAlert mapSituationToAlert(
+    PtSituationElement situation,
+    RealTimeUpdateContext context
+  ) {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 
     if (
@@ -194,7 +184,10 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    alert.addEntites(affectsMapper.mapAffects(situation.getAffects()));
+    alert.addEntites(
+      new AffectsMapper(feedId, context.siriFuzzyTripMatcher(), context.transitService())
+        .mapAffects(situation.getAffects())
+    );
 
     if (alert.entities().isEmpty()) {
       LOG.info(

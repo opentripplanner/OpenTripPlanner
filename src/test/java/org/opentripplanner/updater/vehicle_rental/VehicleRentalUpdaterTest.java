@@ -16,6 +16,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -45,7 +46,7 @@ class VehicleRentalUpdaterTest {
   static class MockManager extends GraphUpdaterManager {
 
     public MockManager(VehicleRentalUpdater updater) {
-      super(new Graph(), new TransitModel(), List.of(updater));
+      super(new DefaultRealTimeUpdateContext(new Graph(), new TransitModel()), List.of(updater));
     }
 
     @Override
