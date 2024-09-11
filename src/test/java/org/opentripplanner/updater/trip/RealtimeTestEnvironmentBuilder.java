@@ -29,7 +29,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     return this;
   }
 
-  public RealtimeTestEnvironmentBuilder addTrip(RealtimeTripInput trip) {
+  public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     createTrip(trip);
     transitModel.index();
     return this;
@@ -51,7 +51,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     return new RealtimeTestEnvironment(sourceType, transitModel);
   }
 
-  private Trip createTrip(RealtimeTripInput tripInput) {
+  private Trip createTrip(TripInput tripInput) {
     var trip = Trip
       .of(id(tripInput.id()))
       .withRoute(tripInput.route())
@@ -81,7 +81,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       .tripPattern(tripInput.id() + "Pattern", tripInput.route())
       .withStopPattern(
         TransitModelForTest.stopPattern(
-          tripInput.stops().stream().map(RealtimeTripInput.StopCall::stop).toList()
+          tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
         )
       )
       .build();

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTripInput;
+import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -25,7 +25,7 @@ class DelayedTest implements RealtimeTestConstants {
 
   @Test
   void singleStopDelay() {
-    var TRIP_INPUT = RealtimeTripInput
+    var TRIP_INPUT = TripInput
       .of(TRIP_1_ID)
       .addStop(STOP_A1, "0:00:10", "0:00:11")
       .addStop(STOP_B1, "0:00:20", "0:00:21")
@@ -72,7 +72,7 @@ class DelayedTest implements RealtimeTestConstants {
    */
   @Test
   void complexDelay() {
-    var tripInput = RealtimeTripInput
+    var tripInput = TripInput
       .of(TRIP_2_ID)
       .addStop(STOP_A1, "0:01:00", "0:01:01")
       .addStop(STOP_B1, "0:01:10", "0:01:11")

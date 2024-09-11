@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
-import org.opentripplanner.updater.trip.RealtimeTripInput;
+import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 /**
@@ -23,7 +23,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class SkippedTest implements RealtimeTestConstants {
 
-  private static final RealtimeTripInput TRIP_INPUT = RealtimeTripInput
+  private static final TripInput TRIP_INPUT = TripInput
     .of(TRIP_2_ID)
     .addStop(STOP_A1, "0:01:00", "0:01:01")
     .addStop(STOP_B1, "0:01:10", "0:01:11")
