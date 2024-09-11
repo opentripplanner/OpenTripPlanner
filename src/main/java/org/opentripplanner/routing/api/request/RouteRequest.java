@@ -278,7 +278,7 @@ public class RouteRequest implements Cloneable, Serializable {
     this.to = to;
   }
 
-  public List<ViaLocation> getPassThroughPoints() {
+  public List<ViaLocation> getViaLocations() {
     return via;
   }
 

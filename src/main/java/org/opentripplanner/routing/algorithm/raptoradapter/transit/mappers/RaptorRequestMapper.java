@@ -115,7 +115,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var r = pt.raptor();
 
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
-      if (!request.getPassThroughPoints().isEmpty()) {
+      if (!request.getViaLocations().isEmpty()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
@@ -181,7 +181,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
   private List<PassThroughPoint> mapPassThroughPoints() {
     return request
-      .getPassThroughPoints()
+      .getViaLocations()
       .stream()
       .map(p -> {
         final int[] stops = p.locations().stream().mapToInt(StopLocation::getIndex).toArray();

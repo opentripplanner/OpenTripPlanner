@@ -311,7 +311,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
-  void testPassThroughPoints() {
+  void testViaLocations() {
     TransitIdMapper.clearFixedFeedId();
 
     final List<String> PTP1 = List.of(stop1, stop2, stop3).stream().map(STOP_TO_ID).toList();
@@ -321,13 +321,13 @@ public class TripRequestMapperTest implements PlanTestConstants {
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
     );
 
-    final List<ViaLocation> points = TripRequestMapper
+    final List<ViaLocation> viaLocations = TripRequestMapper
       .createRequest(executionContext(arguments))
-      .getPassThroughPoints();
-    assertEquals(PTP1, points.get(0).locations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP1", points.get(0).label());
-    assertEquals(PTP2, points.get(1).locations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP2", points.get(1).label());
+      .getViaLocations();
+    assertEquals(PTP1, viaLocations.get(0).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP1", viaLocations.get(0).label());
+    assertEquals(PTP2, viaLocations.get(1).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP2", viaLocations.get(1).label());
   }
 
   @Test
