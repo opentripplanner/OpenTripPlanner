@@ -62,6 +62,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Upgrade OBA, remove camsys-apps.com from Maven repos [#6041](https://github.com/opentripplanner/OpenTripPlanner/pull/6041)
 - OSM data links added to the graph build report about ambiguous levels and layers [#6049](https://github.com/opentripplanner/OpenTripPlanner/pull/6049)
 - Add links for Debug UI to GraphiQL [#6053](https://github.com/opentripplanner/OpenTripPlanner/pull/6053)
+- Update indexes in timetable snapshot [#6007](https://github.com/opentripplanner/OpenTripPlanner/pull/6007)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
