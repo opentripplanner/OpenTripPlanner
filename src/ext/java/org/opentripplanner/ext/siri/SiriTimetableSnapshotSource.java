@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -298,14 +299,25 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Trip trip = tripUpdate.tripTimes().getTrip();
     LocalDate serviceDate = tripUpdate.serviceDate();
 
-    // Get cached trip pattern or create one if it doesn't exist yet
-    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
-      tripUpdate.stopPattern(),
-      trip,
-      serviceDate
-    );
+    final TripPattern pattern;
+    if (tripUpdate.tripPatternCreation()) {
+      pattern = tripUpdate.addedTripPattern();
+    } else {
+      // Get cached trip pattern or create one if it doesn't exist yet
+      pattern =
+        tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip, serviceDate);
+    }
+
     // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
-    var result = snapshotManager.updateBuffer(pattern, tripUpdate.tripTimes(), serviceDate);
+    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
+      pattern,
+      tripUpdate.tripTimes(),
+      serviceDate,
+      tripUpdate.addedTripOnServiceDate(),
+      tripUpdate.tripCreation(),
+      tripUpdate.routeCreation()
+    );
+    var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
     return result;
   }
@@ -330,7 +342,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       } else {
         final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
-        snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         success = true;
       }
     }
