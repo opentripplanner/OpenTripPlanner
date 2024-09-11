@@ -65,7 +65,8 @@
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
-              "id" : "TGVnOk5vdEF2YWlsYWJsZQ"
+              "id" : "TGVnOk5vdEF2YWlsYWJsZQ",
+              "realtimeState": "SCHEDULED"
             },
             {
               "mode" : "BUS",
@@ -156,7 +157,8 @@
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
-              "id": "TGVnOnJPMEFCWGRCQUJoVFEwaEZSRlZNUlVSZlZGSkJUbE5KVkY5TVJVZGZWak1BQlVZNk1USXlBQW95TURJd0xUQXlMVEF5QUFBQUJRQUFBQWNBQTBZNlFnQURSanBEQUFBPQ"
+              "id": "TGVnOnJPMEFCWGRCQUJoVFEwaEZSRlZNUlVSZlZGSkJUbE5KVkY5TVJVZGZWak1BQlVZNk1USXlBQW95TURJd0xUQXlMVEF5QUFBQUJRQUFBQWNBQTBZNlFnQURSanBEQUFBPQ",
+              "realtimeState": "UPDATED"
             },
             {
               "mode" : "RAIL",
@@ -267,7 +269,8 @@
               ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
-              "id": "TGVnOnJPMEFCWGRCQUJoVFEwaEZSRlZNUlVSZlZGSkJUbE5KVkY5TVJVZGZWak1BQlVZNk5ETTVBQW95TURJd0xUQXlMVEF5QUFBQUJRQUFBQWNBQTBZNlF3QURSanBFQUFBPQ"
+              "id": "TGVnOnJPMEFCWGRCQUJoVFEwaEZSRlZNUlVSZlZGSkJUbE5KVkY5TVJVZGZWak1BQlVZNk5ETTVBQW95TURJd0xUQXlMVEF5QUFBQUJRQUFBQWNBQTBZNlF3QURSanBFQUFBPQ",
+              "realtimeState": "UPDATED"
             },
             {
               "mode" : "CAR",
@@ -338,7 +341,8 @@
                 "arrival" : "PT10M"
               },
               "accessibilityScore" : null,
-              "id": "TGVnOk5vdEF2YWlsYWJsZQ"
+              "id": "TGVnOk5vdEF2YWlsYWJsZQ",
+              "realtimeState": "SCHEDULED"
             }
           ]
         }

@@ -152,6 +152,7 @@
         }
         accessibilityScore
         id
+        realtimeState
       }
     }
   }
