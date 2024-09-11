@@ -18,11 +18,6 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -75,7 +70,10 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   RealtimeTestEnvironment(SourceType sourceType, TransitModel transitModel) {
     Objects.requireNonNull(sourceType);
     this.transitModel = transitModel;
-    operator1 = Operator.of(operator1Id).withName("Operator 1").build();
+    var operator1 = Operator
+      .of(id(OPERATOR_1_ID))
+      .withName("Name of %s".formatted(OPERATOR_1_ID))
+      .build();
     transitModel.getOperators().add(operator1);
 
     this.transitModel.index();

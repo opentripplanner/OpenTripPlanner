@@ -20,7 +20,7 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
     // can be made configurable if needed
-    private final Route route = ROUTE_1;
+    private Route route = ROUTE_1;
 
     TripInputBuilder(String id) {
       this.id = id;
@@ -35,6 +35,11 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
 
     public TripInput build() {
       return new TripInput(id, route, stops);
+    }
+
+    public TripInputBuilder withRoute(Route route) {
+      this.route = route;
+      return this;
     }
   }
 

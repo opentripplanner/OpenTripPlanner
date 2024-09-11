@@ -2,12 +2,11 @@ package org.opentripplanner.ext.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -18,12 +17,12 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_1_INPUT = TripInput
     .of(TRIP_1_ID)
+    .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
@@ -54,9 +53,9 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourneyWithExistingRoute() {
-    var env = RealtimeTestEnvironment.siri();
+    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
 
-    Route route = env.getTransitService().getRouteForId(env.route1Id);
+    Route route = ROUTE_1;
     int numPatternForRoute = env.getTransitService().getPatternsForRoute(route).size();
 
     String newJourneyId = "newJourney";
@@ -70,7 +69,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
       env.getScheduledTimetable(newJourneyId)
     );
-    FeedScopedId tripId = TransitModelForTest.id(newJourneyId);
+    FeedScopedId tripId = id(newJourneyId);
     TransitService transitService = env.getTransitService();
     Trip trip = transitService.getTripForId(tripId);
     assertNotNull(trip);
@@ -109,7 +108,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     );
     TransitService transitService = env.getTransitService();
     assertEquals(numRoutes + 1, transitService.getAllRoutes().size());
-    FeedScopedId newRouteId = TransitModelForTest.id(newRouteRef);
+    FeedScopedId newRouteId = id(newRouteRef);
     Route newRoute = transitService.getRouteForId(newRouteId);
     assertNotNull(newRoute);
     assertEquals(1, transitService.getPatternsForRoute(newRoute).size());
@@ -495,8 +494,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04")
-      );
+      .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"));
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {

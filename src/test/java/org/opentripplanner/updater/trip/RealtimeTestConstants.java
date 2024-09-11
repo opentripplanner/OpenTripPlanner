@@ -1,10 +1,13 @@
 package org.opentripplanner.updater.trip;
 
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.StopModel;
@@ -18,6 +21,7 @@ public interface RealtimeTestConstants {
   String TRIP_1_ID = "TestTrip1";
   String TRIP_2_ID = "TestTrip2";
   String OPERATOR_1_ID = "TestOperator1";
+  Operator OPERATOR1 = Operator.of(id(OPERATOR_1_ID)).withName(OPERATOR_1_ID).build();
   String ROUTE_1_ID = "TestRoute1";
 
   TransitModelForTest TEST_MODEL = TransitModelForTest.of();
