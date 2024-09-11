@@ -266,8 +266,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<GraphQLLegType> type() {
-    return environment ->
-      LegTypeMapper.map(getSource(environment));
+    return environment -> LegTypeMapper.map(getSource(environment));
   }
 
   @Override

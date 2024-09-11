@@ -199,9 +199,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost = 0;
     StopTime fromStopTime = new StopTime();
     fromStopTime.setStop(lastPlace.stop);
+    fromStopTime.setFlexWindowStart(start);
+    fromStopTime.setFlexWindowStart(end);
 
     StopTime toStopTime = new StopTime();
     toStopTime.setStop(to.stop);
+    toStopTime.setFlexWindowStart(start);
+    toStopTime.setFlexWindowEnd(end);
 
     Trip trip = trip("1", route("flex").build());
 
