@@ -191,10 +191,9 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment -> getSource(environment).getRealTime();
   }
 
-  // TODO
   @Override
   public DataFetcher<String> realtimeState() {
-    return environment -> null;
+    return environment -> getSource(environment).getRealTimeState().name();
   }
 
   @Override
