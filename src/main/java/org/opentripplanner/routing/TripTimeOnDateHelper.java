@@ -14,11 +14,11 @@ import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TripTimesShortHelper {
+public class TripTimeOnDateHelper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TripTimesShortHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TripTimeOnDateHelper.class);
 
-  public static List<TripTimeOnDate> getTripTimesShort(
+  public static List<TripTimeOnDate> getTripTimeOnDates(
     TransitService transitService,
     Trip trip,
     LocalDate serviceDate
@@ -37,7 +37,7 @@ public class TripTimesShortHelper {
       timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
     }
 
-    // This check is made here to avoid changing TripTimeShort.fromTripTimes
+    // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
     if (
       !transitService.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
