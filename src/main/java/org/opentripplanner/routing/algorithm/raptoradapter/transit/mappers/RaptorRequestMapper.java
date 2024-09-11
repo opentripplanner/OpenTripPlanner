@@ -23,9 +23,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.Pe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.ViaConnection;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
@@ -35,6 +36,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
+  private final LookupStopIndexCallback lookUpStopIndex;
 
   private RaptorRequestMapper(
     RouteRequest request,
@@ -42,7 +44,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     long transitSearchTimeZeroEpocSecond,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    LookupStopIndexCallback lookUpStopIndex
   ) {
     this.request = request;
     this.isMultiThreadedEnbled = isMultiThreaded;
@@ -50,6 +53,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.egressPaths = egressPaths;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
+    this.lookUpStopIndex = lookUpStopIndex;
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -58,7 +62,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     boolean isMultiThreaded,
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    LookupStopIndexCallback lookUpStopIndex
   ) {
     return new RaptorRequestMapper<T>(
       request,
@@ -66,7 +71,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       accessPaths,
       egressPaths,
       transitSearchTimeZero.toEpochSecond(),
-      meterRegistry
+      meterRegistry,
+      lookUpStopIndex
     )
       .doMap();
   }
@@ -115,7 +121,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var r = pt.raptor();
 
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
-      if (!request.getViaLocations().isEmpty()) {
+
+      // TODO - We need handle via locations that are not pass-through-points here
+      if (request.getViaLocations().stream().allMatch(ViaLocation::allowAsPassThroughPoint)) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
@@ -180,14 +188,15 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private List<PassThroughPoint> mapPassThroughPoints() {
-    return request
-      .getViaLocations()
-      .stream()
-      .map(p -> {
-        final int[] stops = p.locations().stream().mapToInt(StopLocation::getIndex).toArray();
-        return new PassThroughPoint(p.label(), stops);
-      })
-      .toList();
+    return request.getViaLocations().stream().map(this::mapPassThroughPoints).toList();
+  }
+
+  private PassThroughPoint mapPassThroughPoints(ViaLocation location) {
+    var feedIds = location.connections().stream().map(ViaConnection::locationId).toList();
+    return new PassThroughPoint(
+      location.label(),
+      lookUpStopIndex.lookupStopLocationIndexes(feedIds)
+    );
   }
 
   static RelaxFunction mapRelaxCost(CostLinearFunction relax) {

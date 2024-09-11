@@ -1,56 +1,66 @@
 package org.opentripplanner.routing.api.request;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Defines a via location which the journey must route through.
- * <p>
- * TODO: The list of stop location forces the client to look up the stops before creating
- *       the request. This duplicates logic in all places using this. Instead this should
- *       be replaced by passing in ids and the look up the location inside the router.
- *       To do this properly the routing service must handle lookup errors properly and
- *       pass the error information properly back to the caller/client.
  */
-public class ViaLocation {
+public final class ViaLocation {
 
   private static final Duration MINIMUM_WAIT_TIME_MAX_LIMIT = Duration.ofHours(24);
 
+  private final String label;
   private final boolean allowAsPassThroughPoint;
   private final Duration minimumWaitTime;
-  private final String label;
-  private final List<StopLocation> locations;
+  private final List<ViaConnection> connections;
 
-  public ViaLocation(
+  @SuppressWarnings("DataFlowIssue")
+  private ViaLocation(
     @Nullable String label,
     boolean allowAsPassThroughPoint,
-    Duration minimumWaitTime,
-    List<StopLocation> locations
+    @Nullable Duration minimumWaitTime,
+    Collection<ViaConnection> connections
   ) {
     this.label = label;
     this.allowAsPassThroughPoint = allowAsPassThroughPoint;
     this.minimumWaitTime =
       DurationUtils.requireNonNegative(
-        minimumWaitTime,
+        minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
         MINIMUM_WAIT_TIME_MAX_LIMIT,
         "minimumWaitTime"
       );
-    this.locations = List.copyOf(locations);
+    this.connections = List.copyOf(connections);
 
     if (allowAsPassThroughPoint && !minimumWaitTime.isZero()) {
       throw new IllegalArgumentException(
-        "AllowAsPassThroughPoint can not be used with minimumWaitTime for " + label + "."
+        "'allowAsPassThroughPoint' can not be used with minimumWaitTime for " + label + "."
+      );
+    }
+    if (allowAsPassThroughPoint && connections.stream().anyMatch(ViaConnection::hasCoordinate)) {
+      throw new IllegalArgumentException(
+        "'allowAsPassThroughPoint' can not be used with coordinates for " + label + "."
       );
     }
   }
 
-  public ViaLocation(@Nullable String label, List<StopLocation> locations) {
-    this(label, true, Duration.ZERO, locations);
+  /**
+   * A pass-through-location instructs the router to visit the location either by boarding,
+   * alighting or on-board a transit.
+   * @param label The name/label for this location. This is used for debugging and logging and is pass-through information.
+   * @param locationIds The ID for the stop, station or multimodal station or groupOfStopPlace.
+   */
+  public static ViaLocation passThroughLocation(
+    @Nullable String label,
+    List<FeedScopedId> locationIds
+  ) {
+    return new ViaLocation(label, true, Duration.ZERO, ViaConnection.connections(locationIds));
   }
 
   /**
@@ -80,10 +90,10 @@ public class ViaLocation {
   }
 
   /**
-   * Get the one or multiple stops of which only one is required to route through.
+   * Get the one or multiple locations of which only one is required to route through.
    */
-  public List<StopLocation> locations() {
-    return locations;
+  public List<ViaConnection> connections() {
+    return connections;
   }
 
   @Override
@@ -95,13 +105,13 @@ public class ViaLocation {
       allowAsPassThroughPoint == that.allowAsPassThroughPoint &&
       Objects.equals(minimumWaitTime, that.minimumWaitTime) &&
       Objects.equals(label, that.label) &&
-      Objects.equals(locations, that.locations)
+      Objects.equals(connections, that.connections)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowAsPassThroughPoint, minimumWaitTime, label, locations);
+    return Objects.hash(allowAsPassThroughPoint, minimumWaitTime, label, connections);
   }
 
   @Override
@@ -111,7 +121,7 @@ public class ViaLocation {
       .addBoolIfTrue(label, label != null)
       .addBoolIfTrue("allowAsPassThroughPoint", allowAsPassThroughPoint)
       .addDuration("minimumWaitTime", minimumWaitTime, Duration.ZERO)
-      .addCol("locations", locations)
+      .addObj("connections", connections)
       .toString();
   }
 }

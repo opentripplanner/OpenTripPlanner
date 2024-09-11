@@ -314,8 +314,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
   void testViaLocations() {
     TransitIdMapper.clearFixedFeedId();
 
-    final List<String> PTP1 = List.of(stop1, stop2, stop3).stream().map(STOP_TO_ID).toList();
-    final List<String> PTP2 = List.of(stop2, stop3, stop1).stream().map(STOP_TO_ID).toList();
+    final List<String> PTP1 = Stream.of(stop1, stop2, stop3).map(STOP_TO_ID).toList();
+    final List<String> PTP2 = Stream.of(stop3, stop2).map(STOP_TO_ID).toList();
     final Map<String, Object> arguments = Map.of(
       "passThroughPoints",
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
@@ -324,26 +324,16 @@ public class TripRequestMapperTest implements PlanTestConstants {
     final List<ViaLocation> viaLocations = TripRequestMapper
       .createRequest(executionContext(arguments))
       .getViaLocations();
-    assertEquals(PTP1, viaLocations.get(0).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals(
+      "ViaLocation{PTP1, allowAsPassThroughPoint, connections: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
+      viaLocations.get(0).toString()
+    );
     assertEquals("PTP1", viaLocations.get(0).label());
-    assertEquals(PTP2, viaLocations.get(1).locations().stream().map(STOP_TO_ID).toList());
+    assertEquals(
+      "ViaLocation{PTP2, allowAsPassThroughPoint, connections: [F:ST:stop3, F:ST:stop2]}",
+      viaLocations.get(1).toString()
+    );
     assertEquals("PTP2", viaLocations.get(1).label());
-  }
-
-  @Test
-  void testPassThroughPointsNoMatch() {
-    TransitIdMapper.clearFixedFeedId();
-
-    final Map<String, Object> arguments = Map.of(
-      "passThroughPoints",
-      List.of(Map.of("placeIds", List.of("F:XX:NonExisting")))
-    );
-
-    final RuntimeException ex = assertThrows(
-      RuntimeException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
-    );
-    assertEquals("No match for F:XX:NonExisting.", ex.getMessage());
   }
 
   @Test

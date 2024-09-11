@@ -1,48 +1,26 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.opentripplanner.routing.api.request.ViaLocation;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class ViaLocationMapper {
 
-  static List<ViaLocation> toLocations(
-    final TransitService transitService,
+  static List<ViaLocation> toPassThroughLocations(
     final List<Map<String, Object>> passThroughPoints
   ) {
-    return passThroughPoints
-      .stream()
-      .map(p -> handlePoint(transitService, p))
-      .filter(Objects::nonNull)
-      .collect(toList());
-    // TODO Propagate an error if a stopplace is unknown and fails lookup.
+    return passThroughPoints.stream().map(ViaLocationMapper::mapViaLocation).collect(toList());
   }
 
-  private static ViaLocation handlePoint(
-    final TransitService transitService,
-    Map<String, Object> map
-  ) {
-    final List<String> stops = (List<String>) map.get("placeIds");
-    final String name = (String) map.get("name");
-    if (stops == null) {
-      return null;
-    }
-
-    return stops
-      .stream()
-      .map(TransitIdMapper::mapIDToDomain)
-      .flatMap(id -> {
-        var stopLocations = transitService.getStopOrChildStops(id);
-        if (stopLocations.isEmpty()) {
-          throw new RuntimeException("No match for %s.".formatted(id));
-        }
-        return stopLocations.stream();
-      })
-      .collect(collectingAndThen(toList(), sls -> new ViaLocation(name, sls)));
+  private static ViaLocation mapViaLocation(Map<String, Object> inputMap) {
+    final String name = (String) inputMap.get("name");
+    final List<FeedScopedId> stopLocationIds =
+      ((List<String>) inputMap.get("placeIds")).stream()
+        .map(TransitIdMapper::mapIDToDomain)
+        .toList();
+    return ViaLocation.passThroughLocation(name, stopLocationIds);
   }
 }

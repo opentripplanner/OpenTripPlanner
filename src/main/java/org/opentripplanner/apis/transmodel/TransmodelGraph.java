@@ -25,6 +25,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +73,7 @@ class TransmodelGraph {
       return ExecutionResultMapper.timeoutResponse();
     } catch (ResponseTooLargeException rtle) {
       return ExecutionResultMapper.tooLargeResponse(rtle.getMessage());
-    } catch (CoercingParseValueException | UnknownOperationException e) {
+    } catch (EntityNotFoundException | CoercingParseValueException | UnknownOperationException e) {
       return ExecutionResultMapper.badRequestResponse(e.getMessage());
     } catch (Exception systemError) {
       LOG.error(systemError.getMessage(), systemError);

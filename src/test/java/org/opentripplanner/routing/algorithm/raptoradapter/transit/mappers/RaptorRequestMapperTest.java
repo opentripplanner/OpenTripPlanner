@@ -3,9 +3,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,6 +19,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 class RaptorRequestMapperTest {
@@ -26,11 +28,12 @@ class RaptorRequestMapperTest {
   private static final StopLocation STOP_A = TEST_MODEL.stop("Stop:A").build();
   private static final List<RaptorAccessEgress> ACCESS = List.of(TestAccessEgress.walk(12, 45));
   private static final List<RaptorAccessEgress> EGRESS = List.of(TestAccessEgress.walk(144, 54));
-  private static final Duration D0s = Duration.ofSeconds(0);
 
   private static final CostLinearFunction R1 = CostLinearFunction.of("50 + 1.0x");
   private static final CostLinearFunction R2 = CostLinearFunction.of("0 + 1.5x");
   private static final CostLinearFunction R3 = CostLinearFunction.of("30 + 2.0x");
+
+  private static final Map<FeedScopedId, StopLocation> STOPS_MAP = Map.of(STOP_A.getId(), STOP_A);
 
   static List<Arguments> testCasesRelaxedCost() {
     return List.of(
@@ -56,7 +59,9 @@ class RaptorRequestMapperTest {
   void testPassThroughPoints() {
     var req = new RouteRequest();
 
-    req.setPassThroughPoints(List.of(new ViaLocation("Via A", List.of(STOP_A))));
+    req.setPassThroughPoints(
+      List.of(ViaLocation.passThroughLocation("Via A", List.of(STOP_A.getId())))
+    );
 
     var result = map(req);
 
@@ -72,7 +77,9 @@ class RaptorRequestMapperTest {
     var req = new RouteRequest();
 
     // Set pass-through and relax transit-group-priority
-    req.setPassThroughPoints(List.of(new ViaLocation("Via A", List.of(STOP_A))));
+    req.setPassThroughPoints(
+      List.of(ViaLocation.passThroughLocation("Via A", List.of(STOP_A.getId())))
+    );
     req.withPreferences(p ->
       p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
     );
@@ -90,7 +97,8 @@ class RaptorRequestMapperTest {
       false,
       ACCESS,
       EGRESS,
-      null
+      null,
+      id -> IntStream.of(STOPS_MAP.get(id).getIndex())
     );
   }
 }

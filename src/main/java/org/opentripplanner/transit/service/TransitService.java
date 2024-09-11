@@ -139,6 +139,12 @@ public interface TransitService {
 
   StopLocation getStopLocation(FeedScopedId parseId);
 
+  /**
+   * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
+   * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
+   * stops, area stop or stop group, then a list with one item is returned.
+   * An empty list is if nothing is found.
+   */
   Collection<StopLocation> getStopOrChildStops(FeedScopedId id);
 
   Collection<StopLocationsGroup> listStopLocationGroups();

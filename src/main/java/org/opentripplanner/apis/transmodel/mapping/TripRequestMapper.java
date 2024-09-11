@@ -16,7 +16,6 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitService;
 
 public class TripRequestMapper {
 
@@ -40,11 +39,10 @@ public class TripRequestMapper {
       "to",
       (Map<String, Object> v) -> request.setTo(GenericLocationMapper.toGenericLocation(v))
     );
-    final TransitService transitService = context.getTransitService();
     callWith.argument(
       "passThroughPoints",
       (List<Map<String, Object>> v) -> {
-        request.setPassThroughPoints(ViaLocationMapper.toLocations(transitService, v));
+        request.setPassThroughPoints(ViaLocationMapper.toPassThroughLocations(v));
       }
     );
 
