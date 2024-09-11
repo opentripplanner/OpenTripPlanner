@@ -741,6 +741,8 @@ type Leg {
   transitLeg: Boolean
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
+  "What the type of the leg is."
+  type: LegType!
   "Whether this leg is walking with a bike."
   walkingBike: Boolean
 }
@@ -2884,6 +2886,18 @@ enum ItineraryFilterDebugProfile {
   LIST_ALL
   "By default, the debug itinerary filters is turned off."
   OFF
+}
+
+enum LegType {
+  """
+  Leg is on a flexible trip that uses flexible time windows, areas or groups of stops. This may or may not be classed
+  as transit, depending the type of service.
+  """
+  FLEX
+  "Leg is on a transit vehicle like bus, train or ferry which follows a published schedule, potentially with added real time information."
+  SCHEDULED_TRANSIT
+  "Leg traverses the street network, for example by walking to a stop, using a rental scooter or driving."
+  STREET
 }
 
 "Identifies whether this stop represents a stop or station."

@@ -9,6 +9,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLLegType;
+import org.opentripplanner.apis.gtfs.mapping.LegTypeMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
@@ -260,6 +262,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).getTrip();
+  }
+
+  @Override
+  public DataFetcher<GraphQLLegType> type() {
+    return environment ->
+      LegTypeMapper.map(getSource(environment));
   }
 
   @Override

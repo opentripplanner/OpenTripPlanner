@@ -1268,6 +1268,12 @@ public class GraphQLTypes {
     }
   }
 
+  public enum GraphQLLegType {
+    FLEX,
+    SCHEDULED_TRANSIT,
+    STREET,
+  }
+
   public static class GraphQLLocalDateRangeInput {
 
     private java.time.LocalDate end;

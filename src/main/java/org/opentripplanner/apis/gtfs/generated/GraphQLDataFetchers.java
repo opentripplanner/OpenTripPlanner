@@ -524,6 +524,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Trip> trip();
 
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLLegType> type();
+
     public DataFetcher<Boolean> walkingBike();
   }
 

@@ -17,6 +17,7 @@
           "walkTime" : 20,
           "legs" : [
             {
+              "type" : "STREET",
               "mode" : "WALK",
               "start" : {
                 "scheduledTime" : "2020-02-02T11:00:00Z",
@@ -67,6 +68,7 @@
               "accessibilityScore" : null
             },
             {
+              "type" : "SCHEDULED_TRANSIT",
               "mode" : "BUS",
               "start" : {
                 "scheduledTime" : "2020-02-02T10:51:00Z",
@@ -157,6 +159,7 @@
               "accessibilityScore" : null
             },
             {
+              "type" : "SCHEDULED_TRANSIT",
               "mode" : "RAIL",
               "start" : {
                 "scheduledTime" : "2020-02-02T11:20:00Z",
@@ -267,6 +270,7 @@
               "accessibilityScore" : null
             },
             {
+              "type" : "STREET",
               "mode" : "CAR",
               "start" : {
                 "scheduledTime" : "2020-02-02T11:50:00Z",

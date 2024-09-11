@@ -26,6 +26,7 @@
       walkDistance
       walkTime
       legs {
+        type
         mode
         start {
           scheduledTime
