@@ -17,37 +17,7 @@ Create a working directory and place the OTP jar file in it and call it `otp.jar
 Now create a file called `build-config.json` in the same folder and fill it with the following
 content:
 
-<!-- build-config BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-```JSON
-// build-config.json
-{
-  "netexDefaults" : {
-    "moduleFilePattern" : ".*-netex\\.zip",
-    "sharedFilePattern" : "_stops.xml",
-    "sharedGroupFilePattern" : "_(\\w{3})(_flexible)?_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "feedId" : "EN"
-  },
-  "transitFeeds" : [
-    {
-      "type" : "netex",
-      "feedId" : "NO",
-      "source" : "https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip"
-    }
-  ],
-  "osm" : [
-    {
-      "source" : "https://download.geofabrik.de/europe/norway-latest.osm.pbf",
-      "osmTagMapping" : "norway",
-      "timeZone" : "Europe/Oslo"
-    }
-  ]
-}
-```
-
-<!-- build-config END -->
+<!-- INSERT: build-config -->
 
 Note the special section specifying how to find NeTEx XML files within the single ZIP archive that
 OTP downloads.
@@ -84,33 +54,7 @@ GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in
 the `router-config.json` file, which is placed in the same directory as the `graph.obj` file and
 loaded at server startup.
 
-<!-- router-config BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-```JSON
-// router-config.json
-{
-  "updaters" : [
-    {
-      "type" : "siri-sx-updater",
-      "frequency" : "1m",
-      "url" : "https://api.entur.io/realtime/v1/services",
-      "feedId" : "NO",
-      "blockReadinessUntilInitialized" : true
-    },
-    {
-      "type" : "siri-et-updater",
-      "frequency" : "1m",
-      "previewIntervalMinutes" : 180,
-      "url" : "https://api.entur.io/realtime/v1/services",
-      "feedId" : "NO",
-      "blockReadinessUntilInitialized" : true
-    }
-  ]
-}
-```
-
-<!-- router-config END -->
+<!-- INSERT: router-config -->
 
 The updaters fetch three different kinds of SIRI data:
 

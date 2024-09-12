@@ -1,0 +1,23 @@
+{
+  "netexDefaults": {
+    "moduleFilePattern": ".*-netex\\.zip",
+    "sharedFilePattern": "_stops.xml",
+    "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
+    "groupFilePattern": "(\\w{3})_.*\\.xml",
+    "feedId": "EN"
+  },
+  "transitFeeds": [
+    {
+      "type": "netex",
+      "feedId": "NO",
+      "source": "https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://download.geofabrik.de/europe/norway-latest.osm.pbf",
+      "osmTagMapping": "norway",
+      "timeZone": "Europe/Oslo"
+    }
+  ]
+}
