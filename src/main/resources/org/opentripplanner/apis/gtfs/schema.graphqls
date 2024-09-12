@@ -738,7 +738,7 @@ type Leg {
   "The Place where the leg ends."
   to: Place!
   "Whether this leg is a transit leg or not."
-  transitLeg: Boolean @deprecated(reason: "Use `type` instead.")
+  transitLeg: Boolean @deprecated(reason : "Use `type` instead.")
   "For transit legs, the trip that is used for traversing the leg. For non-transit legs, `null`."
   trip: Trip
   "What the type of the leg is."
