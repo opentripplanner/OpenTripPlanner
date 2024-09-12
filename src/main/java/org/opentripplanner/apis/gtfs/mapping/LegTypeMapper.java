@@ -6,6 +6,9 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 
+/**
+ * Extracts the type enum from a leg.
+ */
 public class LegTypeMapper {
 
   public static GraphQLTypes.GraphQLLegType map(Leg source) {

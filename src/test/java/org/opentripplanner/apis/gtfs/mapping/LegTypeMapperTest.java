@@ -20,5 +20,4 @@ class LegTypeMapperTest implements PlanTestConstants {
     var busLeg = TestItineraryBuilder.newItinerary(A).bus(1, T11_00, T11_30, B).build().firstLeg();
     assertEquals(GraphQLLegType.SCHEDULED_TRANSIT, LegTypeMapper.map(busLeg));
   }
-
 }
