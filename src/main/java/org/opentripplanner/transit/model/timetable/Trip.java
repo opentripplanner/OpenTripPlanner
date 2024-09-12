@@ -20,6 +20,19 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 
+/**
+ * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
+ * given {@link TransitMode}, on a given sequence of stops served at given passing times.
+ * <p>A scheduled Trip can run at most once per service date,
+ * while a frequency-based Trip runs several times on a given service date.
+ * <p>A Trip can run on multiple service dates.
+ * <p>The service dates on which a trip is running are identified
+ * by its service id and can be looked up with
+ * {@link org.opentripplanner.model.calendar.CalendarService}.
+ * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
+ * via a {@link org.opentripplanner.model.Timetable}
+ * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
+ */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
   private final Operator operator;
