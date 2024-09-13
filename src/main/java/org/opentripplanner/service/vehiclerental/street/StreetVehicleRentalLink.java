@@ -38,10 +38,6 @@ public class StreetVehicleRentalLink extends Edge {
     return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
   }
 
-  public String toString() {
-    return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
-  }
-
   @Override
   @Nonnull
   public State[] traverse(State s0) {

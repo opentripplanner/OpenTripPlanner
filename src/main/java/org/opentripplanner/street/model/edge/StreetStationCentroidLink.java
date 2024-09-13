@@ -29,8 +29,4 @@ public class StreetStationCentroidLink extends FreeEdge {
   ) {
     return connectToGraph(new StreetStationCentroidLink(fromv, tov));
   }
-
-  public String toString() {
-    return "StreetStationCentroidLink(" + fromv + " -> " + tov + ")";
-  }
 }

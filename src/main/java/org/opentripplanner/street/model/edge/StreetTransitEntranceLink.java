@@ -43,10 +43,6 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
     return !isEntrance;
   }
 
-  public String toString() {
-    return "StreetTransitEntranceLink(" + fromv + " -> " + tov + ")";
-  }
-
   protected int getStreetToStopTime() {
     return 0;
   }

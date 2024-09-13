@@ -308,20 +308,17 @@ public class StreetEdge
   }
 
   public String toString() {
-    return (
-      "StreetEdge(" +
-      name +
-      ", " +
-      fromv +
-      " -> " +
-      tov +
-      " length=" +
-      this.getDistanceMeters() +
-      " carSpeed=" +
-      this.getCarSpeed() +
-      " permission=" +
-      this.getPermission() +
-      ")"
+    var nameString = name != null ? name.toString() : null;
+    return buildToString(
+      nameString,
+      b ->
+        b
+          .append(", length=")
+          .append(this.getDistanceMeters())
+          .append(", carSpeed=")
+          .append(this.getCarSpeed())
+          .append(", permission=")
+          .append(this.getPermission())
     );
   }
 

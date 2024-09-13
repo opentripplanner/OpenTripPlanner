@@ -62,10 +62,6 @@ public class VehicleParkingEdge extends Edge {
     return false;
   }
 
-  public String toString() {
-    return "VehicleParkingEdge(" + fromv + " -> " + tov + ")";
-  }
-
   @Override
   @Nonnull
   public State[] traverse(State s0) {

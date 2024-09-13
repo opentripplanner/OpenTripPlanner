@@ -45,11 +45,6 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("fromv", fromv).addObj("tov", tov).toString();
-  }
-
-  @Override
   @Nonnull
   public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeParkLinks in a row.
