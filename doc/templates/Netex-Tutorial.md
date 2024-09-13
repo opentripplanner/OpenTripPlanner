@@ -7,7 +7,7 @@ GTFS but broader in scope.
 
 First of all, you need to download a [bundled jar of OTP](Getting-OTP.md).
 
-Secondly, you need the [Norwegian NeTEx file](https://developer.entur.org/pages-intro-files) as
+Secondly, you will use the [Norwegian NeTEx file](https://developer.entur.org/pages-intro-files) as
 well as the [Norwegian OSM data](http://download.geofabrik.de/europe/norway.html), but OTP can download 
 both of these for you.
 
@@ -24,19 +24,20 @@ OTP downloads.
 
 Now you can instruct OTP to build a graph from this configuration file:
 
-`java -Xmx10G otp.jar --build --save .`
+`java -Xmx10G -jar otp.jar --build --save .`
 
-This should produce a file `graph.obj` in the same directory as your `build-config.json`. 
+This should produce a file `graph.obj` in the same directory as your `build-config.json`.
 
-Building the Norway graph takes approximately 10 minutes (without elevation data, as configured above), 
-and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might 
-speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take
-about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under
-light use.
+Building the Norway graph requires downloading about 1.5GB of input data so stay patient at the beginning
+particularly on a slow internet connection.
+The actual build takes approximately 10 minutes (without elevation data, as is configured above), 
+and can be done within 16GB of heap memory (JVM switch `-Xmx16G`). The Graph file it produces is 
+about 1.1 GB. The server will take about 30 seconds to load this graph and start up, and will 
+consume about 6GB of heap memory under light use.
 
 You can then start up an OTP server with a command like this:
 
-`java -Xmx6G otp.jar --load .`
+`java -Xmx6G -jar otp.jar --load .`
 
 Once the server is started up, go to `http://localhost:8080` in a browser to try out your server
 using OTP's built in testing web client. Try some long trips like Oslo to Bergen and see if you can
@@ -45,7 +46,7 @@ above its very low default value.
 
 ## Adding SIRI real time Data
 
-Another important feature in OTP2 is the ability to
+Another important feature in OTP version 2 is the ability to
 use [SIRI real-time data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information).
 Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply real-time updates on top
 of schedule data. While technically a distinct specification from NeTEx, both NeTEx and SIRI use the
@@ -56,7 +57,9 @@ loaded at server startup.
 
 <!-- INSERT: router-config -->
 
-The updaters fetch three different kinds of SIRI data:
+After saving the file in the working directory, restart OTP.
+
+The updaters fetch two different kinds of SIRI data:
 
 - Situation Exchange (SX, text notices analogous to GTFS-RT Alerts)
 - Estimated Timetable (ET, predicted arrival times analogous to GTFS-RT TripUpdates)

@@ -24,11 +24,10 @@ class NetexTutorialDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_PATH, NETEX_TUTORIAL_MD);
   private static final File OUT_FILE = new File(USER_DOC_PATH, NETEX_TUTORIAL_MD);
 
-  private static final String STANDALONE_CONFIG_NETEX_TUTORIAL = "standalone/config/netex-tutorial/";
+  private static final String TUTORIAL_PATH = "standalone/config/netex-tutorial/";
 
   @Test
   void updateTutorialDoc() {
-
     // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
@@ -41,7 +40,7 @@ class NetexTutorialDocTest {
   }
 
   private static String toJson(String fileName) {
-    var path = STANDALONE_CONFIG_NETEX_TUTORIAL + fileName;
+    var path = TUTORIAL_PATH + fileName;
     var nodeAdapter = loadBuildConfig(path);
     var buf = new DocBuilder();
     buf.addExample(fileName, nodeAdapter.rawNode());
@@ -53,5 +52,4 @@ class NetexTutorialDocTest {
     var conf = new RouterConfig(json, buildConfigPath, false);
     return conf.asNodeAdapter();
   }
-
 }

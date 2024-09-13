@@ -10,7 +10,7 @@
     {
       "type": "siri-et-updater",
       "frequency": "1m",
-      "previewIntervalMinutes": 180,
+      "previewInterval": "1h30m",
       "url": "https://api.entur.io/realtime/v1/services",
       "feedId": "NO",
       "blockReadinessUntilInitialized": true
