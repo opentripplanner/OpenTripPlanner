@@ -3,22 +3,46 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
+import java.util.Set;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 
-public record VehiclePositionUpdaterRunnable(
-  List<VehiclePosition> updates,
-  RealtimeVehiclePatternMatcher matcher
-)
-  implements GraphWriterRunnable {
-  public VehiclePositionUpdaterRunnable {
-    Objects.requireNonNull(updates);
-    Objects.requireNonNull(matcher);
+public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
+
+  private final List<VehiclePosition> updates;
+  private final RealtimeVehicleRepository realtimeVehicleRepository;
+  private final String feedId;
+  private final boolean fuzzyTripMatching;
+  private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
+
+  public VehiclePositionUpdaterRunnable(
+    RealtimeVehicleRepository realtimeVehicleRepository,
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures,
+    String feedId,
+    boolean fuzzyTripMatching,
+    List<VehiclePosition> updates
+  ) {
+    this.updates = Objects.requireNonNull(updates);
+    this.feedId = feedId;
+    this.realtimeVehicleRepository = realtimeVehicleRepository;
+    this.fuzzyTripMatching = fuzzyTripMatching;
+    this.vehiclePositionFeatures = vehiclePositionFeatures;
   }
 
   @Override
-  public void run(Graph graph, TransitModel transitModel) {
+  public void run(RealTimeUpdateContext context) {
+    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
+      feedId,
+      context.transitService()::getTripForId,
+      context.transitService()::getPatternForTrip,
+      context.transitService()::getPatternForTrip,
+      realtimeVehicleRepository,
+      context.transitService().getTimeZone(),
+      fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
+      vehiclePositionFeatures
+    );
     // Apply new vehicle positions
     matcher.applyRealtimeVehicleUpdates(updates);
   }

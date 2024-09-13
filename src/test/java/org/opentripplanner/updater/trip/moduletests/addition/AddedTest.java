@@ -16,9 +16,12 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
@@ -62,8 +65,12 @@ class AddedTest {
     assertEquals(TripUpdateBuilder.ROUTE_NAME, route.getName());
     assertEquals(TransitMode.RAIL, route.getMode());
 
-    var fromTransitModel = env.getTransitService().getRouteForId(route.getId());
+    TransitService transitService = env.getTransitService();
+    var fromTransitModel = transitService.getRouteForId(route.getId());
     assertEquals(fromTransitModel, route);
+    var patternsForRoute = transitService.getPatternsForRoute(route);
+    assertEquals(1, patternsForRoute.size());
+    assertEquals(pattern, patternsForRoute.stream().findFirst().orElseThrow());
 
     assertEquals(PickDrop.CALL_AGENCY, pattern.getBoardType(0));
     assertEquals(PickDrop.CALL_AGENCY, pattern.getAlightType(0));
@@ -122,6 +129,12 @@ class AddedTest {
 
   private TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
     var snapshot = env.getTimetableSnapshot();
+
+    TransitService transitService = env.getTransitService();
+    Trip trip = transitService.getTripForId(TransitModelForTest.id(ADDED_TRIP_ID));
+    assertNotNull(trip);
+    assertNotNull(transitService.getPatternForTrip(trip));
+
     var stopA = env.transitModel.getStopModel().getRegularStop(env.stopA1.getId());
     // Get the trip pattern of the added trip which goes through stopA
     var patternsAtA = env.getTimetableSnapshot().getPatternsForStop(stopA);

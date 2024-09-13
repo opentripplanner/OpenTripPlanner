@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
-import org.opentripplanner.apis.transmodel.model.TripTimeShortHelper;
+import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
@@ -271,7 +271,7 @@ public class LegType {
           .withDirective(gqlUtil.timingData)
           .description("EstimatedCall for the quay where the leg originates.")
           .type(estimatedCallType)
-          .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForFromPlace(env.getSource()))
+          .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForFromPlace(env.getSource()))
           .build()
       )
       .field(
@@ -281,7 +281,7 @@ public class LegType {
           .withDirective(gqlUtil.timingData)
           .description("EstimatedCall for the quay where the leg ends.")
           .type(estimatedCallType)
-          .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForToPlace(env.getSource()))
+          .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForToPlace(env.getSource()))
           .build()
       )
       .field(
@@ -358,7 +358,7 @@ public class LegType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .dataFetcher(env ->
-            TripTimeShortHelper.getIntermediateTripTimeShortsForLeg(env.getSource())
+            TripTimeOnDateHelper.getIntermediateTripTimeOnDatesForLeg(env.getSource())
           )
           .build()
       )
@@ -371,7 +371,8 @@ public class LegType {
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
-          .dataFetcher(env -> TripTimeShortHelper.getAllTripTimeShortsForLegsTrip(env.getSource()))
+          .dataFetcher(env -> TripTimeOnDateHelper.getAllTripTimeOnDatesForLegsTrip(env.getSource())
+          )
           .build()
       )
       //                .field(GraphQLFieldDefinition.newFieldDefinition()

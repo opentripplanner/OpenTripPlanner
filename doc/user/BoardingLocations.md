@@ -60,3 +60,8 @@ add the following to `build-config.json`:
 
 Some stations have a middle platform with a stop on either side of it. In such a case, you can 
 simply add two or more references separated by a semicolon, as seen in [this example](https://www.openstreetmap.org/way/27558650).
+
+## Related chat threads
+
+- [Thread by Tim Fowle](https://matrix.to/#/!oXNNoHKzbaSOlFzLEt:gitter.im/$740KuVeCc65IW7HO9VjvYk92ACk0cOcjKA_BJhnDMSU?via=gitter.im&via=matrix.org&via=builtin.io)
+- [Thread by Sam Cedarbaum](https://matrix.to/#/!oXNNoHKzbaSOlFzLEt:gitter.im/$XY7X9KC0FNSajQ8zDEPUARlv6QHOUd3Qn0R3G2POpqk?via=gitter.im&via=matrix.org&via=builtin.io)

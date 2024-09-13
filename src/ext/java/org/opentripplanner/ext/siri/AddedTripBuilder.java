@@ -33,7 +33,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -173,6 +172,7 @@ class AddedTripBuilder {
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
+    boolean isAddedRoute = false;
     Route route = entityResolver.resolveRoute(lineRef);
     if (route == null) {
       Agency agency = resolveAgency();
@@ -180,8 +180,8 @@ class AddedTripBuilder {
         return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY);
       }
       route = createRoute(agency);
+      isAddedRoute = true;
       LOG.info("Adding route {} to transitModel.", route);
-      transitService.addRoutes(route);
     }
 
     Trip trip = createTrip(route, calServiceId);
@@ -265,18 +265,16 @@ class AddedTripBuilder {
       .withReplacementFor(replacedTrips)
       .build();
 
-    // Adding trip to index necessary to include values in graphql-queries
-    // TODO - SIRI: should more data be added to index?
-    transitService.addTripForId(tripId, trip);
-    transitService.addPatternForTrip(trip, pattern);
-    transitService.addPatternsForRoute(route, pattern);
-    transitService.addTripOnServiceDateById(tripOnServiceDate.getId(), tripOnServiceDate);
-    transitService.addTripOnServiceDateForTripAndDay(
-      new TripIdAndServiceDate(tripId, serviceDate),
-      tripOnServiceDate
+    return Result.success(
+      new TripUpdate(
+        stopPattern,
+        updatedTripTimes,
+        serviceDate,
+        tripOnServiceDate,
+        pattern,
+        isAddedRoute
+      )
     );
-
-    return Result.success(new TripUpdate(stopPattern, updatedTripTimes, serviceDate));
   }
 
   /**

@@ -45,29 +45,10 @@ public class SiriFuzzyTripMatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
-  private static SiriFuzzyTripMatcher instance;
-
   private final Map<String, Set<Trip>> internalPlanningCodeCache = new HashMap<>();
   private final Map<String, Set<Trip>> startStopTripCache = new HashMap<>();
   private final TransitService transitService;
-  private boolean initialized = false;
 
-  /**
-   * Factory method used to create only one instance.
-   * <p>
-   * THIS METHOD IS NOT THREAD-SAFE AND SHOULD BE CALLED DURING THE
-   * INITIALIZATION PROCESS.
-   */
-  public static SiriFuzzyTripMatcher of(TransitService transitService) {
-    if (instance == null) {
-      instance = new SiriFuzzyTripMatcher(transitService);
-    }
-    return instance;
-  }
-
-  /**
-   * Constructor with public access for tests only.
-   */
   public SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
     initCache(this.transitService);
@@ -181,38 +162,34 @@ public class SiriFuzzyTripMatcher {
   }
 
   private void initCache(TransitService index) {
-    if (!initialized) {
-      for (Trip trip : index.getAllTrips()) {
-        TripPattern tripPattern = index.getPatternForTrip(trip);
+    for (Trip trip : index.getAllTrips()) {
+      TripPattern tripPattern = index.getPatternForTrip(trip);
 
-        if (tripPattern == null) {
-          continue;
-        }
-
-        if (tripPattern.getRoute().getMode().equals(TransitMode.RAIL)) {
-          String internalPlanningCode = trip.getNetexInternalPlanningCode();
-          if (internalPlanningCode != null) {
-            internalPlanningCodeCache
-              .computeIfAbsent(internalPlanningCode, key -> new HashSet<>())
-              .add(trip);
-          }
-        }
-        String lastStopId = tripPattern.lastStop().getId().getId();
-
-        TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
-        if (tripTimes != null) {
-          int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
-
-          String key = createStartStopKey(lastStopId, arrivalTime);
-          startStopTripCache.computeIfAbsent(key, k -> new HashSet<>()).add(trip);
-        }
+      if (tripPattern == null) {
+        continue;
       }
 
-      LOG.info("Built internalPlanningCode-cache [{}].", internalPlanningCodeCache.size());
-      LOG.info("Built start-stop-cache [{}].", startStopTripCache.size());
+      if (tripPattern.getRoute().getMode().equals(TransitMode.RAIL)) {
+        String internalPlanningCode = trip.getNetexInternalPlanningCode();
+        if (internalPlanningCode != null) {
+          internalPlanningCodeCache
+            .computeIfAbsent(internalPlanningCode, key -> new HashSet<>())
+            .add(trip);
+        }
+      }
+      String lastStopId = tripPattern.lastStop().getId().getId();
+
+      TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+      if (tripTimes != null) {
+        int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
+
+        String key = createStartStopKey(lastStopId, arrivalTime);
+        startStopTripCache.computeIfAbsent(key, k -> new HashSet<>()).add(trip);
+      }
     }
 
-    initialized = true;
+    LOG.info("Built internalPlanningCode-cache [{}].", internalPlanningCodeCache.size());
+    LOG.info("Built start-stop-cache [{}].", startStopTripCache.size());
   }
 
   private static String createStartStopKey(String lastStopId, int lastStopArrivalTime) {

@@ -36,18 +36,11 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   private final LocalDate toDateTime;
 
   public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitModel transitModel) {
-    super(config, transitModel);
+    super(config);
     this.fromDateTime = config.getFromDateTime();
     this.toDateTime = config.getToDateTime();
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-    this.updateHandler =
-      new SiriAlertsUpdateHandler(
-        feedId,
-        transitModel,
-        transitAlertService,
-        fuzzyTripMatcher(),
-        Duration.ZERO
-      );
+    this.updateHandler = new SiriAlertsUpdateHandler(feedId, transitAlertService, Duration.ZERO);
   }
 
   @Override
@@ -123,7 +116,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   }
 
   private Future<?> processMessage(ServiceDelivery siriSx) {
-    return super.saveResultOnGraph.execute((graph, transitModel) -> updateHandler.update(siriSx));
+    return super.saveResultOnGraph.execute(context -> updateHandler.update(siriSx, context));
   }
 
   private void processHistory(ServiceDelivery siri) {

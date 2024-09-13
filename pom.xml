@@ -56,14 +56,14 @@
 
 
     <properties>
-        <otp.serialization.version.id>156</otp.serialization.version.id>
+        <otp.serialization.version.id>157</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>31.3</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
         <jackson.version>2.17.2</jackson.version>
         <jersey.version>3.1.8</jersey.version>
         <junit.version>5.11.0</junit.version>
-        <micrometer.version>1.13.2</micrometer.version>
+        <micrometer.version>1.13.4</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.7</logback.version>
         <lucene.version>9.11.1</lucene.version>
@@ -533,11 +533,6 @@
             <name>Open Source Geospatial Foundation Repository</name>
             <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
-        <repository>
-            <id>onebusaway-releases</id>
-            <name>Onebusaway Releases Repo</name>
-            <url>https://repo.camsys-apps.com/releases/</url>
-        </repository>
     </repositories>
 
     <dependencyManagement>
@@ -546,7 +541,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.44.0</version>
+                <version>26.45.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -824,13 +819,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.17</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>3.2.3</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -859,7 +848,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>22.2</version>
+            <version>22.3</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
