@@ -4,8 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.routing.api.request.PassThroughViaLocation;
-import org.opentripplanner.routing.api.request.ViaLocation;
+import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class ViaLocationMapper {

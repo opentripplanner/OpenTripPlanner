@@ -23,8 +23,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.Pe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
