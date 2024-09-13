@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -76,7 +77,7 @@ public class OtpHttpClient {
     Map<String, String> requestHeaderValues
   ) {
     return executeAndMapWithResponseHandler(
-      new HttpGet(uri),
+      new HttpHead(uri),
       timeout,
       requestHeaderValues,
       response -> {
