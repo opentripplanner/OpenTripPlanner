@@ -11,7 +11,7 @@
   ],
   "osm": [
     {
-      "source": "https://download.geofabrik.de/europe/norway-latest.osm.pbf",
+      "source": "norway.osm.pbf",
       "osmTagMapping": "norway",
       "timeZone": "Europe/Oslo"
     }

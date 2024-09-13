@@ -8,12 +8,19 @@ GTFS but broader in scope.
 First of all, you need to download a [bundled jar of OTP](Getting-OTP.md).
 
 Secondly, you will use the [Norwegian NeTEx file](https://developer.entur.org/pages-intro-files) as
-well as the [Norwegian OSM data](http://download.geofabrik.de/europe/norway.html), but OTP can download 
-both of these for you.
+well as the [Norwegian OSM data](http://download.geofabrik.de/europe/norway.html), but OTP can download the NeTEx one for you.
 
 ## Configuring the build
 
 Create a working directory and place the OTP jar file in it and call it `otp.jar.`
+
+Since we download the OSM data from a free source, we don't want to put undue stress on the server.
+Therefore we download it before building the graph, not during.
+
+```
+curl https://download.geofabrik.de/europe/norway-latest.osm.pbf -o norway.osm.pbf
+```
+
 Now create a file called `build-config.json` in the same folder and fill it with the following
 content:
 
@@ -28,7 +35,7 @@ Now you can instruct OTP to build a graph from this configuration file:
 
 This should produce a file `graph.obj` in the same directory as your `build-config.json`.
 
-Building the Norway graph requires downloading about 1.5GB of input data so stay patient at the beginning
+Building the Norway graph requires downloading about 250MB of input data so stay patient at the beginning
 particularly on a slow internet connection.
 The actual build takes approximately 10 minutes (without elevation data, as is configured above), 
 and can be done within 16GB of heap memory (JVM switch `-Xmx16G`). The Graph file it produces is 
