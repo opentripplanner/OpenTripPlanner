@@ -91,9 +91,6 @@ public class OtpHttpClient {
 
           return Collections.emptyList();
         }
-        if (response.getEntity() == null || response.getEntity().getContent() == null) {
-          throw new OtpHttpClientException("HTTP request failed: empty response");
-        }
         return Arrays.stream(response.getHeaders()).toList();
       }
     );
