@@ -329,8 +329,22 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
+      var leg = getSource(environment);
       var ref = getSource(environment).getLegReference();
-      var id = LegReferenceSerializer.encode(ref);
+      String id;
+
+      if (ref == null) {
+        id =
+          String.join(
+            "",
+            leg.start().time().toString(),
+            leg.end().time().toString(),
+            leg.getFrom().toStringShort(),
+            leg.getTo().toStringShort()
+          );
+      } else {
+        id = LegReferenceSerializer.encode(ref);
+      }
       return new Relay.ResolvedGlobalId("Leg", id);
     };
   }
