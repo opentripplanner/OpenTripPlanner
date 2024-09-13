@@ -88,8 +88,8 @@ class HttpsDataSourceMetadata {
     return ToStringBuilder
       .of(this.getClass())
       .addObj("contentType", contentType)
-      .addStr("contentLength", FileSizeToTextConverter.fileSizeToString(contentLength))
-      .addObj("lastModified", lastModified)
+      .addObj("contentLength", FileSizeToTextConverter.fileSizeToString(contentLength))
+      .addObj("lastModified", Instant.ofEpochMilli(lastModified).toString())
       .toString();
   }
 }
