@@ -58,6 +58,7 @@ nav:
     - Basic Tutorial: 'Basic-Tutorial.md'
     - Netex and SIRI Tutorial: 'Netex-Tutorial.md'
     - Getting OTP: 'Getting-OTP.md'
+    - Data Sources: 'Data-Sources.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
