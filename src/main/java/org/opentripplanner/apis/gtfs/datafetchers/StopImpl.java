@@ -243,7 +243,9 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   @Override
   public DataFetcher<Iterable<Route>> routes() {
-    return this::getRoutes;
+    return (env) -> {
+      var routes= this.getRoutes(env);
+    };
   }
 
   @Override
