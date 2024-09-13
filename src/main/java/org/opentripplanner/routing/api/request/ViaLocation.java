@@ -1,127 +1,56 @@
 package org.opentripplanner.routing.api.request;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * Defines a via location which the journey must route through.
+ * Defines a via location which the journey must route through. At least one stop location or
+ * coordinate must exist. When routing, the via-location is visited if at least one of the stops
+ * or coordinates is visited, before the journey continues. There is no need to visit any other
+ * stop location or coordinate.
+ * <p>
+ * The stop locations and coordinates are distinct locations. In earlier versions of OTP the
+ * coordinates were used as a fallback for when a stop was not found. But in this version, a
+ * {@link org.opentripplanner.transit.model.framework.EntityNotFoundException} is thrown if
+ * one of the stops does not exist. The search does NOT try to be smart and recover from an
+ * entity no found exception.
  */
-public final class ViaLocation {
-
-  private static final Duration MINIMUM_WAIT_TIME_MAX_LIMIT = Duration.ofHours(24);
-
-  private final String label;
-  private final boolean allowAsPassThroughPoint;
-  private final Duration minimumWaitTime;
-  private final List<ViaConnection> connections;
-
-  @SuppressWarnings("DataFlowIssue")
-  private ViaLocation(
-    @Nullable String label,
-    boolean allowAsPassThroughPoint,
-    @Nullable Duration minimumWaitTime,
-    Collection<ViaConnection> connections
-  ) {
-    this.label = label;
-    this.allowAsPassThroughPoint = allowAsPassThroughPoint;
-    this.minimumWaitTime =
-      DurationUtils.requireNonNegative(
-        minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
-        MINIMUM_WAIT_TIME_MAX_LIMIT,
-        "minimumWaitTime"
-      );
-    this.connections = List.copyOf(connections);
-
-    if (allowAsPassThroughPoint && !minimumWaitTime.isZero()) {
-      throw new IllegalArgumentException(
-        "'allowAsPassThroughPoint' can not be used with minimumWaitTime for " + label + "."
-      );
-    }
-    if (allowAsPassThroughPoint && connections.stream().anyMatch(ViaConnection::hasCoordinate)) {
-      throw new IllegalArgumentException(
-        "'allowAsPassThroughPoint' can not be used with coordinates for " + label + "."
-      );
-    }
-  }
-
+public interface ViaLocation {
   /**
-   * A pass-through-location instructs the router to visit the location either by boarding,
-   * alighting or on-board a transit.
-   * @param label The name/label for this location. This is used for debugging and logging and is pass-through information.
-   * @param locationIds The ID for the stop, station or multimodal station or groupOfStopPlace.
-   */
-  public static ViaLocation passThroughLocation(
-    @Nullable String label,
-    List<FeedScopedId> locationIds
-  ) {
-    return new ViaLocation(label, true, Duration.ZERO, ViaConnection.connections(locationIds));
-  }
-
-  /**
-   * If set to {@code true} this location can be visited as a pass-through-point. Only
-   * collections of stops are supported, not coordinates. Also, the minWaitTime must be
-   * zero(0).
-   */
-  public boolean allowAsPassThroughPoint() {
-    return allowAsPassThroughPoint;
-  }
-
-  /**
-   * The minimum wait time is used to force the trip to stay the given duration at the via
-   * location before the trip is continued. This cannot be used together with allow-pass-through,
-   * since a pass-through stop is visited on-board.
-   */
-  public Duration minimumWaitTime() {
-    return minimumWaitTime;
-  }
-
-  /**
-   * Get an optional name/label of for debugging and logging.
+   * Get an optional name/label of for debugging and logging. Not used in business logic.
    */
   @Nullable
-  public String label() {
-    return label;
+  String label();
+
+  /**
+   * The minimum wait time is used to force the trip to stay the given duration at the via location
+   * before the trip is continued. This cannot be used together with allow-pass-through, since a
+   * pass-through stop is visited on-board.
+   */
+  default Duration minimumWaitTime() {
+    return Duration.ZERO;
   }
 
   /**
-   * Get the one or multiple locations of which only one is required to route through.
+   * Returns {@code true} if this location is a pass-through-point. Only stops can be visited and
+   * the {@code minimumWaitTime} must be zero.
    */
-  public List<ViaConnection> connections() {
-    return connections;
-  }
+  boolean isPassThroughLocation();
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    ViaLocation that = (ViaLocation) o;
-    return (
-      allowAsPassThroughPoint == that.allowAsPassThroughPoint &&
-      Objects.equals(minimumWaitTime, that.minimumWaitTime) &&
-      Objects.equals(label, that.label) &&
-      Objects.equals(connections, that.connections)
-    );
-  }
+  /**
+   * A list of stop witch can be used as via location together with the {@code coordinates}.A stop
+   * location can be a stop, a station, a multimodal station or a group of stations.
+   */
+  List<FeedScopedId> stopLocationIds();
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(allowAsPassThroughPoint, minimumWaitTime, label, connections);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(ViaLocation.class)
-      .addBoolIfTrue(label, label != null)
-      .addBoolIfTrue("allowAsPassThroughPoint", allowAsPassThroughPoint)
-      .addDuration("minimumWaitTime", minimumWaitTime, Duration.ZERO)
-      .addObj("connections", connections)
-      .toString();
+  /**
+   * Get the one or multiple stop locations. This is optional to implement, an empty
+   * list is returned if this is not available.
+   */
+  default List<WgsCoordinate> coordinates() {
+    return List.of();
   }
 }

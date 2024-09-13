@@ -325,12 +325,12 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .createRequest(executionContext(arguments))
       .getViaLocations();
     assertEquals(
-      "ViaLocation{PTP1, allowAsPassThroughPoint, connections: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
+      "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()
     );
     assertEquals("PTP1", viaLocations.get(0).label());
     assertEquals(
-      "ViaLocation{PTP2, allowAsPassThroughPoint, connections: [F:ST:stop3, F:ST:stop2]}",
+      "PassThroughViaLocation{label: PTP2, stopLocationIds: [F:ST:stop3, F:ST:stop2]}",
       viaLocations.get(1).toString()
     );
     assertEquals("PTP2", viaLocations.get(1).label());

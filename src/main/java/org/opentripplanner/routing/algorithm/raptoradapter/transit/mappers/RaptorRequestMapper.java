@@ -23,7 +23,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.Pe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.ViaConnection;
 import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
@@ -123,7 +122,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
 
       // TODO - We need handle via locations that are not pass-through-points here
-      if (request.getViaLocations().stream().allMatch(ViaLocation::allowAsPassThroughPoint)) {
+      if (request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
@@ -192,10 +191,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private PassThroughPoint mapPassThroughPoints(ViaLocation location) {
-    var feedIds = location.connections().stream().map(ViaConnection::locationId).toList();
     return new PassThroughPoint(
       location.label(),
-      lookUpStopIndex.lookupStopLocationIndexes(feedIds)
+      lookUpStopIndex.lookupStopLocationIndexes(location.stopLocationIds())
     );
   }
 
