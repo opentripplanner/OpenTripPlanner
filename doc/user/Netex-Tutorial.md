@@ -46,7 +46,8 @@ content:
       "osmTagMapping" : "norway",
       "timeZone" : "Europe/Oslo"
     }
-  ]
+  ],
+  "osmCacheDataInMem" : true
 }
 ```
 
