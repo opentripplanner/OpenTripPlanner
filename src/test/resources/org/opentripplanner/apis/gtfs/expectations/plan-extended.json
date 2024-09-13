@@ -65,7 +65,7 @@
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
-              "id" : "TGVnOk5vdEF2YWlsYWJsZQ",
+              "id": "TGVnOjIwMjAtMDItMDJUMTE6MDBaMjAyMC0wMi0wMlQxMTowMDoyMFpBIChGOkEpQiAoRjpCKQ",
               "realtimeState": "SCHEDULED"
             },
             {
@@ -341,7 +341,7 @@
                 "arrival" : "PT10M"
               },
               "accessibilityScore" : null,
-              "id": "TGVnOk5vdEF2YWlsYWJsZQ",
+              "id": "TGVnOjIwMjAtMDItMDJUMTE6NTBaMjAyMC0wMi0wMlQxMjowMFpEIChGOkQpRSAoRjpFKQ",
               "realtimeState": "SCHEDULED"
             }
           ]
