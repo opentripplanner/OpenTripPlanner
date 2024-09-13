@@ -14,6 +14,7 @@ import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +90,13 @@ final class HttpsFileDataSource implements DataSource {
         throw new IllegalStateException(e.getLocalizedMessage(), e);
       }
     } else {
-      return in;
+      return ProgressTracker.track(
+        "Downloading %s".formatted(uri.toString()),
+        1000,
+        size(),
+        in,
+        m -> LOG.info(m)
+      );
     }
   }
 

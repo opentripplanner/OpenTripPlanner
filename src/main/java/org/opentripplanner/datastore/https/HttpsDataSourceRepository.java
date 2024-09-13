@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpsDataSourceRepository implements DataSourceRepository {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpsFileDataSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpsDataSourceRepository.class);
 
   private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
 
