@@ -128,8 +128,8 @@ public class VertexFactory {
   }
 
   @Nonnull
-  public TransitStationCentroidVertex transitStationCentroid(Station station) {
-    return addToGraph(new TransitStationCentroidVertex(station));
+  public StationCentroidVertex stationCentroid(Station station) {
+    return addToGraph(new StationCentroidVertex(station));
   }
 
   @Nonnull

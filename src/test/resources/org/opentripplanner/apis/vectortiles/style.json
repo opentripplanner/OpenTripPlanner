@@ -144,7 +144,7 @@
         "BoardingLocationToStopLink",
         "StreetVehicleRentalLink",
         "StreetVehicleParkingLink",
-        "StreetTransitStationCentroidLink"
+        "StreetStationCentroidLink"
       ],
       "layout" : {
         "line-cap" : "round",

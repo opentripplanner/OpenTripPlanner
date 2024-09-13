@@ -32,9 +32,9 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.TransitStationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -66,7 +66,7 @@ public class StreetIndex {
   /**
    * This list contains transitStationVertices for the stations that are configured to route to centroid
    */
-  private final Map<FeedScopedId, TransitStationCentroidVertex> transitStationCentroidVertices;
+  private final Map<FeedScopedId, StationCentroidVertex> stationCentroidVertices;
 
   private final EdgeSpatialIndex edgeSpatialIndex;
   private final HashGridSpatialIndex<Vertex> verticesTree;
@@ -80,7 +80,7 @@ public class StreetIndex {
     this.verticesTree = new HashGridSpatialIndex<>();
     this.vertexLinker = new VertexLinker(graph, stopModel, edgeSpatialIndex);
     this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
-    this.transitStationCentroidVertices = createTransitStationVertexMap(graph);
+    this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
   }
 
@@ -278,7 +278,7 @@ public class StreetIndex {
    * the station centroid if the station is configured to route to centroid.
    */
   public Set<Vertex> getStreetVerticesById(FeedScopedId id) {
-    var stationVertex = transitStationCentroidVertices.get(id);
+    var stationVertex = stationCentroidVertices.get(id);
     if (stationVertex != null) {
       return Set.of(stationVertex);
     }
@@ -464,17 +464,13 @@ public class StreetIndex {
     return Map.copyOf(map);
   }
 
-  private static Map<FeedScopedId, TransitStationCentroidVertex> createTransitStationVertexMap(
+  private static Map<FeedScopedId, StationCentroidVertex> createStationCentroidVertexMap(
     Graph graph
   ) {
-    var vertices = graph.getVerticesOfType(TransitStationCentroidVertex.class);
-
-    var map = new HashMap<FeedScopedId, TransitStationCentroidVertex>();
-    for (var vertex : vertices) {
-      if (vertex.getStation().shouldRouteToCentroid()) {
-        map.put(vertex.getStation().getId(), vertex);
-      }
-    }
-    return Map.copyOf(map);
+    return graph
+      .getVerticesOfType(StationCentroidVertex.class)
+      .stream()
+      .filter(vertex -> vertex.getStation().shouldRouteToCentroid())
+      .collect(Collectors.toUnmodifiableMap(v -> v.getStation().getId(), v -> v));
   }
 }

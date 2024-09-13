@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -40,7 +39,6 @@ public class Station
   private final I18NString url;
   private final ZoneId timezone;
   private final boolean transfersNotAllowed;
-  private final Accessibility wheelchairAccessibility;
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
@@ -63,7 +61,6 @@ public class Station
     this.description = builder.getDescription();
     this.url = builder.getUrl();
     this.timezone = builder.getTimezone();
-    this.wheelchairAccessibility = builder.getWheelchairAccessibility();
 
     // Initialize the geometry with an empty set of children
     this.geometry = computeGeometry(coordinate, Set.of());
@@ -156,13 +153,6 @@ public class Station
   }
 
   /**
-   * Whether this station is accessible by wheelchair or not.
-   */
-  public Accessibility getWheelchairAccessibility() {
-    return wheelchairAccessibility;
-  }
-
-  /**
    * If true do not allow any transfers to or from any stop within station
    */
   public boolean isTransfersNotAllowed() {
@@ -201,8 +191,7 @@ public class Station
       Objects.equals(shouldRouteToCentroid, other.shouldRouteToCentroid) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(timezone, other.timezone) &&
-      Objects.equals(wheelchairAccessibility, other.wheelchairAccessibility)
+      Objects.equals(timezone, other.timezone)
     );
   }
 

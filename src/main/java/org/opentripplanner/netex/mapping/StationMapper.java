@@ -15,7 +15,6 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JAXBUtils;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.StopModelBuilder;
@@ -78,8 +77,7 @@ class StationMapper {
           .map(LocaleStructure::getTimeZone)
           .map(zoneId -> ofZoneId(stopPlace.getId(), zoneId))
           .orElse(defaultTimeZone)
-      )
-      .withWheelchairAccessibility(wheelchairAccessibility(stopPlace));
+      );
 
     if (noTransfersOnIsolatedStops) {
       builder.withTransfersNotAllowed(
@@ -157,12 +155,5 @@ class StationMapper {
       }
       return WgsCoordinate.mean(coordinates);
     }
-  }
-
-  private Accessibility wheelchairAccessibility(StopPlace stopPlace) {
-    return WheelChairMapper.wheelchairAccessibility(
-      stopPlace.getAccessibilityAssessment(),
-      Accessibility.NO_INFORMATION
-    );
   }
 }

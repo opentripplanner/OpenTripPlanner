@@ -7,11 +7,11 @@ import org.opentripplanner.transit.model.site.Station;
 /**
  * A vertex representing a station centroid. This can be used as a source/destination for routing.
  */
-public class TransitStationCentroidVertex extends Vertex {
+public class StationCentroidVertex extends Vertex {
 
   private final Station station;
 
-  public TransitStationCentroidVertex(Station station) {
+  public StationCentroidVertex(Station station) {
     super(station.getLon(), station.getLat());
     this.station = station;
   }

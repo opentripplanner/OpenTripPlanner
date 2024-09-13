@@ -31,18 +31,18 @@ import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
-import org.opentripplanner.street.model.edge.StreetTransitStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
-import org.opentripplanner.street.model.vertex.TransitStationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -294,8 +294,8 @@ public abstract class GraphRoutingTest {
       return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
     }
 
-    public TransitStationCentroidVertex stationCentroid(Station station) {
-      return vertexFactory.transitStationCentroid(station);
+    public StationCentroidVertex stationCentroid(Station station) {
+      return vertexFactory.stationCentroid(station);
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
@@ -322,24 +322,15 @@ public abstract class GraphRoutingTest {
       return List.of(link(from, to), link(to, from));
     }
 
-    public StreetTransitStationCentroidLink link(
-      StreetVertex from,
-      TransitStationCentroidVertex to
-    ) {
-      return StreetTransitStationCentroidLink.createStreetTransitStationLink(from, to);
+    public StreetStationCentroidLink link(StreetVertex from, StationCentroidVertex to) {
+      return StreetStationCentroidLink.createStreetStationLink(from, to);
     }
 
-    public StreetTransitStationCentroidLink link(
-      TransitStationCentroidVertex from,
-      StreetVertex to
-    ) {
-      return StreetTransitStationCentroidLink.createStreetTransitStationLink(from, to);
+    public StreetStationCentroidLink link(StationCentroidVertex from, StreetVertex to) {
+      return StreetStationCentroidLink.createStreetStationLink(from, to);
     }
 
-    public List<StreetTransitStationCentroidLink> biLink(
-      StreetVertex from,
-      TransitStationCentroidVertex to
-    ) {
+    public List<StreetStationCentroidLink> biLink(StreetVertex from, StationCentroidVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 

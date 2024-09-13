@@ -15,14 +15,14 @@ import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
-import org.opentripplanner.street.model.edge.StreetTransitStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
-import org.opentripplanner.street.model.vertex.TransitStationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -72,7 +72,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph, transitModel);
       linkTransitEntrances(graph);
-      linkTransitStationCentroids(graph);
+      linkStationCentroids(graph);
       linkVehicleParks(graph, issueStore);
     }
 
@@ -260,14 +260,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private void linkTransitStationCentroids(Graph graph) {
-    LOG.info(
-      "Linking instances of {} to graph...",
-      TransitStationCentroidVertex.class.getSimpleName()
-    );
-    for (TransitStationCentroidVertex tVertex : graph.getVerticesOfType(
-      TransitStationCentroidVertex.class
-    )) {
+  private void linkStationCentroids(Graph graph) {
+    LOG.info("Linking instances of {} to graph...", StationCentroidVertex.class.getSimpleName());
+    for (StationCentroidVertex tVertex : graph.getVerticesOfType(StationCentroidVertex.class)) {
       graph
         .getLinker()
         .linkVertexPermanently(
@@ -276,13 +271,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              StreetTransitStationCentroidLink.createStreetTransitStationLink(
-                (TransitStationCentroidVertex) vertex,
+              StreetStationCentroidLink.createStreetStationLink(
+                (StationCentroidVertex) vertex,
                 streetVertex
               ),
-              StreetTransitStationCentroidLink.createStreetTransitStationLink(
+              StreetStationCentroidLink.createStreetStationLink(
                 streetVertex,
-                (TransitStationCentroidVertex) vertex
+                (StationCentroidVertex) vertex
               )
             )
         );
