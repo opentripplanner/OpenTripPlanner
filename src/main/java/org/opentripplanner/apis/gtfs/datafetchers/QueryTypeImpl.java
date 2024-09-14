@@ -65,6 +65,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -665,6 +666,36 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       return stationStream.collect(Collectors.toList());
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> entrances() {
+    return environment -> {
+      var args = new GraphQLTypes.GraphQLQueryTypeEntrancesArgs(environment.getArguments());
+
+      TransitService transitService = getTransitService(environment);
+
+      if (args.getGraphQLIds() != null) {
+        return args
+          .getGraphQLIds()
+          .stream()
+          .map(FeedScopedId::parse)
+          .map(transitService::getEntranceById)
+          .collect(Collectors.toList());
+      }
+
+      Stream<Entrance> entranceStream = transitService.getEntrances().stream();
+
+      if (args.getGraphQLName() != null) {
+        String name = args.getGraphQLName().toLowerCase(environment.getLocale());
+        entranceStream =
+          entranceStream.filter(entrance ->
+            GraphQLUtils.startsWith(entrance.getName(), name, environment.getLocale())
+          );
+      }
+
+      return entranceStream.collect(Collectors.toList());
     };
   }
 

@@ -1144,6 +1144,13 @@ type QueryType {
   clusters: [Cluster]
   "Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)"
   departureRow(id: String!): DepartureRow
+  "Station entrance/exit points."
+  entrances(
+    "Only return entrances that match one of the ids in this list"
+    ids: [String],
+    "Query entrances by name"
+    name: String
+  ): [Stop]
   "Get all available feeds"
   feeds: [Feed]
   """
@@ -1961,6 +1968,8 @@ type Stop implements Node & PlaceInterface {
     language: String
   ): String
   direction: String
+  "Returns all entrances of this station (Only applicable for stations)"
+  entrances: [Stop]
   """
   Representations of this stop's geometry. This is mainly interesting for flex stops which can be
   a polygon or a group of stops either consisting of either points or polygons.

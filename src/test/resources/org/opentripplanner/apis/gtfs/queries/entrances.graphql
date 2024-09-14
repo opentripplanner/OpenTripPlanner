@@ -1,0 +1,10 @@
+{
+  entrances {
+    gtfsId
+    lat
+    lon
+    name
+    vehicleMode
+    locationType
+  }
+}

@@ -43,6 +43,8 @@ public class Station
   @JsonBackReference
   private final Set<StopLocation> childStops = new HashSet<>();
 
+  private final Set<Entrance> entrances = new HashSet<>();
+
   private GeometryCollection geometry;
 
   Station(StationBuilder builder) {
@@ -73,6 +75,10 @@ public class Station
     this.geometry = computeGeometry(coordinate, childStops);
   }
 
+  void addEntrance(Entrance entrance) {
+    this.entrances.add(entrance);
+  }
+
   public boolean includes(StopLocation stop) {
     return childStops.contains(stop);
   }
@@ -85,6 +91,11 @@ public class Station
   @Nonnull
   public Collection<StopLocation> getChildStops() {
     return childStops;
+  }
+
+  @Nonnull
+  public Collection<Entrance> getEntrances() {
+    return entrances;
   }
 
   @Override

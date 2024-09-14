@@ -1,0 +1,24 @@
+{
+  stations {
+    gtfsId
+    lat
+    lon
+    name
+    stops {
+      gtfsId
+      lat
+      lon
+      name
+      vehicleMode
+      locationType
+    }
+    entrances {
+      gtfsId
+      lat
+      lon
+      name
+      vehicleMode
+      locationType
+    }
+  }
+}

@@ -73,4 +73,10 @@ class EntranceTest {
       subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
     );
   }
+
+  @Test
+  void isAddedToParentStation() {
+    assertTrue(subject.isPartOfStation());
+    assertTrue(PARENT_STATION.getEntrances().contains(subject));
+  }
 }
