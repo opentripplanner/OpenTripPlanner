@@ -17,6 +17,7 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
+import org.opentripplanner.netex.validation.RouteToCentroidStationIdValidator;
 import org.opentripplanner.netex.validation.Validator;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
@@ -104,6 +105,8 @@ public class NetexBundle implements Closeable {
     // Load data
     loadFileEntries();
 
+    postValidation();
+
     return transitBuilder;
   }
 
@@ -190,5 +193,16 @@ public class NetexBundle implements Closeable {
     } finally {
       issueStore.stopProcessingSource();
     }
+  }
+
+  /**
+   * Validate properties once all data is loaded
+   */
+  private void postValidation() {
+    RouteToCentroidStationIdValidator.validate(
+      issueStore,
+      routeToCentroidStationIds,
+      index
+    );
   }
 }
