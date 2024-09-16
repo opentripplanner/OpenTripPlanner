@@ -17,7 +17,7 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
-import org.opentripplanner.netex.validation.RouteToCentroidStationIdValidator;
+import org.opentripplanner.netex.validation.RouteToCentroidStopPlaceIdValidator;
 import org.opentripplanner.netex.validation.Validator;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
@@ -45,7 +45,7 @@ public class NetexBundle implements Closeable {
 
   private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
-  private final Set<String> routeToCentroidStationIds;
+  private final Set<String> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
   private final Set<IgnorableFeature> ignoredFeatures;
@@ -63,7 +63,7 @@ public class NetexBundle implements Closeable {
     NetexDataSourceHierarchy hierarchy,
     OtpTransitServiceBuilder transitBuilder,
     Set<String> ferryIdsNotAllowedForBicycle,
-    Set<String> routeToCentroidStationIds,
+    Set<String> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops,
     Set<IgnorableFeature> ignorableFeatures
@@ -73,7 +73,7 @@ public class NetexBundle implements Closeable {
     this.hierarchy = hierarchy;
     this.transitBuilder = transitBuilder;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
-    this.routeToCentroidStationIds = routeToCentroidStationIds;
+    this.routeToCentroidStopPlaceIds = routeToCentroidStopPlaceIds;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.ignoredFeatures = Set.copyOf(ignorableFeatures);
@@ -97,7 +97,7 @@ public class NetexBundle implements Closeable {
         deduplicator,
         issueStore,
         ferryIdsNotAllowedForBicycle,
-        routeToCentroidStationIds,
+        routeToCentroidStopPlaceIds,
         maxStopToShapeSnapDistance,
         noTransfersOnIsolatedStops
       );
@@ -199,10 +199,6 @@ public class NetexBundle implements Closeable {
    * Validate properties once all data is loaded
    */
   private void postValidation() {
-    RouteToCentroidStationIdValidator.validate(
-      issueStore,
-      routeToCentroidStationIds,
-      index
-    );
+    RouteToCentroidStopPlaceIdValidator.validate(issueStore, routeToCentroidStopPlaceIds, index);
   }
 }

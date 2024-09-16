@@ -4,19 +4,20 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 
-public class RouteToCentroidStationIdValidator {
+public class RouteToCentroidStopPlaceIdValidator {
+
   public static void validate(
     DataImportIssueStore issueStore,
-    Set<String> routeToCentroidStationIds,
+    Set<String> routeToCentroidStopPlaceIds,
     NetexEntityIndex index
   ) {
-    routeToCentroidStationIds
+    routeToCentroidStopPlaceIds
       .stream()
       .filter(id -> !index.stopPlaceById.containsKey(id))
       .forEach(id ->
         issueStore.add(
           "UnknownStopPlaceId",
-          "routeToCentroidStationIds specified a stopPlace that does not exist: " + id
+          "routeToCentroidStopPlaceIds specified a stop place that does not exist: " + id
         )
       );
   }

@@ -286,7 +286,7 @@ class StopAndStationMapperTest {
 
   @Test
   void testRouteToCentroid() {
-    var routeToCentroidStationIds = Set.of("NSR:StopPlace:1");
+    var routeToCentroidStopPlaceIds = Set.of("NSR:StopPlace:1");
     StopAndStationMapper stopMapper = new StopAndStationMapper(
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
@@ -295,7 +295,7 @@ class StopAndStationMapperTest {
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false,
-      routeToCentroidStationIds
+      routeToCentroidStopPlaceIds
     );
 
     stopMapper.mapParentAndChildStops(

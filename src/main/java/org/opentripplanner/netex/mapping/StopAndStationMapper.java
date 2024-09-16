@@ -71,7 +71,7 @@ class StopAndStationMapper {
     ZoneId defaultTimeZone,
     DataImportIssueStore issueStore,
     boolean noTransfersOnIsolatedStops,
-    Set<String> routeToCentroidStationIds
+    Set<String> routeToCentroidStopPlaceIds
   ) {
     this.stationMapper =
       new StationMapper(
@@ -79,7 +79,7 @@ class StopAndStationMapper {
         idFactory,
         defaultTimeZone,
         noTransfersOnIsolatedStops,
-        routeToCentroidStationIds,
+        routeToCentroidStopPlaceIds,
         stopModelBuilder
       );
     this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder);

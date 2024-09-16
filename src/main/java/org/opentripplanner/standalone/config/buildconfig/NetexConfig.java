@@ -158,28 +158,28 @@ public class NetexConfig {
           .docDefaultValue(dft.ferryIdsNotAllowedForBicycle())
           .asStringSet(base.ferryIdsNotAllowedForBicycle())
       )
-      .addRouteToCentroidStationIds(
+      .addRouteToCentroidStopPlaceIds(
         config
-          .of("routeToCentroidStationIds")
+          .of("routeToCentroidStopPlaceIds")
           .since(V2_6)
-          .summary("List stations that should route to centroid.")
+          .summary("List stop places that should route to centroid.")
           .description(
             """
-            This field contains a list of station ids for which the centroid will be used instead
+            This field contains a list of stop place ids for which the centroid will be used instead
             of the stop coordinates.
             
             When doing street routing from/to a station the default behaviour is to route to any of
-            the stations' child stops. This can cause strange results for stations that have stops
+            the stop place child quays. This can cause strange results for stop places that have quays
             spread over a large area.
             
-            For some stations you might instead wish to use the centroid of the station as the
+            For some stop places you might instead wish to use the centroid of the stop place as the
             source/destination for street routing. In this case the centroid will be  used both for
-            direct street search and for access/egress street search where the station is used as
+            direct street search and for access/egress street search where the stop place is used as
             the start/end of the access/egress.
             """
           )
-          .docDefaultValue(dft.routeToCentroidStationIds())
-          .asStringSet(base.routeToCentroidStationIds())
+          .docDefaultValue(dft.routeToCentroidStopPlaceIds())
+          .asStringSet(base.routeToCentroidStopPlaceIds())
       )
       .withIgnoreFareFrame(
         config
