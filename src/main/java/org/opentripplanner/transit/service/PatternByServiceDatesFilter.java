@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -54,8 +53,9 @@ public class PatternByServiceDatesFilter {
    * Filter the routes by listing all their patterns' service dates and checking if they
    * operate on the specified dates.
    */
-  public Collection<Route> filterRoutes(Stream<Route> routeStream) {
+  public Collection<Route> filterRoutes(Collection<Route> routeStream) {
     return routeStream
+      .stream()
       .filter(r -> {
         var patterns = getPatternsForRoute.apply(r);
         return !this.filterPatterns(patterns).isEmpty();

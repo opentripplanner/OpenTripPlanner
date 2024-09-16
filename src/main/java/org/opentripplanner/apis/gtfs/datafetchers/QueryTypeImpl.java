@@ -619,7 +619,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           args.getGraphQLServiceDates(),
           transitService
         );
-        routeStream = filter.filterRoutes(routeStream).stream();
+        routeStream = filter.filterRoutes(routeStream.toList()).stream();
       }
       return routeStream.toList();
     };

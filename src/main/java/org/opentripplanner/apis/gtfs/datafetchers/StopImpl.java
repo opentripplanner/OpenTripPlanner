@@ -253,7 +253,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           args.getGraphQLServiceDates(),
           getTransitService(env)
         );
-        return filter.filterRoutes(routes.stream());
+        return filter.filterRoutes(routes);
       } else {
         return routes;
       }

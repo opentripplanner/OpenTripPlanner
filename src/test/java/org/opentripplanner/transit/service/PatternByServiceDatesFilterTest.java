@@ -107,7 +107,7 @@ class PatternByServiceDatesFilterTest {
     var filter = defaultFilter(start, end);
 
     var filterInput = List.of(ROUTE_1);
-    var filterOutput = filter.filterRoutes(filterInput.stream());
+    var filterOutput = filter.filterRoutes(filterInput);
 
     if (expectation == NOT_REMOVED) {
       assertEquals(filterOutput, filterInput);
