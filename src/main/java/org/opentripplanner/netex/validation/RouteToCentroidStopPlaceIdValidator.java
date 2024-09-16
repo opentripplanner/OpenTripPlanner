@@ -17,7 +17,8 @@ public class RouteToCentroidStopPlaceIdValidator {
       .forEach(id ->
         issueStore.add(
           "UnknownStopPlaceId",
-          "routeToCentroidStopPlaceIds specified a stop place that does not exist: " + id
+          "routeToCentroidStopPlaceIds specified a stop place that does not exist: %s",
+          id
         )
       );
   }
