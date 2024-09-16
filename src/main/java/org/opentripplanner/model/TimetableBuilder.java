@@ -6,13 +6,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class TimetableBuilder {
@@ -129,22 +127,7 @@ public class TimetableBuilder {
    * The direction for all the trips in this timetable.
    */
   public Direction getDirection() {
-    return Optional
-      .ofNullable(getRepresentativeTripTimes())
-      .map(TripTimes::getTrip)
-      .map(Trip::getDirection)
-      .orElse(Direction.UNKNOWN);
-  }
-
-  private TripTimes getRepresentativeTripTimes() {
-    if (!tripTimes.isEmpty()) {
-      return tripTimes.values().stream().findFirst().get();
-    } else if (!frequencies.isEmpty()) {
-      return frequencies.getFirst().tripTimes;
-    } else {
-      // Pattern is created only for real-time updates
-      return null;
-    }
+    return Timetable.getDirection(tripTimes.values(), frequencies);
   }
 
   public Timetable build() {

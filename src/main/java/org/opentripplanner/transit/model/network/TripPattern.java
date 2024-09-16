@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.Objects.requireNonNullElseGet;
 import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
@@ -349,7 +348,11 @@ public final class TripPattern
   }
 
   /**
-   * The direction for all the trips in this pattern.
+   * Return the direction for all the trips in this pattern.
+   * By construction, all trips in a pattern have the same direction:
+   * - trips derived from NeTEx data belong to a ServiceJourney that belongs to a JourneyPattern
+   * that belongs to a NeTEx Route that specifies a single direction.
+   * - trips derived from GTFS data are grouped by direction in a trip pattern, during graph build.
    */
   public Direction getDirection() {
     return scheduledTimetable.getDirection();

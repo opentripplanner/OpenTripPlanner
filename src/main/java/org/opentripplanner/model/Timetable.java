@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -422,25 +423,19 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * The direction for all the trips in this pattern.
+   * Return the direction for all the trips in this timetable.
+   * By construction, all trips in a timetable have the same direction.
    */
   public Direction getDirection() {
-    return Optional
-      .ofNullable(getRepresentativeTripTimes())
-      .map(TripTimes::getTrip)
-      .map(Trip::getDirection)
-      .orElse(Direction.UNKNOWN);
+    return getDirection(tripTimes, frequencyEntries);
   }
 
+  /**
+   * Return an arbitrary TripTimes in this Timetable.
+   * Return a scheduled trip times if it exists, otherwise return a frequency-based trip times.
+   */
   public TripTimes getRepresentativeTripTimes() {
-    if (!getTripTimes().isEmpty()) {
-      return getTripTimes(0);
-    } else if (!getFrequencyEntries().isEmpty()) {
-      return getFrequencyEntries().get(0).tripTimes;
-    } else {
-      // Pattern is created only for real-time updates
-      return null;
-    }
+    return getRepresentativeTripTimes(tripTimes, frequencyEntries);
   }
 
   /**
@@ -450,5 +445,42 @@ public class Timetable implements Serializable {
    */
   public boolean isCreatedByRealTimeUpdater() {
     return serviceDate != null;
+  }
+
+  /**
+   * The direction for the given collections of trip times.
+   * The method assumes that all trip times have the same directions and picks up one arbitrarily.
+   * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
+   * @param frequencies all the frequency-based trip times in a timetable.
+   */
+  static Direction getDirection(
+    Collection<TripTimes> scheduledTripTimes,
+    Collection<FrequencyEntry> frequencies
+  ) {
+    return Optional
+      .ofNullable(getRepresentativeTripTimes(scheduledTripTimes, frequencies))
+      .map(TripTimes::getTrip)
+      .map(Trip::getDirection)
+      .orElse(Direction.UNKNOWN);
+  }
+
+  /**
+   * Return an arbitrary TripTimes.
+   * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
+   * @param frequencies all the frequency-based trip times in a timetable.
+   *
+   */
+  private static TripTimes getRepresentativeTripTimes(
+    Collection<TripTimes> scheduledTripTimes,
+    Collection<FrequencyEntry> frequencies
+  ) {
+    if (!scheduledTripTimes.isEmpty()) {
+      return scheduledTripTimes.iterator().next();
+    } else if (!frequencies.isEmpty()) {
+      return frequencies.iterator().next().tripTimes;
+    } else {
+      // Pattern is created only for real-time updates
+      return null;
+    }
   }
 }
