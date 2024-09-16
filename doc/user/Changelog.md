@@ -65,6 +65,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update indexes in timetable snapshot [#6007](https://github.com/opentripplanner/OpenTripPlanner/pull/6007)
 - Add Javadoc for Trip [#6022](https://github.com/opentripplanner/OpenTripPlanner/pull/6022)
 - Add Iceland to the list of deployments [ci skip] [#6057](https://github.com/opentripplanner/OpenTripPlanner/pull/6057)
+- Use correct HEAD request when fetching HTTP headers [#6063](https://github.com/opentripplanner/OpenTripPlanner/pull/6063)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.5.0 (2024-03-13)
