@@ -1,8 +1,7 @@
-package org.opentripplanner.apis.gtfs;
+package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -26,6 +25,9 @@ public class PatternTestModel {
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
   private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_1, STOP_1);
 
+  /**
+   * Creates a trip pattern that has a stop pattern, trip times and a trip with a service id.
+   */
   public static TripPattern pattern() {
     var pattern = TransitModelForTest
       .tripPattern("1", ROUTE_1)
