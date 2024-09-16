@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.stops;
+package org.opentripplanner.ext.vectortiles.layers;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

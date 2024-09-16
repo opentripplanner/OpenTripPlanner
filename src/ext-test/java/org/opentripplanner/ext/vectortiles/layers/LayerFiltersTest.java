@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.stops;
+package org.opentripplanner.ext.vectortiles.layers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

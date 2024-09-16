@@ -1,7 +1,7 @@
 package org.opentripplanner.inspector.vector;
 
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.ext.vectortiles.layers.stops.LayerFilters;
+import org.opentripplanner.ext.vectortiles.layers.LayerFilters;
 
 /**
  * Configuration options for a single vector tile layer.

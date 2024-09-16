@@ -14,7 +14,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerType;
-import org.opentripplanner.ext.vectortiles.layers.stops.LayerFilters;
+import org.opentripplanner.ext.vectortiles.layers.LayerFilters;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 

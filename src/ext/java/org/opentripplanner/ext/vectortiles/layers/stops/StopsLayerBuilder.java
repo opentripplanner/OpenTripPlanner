@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.ext.vectortiles.layers.LayerFilters;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.RegularStop;
