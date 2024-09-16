@@ -30,17 +30,18 @@ public class LayerFilters {
    * Returns a predicate which only includes stop which are visited by a pattern that is in the current
    * TriMet service week, namely from Sunday to Sunday.
    */
-  public static Predicate<RegularStop> currentServiceWeek(
+  public static Predicate<RegularStop> buildCurrentServiceWeekPredicate(
     Function<RegularStop, Collection<TripPattern>> getPatternsForStop,
     Function<Trip, Collection<LocalDate>> getServiceDatesForTrip,
     Supplier<LocalDate> nowSupplier
   ) {
     var serviceDate = nowSupplier.get();
     var lastSunday = serviceDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-    var nextSunday = serviceDate.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).plusDays(1);
+    var nextSundayPlusOne = serviceDate.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)).plusDays(1);
 
     var filter = new PatternByServiceDatesFilter(
-      new LocalDateRange(lastSunday, nextSunday),
+      // reminder, the end of the date range is exclusive so it's the next Sunday plus one day
+      new LocalDateRange(lastSunday, nextSundayPlusOne),
       // not used
       route -> List.of(),
       getServiceDatesForTrip
@@ -56,7 +57,7 @@ public class LayerFilters {
   public static Predicate<RegularStop> forType(FilterType type, TransitService transitService) {
     return switch (type) {
       case NONE -> NO_FILTER;
-      case CURRENT_TRIMET_SERVICE_WEEK -> currentServiceWeek(
+      case CURRENT_TRIMET_SERVICE_WEEK -> buildCurrentServiceWeekPredicate(
         transitService::getPatternsForStop,
         trip ->
           transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId()),

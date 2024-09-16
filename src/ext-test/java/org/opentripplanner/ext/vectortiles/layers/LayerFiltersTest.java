@@ -19,7 +19,7 @@ class LayerFiltersTest {
 
   @Test
   void includeStopWithinServiceWeek() {
-    var predicate = LayerFilters.currentServiceWeek(
+    var predicate = LayerFilters.buildCurrentServiceWeekPredicate(
       s -> List.of(PATTERN),
       trip -> List.of(DATE),
       () -> DATE
@@ -31,7 +31,7 @@ class LayerFiltersTest {
   @Test
   void excludeOutsideServiceWeek() {
     var inThreeWeeks = DATE.plusDays(21);
-    var predicate = LayerFilters.currentServiceWeek(
+    var predicate = LayerFilters.buildCurrentServiceWeekPredicate(
       s -> List.of(PATTERN),
       trip -> List.of(inThreeWeeks),
       () -> DATE
