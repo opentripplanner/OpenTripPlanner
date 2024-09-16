@@ -250,7 +250,7 @@ The value is a fraction of the tile size. If you are having problem with icons a
 
 **Since version:** `2.6` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"none"`   
 **Path:** /vectorTiles/layers/[0]   
-**Enum values:** `none` | `current-trimet-service-week`
+**Enum values:** `none` | `sunday-to-sunday-service-week`
 
 Reduce the result set of a layer further by a specific filter.
 

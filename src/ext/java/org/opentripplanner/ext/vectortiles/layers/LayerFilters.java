@@ -57,7 +57,7 @@ public class LayerFilters {
   public static Predicate<RegularStop> forType(FilterType type, TransitService transitService) {
     return switch (type) {
       case NONE -> NO_FILTER;
-      case CURRENT_TRIMET_SERVICE_WEEK -> buildCurrentServiceWeekPredicate(
+      case SUNDAY_TO_SUNDAY_SERVICE_WEEK -> buildCurrentServiceWeekPredicate(
         transitService::getPatternsForStop,
         trip ->
           transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId()),
@@ -68,6 +68,6 @@ public class LayerFilters {
 
   public enum FilterType {
     NONE,
-    CURRENT_TRIMET_SERVICE_WEEK,
+    SUNDAY_TO_SUNDAY_SERVICE_WEEK,
   }
 }
