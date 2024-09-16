@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,12 @@ public class GenerateTripPatternsOperation {
   private final Set<FeedScopedId> calendarServiceIds;
   private final GeometryProcessor geometryProcessor;
 
-  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders = ArrayListMultimap.create();
+  // TODO the linked hashset configuration ensures that TripPatterns are created in the same order
+  //  as Trips are imported, as a workaround for issue #6067
+  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders = MultimapBuilder
+    .linkedHashKeys()
+    .linkedHashSetValues()
+    .build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
   private int freqCount = 0;
