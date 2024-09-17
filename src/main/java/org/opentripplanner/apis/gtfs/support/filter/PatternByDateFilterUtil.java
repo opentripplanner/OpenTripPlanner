@@ -6,7 +6,7 @@ import org.opentripplanner.transit.service.PatternByServiceDatesFilter;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Utility methods for instantiating a {@link PatternByServiceDatesFilter}/
+ * Utility methods for instantiating a {@link PatternByServiceDatesFilter}.
  */
 public class PatternByDateFilterUtil {
 
