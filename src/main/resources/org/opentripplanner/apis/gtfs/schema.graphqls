@@ -2268,8 +2268,6 @@ type Trip implements Node {
   "Whether bikes are allowed on board the vehicle running this trip"
   bikesAllowed: BikesAllowed
   blockId: String
-  "Whether cars are allowed on board the vehicle running this trip"
-  carsAllowed: CarsAllowed
   "Departure time from the first stop"
   departureStoptime(
     """
@@ -3073,8 +3071,9 @@ enum PlanAccessMode {
   """
   BICYCLE_RENTAL
   """
-  Driving a car from the origin to the destination.
-  TODO add more thorough description
+  Driving to a stop and boarding a vehicle with the car.
+  Access can use driving only if the mode used for transfers
+  and egress is also `CAR`.
   """
   CAR
   """
@@ -3187,8 +3186,8 @@ enum PlanEgressMode {
   """
   BICYCLE_RENTAL
   """
-  Driving a car from the origin to the destination.
-  TODO add more thorough description
+  Driving from a stop to the destination. Egress can use driving only if the mode
+  used for access and transfers is also `CAR`.
   """
   CAR
   """
@@ -3230,8 +3229,8 @@ enum PlanTransferMode {
   """
   BICYCLE
   """
-  Driving a car from the origin to the destination.
-  TODO add more thorough description
+  Driving between transit vehicles. Transfers can only use driving if the mode
+  used for access and egress is also `CAR`.
   """
   CAR
   "Walking between transit vehicles (typically between stops)."

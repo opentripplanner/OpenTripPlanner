@@ -89,10 +89,6 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     return trip.getRoute().getBikesAllowed();
   }
 
-  public static CarAccess carAccessForTrip(Trip trip) {
-    return trip.getCarsAllowed();
-  }
-
   @Override
   public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
     for (TransitFilter filter : filters) {
@@ -114,7 +110,7 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     }
 
     if (requireCarsAllowed) {
-      if (carAccessForTrip(trip) != CarAccess.ALLOWED) {
+      if (trip.getCarsAllowed() != CarAccess.ALLOWED) {
         return false;
       }
     }

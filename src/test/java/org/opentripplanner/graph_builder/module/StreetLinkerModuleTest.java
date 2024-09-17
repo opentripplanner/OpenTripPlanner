@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,7 +51,7 @@ class StreetLinkerModuleTest {
     module.buildGraph();
 
     assertTrue(model.stopVertex().isConnectedToGraph());
-    assertEquals(1, model.stopVertex().getOutgoing().size());
+    assertThat(model.stopVertex().getOutgoing()).hasSize(1);
   }
 
   @Test
@@ -63,7 +63,7 @@ class StreetLinkerModuleTest {
 
     assertTrue(model.stopVertex().isConnectedToGraph());
 
-    assertEquals(1, model.stopVertex().getOutgoing().size());
+    assertThat(model.stopVertex().getOutgoing()).hasSize(1);
     var outgoing = model.outgoingLinks().getFirst();
     assertInstanceOf(StreetTransitStopLink.class, outgoing);
 
@@ -87,7 +87,7 @@ class StreetLinkerModuleTest {
       assertTrue(model.stopVertex().isConnectedToGraph());
 
       // stop is used by a flex trip, needs to be linked to both the walk and car edge
-      assertEquals(2, model.stopVertex().getOutgoing().size());
+      assertThat(model.stopVertex().getOutgoing()).hasSize(2);
       var linkToWalk = model.outgoingLinks().getFirst();
       SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
 
@@ -119,7 +119,7 @@ class StreetLinkerModuleTest {
     assertTrue(model.stopVertex().isConnectedToGraph());
 
     // Because the stop is used by a carsAllowed trip it needs to be linked to both the walk and car edge
-    assertEquals(2, model.stopVertex().getOutgoing().size());
+    assertThat(model.stopVertex().getOutgoing()).hasSize(2);
     var linkToWalk = model.outgoingLinks().getFirst();
     SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
 

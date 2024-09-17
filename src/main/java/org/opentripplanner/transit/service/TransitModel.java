@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -44,9 +45,12 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -554,6 +558,53 @@ public class TransitModel implements Serializable {
 
   public FlexTrip getFlexTrip(FeedScopedId tripId) {
     return flexTripsById.get(tripId);
+  }
+
+  public Set<StopLocation> getStopLocationsUsedForFlexTrips() {
+    Set<StopLocation> stopLocations = getAllFlexTrips()
+      .stream()
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
+  }
+
+  /**
+   * The stops that are used by transit capable of transporting cars need to be
+   * connected to the road network (e.g. car ferries). This method returns the
+   * stops that are used by trips that allow cars.
+   * @return set of stop locations that are used for trips that allow cars
+   */
+  public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
+    Set<StopLocation> stopLocations = getAllTripPatterns()
+      .stream()
+      .filter(t ->
+        t
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
+      )
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   private void invalidateIndex() {

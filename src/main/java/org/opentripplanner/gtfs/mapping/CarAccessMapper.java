@@ -10,13 +10,10 @@ class CarAccessMapper {
 
   public static CarAccess mapForTrip(Trip rhs) {
     int carsAllowed = rhs.getCarsAllowed();
-    switch (carsAllowed) {
-      case 1:
-        return CarAccess.ALLOWED;
-      case 2:
-        return CarAccess.NOT_ALLOWED;
-      default:
-        return CarAccess.UNKNOWN;
-    }
+    return switch (carsAllowed) {
+      case 1 -> CarAccess.ALLOWED;
+      case 2 -> CarAccess.NOT_ALLOWED;
+      default -> CarAccess.UNKNOWN;
+    };
   }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -769,23 +770,53 @@ class RouteRequestTransitDataProviderFilterTest {
 
   @Test
   void testCarsAllowed() {
-    RouteBuilder routeBuilder = TransitModelForTest.route("1");
-    TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).withRoute(routeBuilder.build());
-
-    assertEquals(
-      CarAccess.UNKNOWN,
-      RouteRequestTransitDataProviderFilter.carAccessForTrip(trip.build())
-    );
-    trip.withCarsAllowed(CarAccess.ALLOWED);
-    assertEquals(
+    TripTimes tripTimesCarsAllowed = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
       CarAccess.ALLOWED,
-      RouteRequestTransitDataProviderFilter.carAccessForTrip(trip.build())
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
     );
-    trip.withCarsAllowed(CarAccess.NOT_ALLOWED);
-    assertEquals(
+
+    TripTimes tripTimesCarsNotAllowed = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
       CarAccess.NOT_ALLOWED,
-      RouteRequestTransitDataProviderFilter.carAccessForTrip(trip.build())
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
     );
+
+    TripTimes tripTimesCarsUnknown = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
+      CarAccess.UNKNOWN,
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
+    );
+
+    RouteRequestTransitDataProviderFilter filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      true,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    assertThat(filter.tripTimesPredicate(tripTimesCarsAllowed, false)).isTrue();
+    assertThat(filter.tripTimesPredicate(tripTimesCarsNotAllowed, false)).isFalse();
+    assertThat(filter.tripTimesPredicate(tripTimesCarsUnknown, false)).isFalse();
   }
 
   @Test

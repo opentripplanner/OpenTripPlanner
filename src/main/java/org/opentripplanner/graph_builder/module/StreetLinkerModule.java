@@ -84,49 +84,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.startMessage());
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
-
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips =
-        transitModel
-          .getAllFlexTrips()
-          .stream()
-          .flatMap(t -> t.getStops().stream())
-          .collect(Collectors.toSet());
-
-      stopLocationsUsedForFlexTrips.addAll(
-        stopLocationsUsedForFlexTrips
-          .stream()
-          .filter(GroupStop.class::isInstance)
-          .map(GroupStop.class::cast)
-          .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-          .toList()
-      );
+      stopLocationsUsedForFlexTrips = transitModel.getStopLocationsUsedForFlexTrips();
     }
 
-    // The stops that are used by transit capable of transporting cars need to be connected to the road network (e.g. car ferries).
-    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = Set.of();
-    stopLocationsUsedForCarsAllowedTrips =
-      transitModel
-        .getAllTripPatterns()
-        .stream()
-        .filter(t ->
-          t
-            .getScheduledTimetable()
-            .getTripTimes()
-            .stream()
-            .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
-        )
-        .flatMap(t -> t.getStops().stream())
-        .collect(Collectors.toSet());
-
-    stopLocationsUsedForCarsAllowedTrips.addAll(
-      stopLocationsUsedForCarsAllowedTrips
-        .stream()
-        .filter(GroupStop.class::isInstance)
-        .map(GroupStop.class::cast)
-        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-        .toList()
-    );
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = transitModel.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that

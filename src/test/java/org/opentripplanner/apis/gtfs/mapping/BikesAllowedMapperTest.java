@@ -1,8 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
-import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.network.BikeAccess;
 
@@ -10,12 +9,10 @@ class BikesAllowedMapperTest {
 
   @Test
   void mapping() {
-    Arrays
-      .stream(BikeAccess.values())
-      .filter(ba -> ba != BikeAccess.UNKNOWN)
-      .forEach(d -> {
-        var mapped = BikesAllowedMapper.map(d);
-        assertEquals(d.toString(), mapped.toString());
-      });
+    assertThat(BikeAccess.ALLOWED.toString())
+      .isEqualTo(BikesAllowedMapper.map(BikeAccess.ALLOWED).toString());
+    assertThat(BikeAccess.NOT_ALLOWED.toString())
+      .isEqualTo(BikesAllowedMapper.map(BikeAccess.NOT_ALLOWED).toString());
+    assertThat("NO_INFORMATION").isEqualTo(BikesAllowedMapper.map(BikeAccess.UNKNOWN).toString());
   }
 }
