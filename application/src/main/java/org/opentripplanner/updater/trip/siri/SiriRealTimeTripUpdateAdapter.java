@@ -285,10 +285,7 @@ public class SiriRealTimeTripUpdateAdapter {
       pattern = tripUpdate.addedTripPattern();
     } else {
       // Get cached trip pattern or create one if it doesn't exist yet
-      pattern = tripPatternCache.getOrCreateTripPattern(
-        tripUpdate.stopPattern(),
-        trip,
-        serviceDate
+      pattern = tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip
       );
     }
 
