@@ -2004,7 +2004,7 @@ type Stop implements Node & PlaceInterface {
   routes(
     """
     Only include routes whose pattern operates on at least one service date specified by this filter.
-    
+        
     **Note**: A service date is a technical term useful for transit planning purposes and might not
     correspond to a how a passenger thinks of a calendar date. For example, a night bus running
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.

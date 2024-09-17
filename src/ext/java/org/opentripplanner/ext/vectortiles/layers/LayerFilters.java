@@ -28,7 +28,7 @@ public class LayerFilters {
 
   /**
    * Returns a predicate which only includes stop which are visited by a pattern that is in the current
-   * TriMet service week, namely from Sunday to Sunday.
+   * "service week", which lasts from Sunday to Sunday.
    */
   public static Predicate<RegularStop> buildCurrentServiceWeekPredicate(
     Function<RegularStop, Collection<TripPattern>> getPatternsForStop,
