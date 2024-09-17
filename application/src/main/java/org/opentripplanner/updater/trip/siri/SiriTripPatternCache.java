@@ -28,9 +28,12 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 class SiriTripPatternCache {
 
-  // TODO RT_AB: Improve documentation. This seems to be the primary collection of added
-  //   TripPatterns, with other collections serving as indexes. Similar to TripPatternCache.cache
-  //   in the GTFS version of this class, but with service date as part of the key.
+  /**
+   * We cache the trip pattern based on the stop pattern only in order to de-duplicate them.
+   * <p>
+   * Note that we don't really have a definition which properties are really part of the trip
+   * pattern and several pattern keys are used in different parts of OTP.
+   */
   private final Map<StopPattern, TripPattern> cache = new HashMap<>();
 
   // TODO RT_AB: generalize this so we can generate IDs for SIRI or GTFS-RT sources.
