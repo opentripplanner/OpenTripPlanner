@@ -35,8 +35,12 @@ public class OutsideSearchWindowFilter implements RemoveItineraryFlagger {
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return it -> {
-      var time = it.startTime().toInstant();
-      return time.isBefore(earliestDepartureTime) || !time.isBefore(latestDepartureTime);
+      if (it.isSearchWindowAware()) {
+        var time = it.startTime().toInstant();
+        return time.isBefore(earliestDepartureTime) || !time.isBefore(latestDepartureTime);
+      } else {
+        return false;
+      }
     };
   }
 
