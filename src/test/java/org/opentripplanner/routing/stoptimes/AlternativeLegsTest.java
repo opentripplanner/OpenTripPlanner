@@ -66,17 +66,6 @@ class AlternativeLegsTest extends GtfsTest {
     assertEquals(expected, legs);
   }
 
-  private static String getStr(List<ScheduledTransitLeg> alternativeLegs) {
-    return Itinerary.toStr(
-      alternativeLegs
-        .stream()
-        .map(Leg.class::cast)
-        .map(List::of)
-        .map(l -> new Itinerary(l, true))
-        .toList()
-    );
-  }
-
   @Test
   void testNextLegs() {
     var transitService = new DefaultTransitService(transitModel);
@@ -165,5 +154,16 @@ class AlternativeLegsTest extends GtfsTest {
 
     var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B [C₁-1]"));
     assertEquals(expected, legs);
+  }
+
+  private static String getStr(List<ScheduledTransitLeg> alternativeLegs) {
+    return Itinerary.toStr(
+      alternativeLegs
+        .stream()
+        .map(Leg.class::cast)
+        .map(List::of)
+        .map(l -> new Itinerary(l, true))
+        .toList()
+    );
   }
 }

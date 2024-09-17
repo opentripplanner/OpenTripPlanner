@@ -171,6 +171,10 @@ public class Itinerary implements ItinerarySortKey {
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
+  /**
+   * Returns true if this itinerary was produced by an algorithm that is aware of the search window.
+   * As of 2024 only the itineraries produced by RAPTOR that do that.
+   */
   public boolean isSearchWindowAware() {
     return isSearchWindowAware;
   }
