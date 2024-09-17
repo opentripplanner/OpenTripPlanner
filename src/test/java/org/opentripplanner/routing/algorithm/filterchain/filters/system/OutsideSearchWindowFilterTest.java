@@ -70,7 +70,8 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
         newItinerary(A, t9_28).flex(t9_38, time("9:48"), B),
         newItinerary(A, time("9:20")).flex(time("9:20"), t9_28, B).walk(D12m, C)
       )
-      .map(b -> b.withIsSearchWindowAware(true).build());
+      // results from the flex router are not aware of the search window
+      .map(b -> b.withIsSearchWindowAware(false).build());
   }
 
   @ParameterizedTest
