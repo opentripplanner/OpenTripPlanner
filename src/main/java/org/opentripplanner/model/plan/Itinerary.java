@@ -64,12 +64,14 @@ public class Itinerary implements ItinerarySortKey {
   /* other properties */
 
   private final List<SystemNotice> systemNotices = new ArrayList<>();
+  private final boolean isSearchWindowAware;
   private List<Leg> legs;
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  public Itinerary(List<Leg> legs) {
+  public Itinerary(List<Leg> legs, boolean isSearchWindowAware) {
     setLegs(legs);
+    this.isSearchWindowAware = isSearchWindowAware;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
@@ -169,6 +171,10 @@ public class Itinerary implements ItinerarySortKey {
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
+  public boolean isSearchWindowAware() {
+    return isSearchWindowAware;
+  }
+
   public Leg firstLeg() {
     return getLegs().get(0);
   }
@@ -215,7 +221,7 @@ public class Itinerary implements ItinerarySortKey {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    var newItin = new Itinerary(timeShiftedLegs);
+    var newItin = new Itinerary(timeShiftedLegs, isSearchWindowAware);
     newItin.setGeneralizedCost(getGeneralizedCost());
     return newItin;
   }

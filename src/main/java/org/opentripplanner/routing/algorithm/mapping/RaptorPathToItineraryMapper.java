@@ -140,7 +140,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary mapped = mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.getLegs());
 
-    Itinerary itinerary = new Itinerary(legs);
+    Itinerary itinerary = new Itinerary(legs, true);
 
     // Map general itinerary fields
     itinerary.setArrivedAtDestinationWithRentedVehicle(
@@ -399,7 +399,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           createZonedDateTime(path.endTime()),
           path.numberOfTransfers()
         )
-      )
+      ),
+      true
     );
   }
 

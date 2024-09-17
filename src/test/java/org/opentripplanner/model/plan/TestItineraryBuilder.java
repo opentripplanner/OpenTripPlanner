@@ -73,6 +73,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private int lastEndTime;
   private int c1 = 0;
   private int c2 = NOT_SET;
+  private boolean isSearchWindowAware = true;
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -398,6 +399,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
+  public TestItineraryBuilder withIsSearchWindowAware(boolean searchWindowAware) {
+    this.isSearchWindowAware = searchWindowAware;
+    return this;
+  }
+
   public Itinerary egress(int walkDuration) {
     walk(walkDuration, null);
     return build();
@@ -413,7 +419,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public Itinerary build() {
-    Itinerary itinerary = new Itinerary(legs);
+    Itinerary itinerary = new Itinerary(legs, isSearchWindowAware);
     itinerary.setGeneralizedCost(c1);
     if (c2 != NOT_SET) {
       itinerary.setGeneralizedCost2(c2);
