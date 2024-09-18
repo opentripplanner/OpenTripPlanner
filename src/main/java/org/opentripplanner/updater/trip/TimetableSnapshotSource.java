@@ -41,6 +41,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
+import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -333,6 +334,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return snapshotManager.getTimetableSnapshot();
   }
 
+  /**
+   * @return the current timetable snapshot buffer that contains pending changes (not yet published
+   * in a snapshot). This should be used in the context of an updater to build  a TransitEditorService
+   * that sees all the changes applied so far by real-time updates.
+   */
+  public TimetableSnapshot getTimetableSnapshotBuffer() {
+    return snapshotManager.getTimetableSnapshotBuffer();
+  }
+
   private static void logUpdateResult(
     String feedId,
     Map<ScheduleRelationship, Integer> failuresByRelationship,
@@ -424,10 +434,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       );
 
       cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
-      return snapshotManager.updateBuffer(newPattern, updatedTripTimes, serviceDate);
+      return snapshotManager.updateBuffer(
+        new RealTimeTripUpdate(newPattern, updatedTripTimes, serviceDate)
+      );
     } else {
       // Set the updated trip times in the buffer
-      return snapshotManager.updateBuffer(pattern, updatedTripTimes, serviceDate);
+      return snapshotManager.updateBuffer(
+        new RealTimeTripUpdate(pattern, updatedTripTimes, serviceDate)
+      );
     }
   }
 
@@ -453,7 +467,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    final Trip trip = transitEditorService.getTripForId(tripId);
+    final Trip trip = transitEditorService.getScheduledTripForId(tripId);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
@@ -631,7 +645,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       "number of stop should match the number of stop time updates"
     );
 
-    Route route = getOrCreateRoute(tripDescriptor, tripId);
+    Route route;
+    boolean routeExists = routeExists(tripId.getFeedId(), tripDescriptor);
+    if (routeExists) {
+      route =
+        transitEditorService.getRouteForId(
+          new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
+        );
+    } else {
+      route = createRoute(tripDescriptor, tripId);
+    }
 
     // Create new Trip
 
@@ -661,19 +684,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stopTimeUpdates,
       stops,
       serviceDate,
-      RealTimeState.ADDED
+      RealTimeState.ADDED,
+      !routeExists
     );
   }
 
-  private Route getOrCreateRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
-    if (routeExists(tripId.getFeedId(), tripDescriptor)) {
-      // Try to find route
-      return transitEditorService.getRouteForId(
-        new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
-      );
-    }
+  private Route createRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
     // the route in this update doesn't already exist, but the update contains the information so it will be created
-    else if (
+    if (
       tripDescriptor.hasExtension(MfdzRealtimeExtensions.tripDescriptor) &&
       !routeExists(tripId.getFeedId(), tripDescriptor)
     ) {
@@ -697,10 +715,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       var name = Objects.requireNonNullElse(addedRouteExtension.routeLongName(), tripId.toString());
       builder.withLongName(new NonLocalizedString(name));
       builder.withUrl(addedRouteExtension.routeUrl());
-
-      var route = builder.build();
-      transitEditorService.addRoutes(route);
-      return route;
+      return builder.build();
     }
     // no information about the rout is given, so we create a dummy one
     else {
@@ -714,9 +729,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Create route name
       I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
       builder.withLongName(longName);
-      var route = builder.build();
-      transitEditorService.addRoutes(route);
-      return route;
+      return builder.build();
     }
   }
 
@@ -756,7 +769,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final List<StopTimeUpdate> stopTimeUpdates,
     final List<StopLocation> stops,
     final LocalDate serviceDate,
-    final RealTimeState realTimeState
+    final RealTimeState realTimeState,
+    final boolean isAddedRoute
   ) {
     // Preconditions
     Objects.requireNonNull(stops);
@@ -881,7 +895,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       pattern.lastStop().getName()
     );
     // Add new trip times to the buffer
-    return snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
+    // TODO add support for TripOnServiceDate for GTFS-RT
+    return snapshotManager.updateBuffer(
+      new RealTimeTripUpdate(
+        pattern,
+        newTripTimes,
+        serviceDate,
+        null,
+        realTimeState == RealTimeState.ADDED,
+        isAddedRoute
+      )
+    );
   }
 
   /**
@@ -912,7 +936,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
         }
-        snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         success = true;
       }
     }
@@ -951,7 +975,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
         }
-        snapshotManager.updateBuffer(pattern, newTripTimes, serviceDate);
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
         cancelledAddedTrip = true;
       }
     }
@@ -1057,7 +1081,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       tripUpdate.getStopTimeUpdateList(),
       stops,
       serviceDate,
-      RealTimeState.MODIFIED
+      RealTimeState.MODIFIED,
+      false
     );
   }
 

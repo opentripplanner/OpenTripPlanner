@@ -22,13 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.opentripplanner.ext.siri.EntityResolver;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -44,8 +39,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private final String fullyQualifiedNamespace;
   private final String configRef;
   private final String serviceBusUrl;
-  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
-  private final EntityResolver entityResolver;
+  private final boolean fuzzyTripMatching;
   private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
   private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
   private final String topicName;
@@ -69,7 +63,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    */
   protected final int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
+  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
     this.configRef = config.configRef();
     this.authenticationType = config.getAuthenticationType();
     this.fullyQualifiedNamespace = config.getFullyQualifiedNamespace();
@@ -80,10 +74,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.feedId = config.feedId();
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
-    TransitService transitService = new DefaultTransitService(transitModel);
-    this.entityResolver = new EntityResolver(transitService, feedId);
-    this.fuzzyTripMatcher =
-      config.isFuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
+    this.fuzzyTripMatching = config.isFuzzyTripMatching();
   }
 
   /**
@@ -226,12 +217,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     }
   }
 
-  SiriFuzzyTripMatcher fuzzyTripMatcher() {
-    return fuzzyTripMatcher;
-  }
-
-  EntityResolver entityResolver() {
-    return entityResolver;
+  boolean fuzzyTripMatching() {
+    return fuzzyTripMatching;
   }
 
   /**

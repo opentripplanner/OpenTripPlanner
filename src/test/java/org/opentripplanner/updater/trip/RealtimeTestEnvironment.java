@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.opentripplanner.DateTimeHelper;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -20,11 +19,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -37,6 +38,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.UpdateResult;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -83,6 +85,7 @@ public final class RealtimeTestEnvironment {
   public final FeedScopedId route1Id = TransitModelForTest.id("TestRoute1");
   public final Trip trip1;
   public final Trip trip2;
+  public final Operator operator1;
   public final TransitModel transitModel;
   private final SiriTimetableSnapshotSource siriSource;
   private final TimetableSnapshotSource gtfsSource;
@@ -112,7 +115,10 @@ public final class RealtimeTestEnvironment {
     transitModel.initTimeZone(timeZone);
     transitModel.addAgency(TransitModelForTest.AGENCY);
 
-    Route route1 = TransitModelForTest.route(route1Id).build();
+    operator1 = Operator.of(operator1Id).withName("Operator 1").build();
+    transitModel.getOperators().add(operator1);
+
+    Route route1 = TransitModelForTest.route(route1Id).withOperator(operator1).build();
 
     trip1 =
       createTrip(
@@ -181,12 +187,7 @@ public final class RealtimeTestEnvironment {
   }
 
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
-    return new EstimatedTimetableHandler(
-      siriSource,
-      fuzzyMatching ? new SiriFuzzyTripMatcher(getTransitService()) : null,
-      getTransitService(),
-      getFeedId()
-    );
+    return new EstimatedTimetableHandler(siriSource, fuzzyMatching, getFeedId());
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
@@ -304,7 +305,15 @@ public final class RealtimeTestEnvironment {
   ) {
     Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
     UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
-      .applyUpdate(updates, DIFFERENTIAL);
+      .applyUpdate(
+        updates,
+        DIFFERENTIAL,
+        new DefaultRealTimeUpdateContext(
+          new Graph(),
+          transitModel,
+          siriSource.getTimetableSnapshotBuffer()
+        )
+      );
     commitTimetableSnapshot();
     return updateResult;
   }

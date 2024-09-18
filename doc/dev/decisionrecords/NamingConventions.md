@@ -60,7 +60,7 @@ These prefixes are also "allowed", but not preferred - they have some kind of ne
 
 ## Service, Model and Repository
 
-![MainModelOverview](doc/user/images/ServiceModelOverview.png)
+![MainModelOverview](../images/ServiceModelOverview.png)
 
 
 

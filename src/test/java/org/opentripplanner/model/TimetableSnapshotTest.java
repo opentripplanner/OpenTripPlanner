@@ -16,7 +16,6 @@ import java.time.ZoneId;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -25,6 +24,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
@@ -106,7 +106,7 @@ public class TimetableSnapshotTest {
 
   @Test
   public void testUpdate() {
-    Assertions.assertThrows(
+    assertThrows(
       ConcurrentModificationException.class,
       () -> {
         LocalDate today = LocalDate.now(timeZone);
@@ -159,7 +159,7 @@ public class TimetableSnapshotTest {
 
   @Test
   public void testCommit() {
-    Assertions.assertThrows(
+    assertThrows(
       ConcurrentModificationException.class,
       () -> {
         LocalDate today = LocalDate.now(timeZone);
@@ -267,9 +267,11 @@ public class TimetableSnapshotTest {
     TimetableSnapshot committedSnapshot = createCommittedSnapshot();
     LocalDate today = LocalDate.now(timeZone);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
+    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(pattern, tripTimes, today);
     assertThrows(
       ConcurrentModificationException.class,
-      () -> committedSnapshot.update(pattern, null, today)
+      () -> committedSnapshot.update(realTimeTripUpdate)
     );
   }
 
@@ -323,7 +325,9 @@ public class TimetableSnapshotTest {
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
     if (result.isSuccess()) {
-      return resolver.update(pattern, result.successValue().getTripTimes(), serviceDate);
+      return resolver.update(
+        new RealTimeTripUpdate(pattern, result.successValue().getTripTimes(), serviceDate)
+      );
     }
     throw new RuntimeException("createUpdatedTripTimes returned an error: " + result);
   }

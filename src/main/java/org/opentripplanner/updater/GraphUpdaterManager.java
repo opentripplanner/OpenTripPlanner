@@ -12,8 +12,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -66,17 +64,14 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
   /**
    * The Graph that will be updated.
    */
-  private final Graph graph;
-  private final TransitModel transitModel;
+  private final RealTimeUpdateContext realtimeUpdateContext;
 
   /**
    * Constructor.
    *
-   * @param transitModel is the Graph that will be updated.
    */
-  public GraphUpdaterManager(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
-    this.graph = graph;
-    this.transitModel = transitModel;
+  public GraphUpdaterManager(RealTimeUpdateContext context, List<GraphUpdater> updaters) {
+    this.realtimeUpdateContext = context;
     // Thread factories used to create new threads, giving them more human-readable names.
     var graphWriterThreadFactory = new ThreadFactoryBuilder().setNameFormat("graph-writer").build();
     this.scheduler = Executors.newSingleThreadScheduledExecutor(graphWriterThreadFactory);
@@ -189,7 +184,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
   public Future<?> execute(GraphWriterRunnable runnable) {
     return scheduler.submit(() -> {
       try {
-        runnable.run(graph, transitModel);
+        runnable.run(realtimeUpdateContext);
       } catch (Exception e) {
         LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
       }

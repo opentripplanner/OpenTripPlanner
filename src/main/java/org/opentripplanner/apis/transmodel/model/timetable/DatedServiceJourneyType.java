@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.routing.TripTimeOnDateHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -149,7 +149,7 @@ public class DatedServiceJourneyType {
           )
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
-            return TripTimesShortHelper.getTripTimesShort(
+            return TripTimeOnDateHelper.getTripTimeOnDates(
               GqlUtil.getTransitService(environment),
               tripOnServiceDate.getTrip(),
               tripOnServiceDate.getServiceDate()

@@ -26,9 +26,9 @@ On 11 January 2024 a team of OTP developers reviewed this realtime concurrency a
 
 In OTP's internal transit model, realtime data is currently stored separately from the scheduled data. This is only because realtime was originally introduced as an optional extra feature. Now that realtime is very commonly used, we intend to create a single unified transit model that will nonetheless continue to apply the same concurrency approach. 
 
-The following is a sequence diagram showing how threads are intended to communicate. Unlike some common forms of sequence diagrams, time is on the horizontal axis here. Each horizontal line represents either a thread of execution (handling incoming realtime messages or routing requests) or a queue or buffer data structure. Dotted lines represent object references being handed off, and solid lines represent data being copied.
+The following is a sequence diagram showing how threads are intended to communicate. Unlike some common forms of sequence diagrams, time is on the horizontal axis here. Each horizontal line represents either a thread of execution (handling incoming realtime messages or routing requests) or a queue or buffer data structure. Dotted arrows represent object references being handed off, and solid arrows represent data being copied.
 
-![Realtime sequence diagram](images/updater-threads-queues.svg)
+![Realtime Sequence Diagram](images/updater-threads-queues.svg)
 
 At the top of the diagram are the GraphUpdater implementations. These fall broadly into two categories: polling updaters and streaming updaters. Polling updaters periodically send a request to server (often just a simple HTTP server) which returns a file containing the latest version of the updates. Streaming updaters are generally built around libraries implementing message-oriented protocols such as MQTT or AMQP, which fire a callback each time a new message is received. Polling updaters tend to return a full dataset describing the entire system state on each polling operation, while streaming updaters tend to receive incremental messages targeting individual transit trips. As such, polling updaters execute relatively infrequently (perhaps every minute or two) and process large responses, while streaming updaters execute very frequently (often many times per second) and operate on small messages in short bursts. Polling updaters are simpler in many ways and make use of common HTTP server components, but they introduce significant latency and redundant communication. Streaming updaters require more purpose-built or custom-configured components including message brokers, but bandwidth consumption and latency are lower, allowing routing results to reflect vehicle delays and positions immediately after they're reported.
 
@@ -36,11 +36,11 @@ The GraphUpdaterManager coordinates all these updaters, and each runs freely in 
 
 As mentioned above, these GraphWriterRunnable instances must write to the transit data model in a very controlled way, following specific rules. They operate on a buffer containing a shallow copy of the whole transit data structure, and apply a copy-on-write strategy to avoid corrupting existing objects that may be visible to other parts of the system. When an instance is copied for writing, any references to it in parent objects must also be updated. Therefore, writes cause cascading copy operations, and all instances in the object tree back up to the root of the transit data structure must also be copied. As an optimization, if a GraphWriterRunnable is able to determine that the protective copy has already been made in this buffer (the part of the structure it needs to modify is somehow marked as being "dirty") it does not need to make another copy. If the update involves reading the existing data structure before making a change, those reads should be performed within the same contiguous chunk of deferred logic that performs the corresponding write, ensuring that there are no data races between write operations.
 
-This writable buffer of transit data is periodically made immutable and swapped into the role of a live snapshot, which is ready to be handed off to any incoming routing requests. Each time an immutable snapshot is created, a new writable buffer is created by making a shallow copy of the root instance in the transit data aggreagate. This functions like a double-buffering system, except that any number of snapshots can exist at once, and large subsets of the data can be shared across snapshots. As older snapshots (and their component parts) fall out of use, they are dereferenced and become eligible for garbage collection. Although the buffer swap could in principle occur after every write operation, it can incur significant copying and indexing overhead. When incremental message-oriented updaters are present this overhead would be incurred more often than necesary. Snapshots can be throttled to occur at most every few seconds, thereby reducing the total overhead at no perceptible cost to realtime visibility latency.
+This writable buffer of transit data is periodically made immutable and swapped into the role of a live snapshot, which is ready to be handed off to any incoming routing requests. Each time an immutable snapshot is created, a new writable buffer is created by making a shallow copy of the root instance in the transit data aggreagate. This functions like a double-buffering system, except that any number of snapshots can exist at once, and large subsets of the data can be shared across snapshots. As older snapshots (and their component parts) fall out of use, they are dereferenced and become eligible for garbage collection. Although the buffer swap could in principle occur after every write operation, it can incur significant copying and indexing overhead. When incremental message-oriented updaters are present this overhead would be incurred far more often than necessary. Therefore, snapshot publication is scheduled to occur regularly every few seconds, thereby reducing the total overhead without perceptibly increasing the latency of realtime information becoming visible to end users.
 
 This is essentially a multi-version snapshot concurrency control system, inspired by widely used database engines (and in fact informed by books on transactional database design). The end result is a system where:
 
-1. Writing operations are simple to reason about and cannot conflict because only one write happens at a time.
+1. Write operations are simple to reason about and cannot conflict because only one write happens at a time.
 1. Multiple read operations (including routing requests) can occur concurrently.
 1. Read operations do not need to pause while writes are happening.
 1. Read operations see only fully completed write operations, never partial writes.
@@ -50,7 +50,57 @@ This is essentially a multi-version snapshot concurrency control system, inspire
 
 An important characteristic of this approach is that _no locking is necessary_. However, some form of synchronization is used during the buffer swap operation to impose a consistent view of the whole data structure via a happens-before relationship as defined by the Java memory model. While pointers to objects can be handed between threads with no read-tearing of the pointer itself, there is no guarantee that the web of objects pointed to will be consistent without some explicit synchronization at the hand-off.
 
-Arguably the process of creating an immutable live snapshot (and a corresponding new writable buffer) should be handled by a GraphWriterRunnable on the single graph updater thread. This would serve to defer any queued modifications until the new buffer is in place, without introducing any further locking mechanisms.
+For simplicity, the process of creating an immutable live snapshot (and a corresponding new writable buffer) is handled by Runnable on the single graph writer thread. This serves to defer any queued modifications until the new buffer is in place, without introducing any further locking mechanisms.
+
+## Copy-on-Write Strategy in Timetable Snapshots
+
+Below is a high-level diagram of how the timetable snapshots are used to look up arrival and departure times for a particular TripPattern. Each Route is associated with N different TripPatterns (essentially, N different unique sequences of stops). The TimetableSnapshot is used to look up a Timetable for a given TripPattern. That Timetable provides an unchanging view of both realtime-updated and original scheduled arrival/departure times for all trips that match the given TripPattern. The arrays of arrival and departure times for all these trips are parallel to the array of stops for the TripPattern used to look them up. They have the same length, and a given index corresponds to the same stop in any of these arrays. Note that this is a simplification; in reality the data structures are further broken down to reflect which services are running on each specific date.
+
+<img alt="Timetable Lookup Diagram" src="images/timetable-lookup.svg" width="50%"/>
+
+Next, we will walk through a step-by-step diagram of how successive timetable snapshots are built up in a buffer, using a copy-on-write strategy to reuse as many object instances as possible (minimizing time and memory spent on copies) while ensuring that any existing snapshots visible to routing or API threads are consistent and unchanging. This is a more detailed look at the bottom half of the "Threads, Queues, and Buffers" diagram above, and particularly the yellow boxes near its center representing the buffered and live transit data. Each of the following diagrams shows the references between a tree of objects on the heap at a single moment in time, with time progressing as we move down the page.
+
+In the first four diagrams below, each blue box represents a shallow-copied object, maintaining a protective copy of the minimal subtree at and above any leaf nodes that are changed by incoming realtime messages. These shallow copies are being created in a private buffer that is visible only to a single thread that is sequentially executing GraphWriterRunnables enqueued by GraphUpdaters. 
+
+<!-- With []() image syntax markdown sets all widths to 100%, completely ignoring the stated
+     dimensions in each SVG file. Use HTML img tags to force width in percent, which is set to
+     viewBox width divided by 20 to maintain relative sizes. -->
+
+<br>
+<img alt="Snapshot Copy-on-Write Diagram 1" src="images/snapshot-manager-1.svg" width="45%"/><br>
+
+In preparation for applying updates, the collections in the root object of the buffer are shallow-copied. The collection objects themselves are duplicated, but the references they contain remain unchanged: they continue to reference the same existing Timetable instances.
+
+<img alt="Snapshot Copy-on-Write Diagram 2" src="images/snapshot-manager-2.svg" width="42%"/><br>
+
+At this point, the realtime system receives some updated departure times for the first trip on TripPattern A. This will require a change to a primitive array of departure times for that particular trip. All objects leading from the root of the snapshot down to that leaf array are copied in a selective deep copy. Specifically, the Timetable for TripPattern A and the first TripTimes within that Timetable are copied. All other elements in collections continue to point at the previously existing object instances. This is indicated by the (1:N-1) cardinality of the references pointing from the blue copied boxes back to the pre-existing white boxes.
+
+From this step onward, the "requests" box on the right side of the diagram will demonstrate how the snapshots interact with incoming routing and API requests and garbage collection. One of the HTTP handler threads is actively performing routing, so has been given a request-scoped reference to the current live snapshot. 
+
+<img alt="Snapshot Copy-on-Write Diagram 3" src="images/snapshot-manager-3.svg" width="77%"/><br>
+
+In the next diagram, the selective deep copy is complete. The departure times have been updated, and are reachable from the root of the buffer snapshot, without affecting any pre-existing snapshots. The changes to the buffer are not published immediately; a series of changes is usually batched for publication every few seconds. Another incoming HTTP request, this time for the GraphQL API, is given a request-scoped reference to the same immutable live snapshot.
+
+<img alt="Snapshot Copy-on-Write Diagram 4" src="images/snapshot-manager-4.svg" width="83%"/><br>
+
+Every few seconds, the buffer contents are frozen ("committed" in database terms) and made available to routing and API services as a new "live snapshot". Once the snapshot is made visible to other threads, its entire object tree is immutable by convention. This immutability will eventually be enforced in code. The process of applying single-threaded updates to the private buffer begins anew. The blue instances have been promoted to become the current live snapshot. Green boxes will now represent the minimal subtree of shallow protective copies in the private buffer. Note that the two HTTP requests are still in progress, and retain their references to the previous, unchanging snapshot S even though we have published a new snapshot T. In this way, each request maintains a consistent view of all the transit data until it completes.
+
+<img alt="Snapshot Copy-on-Write Diagram 5" src="images/snapshot-manager-5.svg" width="87%"/><br>
+
+Now the realtime system receives some updated arrival and departure times for the third trip in TripPattern B. It again makes a protective copy of all items from the root of the snapshot down to the leaf arrays it needs to update. This includes the Timetable for TripPattern B and the third TripTimes in that Timetable, as well as some primitive arrays. The copied collections in the buffer now contain a mixture of references to white, blue, and green objects from three generations of snapshots. Both live snapshots S and T remain unchanged by the writes to the copies in the buffer, even though the buffer reuses most of the instances in these previous snapshots. Note: In the original (white) snapshot, the TripTimes are only shown for the frontmost Timetable A in the pile. Timetables B and C are also implied to have TripTimes B1, B2, B3... and C1, C2, C3... and associated Trips and time arrays, which are not shown to avoid clutter. For this reason, the protective copies of Timetable B and TripTimes B3 (in green) are shown pointing in the general direction of this tree of pre-existing objects, not at specific individual objects.
+
+The routing request has now completed and released its reference to the original snapshot S (white). But another routing request has arrived on another HTTP handler thread, and is given a request-scoped reference to the current live snapshot T (blue).
+
+<img alt="Snapshot Copy-on-Write Diagram 6" src="images/snapshot-manager-6.svg" width="93%"/><br>
+
+Once the GraphQL request completes, no threads are using the old snapshot S (white) anymore. That snapshot will now be garbage collected, transitively releasing any objects that are no longer used because they've been superseded by protective copies.
+
+<img alt="Snapshot Copy-on-Write Diagram 7" src="images/snapshot-manager-7.svg" width="92%"/><br>
+
+Without any further active steps by OTP or the JVM, simply rearranging elements of the diagram after garbage collection occurs reveals that our routing thread is seeing a full coherent snapshot composed of objects created over the course of several subsequent snapshots. The buffer (green) will soon be promoted to the current live snapshot and the cycle continues.
+
+<img alt="Snapshot Copy-on-Write Diagram 8" src="images/snapshot-manager-8.svg" width="75%"/><br>
+
 
 ## Design Considerations
 

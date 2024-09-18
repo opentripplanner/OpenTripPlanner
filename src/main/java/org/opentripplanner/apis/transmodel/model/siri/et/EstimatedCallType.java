@@ -355,7 +355,7 @@ public class EstimatedCallType {
   }
 
   /**
-   * Resolves all AlertPatches that are relevant for the supplied TripTimeShort.
+   * Resolves all AlertPatches that are relevant for the supplied TripTimeOnDate.
    */
   private static Collection<TransitAlert> getAllRelevantAlerts(
     TripTimeOnDate tripTimeOnDate,

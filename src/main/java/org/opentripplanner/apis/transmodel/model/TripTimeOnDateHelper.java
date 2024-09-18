@@ -12,16 +12,16 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class TripTimeShortHelper {
+public class TripTimeOnDateHelper {
 
   /** Utility class with private constructor to prevent instantiation. */
-  private TripTimeShortHelper() {}
+  private TripTimeOnDateHelper() {}
 
   /**
    * Find trip time short for the from place in transit leg, or null.
    */
   @Nullable
-  public static TripTimeOnDate getTripTimeShortForFromPlace(Leg leg) {
+  public static TripTimeOnDate getTripTimeOnDateForFromPlace(Leg leg) {
     if (!leg.isScheduledTransitLeg()) {
       return null;
     }
@@ -49,7 +49,7 @@ public class TripTimeShortHelper {
    * Find trip time short for the to place in transit leg, or null.
    */
   @Nullable
-  public static TripTimeOnDate getTripTimeShortForToPlace(Leg leg) {
+  public static TripTimeOnDate getTripTimeOnDateForToPlace(Leg leg) {
     if (!leg.isScheduledTransitLeg()) {
       return null;
     }
@@ -77,7 +77,7 @@ public class TripTimeShortHelper {
   /**
    * Find trip time shorts for all stops for the full trip of a leg.
    */
-  public static List<TripTimeOnDate> getAllTripTimeShortsForLegsTrip(Leg leg) {
+  public static List<TripTimeOnDate> getAllTripTimeOnDatesForLegsTrip(Leg leg) {
     if (!leg.isScheduledTransitLeg()) {
       return List.of();
     }
@@ -96,7 +96,7 @@ public class TripTimeShortHelper {
   /**
    * Find trip time shorts for all intermediate stops for a leg.
    */
-  public static List<TripTimeOnDate> getIntermediateTripTimeShortsForLeg(Leg leg) {
+  public static List<TripTimeOnDate> getIntermediateTripTimeOnDatesForLeg(Leg leg) {
     if (!leg.isScheduledTransitLeg()) {
       return List.of();
     }
