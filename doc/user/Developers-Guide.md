@@ -143,7 +143,7 @@ how to generate a live local preview of the documentation while you're writing i
 In short:
 
 ```
-$ pip install -r docs/requirements.txt
+$ pip install -r doc/user/requirements.txt
 $ mkdocs serve
 ```
 
