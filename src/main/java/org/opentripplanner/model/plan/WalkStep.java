@@ -44,6 +44,7 @@ public final class WalkStep {
   private final boolean walkingBike;
 
   private final String exit;
+  private final String entrance;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -56,6 +57,7 @@ public final class WalkStep {
     I18NString directionText,
     Set<StreetNote> streetNotes,
     String exit,
+    String entrance,
     ElevationProfile elevationProfile,
     boolean bogusName,
     boolean walkingBike,
@@ -76,6 +78,7 @@ public final class WalkStep {
     this.walkingBike = walkingBike;
     this.area = area;
     this.exit = exit;
+    this.entrance = entrance;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -128,6 +131,13 @@ public final class WalkStep {
    */
   public String getExit() {
     return exit;
+  }
+
+  /**
+   * When entering or exiting a public transport station, the entrance name
+   */
+  public String getEntrance() {
+    return entrance;
   }
 
   /**

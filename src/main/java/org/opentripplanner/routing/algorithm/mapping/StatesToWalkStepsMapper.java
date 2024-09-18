@@ -26,6 +26,7 @@ import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -258,6 +259,8 @@ public class StatesToWalkStepsMapper {
 
     setMotorwayExit(backState);
 
+    setStationEntrance(backState);
+
     if (createdNewStep && !modeTransition) {
       // check last three steps for zag
       int lastIndex = steps.size() - 1;
@@ -377,6 +380,21 @@ public class StatesToWalkStepsMapper {
     }
     if (exitState.getVertex() instanceof ExitVertex) {
       current.withExit(((ExitVertex) exitState.getVertex()).getExitName());
+    }
+  }
+
+  /**
+   * Update the walk step with the name of the station entrance if set from OSM
+   */
+  private void setStationEntrance(State backState) {
+    State entranceState = backState;
+    Edge entranceEdge = entranceState.getBackEdge();
+    while (entranceEdge instanceof FreeEdge) {
+      entranceState = entranceState.getBackState();
+      entranceEdge = entranceState.getBackEdge();
+    }
+    if (entranceState.getVertex() instanceof StationEntranceVertex) {
+      current.withEntrance(((StationEntranceVertex) entranceState.getVertex()).getEntranceName());
     }
   }
 

@@ -54,6 +54,11 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
   }
 
   @Override
+  public DataFetcher<String> entrance() {
+    return environment -> getSource(environment).getEntrance();
+  }
+
+  @Override
   public DataFetcher<Double> lat() {
     return environment -> getSource(environment).getStartLocation().latitude();
   }

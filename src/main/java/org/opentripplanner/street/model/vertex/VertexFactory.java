@@ -104,6 +104,15 @@ public class VertexFactory {
   }
 
   @Nonnull
+  public StationEntranceVertex stationEntrance(
+    long nid,
+    Coordinate coordinate,
+    String entranceName
+  ) {
+    return addToGraph(new StationEntranceVertex(coordinate.x, coordinate.y, nid, entranceName));
+  }
+
+  @Nonnull
   public OsmVertex osm(
     Coordinate coordinate,
     OSMNode node,

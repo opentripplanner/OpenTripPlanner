@@ -95,6 +95,15 @@ class VertexGenerator {
         iv = bv;
       }
 
+      if (node.isSubwayEntrance()) {
+        String ref = node.getTag("ref");
+        if (ref != null) {
+          iv = vertexFactory.stationEntrance(nid, coordinate, ref);
+        } else {
+          iv = vertexFactory.stationEntrance(nid, coordinate, "MAIN_ENTRANCE");
+        }
+      }
+
       if (iv == null) {
         iv =
           vertexFactory.osm(

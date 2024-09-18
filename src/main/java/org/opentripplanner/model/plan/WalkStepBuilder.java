@@ -25,6 +25,7 @@ public class WalkStepBuilder {
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
+  private String entrance;
   private boolean stayOn = false;
   /**
    * Distance used for appending elevation profiles
@@ -71,6 +72,11 @@ public class WalkStepBuilder {
 
   public WalkStepBuilder withExit(String exit) {
     this.exit = exit;
+    return this;
+  }
+
+  public WalkStepBuilder withEntrance(String entrance) {
+    this.entrance = entrance;
     return this;
   }
 
@@ -156,6 +162,7 @@ public class WalkStepBuilder {
       directionText,
       streetNotes,
       exit,
+      entrance,
       elevationProfile,
       bogusName,
       walkingBike,
