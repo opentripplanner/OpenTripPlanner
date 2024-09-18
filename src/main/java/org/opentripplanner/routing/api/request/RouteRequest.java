@@ -35,14 +35,6 @@ import org.slf4j.LoggerFactory;
  * All defaults should be specified here in the RouteRequest, NOT as annotations on query parameters
  * in web services that create RouteRequests. This establishes a priority chain for default values:
  * RouteRequest field initializers, then JSON router config, then query parameters.
- *
- * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor
- * router or other non-transit routing (walk, bike, car etc.)
- * <p>
- * TODO OTP2 Many fields are deprecated in this class, the reason is documented in the
- *           RoutingResource class, not here. Eventually the field will be removed from this
- *           class, but we want to keep it in the RoutingResource as long as we support the
- *           REST API.
  */
 public class RouteRequest implements Cloneable, Serializable {
 
