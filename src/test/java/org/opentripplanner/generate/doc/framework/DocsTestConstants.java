@@ -14,7 +14,7 @@ public interface DocsTestConstants {
   File USER_DOC_PATH = new File(DOC_ROOT, "user");
 
   /**
-   * This method return {@code true} if the /docs directory is available. If not, a warning is
+   * This method return {@code true} if the /doc directory is available. If not, a warning is
    * logged and the method returns {@code false}. This is used by the {@link GeneratesDocumentation}
    * annotation.
    */
@@ -24,7 +24,7 @@ public interface DocsTestConstants {
     }
     LOG.warn(
       """
-      SKIP TEST - '/docs' NOT FOUND
+      SKIP TEST - '/doc' NOT FOUND
       
           The doc/templates directory might not be available if you run the tests outside the
           root of the projects. This may happen if the project root is not the working directory,
