@@ -182,6 +182,13 @@ public class RouteRequest implements Cloneable, Serializable {
    * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page". The date-time is
    * used for many things, for example finding the days to search, but the transit search is using
    * the cursor[if exist], not the date-time.
+   * <p>
+   * The direct mode is also unset when there is a page cursor because for anything other than the
+   * initial page we don't want to see direct results.
+   * <p>
+   * However, because we still want to have a walking result to compare the transit with, we
+   * temporarily set the direct mode in {@link org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty}
+   * and then filter out this walking itinerary in {@link org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter}.
    */
   public void applyPageCursor() {
     if (pageCursor != null) {
