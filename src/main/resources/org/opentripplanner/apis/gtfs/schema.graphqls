@@ -2003,7 +2003,7 @@ type Stop implements Node & PlaceInterface {
   "Routes which pass through this stop"
   routes(
     """
-    Only include routes whose are operational on at least one service date specified by this filter.
+    Only include routes which are operational on at least one service date specified by this filter.
         
     **Note**: A service date is a technical term useful for transit planning purposes and might not
     correspond to a how a passenger thinks of a calendar date. For example, a night bus running
