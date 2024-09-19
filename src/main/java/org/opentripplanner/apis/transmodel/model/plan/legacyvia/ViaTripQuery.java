@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model.plan.legacyvia;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
@@ -28,6 +28,7 @@ public class ViaTripQuery {
       .description(
         "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
       )
+      .deprecate("The the regular plan query with via stop instead.")
       .type(new GraphQLNonNull(viaTripType))
       .withDirective(gqlUtil.timingData)
       .argument(

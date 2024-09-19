@@ -74,10 +74,10 @@ import org.opentripplanner.apis.transmodel.model.plan.TripPatternTimePenaltyType
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.TripType;
-import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
-import org.opentripplanner.apis.transmodel.model.plan.ViaSegmentInputType;
-import org.opentripplanner.apis.transmodel.model.plan.ViaTripQuery;
-import org.opentripplanner.apis.transmodel.model.plan.ViaTripType;
+import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaLocationInputType;
+import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaSegmentInputType;
+import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripQuery;
+import org.opentripplanner.apis.transmodel.model.plan.legacyvia.ViaTripType;
 import org.opentripplanner.apis.transmodel.model.siri.et.EstimatedCallType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.AffectsType;
 import org.opentripplanner.apis.transmodel.model.siri.sx.PtSituationElementType;
