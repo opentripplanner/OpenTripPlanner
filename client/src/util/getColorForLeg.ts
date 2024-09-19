@@ -21,7 +21,7 @@ const getColorForMode = function (mode: Mode) {
 };
 
 /**
- * Extract a line color from a leg. If there isn't on given by its line property use fallback colors.
+ * Extract a line color from a leg. If there isn't one given by its line, this method returns a fallback color.
  */
 export const getColorForLeg = function (leg: Leg) {
   if (leg.line?.presentation?.colour) {
