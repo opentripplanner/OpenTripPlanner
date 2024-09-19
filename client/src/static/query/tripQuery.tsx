@@ -64,6 +64,9 @@ export const query = graphql(`
             publicCode
             name
             id
+            presentation {
+              colour
+            }
           }
           authority {
             name
