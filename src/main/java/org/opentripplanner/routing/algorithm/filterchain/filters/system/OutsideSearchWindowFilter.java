@@ -7,8 +7,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
- * This filter will remove all itineraries that are outside the search-window. In some
- * cases the access is time-shifted after the end of the search-window. These results
+ * This filter will remove all itineraries that are both search-window aware and outside the
+ * search-window. Only those that use transit are search-window, street and flex itineraries are not.
+ * <p>
+ * In some cases the access is time-shifted after the end of the search-window. These results
  * should appear again when paging to the next page. Hence, this filter will remove
  * such itineraries. The same is true for when paging to the previous page for arriveBy=true.
  * <p>

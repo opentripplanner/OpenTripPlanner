@@ -164,6 +164,13 @@ public class Itinerary implements ItinerarySortKey {
     return isStreetOnly();
   }
 
+  /**
+   * Returns true if this itinerary has only flex and walking legs.
+   */
+  public boolean isFlexAndWalkOnly() {
+    return legs.stream().allMatch(l -> l.isFlexibleTrip() || l.isWalkingLeg());
+  }
+
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
     return legs

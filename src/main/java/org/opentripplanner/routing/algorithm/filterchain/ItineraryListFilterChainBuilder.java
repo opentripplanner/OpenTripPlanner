@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveBi
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveNonTransitItinerariesBasedOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.FlexSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
@@ -468,6 +469,7 @@ public class ItineraryListFilterChainBuilder {
           filters,
           new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow)
         );
+        addRemoveFilter(filters, new FlexSearchWindowFilter(earliestDepartureTime));
       }
 
       // Remove itineraries present in the page retrieved before this page/search.
