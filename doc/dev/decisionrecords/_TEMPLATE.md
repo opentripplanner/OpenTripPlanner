@@ -6,8 +6,6 @@
   later. 
 -->
 
-Original pull-request: {#NNNN}
-
 
 ### Context and Problem Statement
 
