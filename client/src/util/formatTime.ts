@@ -1,3 +1,5 @@
+import {useTimeZone} from "../hooks/useTimeZone.ts";
+
 /**
  * Format departure and arrival times from scalar dateTime strings
  *
@@ -9,5 +11,6 @@ export function formatTime(dateTime: string, style?: 'short' | 'medium') {
   return parsed.toLocaleTimeString('en-US', {
     timeStyle: style ? style : parsed.getSeconds() === 0 ? 'short' : 'medium',
     hourCycle: 'h24',
+    timeZone: useTimeZone()
   });
 }
