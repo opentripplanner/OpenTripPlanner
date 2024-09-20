@@ -269,8 +269,11 @@ class GenerateTripPatternsOperationTest {
 
   static List<Arguments> testCases() {
     return List.of(
+      // trips with different modes
       Arguments.of(trip1, trip3),
+      // trips with different sub-modes
       Arguments.of(trip1, trip4),
+      // trips with different directions
       Arguments.of(trip1, trip5)
     );
   }

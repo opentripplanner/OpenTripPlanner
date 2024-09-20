@@ -107,22 +107,6 @@ public class TimetableBuilder {
     return this;
   }
 
-  public TripPattern getPattern() {
-    return pattern;
-  }
-
-  public LocalDate getServiceDate() {
-    return serviceDate;
-  }
-
-  List<TripTimes> createImmutableOrderedListOfTripTimes() {
-    return tripTimes.values().stream().sorted().toList();
-  }
-
-  public List<FrequencyEntry> getFrequencies() {
-    return frequencies;
-  }
-
   /**
    * The direction for all the trips in this timetable.
    */
@@ -132,5 +116,21 @@ public class TimetableBuilder {
 
   public Timetable build() {
     return new Timetable(this);
+  }
+
+  List<TripTimes> createImmutableOrderedListOfTripTimes() {
+    return tripTimes.values().stream().sorted().toList();
+  }
+
+  TripPattern getPattern() {
+    return pattern;
+  }
+
+  LocalDate getServiceDate() {
+    return serviceDate;
+  }
+
+  List<FrequencyEntry> getFrequencies() {
+    return frequencies;
   }
 }
