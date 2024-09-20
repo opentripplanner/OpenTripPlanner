@@ -5,6 +5,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.7.0-SNAPSHOT (under development)
 
+- Extra leg when transferring at the same stop [#5984](https://github.com/opentripplanner/OpenTripPlanner/pull/5984)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
