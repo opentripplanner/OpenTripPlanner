@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -18,6 +19,7 @@ import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
@@ -82,6 +84,13 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
     var preferences = request.preferences();
 
+    // TODO Fix the Raptor search so pass-through and via search can be used together.
+    if (hasViaLocationsAndPassThroughLocations()) {
+      throw new IllegalArgumentException(
+        "A mix of via-locations and pass-through is not allowed in this versionP."
+      );
+    }
+
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());
 
@@ -122,7 +131,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
 
       // TODO - We need handle via locations that are not pass-through-points here
-      if (request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)) {
+      if (hasPassThroughOnly()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
@@ -150,6 +159,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
+
+    if (hasViaLocationsOnly()) {
+      builder.searchParams().addViaLocations(mapViaLocations());
+    }
 
     var raptorDebugging = request.journey().transit().raptorDebugging();
 
@@ -182,8 +195,46 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         )
       );
     }
-
     return builder.build();
+  }
+
+  private boolean hasPassThroughOnly() {
+    return request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation);
+  }
+
+  private boolean hasViaLocationsOnly() {
+    return request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation);
+  }
+
+  private boolean hasViaLocationsAndPassThroughLocations() {
+    var c = request.getViaLocations();
+    return (
+      request.isViaSearch() &&
+      c.stream().anyMatch(ViaLocation::isPassThroughLocation) &&
+      c.stream().anyMatch(Predicate.not(ViaLocation::isPassThroughLocation))
+    );
+  }
+
+  private List<RaptorViaLocation> mapViaLocations() {
+    return request.getViaLocations().stream().map(this::mapViaLocation).toList();
+  }
+
+  private RaptorViaLocation mapViaLocation(ViaLocation input) {
+    if (input.isPassThroughLocation()) {
+      var builder = RaptorViaLocation.allowPassThrough(input.label());
+      for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
+        builder.addViaStop(stopIndex);
+      }
+      return builder.build();
+    }
+    // Visit Via location
+    else {
+      var builder = RaptorViaLocation.via(input.label(), input.minimumWaitTime());
+      for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
+        builder.addViaStop(stopIndex);
+      }
+      return builder.build();
+    }
   }
 
   private List<PassThroughPoint> mapPassThroughPoints() {

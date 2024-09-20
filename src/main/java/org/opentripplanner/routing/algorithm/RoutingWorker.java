@@ -230,10 +230,18 @@ public class RoutingWorker {
       : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
-  private Void routeDirectStreet(
+  private List<Itinerary> routeDirectStreet(
     List<Itinerary> itineraries,
     Collection<RoutingError> routingErrors
   ) {
+    // TODO: Add support for via search to the direct-street search and remove this.
+    //       The direct search is used to prune away silly transit results and it
+    //       would be nice to also support via as a feature in the direct-street
+    //       search.
+    if (request.isViaSearch()) {
+      return null;
+    }
+
     debugTimingAggregator.startedDirectStreetRouter();
     try {
       itineraries.addAll(DirectStreetRouter.route(serverContext, request));

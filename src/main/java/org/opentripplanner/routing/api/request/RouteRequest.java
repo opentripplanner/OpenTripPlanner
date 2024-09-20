@@ -279,6 +279,13 @@ public class RouteRequest implements Cloneable, Serializable {
     this.to = to;
   }
 
+  /**
+   * Return {@code true} if at least one via location is set!
+   */
+  public boolean isViaSearch() {
+    return !via.isEmpty();
+  }
+
   public List<ViaLocation> getViaLocations() {
     return via;
   }

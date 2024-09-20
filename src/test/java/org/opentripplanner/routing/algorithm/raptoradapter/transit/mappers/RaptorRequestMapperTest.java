@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -53,6 +55,24 @@ class RaptorRequestMapperTest {
   void mapRelaxCost(CostLinearFunction input, int cost, int expected) {
     var calcCost = RaptorRequestMapper.mapRelaxCost(input);
     assertEquals(expected, calcCost.relax(cost));
+  }
+
+  @Test
+  void testViaLocation() {
+    var req = new RouteRequest();
+    var minWaitTime = Duration.ofMinutes(13);
+
+    req.setViaLocations(
+      List.of(new VisitViaLocation("Via A", minWaitTime, List.of(STOP_A.getId()), List.of()))
+    );
+
+    var result = map(req);
+
+    assertTrue(result.searchParams().hasViaLocations());
+    assertEquals(
+      "[Via{label: Via A, minWaitTime: 13m, connections: [0 13m]}]",
+      result.searchParams().viaLocations().toString()
+    );
   }
 
   @Test
