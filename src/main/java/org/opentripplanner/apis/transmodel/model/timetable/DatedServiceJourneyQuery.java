@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
@@ -38,10 +39,7 @@ public class DatedServiceJourneyQuery {
       .build();
   }
 
-  public static GraphQLFieldDefinition createQuery(
-    GraphQLOutputType datedServiceJourneyType,
-    GqlUtil gqlUtil
-  ) {
+  public static GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
     return GraphQLFieldDefinition
       .newFieldDefinition()
       .name("datedServiceJourneys")
@@ -69,7 +67,9 @@ public class DatedServiceJourneyQuery {
         GraphQLArgument
           .newArgument()
           .name("operatingDays")
-          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(gqlUtil.dateScalar))))
+          .type(
+            new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR)))
+          )
       )
       .argument(
         GraphQLArgument

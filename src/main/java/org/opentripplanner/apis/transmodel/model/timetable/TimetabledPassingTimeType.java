@@ -8,6 +8,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -25,8 +26,7 @@ public class TimetabledPassingTimeType {
     GraphQLOutputType noticeType,
     GraphQLOutputType quayType,
     GraphQLOutputType destinationDisplayType,
-    GraphQLOutputType serviceJourneyType,
-    GqlUtil gqlUtil
+    GraphQLOutputType serviceJourneyType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -44,7 +44,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("arrival")
-          .type(gqlUtil.timeScalar)
+          .type(TransmodelScalars.TIME_SCALAR)
           .description("Scheduled time of arrival at quay")
           .dataFetcher(environment ->
             missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledArrival())
@@ -55,7 +55,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("departure")
-          .type(gqlUtil.timeScalar)
+          .type(TransmodelScalars.TIME_SCALAR)
           .description("Scheduled time of departure from quay")
           .dataFetcher(environment ->
             missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledDeparture())
@@ -111,7 +111,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("earliestDepartureTime")
-          .type(gqlUtil.timeScalar)
+          .type(TransmodelScalars.TIME_SCALAR)
           .description(
             "Earliest possible departure time for a service journey with a service window."
           )
@@ -131,7 +131,7 @@ public class TimetabledPassingTimeType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("latestArrivalTime")
-          .type(gqlUtil.timeScalar)
+          .type(TransmodelScalars.TIME_SCALAR)
           .description(
             "Latest possible (planned) arrival time for a service journey with a service window."
           )
