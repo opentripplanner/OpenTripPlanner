@@ -10,7 +10,8 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * for filtering is useful when combining flex with transit.
  * <p>
  * The flex router also searches the previous day (arrive by) or the next one (depart after).
- * If you didn't do it you could get yesterday's or tomorrow's results where you would not expect it.
+ * If you didn't didn't filter the flex results by something you could get yesterday's or tomorrow's
+ * trips where you would not expect it.
  */
 public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
 
