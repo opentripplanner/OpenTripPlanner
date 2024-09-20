@@ -1,18 +1,17 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLCarsAllowed;
 import org.opentripplanner.transit.model.network.CarAccess;
 
 class CarsAllowedMapperTest {
 
   @Test
   void mapping() {
-    assertThat(CarAccess.ALLOWED.toString())
-      .isEqualTo(CarsAllowedMapper.map(CarAccess.ALLOWED).toString());
-    assertThat(CarAccess.NOT_ALLOWED.toString())
-      .isEqualTo(CarsAllowedMapper.map(CarAccess.NOT_ALLOWED).toString());
-    assertThat("NO_INFORMATION").isEqualTo(CarsAllowedMapper.map(CarAccess.UNKNOWN).toString());
+    assertEquals(GraphQLCarsAllowed.NO_INFORMATION, CarsAllowedMapper.map(CarAccess.UNKNOWN));
+    assertEquals(GraphQLCarsAllowed.NOT_ALLOWED, CarsAllowedMapper.map(CarAccess.NOT_ALLOWED));
+    assertEquals(GraphQLCarsAllowed.ALLOWED, CarsAllowedMapper.map(CarAccess.ALLOWED));
   }
 }
