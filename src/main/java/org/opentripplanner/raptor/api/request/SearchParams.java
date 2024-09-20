@@ -32,7 +32,7 @@ public class SearchParams {
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
   private final Collection<RaptorAccessEgress> egressPaths;
-  private final List<ViaLocation> viaLocations;
+  private final List<RaptorViaLocation> viaLocations;
 
   /**
    * Default values are defined in the default constructor.
@@ -212,7 +212,7 @@ public class SearchParams {
    *    * <p/>
    *    * Required, at least one egress path must exist.
    */
-  public List<ViaLocation> viaLocations() {
+  public List<RaptorViaLocation> viaLocations() {
     return viaLocations;
   }
 

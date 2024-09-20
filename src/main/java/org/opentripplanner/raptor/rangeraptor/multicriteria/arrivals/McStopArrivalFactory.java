@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.ViaConnection;
+import org.opentripplanner.raptor.api.request.RaptorViaConnection;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 
 public interface McStopArrivalFactory<T extends RaptorTripSchedule> {
@@ -24,7 +24,7 @@ public interface McStopArrivalFactory<T extends RaptorTripSchedule> {
 
   default McStopArrival<T> createViaStopArrival(
     McStopArrival<T> previous,
-    ViaConnection viaConnection
+    RaptorViaConnection viaConnection
   ) {
     if (viaConnection.isSameStop()) {
       if (viaConnection.durationInSeconds() == 0) {

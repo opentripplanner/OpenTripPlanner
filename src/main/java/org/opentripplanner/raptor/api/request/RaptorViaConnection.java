@@ -29,7 +29,7 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  * {@code c1} need to include the walk time, but not the wait time (assuming all connections
  * have the same minimum wait time).
  */
-public final class ViaConnection {
+public final class RaptorViaConnection {
 
   private final int fromStop;
   private final int durationInSeconds;
@@ -37,7 +37,7 @@ public final class ViaConnection {
   @Nullable
   private final RaptorTransfer transfer;
 
-  ViaConnection(ViaLocation parent, int fromStop, @Nullable RaptorTransfer transfer) {
+  RaptorViaConnection(RaptorViaLocation parent, int fromStop, @Nullable RaptorTransfer transfer) {
     this.fromStop = fromStop;
     this.transfer = transfer;
     this.durationInSeconds =
@@ -90,7 +90,7 @@ public final class ViaConnection {
    * The method returns {@code true} if this instance is better or equals to the given other
    * stop with respect to being pareto-optimal.
    */
-  boolean isBetterOrEqual(ViaConnection other) {
+  boolean isBetterOrEqual(RaptorViaConnection other) {
     if (fromStop != other.fromStop || toStop() != other.toStop()) {
       return false;
     }
@@ -105,7 +105,7 @@ public final class ViaConnection {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ViaConnection that = (ViaConnection) o;
+    RaptorViaConnection that = (RaptorViaConnection) o;
     return fromStop == that.fromStop && Objects.equals(transfer, that.transfer);
   }
 

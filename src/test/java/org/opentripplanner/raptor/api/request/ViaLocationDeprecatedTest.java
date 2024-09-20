@@ -30,7 +30,7 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void passThroughStop() {
-    var subject = ViaLocation.allowPassThrough("PassThrough A").addViaStop(STOP_C).build();
+    var subject = RaptorViaLocation.allowPassThrough("PassThrough A").addViaStop(STOP_C).build();
 
     assertEquals("PassThrough A", subject.label());
     assertTrue(subject.allowPassThrough());
@@ -56,7 +56,7 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void viaSingleStop() {
-    var subject = ViaLocation.via("Tx A").addViaStop(STOP_B).build();
+    var subject = RaptorViaLocation.via("Tx A").addViaStop(STOP_B).build();
 
     assertEquals("Tx A", subject.label());
     assertFalse(subject.allowPassThrough());
@@ -78,7 +78,7 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void testCombinationOfPassThroughAndTransfer() {
-    var subject = ViaLocation
+    var subject = RaptorViaLocation
       .allowPassThrough("PassThrough A")
       .addViaStop(STOP_C)
       .addViaTransfer(STOP_A, TX)
@@ -110,7 +110,7 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void viaStopAorCWithWaitTime() {
-    var subject = ViaLocation
+    var subject = RaptorViaLocation
       .via("Plaza", WAIT_TIME)
       .addViaStop(STOP_C)
       .addViaTransfer(STOP_A, TX)
@@ -163,14 +163,14 @@ class ViaLocationDeprecatedTest {
     boolean expected,
     String description
   ) {
-    var subject = ViaLocation
+    var subject = RaptorViaLocation
       .via("Subject")
       .addViaTransfer(STOP_A, new TestTransfer(STOP_B, TX_DURATION, C1))
       .build()
       .connections()
       .getFirst();
 
-    var candidate = ViaLocation
+    var candidate = RaptorViaLocation
       .via("Candidate")
       .addViaTransfer(fromStop, new TestTransfer(toStop, minWaitTime, c1))
       .build()
@@ -185,7 +185,7 @@ class ViaLocationDeprecatedTest {
     var e = assertThrows(
       IllegalArgumentException.class,
       () ->
-        ViaLocation
+        RaptorViaLocation
           .via("S")
           .addViaTransfer(STOP_A, new TestTransfer(STOP_B, TX_DURATION, C1))
           .addViaTransfer(STOP_A, new TestTransfer(STOP_B, TX_DURATION, C1))
@@ -199,10 +199,13 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void testEqualsAndHashCode() {
-    var subject = ViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
-    var same = ViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
+    var subject = RaptorViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
+    var same = RaptorViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
     // Slightly less wait-time and slightly larger cost(c1)
-    var other = ViaLocation.via(null, Duration.ofSeconds(1)).addViaTransfer(STOP_A, TX).build();
+    var other = RaptorViaLocation
+      .via(null, Duration.ofSeconds(1))
+      .addViaTransfer(STOP_A, TX)
+      .build();
 
     assertEquals(subject, same);
     assertNotEquals(subject, other);
@@ -214,28 +217,28 @@ class ViaLocationDeprecatedTest {
 
   @Test
   void testToString() {
-    var subject = ViaLocation.via("A|B").addViaStop(STOP_A).addViaStop(STOP_B).build();
+    var subject = RaptorViaLocation.via("A|B").addViaStop(STOP_A).addViaStop(STOP_B).build();
     assertEquals("Via{label: A|B, connections: [12, 13]}", subject.toString());
     assertEquals(
       "Via{label: A|B, connections: [A, B]}",
       subject.toString(ViaLocationDeprecatedTest::stopName)
     );
 
-    subject = ViaLocation.via(null, WAIT_TIME).addViaStop(STOP_B).build();
+    subject = RaptorViaLocation.via(null, WAIT_TIME).addViaStop(STOP_B).build();
     assertEquals("Via{minWaitTime: 3m, connections: [13 3m]}", subject.toString());
     assertEquals(
       "Via{minWaitTime: 3m, connections: [B 3m]}",
       subject.toString(ViaLocationDeprecatedTest::stopName)
     );
 
-    subject = ViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
+    subject = RaptorViaLocation.via(null).addViaTransfer(STOP_A, TX).build();
     assertEquals("Via{connections: [12~13 35s]}", subject.toString());
     assertEquals(
       "Via{connections: [A~B 35s]}",
       subject.toString(ViaLocationDeprecatedTest::stopName)
     );
 
-    subject = ViaLocation.allowPassThrough(null).addViaStop(STOP_C).build();
+    subject = RaptorViaLocation.allowPassThrough(null).addViaStop(STOP_C).build();
     assertEquals("Via{allowPassThrough, connections: [14]}", subject.toString());
     assertEquals(
       "Via{allowPassThrough, connections: [C]}",

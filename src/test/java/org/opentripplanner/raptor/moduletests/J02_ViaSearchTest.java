@@ -17,7 +17,7 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTransfer.transfer;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.api.request.ViaLocation.via;
+import static org.opentripplanner.raptor.api.request.RaptorViaLocation.via;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -30,7 +30,7 @@ import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.ViaLocation;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 
 /**
@@ -50,17 +50,17 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
  */
 class J02_ViaSearchTest {
 
-  static final List<ViaLocation> VIA_LOCATION_STOP_B = List.of(viaLocation("B", STOP_B));
-  static final List<ViaLocation> VIA_LOCATION_STOP_C = List.of(viaLocation("C", STOP_C));
-  static final List<ViaLocation> VIA_LOCATION_STOP_A_OR_B = List.of(
+  static final List<RaptorViaLocation> VIA_LOCATION_STOP_B = List.of(viaLocation("B", STOP_B));
+  static final List<RaptorViaLocation> VIA_LOCATION_STOP_C = List.of(viaLocation("C", STOP_C));
+  static final List<RaptorViaLocation> VIA_LOCATION_STOP_A_OR_B = List.of(
     viaLocation("B&C", STOP_A, STOP_B)
   );
 
-  static final List<ViaLocation> VIA_LOCATION_STOP_B_THEN_D = List.of(
+  static final List<RaptorViaLocation> VIA_LOCATION_STOP_B_THEN_D = List.of(
     viaLocation("B", STOP_B),
     viaLocation("D", STOP_D)
   );
-  static final List<ViaLocation> VIA_LOCATION_STOP_C_THEN_B = List.of(
+  static final List<RaptorViaLocation> VIA_LOCATION_STOP_C_THEN_B = List.of(
     viaLocation("B", STOP_C),
     viaLocation("D", STOP_B)
   );
@@ -356,7 +356,7 @@ class J02_ViaSearchTest {
     requestBuilder
       .searchParams()
       .addAccessPaths(walk(STOP_A, D30s))
-      .addViaLocations(List.of(ViaLocation.via("B", minWaitTime).addViaStop(STOP_B).build()))
+      .addViaLocations(List.of(RaptorViaLocation.via("B", minWaitTime).addViaStop(STOP_B).build()))
       .addEgressPaths(walk(STOP_C, D30s));
 
     // We expect to bard the second trip at 0:05:45, since the minWaitTime is 45s and the
@@ -368,8 +368,8 @@ class J02_ViaSearchTest {
     );
   }
 
-  private static ViaLocation viaLocation(String label, int... stops) {
-    var builder = ViaLocation.via(label);
+  private static RaptorViaLocation viaLocation(String label, int... stops) {
+    var builder = RaptorViaLocation.via(label);
     Arrays.stream(stops).forEach(builder::addViaStop);
     return builder.build();
   }

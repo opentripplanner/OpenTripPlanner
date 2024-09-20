@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.raptor.api.request.ViaLocation;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
@@ -67,7 +67,7 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
         .searchParams()
         .viaLocations()
         .stream()
-        .map(ViaLocation::connections)
+        .map(RaptorViaLocation::connections)
         .map(ViaConnections::new)
         .toList()
       : List.of();

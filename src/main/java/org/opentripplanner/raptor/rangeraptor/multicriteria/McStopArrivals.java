@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.ViaConnection;
+import org.opentripplanner.raptor.api.request.RaptorViaConnection;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
@@ -175,7 +175,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
               new ParetoSetEventListener<>() {
                 @Override
                 public void notifyElementAccepted(ArrivalView<T> newElement) {
-                  for (ViaConnection c : list) {
+                  for (RaptorViaConnection c : list) {
                     var e = (McStopArrival<T>) newElement;
                     var n = stopArrivalFactory.createViaStopArrival(e, c);
                     if (n != null) {

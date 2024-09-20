@@ -30,7 +30,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths = new ArrayList<>();
   private final Collection<RaptorAccessEgress> egressPaths = new ArrayList<>();
-  private final List<ViaLocation> viaLocations = new ArrayList<>();
+  private final List<RaptorViaLocation> viaLocations = new ArrayList<>();
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -163,16 +163,16 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
-  public Collection<ViaLocation> viaLocations() {
+  public Collection<RaptorViaLocation> viaLocations() {
     return viaLocations;
   }
 
-  public SearchParamsBuilder<T> addViaLocation(ViaLocation location) {
+  public SearchParamsBuilder<T> addViaLocation(RaptorViaLocation location) {
     viaLocations.add(location);
     return this;
   }
 
-  public SearchParamsBuilder<T> addViaLocations(Collection<ViaLocation> locations) {
+  public SearchParamsBuilder<T> addViaLocations(Collection<RaptorViaLocation> locations) {
     viaLocations.addAll(locations);
     return this;
   }

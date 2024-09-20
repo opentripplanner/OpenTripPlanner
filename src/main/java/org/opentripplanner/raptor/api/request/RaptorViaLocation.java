@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -12,16 +11,16 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
-public final class ViaLocation {
+public final class RaptorViaLocation {
 
   private static final int MAX_WAIT_TIME_LIMIT = (int) Duration.ofHours(24).toSeconds();
 
   private final String label;
   private final boolean allowPassThrough;
   private final int minimumWaitTime;
-  private final List<ViaConnection> connections;
+  private final List<RaptorViaConnection> connections;
 
-  private ViaLocation(
+  private RaptorViaLocation(
     String label,
     boolean allowPassThrough,
     Duration minimumWaitTime,
@@ -81,7 +80,7 @@ public final class ViaLocation {
     return minimumWaitTime;
   }
 
-  public List<ViaConnection> connections() {
+  public List<RaptorViaConnection> connections() {
     return connections;
   }
 
@@ -93,7 +92,7 @@ public final class ViaLocation {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ViaLocation that = (ViaLocation) o;
+    RaptorViaLocation that = (RaptorViaLocation) o;
     return (
       allowPassThrough == that.allowPassThrough &&
       minimumWaitTime == that.minimumWaitTime &&
@@ -124,13 +123,13 @@ public final class ViaLocation {
     return buf.append("}").toString();
   }
 
-  private List<ViaConnection> validateConnections(List<StopAndTransfer> connections) {
+  private List<RaptorViaConnection> validateConnections(List<StopAndTransfer> connections) {
     if (connections.isEmpty()) {
       throw new IllegalArgumentException("At least one connection is required.");
     }
     var list = connections
       .stream()
-      .map(it -> new ViaConnection(this, it.fromStop, it.transfer))
+      .map(it -> new RaptorViaConnection(this, it.fromStop, it.transfer))
       .toList();
 
     // Compare all pairs to check for duplicates and none optimal connections
@@ -171,15 +170,15 @@ public final class ViaLocation {
       return this;
     }
 
-    public ViaLocation build() {
-      return new ViaLocation(label, allowPassThrough, minimumWaitTime, connections);
+    public RaptorViaLocation build() {
+      return new RaptorViaLocation(label, allowPassThrough, minimumWaitTime, connections);
     }
   }
 
   /**
    * Use internally to store connection data, before creating the connection objects. If is
-   * needed to create the bidirectional relationship between {@link ViaLocation} and
-   * {@link ViaConnection}.
+   * needed to create the bidirectional relationship between {@link RaptorViaLocation} and
+   * {@link RaptorViaConnection}.
    */
   private record StopAndTransfer(int fromStop, @Nullable RaptorTransfer transfer) {}
 }
