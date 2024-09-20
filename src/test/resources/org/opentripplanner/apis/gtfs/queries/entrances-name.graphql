@@ -1,0 +1,10 @@
+{
+  entrances(name: "station-exit") {
+    gtfsId
+    lat
+    lon
+    name
+    vehicleMode
+    locationType
+  }
+}

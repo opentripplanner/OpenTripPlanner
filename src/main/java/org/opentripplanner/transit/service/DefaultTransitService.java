@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -160,6 +161,17 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<Station> getStations() {
     OTPRequestTimeoutException.checkForTimeout();
     return this.transitModel.getStopModel().listStations();
+  }
+
+  @Override
+  public Entrance getEntranceById(FeedScopedId id) {
+    return this.transitModel.getStopModel().getEntranceById(id);
+  }
+
+  @Override
+  public Collection<Entrance> getEntrances() {
+    OTPRequestTimeoutException.checkForTimeout();
+    return this.transitModel.getStopModel().listEntrances();
   }
 
   @Override

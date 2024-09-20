@@ -29,6 +29,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.AreaStopBuilder;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.EntranceBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
@@ -156,6 +158,10 @@ public class TransitModelForTest {
     return stop(idAndName).withCoordinate(lat, lon);
   }
 
+  public RegularStopBuilder stop(String idAndName, Station station) {
+    return stop(idAndName).withParentStation(station);
+  }
+
   public StationBuilder station(String idAndName) {
     return Station
       .of(new FeedScopedId(FEED_ID, idAndName))
@@ -164,6 +170,15 @@ public class TransitModelForTest {
       .withCoordinate(60.0, 10.0)
       .withDescription(new NonLocalizedString("Station " + idAndName))
       .withPriority(StopTransferPriority.ALLOWED);
+  }
+
+  public EntranceBuilder entrance(String idAndName, Station station) {
+    return Entrance
+      .of(new FeedScopedId(FEED_ID, idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withParentStation(station)
+      .withCoordinate(70.0, 20.0)
+      .withDescription(new NonLocalizedString("Entrance " + idAndName));
   }
 
   public GroupStop groupStop(String idAndName, RegularStop... stops) {

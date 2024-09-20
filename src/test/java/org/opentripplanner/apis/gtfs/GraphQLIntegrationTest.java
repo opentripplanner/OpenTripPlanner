@@ -88,7 +88,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -110,9 +112,15 @@ class GraphQLIntegrationTest {
   private static final Place G = TEST_MODEL.place("G", 9.5, 11.0);
   private static final Place H = TEST_MODEL.place("H", 10.0, 11.5);
 
+  private static final Station STATION_1 = TEST_MODEL.station("station").build();
+  private static final RegularStop CHILD_STOP = TEST_MODEL.stop("child-stop", STATION_1).build();
+  private static final Entrance ENTRANCE = TEST_MODEL
+    .entrance("station-entrance", STATION_1)
+    .build();
+  private static final Entrance EXIT = TEST_MODEL.entrance("station-exit", STATION_1).build();
+
   private static final List<RegularStop> STOP_LOCATIONS = Stream
-    .of(A, B, C, D, E, F, G, H)
-    .map(p -> (RegularStop) p.stop)
+    .concat(Stream.of(A, B, C, D, E, F, G, H).map(p -> (RegularStop) p.stop), Stream.of(CHILD_STOP))
     .toList();
 
   private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
@@ -157,7 +165,7 @@ class GraphQLIntegrationTest {
 
     var stopModel = TEST_MODEL.stopModelBuilder();
     STOP_LOCATIONS.forEach(stopModel::withRegularStop);
-    var model = stopModel.build();
+    var model = stopModel.withStation(STATION_1).withEntrance(ENTRANCE).withEntrance(EXIT).build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
     final TripPattern pattern = TEST_MODEL.pattern(BUS).build();

@@ -1,0 +1,14 @@
+{
+  "data" : {
+    "entrances" : [
+      {
+        "gtfsId" : "F:station-entrance",
+        "lat" : 70.0,
+        "lon" : 20.0,
+        "name" : "station-entrance",
+        "vehicleMode" : null,
+        "locationType" : "ENTRANCE"
+      }
+    ]
+  }
+}

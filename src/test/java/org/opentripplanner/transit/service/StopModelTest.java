@@ -14,6 +14,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -24,6 +25,7 @@ class StopModelTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
+  private static final WgsCoordinate COOR_C = new WgsCoordinate(64.0, 13.0);
   private static final Geometry GEOMETRY = GeometryUtils
     .getGeometryFactory()
     .createPoint(COOR_A.asJtsCoordinate());
@@ -35,7 +37,15 @@ class StopModelTest {
     .withCoordinate(COOR_B)
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
-
+  private static final FeedScopedId ENTRANCE_ID = TransitModelForTest.id("ENTRANCE");
+  public static final NonLocalizedString ENTRANCE_NAME = NonLocalizedString.ofNullable("ENTRANCE");
+  private static final Entrance ENTRANCE = Entrance
+    .of(ENTRANCE_ID)
+    .withName(ENTRANCE_NAME)
+    .withCoordinate(COOR_C)
+    .withParentStation(STATION)
+    .build();
+  private static final String EXP_ENTRANCES = List.of(ENTRANCE).toString();
   private final StopModelBuilder stopModelBuilder = StopModel.of();
   private final RegularStop stop = stopModelBuilder
     .regularStop(ID)
@@ -109,6 +119,10 @@ class StopModelTest {
     assertEquals(EXP_STATIONS, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
+    // Stations should also implicitly add all of their entrances
+    assertEquals(ENTRANCE, m.getEntranceById(ENTRANCE_ID));
+    assertEquals(EXP_ENTRANCES, m.listEntrances().toString());
+    assertEquals(COOR_C, m.getCoordinateById(ENTRANCE_ID));
   }
 
   @Test
@@ -139,5 +153,14 @@ class StopModelTest {
   void testNullStopLocationId() {
     var m = StopModel.of().build();
     assertNull(m.getStopLocation(null));
+  }
+
+  @Test
+  void testEntrances() {
+    var m = stopModelBuilder.withEntrance(ENTRANCE).build();
+    assertEquals(ENTRANCE, m.getEntranceById(ENTRANCE_ID));
+    assertEquals(EXP_ENTRANCES, m.listEntrances().toString());
+    assertEquals(COOR_C, m.getCoordinateById(ENTRANCE_ID));
+    assertFalse(m.hasAreaStops());
   }
 }

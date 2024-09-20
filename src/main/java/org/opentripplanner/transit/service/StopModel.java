@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.collection.CollectionsView;
@@ -13,6 +14,7 @@ import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -33,6 +35,7 @@ public class StopModel implements Serializable {
   private final AtomicInteger stopIndexCounter;
   private final Map<FeedScopedId, RegularStop> regularStopById;
   private final Map<FeedScopedId, Station> stationById;
+  private final Map<FeedScopedId, Entrance> entranceById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
   private final Map<FeedScopedId, AreaStop> areaStopById;
@@ -44,6 +47,7 @@ public class StopModel implements Serializable {
     this.stopIndexCounter = new AtomicInteger(0);
     this.regularStopById = Map.of();
     this.stationById = Map.of();
+    this.entranceById = Map.of();
     this.multiModalStationById = Map.of();
     this.groupOfStationsById = Map.of();
     this.areaStopById = Map.of();
@@ -55,6 +59,7 @@ public class StopModel implements Serializable {
     this.stopIndexCounter = builder.stopIndexCounter();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
+    this.entranceById = builder.entranceById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
     this.groupOfStationsById = builder.groupOfStationById().asImmutableMap();
     this.areaStopById = builder.areaStopById().asImmutableMap();
@@ -77,6 +82,7 @@ public class StopModel implements Serializable {
     this.multiModalStationById =
       MapUtils.combine(main.multiModalStationById, child.multiModalStationById);
     this.stationById = MapUtils.combine(main.stationById, child.stationById);
+    this.entranceById = MapUtils.combine(main.entranceById, child.entranceById);
     reindex();
   }
 
@@ -204,6 +210,19 @@ public class StopModel implements Serializable {
     return multiModalStationById.get(id);
   }
 
+  @Nullable
+  public Entrance getEntranceById(FeedScopedId id) {
+    return entranceById.get(id);
+  }
+
+  public Collection<Entrance> listEntrances() {
+    return entranceById
+      .values()
+      .stream()
+      .sorted((e1, e2) -> e1.getId().compareTo(e2.getId()))
+      .collect(Collectors.toList());
+  }
+
   public Collection<MultiModalStation> listMultiModalStations() {
     return multiModalStationById.values();
   }
@@ -259,6 +278,12 @@ public class StopModel implements Serializable {
     if (station != null) {
       return station.getCoordinate();
     }
+    // Entrance
+    Entrance entrance = entranceById.get(id);
+    if (entrance != null) {
+      return entrance.getCoordinate();
+    }
+
     // Single stop (regular transit and flex)
     StopLocation stop = getStopLocation(id);
     return stop == null ? null : stop.getCoordinate();

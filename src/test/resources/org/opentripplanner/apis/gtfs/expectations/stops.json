@@ -56,6 +56,13 @@
         "lon" : 11.5,
         "name" : "H",
         "vehicleMode" : "BUS"
+      },
+      {
+        "gtfsId" : "F:child-stop",
+        "lat" : 60.0,
+        "lon" : 10.0,
+        "name" : "child-stop",
+        "vehicleMode" : "BUS"
       }
     ]
   }

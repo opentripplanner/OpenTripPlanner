@@ -13,6 +13,10 @@ public final class Entrance extends StationElement<Entrance, EntranceBuilder> {
     super(builder);
     // Verify coordinate is not null
     Objects.requireNonNull(getCoordinate());
+
+    if (isPartOfStation()) {
+      getParentStation().addEntrance(this);
+    }
   }
 
   public static EntranceBuilder of(FeedScopedId id) {

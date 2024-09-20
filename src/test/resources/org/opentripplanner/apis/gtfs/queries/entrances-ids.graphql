@@ -1,0 +1,10 @@
+{
+  entrances(ids: ["F:station-entrance"]) {
+    gtfsId
+    lat
+    lon
+    name
+    vehicleMode
+    locationType
+  }
+}

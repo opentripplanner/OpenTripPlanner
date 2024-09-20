@@ -9,6 +9,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.AreaStopBuilder;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
@@ -25,6 +26,7 @@ public class StopModelBuilder {
   private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
   private final EntityById<GroupStop> groupStopById = new DefaultEntityById<>();
   private final EntityById<Station> stationById = new DefaultEntityById<>();
+  private final EntityById<Entrance> entranceById = new DefaultEntityById<>();
   private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
   private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
@@ -63,6 +65,16 @@ public class StopModelBuilder {
 
   public StopModelBuilder withStation(Station station) {
     stationById.add(station);
+    entranceById.addAll(station.getEntrances());
+    return this;
+  }
+
+  public ImmutableEntityById<Entrance> entranceById() {
+    return entranceById;
+  }
+
+  public StopModelBuilder withEntrance(Entrance entrance) {
+    entranceById.add(entrance);
     return this;
   }
 

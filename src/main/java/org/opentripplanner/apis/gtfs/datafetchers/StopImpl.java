@@ -31,6 +31,7 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -44,7 +45,12 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new GraphQLTypes.GraphQLStopAlertsArgs(environment.getArguments());
       List<GraphQLTypes.GraphQLStopAlertType> types = args.getGraphQLTypes();
-      FeedScopedId id = getValue(environment, StopLocation::getId, AbstractTransitEntity::getId);
+      FeedScopedId id = getValue(
+        environment,
+        StopLocation::getId,
+        AbstractTransitEntity::getId,
+        Entrance::getId
+      );
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         if (types.contains(GraphQLTypes.GraphQLStopAlertType.STOP)) {
@@ -127,7 +133,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   @Override
   public DataFetcher<String> code() {
-    return environment -> getValue(environment, StopLocation::getCode, Station::getCode);
+    return environment ->
+      getValue(environment, StopLocation::getCode, Station::getCode, Entrance::getCode);
   }
 
   @Override
@@ -143,6 +150,11 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         station ->
           org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
             station.getDescription(),
+            environment
+          ),
+        entrance ->
+          org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
+            entrance.getDescription(),
             environment
           )
       );
@@ -162,18 +174,27 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
             station.getUrl(),
             environment
-          )
+          ),
+        // TODO: Entrances could theoretically support URLs, but not currently in model.
+        entrance -> null
       );
   }
 
   @Override
   public DataFetcher<Object> locationType() {
-    return environment -> getValue(environment, stop -> "STOP", station -> "STATION");
+    return environment ->
+      getValue(environment, stop -> "STOP", station -> "STATION", entrance -> "ENTRANCE");
   }
 
   @Override
   public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
+    return environment ->
+      getValue(
+        environment,
+        StopLocation::getParentStation,
+        station -> null,
+        Entrance::getParentStation
+      );
   }
 
   // TODO
@@ -184,13 +205,19 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   @Override
   public DataFetcher<Object> geometries() {
-    return environment -> getValue(environment, StopLocation::getGeometry, Station::getGeometry);
+    return environment ->
+      getValue(environment, StopLocation::getGeometry, Station::getGeometry, null);
   }
 
   @Override
   public DataFetcher<String> gtfsId() {
     return environment ->
-      getValue(environment, stop -> stop.getId().toString(), station -> station.getId().toString());
+      getValue(
+        environment,
+        stop -> stop.getId().toString(),
+        station -> station.getId().toString(),
+        entrance -> entrance.getId().toString()
+      );
   }
 
   @Override
@@ -199,18 +226,31 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       getValue(
         environment,
         stop -> new Relay.ResolvedGlobalId("Stop", stop.getId().toString()),
-        station -> new Relay.ResolvedGlobalId("Stop", station.getId().toString())
+        station -> new Relay.ResolvedGlobalId("Stop", station.getId().toString()),
+        entrance -> new Relay.ResolvedGlobalId("Stop", entrance.getId().toString())
       );
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getValue(environment, StopLocation::getLat, Station::getLat);
+    return environment ->
+      getValue(
+        environment,
+        StopLocation::getLat,
+        Station::getLat,
+        entrance -> entrance.getCoordinate().latitude()
+      );
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
+    return environment ->
+      getValue(
+        environment,
+        StopLocation::getLon,
+        Station::getLon,
+        entrance -> entrance.getCoordinate().longitude()
+      );
   }
 
   @Override
@@ -227,6 +267,11 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
             station.getName(),
             environment
+          ),
+        entrance ->
+          org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
+            entrance.getName(),
+            environment
           )
       );
   }
@@ -238,7 +283,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   @Override
   public DataFetcher<String> platformCode() {
-    return environment -> getValue(environment, StopLocation::getPlatformCode, station -> null);
+    return environment ->
+      getValue(environment, StopLocation::getPlatformCode, station -> null, entrance -> null);
   }
 
   @Override
@@ -283,7 +329,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             !args.getGraphQLOmitCanceled()
           );
         },
-        station -> null
+        station -> null,
+        entrance -> null
       );
   }
 
@@ -293,7 +340,24 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       getValue(
         environment,
         stop -> null,
-        station -> new ArrayList<Object>(station.getChildStops())
+        station -> new ArrayList<Object>(station.getChildStops()),
+        entrance -> null
+      );
+  }
+
+  @Override
+  public DataFetcher<Iterable<Object>> entrances() {
+    return environment ->
+      getValue(
+        environment,
+        stop -> null,
+        station ->
+          station
+            .getEntrances()
+            .stream()
+            .sorted((e1, e2) -> e1.getId().compareTo(e2.getId()))
+            .collect(Collectors.toList()),
+        entrances -> null
       );
   }
 
@@ -322,7 +386,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             .stream()
             .map(stopTFunction)
             .flatMap(Collection::stream)
-            .collect(Collectors.toList())
+            .collect(Collectors.toList()),
+        entrance -> null
       );
     };
   }
@@ -358,7 +423,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             .stream()
             .map(stopTFunction)
             .flatMap(Collection::stream)
-            .collect(Collectors.toList())
+            .collect(Collectors.toList()),
+        entrance -> null
       );
     };
   }
@@ -384,7 +450,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       Stream<StopTimesInPattern> stream = getValue(
         environment,
         stopTFunction,
-        station -> station.getChildStops().stream().flatMap(stopTFunction)
+        station -> station.getChildStops().stream().flatMap(stopTFunction),
+        entrance -> Stream.of()
       );
 
       return stream
@@ -401,7 +468,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       getValue(
         environment,
         stop -> stop.getTimeZone().toString(),
-        station -> station.getTimezone().toString()
+        station -> station.getTimezone().toString(),
+        entrance -> null
       );
   }
 
@@ -426,7 +494,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             )
             .collect(Collectors.toList());
         },
-        station -> null
+        station -> null,
+        entrance -> null
       );
   }
 
@@ -449,7 +518,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             .stream()
             .findFirst()
             .map(Enum::toString)
-            .orElse(null)
+            .orElse(null),
+        entrance -> null
       );
     };
   }
@@ -466,7 +536,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       var boarding = getValue(
         environment,
         StopLocation::getWheelchairAccessibility,
-        station -> null
+        station -> null,
+        Entrance::getWheelchairAccessibility
       );
       return GraphQLUtils.toGraphQL(boarding);
     };
@@ -475,14 +546,15 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   @Override
   public DataFetcher<String> zoneId() {
     return environment ->
-      getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
+      getValue(environment, StopLocation::getFirstZoneAsString, station -> null, null);
   }
 
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
     return getValue(
       environment,
       stop -> getTransitService(environment).getPatternsForStop(stop, true),
-      station -> null
+      station -> null,
+      entrance -> null
     );
   }
 
@@ -490,7 +562,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return getValue(
       environment,
       stop -> getTransitService(environment).getRoutesForStop(stop),
-      station -> null
+      station -> null,
+      entrance -> null
     );
   }
 
@@ -557,13 +630,16 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   private static <T> T getValue(
     DataFetchingEnvironment environment,
     Function<StopLocation, T> stopTFunction,
-    Function<Station, T> stationTFunction
+    Function<Station, T> stationTFunction,
+    Function<Entrance, T> entranceFunction
   ) {
     Object source = environment.getSource();
     if (source instanceof StopLocation) {
       return stopTFunction.apply((StopLocation) source);
     } else if (source instanceof Station) {
       return stationTFunction.apply((Station) source);
+    } else if (source instanceof Entrance) {
+      return entranceFunction.apply((Entrance) source);
     }
     return null;
   }
