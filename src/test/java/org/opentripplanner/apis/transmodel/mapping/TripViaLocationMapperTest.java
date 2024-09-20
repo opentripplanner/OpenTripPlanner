@@ -19,7 +19,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ViaLocationMapperTest {
+class TripViaLocationMapperTest {
 
   public static final String LABEL = "TestLabel";
   public static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
@@ -36,7 +36,7 @@ class ViaLocationMapperTest {
     Map<String, Object> input = Map.ofEntries(
       entry(FIELD_VISIT, visitInput(LABEL, MIN_WAIT_TIME, LIST_IDS_INPUT))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
 
     var via = result.getFirst();
 
@@ -56,7 +56,7 @@ class ViaLocationMapperTest {
       FIELD_VISIT,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
 
     var via = result.getFirst();
 
@@ -69,7 +69,7 @@ class ViaLocationMapperTest {
   @Test
   void tetMapToPassThrough() {
     Map<String, Object> input = Map.of(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT));
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
     var via = result.getFirst();
 
     assertEquals(LABEL, via.label());
@@ -87,7 +87,7 @@ class ViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
     var via = result.getFirst();
 
     assertNull(via.label());
@@ -103,20 +103,20 @@ class ViaLocationMapperTest {
     );
     var ex = assertThrows(
       IllegalArgumentException.class,
-      () -> ViaLocationMapper.mapToViaLocations(List.of(input))
+      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
-      "Both 'visit' and 'passThrough' can not be set in 'via' (@oneOf).",
+      "Only one entry in 'via @oneOf' is allowed. Set: 'visit', 'passThrough'",
       ex.getMessage()
     );
 
     ex =
       assertThrows(
         IllegalArgumentException.class,
-        () -> ViaLocationMapper.mapToViaLocations(List.of(Map.of()))
+        () -> TripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
       );
     assertEquals(
-      "Either 'visit' or 'passThrough' should be set in 'via' (@oneOf).",
+      "No entries in 'via @oneOf'. One of 'visit', 'passThrough' must be set.",
       ex.getMessage()
     );
   }

@@ -43,13 +43,13 @@ public class TripRequestMapper {
     callWith.argument(
       "passThroughPoints",
       (List<Map<String, Object>> v) -> {
-        request.setViaLocations(ViaLocationMapper.toLegacyPassThroughLocations(v));
+        request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
       }
     );
     callWith.argument(
       TripQuery.FIELD_VIA,
       (List<Map<String, Object>> v) -> {
-        request.setViaLocations(ViaLocationMapper.mapToViaLocations(v));
+        request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
       }
     );
 

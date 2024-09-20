@@ -6,17 +6,18 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
-import org.opentripplanner.framework.collection.CollectionUtils;
+import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class ViaLocationMapper {
+class TripViaLocationMapper {
 
   static List<ViaLocation> mapToViaLocations(final List<Map<String, Object>> via) {
-    return via.stream().map(ViaLocationMapper::mapViaLocation).collect(toList());
+    return via.stream().map(TripViaLocationMapper::mapViaLocation).collect(toList());
   }
 
   /**
@@ -28,35 +29,25 @@ class ViaLocationMapper {
   ) {
     return passThroughPoints
       .stream()
-      .map(ViaLocationMapper::mapLegacyPassThroughViaLocation)
+      .map(TripViaLocationMapper::mapLegacyPassThroughViaLocation)
       .collect(toList());
   }
 
   private static ViaLocation mapViaLocation(Map<String, Object> inputMap) {
-    Map<String, Object> visit = (Map<String, Object>) inputMap.get(
-      ViaLocationInputType.FIELD_VISIT
-    );
-    Map<String, Object> passThrough = (Map<String, Object>) inputMap.get(
+    var fieldName = OneOfInputValidator.validateOneOf(
+      inputMap,
+      TripQuery.FIELD_VIA,
+      ViaLocationInputType.FIELD_VISIT,
       ViaLocationInputType.FIELD_PASS_THROUGH
     );
 
-    if (CollectionUtils.isEmpty(visit)) {
-      if (CollectionUtils.isEmpty(passThrough)) {
-        throw new IllegalArgumentException(
-          "Either 'visit' or 'passThrough' should be set in 'via' (@oneOf)."
-        );
-      } else {
-        return mapPassThroughViaLocation(passThrough);
-      }
-    } else {
-      if (CollectionUtils.isEmpty(passThrough)) {
-        return mapVisitViaLocation(visit);
-      } else {
-        throw new IllegalArgumentException(
-          "Both 'visit' and 'passThrough' can not be set in 'via' (@oneOf)."
-        );
-      }
-    }
+    Map<String, Object> value = (Map<String, Object>) inputMap.get(fieldName);
+
+    return switch (fieldName) {
+      case ViaLocationInputType.FIELD_VISIT -> mapVisitViaLocation(value);
+      case ViaLocationInputType.FIELD_PASS_THROUGH -> mapPassThroughViaLocation(value);
+      default -> throw new IllegalArgumentException("Unknown field: " + fieldName);
+    };
   }
 
   private static VisitViaLocation mapVisitViaLocation(Map<String, Object> inputMap) {

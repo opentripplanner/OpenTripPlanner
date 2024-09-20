@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
-import static org.opentripplanner.apis.transmodel.model.framework.OneOfDirective.ONE_OF_DIRECTIVE;
+import static graphql.Directives.OneOfDirective;
 
 import graphql.Scalars;
 import graphql.language.StringValue;
@@ -107,7 +107,7 @@ public class ViaLocationInputType {
     .newInputObject()
     .name(INPUT_VIA_LOCATION)
     .description(DOC_VIA_LOCATION)
-    .withDirective(ONE_OF_DIRECTIVE)
+    .withDirective(OneOfDirective)
     .field(b -> b.name(FIELD_VISIT).type(VISIT_VIA_LOCATION_INPUT))
     .field(b -> b.name(FIELD_PASS_THROUGH).type(PASS_THROUGH_VIA_LOCATION_INPUT))
     .build();
