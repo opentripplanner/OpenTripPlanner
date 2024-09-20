@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class ViaLocationTest {
+class PassThroughPointTest {
 
   private static final int[] STOPS = { 2, 7, 13 };
 
