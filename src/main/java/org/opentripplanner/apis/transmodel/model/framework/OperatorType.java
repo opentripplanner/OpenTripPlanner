@@ -47,7 +47,7 @@ public class OperatorType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
             GqlUtil
@@ -63,7 +63,7 @@ public class OperatorType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourney")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment ->
             GqlUtil

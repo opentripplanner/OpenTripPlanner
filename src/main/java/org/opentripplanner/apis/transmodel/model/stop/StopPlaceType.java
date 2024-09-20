@@ -29,7 +29,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
-import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -228,7 +228,7 @@ public class StopPlaceType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quays")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Returns all quays that are children of this stop place")
           .type(new GraphQLList(quayType))
           .argument(
@@ -286,7 +286,7 @@ public class StopPlaceType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("estimatedCalls")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of visits to this stop place as part of vehicle journeys.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .argument(

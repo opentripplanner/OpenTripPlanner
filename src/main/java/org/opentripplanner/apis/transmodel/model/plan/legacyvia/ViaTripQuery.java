@@ -11,6 +11,7 @@ import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 
@@ -31,7 +32,7 @@ public class ViaTripQuery {
       )
       .deprecate("The the regular plan query with via stop instead.")
       .type(new GraphQLNonNull(viaTripType))
-      .withDirective(TransmodelScalars.TIMING_DATA)
+      .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
         GraphQLArgument
           .newArgument()

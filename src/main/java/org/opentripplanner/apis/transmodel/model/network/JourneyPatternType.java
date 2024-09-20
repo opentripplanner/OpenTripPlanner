@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.transmodel.mapping.GeometryMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
@@ -68,7 +69,7 @@ public class JourneyPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneys")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(e ->
             ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList())
@@ -79,7 +80,7 @@ public class JourneyPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneysForDate")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of service journeys for the journey pattern for a given date")
           .argument(
             GraphQLArgument.newArgument().name("date").type(TransmodelScalars.DATE_SCALAR).build()

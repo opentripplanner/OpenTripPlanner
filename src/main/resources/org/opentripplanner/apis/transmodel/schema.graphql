@@ -2,9 +2,6 @@ schema {
   query: QueryType
 }
 
-"One and only one of the fields in the (input) type must be non null."
-directive @OneOf on OBJECT | INPUT_OBJECT
-
 "Marks the field, argument, input field or enum value as deprecated"
 directive @deprecated(
     "The reason for the deprecation"
@@ -2122,7 +2119,7 @@ visit-via-location. An on-board "visit" is only allowed for pass-through-via-loc
 the visit-via-location can visit a stop-location or a coordinate and specify a
 minimum-wait-time.
 """
-input PlanViaLocationInput @OneOf {
+input PlanViaLocationInput @oneOf {
   passThrough: PlanPassThroughViaLocationInput
   visit: PlanVisitViaLocationInput
 }

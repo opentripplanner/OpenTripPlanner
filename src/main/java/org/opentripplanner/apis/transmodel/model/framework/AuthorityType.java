@@ -64,7 +64,7 @@ public class AuthorityType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
             getTransitService(environment)
@@ -79,7 +79,7 @@ public class AuthorityType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("situations")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Get all situations active for the authority.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->

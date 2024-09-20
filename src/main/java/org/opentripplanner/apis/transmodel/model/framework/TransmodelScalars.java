@@ -1,7 +1,5 @@
 package org.opentripplanner.apis.transmodel.model.framework;
 
-import graphql.introspection.Introspection;
-import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunctionFactory;
@@ -21,7 +19,6 @@ public class TransmodelScalars {
   public static final GraphQLScalarType LOCAL_TIME_SCALAR;
   public static final GraphQLObjectType TIME_SCALAR;
   public static final GraphQLScalarType DURATION_SCALAR;
-  public static final GraphQLDirective TIMING_DATA;
 
   static {
     DATE_SCALAR = DateScalarFactory.createTransmodelDateScalar();
@@ -29,12 +26,5 @@ public class TransmodelScalars {
     LOCAL_TIME_SCALAR = LocalTimeScalarFactory.createLocalTimeScalar();
     TIME_SCALAR = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
     DURATION_SCALAR = DurationScalarFactory.createDurationScalar();
-    TIMING_DATA =
-      GraphQLDirective
-        .newDirective()
-        .name("timingData")
-        .description("Add timing data to prometheus, if Actuator API is enabled")
-        .validLocation(Introspection.DirectiveLocation.FIELD_DEFINITION)
-        .build();
   }
 }

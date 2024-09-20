@@ -18,7 +18,7 @@ import org.opentripplanner.apis.transmodel.model.TransportModeSlack;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
-import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
@@ -52,7 +52,7 @@ public class TripQuery {
         "trip patterns describing suggested alternatives for the trip."
       )
       .type(new GraphQLNonNull(tripType))
-      .withDirective(TransmodelScalars.TIMING_DATA)
+      .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
         GraphQLArgument
           .newArgument()

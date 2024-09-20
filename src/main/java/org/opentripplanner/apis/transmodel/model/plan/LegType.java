@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
@@ -269,7 +270,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("fromEstimatedCall")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg originates.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForFromPlace(env.getSource()))
@@ -279,7 +280,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("toEstimatedCall")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg ends.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForToPlace(env.getSource()))
@@ -353,7 +354,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("intermediateEstimatedCalls")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
           )
@@ -367,7 +368,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneyEstimatedCalls")
-          .withDirective(TransmodelScalars.TIMING_DATA)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )
