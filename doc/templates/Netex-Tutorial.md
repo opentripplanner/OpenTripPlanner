@@ -31,7 +31,7 @@ OTP downloads.
 
 Now you can instruct OTP to build a graph from this configuration file:
 
-`java -Xmx10G -jar otp.jar --build --save .`
+`java -Xmx16G -jar otp.jar --build --save .`
 
 This should produce a file `graph.obj` in the same directory as your `build-config.json`.
 
