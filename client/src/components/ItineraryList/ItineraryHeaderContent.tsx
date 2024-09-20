@@ -45,6 +45,7 @@ export function ItineraryHeaderContent({
         }}
       />
       <div
+        title={tripPattern.expectedStartTime}
         className="itinerary-header-itinerary-time"
         style={{
           left: `${leftPx - TIME_BOX_WIDTH}px`,
@@ -65,6 +66,7 @@ export function ItineraryHeaderContent({
       ))}
 
       <div
+        title={tripPattern.expectedEndTime}
         className="itinerary-header-itinerary-time"
         style={{
           left: `${leftPx + widthPx + 2}px`,
