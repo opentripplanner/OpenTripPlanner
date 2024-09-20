@@ -28,6 +28,12 @@ public class TripQuery {
   public static final String ACCESS_EGRESS_PENALTY = "accessEgressPenalty";
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
+  public static final String FIELD_VIA = "via";
+  public static final String DOC_VIA =
+    """
+    The list of via locations the journey is required to visit. All locations are
+    visited in the order they are listed.
+    """;
 
   public static GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
@@ -174,8 +180,17 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("passThroughPoints")
+          .deprecate("Use via instead")
           .description("The list of points the journey is required to pass through.")
           .type(new GraphQLList(new GraphQLNonNull(PassThroughPointInputType.INPUT_TYPE)))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name(FIELD_VIA)
+          .description(DOC_VIA)
+          .type(new GraphQLList(new GraphQLNonNull(ViaLocationInputType.VIA_LOCATION_INPUT)))
           .build()
       )
       .argument(

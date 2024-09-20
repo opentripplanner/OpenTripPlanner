@@ -59,7 +59,7 @@ class RaptorRequestMapperTest {
   void testPassThroughPoints() {
     var req = new RouteRequest();
 
-    req.setPassThroughPoints(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
+    req.setViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
 
     var result = map(req);
 
@@ -75,7 +75,7 @@ class RaptorRequestMapperTest {
     var req = new RouteRequest();
 
     // Set pass-through and relax transit-group-priority
-    req.setPassThroughPoints(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
+    req.setViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
     req.withPreferences(p ->
       p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
     );

@@ -48,6 +48,19 @@ public class CollectionUtils {
   }
 
   /**
+   * A null-safe version of isEmpty() for a collection.
+   * <p>
+   * If the collection is {@code null} then {@code true} is returned.
+   * <p>
+   * If the collection is empty then {@code true} is returned.
+   * <p>
+   * Otherwise {@code false} is returned.
+   */
+  public static boolean isEmpty(@Nullable Map<?, ?> m) {
+    return m == null || m.isEmpty();
+  }
+
+  /**
    * Look up the given key in a Map, return null if the key is null.
    * This prevents a NullPointerException if the underlying implementation of the map does not
    * accept querying with null keys (e.g. ImmutableMap).

@@ -283,7 +283,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return via;
   }
 
-  public void setPassThroughPoints(final List<ViaLocation> via) {
+  public void setViaLocations(final List<ViaLocation> via) {
     this.via = via;
   }
 

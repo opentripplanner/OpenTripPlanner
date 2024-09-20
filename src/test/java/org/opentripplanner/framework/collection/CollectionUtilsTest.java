@@ -1,13 +1,17 @@
 package org.opentripplanner.framework.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.type.Month;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -39,5 +43,19 @@ class CollectionUtilsTest {
     // And: Set should be sorted alphabetically
     Set<Object> set = new HashSet<>(list);
     assertEquals("[<null>, APRIL, JUNE, PT3H]", CollectionUtils.toString(set, NULL_STRING));
+  }
+
+  @Test
+  void testIsEmptyMap() {
+    assertTrue(CollectionUtils.isEmpty((Map<Object, Object>) null));
+    assertTrue(CollectionUtils.isEmpty(Map.of()));
+    assertFalse(CollectionUtils.isEmpty(Map.of(1, 1)));
+  }
+
+  @Test
+  void testIsEmptyCollection() {
+    assertTrue(CollectionUtils.isEmpty((Collection<Object>) null));
+    assertTrue(CollectionUtils.isEmpty(List.of()));
+    assertFalse(CollectionUtils.isEmpty(Set.of(1)));
   }
 }
