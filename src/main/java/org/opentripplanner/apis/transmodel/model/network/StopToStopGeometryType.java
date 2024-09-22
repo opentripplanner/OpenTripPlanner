@@ -3,7 +3,7 @@ package org.opentripplanner.apis.transmodel.model.network;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.apis.transmodel.model.util.EncodedPolylineBeanWithStops;
+import org.opentripplanner.apis.transmodel.model.framework.EncodedPolylineBeanWithStops;
 
 public class StopToStopGeometryType {
 
