@@ -40,8 +40,8 @@ export function TimeInputField({
 
   return (
     <Form.Group>
-      <Form.Label column="sm" htmlFor="timePicker">
-        Time ({useTimeZone()})
+      <Form.Label column="sm" htmlFor="timePicker" title={useTimeZone()}>
+        Time
       </Form.Label>
       <Form.Control type="datetime-local" id="timePicker" size="sm" onChange={onChange} value={current} />
     </Form.Group>
