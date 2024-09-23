@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -69,7 +69,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return strategy;
   }
 
-  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
+  public Heuristics createHeuristics(RaptorRouterResult<T> results) {
     return oneOf(
       new HeuristicsAdapter(
         ctx.nStops(),

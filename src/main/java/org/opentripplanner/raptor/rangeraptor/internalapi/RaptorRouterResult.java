@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 /**
  * This is the result of a RangeRaptor route call.
  */
-public interface RaptorWorkerResult<T extends RaptorTripSchedule> {
+public interface RaptorRouterResult<T extends RaptorTripSchedule> {
   /**
    * Return all paths found.
    */

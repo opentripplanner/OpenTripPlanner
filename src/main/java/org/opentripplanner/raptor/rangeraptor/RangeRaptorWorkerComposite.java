@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.util.composite.CompositeUtil;
 
 /**
@@ -37,7 +37,7 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorWorkerResult<T> results() {
+  public RaptorRouterResult<T> results() {
     return tail().results();
   }
 

@@ -4,14 +4,14 @@ import java.util.Collection;
 import java.util.function.Supplier;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 
 /**
  * Result for Standard Range Raptor route call.
  */
-public class StdRaptorWorkerResult<T extends RaptorTripSchedule> implements RaptorWorkerResult<T> {
+public class StdRaptorRouterResult<T extends RaptorTripSchedule> implements RaptorRouterResult<T> {
 
   private final BestTimes bestTimes;
   private final Supplier<Collection<RaptorPath<T>>> pathSupplier;
@@ -23,7 +23,7 @@ public class StdRaptorWorkerResult<T extends RaptorTripSchedule> implements Rapt
    */
   private Collection<RaptorPath<T>> paths = null;
 
-  public StdRaptorWorkerResult(
+  public StdRaptorRouterResult(
     BestTimes bestTimes,
     Supplier<Collection<RaptorPath<T>>> pathSupplier,
     Supplier<SingleCriteriaStopArrivals> bestNumberOfTransfersSupplier

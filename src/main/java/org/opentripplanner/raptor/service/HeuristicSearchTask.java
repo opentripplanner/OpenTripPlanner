@@ -10,7 +10,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private RangeRaptor<T> search = null;
   private RaptorRequest<T> originalRequest;
   private RaptorRequest<T> heuristicRequest;
-  private RaptorWorkerResult<T> result = null;
+  private RaptorRouterResult<T> result = null;
 
   public HeuristicSearchTask(
     RaptorRequest<T> request,
@@ -144,7 +144,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
       );
 
       heuristicRequest = builder.build();
-      search = config.createHeuristicSearch(transitData, heuristicRequest);
+      search = config.createRangeRaptorWithHeuristicSearch(transitData, heuristicRequest);
     }
   }
 }

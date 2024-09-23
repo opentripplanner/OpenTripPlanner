@@ -5,7 +5,8 @@ import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
@@ -43,7 +44,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptor<T extends RaptorTripSchedule> {
+public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRouter<T> {
 
   private final RangeRaptorWorker<T> worker;
 
@@ -84,13 +85,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> {
     this.lifeCycle = lifeCyclePublisher;
   }
 
-  /**
-   * For each iteration (minute), calculate the minimum travel time to each transit stop in
-   * seconds.
-   * <p/>
-   * Run the scheduled search, round 0 is the street search.
-   */
-  public RaptorWorkerResult<T> route() {
+  public RaptorRouterResult<T> route() {
     timers.route(() -> {
       int iterationDepartureTime = RaptorConstants.TIME_NOT_SET;
       lifeCycle.notifyRouteSearchStart(calculator.searchForward());

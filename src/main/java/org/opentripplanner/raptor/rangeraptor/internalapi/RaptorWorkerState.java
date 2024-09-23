@@ -45,5 +45,5 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    */
   void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
 
-  RaptorWorkerResult<T> results();
+  RaptorRouterResult<T> results();
 }

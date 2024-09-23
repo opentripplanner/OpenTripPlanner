@@ -5,7 +5,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
@@ -209,8 +209,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorWorkerResult<T> results() {
-    return new StdRaptorWorkerResult<>(
+  public RaptorRouterResult<T> results() {
+    return new StdRaptorRouterResult<>(
       bestTimes,
       stopArrivalsState::extractPaths,
       bestNumberOfTransfers::extractBestNumberOfTransfers

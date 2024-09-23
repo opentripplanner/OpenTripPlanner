@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
@@ -58,7 +58,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return SearchContext.of(request, tuningParameters, transit, acceptC2AtDestination).build();
   }
 
-  public RangeRaptor<T> createStdWorker(
+  public RangeRaptor<T> createRangeRaptorWithStdWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
@@ -70,7 +70,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  public RangeRaptor<T> createMcWorker(
+  public RangeRaptor<T> createRangeRaptorWithMcWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
@@ -97,17 +97,17 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return createRangeRaptor(context, worker);
   }
 
-  public RangeRaptor<T> createHeuristicSearch(
+  public RangeRaptor<T> createRangeRaptorWithHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    return createStdWorker(transitData, request);
+    return createRangeRaptorWithStdWorker(transitData, request);
   }
 
   public Heuristics createHeuristic(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
-    RaptorWorkerResult<T> results
+    RaptorRouterResult<T> results
   ) {
     var context = context(transitData, request);
     return new StdRangeRaptorConfig<>(context).createHeuristics(results);

@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
@@ -110,7 +110,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorWorkerResult<T> results() {
+  public RaptorRouterResult<T> results() {
     return state.results();
   }
 

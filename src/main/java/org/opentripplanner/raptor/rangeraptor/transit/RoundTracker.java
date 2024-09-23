@@ -5,8 +5,8 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.
  * <p>
- * In round 0 the access paths with one leg are added. In round 1 the first transit and transfers is
- * added, ...
+ * In round zero(0), the access paths with one leg are added. In round one(1) the first transit and
+ * transfers is added, ...
  */
 public class RoundTracker {
 
@@ -30,7 +30,7 @@ public class RoundTracker {
    * This is default set to the maximum number of rounds limit, but as soon as the destination is
    * reach the {@link #numberOfAdditionalTransfers} is used to update the limit.
    * <p/>
-   * The limit is inclusive, indicating the the last round to process.
+   * The limit is inclusive, indicating the last round to process.
    */
   private int roundMaxLimit;
 

@@ -129,17 +129,18 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
     LOG.debug("Main request: {}", request);
-    RangeRaptor<T> raptorWorker;
+    RangeRaptor<T> rangeRaptorRouter;
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      raptorWorker = config.createMcWorker(transitData, request, getDestinationHeuristics());
+      rangeRaptorRouter =
+        config.createRangeRaptorWithMcWorker(transitData, request, getDestinationHeuristics());
     } else {
-      raptorWorker = config.createStdWorker(transitData, request);
+      rangeRaptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
 
     // Route
-    var result = raptorWorker.route();
+    var result = rangeRaptorRouter.route();
 
     // create and return response
     return new RaptorResponse<>(
