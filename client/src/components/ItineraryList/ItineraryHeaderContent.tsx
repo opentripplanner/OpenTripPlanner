@@ -1,8 +1,9 @@
 import { TripPattern } from '../../gql/graphql.ts';
 import { TIME_BOX_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
 import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { formatTime } from '../../util/formatTime.ts';
+import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 
 export function ItineraryHeaderContent({
   tripPattern,
@@ -24,13 +25,15 @@ export function ItineraryHeaderContent({
     latestEndTime,
   );
 
+  const timeZone = useContext(TimeZoneContext);
+
   const formattedStartTime = useMemo(
-    () => formatTime(tripPattern.expectedStartTime, 'short'),
+    () => formatTime(tripPattern.expectedStartTime, timeZone, 'short'),
     [tripPattern.expectedStartTime],
   );
 
   const formattedEndTime = useMemo(
-    () => formatTime(tripPattern.expectedEndTime, 'short'),
+    () => formatTime(tripPattern.expectedEndTime, timeZone, 'short'),
     [tripPattern.expectedEndTime],
   );
 
