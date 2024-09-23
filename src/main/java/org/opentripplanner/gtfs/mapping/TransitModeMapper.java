@@ -19,7 +19,7 @@ public class TransitModeMapper {
     if (routeType >= 100 && routeType < 200) { // Railway Service
       return TransitMode.RAIL;
     } else if (routeType >= 200 && routeType < 300) { //Coach Service
-      return TransitMode.BUS;
+      return TransitMode.COACH;
     } else if (routeType >= 300 && routeType < 500) { //Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
@@ -30,11 +30,10 @@ public class TransitModeMapper {
       return TransitMode.RAIL;
     } else if (routeType >= 500 && routeType < 700) { //Metro Service and Underground Service
       return TransitMode.SUBWAY;
-    } else if (routeType >= 700 && routeType < 900) { //Bus Service and Trolleybus service
-      if (routeType == 800) {
-        return TransitMode.TROLLEYBUS;
-      }
+    } else if (routeType >= 700 && routeType < 800) { //Bus Service
       return TransitMode.BUS;
+    } else if (routeType >= 800 && routeType < 900) { //Trolleybus Service
+      return TransitMode.TROLLEYBUS;
     } else if (routeType >= 900 && routeType < 1000) { //Tram service
       return TransitMode.TRAM;
     } else if (routeType >= 1000 && routeType < 1100) { //Water Transport Service
