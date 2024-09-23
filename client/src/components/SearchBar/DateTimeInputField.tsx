@@ -1,6 +1,6 @@
 import { Form } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { ChangeEvent, useCallback, useContext, useMemo } from 'react';
+import { ChangeEvent, useCallback, useContext } from 'react';
 import { Temporal } from '@js-temporal/polyfill';
 import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 
@@ -12,14 +12,10 @@ export function DateTimeInputField({
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
 }) {
   const timeZone = useContext(TimeZoneContext);
-  const current = useMemo(
-    () =>
-      Temporal.Instant.from(tripQueryVariables.dateTime)
-        .toZonedDateTimeISO(timeZone)
-        .toPlainDateTime()
-        .toString({ smallestUnit: 'minute', calendarName: 'never' }),
-    [tripQueryVariables.dateTime],
-  );
+  const current = Temporal.Instant.from(tripQueryVariables.dateTime)
+    .toZonedDateTimeISO(timeZone)
+    .toPlainDateTime()
+    .toString({ smallestUnit: 'minute', calendarName: 'never' });
 
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
