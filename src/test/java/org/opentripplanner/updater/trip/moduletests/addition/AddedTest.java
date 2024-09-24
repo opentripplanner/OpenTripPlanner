@@ -7,10 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.SERVICE_DATE;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_A1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_B1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestEnvironment.STOP_C1_ID;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
@@ -23,18 +19,19 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-class AddedTest {
+class AddedTest implements RealtimeTestConstants {
 
   final String ADDED_TRIP_ID = "added_trip";
 
   @Test
   void addedTrip() {
-    var env = RealtimeTestEnvironment.gtfs();
+    var env = RealtimeTestEnvironment.gtfs().build();
 
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addStopTime(STOP_A1_ID, 30)
       .addStopTime(STOP_B1_ID, 40)
       .addStopTime(STOP_C1_ID, 55)
@@ -46,8 +43,8 @@ class AddedTest {
 
   @Test
   void addedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs();
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+    var env = RealtimeTestEnvironment.gtfs().build();
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
@@ -81,8 +78,8 @@ class AddedTest {
 
   @Test
   void addedWithUnknownStop() {
-    var env = RealtimeTestEnvironment.gtfs();
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+    var env = RealtimeTestEnvironment.gtfs().build();
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -105,8 +102,8 @@ class AddedTest {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs();
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone)
+    var env = RealtimeTestEnvironment.gtfs().build();
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -135,7 +132,7 @@ class AddedTest {
     assertNotNull(trip);
     assertNotNull(transitService.getPatternForTrip(trip));
 
-    var stopA = env.transitModel.getStopModel().getRegularStop(env.stopA1.getId());
+    var stopA = env.transitModel.getStopModel().getRegularStop(STOP_A1.getId());
     // Get the trip pattern of the added trip which goes through stopA
     var patternsAtA = env.getTimetableSnapshot().getPatternsForStop(stopA);
 
