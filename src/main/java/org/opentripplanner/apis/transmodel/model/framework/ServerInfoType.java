@@ -115,7 +115,7 @@ public class ServerInfoType {
             """
               The internal time zone of the transit data.
               
-              Note: Input data can be in several time zones but OTP internally operates on a single one.
+              Note: The input data can be in several time zones, but OTP internally operates on a single one.
             """
           )
           .type(Scalars.GraphQLString)
