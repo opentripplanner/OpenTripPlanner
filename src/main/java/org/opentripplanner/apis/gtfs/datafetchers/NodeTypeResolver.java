@@ -86,9 +86,6 @@ public class NodeTypeResolver implements TypeResolver {
     if (o instanceof Trip) {
       return schema.getObjectType("Trip");
     }
-    if (o instanceof Leg) {
-      return schema.getObjectType("Leg");
-    }
     return null;
   }
 
