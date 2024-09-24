@@ -69,9 +69,9 @@ public class Itinerary implements ItinerarySortKey {
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  private Itinerary(List<Leg> legs, boolean isSearchWindowAware) {
+  private Itinerary(List<Leg> legs, boolean searchWindowAware) {
     setLegs(legs);
-    this.isSearchWindowAware = isSearchWindowAware;
+    this.searchWindowAware = searchWindowAware;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
@@ -182,7 +182,7 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * Returns true if this itinerary has only flex and walking legs.
    */
-  public boolean isFlexAndWalkOnly() {
+  public boolean isDirectFlex() {
     return legs.stream().allMatch(l -> l.isFlexibleTrip() || l.isWalkingLeg());
   }
 
@@ -198,7 +198,7 @@ public class Itinerary implements ItinerarySortKey {
    * As of 2024 only the itineraries produced by RAPTOR that do that.
    */
   public boolean isSearchWindowAware() {
-    return isSearchWindowAware;
+    return searchWindowAware;
   }
 
   public Leg firstLeg() {
@@ -247,7 +247,7 @@ public class Itinerary implements ItinerarySortKey {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    var newItin = new Itinerary(timeShiftedLegs, isSearchWindowAware);
+    var newItin = new Itinerary(timeShiftedLegs, searchWindowAware);
     newItin.setGeneralizedCost(getGeneralizedCost());
     return newItin;
   }

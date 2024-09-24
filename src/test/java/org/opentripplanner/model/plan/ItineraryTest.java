@@ -260,8 +260,8 @@ public class ItineraryTest implements PlanTestConstants {
 
     @Test
     void flexAndWalk() {
-      assertFalse(itinerary().isFlexAndWalkOnly());
-      assertTrue(newItinerary(A).flex(T11_10, T11_20, B).build().isFlexAndWalkOnly());
+      assertFalse(itinerary().isDirectFlex());
+      assertTrue(newItinerary(A).flex(T11_10, T11_20, B).build().isDirectFlex());
     }
 
     private static Itinerary itinerary() {
