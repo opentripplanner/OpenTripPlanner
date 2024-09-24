@@ -134,7 +134,7 @@ public class GraphPathToItineraryMapper {
       }
     }
 
-    Itinerary itinerary = new Itinerary(legs, false);
+    Itinerary itinerary = Itinerary.createDirectItinerary(legs);
 
     calculateElevations(itinerary, path.edges);
 

@@ -69,7 +69,7 @@ public class Itinerary implements ItinerarySortKey {
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  public Itinerary(List<Leg> legs, boolean isSearchWindowAware) {
+  private Itinerary(List<Leg> legs, boolean isSearchWindowAware) {
     setLegs(legs);
     this.isSearchWindowAware = isSearchWindowAware;
 
@@ -87,6 +87,21 @@ public class Itinerary implements ItinerarySortKey {
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
     this.setElevationLost(totals.totalElevationLost);
+  }
+
+  /**
+   * Creates an itinerary that contains scheduled transit which is aware of the search window.
+   */
+  public static Itinerary createScheduledTransitItinerary(List<Leg> legs) {
+    return new Itinerary(legs, true);
+  }
+
+  /**
+   * Creates an itinerary that creates only street or flex results which are not aware of the
+   * time window.
+   */
+  public static Itinerary createDirectItinerary(List<Leg> legs) {
+    return new Itinerary(legs, false);
   }
 
   /**

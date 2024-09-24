@@ -423,7 +423,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public Itinerary build() {
-    Itinerary itinerary = new Itinerary(legs, isSearchWindowAware);
+    Itinerary itinerary;
+    if (isSearchWindowAware) {
+      itinerary = Itinerary.createScheduledTransitItinerary(legs);
+    } else {
+      itinerary = Itinerary.createDirectItinerary(legs);
+    }
     itinerary.setGeneralizedCost(c1);
     if (c2 != NOT_SET) {
       itinerary.setGeneralizedCost2(c2);
