@@ -670,6 +670,12 @@ type Leg {
   """
   headsign: String
   """
+  The best estimate of the time between two arriving vehicles. This is particularly important for
+  non-strict frequency trips, but could become important for real-time trips, strict frequency
+  trips, and scheduled trips with empirical headways.
+  """
+  headway: Int
+  """
   Interlines with previous leg.
   This is true when the same vehicle is used for the previous leg as for this leg
   and passenger can stay inside the vehicle.

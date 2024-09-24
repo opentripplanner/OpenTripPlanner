@@ -14,11 +14,13 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.gtfs.GraphQLScalars;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
@@ -161,6 +163,15 @@ public class LegType {
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
           .description("NOT IMPLEMENTED")
           .dataFetcher(env -> leg(env).getDuration().toSeconds())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("headway")
+          .description("The leg's headway in seconds")
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> leg(env).getHeadway())
           .build()
       )
       .field(
