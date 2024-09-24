@@ -1173,7 +1173,7 @@ type QueryType {
   ): Trip
   "Try refetching the current state of a transit leg using its ID"
   leg(id: String!): Leg
-    """
+  """
   Get all places (stops, stations, etc. with coordinates) within the specified
   radius from a location. The returned type is a Relay connection (see
   https://facebook.github.io/relay/graphql/connections.htm). The placeAtDistance
