@@ -781,6 +781,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Trip> fuzzyTrip();
 
+    public DataFetcher<Leg> leg();
+
     public DataFetcher<Connection<PlaceAtDistance>> nearest();
 
     public DataFetcher<Object> node();
