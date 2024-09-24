@@ -64,7 +64,7 @@ public class Itinerary implements ItinerarySortKey {
   /* other properties */
 
   private final List<SystemNotice> systemNotices = new ArrayList<>();
-  private final boolean isSearchWindowAware;
+  private final boolean searchWindowAware;
   private List<Leg> legs;
 
   private ItineraryFares fare = ItineraryFares.empty();
