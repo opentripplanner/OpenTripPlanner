@@ -566,12 +566,6 @@ public class GraphQLTypes {
     }
   }
 
-  public enum GraphQLCarsAllowed {
-    ALLOWED,
-    NOT_ALLOWED,
-    NO_INFORMATION,
-  }
-
   public static class GraphQLCyclingOptimizationInput {
 
     private GraphQLTriangleCyclingFactorsInput triangle;

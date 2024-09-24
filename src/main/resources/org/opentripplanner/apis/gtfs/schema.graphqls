@@ -2774,15 +2774,6 @@ enum BikesAllowed {
   NO_INFORMATION
 }
 
-enum CarsAllowed {
-  "The vehicle being used on this particular trip can accommodate at least one car."
-  ALLOWED
-  "No cars are allowed on this trip."
-  NOT_ALLOWED
-  "There is no car information for the trip."
-  NO_INFORMATION
-}
-
 """
 Predefined optimization alternatives for bicycling routing. For more customization,
 one can use the triangle factors.
