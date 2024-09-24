@@ -1623,7 +1623,9 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serverInfo")
-          .description("Get OTP server information")
+          .description(
+            "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
+          )
           .withDirective(gqlUtil.timingData)
           .type(new GraphQLNonNull(serverInfoType))
           .dataFetcher(e -> projectInfo())
