@@ -1083,7 +1083,7 @@ type ServerInfo {
   """
     The internal time zone of the transit data.
   
-    Note: The input data can be in several time zones, but OTP internally operates on a single one.
+    Note: Input data can be in several time zones but OTP internally operates on a single one.
   """
   internalTransitModelTimeZone: String
   "The 'configVersion' of the otp-config.json file."
