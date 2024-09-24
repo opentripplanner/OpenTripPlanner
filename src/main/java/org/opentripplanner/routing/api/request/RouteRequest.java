@@ -178,9 +178,8 @@ public class RouteRequest implements Cloneable, Serializable {
    * The direct mode is also unset when there is a page cursor because for anything other than the
    * initial page we don't want to see direct results.
    * <p>
-   * However, because we still want to have a walking result to compare the transit with, we
-   * temporarily set the direct mode in {@link org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty}
-   * and then filter out this walking itinerary in {@link org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter}.
+   * See also {@link org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty},
+   * it uses a direct search to prune transit.
    */
   public void applyPageCursor() {
     if (pageCursor != null) {

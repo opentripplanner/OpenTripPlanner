@@ -87,7 +87,7 @@ class EmissionsTest {
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
-    Itinerary i = Itinerary.createScheduledTransitItinerary(
+    Itinerary i = createScheduledTransitItinerary(
       List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS))
     );
     decorateWithEmission.decorate(i);
@@ -96,7 +96,7 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForCombinedRoute() {
-    Itinerary i = Itinerary.createScheduledTransitItinerary(
+    Itinerary i = createScheduledTransitItinerary(
       List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG)
     );
     decorateWithEmission.decorate(i);
@@ -105,7 +105,7 @@ class EmissionsTest {
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
-    Itinerary i = Itinerary.createScheduledTransitItinerary(
+    Itinerary i = createScheduledTransitItinerary(
       List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
     );
     decorateWithEmission.decorate(i);
