@@ -4231,6 +4231,26 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLStopRoutesArgs {
+
+    private GraphQLLocalDateRangeInput serviceDates;
+
+    public GraphQLStopRoutesArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDates =
+          new GraphQLLocalDateRangeInput((Map<String, Object>) args.get("serviceDates"));
+      }
+    }
+
+    public GraphQLLocalDateRangeInput getGraphQLServiceDates() {
+      return this.serviceDates;
+    }
+
+    public void setGraphQLServiceDates(GraphQLLocalDateRangeInput serviceDates) {
+      this.serviceDates = serviceDates;
+    }
+  }
+
   public static class GraphQLStopStopTimesForPatternArgs {
 
     private String id;

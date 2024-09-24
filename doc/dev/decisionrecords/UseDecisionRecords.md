@@ -1,9 +1,9 @@
 # Decision Records
 
-[TODO - Not precise] An OTP Decision Record is a justified software design choice that addresses a
-significant functional or non-functional requirement. [Architectural Decision Records](https://adr.github.io/)
-is a similar concept, but we have widened the scope to include any relevant decision about
-OTP development.
+An OTP Decision Record is a justified software design choice that addresses a significant 
+functional or non-functional requirement. [Architectural Decision Records](https://adr.github.io/) is a similar 
+concept, but we have widened the scope to include any relevant decision about OTP development.
+
 
 ## Process
 
@@ -26,12 +26,12 @@ the decision.
 - The final approval is done in the developer meeting, at least 3 developers representing 3
   different organisations should approve it. No vote against the proposal. If the developers
   are not able to agree, the PLC can decide.
-- References to Architectural Decision Records in reviews can be done by linking or just typing
-  e.g. `Use-Dependency-Injection` or [Use-Dependency-Injection](/DECISION_RECORDS.md#use-dependency-injection)
+- References to Development Decision Records in reviews can be done by linking or just typing. 
+  For example `Use-Dependency-Injection` or [Use-Dependency-Injection](../../../DEVELOPMENT_DECISION_RECORDS.md#use-dependency-injection)
 
 ### Checklist
 - [ ] Give it a meaningful title that quickly lets the reader understand what it is all about.
 - [ ] Get it approved in a developer meeting with 3 votes in favor (3 organisations).
-- [ ] Add the name and description to the list in the [Decision Records](/DECISION_RECORDS.md) list.
+- [ ] Add the name and description to the list in the [Development Decision Records](../../../DEVELOPMENT_DECISION_RECORDS.md) list.
       Maximum two sentences should be used. Try to keep it as short as possible.
 - [ ] Remember to link to the PR.

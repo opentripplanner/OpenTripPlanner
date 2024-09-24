@@ -173,7 +173,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.5.0 of OTP:
+Here is an example including variable substitution, assuming version 2.6.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -197,7 +197,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.5.0.obj"
+          "source": "netex-v2.6.0.obj"
         }
       ]
 } 
@@ -226,6 +226,7 @@ Here is a list of all features which can be toggled on/off and their default val
 | `APIUpdaterStatus`                         | Enable endpoint for graph updaters status.                                                                                                                                                                                                                                                                                               |         ✓️         |         |
 | `ConsiderPatternsForDirectTransfers`       | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                                                                                                                                                                       |         ✓️         |         |
 | `DebugUi`                                  | Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses. Be aware that the map tiles are not a stable API and can change without notice. Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.                         |         ✓️         |         |
+| `ExtraTransferLegOnSameStop`               | Should there be a transfer leg when transferring on the very same stop. Note that for in-seat/interlined transfers no transfer leg will be generated.                                                                                                                                                                                    |                    |         |
 | `FloatingBike`                             | Enable floating bike routing.                                                                                                                                                                                                                                                                                                            |         ✓️         |         |
 | `GtfsGraphQlApi`                           | Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md).                                                                                                                                                                                                                                                                                 |         ✓️         |         |
 | `GtfsGraphQlApiRentalStationFuzzyMatching` | Does vehicleRentalStation query also allow ids that are not feed scoped.                                                                                                                                                                                                                                                                 |                    |         |

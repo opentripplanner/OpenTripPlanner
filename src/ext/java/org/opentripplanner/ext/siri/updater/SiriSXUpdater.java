@@ -5,13 +5,11 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -60,13 +58,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
-      new SiriAlertsUpdateHandler(
-        config.feedId(),
-        transitModel,
-        transitAlertService,
-        SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
-        config.earlyStart()
-      );
+      new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, config.earlyStart());
     siriHttpLoader = new SiriHttpLoader(url, config.timeout(), config.requestHeaders());
 
     retry =
@@ -149,8 +141,8 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
           // All that said, out of all the update types, Alerts (and SIRI SX) are probably the ones
           // that would be most tolerant of non-versioned application-wide storage since they don't
           // participate in routing and are tacked on to already-completed routing responses.
-          writeToGraphCallback.execute((graph, transitModel) -> {
-            updateHandler.update(serviceDelivery);
+          writeToGraphCallback.execute(context -> {
+            updateHandler.update(serviceDelivery, context);
             if (markPrimed) {
               primed = true;
             }

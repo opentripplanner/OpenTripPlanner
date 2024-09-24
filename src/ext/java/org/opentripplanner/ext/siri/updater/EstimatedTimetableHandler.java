@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
-import org.opentripplanner.ext.siri.EntityResolver;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -15,8 +13,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 public class EstimatedTimetableHandler {
 
   private final SiriTimetableSnapshotSource snapshotSource;
-  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
-  private final EntityResolver entityResolver;
+  private final boolean fuzzyTripMatching;
   /**
    * The ID for the static feed to which these real time updates are applied
    */
@@ -24,30 +21,11 @@ public class EstimatedTimetableHandler {
 
   public EstimatedTimetableHandler(
     SiriTimetableSnapshotSource snapshotSource,
-    boolean fuzzyMatching,
-    TransitService transitService,
-    String feedId
-  ) {
-    this(
-      snapshotSource,
-      fuzzyMatching ? SiriFuzzyTripMatcher.of(transitService) : null,
-      transitService,
-      feedId
-    );
-  }
-
-  /**
-   * Constructor for tests only.
-   */
-  public EstimatedTimetableHandler(
-    SiriTimetableSnapshotSource snapshotSource,
-    SiriFuzzyTripMatcher siriFuzzyTripMatcher,
-    TransitService transitService,
+    boolean fuzzyTripMatching,
     String feedId
   ) {
     this.snapshotSource = snapshotSource;
-    this.fuzzyTripMatcher = siriFuzzyTripMatcher;
-    this.entityResolver = new EntityResolver(transitService, feedId);
+    this.fuzzyTripMatching = fuzzyTripMatching;
     this.feedId = feedId;
   }
 
@@ -56,11 +34,12 @@ public class EstimatedTimetableHandler {
    */
   public UpdateResult applyUpdate(
     List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries,
-    UpdateIncrementality updateMode
+    UpdateIncrementality updateMode,
+    RealTimeUpdateContext context
   ) {
     return snapshotSource.applyEstimatedTimetable(
-      fuzzyTripMatcher,
-      entityResolver,
+      fuzzyTripMatching ? context.siriFuzzyTripMatcher() : null,
+      context.entityResolver(feedId),
       feedId,
       updateMode,
       estimatedTimetableDeliveries

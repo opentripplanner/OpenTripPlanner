@@ -5,13 +5,12 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -73,7 +72,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(Graph graph, TransitModel ignored) {
+    public void run(RealTimeUpdateContext context) {
       updates.forEach(this::handleUpdate);
     }
 

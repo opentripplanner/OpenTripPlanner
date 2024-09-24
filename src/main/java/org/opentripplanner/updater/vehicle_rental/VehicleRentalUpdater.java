@@ -15,7 +15,6 @@ import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -32,8 +31,8 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -156,10 +155,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(Graph graph, TransitModel transitModel) {
+    public void run(RealTimeUpdateContext context) {
       // Apply stations to graph
       Set<FeedScopedId> stationSet = new HashSet<>();
-      var vertexFactory = new VertexFactory(graph);
+      var vertexFactory = new VertexFactory(context.graph());
 
       /* add any new stations and update vehicle counts for existing stations */
       for (VehicleRentalPlace station : stations) {
@@ -239,7 +238,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
-        var updater = new GeofencingVertexUpdater(graph.getStreetIndex()::getEdgesForEnvelope);
+        var updater = new GeofencingVertexUpdater(
+          context.graph().getStreetIndex()::getEdgesForEnvelope
+        );
         latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
 

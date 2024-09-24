@@ -60,10 +60,10 @@ public class JourneyWhiteListed {
     if (authorityIds.isEmpty() && lineIds.isEmpty()) {
       return stream;
     }
-    return stream.filter(it -> isTripTimeShortAcceptable(it, authorityIds, lineIds));
+    return stream.filter(it -> isTripTimeOnDateAcceptable(it, authorityIds, lineIds));
   }
 
-  private static boolean isTripTimeShortAcceptable(
+  private static boolean isTripTimeOnDateAcceptable(
     TripTimeOnDate tts,
     Collection<FeedScopedId> authorityIds,
     Collection<FeedScopedId> lineIds

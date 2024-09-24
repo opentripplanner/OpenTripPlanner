@@ -12,11 +12,13 @@ import org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
@@ -93,7 +95,16 @@ public class UpdaterConfigurator {
       )
     );
 
-    GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, transitModel, updaters);
+    TimetableSnapshot timetableSnapshotBuffer = null;
+    if (siriTimetableSnapshotSource != null) {
+      timetableSnapshotBuffer = siriTimetableSnapshotSource.getTimetableSnapshotBuffer();
+    } else if (gtfsTimetableSnapshotSource != null) {
+      timetableSnapshotBuffer = gtfsTimetableSnapshotSource.getTimetableSnapshotBuffer();
+    }
+    GraphUpdaterManager updaterManager = new GraphUpdaterManager(
+      new DefaultRealTimeUpdateContext(graph, transitModel, timetableSnapshotBuffer),
+      updaters
+    );
 
     configureTimetableSnapshotFlush(updaterManager);
 
@@ -159,30 +170,22 @@ public class UpdaterConfigurator {
       updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitModel));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
-      updaters.add(
-        new PollingTripUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
-      );
+      updaters.add(new PollingTripUpdater(configItem, provideGtfsTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
-      updaters.add(
-        new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository, transitModel)
-      );
+      updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, transitModel, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriETUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
-      updaters.add(
-        new SiriETGooglePubsubUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
-      );
+      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
-      updaters.add(
-        new MqttGtfsRealtimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
-      );
+      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       switch (configItem.updateType()) {
@@ -213,9 +216,7 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
-      updaters.add(
-        new SiriAzureETUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
-      );
+      updaters.add(new SiriAzureETUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(new SiriAzureSXUpdater(configItem, transitModel));
