@@ -9,6 +9,6 @@ export function formatTime(dateTime: string, timeZone: string, style?: 'short' |
   return parsed.toLocaleTimeString('en-US', {
     timeStyle: style ? style : parsed.getSeconds() === 0 ? 'short' : 'medium',
     hourCycle: 'h24',
-    timeZone: timeZone
+    timeZone: timeZone,
   });
 }

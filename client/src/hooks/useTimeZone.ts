@@ -8,6 +8,9 @@ type ServerInfo = {
 
 const fetchServerInfo = (): Promise<ServerInfo> => fetch(serverInfoUrl).then((r) => r.json());
 
+/**
+ * Fetch the transit model's time zone from the server and use the browser's as the fallback.
+ */
 export const useTimeZone = () => {
   const [data, setData] = useState<ServerInfo | null>(null);
   useEffect(() => {
