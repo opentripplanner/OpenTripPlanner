@@ -42,6 +42,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -365,6 +366,20 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  public DataFetcher<Leg> leg() {
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      var args = new GraphQLTypes.GraphQLQueryTypeLegArgs(environment.getArguments());
+      String id = args.getGraphQLId().getId();
+      LegReference ref = LegReferenceSerializer.decode(id);
+      if (ref == null) {
+        return null;
+      }
+      return ref.getLeg(transitService);
+    };
+  }
+
+  @Override
   public DataFetcher<Object> node() {
     return environment -> {
       var args = new GraphQLTypes.GraphQLQueryTypeNodeArgs(environment.getArguments());
@@ -447,12 +462,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             // TODO: Add geometry
             return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
           }
-        case "Leg":
-          LegReference ref = LegReferenceSerializer.decode(id);
-          if (ref == null) {
-            return null;
-          }
-          return ref.getLeg(transitService);
         case "TicketType":
           return null; //TODO
         case "Trip":
