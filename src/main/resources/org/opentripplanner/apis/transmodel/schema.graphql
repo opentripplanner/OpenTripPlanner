@@ -1075,6 +1075,12 @@ type ServerInfo {
   gitBranch: String
   gitCommit: String
   gitCommitTime: String
+  """
+    The internal time zone of the transit data.
+  
+    Note: Input data can be in several time zones but OTP internally operates on a single one.
+  """
+  internalTransitModelTimeZone: String
   "The 'configVersion' of the otp-config.json file."
   otpConfigVersion: String
   "The otp-serialization-version-id used to check graphs for compatibility with current version of OTP."

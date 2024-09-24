@@ -7,14 +7,13 @@ import { useTripQuery } from '../hooks/useTripQuery.ts';
 import { useServerInfo } from '../hooks/useServerInfo.ts';
 import { useTripQueryVariables } from '../hooks/useTripQueryVariables.ts';
 import { TimeZoneContext } from '../hooks/TimeZoneContext.ts';
-import { useTimeZone } from '../hooks/useTimeZone.ts';
 
 export function App() {
   const serverInfo = useServerInfo();
-  const timeZone = useTimeZone();
   const { tripQueryVariables, setTripQueryVariables } = useTripQueryVariables();
   const [tripQueryResult, loading, callback] = useTripQuery(tripQueryVariables);
   const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
+  const timeZone = serverInfo?.internalTransitModelTimeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return (
     <div className="app">

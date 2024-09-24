@@ -13,6 +13,7 @@ const query = graphql(`
       routerConfigVersion
       gitCommit
       gitBranch
+      internalTransitModelTimeZone
     }
   }
 `);
