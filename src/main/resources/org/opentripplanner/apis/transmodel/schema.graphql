@@ -730,7 +730,7 @@ type QueryType {
   ): quayAtDistanceConnection @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
-  "Get OTP server information"
+  "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
   serverInfo: ServerInfo! @timingData
   "Get a single service journey based on its id"
   serviceJourney(id: String!): ServiceJourney @timingData
@@ -1067,6 +1067,11 @@ type RoutingParameters {
   wheelChairAccessible: Boolean
 }
 
+"""
+Information about the deployment. This is only useful to developers of OTP itself.
+It is not recommended for regular API consumers to use this type as it has no
+stability guarantees.
+"""
 type ServerInfo {
   "The 'configVersion' of the build-config.json file."
   buildConfigVersion: String
