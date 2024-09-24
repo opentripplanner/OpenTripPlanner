@@ -20,12 +20,11 @@ public class ServerInfo {
 
   private final ZoneId timeZone;
   private static final String cpuName;
-  private static final int nCores ;
+  private static final int nCores;
 
   public ServerInfo(@Context OtpServerRequestContext serverContext) {
     this.timeZone = serverContext.transitService().getTimeZone();
   }
-
 
   /**
    * Determine the OTP version and CPU type of the running server. This information should not
@@ -43,7 +42,7 @@ public class ServerInfo {
       while ((line = br.readLine()) != null) {
         if (line.startsWith("model name")) {
           cpu = line.split(": ")[1];
-          cores+= 1;
+          cores += 1;
         }
       }
       fis.close();
@@ -51,8 +50,6 @@ public class ServerInfo {
     cpuName = cpu;
     nCores = cores;
   }
-
-
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)

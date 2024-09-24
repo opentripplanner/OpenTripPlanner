@@ -13,7 +13,12 @@ public class ApiServerInfo {
   public final String otpSerializationVersionId;
   public final String transitTimeZone;
 
-  public ApiServerInfo(String cpuName, int nCores, OtpProjectInfo projectInfo, ZoneId transitTimeZone) {
+  public ApiServerInfo(
+    String cpuName,
+    int nCores,
+    OtpProjectInfo projectInfo,
+    ZoneId transitTimeZone
+  ) {
     this.cpuName = cpuName;
     this.nCores = nCores;
     this.version = new ApiProjectVersion(projectInfo.version);

@@ -29,12 +29,12 @@ export function ItineraryHeaderContent({
 
   const formattedStartTime = useMemo(
     () => formatTime(tripPattern.expectedStartTime, timeZone, 'short'),
-    [tripPattern.expectedStartTime],
+    [tripPattern.expectedStartTime, timeZone],
   );
 
   const formattedEndTime = useMemo(
     () => formatTime(tripPattern.expectedEndTime, timeZone, 'short'),
-    [tripPattern.expectedEndTime],
+    [tripPattern.expectedEndTime, timeZone],
   );
 
   return (

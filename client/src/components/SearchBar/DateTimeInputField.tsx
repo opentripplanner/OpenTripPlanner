@@ -28,7 +28,7 @@ export function DateTimeInputField({
         dateTime: dateTime,
       });
     },
-    [tripQueryVariables, setTripQueryVariables],
+    [tripQueryVariables, setTripQueryVariables, timeZone],
   );
 
   return (
