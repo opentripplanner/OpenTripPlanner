@@ -370,7 +370,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       var args = new GraphQLTypes.GraphQLQueryTypeLegArgs(environment.getArguments());
-      String id = args.getGraphQLId().getId();
+      String id = args.getGraphQLId();
       LegReference ref = LegReferenceSerializer.decode(id);
       if (ref == null) {
         return null;
