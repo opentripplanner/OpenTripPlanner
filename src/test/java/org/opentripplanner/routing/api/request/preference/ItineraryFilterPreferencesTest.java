@@ -127,7 +127,11 @@ class ItineraryFilterPreferencesTest {
 
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withGroupSimilarityKeepOne(0.95).build();
-    var same = other.copyOf().withGroupSimilarityKeepOne(GROUP_SIMILARITY_KEEP_ONE).build();
+    var same = other
+      .copyOf()
+      .withGroupSimilarityKeepOne(GROUP_SIMILARITY_KEEP_ONE)
+      .withFilterDirectFlexByEarliestDeparture(true)
+      .build();
     assertEqualsAndHashCode(subject, other, same);
   }
 
