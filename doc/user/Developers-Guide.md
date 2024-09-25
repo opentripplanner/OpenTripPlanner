@@ -56,7 +56,7 @@ There are several ways to get involved:
 * Join the [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) and the 
   [user mailing list](http://groups.google.com/group/opentripplanner-users).
 
-* Fix typos and improve the documentation within the `/docs` directory of the project (details
+* Fix typos and improve the documentation within the `/doc/user` directory of the project (details
   below).
 
 * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
@@ -133,7 +133,7 @@ control to be applied to documentation as well as program source code. All pull 
 how OTP is used or configured should include changes to the documentation alongside code
 modifications.
 
-The documentation files are in Markdown format and are in the `/docs` directory under the root of
+The documentation files are in Markdown format and are in the `/doc/user` directory under the root of
 the project. On every push to the `dev-2.x` branch the documentation will be rebuilt and deployed as
 static pages to our subdomain of [Github Pages](https://github.com/opentripplanner/docs). 
 MkDocs is a Python program and should run on any major platform. 
@@ -143,7 +143,7 @@ how to generate a live local preview of the documentation while you're writing i
 In short:
 
 ```
-$ pip install -r docs/requirements.txt
+$ pip install -r doc/user/requirements.txt
 $ mkdocs serve
 ```
 
