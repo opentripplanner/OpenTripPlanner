@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,11 +20,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestRoute;
@@ -51,12 +57,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -73,8 +77,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
-
-  private final TestTransitData data = new TestTransitData();
+  private static final Route ROUTE = TransitModelForTest.route("route").build();
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
@@ -84,9 +87,9 @@ public class RaptorPathToItineraryMapperTest {
     STOP_COSTS
   );
 
-  private static final RegularStop S1 = TEST_MODEL.stop("STOP1", 0.0, 0.0).build();
-
-  private static final RegularStop S2 = TEST_MODEL.stop("STOP2", 1.0, 1.0).build();
+  private static final RegularStop S1 = TEST_MODEL.stop("STOP1").build();
+  private static final RegularStop S2 = TEST_MODEL.stop("STOP2").build();
+  private static final RegularStop S3 = TEST_MODEL.stop("STOP3").build();
 
   @ParameterizedTest
   @ValueSource(ints = { 0, 3000, -3000 })
@@ -111,6 +114,35 @@ public class RaptorPathToItineraryMapperTest {
       itinerary.getLegs().get(0).getGeneralizedCost(),
       "Incorrect cost returned"
     );
+  }
+
+  @Test
+  void noExtraLegWhenTransferringAtSameStop() {
+    var mapper = getRaptorPathToItineraryMapper();
+
+    var path = transferAtSameStopPath();
+    var itinerary = mapper.createItinerary(path);
+    assertThat(itinerary.getLegs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
+  }
+
+  @Test
+  void extraLegWhenTransferringAtSameStop() {
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
+
+    var schedule = getTestTripSchedule2();
+    var path = new TestPathBuilder(COST_CALCULATOR)
+      .access(TRANSIT_START - BOARD_SLACK, 1)
+      .bus(schedule, 2)
+      .bus(schedule, 1)
+      .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
+
+    OTPFeature.ExtraTransferLegOnSameStop.testOn(() -> {
+      var itinerary = mapper.createItinerary(path);
+      assertEquals(
+        List.of(ScheduledTransitLeg.class, StreetLeg.class, ScheduledTransitLeg.class),
+        itinerary.getLegs().stream().map(Leg::getClass).toList()
+      );
+    });
   }
 
   @Test
@@ -184,6 +216,36 @@ public class RaptorPathToItineraryMapperTest {
     assertEquals(3, itinerary.getLegs().size(), "The wrong number of legs was returned");
   }
 
+  private RaptorPath<TestTripSchedule> transferAtSameStopPath() {
+    var schedule = transferAtSameStopSchedule();
+    return new TestPathBuilder(COST_CALCULATOR)
+      .access(TRANSIT_START, 1)
+      .bus(schedule, 2)
+      .bus(schedule, 1)
+      .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
+  }
+
+  private TestTripSchedule transferAtSameStopSchedule() {
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+
+    var timetable = new TestTripSchedule.Builder()
+      .times(
+        TimeUtils.time("10:00"),
+        TimeUtils.time("10:05"),
+        TimeUtils.time("10:10"),
+        TimeUtils.time("10:15"),
+        TimeUtils.time("10:20")
+      )
+      .pattern(pattern)
+      .originalPattern(getOriginalPattern(pattern))
+      .build();
+
+    data.withRoutes(TestRoute.route("TransferAtSameStop", 1, 2, 3, 2, 1).withTimetable(timetable));
+
+    return data.getRoute(0).getTripSchedule(0);
+  }
+
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
     var stopModelBuilder = TEST_MODEL.stopModelBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
@@ -233,7 +295,12 @@ public class RaptorPathToItineraryMapperTest {
       new HashMap<>(),
       null,
       null,
-      TEST_MODEL.stopModelBuilder().withRegularStop(S1).withRegularStop(S2).build(),
+      TEST_MODEL
+        .stopModelBuilder()
+        .withRegularStop(S1)
+        .withRegularStop(S2)
+        .withRegularStop(S3)
+        .build(),
       null,
       null,
       null,
@@ -241,21 +308,30 @@ public class RaptorPathToItineraryMapperTest {
     );
   }
 
+  private TestTripSchedule getTestTripSchedule2() {
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
+
+    var timetable = new TestTripSchedule.Builder()
+      .times(
+        TimeUtils.time("10:00"),
+        TimeUtils.time("10:05"),
+        TimeUtils.time("10:10"),
+        TimeUtils.time("10:15"),
+        TimeUtils.time("10:20")
+      )
+      .pattern(pattern)
+      .originalPattern(getOriginalPattern(pattern))
+      .build();
+
+    data.withRoutes(TestRoute.route("TestRoute_1", 1, 2, 3, 2, 1).withTimetable(timetable));
+
+    return data.getRoute(0).getTripSchedule(0);
+  }
+
   private TestTripSchedule getTestTripSchedule() {
-    var agency = Agency
-      .of(new FeedScopedId("TestFeed", "Auth_1"))
-      .withName("Test_Agency")
-      .withTimezone("Europe/Stockholm")
-      .build();
-
-    var route = Route
-      .of(new FeedScopedId("TestFeed", "Line_1"))
-      .withAgency(agency)
-      .withMode(TransitMode.BUS)
-      .withShortName("Test_Bus")
-      .build();
-
-    var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(route);
+    TestTransitData data = new TestTransitData();
+    var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(ROUTE);
 
     var timetable = new TestTripSchedule.Builder()
       .times(TRANSIT_START, TRANSIT_END)

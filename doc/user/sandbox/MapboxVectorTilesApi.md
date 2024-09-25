@@ -173,6 +173,7 @@ For each layer, the configuration includes:
 |       type = "stop"                                            |   `enum`   | Type of the layer.                                                                         | *Required* |               |  2.0  |
 |       [cacheMaxSeconds](#vectorTiles_layers_0_cacheMaxSeconds) |  `integer` | Sets the cache header in the response.                                                     | *Optional* | `-1`          |  2.0  |
 |       [expansionFactor](#vectorTiles_layers_0_expansionFactor) |  `double`  | How far outside its boundaries should the tile contain information.                        | *Optional* | `0.25`        |  2.0  |
+|       [filter](#vectorTiles_layers_0_filter)                   |   `enum`   | Reduce the result set of a layer further by a specific filter.                             | *Optional* | `"none"`      |  2.6  |
 |       [mapper](#vectorTiles_layers_0_mapper)                   |  `string`  | Describes the mapper converting from the OTP model entities to the vector tile properties. | *Required* |               |  2.0  |
 |       maxZoom                                                  |  `integer` | Maximum zoom levels the layer is active for.                                               | *Optional* | `20`          |  2.0  |
 |       minZoom                                                  |  `integer` | Minimum zoom levels the layer is active for.                                               | *Optional* | `9`           |  2.0  |
@@ -244,6 +245,18 @@ The lowest value of the layers included is selected.
 How far outside its boundaries should the tile contain information.
 
 The value is a fraction of the tile size. If you are having problem with icons and shapes being clipped at tile edges, then increase this number.
+
+<h4 id="vectorTiles_layers_0_filter">filter</h4>
+
+**Since version:** `2.6` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"none"`   
+**Path:** /vectorTiles/layers/[0]   
+**Enum values:** `none` | `sunday-to-sunday-service-week`
+
+Reduce the result set of a layer further by a specific filter.
+
+This is useful for when the schema of a layer, say stops, should remain unchanged but some
+elements should not be included in the result.
+
 
 <h4 id="vectorTiles_layers_0_mapper">mapper</h4>
 

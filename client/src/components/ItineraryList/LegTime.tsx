@@ -1,4 +1,6 @@
 import { formatTime } from '../../util/formatTime.ts';
+import { useContext } from 'react';
+import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 
 export function LegTime({
   aimedTime,
@@ -9,14 +11,19 @@ export function LegTime({
   expectedTime: string;
   hasRealtime: boolean;
 }) {
+  const timeZone = useContext(TimeZoneContext);
   return aimedTime !== expectedTime ? (
     <>
-      <span style={{ color: 'red' }}>{formatTime(expectedTime, 'short')}</span>
-      <span style={{ textDecoration: 'line-through' }}>{formatTime(aimedTime, 'short')}</span>
+      <span title={expectedTime} style={{ color: 'red' }}>
+        {formatTime(expectedTime, timeZone, 'short')}
+      </span>
+      <span title={aimedTime} style={{ textDecoration: 'line-through' }}>
+        {formatTime(aimedTime, timeZone, 'short')}
+      </span>
     </>
   ) : (
-    <span>
-      {formatTime(expectedTime, 'short')}
+    <span title={expectedTime}>
+      {formatTime(expectedTime, timeZone, 'short')}
       {hasRealtime && <span> (on time)</span>}
     </span>
   );

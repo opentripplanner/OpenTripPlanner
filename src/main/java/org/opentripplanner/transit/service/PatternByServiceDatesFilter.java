@@ -1,16 +1,13 @@
-package org.opentripplanner.apis.gtfs;
+package org.opentripplanner.transit.service;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Stream;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Encapsulates the logic to filter patterns by the service dates that they operate on. It also
@@ -29,7 +26,7 @@ public class PatternByServiceDatesFilter {
    * This method is not private to enable unit testing.
    * <p>
    */
-  PatternByServiceDatesFilter(
+  public PatternByServiceDatesFilter(
     LocalDateRange range,
     Function<Route, Collection<TripPattern>> getPatternsForRoute,
     Function<Trip, Collection<LocalDate>> getServiceDatesForTrip
@@ -45,17 +42,6 @@ public class PatternByServiceDatesFilter {
     }
   }
 
-  public PatternByServiceDatesFilter(
-    GraphQLTypes.GraphQLLocalDateRangeInput filterInput,
-    TransitService transitService
-  ) {
-    this(
-      new LocalDateRange(filterInput.getGraphQLStart(), filterInput.getGraphQLEnd()),
-      transitService::getPatternsForRoute,
-      trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
-    );
-  }
-
   /**
    * Filter the patterns by the service dates that it operates on.
    */
@@ -67,8 +53,9 @@ public class PatternByServiceDatesFilter {
    * Filter the routes by listing all their patterns' service dates and checking if they
    * operate on the specified dates.
    */
-  public Collection<Route> filterRoutes(Stream<Route> routeStream) {
+  public Collection<Route> filterRoutes(Collection<Route> routeStream) {
     return routeStream
+      .stream()
       .filter(r -> {
         var patterns = getPatternsForRoute.apply(r);
         return !this.filterPatterns(patterns).isEmpty();

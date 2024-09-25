@@ -59,6 +59,62 @@
       "url": "https://gbfs.spin.pm/api/gbfs/v2/portland"
     }
   ],
+  "vectorTiles": {
+    "basePath": "/rtp/routers/default/vectorTiles",
+    "attribution": "<a href='https://trimet.org/mod'>Regional Partners</a>",
+    "layers": [
+      {
+        "name": "stops",
+        "type": "Stop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600,
+        "filter": "sunday-to-sunday-service-week"
+      },
+      {
+        "name": "areaStops",
+        "type": "AreaStop",
+        "mapper": "OTPRR",
+        "maxZoom": 30,
+        "minZoom":  8,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "stations",
+        "type": "Station",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "rentalVehicles",
+        "type": "VehicleRentalVehicle",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 60
+      },
+      {
+        "name": "rentalStations",
+        "type": "VehicleRentalStation",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "vehicleParking",
+        "type": "VehicleParking",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 10,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      }
+    ]
+  },
   "rideHailingServices": [
     {
       "type": "uber-car-hailing",
