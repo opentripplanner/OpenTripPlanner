@@ -1,6 +1,7 @@
 import { Form } from 'react-bootstrap';
 import { COORDINATE_PRECISION } from './constants.ts';
 import { Location } from '../../gql/graphql.ts';
+import { mediumInputStyle } from '../ItineraryList/inputStyle.ts';
 
 export function LocationInputField({ location, id, label }: { location: Location; id: string; label: string }) {
   return (
@@ -13,6 +14,7 @@ export function LocationInputField({ location, id, label }: { location: Location
         id={id}
         size="sm"
         placeholder="[Click in map]"
+        style={mediumInputStyle}
         // Intentionally empty for now, but needed because of
         // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
         onChange={() => {}}

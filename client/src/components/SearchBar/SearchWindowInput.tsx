@@ -1,5 +1,6 @@
 import { Form } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
+import { smallInputStyle } from '../ItineraryList/inputStyle.ts';
 
 export function SearchWindowInput({
   tripQueryVariables,
@@ -19,6 +20,7 @@ export function SearchWindowInput({
         size="sm"
         placeholder="(in minutes)"
         min={1}
+        style={smallInputStyle}
         value={tripQueryVariables.searchWindow || ''}
         onChange={(event) =>
           setTripQueryVariables({

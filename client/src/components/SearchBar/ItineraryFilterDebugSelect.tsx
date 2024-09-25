@@ -1,5 +1,6 @@
 import { Form } from 'react-bootstrap';
 import { ItineraryFilterDebugProfile, TripQueryVariables } from '../../gql/graphql.ts';
+import { mediumInputStyle } from '../ItineraryList/inputStyle.ts';
 
 export function ItineraryFilterDebugSelect({
   tripQueryVariables,
@@ -11,11 +12,12 @@ export function ItineraryFilterDebugSelect({
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor="itineraryDebugFilterSelect">
-        Itinerary filter debug
+        Filter debug
       </Form.Label>
       <Form.Select
         id="itineraryDebugFilterSelect"
         size="sm"
+        style={mediumInputStyle}
         onChange={(e) => {
           setTripQueryVariables({
             ...tripQueryVariables,

@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from 'react';
 import { Form } from 'react-bootstrap';
+import { mediumInputStyle } from '../ItineraryList/inputStyle.ts';
 
 type MultiSelectDropdownOption<T> = {
   id: T;
@@ -40,6 +41,7 @@ const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }:
         type="text"
         id="multiSelectDropdown"
         size="sm"
+        style={mediumInputStyle}
         value={values.length > 0 ? values.join(', ') : 'Not selected'}
         onClick={toggleDropdown}
         onChange={() => {}}
