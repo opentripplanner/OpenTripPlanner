@@ -40,6 +40,15 @@ public class FareRuleSet implements Serializable {
     return routeOriginDestinations;
   }
 
+  public boolean hasRules() {
+    return (
+      !routes.isEmpty() ||
+      !originDestinations.isEmpty() ||
+      !routeOriginDestinations.isEmpty() ||
+      !contains.isEmpty()
+    );
+  }
+
   public void addContains(String containsId) {
     contains.add(containsId);
   }
