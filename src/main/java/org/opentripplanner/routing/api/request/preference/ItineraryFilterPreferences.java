@@ -31,7 +31,7 @@ public final class ItineraryFilterPreferences {
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
-  private final boolean removeTransitIfWalkingIsBetter;
+  private final boolean filterDirectFlexByEarliestDeparture;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
@@ -52,7 +52,7 @@ public final class ItineraryFilterPreferences {
       );
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
-    this.removeTransitIfWalkingIsBetter = false;
+    this.filterDirectFlexByEarliestDeparture = true;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -73,7 +73,7 @@ public final class ItineraryFilterPreferences {
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       Objects.requireNonNull(builder.removeTransitWithHigherCostThanBestOnStreetOnly);
-    this.removeTransitIfWalkingIsBetter = builder.removeTransitIfWalkingIsBetter;
+    this.filterDirectFlexByEarliestDeparture = builder.filterDirectFlexByEarliestDeparture;
   }
 
   public static Builder of() {
@@ -136,8 +136,8 @@ public final class ItineraryFilterPreferences {
     return removeTransitWithHigherCostThanBestOnStreetOnly;
   }
 
-  public boolean removeTransitIfWalkingIsBetter() {
-    return removeTransitIfWalkingIsBetter;
+  public boolean filterDirectFlexByEarliestDeparture() {
+    return filterDirectFlexByEarliestDeparture;
   }
 
   @Override
@@ -187,7 +187,7 @@ public final class ItineraryFilterPreferences {
         "removeItinerariesWithSameRoutesAndStops",
         removeItinerariesWithSameRoutesAndStops
       )
-      .addBoolIfTrue("removeTransitIfWalkingIsBetter", removeTransitIfWalkingIsBetter)
+      .addBoolIfTrue("filterDirectFlexByEarliestDeparture", filterDirectFlexByEarliestDeparture)
       .toString();
   }
 
@@ -200,7 +200,6 @@ public final class ItineraryFilterPreferences {
       accessibilityScore == that.accessibilityScore &&
       Double.compare(that.bikeRentalDistanceRatio, bikeRentalDistanceRatio) == 0 &&
       debug == that.debug &&
-      removeTransitIfWalkingIsBetter == that.removeTransitIfWalkingIsBetter &&
       filterItinerariesWithSameFirstOrLastTrip == that.filterItinerariesWithSameFirstOrLastTrip &&
       Double.compare(
         that.groupedOtherThanSameLegsMaxCostMultiplier,
@@ -217,7 +216,8 @@ public final class ItineraryFilterPreferences {
         removeTransitWithHigherCostThanBestOnStreetOnly,
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
-      Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit)
+      Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
+      filterDirectFlexByEarliestDeparture == that.filterDirectFlexByEarliestDeparture
     );
   }
 
@@ -237,7 +237,7 @@ public final class ItineraryFilterPreferences {
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
       removeTransitWithHigherCostThanBestOnStreetOnly,
-      removeTransitIfWalkingIsBetter
+      filterDirectFlexByEarliestDeparture
     );
   }
 
@@ -258,6 +258,7 @@ public final class ItineraryFilterPreferences {
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
     private boolean removeTransitIfWalkingIsBetter;
+    private boolean filterDirectFlexByEarliestDeparture;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -341,11 +342,6 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withRemoveTransitIfWalkingIsBetter(boolean removeTransitIfWalkingIsBetter) {
-      this.removeTransitIfWalkingIsBetter = removeTransitIfWalkingIsBetter;
-      return this;
-    }
-
     public Builder(ItineraryFilterPreferences original) {
       this.original = original;
       this.accessibilityScore = original.accessibilityScore;
@@ -365,7 +361,7 @@ public final class ItineraryFilterPreferences {
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
-      this.removeTransitIfWalkingIsBetter = original.removeTransitIfWalkingIsBetter;
+      this.filterDirectFlexByEarliestDeparture = original.filterDirectFlexByEarliestDeparture;
     }
 
     public Builder apply(Consumer<Builder> body) {
@@ -376,6 +372,13 @@ public final class ItineraryFilterPreferences {
     public ItineraryFilterPreferences build() {
       var value = new ItineraryFilterPreferences(this);
       return original.equals(value) ? original : value;
+    }
+
+    public Builder withFilterDirectFlexByEarliestDeparture(
+      boolean filterDirectFlexByEarliestDeparture
+    ) {
+      this.filterDirectFlexByEarliestDeparture = filterDirectFlexByEarliestDeparture;
+      return this;
     }
   }
 }

@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -260,6 +261,19 @@ removed from list.
             "Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport."
           )
           .asDouble(dft.minBikeParkingDistance())
+      )
+      .withFilterDirectFlexByEarliestDeparture(
+        c
+          .of("filterDirectFlexByEarliestDeparture")
+          .since(V2_7)
+          .summary("Filter direct flex results by the earliestDepartureTime of the search window.")
+          .description(
+            """
+              When direct flex is mixed with a transit search in the same request, then the direct flex results can be filtered by the
+              earliest departure time of the transit search window.
+            """
+          )
+          .asBoolean(true)
       )
       .build();
   }

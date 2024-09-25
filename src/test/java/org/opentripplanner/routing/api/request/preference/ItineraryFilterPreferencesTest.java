@@ -133,7 +133,10 @@ class ItineraryFilterPreferencesTest {
 
   @Test
   void testToString() {
-    assertEquals("ItineraryFilterPreferences{}", ItineraryFilterPreferences.DEFAULT.toString());
+    assertEquals(
+      "ItineraryFilterPreferences{filterDirectFlexByEarliestDeparture}",
+      ItineraryFilterPreferences.DEFAULT.toString()
+    );
     assertEquals(
       "ItineraryFilterPreferences{" +
       "accessibilityScore, " +
@@ -147,7 +150,8 @@ class ItineraryFilterPreferencesTest {
       "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
       "parkAndRideDurationRatio: 0.44, " +
       "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
-      "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t" +
+      "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
+      "filterDirectFlexByEarliestDeparture" +
       "}",
       subject.toString()
     );
