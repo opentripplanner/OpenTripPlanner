@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.condition.EnabledIf;
 
 /**
- * Use this annotation on tests that generate(access) the /docs directory outside the
+ * Use this annotation on tests that generate(access) the /doc directory outside the
  * source/resource.
  * <p>
  * All tests annotated with this annotation is tagged with "docs". You may include or exclude

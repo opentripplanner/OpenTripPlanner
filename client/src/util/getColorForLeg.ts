@@ -1,6 +1,6 @@
-import { Mode } from '../gql/graphql.ts';
+import { Leg, Mode } from '../gql/graphql.ts';
 
-export const getColorForMode = function (mode: Mode) {
+const getColorForMode = function (mode: Mode) {
   if (mode === Mode.Foot) return '#191616';
   if (mode === Mode.Bicycle) return '#5076D9';
   if (mode === Mode.Scooter) return '#253664';
@@ -18,4 +18,15 @@ export const getColorForMode = function (mode: Mode) {
   if (mode === Mode.Monorail) return '#81304C';
   if (mode === Mode.Taxi) return '#81304C';
   return '#aaa';
+};
+
+/**
+ * Extract a line color from a leg. If there isn't one given by its line, this method returns a fallback color.
+ */
+export const getColorForLeg = function (leg: Leg) {
+  if (leg.line?.presentation?.colour) {
+    return `#${leg.line.presentation.colour}`;
+  } else {
+    return getColorForMode(leg.mode);
+  }
 };
