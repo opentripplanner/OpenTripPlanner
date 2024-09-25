@@ -13,7 +13,8 @@ public class RouteTypeMapper {
 
     return switch (domain) {
       case RAIL -> 2;
-      case COACH, BUS -> 3;
+      case BUS -> 3;
+      case COACH -> 200;
       case SUBWAY -> 1;
       case TRAM -> 0;
       case FERRY -> 4;

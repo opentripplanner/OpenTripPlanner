@@ -3,25 +3,8 @@ package org.opentripplanner.ext.restapi.parameter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
-import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAILING;
-import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.api.request.StreetMode.WALK;
-import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
-import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
-import static org.opentripplanner.transit.model.basic.TransitMode.CABLE_CAR;
-import static org.opentripplanner.transit.model.basic.TransitMode.CARPOOL;
-import static org.opentripplanner.transit.model.basic.TransitMode.COACH;
-import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
-import static org.opentripplanner.transit.model.basic.TransitMode.FUNICULAR;
-import static org.opentripplanner.transit.model.basic.TransitMode.GONDOLA;
-import static org.opentripplanner.transit.model.basic.TransitMode.MONORAIL;
-import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
-import static org.opentripplanner.transit.model.basic.TransitMode.SUBWAY;
-import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
-import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
+import static org.opentripplanner.routing.api.request.StreetMode.*;
+import static org.opentripplanner.transit.model.basic.TransitMode.*;
 
 import jakarta.ws.rs.BadRequestException;
 import java.util.Set;
@@ -197,8 +180,8 @@ public class QualifiedModeSetTest {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,TRANSIT,CARPOOL");
 
     Set<TransitMode> expected = Set.of(
-      TransitMode.RAIL,
-      TransitMode.COACH,
+      RAIL,
+      COACH,
       SUBWAY,
       BUS,
       TRAM,
@@ -210,7 +193,7 @@ public class QualifiedModeSetTest {
       TROLLEYBUS,
       CARPOOL,
       MONORAIL,
-      TransitMode.TAXI
+      TAXI
     );
 
     var mainModes = Set.copyOf(modeSet.getTransitModes());
@@ -231,7 +214,7 @@ public class QualifiedModeSetTest {
   @Test
   void carHailWithTransit() {
     var modeSet = new QualifiedModeSet("CAR_HAIL,BUS,RAIL");
-    assertEquals(Set.of(COACH, BUS, RAIL), Set.copyOf(modeSet.getTransitModes()));
+    assertEquals(Set.of(BUS, RAIL), Set.copyOf(modeSet.getTransitModes()));
 
     assertEquals(WALK, modeSet.getRequestModes().directMode);
     assertEquals(CAR_HAILING, modeSet.getRequestModes().accessMode);
