@@ -739,8 +739,10 @@ convenient when tuning the itinerary-filter-chain.
 
 Filter direct flex results by the earliestDepartureTime of the search window.
 
-  When direct flex is mixed with a transit search in the same request, then the direct flex results can be filtered by the
-  earliest departure time of the transit search window.
+When direct flex is mixed with a transit search in the same request, then the direct flex results are filtered by the
+earliest departure time of the transit search window.
+
+Use this configuration to turn this feature off.
 
 
 <h3 id="rd_if_filterItinerariesWithSameFirstOrLastTrip">filterItinerariesWithSameFirstOrLastTrip</h3>
