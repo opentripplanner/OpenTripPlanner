@@ -12,9 +12,9 @@
     transportModes: [{ mode: CAR, qualifier: HAIL }]
     via: [
       {
-        passThroughLocation: {
+        passThrough: {
           label: "A stop that you want to visit along the route"
-          stopLocationId: "F:A"
+          stopLocationIds: ["F:A"]
         }
       }
     ]

@@ -16,9 +16,9 @@ class PassThroughLocationMapperTest {
 
   public static List<List<Map<?, ?>>> failureCases() {
     return List.of(
-      List.of(Map.of("passThroughLocation", Map.of("stopLocationId", "fantasy:id"))),
-      List.of(Map.of("passThroughLocation", Map.of())),
-      List.of(Map.of("passThroughLocation", Map.of()), Map.of("passThroughLocation", Map.of()))
+      List.of(Map.of("passThrough", Map.of("stopLocationIds", List.of("fantasy:id")))),
+      List.of(Map.of("passThrough", Map.of())),
+      List.of(Map.of("passThrough", Map.of()), Map.of("passThroughLocation", Map.of()))
     );
   }
 

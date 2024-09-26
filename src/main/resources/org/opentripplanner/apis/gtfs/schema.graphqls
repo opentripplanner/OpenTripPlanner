@@ -1473,7 +1473,7 @@ type QueryType {
     "List of routes and agencies which are given lower preference when planning the itinerary"
     unpreferred: InputUnpreferred,
     "The list of points the journey is required to pass through."
-    via: [ViaLocationInput!],
+    via: [PlanViaLocationInput!],
     """
     How much less bad is waiting at the beginning of the trip (replaces
     `waitReluctance` on the first boarding). Default value: 0.4
@@ -3945,14 +3945,6 @@ input ParkingFilterOperation {
   tags: [String]
 }
 
-"A stop that must be visited by the routing result."
-input PassThroughLocationInput {
-  "Optional label of the via point for debugging and logging. It is not used in routing."
-  label: String
-  "The ID of the stop or station to visit. Should be in the format <FeedId>:<LocationId>."
-  stopLocationId: String!
-}
-
 "A coordinate used for a location in a plan query."
 input PlanCoordinateInput {
   "Latitude as a WGS84 format number."
@@ -4063,6 +4055,21 @@ input PlanModesInput {
   transitOnly: Boolean = false
 }
 
+"""
+One of the listed stop locations must be visited on-board a transit vehicle or the journey must
+alight or board at the location.
+"""
+input PlanPassThroughViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String]
+}
+
 "Wrapper type for different types of preferences related to plan query."
 input PlanPreferencesInput {
   "Accessibility preferences that affect both the street and transit routing."
@@ -4154,6 +4161,43 @@ input PlanTransitModesInput {
   itinerary without any transit legs. By default, all transit modes are usable.
   """
   transit: [PlanTransitModePreferenceInput!]
+}
+
+"""
+A via-location is used to specifying a location as an intermediate place the router must
+route through. The via-location must be either a pass-through-location or a
+visit-via-location. An on-board "visit" is only allowed for pass-through-via-locations, while
+the visit-via-location can visit a stop-location or a coordinate and specify a
+minimum-wait-time.
+"""
+input PlanViaLocationInput @oneOf {
+  passThrough: PlanPassThroughViaLocationInput
+  visit: PlanVisitViaLocationInput
+}
+
+"""
+A visit-via-location is a physical visit to one of the stops or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for
+it to to be accepted. To visit a coordinate, the traveler must walk(bike or drive) to
+the closest point in the street network from a stop and back to another stop to join
+the transit network.
+
+NOTE! Coordinates are NOT supported jet.
+"""
+input PlanVisitViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  The minimum wait time is used to force the trip to stay the given duration at the
+  via-location before the trip is continued.
+  """
+  minimumWaitTime: Duration = "PT0S"
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String]
 }
 
 "What criteria should be used when optimizing a scooter route."
@@ -4323,16 +4367,6 @@ input VehicleParkingInput {
   preferred options are available.
   """
   unpreferredCost: Int
-}
-
-"""
-Represents an element that must be visited by the routing result.
-
-Right now only stop or station IDs are supported but this will be extended to support via point
-coordinates as well.
-"""
-input ViaLocationInput {
-  passThroughLocation: PassThroughLocationInput
 }
 
 "Preferences related to walking (excluding walking a bicycle or a scooter)."
