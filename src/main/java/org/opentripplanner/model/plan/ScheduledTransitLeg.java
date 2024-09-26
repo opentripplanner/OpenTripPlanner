@@ -433,7 +433,6 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addEnum("alightRule", getAlightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
-      .addEnum("realtimeState", getRealTimeState())
       .toString();
   }
 

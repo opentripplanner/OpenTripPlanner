@@ -66,7 +66,7 @@
               "rideHailingEstimate" : null,
               "accessibilityScore" : null,
               "id": null,
-              "realtimeState": "SCHEDULED"
+              "realtimeState": null
             },
             {
               "mode" : "BUS",
@@ -342,7 +342,7 @@
               },
               "accessibilityScore" : null,
               "id": null,
-              "realtimeState": "SCHEDULED"
+              "realtimeState": null
             }
           ]
         }

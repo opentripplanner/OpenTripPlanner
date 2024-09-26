@@ -246,7 +246,7 @@ public interface Leg {
   }
 
   default RealTimeState getRealTimeState() {
-    return RealTimeState.SCHEDULED;
+    return null;
   }
 
   /**
