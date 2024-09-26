@@ -1,6 +1,5 @@
 import { Form } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { smallInputStyle } from '../ItineraryList/inputStyle.ts';
 
 export function NumTripPatternsInput({
   tripQueryVariables,
@@ -20,7 +19,7 @@ export function NumTripPatternsInput({
         size="sm"
         placeholder="12"
         min={1}
-        style={smallInputStyle}
+        className="input-small"
         value={tripQueryVariables.numTripPatterns || ''}
         onChange={(event) =>
           setTripQueryVariables({

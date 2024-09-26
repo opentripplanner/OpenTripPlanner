@@ -50,6 +50,14 @@
   margin-right: 1rem;
 }
 
+.search-bar input.input-small {
+  max-width: 100px;
+}
+
+.search-bar input.input-medium {
+  max-width: 130px;
+}
+
 .search-bar-route-button-wrapper {
   height: 5rem;
   padding-top: 25px;
