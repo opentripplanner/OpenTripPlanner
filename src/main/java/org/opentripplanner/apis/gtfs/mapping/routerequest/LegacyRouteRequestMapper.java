@@ -32,7 +32,6 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyRouteRequestMapper {
 
@@ -57,7 +56,7 @@ public class LegacyRouteRequestMapper {
     callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
     callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
-    mapViaPoints(request, callWith, context.transitService());
+    mapViaPoints(request, callWith);
 
     request.setDateTime(
       environment.getArgument("date"),
@@ -260,15 +259,11 @@ public class LegacyRouteRequestMapper {
     return request;
   }
 
-  static void mapViaPoints(
-    RouteRequest request,
-    CallerWithEnvironment callWith,
-    TransitService transitService
-  ) {
+  static void mapViaPoints(RouteRequest request, CallerWithEnvironment callWith) {
     callWith.argument(
       "via",
       (List<Map<String, Object>> v) ->
-        request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v))
+        request.setViaLocations(ViaLocationMapper.mapToViaLocations(v))
     );
   }
 

@@ -265,7 +265,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   void passThroughPoints() {
     Map<String, Object> arguments = Map.of(
       "via",
-      List.of(Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"))))
+      List.of(
+        Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+      )
     );
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
@@ -273,12 +275,12 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       context
     );
     assertEquals(
-      "[PassThroughPoint[stopLocations=[RegularStop{F:stop1 stop1}], name=null]]",
-      routeRequest.getPassThroughPoints().toString()
+      "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
+      routeRequest.getViaLocations().toString()
     );
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
-    assertEquals(List.of(), noParamsReq.getPassThroughPoints());
+    assertEquals(List.of(), noParamsReq.getViaLocations());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

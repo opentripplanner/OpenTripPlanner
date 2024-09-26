@@ -21,7 +21,7 @@ class CollectionUtilsTest {
 
   @Test
   void testIsEmpty() {
-    assertTrue(CollectionUtils.isEmpty(null));
+    assertTrue(CollectionUtils.isEmpty((List) null));
     assertTrue(CollectionUtils.isEmpty(List.of()));
     assertFalse(CollectionUtils.isEmpty(List.of(1)));
   }
