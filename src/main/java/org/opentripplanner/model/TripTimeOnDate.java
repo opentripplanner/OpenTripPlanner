@@ -63,6 +63,9 @@ public class TripTimeOnDate {
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
     TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
+    if (times == null) {
+      return out;
+    }
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
     }
@@ -83,6 +86,9 @@ public class TripTimeOnDate {
   ) {
     TripTimes times = table.getTripTimes(trip);
     List<TripTimeOnDate> out = new ArrayList<>();
+    if (times == null) {
+      return out;
+    }
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
