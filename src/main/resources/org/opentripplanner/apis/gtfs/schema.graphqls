@@ -1171,7 +1171,10 @@ type QueryType {
     "Departure time of the trip, format: seconds since midnight of the departure date"
     time: Int!
   ): Trip
-  "Try refetching the current state of a transit leg using its ID"
+  """
+  Try refetching the current state of a transit leg using its ID.
+  This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
+  """
   leg(id: ID!): Leg
   """
   Get all places (stops, stations, etc. with coordinates) within the specified
