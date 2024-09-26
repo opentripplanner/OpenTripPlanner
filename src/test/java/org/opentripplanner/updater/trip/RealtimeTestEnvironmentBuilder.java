@@ -88,8 +88,8 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
           tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
         )
       )
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    pattern.add(tripTimes);
 
     transitModel.addTripPattern(pattern.getId(), pattern);
 

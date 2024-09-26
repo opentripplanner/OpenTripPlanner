@@ -36,7 +36,6 @@ public class TripPatternForDateMapperTest {
   @BeforeAll
   public static void setUp() throws Exception {
     var pattern = TEST_MODEL.pattern(BUS).build();
-    timetable = new Timetable(pattern);
     var trip = TransitModelForTest.trip("1").build();
     var tripTimes = TripTimesFactory.tripTimes(
       trip,
@@ -44,7 +43,7 @@ public class TripPatternForDateMapperTest {
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);
-    timetable.addTripTimes(tripTimes);
+    timetable = Timetable.of().withTripPattern(pattern).addTripTimes(tripTimes).build();
   }
 
   /**

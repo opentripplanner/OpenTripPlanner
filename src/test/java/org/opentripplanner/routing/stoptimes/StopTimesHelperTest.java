@@ -33,14 +33,21 @@ class StopTimesHelperTest {
     transitService = new DefaultTransitService(transitModel);
     feedId = transitModel.getFeedIds().iterator().next();
     stopId = new FeedScopedId(feedId, "J");
-    pattern =
-      transitService.getPatternForTrip(
-        transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
-      );
-    var tt = transitService.getTimetableForTripPattern(pattern, LocalDate.now());
+    var originalPattern = transitService.getPatternForTrip(
+      transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
+    );
+    var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes(0).copyScheduledTimes();
     newTripTimes.cancelTrip();
-    tt.setTripTimes(0, newTripTimes);
+    pattern =
+      originalPattern
+        .copy()
+        .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
+        .build();
+    // replace the original pattern by the updated pattern in the transit model
+    transitModel.addTripPattern(pattern.getId(), pattern);
+    transitModel.index();
+    transitService = new DefaultTransitService(transitModel);
   }
 
   /**

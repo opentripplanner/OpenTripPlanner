@@ -210,13 +210,6 @@ class AddedTripBuilder {
 
     // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
-    TripPattern pattern = TripPattern
-      .of(getTripPatternId.apply(trip))
-      .withRoute(trip.getRoute())
-      .withMode(trip.getMode())
-      .withNetexSubmode(trip.getNetexSubMode())
-      .withStopPattern(stopPattern)
-      .build();
 
     RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
       trip,
@@ -229,7 +222,16 @@ class AddedTripBuilder {
     // therefore they must be valid
     tripTimes.validateNonIncreasingTimes();
     tripTimes.setServiceCode(transitService.getServiceCodeForId(trip.getServiceId()));
-    pattern.add(tripTimes);
+
+    TripPattern pattern = TripPattern
+      .of(getTripPatternId.apply(trip))
+      .withRoute(trip.getRoute())
+      .withMode(trip.getMode())
+      .withNetexSubmode(trip.getNetexSubMode())
+      .withStopPattern(stopPattern)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
+
     RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();
 
     // Loop through calls again and apply updates

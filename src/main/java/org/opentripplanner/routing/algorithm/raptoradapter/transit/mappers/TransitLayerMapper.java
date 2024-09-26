@@ -7,15 +7,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -26,7 +23,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -62,16 +58,6 @@ public class TransitLayerMapper {
     TransitModel transitModel
   ) {
     return new TransitLayerMapper(transitModel).map(tuningParameters);
-  }
-
-  // TODO We could save time by either pre-sorting these, or by using a sorting algorithm that is
-  //      optimized for sorting nearly-sorted lists.
-  static List<TripTimes> getSortedTripTimes(Timetable timetable) {
-    return timetable
-      .getTripTimes()
-      .stream()
-      .sorted(Comparator.comparing(TripTimes::sortIndex))
-      .collect(Collectors.toList());
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {

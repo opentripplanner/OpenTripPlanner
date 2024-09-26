@@ -29,18 +29,17 @@ public class PatternTestModel {
    * Creates a trip pattern that has a stop pattern, trip times and a trip with a service id.
    */
   public static TripPattern pattern() {
-    var pattern = TransitModelForTest
-      .tripPattern("1", ROUTE_1)
-      .withStopPattern(STOP_PATTERN)
-      .build();
-
     var tt = ScheduledTripTimes
       .of()
       .withTrip(TRIP)
       .withArrivalTimes("10:00 10:05")
       .withDepartureTimes("10:00 10:05")
       .build();
-    pattern.add(tt);
-    return pattern;
+
+    return TransitModelForTest
+      .tripPattern("1", ROUTE_1)
+      .withStopPattern(STOP_PATTERN)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tt))
+      .build();
   }
 }
