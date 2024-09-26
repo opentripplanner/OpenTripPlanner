@@ -132,7 +132,7 @@ public final class RaptorViaLocation {
       .map(it -> new RaptorViaConnection(this, it.fromStop, it.transfer))
       .toList();
 
-    // Compare all pairs to check for duplicates and none optimal connections
+    // Compare all pairs to check for duplicates and non-optimal connections
     for (int i = 0; i < list.size(); ++i) {
       var a = list.get(i);
       for (int j = i + 1; j < list.size(); ++j) {

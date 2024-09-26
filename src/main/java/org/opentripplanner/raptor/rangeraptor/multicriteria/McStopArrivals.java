@@ -37,7 +37,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private final BitSet touchedStops;
   private final McStopArrivals<T> next;
 
-  //private final ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory;
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final DebugStopArrivalsStatistics debugStats;
   private final ParetoComparator<McStopArrival<T>> comparator;

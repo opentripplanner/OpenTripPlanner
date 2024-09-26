@@ -205,9 +205,9 @@ public class SearchParams {
   }
 
   /**
-   * List of all possible via locations. All
+   * List of all possible via locations.
    *    * <p>
-   *    * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path start, NOT the
+   *    * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path starts, NOT the
    *    * destination - think of it as a reversed path.
    *    * <p/>
    *    * Required, at least one egress path must exist.

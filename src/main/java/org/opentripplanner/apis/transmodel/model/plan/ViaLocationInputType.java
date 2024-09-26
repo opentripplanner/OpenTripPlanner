@@ -25,7 +25,7 @@ public class ViaLocationInputType {
     the closest point in the street network from a stop and back to another stop to join
     the transit network.
     
-    NOTE! Coordinates are NOT supported jet.
+    NOTE! Coordinates are NOT supported yet.
     """;
   private static final String DOC_PASS_THROUGH_VIA_LOCATION =
     """

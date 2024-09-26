@@ -5,7 +5,7 @@ import java.util.stream.IntStream;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * The raptor mapper does not have access to the transit layer, so it need help to
+ * The raptor mapper does not have access to the transit layer, so it needs help to
  * lookup stop-location indexes (Stop index used by Raptor). There is a one-to-one
  * mapping between stops and stop-index, but a station, multimodal-station or group-of-stations
  * will most likely contain more than one stop.
