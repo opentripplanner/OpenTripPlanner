@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  *
  * <h4>Route via a pass-through-stop</h4>
  * Raptor will allow a path to go through a pass-through-stop. The stop can be visited on-board
- * transit, or at the alight- or board-stop. The from-stop and to-stop is the same, and the
+ * transit, or at the alight- or board-stop. The from-stop and to-stop must be the same, and the
  * minimum-wait-time must be zero.
  *
  * <h4>Route via a single stop with a minimum-wait-time</h4>
