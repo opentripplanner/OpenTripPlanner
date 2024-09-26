@@ -158,6 +158,13 @@ What to put in Javadoc:
     - Is it immutable or should anything be treated as immutable
     - Is it a utility class of static methods that should not be instantiated
 
+### Annotations
+
+- On methods:
+    - Method should be marked as `@Nullable` if it can return null values
+        - Use of `@Nonnull` on methods should be avoided as it's the default behaviour
+    - Method parameters can be marked as `@Nullable` or `@Nonnull`
+
 ## JavaScript
 
 As of #206, we
