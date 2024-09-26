@@ -55,6 +55,10 @@
   padding-top: 25px;
 }
 
+.search-bar-route-button-wrapper a.btn img {
+  margin-top: -2px;
+}
+
 .itinerary-list-container {
   width: 36rem;
   overflow-y: auto;
