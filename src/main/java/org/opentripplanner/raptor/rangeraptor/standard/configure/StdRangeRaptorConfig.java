@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -32,6 +32,7 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArriv
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
+import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -68,11 +69,11 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     return strategy;
   }
 
-  public Heuristics createHeuristics(RaptorWorkerResult<T> results) {
+  public Heuristics createHeuristics(RaptorRouterResult<T> results) {
     return oneOf(
       new HeuristicsAdapter(
         ctx.nStops(),
-        ctx.egressPaths(),
+        egressPaths(),
         ctx.calculator(),
         ctx.costCalculator(),
         results.extractBestOverallArrivals(),
@@ -163,7 +164,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private StopArrivalsState<T> wrapStopArrivalsStateWithDebugger(StopArrivalsState<T> state) {
     if (ctx.debugFactory().isDebugStopArrival()) {
       return new DebugStopArrivalsState<>(
-        ctx.roundProvider(),
+        ctx.lifeCycle(),
         ctx.debugFactory(),
         stopsCursor(),
         state
@@ -180,7 +181,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     // adapter notify the destination on each new egress stop arrival.
     var pathsAdapter = createEgressArrivalToPathAdapter(destinationArrivalPaths);
 
-    resolveStopArrivals().setupEgressStopStates(ctx.egressPaths(), pathsAdapter);
+    resolveStopArrivals().setupEgressStopStates(egressPaths(), pathsAdapter);
 
     return destinationArrivalPaths;
   }
@@ -219,7 +220,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       this.stopArrivals =
         withBestNumberOfTransfers(
           oneOf(
-            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider()),
+            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.lifeCycle()),
             StdStopArrivals.class
           )
         );
@@ -232,7 +233,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   private SimpleBestNumberOfTransfers createSimpleBestNumberOfTransfers() {
     return withBestNumberOfTransfers(
-      new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.roundProvider())
+      new SimpleBestNumberOfTransfers(ctx.nStops(), ctx.lifeCycle())
     );
   }
 
@@ -249,7 +250,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       resolveBestNumberOfTransfers(),
       ctx.calculator(),
       ctx.slackProvider().transferSlack(),
-      ctx.egressPaths(),
+      egressPaths(),
       MIN_TRAVEL_DURATION.is(ctx.profile()),
       paretoComparator(ctx.paretoSetTimeConfig(), ParetoSetCost.NONE, null, null),
       ctx.lifeCycle()
@@ -259,9 +260,13 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private SimpleArrivedAtDestinationCheck createSimpleArrivedAtDestinationCheck() {
     return new SimpleArrivedAtDestinationCheck(
       resolveBestTimes(),
-      ctx.egressPaths().egressesWitchStartByWalking(),
-      ctx.egressPaths().egressesWitchStartByARide()
+      egressPaths().egressesWitchStartByWalking(),
+      egressPaths().egressesWitchStartByARide()
     );
+  }
+
+  private EgressPaths egressPaths() {
+    return ctx.legs().getLast().egressPaths();
   }
 
   private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(S value) {

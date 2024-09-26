@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -271,7 +273,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("date")
-          .type(new GraphQLNonNull(gqlUtil.dateScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
           .build()
@@ -326,7 +328,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("situations")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
           .dataFetcher(environment ->

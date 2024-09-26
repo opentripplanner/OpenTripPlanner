@@ -1,21 +1,21 @@
 package org.opentripplanner.raptor.rangeraptor;
 
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessPaths.calculateMaxNumberOfRides;
+
 import java.util.Collection;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
-import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
-import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -50,7 +50,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
  */
 @SuppressWarnings("Duplicates")
 public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
-  implements RaptorWorker<T> {
+  implements RangeRaptorWorker<T> {
 
   private final RoutingStrategy<T> transitWorker;
 
@@ -65,12 +65,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
    */
   private final RaptorWorkerState<T> state;
 
-  /**
-   * The round tracker keep track for the current Raptor round, and abort the search if the round
-   * max limit is reached.
-   */
-  private final RoundTracker roundTracker;
-
   private final RaptorTransitDataProvider<T> transitData;
 
   private final SlackProvider slackProvider;
@@ -79,9 +73,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
   private final RaptorTimers timers;
 
+  @Nullable
   private final AccessPaths accessPaths;
-
-  private final LifeCycleEventPublisher lifeCycle;
 
   private final int minNumberOfRounds;
 
@@ -89,15 +82,16 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
 
   private int iterationDepartureTime;
 
+  private int round;
+
   public DefaultRangeRaptorWorker(
     RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
     SlackProvider slackProvider,
-    AccessPaths accessPaths,
-    RoundProvider roundProvider,
+    @Nullable AccessPaths accessPaths,
     RaptorTransitCalculator<T> calculator,
-    LifeCycleEventPublisher lifeCyclePublisher,
+    WorkerLifeCycle lifeCycle,
     RaptorTimers timers,
     boolean enableTransferConstraints
   ) {
@@ -108,92 +102,31 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     this.calculator = calculator;
     this.timers = timers;
     this.accessPaths = accessPaths;
-    this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
+    this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
     this.enableTransferConstraints = enableTransferConstraints;
 
-    // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
-    // "everyone" by providing access to it in the context.
-    this.roundTracker = (RoundTracker) roundProvider;
-    this.lifeCycle = lifeCyclePublisher;
+    lifeCycle.onSetupIteration(time -> this.iterationDepartureTime = time);
+    lifeCycle.onPrepareForNextRound(round -> this.round = round);
   }
 
-  /**
-   * For each iteration (minute), calculate the minimum travel time to each transit stop in
-   * seconds.
-   * <p/>
-   * Run the scheduled search, round 0 is the street search.
-   */
   @Override
-  public RaptorWorkerResult<T> route() {
-    timers.route(() -> {
-      lifeCycle.notifyRouteSearchStart(calculator.searchForward());
-      transitData.setup();
-
-      // The main outer loop iterates backward over all minutes in the departure times window.
-      // Ergo, we re-use the arrival times found in searches that have already occurred that
-      // depart later, because the arrival time given departure at time t is upper-bounded by
-      // the arrival time given departure at minute t + 1.
-      final IntIterator it = calculator.rangeRaptorMinutes();
-      while (it.hasNext()) {
-        setupIteration(it.next());
-        runRaptorForMinute();
-      }
-
-      // Iterate over virtual departure times - this is needed to allow access with a time-penalty
-      // which falls outside the search-window due to the added time-penalty.
-      if (!calculator.oneIterationOnly()) {
-        final IntIterator as = accessPaths.iterateOverPathsWithPenalty(iterationDepartureTime);
-        while (as.hasNext()) {
-          setupIteration(as.next());
-          runRaptorForMinute();
-        }
-      }
-    });
+  public RaptorRouterResult<T> results() {
     return state.results();
-  }
-
-  /**
-   * Perform one minute of a RAPTOR search.
-   */
-  private void runRaptorForMinute() {
-    findAccessOnStreetForRound();
-
-    while (hasMoreRounds()) {
-      lifeCycle.prepareForNextRound(roundTracker.nextRound());
-
-      // NB since we have transfer limiting not bothering to cut off search when there are no
-      // more transfers as that will be rare and complicates the code
-      findTransitForRound();
-
-      findAccessOnBoardForRound();
-
-      findTransfersForRound();
-
-      lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
-
-      findAccessOnStreetForRound();
-    }
-
-    // This state is repeatedly modified as the outer loop progresses over departure minutes.
-    // We have to be careful here, the next iteration will modify the state, so we need to make
-    // protective copies of any information we want to retain.
-    lifeCycle.iterationComplete();
   }
 
   /**
    * Check if the RangeRaptor should continue with a new round.
    */
-  private boolean hasMoreRounds() {
-    if (round() < minNumberOfRounds) {
-      return true;
-    }
-    return state.isNewRoundAvailable() && roundTracker.hasMoreRounds();
+  @Override
+  public boolean hasMoreRounds() {
+    return state.isNewRoundAvailable();
   }
 
   /**
    * Perform a scheduled search
    */
-  private void findTransitForRound() {
+  @Override
+  public void findTransitForRound() {
     timers.findTransitForRound(() -> {
       IntIterator stops = state.stopsTouchedPreviousRound();
       IntIterator routeIndexIterator = transitData.routeIndexIterator(stops);
@@ -248,11 +181,11 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
           }
         }
       }
-      lifeCycle.transitsForRoundComplete();
     });
   }
 
-  private void findTransfersForRound() {
+  @Override
+  public void findTransfersForRound() {
     timers.findTransfersForRound(() -> {
       IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
@@ -262,30 +195,22 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         // loop transfers are already included by virtue of those stops having been reached
         state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
       }
-
-      lifeCycle.transfersForRoundComplete();
     });
   }
 
-  private int round() {
-    return roundTracker.round();
+  @Override
+  public boolean isDestinationReachedInCurrentRound() {
+    return state.isDestinationReachedInCurrentRound();
   }
 
-  private void findAccessOnStreetForRound() {
-    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round()));
+  @Override
+  public void findAccessOnStreetForRound() {
+    addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides(round));
   }
 
-  private void findAccessOnBoardForRound() {
-    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round()));
-  }
-
-  /**
-   * Run the raptor search for this particular iteration departure time
-   */
-  private void setupIteration(int iterationDepartureTime) {
-    OTPRequestTimeoutException.checkForTimeout();
-    this.iterationDepartureTime = iterationDepartureTime;
-    lifeCycle.setupIteration(this.iterationDepartureTime);
+  @Override
+  public void findAccessOnBoardForRound() {
+    addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides(round));
   }
 
   /**

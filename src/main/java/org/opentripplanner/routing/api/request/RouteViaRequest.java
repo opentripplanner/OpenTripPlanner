@@ -14,7 +14,11 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
 /**
  * Trip planning request with a list of via points.
+ *
+ * @deprecated We will replace the complex via-search with a simpler version part of the
+ *      existing trip search.
  */
+@Deprecated
 public class RouteViaRequest implements Serializable {
 
   private final GenericLocation from;
@@ -27,7 +31,10 @@ public class RouteViaRequest implements Serializable {
   private final Locale locale;
   private final Integer numItineraries;
 
-  private RouteViaRequest(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
+  private RouteViaRequest(
+    List<ViaLocationDeprecated> viaLocations,
+    List<JourneyRequest> viaJourneys
+  ) {
     if (viaLocations == null || viaLocations.isEmpty()) {
       throw new IllegalArgumentException("viaLocations must not be empty");
     }
@@ -67,7 +74,10 @@ public class RouteViaRequest implements Serializable {
     this.numItineraries = builder.numItineraries;
   }
 
-  public static Builder of(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
+  public static Builder of(
+    List<ViaLocationDeprecated> viaLocations,
+    List<JourneyRequest> viaJourneys
+  ) {
     return new Builder(new RouteViaRequest(viaLocations, viaJourneys));
   }
 
@@ -230,8 +240,8 @@ public class RouteViaRequest implements Serializable {
   }
 
   /**
-   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocation}. The last
+   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocationDeprecated}. The last
    * segment has null viaLocation, as `to` is the destination of that segment.
    */
-  public record ViaSegment(JourneyRequest journeyRequest, ViaLocation viaLocation) {}
+  public record ViaSegment(JourneyRequest journeyRequest, ViaLocationDeprecated viaLocation) {}
 }

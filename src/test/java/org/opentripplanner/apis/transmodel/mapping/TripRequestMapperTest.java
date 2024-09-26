@@ -39,11 +39,11 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.api.request.PassThroughPoint;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -311,39 +311,29 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
-  void testPassThroughPoints() {
+  void testViaLocations() {
     TransitIdMapper.clearFixedFeedId();
 
-    final List<String> PTP1 = List.of(stop1, stop2, stop3).stream().map(STOP_TO_ID).toList();
-    final List<String> PTP2 = List.of(stop2, stop3, stop1).stream().map(STOP_TO_ID).toList();
+    final List<String> PTP1 = Stream.of(stop1, stop2, stop3).map(STOP_TO_ID).toList();
+    final List<String> PTP2 = Stream.of(stop3, stop2).map(STOP_TO_ID).toList();
     final Map<String, Object> arguments = Map.of(
       "passThroughPoints",
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
     );
 
-    final List<PassThroughPoint> points = TripRequestMapper
+    final List<ViaLocation> viaLocations = TripRequestMapper
       .createRequest(executionContext(arguments))
-      .getPassThroughPoints();
-    assertEquals(PTP1, points.get(0).stopLocations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP1", points.get(0).name());
-    assertEquals(PTP2, points.get(1).stopLocations().stream().map(STOP_TO_ID).toList());
-    assertEquals("PTP2", points.get(1).name());
-  }
-
-  @Test
-  void testPassThroughPointsNoMatch() {
-    TransitIdMapper.clearFixedFeedId();
-
-    final Map<String, Object> arguments = Map.of(
-      "passThroughPoints",
-      List.of(Map.of("placeIds", List.of("F:XX:NonExisting")))
+      .getViaLocations();
+    assertEquals(
+      "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
+      viaLocations.get(0).toString()
     );
-
-    final RuntimeException ex = assertThrows(
-      RuntimeException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    assertEquals("PTP1", viaLocations.get(0).label());
+    assertEquals(
+      "PassThroughViaLocation{label: PTP2, stopLocationIds: [F:ST:stop3, F:ST:stop2]}",
+      viaLocations.get(1).toString()
     );
-    assertEquals("No match for F:XX:NonExisting.", ex.getMessage());
+    assertEquals("PTP2", viaLocations.get(1).label());
   }
 
   @Test

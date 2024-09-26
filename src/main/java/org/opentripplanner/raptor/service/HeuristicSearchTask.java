@@ -8,17 +8,17 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thin wrapper around a {@link RaptorWorker} to allow for some small additional features. This
- * is mostly to extracted some "glue" out of the {@link RangeRaptorDynamicSearch} to make that
- * simpler and let it focus on the main bossiness logic.
+ * This is a thin wrapper around the {@link RangeRaptor} to allow for some small additional
+ * features. This is mostly to extract some "glue" out of the {@link RangeRaptorDynamicSearch} to
+ * make that simpler and let it focus on the main bossiness logic.
  * <p>
  * This class is not meant for reuse, create one task for each potential heuristic search. The task
  * must be {@link #enable()}d before it is {@link #run()}.
@@ -33,10 +33,10 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private final RaptorTransitDataProvider<T> transitData;
 
   private boolean run = false;
-  private RaptorWorker<T> search = null;
+  private RangeRaptor<T> search = null;
   private RaptorRequest<T> originalRequest;
   private RaptorRequest<T> heuristicRequest;
-  private RaptorWorkerResult<T> result = null;
+  private RaptorRouterResult<T> result = null;
 
   public HeuristicSearchTask(
     RaptorRequest<T> request,
@@ -144,7 +144,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
       );
 
       heuristicRequest = builder.build();
-      search = config.createHeuristicSearch(transitData, heuristicRequest);
+      search = config.createRangeRaptorWithHeuristicSearch(transitData, heuristicRequest);
     }
   }
 }

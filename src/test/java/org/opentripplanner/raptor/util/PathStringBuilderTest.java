@@ -5,8 +5,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 
 public class PathStringBuilderTest {
 

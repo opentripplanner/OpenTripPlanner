@@ -1,17 +1,17 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
@@ -42,18 +42,22 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  */
 public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
-  private final SearchContext<T> context;
+  private final SearchContextViaLeg<T> contextLeg;
   private final PathConfig<T> pathConfig;
+  private final PassThroughPointsService passThroughPointsService;
   private DestinationArrivalPaths<T> paths;
-  private PassThroughPointsService passThroughPointsService;
+  private McRangeRaptorWorkerState<T> state;
+  private Heuristics heuristics;
+  private McStopArrivals<T> arrivals;
+  private McStopArrivals<T> nextLegArrivals = null;
 
   public McRangeRaptorConfig(
-    SearchContext<T> context,
+    SearchContextViaLeg<T> contextLeg,
     PassThroughPointsService passThroughPointsService
   ) {
-    this.context = Objects.requireNonNull(context);
+    this.contextLeg = Objects.requireNonNull(contextLeg);
     this.passThroughPointsService = Objects.requireNonNull(passThroughPointsService);
-    this.pathConfig = new PathConfig<>(context);
+    this.pathConfig = new PathConfig<>(this.contextLeg.parent());
   }
 
   /**
@@ -70,12 +74,53 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /**
    * Create new multi-criteria worker with optional heuristics.
    */
-  public RaptorWorker<T> createWorker(
-    Heuristics heuristics,
-    BiFunction<RaptorWorkerState<T>, RoutingStrategy<T>, RaptorWorker<T>> createWorker
+  public McRangeRaptorConfig<T> withHeuristics(Heuristics heuristics) {
+    this.heuristics = heuristics;
+    return this;
+  }
+
+  /**
+   * Set the next leg state. This is used to connect the state created by this config with the
+   * next leg. If this is the last leg, the next leg should be {@code null}. Calling this method
+   * is optional - if not called.
+   */
+  public McRangeRaptorConfig<T> connectWithNextLegArrivals(
+    @Nullable McStopArrivals<T> nextLegArrivals
   ) {
-    McRangeRaptorWorkerState<T> state = createState(heuristics);
-    return createWorker.apply(state, createTransitWorkerStrategy(state));
+    this.nextLegArrivals = nextLegArrivals;
+    return this;
+  }
+
+  /**
+   * Create new multi-criteria worker with optional heuristics.
+   */
+  public RoutingStrategy<T> strategy() {
+    return createTransitWorkerStrategy(createState(heuristics));
+  }
+
+  public RaptorWorkerState<T> state() {
+    return createState(heuristics);
+  }
+
+  /**
+   * This is used in the config to chain more than one search together.
+   */
+  public McStopArrivals<T> stopArrivals() {
+    if (arrivals == null) {
+      this.arrivals =
+        new McStopArrivals<>(
+          context().nStops(),
+          contextLeg.accessPaths(),
+          contextLeg.egressPaths(),
+          contextLeg.viaConnections(),
+          createDestinationArrivalPaths(),
+          nextLegArrivals,
+          createStopArrivalFactory(),
+          createFactoryParetoComparator(),
+          context().debugFactory()
+        );
+    }
+    return arrivals;
   }
 
   /* private factory methods */
@@ -101,51 +146,49 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   ) {
     return new MultiCriteriaRoutingStrategy<>(
       state,
-      context.createTimeBasedBoardingSupport(),
+      context().createTimeBasedBoardingSupport(),
       factory,
       passThroughPointsService,
-      context.costCalculator(),
-      context.slackProvider(),
+      context().costCalculator(),
+      context().slackProvider(),
       createPatternRideParetoSet(patternRideComparator)
     );
   }
 
   private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
-    return new McRangeRaptorWorkerState<>(
-      createStopArrivals(),
-      createDestinationArrivalPaths(),
-      createHeuristicsProvider(heuristics),
-      createStopArrivalFactory(),
-      context.costCalculator(),
-      context.calculator(),
-      context.lifeCycle()
-    );
+    if (state == null) {
+      state =
+        new McRangeRaptorWorkerState<>(
+          stopArrivals(),
+          createDestinationArrivalPaths(),
+          createHeuristicsProvider(heuristics),
+          createStopArrivalFactory(),
+          context().costCalculator(),
+          context().calculator(),
+          context().lifeCycle()
+        );
+    }
+    return state;
   }
 
   private McStopArrivalFactory<T> createStopArrivalFactory() {
     return includeC2() ? new StopArrivalFactoryC2<>() : new StopArrivalFactoryC1<>();
   }
 
-  private McStopArrivals<T> createStopArrivals() {
-    return new McStopArrivals<>(
-      context.nStops(),
-      context.egressPaths(),
-      context.accessPaths(),
-      createDestinationArrivalPaths(),
-      createFactoryParetoComparator(),
-      context.debugFactory()
-    );
+  private SearchContext<T> context() {
+    return contextLeg.parent();
   }
 
   private HeuristicsProvider<T> createHeuristicsProvider(Heuristics heuristics) {
     if (heuristics == null) {
       return new HeuristicsProvider<>();
     } else {
+      var ctx = contextLeg.parent();
       return new HeuristicsProvider<>(
         heuristics,
-        context.roundProvider(),
         createDestinationArrivalPaths(),
-        context.debugFactory()
+        ctx.lifeCycle(),
+        ctx.debugFactory()
       );
     }
   }
@@ -153,7 +196,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private <R extends PatternRide<T>> ParetoSet<R> createPatternRideParetoSet(
     ParetoComparator<R> comparator
   ) {
-    return new ParetoSet<>(comparator, context.debugFactory().paretoSetPatternRideListener());
+    return new ParetoSet<>(comparator, context().debugFactory().paretoSetPatternRideListener());
   }
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
@@ -169,7 +212,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private MultiCriteriaRequest<T> mcRequest() {
-    return context.multiCriteria();
+    return context().multiCriteria();
   }
 
   /**
@@ -220,7 +263,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     if (isPassThrough()) {
       return ParetoSetCost.USE_C1_AND_C2;
     }
-    if (context.multiCriteria().relaxCostAtDestination() != null) {
+    if (context().multiCriteria().relaxCostAtDestination() != null) {
       return ParetoSetCost.USE_C1_RELAX_DESTINATION;
     }
     return ParetoSetCost.USE_C1;

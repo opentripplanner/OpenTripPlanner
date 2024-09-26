@@ -14,8 +14,7 @@ public interface RaptorTransfer {
   int stop();
 
   /**
-   * The generalized cost of this transfer in centi-seconds. The value is used to compare with
-   * riding transit, and will be one component of a full itinerary.
+   * The generalized cost of this transfer in centi-seconds.
    * <p>
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.

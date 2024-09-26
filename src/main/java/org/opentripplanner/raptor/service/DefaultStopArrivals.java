@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.service;
 
 import org.opentripplanner.raptor.api.response.StopArrivals;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 
 /**
@@ -13,9 +13,9 @@ public class DefaultStopArrivals implements StopArrivals {
   private SingleCriteriaStopArrivals bestTransitArrivalTime = null;
   private SingleCriteriaStopArrivals bestNumberOfTransfers = null;
 
-  private final RaptorWorkerResult<?> results;
+  private final RaptorRouterResult<?> results;
 
-  public DefaultStopArrivals(RaptorWorkerResult<?> results) {
+  public DefaultStopArrivals(RaptorRouterResult<?> results) {
     this.results = results;
   }
 

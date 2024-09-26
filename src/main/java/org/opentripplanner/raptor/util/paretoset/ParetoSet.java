@@ -211,6 +211,14 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     // Noop
   }
 
+  protected ParetoComparator<T> getComparator() {
+    return comparator;
+  }
+
+  protected ParetoSetEventListener<? super T> getEventListener() {
+    return eventListener;
+  }
+
   /**
    * Return an iterable instance. This is made to be as FAST AS POSSIBLE, sacrificing thread-safety
    * and modifiable protection.

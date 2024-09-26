@@ -834,7 +834,7 @@ type QueryType {
     "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
     pageCursor: String,
     "The list of points the journey is required to pass through."
-    passThroughPoints: [PassThroughPoint!],
+    passThroughPoints: [PassThroughPoint!] @deprecated(reason : "Use via instead"),
     """
     Relax generalized-cost when comparing trips with a different set of
     transit-group-priorities. The groups are set server side for service-journey and
@@ -900,6 +900,11 @@ type QueryType {
     triangleFactors: TriangleFactors,
     "Whether or not bike rental availability information will be used to plan bike rental trips."
     useBikeRentalAvailabilityInformation: Boolean = false,
+    """
+    The list of via locations the journey is required to visit. All locations are
+    visited in the order they are listed.
+    """
+    via: [PlanViaLocationInput!],
     "Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting."
     waitReluctance: Float = 1.0,
     "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
@@ -943,7 +948,7 @@ type QueryType {
     via: [ViaLocationInput!]!,
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
-  ): ViaTrip! @timingData
+  ): ViaTrip! @deprecated(reason : "The the regular plan query with via stop instead.") @timingData
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -2101,6 +2106,58 @@ input PenaltyForStreetMode {
   streetMode: StreetMode!
   "Penalty applied to the time for the given list of modes."
   timePenalty: DoubleFunction!
+}
+
+"""
+One of the listed stop locations must be visited on-board a transit vehicle or the journey must
+alight or board at the location.
+"""
+input PlanPassThroughViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String]
+}
+
+"""
+A via-location is used to specifying a location as an intermediate place the router must
+route through. The via-location must be either a pass-through-location or a
+visit-via-location. An on-board "visit" is only allowed for pass-through-via-locations, while
+the visit-via-location can visit a stop-location or a coordinate and specify a
+minimum-wait-time.
+"""
+input PlanViaLocationInput @oneOf {
+  passThrough: PlanPassThroughViaLocationInput
+  visit: PlanVisitViaLocationInput
+}
+
+"""
+A visit-via-location is a physical visit to one of the stops or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for
+it to to be accepted. To visit a coordinate, the traveler must walk(bike or drive) to
+the closest point in the street network from a stop and back to another stop to join
+the transit network.
+
+NOTE! Coordinates are NOT supported jet.
+"""
+input PlanVisitViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  The minimum wait time is used to force the trip to stay the given duration at the
+  via-location before the trip is continued.
+  """
+  minimumWaitTime: Duration = "PT0S"
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String]
 }
 
 """

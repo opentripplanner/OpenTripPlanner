@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 

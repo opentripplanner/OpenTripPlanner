@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -30,36 +29,55 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     super(comparator, listener);
   }
 
-  /**
-   * Create a stop arrivals pareto set and attach an optional {@code paretoSetEventListener}
-   * (debug handler).
-   */
-  static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
-    ParetoComparator<McStopArrival<T>> comparator,
-    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
+  public static <T extends RaptorTripSchedule> Builder<T> of(
+    ParetoComparator<McStopArrival<T>> comparator
   ) {
-    return new StopArrivalParetoSet<>(comparator, paretoSetEventListener);
+    return new Builder<>(comparator);
   }
 
-  /**
-   * Create a new StopArrivalParetoSet and attach a debugger if it exist. Also attach a {@link
-   * CalculateTransferToDestination} listener which will create new destination arrivals for each
-   * accepted egress stop arrival.
-   */
-  static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
-    ParetoComparator<McStopArrival<T>> comparator,
-    List<RaptorAccessEgress> egressPaths,
-    DestinationArrivalPaths<T> destinationArrivals,
-    @Nullable ParetoSetEventListener<ArrivalView<T>> paretoSetEventListener
-  ) {
-    ParetoSetEventListener<ArrivalView<T>> listener;
+  static class Builder<T extends RaptorTripSchedule> {
 
-    listener = new CalculateTransferToDestination<>(egressPaths, destinationArrivals);
+    private ParetoSetEventListener<ArrivalView<T>> debugListener = null;
+    private ParetoSetEventListener<ArrivalView<T>> egressListener = null;
+    private ParetoSetEventListener<ArrivalView<T>> nextSearchListener = null;
+    private final ParetoComparator<McStopArrival<T>> comparator;
 
-    if (paretoSetEventListener != null) {
-      listener = new ParetoSetEventListenerComposite<>(paretoSetEventListener, listener);
+    Builder(ParetoComparator<McStopArrival<T>> comparator) {
+      this.comparator = comparator;
     }
 
-    return new StopArrivalParetoSet<>(comparator, listener);
+    /**
+     * Attach an optional {@code paretoSetEventListener} debug handler.
+     */
+    Builder<T> withDebugListener(ParetoSetEventListener<ArrivalView<T>> debugListener) {
+      this.debugListener = debugListener;
+      return this;
+    }
+
+    /**
+     * Attach a {@link CalculateTransferToDestination} listener which will create new destination
+     * arrivals for each accepted egress stop arrival.
+     */
+    Builder<T> withEgressListener(
+      List<RaptorAccessEgress> egressPaths,
+      DestinationArrivalPaths<T> destinationArrivals
+    ) {
+      this.egressListener = new CalculateTransferToDestination<>(egressPaths, destinationArrivals);
+      return this;
+    }
+
+    Builder<T> withNextSearchListener(ParetoSetEventListener<ArrivalView<T>> nextSearchListener) {
+      this.nextSearchListener = nextSearchListener;
+      return this;
+    }
+
+    StopArrivalParetoSet<T> build() {
+      // The order of the listeners is important, we want the debug event for reaching a
+      // stop to appear before the path is logged (in case both debuggers are enabled).
+      return new StopArrivalParetoSet<>(
+        comparator,
+        ParetoSetEventListenerComposite.of(debugListener, nextSearchListener, egressListener)
+      );
+    }
   }
 }

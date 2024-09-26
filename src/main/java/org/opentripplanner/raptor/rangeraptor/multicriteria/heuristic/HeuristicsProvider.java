@@ -1,11 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic;
 
+import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 
@@ -18,26 +19,32 @@ import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 public final class HeuristicsProvider<T extends RaptorTripSchedule> {
 
   private final Heuristics heuristics;
-  private final RoundProvider roundProvider;
   private final DestinationArrivalPaths<T> paths;
   private final HeuristicAtStop[] stops;
   private final DebugHandlerFactory<T> debugHandlerFactory;
 
+  private int round;
+
   public HeuristicsProvider() {
-    this(null, null, null, null);
+    this.heuristics = null;
+    this.paths = null;
+    this.stops = null;
+    this.debugHandlerFactory = null;
   }
 
   public HeuristicsProvider(
     Heuristics heuristics,
-    RoundProvider roundProvider,
     DestinationArrivalPaths<T> paths,
+    WorkerLifeCycle lifeCycle,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
-    this.heuristics = heuristics;
-    this.roundProvider = roundProvider;
-    this.paths = paths;
-    this.stops = heuristics == null ? null : new HeuristicAtStop[heuristics.size()];
-    this.debugHandlerFactory = debugHandlerFactory;
+    this.heuristics = Objects.requireNonNull(heuristics);
+    this.paths = Objects.requireNonNull(paths);
+    this.stops = new HeuristicAtStop[heuristics.size()];
+    this.debugHandlerFactory = Objects.requireNonNull(debugHandlerFactory);
+
+    // Use life-cycle events to inject the range-raptor round
+    lifeCycle.onPrepareForNextRound(r -> this.round = r);
   }
 
   /**
@@ -89,7 +96,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
       return false;
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
-    int minNumberOfTransfers = roundProvider.round() - 1 + h.minNumTransfers();
+    int minNumberOfTransfers = round - 1 + h.minNumTransfers();
     int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
     int departureTime = minArrivalTime - minTravelDuration;

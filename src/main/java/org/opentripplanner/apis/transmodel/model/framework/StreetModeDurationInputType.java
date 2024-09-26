@@ -42,7 +42,7 @@ public class StreetModeDurationInputType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name(FIELD_DURATION)
-          .type(new GraphQLNonNull(gqlUtil.durationScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DURATION_SCALAR))
       )
       .build();
   }

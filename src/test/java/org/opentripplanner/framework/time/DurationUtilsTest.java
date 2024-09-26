@@ -23,6 +23,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class DurationUtilsTest {
 
+  private final Duration NEG_1s = Duration.ofSeconds(-1);
+  private final Duration D1s = Duration.ofSeconds(1);
   private final Duration D3d = Duration.ofDays(3);
   private final Duration D2h = Duration.ofHours(2);
   private final Duration D5m = Duration.ofMinutes(5);
@@ -125,6 +127,28 @@ public class DurationUtilsTest {
   public void testRequireNonNegative() {
     assertThrows(NullPointerException.class, () -> requireNonNegative(null));
     assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Duration.ofSeconds(-1)));
+  }
+
+  @Test
+  public void testRequireNonNegativeAndMaxLimit() {
+    // Firs make sure legal values are accepted
+    requireNonNegative(Duration.ZERO, D2h, "test");
+    requireNonNegative(D2h.minus(D1s), D2h, "test");
+
+    // null is not supported
+    assertThrows(NullPointerException.class, () -> requireNonNegative(null, D2h, "test"));
+
+    // Test max limit
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegative(D2h, D2h, "test")
+    );
+    assertEquals("Duration test can't be longer or equals too 2h: PT2H", ex.getMessage());
+
+    // Test non-negative
+    ex =
+      assertThrows(IllegalArgumentException.class, () -> requireNonNegative(NEG_1s, D2h, "test"));
+    assertEquals("Duration test can't be negative: PT-1S", ex.getMessage());
   }
 
   @Test

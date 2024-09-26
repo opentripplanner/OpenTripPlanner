@@ -10,7 +10,10 @@ import org.opentripplanner.framework.lang.StringUtils;
 
 /**
  * A collection of stop indexes used to define a pass through-point.
+ *
+ * @deprecated This will be replaced by ViaLocation
  */
+@Deprecated
 public class PassThroughPoint {
 
   private final String name;

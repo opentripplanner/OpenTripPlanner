@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.U
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +14,10 @@ import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
-import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -25,7 +26,6 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
@@ -38,13 +38,14 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
+import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 /**
- * The search context is used to hold search scoped instances and to pass these to who ever need
- * them.
+ * The search context is used to hold search scoped instances and to pass these to whom ever need
+ * them. It is one search-context pr RangeRaptor
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -64,31 +65,29 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final RaptorTuningParameters tuningParameters;
   private final RoundTracker roundTracker;
   private final DebugHandlerFactory<T> debugFactory;
-  private final EgressPaths egressPaths;
-  private final AccessPaths accessPaths;
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
   @Nullable
   private final IntPredicate acceptC2AtDestination;
 
+  private final List<SearchContextViaLeg<T>> legs;
+
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
-  /**
-   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
-   *                             for accepting it at the destination, if not this is {@code null}.
-   */
   public SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
     RaptorTransitDataProvider<T> transit,
+    AccessPaths accessPaths,
+    List<ViaConnections> viaConnections,
+    @Nullable EgressPaths egressPaths,
     @Nullable IntPredicate acceptC2AtDestination
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
-    this.accessPaths = accessPaths(tuningParameters.iterationDepartureStepInSeconds(), request);
-    this.egressPaths = egressPaths(request);
+
     this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker =
       new RoundTracker(
@@ -98,18 +97,24 @@ public class SearchContext<T extends RaptorTripSchedule> {
       );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     this.acceptC2AtDestination = acceptC2AtDestination;
+    this.legs = initLegs(accessPaths, viaConnections, egressPaths);
   }
 
-  public AccessPaths accessPaths() {
-    return accessPaths;
+  /**
+   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
+   *                             for accepting it at the destination, if not this is {@code null}.
+   */
+  public static <T extends RaptorTripSchedule> SearchContextBuilder<T> of(
+    RaptorRequest<T> request,
+    RaptorTuningParameters tuningParameters,
+    RaptorTransitDataProvider<T> transit,
+    @Nullable IntPredicate acceptC2AtDestination
+  ) {
+    return new SearchContextBuilder<>(request, tuningParameters, transit, acceptC2AtDestination);
   }
 
-  public EgressPaths egressPaths() {
-    return egressPaths;
-  }
-
-  public int[] egressStops() {
-    return egressPaths().stops();
+  public List<SearchContextViaLeg<T>> legs() {
+    return legs;
   }
 
   public SearchParams searchParams() {
@@ -193,7 +198,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return tuningParameters.maxNumberOfTransfers() + 1;
   }
 
-  public RoundProvider roundProvider() {
+  public RoundTracker roundTracker() {
     return roundTracker;
   }
 
@@ -224,10 +229,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   public TimeBasedBoardingSupport<T> createTimeBasedBoardingSupport() {
     return new TimeBasedBoardingSupport<>(
-      accessPaths().hasTimeDependentAccess(),
+      legs.getFirst().accessPaths().hasTimeDependentAccess(),
       slackProvider(),
       calculator(),
-      roundProvider(),
       lifeCycle()
     );
   }
@@ -314,18 +318,29 @@ public class SearchContext<T extends RaptorTripSchedule> {
       : p -> slackProvider.alightSlack(p.slackIndex());
   }
 
-  private static AccessPaths accessPaths(int iterationStep, RaptorRequest<?> request) {
-    boolean forward = request.searchDirection().isForward();
-    var params = request.searchParams();
-    var paths = forward ? params.accessPaths() : params.egressPaths();
-    return AccessPaths.create(iterationStep, paths, request.profile(), request.searchDirection());
-  }
+  private List<SearchContextViaLeg<T>> initLegs(
+    AccessPaths accessPaths,
+    List<ViaConnections> viaConnections,
+    EgressPaths egressPaths
+  ) {
+    if (viaConnections.isEmpty()) {
+      return List.of(new SearchContextViaLeg<>(this, accessPaths, null, egressPaths));
+    }
+    var accessEmpty = accessPaths.copyEmpty();
+    var list = new ArrayList<SearchContextViaLeg<T>>();
+    for (ViaConnections c : viaConnections) {
+      list.add(
+        new SearchContextViaLeg<>(
+          this,
+          c == viaConnections.getFirst() ? accessPaths : accessEmpty,
+          c,
+          null
+        )
+      );
+    }
+    list.add(new SearchContextViaLeg<>(this, accessEmpty, null, egressPaths));
 
-  private static EgressPaths egressPaths(RaptorRequest<?> request) {
-    boolean forward = request.searchDirection().isForward();
-    var params = request.searchParams();
-    var paths = forward ? params.egressPaths() : params.accessPaths();
-    return EgressPaths.create(paths, request.profile());
+    return List.copyOf(list);
   }
 
   static ParetoSetTime paretoSetTimeConfig(

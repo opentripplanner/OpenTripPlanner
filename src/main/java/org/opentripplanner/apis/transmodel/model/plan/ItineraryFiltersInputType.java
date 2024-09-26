@@ -8,6 +8,7 @@ import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -26,7 +27,7 @@ public class ItineraryFiltersInputType {
   private static final String GROUP_SIMILARITY_KEEP_N_ITINERARIES =
     "groupSimilarityKeepNumOfItineraries";
 
-  public static GraphQLInputObjectType create(GqlUtil gqlUtil, ItineraryFilterPreferences dft) {
+  public static GraphQLInputObjectType create(ItineraryFilterPreferences dft) {
     return GraphQLInputObjectType
       .newInputObject()
       .name("ItineraryFilters")
@@ -59,7 +60,7 @@ public class ItineraryFiltersInputType {
                 GraphQLInputObjectField
                   .newInputObjectField()
                   .name("costLimitFunction")
-                  .type(new GraphQLNonNull(gqlUtil.doubleFunctionScalar))
+                  .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
                   .build()
               )
               .field(

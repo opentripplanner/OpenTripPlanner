@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -18,14 +19,15 @@ import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
@@ -35,6 +37,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
+  private final LookupStopIndexCallback lookUpStopIndex;
 
   private RaptorRequestMapper(
     RouteRequest request,
@@ -42,7 +45,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     long transitSearchTimeZeroEpocSecond,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    LookupStopIndexCallback lookUpStopIndex
   ) {
     this.request = request;
     this.isMultiThreadedEnbled = isMultiThreaded;
@@ -50,6 +54,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     this.egressPaths = egressPaths;
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
+    this.lookUpStopIndex = lookUpStopIndex;
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -58,7 +63,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     boolean isMultiThreaded,
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
-    MeterRegistry meterRegistry
+    MeterRegistry meterRegistry,
+    LookupStopIndexCallback lookUpStopIndex
   ) {
     return new RaptorRequestMapper<T>(
       request,
@@ -66,7 +72,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       accessPaths,
       egressPaths,
       transitSearchTimeZero.toEpochSecond(),
-      meterRegistry
+      meterRegistry,
+      lookUpStopIndex
     )
       .doMap();
   }
@@ -76,6 +83,13 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     var searchParams = builder.searchParams();
 
     var preferences = request.preferences();
+
+    // TODO Fix the Raptor search so pass-through and via search can be used together.
+    if (hasViaLocationsAndPassThroughLocations()) {
+      throw new IllegalArgumentException(
+        "A mix of via-locations and pass-through is not allowed in this versionP."
+      );
+    }
 
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());
@@ -115,7 +129,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var r = pt.raptor();
 
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
-      if (!request.getPassThroughPoints().isEmpty()) {
+
+      // TODO - We need handle via locations that are not pass-through-points here
+      if (hasPassThroughOnly()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
       } else if (!pt.relaxTransitGroupPriority().isNormal()) {
@@ -143,6 +159,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
+
+    if (hasViaLocationsOnly()) {
+      builder.searchParams().addViaLocations(mapViaLocations());
+    }
 
     var raptorDebugging = request.journey().transit().raptorDebugging();
 
@@ -175,19 +195,57 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         )
       );
     }
-
     return builder.build();
   }
 
+  private boolean hasPassThroughOnly() {
+    return request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation);
+  }
+
+  private boolean hasViaLocationsOnly() {
+    return request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation);
+  }
+
+  private boolean hasViaLocationsAndPassThroughLocations() {
+    var c = request.getViaLocations();
+    return (
+      request.isViaSearch() &&
+      c.stream().anyMatch(ViaLocation::isPassThroughLocation) &&
+      c.stream().anyMatch(Predicate.not(ViaLocation::isPassThroughLocation))
+    );
+  }
+
+  private List<RaptorViaLocation> mapViaLocations() {
+    return request.getViaLocations().stream().map(this::mapViaLocation).toList();
+  }
+
+  private RaptorViaLocation mapViaLocation(ViaLocation input) {
+    if (input.isPassThroughLocation()) {
+      var builder = RaptorViaLocation.allowPassThrough(input.label());
+      for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
+        builder.addViaStop(stopIndex);
+      }
+      return builder.build();
+    }
+    // Visit Via location
+    else {
+      var builder = RaptorViaLocation.via(input.label(), input.minimumWaitTime());
+      for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
+        builder.addViaStop(stopIndex);
+      }
+      return builder.build();
+    }
+  }
+
   private List<PassThroughPoint> mapPassThroughPoints() {
-    return request
-      .getPassThroughPoints()
-      .stream()
-      .map(p -> {
-        final int[] stops = p.stopLocations().stream().mapToInt(StopLocation::getIndex).toArray();
-        return new PassThroughPoint(p.name(), stops);
-      })
-      .toList();
+    return request.getViaLocations().stream().map(this::mapPassThroughPoints).toList();
+  }
+
+  private PassThroughPoint mapPassThroughPoints(ViaLocation location) {
+    return new PassThroughPoint(
+      location.label(),
+      lookUpStopIndex.lookupStopLocationIndexes(location.stopLocationIds())
+    );
   }
 
   static RelaxFunction mapRelaxCost(CostLinearFunction relax) {

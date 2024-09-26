@@ -16,6 +16,12 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  */
 public class SearchParams {
 
+  /**
+   * The maximum number of via-locations is used as a check to avoid exploiting the
+   * search performance. Consider restricting this further in the upstream services.
+   */
+  private static final int MAX_VIA_POINTS = 10;
+
   private final int earliestDepartureTime;
   private final int latestArrivalTime;
   private final int searchWindowInSeconds;
@@ -26,6 +32,7 @@ public class SearchParams {
   private final boolean constrainedTransfers;
   private final Collection<RaptorAccessEgress> accessPaths;
   private final Collection<RaptorAccessEgress> egressPaths;
+  private final List<RaptorViaLocation> viaLocations;
 
   /**
    * Default values are defined in the default constructor.
@@ -41,6 +48,7 @@ public class SearchParams {
     constrainedTransfers = false;
     accessPaths = List.of();
     egressPaths = List.of();
+    viaLocations = List.of();
   }
 
   SearchParams(SearchParamsBuilder<?> builder) {
@@ -54,6 +62,7 @@ public class SearchParams {
     this.constrainedTransfers = builder.constrainedTransfers();
     this.accessPaths = List.copyOf(builder.accessPaths());
     this.egressPaths = List.copyOf(builder.egressPaths());
+    this.viaLocations = List.copyOf(builder.viaLocations());
   }
 
   /**
@@ -196,6 +205,22 @@ public class SearchParams {
   }
 
   /**
+   * List of all possible via locations. All
+   *    * <p>
+   *    * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path start, NOT the
+   *    * destination - think of it as a reversed path.
+   *    * <p/>
+   *    * Required, at least one egress path must exist.
+   */
+  public List<RaptorViaLocation> viaLocations() {
+    return viaLocations;
+  }
+
+  public boolean hasViaLocations() {
+    return !viaLocations.isEmpty();
+  }
+
+  /**
    * Get the maximum duration of any access or egress path in seconds.
    */
   public int accessEgressMaxDurationSeconds() {
@@ -214,7 +239,8 @@ public class SearchParams {
       preferLateArrival,
       numberOfAdditionalTransfers,
       accessPaths,
-      egressPaths
+      egressPaths,
+      viaLocations
     );
   }
 
@@ -234,7 +260,8 @@ public class SearchParams {
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
       accessPaths.equals(that.accessPaths) &&
-      egressPaths.equals(that.egressPaths)
+      egressPaths.equals(that.egressPaths) &&
+      viaLocations.equals(viaLocations)
     );
   }
 
@@ -254,6 +281,7 @@ public class SearchParams {
       )
       .addCollection("accessPaths", accessPaths, 5, RaptorAccessEgress::defaultToString)
       .addCollection("egressPaths", egressPaths, 5, RaptorAccessEgress::defaultToString)
+      .addCollection("via", viaLocations, 5)
       .toString();
   }
 
@@ -277,6 +305,10 @@ public class SearchParams {
     assertProperty(
       !(preferLateArrival && timetable),
       "The 'departAsLateAsPossible' is not allowed together with 'timetableEnabled'."
+    );
+    assertProperty(
+      viaLocations.size() <= MAX_VIA_POINTS,
+      "The 'viaLocations' exceeds the  maximum number of via-locations (" + MAX_VIA_POINTS + ")."
     );
   }
 }

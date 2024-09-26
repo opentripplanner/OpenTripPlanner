@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -18,9 +19,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   private final RaptorRequestBuilder<T> parent;
-  private final Collection<RaptorAccessEgress> accessPaths = new ArrayList<>();
-  private final Collection<RaptorAccessEgress> egressPaths = new ArrayList<>();
-  // Search
+
   private int earliestDepartureTime;
   private int latestArrivalTime;
   private int searchWindowInSeconds;
@@ -29,6 +28,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   private int maxNumberOfTransfers;
   private boolean timetable;
   private boolean constrainedTransfers;
+  private final Collection<RaptorAccessEgress> accessPaths = new ArrayList<>();
+  private final Collection<RaptorAccessEgress> egressPaths = new ArrayList<>();
+  private final List<RaptorViaLocation> viaLocations = new ArrayList<>();
 
   public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
     this.parent = parent;
@@ -42,6 +44,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     this.constrainedTransfers = defaults.constrainedTransfers();
     this.accessPaths.addAll(defaults.accessPaths());
     this.egressPaths.addAll(defaults.egressPaths());
+    this.viaLocations.addAll(defaults.viaLocations());
   }
 
   public int earliestDepartureTime() {
@@ -72,9 +75,9 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
   }
 
   public SearchParamsBuilder<T> searchWindow(Duration searchWindow) {
-    this.searchWindowInSeconds =
-      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds();
-    return this;
+    return searchWindowInSeconds(
+      searchWindow == null ? RaptorConstants.NOT_SET : (int) searchWindow.toSeconds()
+    );
   }
 
   /**
@@ -160,6 +163,20 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 
+  public Collection<RaptorViaLocation> viaLocations() {
+    return viaLocations;
+  }
+
+  public SearchParamsBuilder<T> addViaLocation(RaptorViaLocation location) {
+    viaLocations.add(location);
+    return this;
+  }
+
+  public SearchParamsBuilder<T> addViaLocations(Collection<RaptorViaLocation> locations) {
+    viaLocations.addAll(locations);
+    return this;
+  }
+
   public RaptorRequest<T> build() {
     return parent.build();
   }
@@ -180,6 +197,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
+      .addCollection("via", viaLocations, 10)
       .toString();
   }
 }

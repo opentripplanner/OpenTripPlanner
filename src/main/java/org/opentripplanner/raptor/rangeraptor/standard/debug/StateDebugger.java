@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 
 /**
@@ -17,28 +17,25 @@ import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCu
 class StateDebugger<T extends RaptorTripSchedule> {
 
   private final StopsCursor<T> cursor;
-  private final RoundProvider roundProvider;
   private final DebugHandler<ArrivalView<?>> debugHandlerStopArrivals;
+  private int round;
 
-  StateDebugger(
-    StopsCursor<T> cursor,
-    RoundProvider roundProvider,
-    DebugHandlerFactory<T> dFactory
-  ) {
+  StateDebugger(StopsCursor<T> cursor, WorkerLifeCycle lifeCycle, DebugHandlerFactory<T> dFactory) {
     this.cursor = cursor;
-    this.roundProvider = roundProvider;
     this.debugHandlerStopArrivals = dFactory.debugStopArrival();
+
+    lifeCycle.onPrepareForNextRound(r -> this.round = r);
   }
 
   void acceptAccessPath(int stop, RaptorAccessEgress access) {
     if (isDebug(stop)) {
-      debugHandlerStopArrivals.accept(cursor.access(round(), stop, access));
+      debugHandlerStopArrivals.accept(cursor.access(round, stop, access));
     }
   }
 
   void rejectAccessPath(RaptorAccessEgress accessPath, int arrivalTime) {
     if (isDebug(accessPath.stop())) {
-      reject(cursor.fictiveAccess(round(), accessPath, arrivalTime));
+      reject(cursor.fictiveAccess(round, accessPath, arrivalTime));
     }
   }
 
@@ -64,13 +61,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
   void rejectTransit(int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
     if (isDebug(alightStop)) {
-      reject(cursor.fictiveTransit(round(), alightStop, alightTime, trip, boardStop, boardTime));
+      reject(cursor.fictiveTransit(round, alightStop, alightTime, trip, boardStop, boardTime));
     }
   }
 
   void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
     if (isDebug(transfer.stop())) {
-      reject(cursor.fictiveTransfer(round(), fromStop, transfer, toStop, arrivalTime));
+      reject(cursor.fictiveTransfer(round, fromStop, transfer, toStop, arrivalTime));
     }
   }
 
@@ -81,7 +78,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
   }
 
   private void accept(int stop, boolean stopReachedOnBoard) {
-    debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
+    debugHandlerStopArrivals.accept(cursor.stop(round, stop, stopReachedOnBoard));
   }
 
   /**
@@ -94,8 +91,6 @@ class StateDebugger<T extends RaptorTripSchedule> {
    * handler about arrivals that are about to be dropped.
    */
   private void drop(int stop, boolean onBoard, boolean newBestOverall) {
-    final int round = round();
-
     // if new arrival arrived on-board,
     if (onBoard) {
       // and an existing on-board arrival exist
@@ -121,9 +116,5 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
   private void dropExistingArrival(int round, int stop, boolean onBoard) {
     debugHandlerStopArrivals.drop(cursor.stop(round, stop, onBoard), null, null);
-  }
-
-  private int round() {
-    return roundProvider.round();
   }
 }

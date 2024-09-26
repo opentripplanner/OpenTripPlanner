@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitService;
 
 public class TripRequestMapper {
 
@@ -40,11 +40,16 @@ public class TripRequestMapper {
       "to",
       (Map<String, Object> v) -> request.setTo(GenericLocationMapper.toGenericLocation(v))
     );
-    final TransitService transitService = context.getTransitService();
     callWith.argument(
       "passThroughPoints",
       (List<Map<String, Object>> v) -> {
-        request.setPassThroughPoints(PassThroughLocationMapper.toLocations(transitService, v));
+        request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      }
+    );
+    callWith.argument(
+      TripQuery.FIELD_VIA,
+      (List<Map<String, Object>> v) -> {
+        request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
       }
     );
 

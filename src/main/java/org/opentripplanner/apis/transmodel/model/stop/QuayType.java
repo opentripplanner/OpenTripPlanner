@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -169,7 +170,7 @@ public class QuayType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of lines servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
           .dataFetcher(env ->
@@ -187,7 +188,7 @@ public class QuayType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("journeyPatterns")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of journey patterns servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
           .dataFetcher(env ->
@@ -199,7 +200,7 @@ public class QuayType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("estimatedCalls")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of visits to this quay as part of vehicle journeys.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .argument(

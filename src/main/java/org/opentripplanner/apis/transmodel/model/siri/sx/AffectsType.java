@@ -8,6 +8,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLUnionType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.stop.StopPlaceType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -23,8 +24,7 @@ public class AffectsType {
     GraphQLOutputType stopPlaceType,
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
-    GraphQLOutputType datedServiceJourneyType,
-    GqlUtil gqlUtil
+    GraphQLOutputType datedServiceJourneyType
   ) {
     GraphQLObjectType affectedStopPlace = GraphQLObjectType
       .newObject()
@@ -96,7 +96,7 @@ public class AffectsType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("operatingDay")
-          .type(gqlUtil.dateScalar)
+          .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment -> environment.<EntitySelector.Trip>getSource().serviceDate())
           .build()
       )
@@ -204,7 +204,7 @@ public class AffectsType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("operatingDay")
-          .type(gqlUtil.dateScalar)
+          .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
             environment.<EntitySelector.StopAndTrip>getSource().serviceDate()
           )

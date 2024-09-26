@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
@@ -268,7 +270,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("fromEstimatedCall")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg originates.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForFromPlace(env.getSource()))
@@ -278,7 +280,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("toEstimatedCall")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg ends.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForToPlace(env.getSource()))
@@ -318,7 +320,7 @@ public class LegType {
           .description(
             "For transit legs, the service date of the trip. For non-transit legs, null."
           )
-          .type(gqlUtil.dateScalar)
+          .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
             Optional.of((Leg) environment.getSource()).map(Leg::getServiceDate).orElse(null)
           )
@@ -352,7 +354,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("intermediateEstimatedCalls")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
           )
@@ -366,7 +368,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneyEstimatedCalls")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )

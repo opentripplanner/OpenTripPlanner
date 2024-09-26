@@ -107,6 +107,12 @@ public abstract class McStopArrival<T extends RaptorTripSchedule> implements Arr
     throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
   }
 
+  /**
+   * Add the given amount of slack to the arrival-time. This is used to add extraordinary
+   * wait-time to an arrival - for example, in via-search where a minimum-wait-time can be set.
+   */
+  public abstract McStopArrival<T> addSlackToArrivalTime(int slack);
+
   @Override
   public final int hashCode() {
     throw new IllegalStateException("Avoid using hashCode() and equals() for this class.");
