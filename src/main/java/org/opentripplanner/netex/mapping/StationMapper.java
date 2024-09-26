@@ -36,7 +36,7 @@ class StationMapper {
 
   private final boolean noTransfersOnIsolatedStops;
 
-  private final Set<String> routeToCentroidStopPlaceIds;
+  private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
 
   private final StopModelBuilder stopModelBuilder;
 
@@ -45,7 +45,7 @@ class StationMapper {
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
     boolean noTransfersOnIsolatedStops,
-    Set<String> routeToCentroidStopPlaceIds,
+    Set<FeedScopedId> routeToCentroidStopPlaceIds,
     StopModelBuilder stopModelBuilder
   ) {
     this.issueStore = issueStore;
@@ -66,7 +66,7 @@ class StationMapper {
       .of(id)
       .withName(resolveName(stopPlace))
       .withCoordinate(mapCoordinate(stopPlace))
-      .withShouldRouteToCentroid(shouldRouteToCentroid(stopPlace))
+      .withShouldRouteToCentroid(shouldRouteToCentroid(id))
       .withDescription(
         NonLocalizedString.ofNullable(stopPlace.getDescription(), MultilingualString::getValue)
       )
@@ -88,8 +88,8 @@ class StationMapper {
     return builder.build();
   }
 
-  private boolean shouldRouteToCentroid(StopPlace stopPlace) {
-    return routeToCentroidStopPlaceIds.contains(stopPlace.getId());
+  private boolean shouldRouteToCentroid(FeedScopedId stopPlaceId) {
+    return routeToCentroidStopPlaceIds.contains(stopPlaceId);
   }
 
   private ZoneId ofZoneId(String stopPlaceId, String zoneId) {

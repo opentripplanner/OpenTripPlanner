@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -300,6 +302,26 @@ public class GraphBuilderModules {
       .stopConsolidation()
       .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
       .orElse(null);
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
+    DataImportIssueStore issueStore,
+    BuildConfig config,
+    TransitModel transitModel
+  ) {
+    var ids = config.transitRouteToStationCentroid();
+    var stationIds = transitModel
+      .getStopModel()
+      .listStations()
+      .stream()
+      .map(AbstractTransitEntity::getId)
+      .toList();
+    return ids.isEmpty()
+      ? null
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, stationIds);
   }
 
   /* private methods */

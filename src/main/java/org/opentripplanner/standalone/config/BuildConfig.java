@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -45,6 +46,7 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,16 +175,12 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxElevationPropagationMeters;
   public final boolean readCachedElevations;
   public final boolean writeCachedElevations;
-
   public final boolean includeEllipsoidToGeoidDifference;
-
   public final boolean multiThreadElevationCalculations;
-
   public final LocalDate transitServiceStart;
-
   public final LocalDate transitServiceEnd;
   public final ZoneId transitModelTimeZone;
-
+  private final List<FeedScopedId> transitRouteToStationCentroid;
   public final URI stopConsolidation;
 
   /**
@@ -437,6 +435,28 @@ Use an empty string to make it unbounded.
           )
           .asDateOrRelativePeriod("P3Y", confZone);
     }
+
+    transitRouteToStationCentroid =
+      root
+        .of("transitRouteToStationCentroid")
+        .since(V2_6)
+        .summary("List stations that should route to centroid.")
+        .description(
+          """
+        This field contains a list of station ids for which the centroid will be used instead
+        of the stop coordinates.
+        
+        When doing street routing from/to a station the default behaviour is to route to any of
+        the stations child stops. This can cause strange results for stations that have stops
+        spread over a large area.
+        
+        For some stations you might instead wish to use the centroid of the station as the
+        source/destination for street routing. In this case the centroid will be  used both for
+        direct street search and for access/egress street search where the station is used as
+        the start/end of the access/egress.
+        """
+        )
+        .asFeedScopedIds(List.of());
 
     writeCachedElevations =
       root
@@ -716,6 +736,10 @@ Netex data is also often supplied in a ZIP file.
 
   public ServiceDateInterval getTransitServicePeriod() {
     return new ServiceDateInterval(transitServiceStart, transitServiceEnd);
+  }
+
+  public List<FeedScopedId> transitRouteToStationCentroid() {
+    return transitRouteToStationCentroid;
   }
 
   public int getSubwayAccessTimeSeconds() {

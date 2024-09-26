@@ -22,6 +22,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -71,7 +72,7 @@ class StopAndStationMapper {
     ZoneId defaultTimeZone,
     DataImportIssueStore issueStore,
     boolean noTransfersOnIsolatedStops,
-    Set<String> routeToCentroidStopPlaceIds
+    Set<FeedScopedId> routeToCentroidStopPlaceIds
   ) {
     this.stationMapper =
       new StationMapper(
