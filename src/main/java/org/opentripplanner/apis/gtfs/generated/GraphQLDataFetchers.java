@@ -18,6 +18,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverity
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
@@ -504,7 +505,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Boolean> realTime();
 
-    public DataFetcher<String> realtimeState();
+    public DataFetcher<GraphQLRealtimeState> realtimeState();
 
     public DataFetcher<Boolean> rentedBike();
 
@@ -1082,7 +1083,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> realtimeDeparture();
 
-    public DataFetcher<String> realtimeState();
+    public DataFetcher<GraphQLRealtimeState> realtimeState();
 
     public DataFetcher<Integer> scheduledArrival();
 
