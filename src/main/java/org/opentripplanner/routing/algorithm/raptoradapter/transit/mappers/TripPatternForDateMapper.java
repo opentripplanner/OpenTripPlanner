@@ -3,12 +3,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
@@ -32,8 +29,6 @@ import org.slf4j.LoggerFactory;
 public class TripPatternForDateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDateMapper.class);
-
-  private final ConcurrentMap<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new ConcurrentHashMap<>();
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
@@ -69,19 +64,7 @@ public class TripPatternForDateMapper {
 
     List<TripTimes> times = new ArrayList<>();
 
-    // The TripTimes are not sorted by departure time in the source timetable because
-    // OTP1 performs a simple/ linear search. Raptor results depend on trips being
-    // sorted. We reuse the same timetables many times on different days, so cache the
-    // sorted versions to avoid repeated compute-intensive sorting. Anecdotally this
-    // reduces mapping time by more than half, but it is still rather slow. NL Mapping
-    // takes 32 seconds sorting every timetable, 9 seconds with cached sorting, and 6
-    // seconds with no timetable sorting at all.
-    List<TripTimes> sortedTripTimes = sortedTripTimesForTimetable.computeIfAbsent(
-      timetable,
-      TransitLayerMapper::getSortedTripTimes
-    );
-
-    for (TripTimes tripTimes : sortedTripTimes) {
+    for (TripTimes tripTimes : timetable.getTripTimes()) {
       if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
         continue;
       }

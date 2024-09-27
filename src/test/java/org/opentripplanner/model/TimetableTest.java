@@ -190,7 +190,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
       assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     });
 
@@ -217,7 +217,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip arrival time only
@@ -246,7 +246,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip departure time only
@@ -273,7 +273,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip using stop id
@@ -299,7 +299,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
   }
 

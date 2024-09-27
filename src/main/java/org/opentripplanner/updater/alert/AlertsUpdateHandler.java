@@ -40,12 +40,16 @@ public class AlertsUpdateHandler {
   private long earlyStart;
 
   /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
-  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final boolean fuzzyTripMatching;
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(DataImportIssueStore.NOOP);
 
-  public void update(FeedMessage message) {
+  public AlertsUpdateHandler(boolean fuzzyTripMatching) {
+    this.fuzzyTripMatching = fuzzyTripMatching;
+  }
+
+  public void update(FeedMessage message, GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
     Collection<TransitAlert> alerts = new ArrayList<>();
     for (FeedEntity entity : message.getEntityList()) {
       if (!entity.hasAlert()) {
@@ -53,7 +57,7 @@ public class AlertsUpdateHandler {
       }
       GtfsRealtime.Alert alert = entity.getAlert();
       String id = entity.getId();
-      alerts.add(mapAlert(id, alert));
+      alerts.add(mapAlert(id, alert, fuzzyTripMatcher));
     }
     transitAlertService.setAlerts(alerts);
   }
@@ -70,11 +74,11 @@ public class AlertsUpdateHandler {
     this.earlyStart = earlyStart;
   }
 
-  public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
-    this.fuzzyTripMatcher = fuzzyTripMatcher;
-  }
-
-  private TransitAlert mapAlert(String id, GtfsRealtime.Alert alert) {
+  private TransitAlert mapAlert(
+    String id,
+    GtfsRealtime.Alert alert,
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher
+  ) {
     TransitAlertBuilder alertBuilder = TransitAlert
       .of(new FeedScopedId(feedId, id))
       .withDescriptionText(deBuffer(alert.getDescriptionText()))
@@ -99,7 +103,7 @@ public class AlertsUpdateHandler {
     alertBuilder.addTimePeriods(periods);
 
     for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
-      if (fuzzyTripMatcher != null && informed.hasTrip()) {
+      if (fuzzyTripMatching && informed.hasTrip()) {
         TripDescriptor trip = fuzzyTripMatcher.match(feedId, informed.getTrip());
         informed = informed.toBuilder().setTrip(trip).build();
       }

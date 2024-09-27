@@ -9,6 +9,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import org.opentripplanner.apis.transmodel.support.GqlUtil;
 
 public class ServerInfoType {
 
@@ -16,6 +17,13 @@ public class ServerInfoType {
     return GraphQLObjectType
       .newObject()
       .name("ServerInfo")
+      .description(
+        """
+        Information about the deployment. This is only useful to developers of OTP itself.
+        It is not recommended for regular API consumers to use this type as it has no
+        stability guarantees.
+        """
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -97,6 +105,21 @@ public class ServerInfoType {
           )
           .type(Scalars.GraphQLString)
           .dataFetcher(e -> projectInfo().getOtpSerializationVersionId())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("internalTransitModelTimeZone")
+          .description(
+            """
+              The internal time zone of the transit data.
+              
+              Note: The input data can be in several time zones, but OTP internally operates on a single one.
+            """
+          )
+          .type(Scalars.GraphQLString)
+          .dataFetcher(e -> GqlUtil.getTransitService(e).getTimeZone())
           .build()
       )
       .build();

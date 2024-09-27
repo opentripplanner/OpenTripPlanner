@@ -1,18 +1,23 @@
 package org.opentripplanner.transit.model.network;
 
+import static java.util.Objects.requireNonNullElseGet;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class TripPatternBuilder
@@ -24,6 +29,7 @@ public final class TripPatternBuilder
   private boolean containsMultipleModes;
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
+  private TimetableBuilder scheduledTimetableBuilder;
   private String name;
 
   private boolean createdByRealtimeUpdate;
@@ -33,6 +39,7 @@ public final class TripPatternBuilder
 
   TripPatternBuilder(FeedScopedId id) {
     super(id);
+    this.scheduledTimetableBuilder = Timetable.of();
   }
 
   TripPatternBuilder(TripPattern original) {
@@ -86,7 +93,25 @@ public final class TripPatternBuilder
   }
 
   public TripPatternBuilder withScheduledTimeTable(Timetable scheduledTimetable) {
+    if (scheduledTimetableBuilder != null) {
+      throw new IllegalStateException(
+        "Cannot set scheduled Timetable after scheduled Timetable builder is created"
+      );
+    }
     this.scheduledTimetable = scheduledTimetable;
+    return this;
+  }
+
+  public TripPatternBuilder withScheduledTimeTableBuilder(
+    UnaryOperator<TimetableBuilder> producer
+  ) {
+    // create a builder for the scheduled timetable only if it needs to be modified.
+    // otherwise reuse the existing timetable
+    if (scheduledTimetableBuilder == null) {
+      scheduledTimetableBuilder = scheduledTimetable.copyOf();
+      scheduledTimetable = null;
+    }
+    producer.apply(scheduledTimetableBuilder);
     return this;
   }
 
@@ -115,6 +140,13 @@ public final class TripPatternBuilder
     return route.getMode().ordinal();
   }
 
+  public Direction getDirection() {
+    if (scheduledTimetable != null) {
+      return scheduledTimetable.getDirection();
+    }
+    return scheduledTimetableBuilder.getDirection();
+  }
+
   @Override
   protected TripPattern buildFromValues() {
     return new TripPattern(this);
@@ -125,11 +157,11 @@ public final class TripPatternBuilder
   }
 
   public TransitMode getMode() {
-    return mode;
+    return mode != null ? mode : route.getMode();
   }
 
   public SubMode getNetexSubmode() {
-    return netexSubMode;
+    return netexSubMode != null ? netexSubMode : route.getNetexSubmode();
   }
 
   public boolean getContainsMultipleModes() {
@@ -142,6 +174,10 @@ public final class TripPatternBuilder
 
   public Timetable getScheduledTimetable() {
     return scheduledTimetable;
+  }
+
+  public TimetableBuilder getScheduledTimetableBuilder() {
+    return scheduledTimetableBuilder;
   }
 
   public String getName() {

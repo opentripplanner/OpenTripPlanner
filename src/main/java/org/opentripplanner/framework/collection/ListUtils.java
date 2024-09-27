@@ -69,4 +69,13 @@ public class ListUtils {
       return List.of(input);
     }
   }
+
+  /**
+   * This method converts the given collection to an instance of a List. If the input is
+   * {@code null} an empty collection is returned. If not the {@link List#copyOf(Collection)} is
+   * called.
+   */
+  public static <T> List<T> nullSafeImmutableList(Collection<T> c) {
+    return (c == null) ? List.of() : List.copyOf(c);
+  }
 }

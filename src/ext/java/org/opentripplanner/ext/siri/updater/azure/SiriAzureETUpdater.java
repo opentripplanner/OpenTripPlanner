@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
@@ -40,10 +39,9 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
   public SiriAzureETUpdater(
     SiriAzureETUpdaterParameters config,
-    TransitModel transitModel,
     SiriTimetableSnapshotSource snapshotSource
   ) {
-    super(config, transitModel);
+    super(config);
     this.fromDateTime = config.getFromDateTime();
     this.snapshotSource = snapshotSource;
     this.recordMetrics = TripUpdateMetrics.streaming(config);
@@ -98,10 +96,10 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
   }
 
   private Future<?> processMessage(List<EstimatedTimetableDeliveryStructure> updates) {
-    return super.saveResultOnGraph.execute((graph, transitModel) -> {
+    return super.saveResultOnGraph.execute(context -> {
       var result = snapshotSource.applyEstimatedTimetable(
-        fuzzyTripMatcher(),
-        entityResolver(),
+        fuzzyTripMatching() ? context.siriFuzzyTripMatcher() : null,
+        context.entityResolver(feedId),
         feedId,
         UpdateIncrementality.DIFFERENTIAL,
         updates

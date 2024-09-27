@@ -60,6 +60,12 @@
   overflow-y: auto;
 }
 
+.itinerary-list-container .time-zone-info {
+  margin: 10px 20px;
+  font-size: 12px;
+  text-align: right;
+}
+
 .itinerary-header-wrapper {
   position: relative;
   background: #0a53be;

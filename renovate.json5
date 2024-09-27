@@ -150,6 +150,14 @@
         "com.google.dagger:"
       ],
       "minimumReleaseAge": "1 week"
+    },
+    {
+      "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
+      "matchPackagePrefixes": [
+        "org.geotools:"
+      ],
+      "minimumReleaseAge": "1 week",
+      "labels": ["skip changelog", "bump serialization id"]
     }
   ],
   "timezone": "Europe/Berlin"

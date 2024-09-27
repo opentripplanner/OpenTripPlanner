@@ -24,14 +24,14 @@ import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOptsBuilde
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 
 /**
- * This test run the SpeedTest on the Portland dataset. It tests all SpeedTest
+ * This test runs the SpeedTest on the Portland dataset. It tests all SpeedTest
  * profiles. This is also a good integration-test for the OTP routing query.
  */
 public class SpeedIntegrationTest {
 
   /**
-   * We need to use a relative path here, because the test will update the results files in case
-   * the results differ. This make it easy to maintain the test.
+   * We need to use a relative path here, because the test will update the result files in case
+   * the results differ. This makes it easy to maintain the test.
    */
   private static final File BASE_DIR = Path.of("src", "test", "resources", "speedtest").toFile();
 

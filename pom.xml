@@ -7,7 +7,7 @@
     <url>https://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.7.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -56,14 +56,14 @@
 
 
     <properties>
-        <otp.serialization.version.id>156</otp.serialization.version.id>
+        <otp.serialization.version.id>158</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>31.3</geotools.version>
+        <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
         <jackson.version>2.17.2</jackson.version>
         <jersey.version>3.1.8</jersey.version>
         <junit.version>5.11.0</junit.version>
-        <micrometer.version>1.13.2</micrometer.version>
+        <micrometer.version>1.13.4</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.7</logback.version>
         <lucene.version>9.11.1</lucene.version>
@@ -242,7 +242,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -541,7 +541,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.44.0</version>
+                <version>26.45.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -701,7 +701,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.12.0</version>
+            <version>5.13.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -848,7 +848,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>22.2</version>
+            <version>22.3</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -858,7 +858,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.3.1</version>
+            <version>5.4</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -912,7 +912,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.27.0</version>
+            <version>1.27.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -989,7 +989,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.5</version>
+                        <version>3.2.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
