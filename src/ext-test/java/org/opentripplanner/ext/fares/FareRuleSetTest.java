@@ -69,16 +69,7 @@ class FareRuleSetTest {
     var trips = Set.of(new FeedScopedId("feed", "trip1"));
     var zones = Set.of("zone1");
     assertTrue(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), Set.of(), Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
     assertTrue(
       fareRuleSet.matches(
@@ -98,28 +89,10 @@ class FareRuleSetTest {
   void testMatchesWithOriginDestination() {
     fareRuleSet.addOriginDestination("A", "B");
     assertTrue(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), Set.of(), Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
     assertFalse(
-      fareRuleSet.matches(
-        "B",
-        "C",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("B", "C", Set.of(), Set.of(), Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
   }
 
@@ -131,28 +104,10 @@ class FareRuleSetTest {
     fareRuleSet.addContains("Zone1");
     fareRuleSet.addContains("Zone2");
     assertTrue(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        zones,
-        new HashSet<>(),
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", zones, Set.of(), Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
     assertFalse(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), Set.of(), Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
   }
 
@@ -164,24 +119,15 @@ class FareRuleSetTest {
     routes.add(routeId);
     fareRuleSet.addRoute(routeId);
     assertTrue(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        routes,
-        new HashSet<>(),
-        0,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), routes, Set.of(), 0, Duration.ZERO, Duration.ZERO)
     );
     assertFalse(
       fareRuleSet.matches(
         "A",
         "B",
-        new HashSet<>(),
+        Set.of(),
         Set.of(otherRouteId),
-        new HashSet<>(),
+        Set.of(),
         0,
         Duration.ZERO,
         Duration.ZERO
@@ -192,28 +138,10 @@ class FareRuleSetTest {
   @Test
   void testMatchesWithTransfers() {
     assertTrue(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        1,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), Set.of(), Set.of(), 1, Duration.ZERO, Duration.ZERO)
     );
     assertFalse(
-      fareRuleSet.matches(
-        "A",
-        "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
-        2,
-        Duration.ZERO,
-        Duration.ZERO
-      )
+      fareRuleSet.matches("A", "B", Set.of(), Set.of(), Set.of(), 2, Duration.ZERO, Duration.ZERO)
     );
   }
 
@@ -223,9 +151,9 @@ class FareRuleSetTest {
       fareRuleSet.matches(
         "A",
         "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
+        Set.of(),
+        Set.of(),
+        Set.of(),
         0,
         Duration.ofSeconds(7000),
         Duration.ZERO
@@ -235,9 +163,9 @@ class FareRuleSetTest {
       fareRuleSet.matches(
         "A",
         "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
+        Set.of(),
+        Set.of(),
+        Set.of(),
         0,
         Duration.ofSeconds(8000),
         Duration.ZERO
@@ -259,9 +187,9 @@ class FareRuleSetTest {
       journeyRuleSet.matches(
         "A",
         "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
+        Set.of(),
+        Set.of(),
+        Set.of(),
         0,
         Duration.ZERO,
         Duration.ofSeconds(7000)
@@ -271,9 +199,9 @@ class FareRuleSetTest {
       journeyRuleSet.matches(
         "A",
         "B",
-        new HashSet<>(),
-        new HashSet<>(),
-        new HashSet<>(),
+        Set.of(),
+        Set.of(),
+        Set.of(),
         0,
         Duration.ZERO,
         Duration.ofSeconds(8000)
