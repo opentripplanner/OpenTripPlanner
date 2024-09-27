@@ -1,12 +1,12 @@
-package org.opentripplanner.apis.gtfs;
+package org.opentripplanner.transit.service;
 
 import static java.time.LocalDate.parse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
-import static org.opentripplanner.apis.gtfs.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.PatternTestModel.ROUTE_1;
+import static org.opentripplanner.transit.service.PatternByServiceDatesFilterTest.FilterExpectation.NOT_REMOVED;
+import static org.opentripplanner.transit.service.PatternByServiceDatesFilterTest.FilterExpectation.REMOVED;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,49 +14,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.model.LocalDateRange;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model._data.PatternTestModel;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
 
 class PatternByServiceDatesFilterTest {
 
-  private static final Route ROUTE_1 = TransitModelForTest.route("1").build();
-  private static final FeedScopedId SERVICE_ID = id("service");
-  private static final Trip TRIP = TransitModelForTest
-    .trip("t1")
-    .withRoute(ROUTE_1)
-    .withServiceId(SERVICE_ID)
-    .build();
-  private static final TransitModelForTest MODEL = new TransitModelForTest(StopModel.of());
-  private static final RegularStop STOP_1 = MODEL.stop("1").build();
-  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_1, STOP_1);
-  private static final TripPattern PATTERN_1 = pattern();
+  private static final TripPattern PATTERN_1 = PatternTestModel.pattern();
 
   enum FilterExpectation {
     REMOVED,
     NOT_REMOVED,
-  }
-
-  private static TripPattern pattern() {
-    var pattern = TransitModelForTest
-      .tripPattern("1", ROUTE_1)
-      .withStopPattern(STOP_PATTERN)
-      .build();
-
-    var tt = ScheduledTripTimes
-      .of()
-      .withTrip(TRIP)
-      .withArrivalTimes("10:00 10:05")
-      .withDepartureTimes("10:00 10:05")
-      .build();
-    pattern.add(tt);
-    return pattern;
   }
 
   static List<Arguments> invalidRangeCases() {
@@ -140,7 +107,7 @@ class PatternByServiceDatesFilterTest {
     var filter = defaultFilter(start, end);
 
     var filterInput = List.of(ROUTE_1);
-    var filterOutput = filter.filterRoutes(filterInput.stream());
+    var filterOutput = filter.filterRoutes(filterInput);
 
     if (expectation == NOT_REMOVED) {
       assertEquals(filterOutput, filterInput);

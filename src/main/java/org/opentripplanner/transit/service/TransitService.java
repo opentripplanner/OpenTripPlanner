@@ -24,6 +24,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -307,4 +308,12 @@ public interface TransitService {
   Set<LocalDate> getAllServiceCodes();
 
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
+
+  /**
+   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
+   *
+   * @param request - A TripOnServiceDateRequest object with filtering defined.
+   * @return - A list of TripOnServiceDates
+   */
+  List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request);
 }

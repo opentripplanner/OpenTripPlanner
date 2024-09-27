@@ -35,8 +35,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
+import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -589,6 +592,23 @@ public class DefaultTransitService implements TransitEditorService {
       }
     }
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
+  }
+
+  /**
+   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
+   *
+   * @param request - A TripOnServiceDateRequest object with filtering defined.
+   * @return - A list of TripOnServiceDates
+   */
+  @Override
+  public List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request) {
+    Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
+    return transitModelIndex
+      .getTripOnServiceDateForTripAndDay()
+      .values()
+      .stream()
+      .filter(matcher::match)
+      .collect(Collectors.toList());
   }
 
   /**

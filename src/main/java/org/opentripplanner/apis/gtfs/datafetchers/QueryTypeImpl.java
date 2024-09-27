@@ -27,12 +27,12 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.PatternByServiceDatesFilter;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
+import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
@@ -615,8 +615,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       if (LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates())) {
-        var filter = new PatternByServiceDatesFilter(args.getGraphQLServiceDates(), transitService);
-        routeStream = filter.filterRoutes(routeStream).stream();
+        var filter = PatternByDateFilterUtil.ofGraphQL(
+          args.getGraphQLServiceDates(),
+          transitService
+        );
+        routeStream = filter.filterRoutes(routeStream.toList()).stream();
       }
       return routeStream.toList();
     };
