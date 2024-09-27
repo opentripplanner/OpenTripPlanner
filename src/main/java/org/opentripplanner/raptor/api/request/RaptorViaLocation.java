@@ -11,6 +11,13 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
+/**
+ * Defines a via location which Raptor will force the path through. The concrete location is
+ * called a connection. A location must have at least one connection, but can have more than
+ * on alternative. Raptor will force the path through one of the connections. So, if there
+ * are two connections, stop A and B, then Raptor will force the path through A or B. If the
+ * path goes through A, it may or may not go through B.
+ */
 public final class RaptorViaLocation {
 
   private static final int MAX_WAIT_TIME_LIMIT = (int) Duration.ofHours(24).toSeconds();
