@@ -85,7 +85,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips = transitModel.getStopLocationsUsedForFlexTrips();
+      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(transitModel);
     }
 
     Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = transitModel.getStopLocationsUsedForCarsAllowedTrips();
@@ -324,6 +324,24 @@ public class StreetLinkerModule implements GraphBuilderModule {
       vehicleParking.getEntrances().remove(entrance);
       return null;
     }
+  }
+
+  private Set<StopLocation> getStopLocationsUsedForFlexTrips(TransitModel transitModel) {
+    Set<StopLocation> stopLocations = transitModel
+      .getAllFlexTrips()
+      .stream()
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   private enum StopLinkType {

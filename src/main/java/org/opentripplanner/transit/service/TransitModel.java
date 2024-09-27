@@ -560,23 +560,6 @@ public class TransitModel implements Serializable {
     return flexTripsById.get(tripId);
   }
 
-  public Set<StopLocation> getStopLocationsUsedForFlexTrips() {
-    Set<StopLocation> stopLocations = getAllFlexTrips()
-      .stream()
-      .flatMap(t -> t.getStops().stream())
-      .collect(Collectors.toSet());
-
-    stopLocations.addAll(
-      stopLocations
-        .stream()
-        .filter(GroupStop.class::isInstance)
-        .map(GroupStop.class::cast)
-        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-        .toList()
-    );
-    return stopLocations;
-  }
-
   /**
    * The stops that are used by transit capable of transporting cars need to be
    * connected to the road network (e.g. car ferries). This method returns the

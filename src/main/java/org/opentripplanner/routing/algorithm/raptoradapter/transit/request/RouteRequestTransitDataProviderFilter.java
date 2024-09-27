@@ -103,16 +103,12 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
   public boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters) {
     final Trip trip = tripTimes.getTrip();
 
-    if (requireBikesAllowed) {
-      if (bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
-        return false;
-      }
+    if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
+      return false;
     }
 
-    if (requireCarsAllowed) {
-      if (trip.getCarsAllowed() != CarAccess.ALLOWED) {
-        return false;
-      }
+    if (requireCarsAllowed && trip.getCarsAllowed() != CarAccess.ALLOWED) {
+      return false;
     }
 
     if (wheelchairEnabled) {
