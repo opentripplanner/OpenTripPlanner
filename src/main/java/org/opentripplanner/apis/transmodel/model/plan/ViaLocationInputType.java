@@ -1,11 +1,13 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
 import static graphql.Directives.OneOfDirective;
+import static graphql.Scalars.GraphQLString;
 
-import graphql.Scalars;
 import graphql.language.StringValue;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLType;
 import java.time.Duration;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 
@@ -71,7 +73,7 @@ public class ViaLocationInputType {
     .newInputObject()
     .name(INPUT_VISIT_VIA_LOCATION)
     .description(DOC_VISIT_VIA_LOCATION)
-    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(Scalars.GraphQLString))
+    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
     .field(b ->
       b
         .name(FIELD_MINIMUM_WAIT_TIME)
@@ -83,7 +85,7 @@ public class ViaLocationInputType {
       b
         .name(FIELD_STOP_LOCATION_IDS)
         .description(DOC_STOP_LOCATION_IDS)
-        .type(GraphQLList.list(Scalars.GraphQLString))
+        .type(gqlListNonNullEntries(GraphQLString))
     )
     /*
       TODO: Add support for coordinates
@@ -94,12 +96,13 @@ public class ViaLocationInputType {
     .newInputObject()
     .name(INPUT_PASS_THROUGH_VIA_LOCATION)
     .description(DOC_PASS_THROUGH_VIA_LOCATION)
-    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(Scalars.GraphQLString))
+    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
     .field(b ->
+      // This is NOT nonNull, because we might add other parameters later, like 'list of line-ids'
       b
         .name(FIELD_STOP_LOCATION_IDS)
         .description(DOC_STOP_LOCATION_IDS)
-        .type(GraphQLList.list(Scalars.GraphQLString))
+        .type(gqlListNonNullEntries(GraphQLString))
     )
     .build();
 
@@ -111,4 +114,11 @@ public class ViaLocationInputType {
     .field(b -> b.name(FIELD_VISIT).type(VISIT_VIA_LOCATION_INPUT))
     .field(b -> b.name(FIELD_PASS_THROUGH).type(PASS_THROUGH_VIA_LOCATION_INPUT))
     .build();
+
+  /**
+   * Return a {@link GraphQLList} with {@link GraphQLNonNull} elements.
+   */
+  private static GraphQLList gqlListNonNullEntries(GraphQLType wrappedType) {
+    return new GraphQLList(new GraphQLNonNull(wrappedType));
+  }
 }
