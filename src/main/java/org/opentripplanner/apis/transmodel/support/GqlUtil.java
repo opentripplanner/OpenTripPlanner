@@ -96,10 +96,6 @@ public class GqlUtil {
     return argumentValue;
   }
 
-  public static <T> List<T> listOfNullSafe(T element) {
-    return element == null ? List.of() : List.of(element);
-  }
-
   /**
    * Helper method to support the deprecated 'lang' argument.
    */
