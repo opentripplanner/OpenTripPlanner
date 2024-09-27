@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
