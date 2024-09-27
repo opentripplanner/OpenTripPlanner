@@ -211,17 +211,17 @@ class StreetLinkerModuleTest {
         })
         .toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
-      TripPattern tripPattern = TransitModelForTest
-        .tripPattern("carsAllowedTripPattern", route)
-        .withStopPattern(stopPattern)
-        .build();
       RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
         trip,
         stopTimes,
         transitModel.getDeduplicator()
       );
+      TripPattern tripPattern = TransitModelForTest
+        .tripPattern("carsAllowedTripPattern", route)
+        .withStopPattern(stopPattern)
+        .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+        .build();
 
-      tripPattern.add(tripTimes);
       transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
