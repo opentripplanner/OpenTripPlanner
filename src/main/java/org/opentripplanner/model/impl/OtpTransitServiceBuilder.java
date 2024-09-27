@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
@@ -15,6 +16,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -51,6 +53,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
 import org.slf4j.Logger;
@@ -375,21 +378,40 @@ public class OtpTransitServiceBuilder {
   private void fixOrRemovePatternsWhichReferenceNoneExistingTrips() {
     int orgSize = tripPatterns.size();
     List<Map.Entry<StopPattern, TripPattern>> removePatterns = new ArrayList<>();
+    List<TripPattern> updatedPatterns = new ArrayList<>();
 
     for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
       TripPattern ptn = e.getValue();
-      ptn.removeTrips(t -> !tripsById.containsKey(t.getId()));
-      if (ptn.scheduledTripsAsStream().findAny().isEmpty()) {
+      Set<TripTimes> tripTimesToBeRemoved = ptn
+        .getScheduledTimetable()
+        .getTripTimes()
+        .stream()
+        .filter(tripTimes -> !tripsById.containsKey(tripTimes.getTrip().getId()))
+        .collect(Collectors.toUnmodifiableSet());
+      if (!tripTimesToBeRemoved.isEmpty()) {
         removePatterns.add(e);
+        Timetable updatedTimetable = ptn
+          .getScheduledTimetable()
+          .copyOf()
+          .removeAllTripTimes(tripTimesToBeRemoved)
+          .build();
+        TripPattern updatedPattern = ptn.copy().withScheduledTimeTable(updatedTimetable).build();
+        if (!updatedTimetable.getTripTimes().isEmpty()) {
+          updatedPatterns.add(updatedPattern);
+        } else {
+          issueStore.add(
+            "RemovedEmptyTripPattern",
+            "Removed trip pattern %s as it contains no trips",
+            updatedPattern.getId()
+          );
+        }
       }
     }
     for (Map.Entry<StopPattern, TripPattern> it : removePatterns) {
       tripPatterns.remove(it.getKey(), it.getValue());
-      issueStore.add(
-        "RemovedEmptyTripPattern",
-        "Removed trip pattern %s as it contains no trips",
-        it.getValue().getId()
-      );
+    }
+    for (TripPattern tripPattern : updatedPatterns) {
+      tripPatterns.put(tripPattern.getStopPattern(), tripPattern);
     }
     logRemove("TripPattern", orgSize, tripPatterns.size(), "No trips for pattern exist.");
   }

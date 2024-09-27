@@ -84,7 +84,7 @@ class NetexEpipBundleSmokeTest {
 
   private void assertAgencies(Collection<Agency> agencies) {
     assertEquals(3, agencies.size());
-    Agency a = list(agencies).get(0);
+    Agency a = list(agencies).getFirst();
     assertEquals("DE::Authority:41::", a.getId().getId());
     assertEquals("HOCHBAHN, Bus", a.getName());
     assertNull(a.getUrl());
@@ -146,7 +146,7 @@ class NetexEpipBundleSmokeTest {
       p.getStops().toString()
     );
     List<Trip> trips = p.scheduledTripsAsStream().toList();
-    assertEquals("Trip{HH:DE::ServiceJourney:36439031_0:: X86}", trips.get(0).toString());
+    assertEquals("Trip{HH:DE::ServiceJourney:36439062_0:: X86}", trips.getFirst().toString());
     assertEquals(55, trips.size());
     assertEquals(4, patterns.size());
   }
@@ -176,12 +176,12 @@ class NetexEpipBundleSmokeTest {
   private void assetServiceCalendar(CalendarServiceData cal) {
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
     assertEquals(2, sIds.size());
-    FeedScopedId serviceId1 = sIds.get(0);
+    FeedScopedId serviceId1 = sIds.getFirst();
 
     List<LocalDate> dates = cal.getServiceDatesForServiceId(serviceId1);
 
-    assertEquals("2023-02-02", dates.get(0).toString());
-    assertEquals("2023-12-08", dates.get(dates.size() - 1).toString());
+    assertEquals("2023-02-02", dates.getFirst().toString());
+    assertEquals("2023-12-08", dates.getLast().toString());
     assertEquals(214, dates.size());
   }
 }

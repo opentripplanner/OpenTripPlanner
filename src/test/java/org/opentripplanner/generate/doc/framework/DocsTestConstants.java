@@ -14,19 +14,20 @@ public interface DocsTestConstants {
   File USER_DOC_PATH = new File(DOC_ROOT, "user");
 
   /**
-   * This method return {@code true} if the /docs directory is available. If not, a warning is
+   * This method return {@code true} if both the /doc/user and /doc/templates directories are available. If not, a warning is
    * logged and the method returns {@code false}. This is used by the {@link GeneratesDocumentation}
    * annotation.
    */
   static boolean docsExistOrWarn() {
-    if (USER_DOC_PATH.exists()) {
+    if (USER_DOC_PATH.exists() && TEMPLATE_PATH.exists()) {
       return true;
     }
+
     LOG.warn(
       """
-      SKIP TEST - '/docs' NOT FOUND
+      SKIP TEST - '/doc/user' or '/doc/templates' NOT FOUND
       
-          The doc/templates directory might not be available if you run the tests outside the
+          The /doc/user and /doc/templates directories might not be available if you run the tests outside the
           root of the projects. This may happen if the project root is not the working directory,
           if you run tests using jar files or in a Maven multi-module project.
           

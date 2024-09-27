@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -52,9 +53,9 @@ public class TimetableSnapshotTest {
 
   @Test
   public void testCompare() {
-    Timetable orig = new Timetable(null);
-    Timetable a = new Timetable(orig, LocalDate.now(timeZone).minusDays(1));
-    Timetable b = new Timetable(orig, LocalDate.now(timeZone));
+    Timetable orig = Timetable.of().build();
+    Timetable a = orig.copyOf().withServiceDate(LocalDate.now(timeZone).minusDays(1)).build();
+    Timetable b = orig.copyOf().withServiceDate(LocalDate.now(timeZone)).build();
     assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
   }
 
@@ -106,52 +107,50 @@ public class TimetableSnapshotTest {
 
   @Test
   public void testUpdate() {
+    LocalDate today = LocalDate.now(timeZone);
+    LocalDate yesterday = today.minusDays(1);
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+
+    TimetableSnapshot resolver = new TimetableSnapshot();
+    Timetable origNow = resolver.resolve(pattern, today);
+
+    TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
+
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(
+      TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+    );
+    stopTimeUpdateBuilder.setDeparture(TripUpdate.StopTimeEvent.newBuilder().setDelay(5).build());
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    // new timetable for today
+    updateResolver(resolver, pattern, tripUpdate, today);
+    Timetable updatedNow = resolver.resolve(pattern, today);
+    assertNotSame(origNow, updatedNow);
+
+    // a new timetable instance is created for today
+    updateResolver(resolver, pattern, tripUpdate, today);
+    assertNotEquals(updatedNow, resolver.resolve(pattern, today));
+
+    // create new timetable for tomorrow
+    updateResolver(resolver, pattern, tripUpdate, yesterday);
+    assertNotSame(origNow, resolver.resolve(pattern, yesterday));
+    assertNotSame(updatedNow, resolver.resolve(pattern, yesterday));
+
+    // exception if we try to modify a snapshot
+    TimetableSnapshot snapshot = resolver.commit();
     assertThrows(
       ConcurrentModificationException.class,
       () -> {
-        LocalDate today = LocalDate.now(timeZone);
-        LocalDate yesterday = today.minusDays(1);
-        TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
-
-        TimetableSnapshot resolver = new TimetableSnapshot();
-        Timetable origNow = resolver.resolve(pattern, today);
-
-        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
-
-        tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
-
-        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
-        stopTimeUpdateBuilder.setStopSequence(2);
-        stopTimeUpdateBuilder.setScheduleRelationship(
-          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
-        );
-        stopTimeUpdateBuilder.setDeparture(
-          TripUpdate.StopTimeEvent.newBuilder().setDelay(5).build()
-        );
-
-        TripUpdate tripUpdate = tripUpdateBuilder.build();
-
-        // new timetable for today
-        updateResolver(resolver, pattern, tripUpdate, today);
-        Timetable updatedNow = resolver.resolve(pattern, today);
-        assertNotSame(origNow, updatedNow);
-
-        // reuse timetable for today
-        updateResolver(resolver, pattern, tripUpdate, today);
-        assertEquals(updatedNow, resolver.resolve(pattern, today));
-
-        // create new timetable for tomorrow
-        updateResolver(resolver, pattern, tripUpdate, yesterday);
-        assertNotSame(origNow, resolver.resolve(pattern, yesterday));
-        assertNotSame(updatedNow, resolver.resolve(pattern, yesterday));
-
-        // exception if we try to modify a snapshot
-        TimetableSnapshot snapshot = resolver.commit();
         updateResolver(snapshot, pattern, tripUpdate, yesterday);
       }
     );

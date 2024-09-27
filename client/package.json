@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@googlemaps/polyline-codec": "1.0.28",
+    "@js-temporal/polyfill": "0.4.4",
     "bootstrap": "5.3.3",
     "graphql": "16.9.0",
     "graphql-request": "7.1.0",

@@ -298,22 +298,15 @@ public class TimetableSnapshot {
     }
 
     Timetable tt = resolve(pattern, serviceDate);
-    // we need to perform the copy of Timetable here rather than in Timetable.update()
-    // to avoid repeatedly copying in case several updates are applied to the same timetable
-    tt = copyTimetable(pattern, serviceDate, tt);
+    TimetableBuilder ttb = tt.copyOf().withServiceDate(serviceDate);
 
     // Assume all trips in a pattern are from the same feed, which should be the case.
-    // Find trip index
-    Trip trip = updatedTripTimes.getTrip();
-    int tripIndex = tt.getTripIndex(trip.getId());
-    if (tripIndex == -1) {
-      // Trip not found, add it
-      tt.addTripTimes(updatedTripTimes);
-    } else {
-      // Set updated trip times of trip
-      tt.setTripTimes(tripIndex, updatedTripTimes);
-    }
+    ttb.addOrUpdateTripTimes(updatedTripTimes);
 
+    Timetable updated = ttb.build();
+    swapTimetable(pattern, tt, updated);
+
+    Trip trip = updatedTripTimes.getTrip();
     if (pattern.isCreatedByRealtimeUpdater()) {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();
@@ -459,8 +452,11 @@ public class TimetableSnapshot {
         if (tripTimesToRemove != null) {
           for (Timetable originalTimetable : sortedTimetables) {
             if (originalTimetable.getTripTimes().contains(tripTimesToRemove)) {
-              Timetable updatedTimetable = copyTimetable(pattern, serviceDate, originalTimetable);
-              updatedTimetable.getTripTimes().remove(tripTimesToRemove);
+              Timetable updatedTimetable = originalTimetable
+                .copyOf()
+                .removeTripTimes(tripTimesToRemove)
+                .build();
+              swapTimetable(pattern, originalTimetable, updatedTimetable);
             }
           }
         }
@@ -579,36 +575,33 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Make a copy of the given timetable for a given pattern and service date.
-   * If the timetable was already copied-on write in this snapshot, the same instance will be
-   * returned. The SortedSet that holds the collection of Timetables for that pattern
+   * Replace the original Timetable by the updated one in the timetable index.
+   * The SortedSet that holds the collection of Timetables for that pattern
    * (sorted by service date) is shared between multiple snapshots and must be copied as well.<br/>
    * Note on performance: if  multiple Timetables are modified in a SortedSet, the SortedSet will be
    * copied multiple times. The impact on memory/garbage collection is assumed to be minimal
    * since the collection is small.
    * The SortedSet is made immutable to prevent change after snapshot publication.
    */
-  private Timetable copyTimetable(TripPattern pattern, LocalDate serviceDate, Timetable tt) {
-    if (!dirtyTimetables.contains(tt)) {
-      Timetable old = tt;
-      tt = new Timetable(tt, serviceDate);
-      SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
-      if (sortedTimetables == null) {
-        sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
-      } else {
-        SortedSet<Timetable> temp = new TreeSet<>(new SortedTimetableComparator());
-        temp.addAll(sortedTimetables);
-        sortedTimetables = temp;
-      }
-      if (old.getServiceDate() != null) {
-        sortedTimetables.remove(old);
-      }
-      sortedTimetables.add(tt);
-      timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
-      dirtyTimetables.add(tt);
-      dirty = true;
+  private void swapTimetable(TripPattern pattern, Timetable original, Timetable updated) {
+    SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
+    if (sortedTimetables == null) {
+      sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
+    } else {
+      SortedSet<Timetable> temp = new TreeSet<>(new SortedTimetableComparator());
+      temp.addAll(sortedTimetables);
+      sortedTimetables = temp;
     }
-    return tt;
+    // This is a minor optimization:
+    // Since sortedTimetables contains only timetables created in real-time, no need to try to
+    // remove the original if it was not created by real-time.
+    if (original.isCreatedByRealTimeUpdater()) {
+      sortedTimetables.remove(original);
+    }
+    sortedTimetables.add(updated);
+    timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
+    dirtyTimetables.add(updated);
+    dirty = true;
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {

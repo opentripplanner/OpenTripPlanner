@@ -482,13 +482,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
     stopTimes.add(toStopTime);
 
     StopPattern stopPattern = new StopPattern(stopTimes);
+    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     TripPattern tripPattern = TripPattern
       .of(route.getId())
       .withRoute(route)
       .withStopPattern(stopPattern)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    tripPattern.add(tripTimes);
 
     ScheduledTransitLeg leg;
 

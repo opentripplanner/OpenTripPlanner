@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -54,23 +53,23 @@ class ScheduledTransitLegReferenceTest {
     stop4 = TEST_MODEL.stop("STOP4", 0, 0).withParentStation(parentStation).build();
 
     // build transit data
-    TripPattern tripPattern = TransitModelForTest
-      .tripPattern("1", TransitModelForTest.route(id("1")).build())
-      .withStopPattern(TransitModelForTest.stopPattern(stop1, stop2, stop3))
-      .build();
-    Timetable timetable = tripPattern.getScheduledTimetable();
     Trip trip = TransitModelForTest.trip("1").build();
-    tripId = trip.getId();
-    stopIdAtPosition0 = tripPattern.getStop(0).getId();
-    stopIdAtPosition1 = tripPattern.getStop(1).getId();
-    stopIdAtPosition2 = tripPattern.getStop(2).getId();
     var tripTimes = TripTimesFactory.tripTimes(
       trip,
       TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);
-    timetable.addTripTimes(tripTimes);
+    TripPattern tripPattern = TransitModelForTest
+      .tripPattern("1", TransitModelForTest.route(id("1")).build())
+      .withStopPattern(TransitModelForTest.stopPattern(stop1, stop2, stop3))
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
+
+    tripId = trip.getId();
+    stopIdAtPosition0 = tripPattern.getStop(0).getId();
+    stopIdAtPosition1 = tripPattern.getStop(1).getId();
+    stopIdAtPosition2 = tripPattern.getStop(2).getId();
 
     // build transit model
     StopModel stopModel = TEST_MODEL

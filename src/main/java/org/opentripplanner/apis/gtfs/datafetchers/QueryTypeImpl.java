@@ -42,6 +42,9 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -359,6 +362,20 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       return new SimpleListConnection<>(places).get(environment);
+    };
+  }
+
+  @Override
+  public DataFetcher<Leg> leg() {
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      var args = new GraphQLTypes.GraphQLQueryTypeLegArgs(environment.getArguments());
+      String id = args.getGraphQLId();
+      LegReference ref = LegReferenceSerializer.decode(id);
+      if (ref == null) {
+        return null;
+      }
+      return ref.getLeg(transitService);
     };
   }
 
