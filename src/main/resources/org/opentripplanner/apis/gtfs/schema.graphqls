@@ -674,7 +674,7 @@ type Leg {
   Re-fetching fails when the underlying transit data no longer exists.
   Non-transit legs cannot be refetched using their id.
   """
-  id: ID
+  id: String
   """
   Interlines with previous leg.
   This is true when the same vehicle is used for the previous leg as for this leg
@@ -1172,10 +1172,10 @@ type QueryType {
     time: Int!
   ): Trip
   """
-  Try refetching the current state of a transit leg using its ID.
+  Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
   """
-  leg(id: ID!): Leg
+  leg(id: String!): Leg
   """
   Get all places (stops, stations, etc. with coordinates) within the specified
   radius from a location. The returned type is a Relay connection (see

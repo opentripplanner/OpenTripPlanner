@@ -2434,19 +2434,19 @@ public class GraphQLTypes {
 
   public static class GraphQLQueryTypeLegArgs {
 
-    private graphql.relay.Relay.ResolvedGlobalId id;
+    private String id;
 
     public GraphQLQueryTypeLegArgs(Map<String, Object> args) {
       if (args != null) {
-        this.id = (graphql.relay.Relay.ResolvedGlobalId) args.get("id");
+        this.id = (String) args.get("id");
       }
     }
 
-    public graphql.relay.Relay.ResolvedGlobalId getGraphQLId() {
+    public String getGraphQLId() {
       return this.id;
     }
 
-    public void setGraphQLId(graphql.relay.Relay.ResolvedGlobalId id) {
+    public void setGraphQLId(String id) {
       this.id = id;
     }
   }
