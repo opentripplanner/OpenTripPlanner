@@ -16,7 +16,6 @@ Currently contains the following updaters:
 - [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
 - [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - [Bikely](https://www.safebikely.com/)
-- [NOI Open Data Hub](https://opendatahub.com/)
 
 ### Configuration
 
@@ -39,10 +38,6 @@ All updaters have the following parameters in common:
 ## Bikely
 
 <!-- INSERT: bikely -->
-
-## NOI Open Data Hub
-
-<!-- INSERT: noi-open-data-hub -->
 
 ## Bikeep
 

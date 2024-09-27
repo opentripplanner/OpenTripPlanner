@@ -11,7 +11,6 @@ import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -78,17 +77,6 @@ public class VehicleParkingUpdaterConfig {
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
         HttpHeadersConfig.headers(c, V2_3)
-      );
-      case NOI_OPEN_DATA_HUB -> new NoiUpdaterParameters(
-        updaterRef,
-        c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
-        feedId,
-        c
-          .of("frequency")
-          .since(V2_6)
-          .summary("How often to update the source.")
-          .asDuration(Duration.ofMinutes(1)),
-        HttpHeadersConfig.headers(c, V2_6)
       );
       case BIKEEP -> new BikeepUpdaterParameters(
         updaterRef,
