@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 
 /**
  * This filter will remove all itineraries that are both search-window aware and outside the
- * search-window. Only those that use transit are search-window, street and flex itineraries are not.
+ * search-window. Only those that use transit are search-window aware, street and flex itineraries are not.
  * <p>
  * In some cases the access is time-shifted after the end of the search-window. These results
  * should appear again when paging to the next page. Hence, this filter will remove
