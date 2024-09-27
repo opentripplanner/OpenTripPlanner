@@ -672,7 +672,6 @@ type Leg {
   """
   An identifier for the leg, which can be used to re-fetch transit leg information.
   Re-fetching fails when the underlying transit data no longer exists.
-  Non-transit legs cannot be refetched using their id.
   """
   id: String
   """
