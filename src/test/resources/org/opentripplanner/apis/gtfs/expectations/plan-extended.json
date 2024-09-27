@@ -64,7 +64,9 @@
               "intermediatePlaces" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "accessibilityScore" : null,
+              "id": null,
+              "realtimeState": null
             },
             {
               "mode" : "BUS",
@@ -154,7 +156,9 @@
               ],
               "alerts" : [ ],
               "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "accessibilityScore" : null,
+              "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6MTIyAAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QgADRjpDAAA=",
+              "realtimeState": "UPDATED"
             },
             {
               "mode" : "RAIL",
@@ -264,7 +268,9 @@
                 }
               ],
               "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "accessibilityScore" : null,
+              "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6NDM5AAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QwADRjpEAAA=",
+              "realtimeState": "UPDATED"
             },
             {
               "mode" : "CAR",
@@ -334,7 +340,9 @@
                 },
                 "arrival" : "PT10M"
               },
-              "accessibilityScore" : null
+              "accessibilityScore" : null,
+              "id": null,
+              "realtimeState": null
             }
           ]
         }

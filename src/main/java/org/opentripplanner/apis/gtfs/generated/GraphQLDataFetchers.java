@@ -482,6 +482,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> headsign();
 
+    public DataFetcher<String> id();
+
     public DataFetcher<Boolean> interlineWithPreviousLeg();
 
     public DataFetcher<Boolean> intermediatePlace();
@@ -778,6 +780,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<String>> feeds();
 
     public DataFetcher<Trip> fuzzyTrip();
+
+    public DataFetcher<Leg> leg();
 
     public DataFetcher<Connection<PlaceAtDistance>> nearest();
 

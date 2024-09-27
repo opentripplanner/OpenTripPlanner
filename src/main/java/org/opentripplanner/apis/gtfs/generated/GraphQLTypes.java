@@ -2432,6 +2432,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeLegArgs {
+
+    private String id;
+
+    public GraphQLQueryTypeLegArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
+
+    public String getGraphQLId() {
+      return this.id;
+    }
+
+    public void setGraphQLId(String id) {
+      this.id = id;
+    }
+  }
+
   public static class GraphQLQueryTypeNearestArgs {
 
     private String after;
