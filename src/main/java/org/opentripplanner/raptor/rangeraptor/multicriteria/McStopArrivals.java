@@ -9,8 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorViaConnection;
-import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
@@ -22,7 +20,6 @@ import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
-import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
@@ -35,7 +32,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private final StopArrivalParetoSet<T>[] arrivals;
   private final BitSet touchedStops;
-  private final McStopArrivals<T> next;
 
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final DebugStopArrivalsStatistics debugStats;
@@ -68,12 +64,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     //noinspection unchecked
     this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
     this.touchedStops = new BitSet(nStops);
-    this.next = next;
     this.comparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initViaConnections(viaConnections, stopArrivalFactory);
+    initViaConnections(viaConnections, stopArrivalFactory, next);
     initEgressStopAndGlueItToDestinationArrivals(egressPaths, paths);
   }
 
@@ -158,31 +153,21 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private void initViaConnections(
     @Nullable ViaConnections viaConnections,
-    McStopArrivalFactory<T> stopArrivalFactory
+    McStopArrivalFactory<T> stopArrivalFactory,
+    McStopArrivals<T> next
   ) {
     if (viaConnections == null) {
       return;
     }
     viaConnections
       .byFromStop()
-      .forEachEntry((stop, list) -> {
+      .forEachEntry((stop, connections) -> {
         this.arrivals[stop] =
           StopArrivalParetoSet
             .of(comparator)
             .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
             .withNextSearchListener(
-              new ParetoSetEventListener<>() {
-                @Override
-                public void notifyElementAccepted(ArrivalView<T> newElement) {
-                  for (RaptorViaConnection c : list) {
-                    var e = (McStopArrival<T>) newElement;
-                    var n = stopArrivalFactory.createViaStopArrival(e, c);
-                    if (n != null) {
-                      next.addStopArrival(n);
-                    }
-                  }
-                }
-              }
+              new ViaConnectionStopArrivalEventListener<>(stopArrivalFactory, connections, next)
             )
             .build();
         return true;
