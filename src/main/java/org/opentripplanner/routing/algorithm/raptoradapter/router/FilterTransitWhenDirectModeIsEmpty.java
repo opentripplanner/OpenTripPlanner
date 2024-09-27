@@ -10,7 +10,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
  * ´directMode´, OTP does not do the streetSearch. And, the removal of non-optimal results is not
  * done, there is not street results to use to prune bad transit results with. In other words OTP is
  * forced to return at least one itinerary with at least one transit leg. So, instead of walking
- * maybe 100 meters, the OTP suggest you need to walk to the closest bus stop, take the bus one
+ * maybe 100 meters, OTP suggests you need to walk to the closest bus stop, take the bus for one
  * stop and walk back, often with more walking than just those 100 meters.
  * <p>
  * <b>Let say OTP produces these internal results:</b>
