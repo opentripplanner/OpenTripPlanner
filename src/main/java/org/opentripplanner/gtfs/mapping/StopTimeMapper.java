@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopArea;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
@@ -22,7 +21,6 @@ class StopTimeMapper {
   private final LocationMapper locationMapper;
 
   private final LocationGroupMapper locationGroupMapper;
-  private final StopAreaMapper stopAreaMapper;
 
   private final TripMapper tripMapper;
   private final BookingRuleMapper bookingRuleMapper;
@@ -35,7 +33,6 @@ class StopTimeMapper {
     StopMapper stopMapper,
     LocationMapper locationMapper,
     LocationGroupMapper locationGroupMapper,
-    StopAreaMapper stopAreaMapper,
     TripMapper tripMapper,
     BookingRuleMapper bookingRuleMapper,
     TranslationHelper translationHelper
@@ -43,7 +40,6 @@ class StopTimeMapper {
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
     this.locationGroupMapper = locationGroupMapper;
-    this.stopAreaMapper = stopAreaMapper;
     this.tripMapper = tripMapper;
     this.bookingRuleMapper = bookingRuleMapper;
     this.translationHelper = translationHelper;
@@ -71,8 +67,6 @@ class StopTimeMapper {
       case Stop stop -> lhs.setStop(stopMapper.map(stop));
       case Location location -> lhs.setStop(locationMapper.map(location));
       case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
-      // TODO: only here for backwards compatibility, this will be removed in the future
-      case StopArea area -> lhs.setStop(stopAreaMapper.map(area));
       default -> throw new IllegalArgumentException(
         "Unknown location type: %s".formatted(stopLocation)
       );
