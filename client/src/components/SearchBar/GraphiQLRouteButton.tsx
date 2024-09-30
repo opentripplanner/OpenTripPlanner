@@ -12,7 +12,7 @@ function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQ
   return (
     <Button href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedVariables} target={'_blank'}>
       <img
-        alt="Openin GraphiQL"
+        alt="Open in GraphiQL"
         title="Open in GraphiQL"
         src={logo}
         width="20"
