@@ -129,9 +129,12 @@ class RealtimeResolverTest {
   private static TripPattern delay(TripPattern pattern1, int seconds) {
     var originalTimeTable = pattern1.getScheduledTimetable();
 
-    var delayedTimetable = new Timetable(pattern1);
     var delayedTripTimes = delay(originalTimeTable.getTripTimes(0), seconds);
-    delayedTimetable.addTripTimes(delayedTripTimes);
+    var delayedTimetable = Timetable
+      .of()
+      .withTripPattern(pattern1)
+      .addTripTimes(delayedTripTimes)
+      .build();
 
     return pattern1.copy().withScheduledTimeTable(delayedTimetable).build();
   }

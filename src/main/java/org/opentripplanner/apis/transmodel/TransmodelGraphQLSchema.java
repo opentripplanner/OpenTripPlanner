@@ -1596,7 +1596,7 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("leg")
-          .description("Refetch a single leg based on its id")
+          .description("Refetch a single transit leg based on its id")
           .withDirective(gqlUtil.timingData)
           .type(LegType.REF)
           .argument(

@@ -163,11 +163,13 @@ class GraphQLIntegrationTest {
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
-    final TripPattern pattern = TEST_MODEL.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
-    pattern.add(tripTimes);
+    final TripPattern pattern = TEST_MODEL
+      .pattern(BUS)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
 

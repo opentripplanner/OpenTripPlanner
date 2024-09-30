@@ -62,8 +62,8 @@ public class TestRouteData {
         .of(TransitModelForTest.id("TP:" + route))
         .withRoute(this.route)
         .withStopPattern(new StopPattern(stopTimesFistTrip))
+        .withScheduledTimeTableBuilder(builder -> builder.addAllTripTimes(tripTimes))
         .build();
-    tripTimes.forEach(tripPattern::add);
 
     RoutingTripPattern routingTripPattern = tripPattern.getRoutingTripPattern();
 
