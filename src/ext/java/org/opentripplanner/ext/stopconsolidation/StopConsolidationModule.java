@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StopConsolidationModule implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationModule.class);
 
   private final StopConsolidationRepository repository;
   private final TransitModel transitModel;

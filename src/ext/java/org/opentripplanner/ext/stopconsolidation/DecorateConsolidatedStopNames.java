@@ -1,8 +1,10 @@
 package org.opentripplanner.ext.stopconsolidation;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
@@ -13,6 +15,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  */
 public class DecorateConsolidatedStopNames implements ItineraryDecorator {
 
+  private static final int MAX_INTRA_STOP_WALK_DISTANCE_METERS = 15;
   private final StopConsolidationService service;
 
   public DecorateConsolidatedStopNames(StopConsolidationService service) {
@@ -22,6 +25,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   @Override
   public void decorate(Itinerary itinerary) {
     replaceConsolidatedStops(itinerary);
+    removeWalkLegs(itinerary);
   }
 
   /**
@@ -49,6 +53,43 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
         return leg;
       }
     });
+  }
+
+  /**
+   * Removes walk legs from and to a consolidated stop if they are deemed "short". This means that
+   * they are from a different element of the consolidated stop.
+   */
+  private void removeWalkLegs(Itinerary itinerary) {
+    var legs = new ArrayList<>(itinerary.getLegs());
+    var first = legs.getFirst();
+    if (
+      service.isPartOfConsolidatedStop(first.getTo().stop) &&
+      first.isWalkingLeg() &&
+      first.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS
+    ) {
+      legs.removeFirst();
+    }
+    var last = legs.getLast();
+    if (
+      service.isPartOfConsolidatedStop(last.getFrom().stop) &&
+      last.isWalkingLeg() &&
+      last.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS
+    ) {
+      legs.removeLast();
+    }
+
+    var transfersRemoved = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
+
+    itinerary.setLegs(transfersRemoved);
+  }
+
+  private boolean isTransferWithinConsolidatedStop(Leg l) {
+    return (
+      l.isWalkingLeg() &&
+      (l.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS) &&
+      service.isPartOfConsolidatedStop(l.getFrom().stop) &&
+      service.isPartOfConsolidatedStop(l.getTo().stop)
+    );
   }
 
   /**
