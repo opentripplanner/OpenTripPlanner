@@ -932,14 +932,14 @@ case where this is not the case.
 List stop places that should route to centroid.
 
 This field contains a list of stop place ids for which the centroid will be used instead
-of the stop coordinates.
+of the stop coordinates when routing to the stop place.
 
 When doing street routing from/to a station the default behaviour is to route to any of
 the stop place child quays. This can cause strange results for stop places that have quays
 spread over a large area.
 
 For some stop places you might instead wish to use the centroid of the stop place as the
-source/destination for street routing. In this case the centroid will be  used both for
+source/destination for street routing. In this case the centroid will be used both for
 direct street search and for access/egress street search where the stop place is used as
 the start/end of the access/egress.
 
@@ -1097,14 +1097,14 @@ case where this is not the case.
 List stop places that should route to centroid.
 
 This field contains a list of stop place ids for which the centroid will be used instead
-of the stop coordinates.
+of the stop coordinates when routing to the stop place.
 
 When doing street routing from/to a station the default behaviour is to route to any of
 the stop place child quays. This can cause strange results for stop places that have quays
 spread over a large area.
 
 For some stop places you might instead wish to use the centroid of the stop place as the
-source/destination for street routing. In this case the centroid will be  used both for
+source/destination for street routing. In this case the centroid will be used both for
 direct street search and for access/egress street search where the stop place is used as
 the start/end of the access/egress.
 

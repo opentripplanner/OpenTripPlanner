@@ -196,6 +196,20 @@ public abstract class SphericalDistanceLibrary {
     return dLatDeg / minCosLat;
   }
 
+  /**
+   * Approximately move a coordinate a given number of meters. This will fail if crossing the anti-
+   * meridian or any of the poles.
+   */
+  public static WgsCoordinate moveMeters(
+    WgsCoordinate coordinate,
+    double latMeters,
+    double lonMeters
+  ) {
+    var degreesLat = metersToDegrees(latMeters);
+    var degreesLon = metersToLonDegrees(lonMeters, coordinate.latitude());
+    return coordinate.add(degreesLat, degreesLon);
+  }
+
   public static Envelope bounds(double lat, double lon, double latDistance, double lonDistance) {
     double radiusOfEarth = RADIUS_OF_EARTH_IN_M;
 

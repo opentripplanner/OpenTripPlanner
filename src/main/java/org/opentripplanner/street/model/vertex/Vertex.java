@@ -163,7 +163,10 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return getLabel().toString();
   }
 
-  public WgsCoordinate getWgsCoordinate() {
+  /**
+   * Return the position of the vertex as a WgsCoordinate.
+   */
+  public WgsCoordinate toWgsCoordinate() {
     return new WgsCoordinate(y, x);
   }
 

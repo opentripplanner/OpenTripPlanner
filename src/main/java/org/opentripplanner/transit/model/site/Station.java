@@ -106,7 +106,7 @@ public class Station
 
   /**
    * When doing a street search from/to the station, we can either route to the centroid of the station
-   * or from/to any child stop.
+   * or from/to any child stop. This feature is inactive unless configured.
    */
   public boolean shouldRouteToCentroid() {
     return shouldRouteToCentroid;

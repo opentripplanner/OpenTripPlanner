@@ -107,7 +107,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = DirectlyConnectedStopFinder.findDirectlyConnectedStops(
+    List<NearbyStop> stopsFound = NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
       Sets.difference(originVertices, ignoreVertices),
       reverseDirection,
       request,
@@ -121,6 +121,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     ) {
       return stopsFound;
     }
+    stopsFound = new ArrayList<>(stopsFound);
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()

@@ -31,6 +31,6 @@ class VertexTest {
   @Test
   void testWgsCoordinate() {
     Vertex v1 = new SimpleVertex("", LAT, LON);
-    assertEquals(new WgsCoordinate(LAT, LON), v1.getWgsCoordinate());
+    assertEquals(new WgsCoordinate(LAT, LON), v1.toWgsCoordinate());
   }
 }

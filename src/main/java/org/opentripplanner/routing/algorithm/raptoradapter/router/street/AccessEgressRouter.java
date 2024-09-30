@@ -1,28 +1,18 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.collection.ListUtils;
-import org.opentripplanner.graph_builder.module.nearbystops.DirectlyConnectedStopFinder;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
-import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +44,7 @@ public class AccessEgressRouter {
 
     // Note: We do direct and street search in two parts since some stations will use the centroid
     // for street routing, but should still give direct access/egresses to its child-stops.
-    var directAccessEgress = AccessEgressRouter.findDirectAccessEgress(
+    var directAccessEgress = findDirectAccessEgress(
       verticesContainer,
       request,
       streetRequest,
@@ -67,9 +57,9 @@ public class AccessEgressRouter {
       .map(nearbyStop -> nearbyStop.state.getVertex())
       .collect(Collectors.toSet());
 
-    var originVertices = accessOrEgress.isEgress()
-      ? verticesContainer.getToVertices()
-      : verticesContainer.getFromVertices();
+    var originVertices = accessOrEgress.isAccess()
+      ? verticesContainer.getFromVertices()
+      : verticesContainer.getToVertices();
     var streetAccessEgress = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,
@@ -93,16 +83,12 @@ public class AccessEgressRouter {
     StreetRequest streetRequest,
     AccessEgressType accessOrEgress
   ) {
-    var directVertices = accessOrEgress.isEgress()
-      ? verticesContainer.getToStopVertices()
-      : verticesContainer.getFromStopVertices();
+    var directVertices = accessOrEgress.isAccess()
+      ? verticesContainer.getFromStopVertices()
+      : verticesContainer.getToStopVertices();
 
-    if (directVertices.isEmpty()) {
-      return List.of();
-    }
-
-    return DirectlyConnectedStopFinder.findDirectlyConnectedStops(
-      Collections.unmodifiableSet(directVertices),
+    return NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
+      directVertices,
       accessOrEgress.isEgress(),
       routeRequest,
       streetRequest

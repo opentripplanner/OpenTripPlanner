@@ -14,7 +14,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.geometry.CoordinateHelper;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -24,7 +24,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 class StreetNearbyStopFinderTest extends GraphRoutingTest {
 
-  private static final CoordinateHelper origin = new CoordinateHelper(0.0, 0.0);
+  private static final WgsCoordinate origin = new WgsCoordinate(0.0, 0.0);
   private TransitStopVertex isolatedStop;
   private TransitStopVertex stopA;
   private TransitStopVertex stopB;
@@ -37,22 +37,22 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
-          var isolated = intersection("isolated", origin.north(1000));
+          var isolated = intersection("isolated", origin.moveNorthMeters(1000));
 
-          var A = intersection("A", origin.get());
-          var B = intersection("B", origin.east(100));
-          var C = intersection("C", origin.east(200));
-          var D = intersection("D", origin.east(300));
+          var A = intersection("A", origin);
+          var B = intersection("B", origin.moveEastMeters(100));
+          var C = intersection("C", origin.moveEastMeters(200));
+          var D = intersection("D", origin.moveEastMeters(300));
 
           biStreet(A, B, 100);
           biStreet(B, C, 100);
           biStreet(C, D, 100);
 
-          isolatedStop = stop("IsolatedStop", isolated.getWgsCoordinate());
-          stopA = stop("StopA", A.getWgsCoordinate());
-          stopB = stop("StopB", B.getWgsCoordinate());
-          stopC = stop("StopC", C.getWgsCoordinate());
-          stopD = stop("StopD", D.getWgsCoordinate());
+          isolatedStop = stop("IsolatedStop", isolated.toWgsCoordinate());
+          stopA = stop("StopA", A.toWgsCoordinate());
+          stopB = stop("StopB", B.toWgsCoordinate());
+          stopC = stop("StopC", C.toWgsCoordinate());
+          stopD = stop("StopD", D.toWgsCoordinate());
 
           biLink(A, stopA);
           biLink(B, stopB);

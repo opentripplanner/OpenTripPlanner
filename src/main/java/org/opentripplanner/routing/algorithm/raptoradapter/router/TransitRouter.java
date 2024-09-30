@@ -228,7 +228,7 @@ public class TransitRouter {
   }
 
   private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
-    var streetRequest = type.isEgress() ? request.journey().egress() : request.journey().access();
+    var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.clone();
@@ -259,11 +259,10 @@ public class TransitRouter {
       durationLimit,
       stopCountLimit
     );
-    var nearbyAccessEgress = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
-    nearbyAccessEgress = timeshiftRideHailing(streetRequest, type, nearbyAccessEgress);
+    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
+    accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
-    var results = new ArrayList<>(nearbyAccessEgress);
-    results.addAll(nearbyAccessEgress);
+    var results = new ArrayList<>(accessEgresses);
 
     // Special handling of flex accesses
     if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {

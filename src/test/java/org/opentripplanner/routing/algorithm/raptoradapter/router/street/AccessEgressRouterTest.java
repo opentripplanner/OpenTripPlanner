@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.geometry.CoordinateHelper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -25,11 +24,11 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   private Graph graph;
 
-  private TransitStopVertex stop1;
-  private TransitStopVertex stop2;
+  private TransitStopVertex stopForCentroidRoutingStation;
+  private TransitStopVertex stopForNoCentroidRoutingStation;
 
-  private static final CoordinateHelper origin = new CoordinateHelper(0.0, 0.0);
-  private static final WgsCoordinate farAwayCoordinate = origin.east(100000);
+  private static final WgsCoordinate origin = new WgsCoordinate(0.0, 0.0);
+  private static final WgsCoordinate farAwayCoordinate = origin.moveEastMeters(100000);
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -37,10 +36,10 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
-          var A = intersection("A", origin.get());
-          var B = intersection("B", origin.east(100));
-          var C = intersection("C", origin.east(200));
-          var D = intersection("D", origin.east(300));
+          var A = intersection("A", origin);
+          var B = intersection("B", origin.moveEastMeters(100));
+          var C = intersection("C", origin.moveEastMeters(200));
+          var D = intersection("D", origin.moveEastMeters(300));
           var farAway = intersection("FarAway", farAwayCoordinate);
 
           biStreet(A, B, 100);
@@ -48,27 +47,30 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           biStreet(C, D, 100);
           biStreet(farAway, A, 1000000);
 
-          // Station1 has centroid routing
-          var station1 = stationEntity(
-            "Station1",
-            b -> b.withCoordinate(A.getWgsCoordinate()).withShouldRouteToCentroid(true)
+          var centroidRoutingStation = stationEntity(
+            "CentroidRoutingStation",
+            b -> b.withCoordinate(A.toWgsCoordinate()).withShouldRouteToCentroid(true)
           );
-          var station1Centroid = stationCentroid(station1);
+          var centroidRoutingStationVertex = stationCentroid(centroidRoutingStation);
 
-          // Station2 does not have centroid routing
-          var station2 = stationEntity("Station2", b -> b.withCoordinate(D.getWgsCoordinate()));
-          var station2Centroid = stationCentroid(station2);
+          var noCentroidRoutingStation = stationEntity(
+            "NoCentroidRoutingStation",
+            b -> b.withCoordinate(D.toWgsCoordinate())
+          );
+          var noCentroidRoutingStationVertex = stationCentroid(noCentroidRoutingStation);
 
-          // Stop1 is a child of station1
-          stop1 = stop("Stop1", B.getWgsCoordinate(), station1);
+          // StopForCentroidRoutingStation is a child of centroidRoutingStation
+          stopForCentroidRoutingStation =
+            stop("StopForCentroidRoutingStation", B.toWgsCoordinate(), centroidRoutingStation);
 
-          // Stop1 is a child of station2
-          stop2 = stop("Stop2", C.getWgsCoordinate(), station2);
+          // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
+          stopForNoCentroidRoutingStation =
+            stop("StopForNoCentroidRoutingStation", C.toWgsCoordinate(), noCentroidRoutingStation);
 
-          biLink(A, station1Centroid);
-          biLink(B, stop1);
-          biLink(C, stop2);
-          biLink(D, station2Centroid);
+          biLink(A, centroidRoutingStationVertex);
+          biLink(B, stopForCentroidRoutingStation);
+          biLink(C, stopForNoCentroidRoutingStation);
+          biLink(D, noCentroidRoutingStationVertex);
         }
       }
     );
@@ -78,59 +80,95 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   @Test
   void findAccessEgressFromStop() {
     var accesses = findAccessEgressFromTo(
-      location("Stop1"),
+      location("StopForCentroidRoutingStation"),
       location(farAwayCoordinate),
       AccessEgressType.ACCESS
     );
-    assertAcessEgresses(Set.of("direct[Stop1]", "street[Stop1 -> Stop2]"), accesses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForCentroidRoutingStation]",
+        "street[StopForCentroidRoutingStation -> StopForNoCentroidRoutingStation]"
+      ),
+      accesses
+    );
 
     var egresses = findAccessEgressFromTo(
       location(farAwayCoordinate),
-      location("Stop1"),
+      location("StopForCentroidRoutingStation"),
       AccessEgressType.EGRESS
     );
-    assertAcessEgresses(Set.of("direct[Stop1]", "street[Stop1 -> Stop2]"), egresses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForCentroidRoutingStation]",
+        "street[StopForCentroidRoutingStation -> StopForNoCentroidRoutingStation]"
+      ),
+      egresses
+    );
   }
 
   @Test
   void findAccessEgressStation() {
     // For stations with centroid routing we should use the station centroid as source for the street search
     var accesses = findAccessEgressFromTo(
-      location("Station1"),
+      location("CentroidRoutingStation"),
       location(farAwayCoordinate),
       AccessEgressType.ACCESS
     );
-    assertAcessEgresses(Set.of("direct[Stop1]", "street[Station1 -> Stop2]"), accesses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForCentroidRoutingStation]",
+        "street[CentroidRoutingStation -> StopForNoCentroidRoutingStation]"
+      ),
+      accesses
+    );
 
     var egresses = findAccessEgressFromTo(
       location(farAwayCoordinate),
-      location("Station1"),
+      location("CentroidRoutingStation"),
       AccessEgressType.EGRESS
     );
-    assertAcessEgresses(Set.of("direct[Stop1]", "street[Station1 -> Stop2]"), egresses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForCentroidRoutingStation]",
+        "street[CentroidRoutingStation -> StopForNoCentroidRoutingStation]"
+      ),
+      egresses
+    );
   }
 
   @Test
   void findAccessEgressStationNoCentroidRouting() {
     // For stations without centroid routing we should use the quay as source for the street search
     var accesses = findAccessEgressFromTo(
-      location("Station2"),
+      location("NoCentroidRoutingStation"),
       location(farAwayCoordinate),
       AccessEgressType.ACCESS
     );
-    assertAcessEgresses(Set.of("direct[Stop2]", "street[Stop2 -> Stop1]"), accesses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForNoCentroidRoutingStation]",
+        "street[StopForNoCentroidRoutingStation -> StopForCentroidRoutingStation]"
+      ),
+      accesses
+    );
 
     var egresses = findAccessEgressFromTo(
       location(farAwayCoordinate),
-      location("Station2"),
+      location("NoCentroidRoutingStation"),
       AccessEgressType.EGRESS
     );
-    assertAcessEgresses(Set.of("direct[Stop2]", "street[Stop2 -> Stop1]"), egresses);
+    assertAcessEgresses(
+      Set.of(
+        "direct[StopForNoCentroidRoutingStation]",
+        "street[StopForNoCentroidRoutingStation -> StopForCentroidRoutingStation]"
+      ),
+      egresses
+    );
   }
 
   @Test
   void findAccessEgressFromCoordinate() {
-    var coordinate = origin.east(5);
+    var coordinate = origin.moveEastMeters(5);
 
     // We should get street access from coordinate to quay1 and quay2
     var accesses = findAccessEgressFromTo(
@@ -138,7 +176,13 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       location(farAwayCoordinate),
       AccessEgressType.ACCESS
     );
-    assertAcessEgresses(Set.of("street[Origin -> Stop1]", "street[Origin -> Stop2]"), accesses);
+    assertAcessEgresses(
+      Set.of(
+        "street[Origin -> StopForCentroidRoutingStation]",
+        "street[Origin -> StopForNoCentroidRoutingStation]"
+      ),
+      accesses
+    );
 
     // We should get street access from coordinate to quay1 and quay2
     var egresses = findAccessEgressFromTo(
@@ -147,14 +191,15 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       AccessEgressType.EGRESS
     );
     assertAcessEgresses(
-      Set.of("street[Destination -> Stop1]", "street[Destination -> Stop2]"),
+      Set.of(
+        "street[Destination -> StopForCentroidRoutingStation]",
+        "street[Destination -> StopForNoCentroidRoutingStation]"
+      ),
       egresses
     );
   }
 
-  ////////////////////
-  // Helper methods //
-  ////////////////////
+  /* Helper methods */
 
   private GenericLocation location(WgsCoordinate coordinate) {
     return new GenericLocation(coordinate.latitude(), coordinate.longitude());

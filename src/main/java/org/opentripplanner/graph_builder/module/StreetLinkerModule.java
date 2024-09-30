@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -25,6 +26,7 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -261,25 +263,26 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkStationCentroids(Graph graph) {
-    LOG.info("Linking instances of {} to graph...", StationCentroidVertex.class.getSimpleName());
-    for (StationCentroidVertex tVertex : graph.getVerticesOfType(StationCentroidVertex.class)) {
+    BiFunction<Vertex, StreetVertex, List<Edge>> createLinkEdges = (theStation, streetVertex) ->
+      List.of(
+        StreetStationCentroidLink.createStreetStationLink(
+          (StationCentroidVertex) theStation,
+          streetVertex
+        ),
+        StreetStationCentroidLink.createStreetStationLink(
+          streetVertex,
+          (StationCentroidVertex) theStation
+        )
+      );
+
+    for (StationCentroidVertex station : graph.getVerticesOfType(StationCentroidVertex.class)) {
       graph
         .getLinker()
         .linkVertexPermanently(
-          tVertex,
+          station,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetStationCentroidLink.createStreetStationLink(
-                (StationCentroidVertex) vertex,
-                streetVertex
-              ),
-              StreetStationCentroidLink.createStreetStationLink(
-                streetVertex,
-                (StationCentroidVertex) vertex
-              )
-            )
+          createLinkEdges
         );
     }
   }
