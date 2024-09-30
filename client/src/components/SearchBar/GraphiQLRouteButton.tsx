@@ -9,16 +9,15 @@ function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQ
   const formattedVariables = encodeURIComponent(JSON.stringify(tripQueryVariables));
   const formattedQuery = encodeURIComponent(queryAsString);
 
+  const hint = 'Open in GraphiQL';
+
   return (
-    <Button href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedVariables} target={'_blank'}>
-      <img
-        alt="Open in GraphiQL"
-        title="Open in GraphiQL"
-        src={graphqlIcon}
-        width="20"
-        height="20"
-        className="d-inline-block align-middle"
-      />
+    <Button
+      title={hint}
+      href={graphiQLUrl + '&query=' + formattedQuery + '&variables=' + formattedVariables}
+      target={'_blank'}
+    >
+      <img alt={hint} title={hint} src={graphqlIcon} width="20" height="20" className="d-inline-block align-middle" />
     </Button>
   );
 }
