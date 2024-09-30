@@ -14,11 +14,11 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 class FlexSearchWindowFilterTest implements PlanTestConstants {
 
   private static final Instant LATEST_DEPARTURE_TIME = TestItineraryBuilder
-    .newTime(time("9:20"))
+    .newTime(time("09:20"))
     .toInstant();
 
   @ParameterizedTest
-  @ValueSource(strings = { "9:20", "9:21", "13:20" })
+  @ValueSource(strings = { "09:20", "09:21", "13:20" })
   void keepFlexItinerariesAfterLDT(String startTime) {
     var edt = "9:20";
     var subject = new FlexSearchWindowFilter(TestItineraryBuilder.newTime(time(edt)).toInstant());
@@ -32,7 +32,7 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = { "0:0", "0:01", "9:19" })
+  @ValueSource(strings = { "00:00", "00:01", "09:19" })
   void removeFlexItinerariesBeforeLDT(String startTime) {
     var subject = new FlexSearchWindowFilter(LATEST_DEPARTURE_TIME);
 
