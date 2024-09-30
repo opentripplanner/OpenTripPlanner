@@ -1,7 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
 import { queryAsString } from '../../static/query/tripQuery.tsx';
-import logo from '../../static/img/graphql-solid.svg';
+import graphqlIcon from '../../static/img/graphql-solid.svg';
 
 const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;
 
@@ -14,7 +14,7 @@ function GraphiQLRouteButton({ tripQueryVariables }: { tripQueryVariables: TripQ
       <img
         alt="Open in GraphiQL"
         title="Open in GraphiQL"
-        src={logo}
+        src={graphqlIcon}
         width="20"
         height="20"
         className="d-inline-block align-middle"
