@@ -92,7 +92,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
       FareRuleSet fareRule = fareRuleSet.get(id);
       if (fareRule == null) {
         // Should never happen by design
-        LOG.error("Inexistant fare ID in fare rule: " + id);
+        LOG.error("Nonexistent fare ID in fare rule: " + id);
         continue;
       }
       String contains = rule.getContainsId();
