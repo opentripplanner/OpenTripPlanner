@@ -797,7 +797,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Set arrival time
       final var arrival = added.arrivalTime();
       if (arrival.isPresent()) {
-        final var delay = added.arrivalDelay().orElse(0);
+        final var delay = added.arrivalDelay();
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
@@ -812,7 +812,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Set departure time
       final var departure = added.departureTime();
       if (departure.isPresent()) {
-        final var delay = added.departureDelay().orElse(0);
+        final var delay = added.departureDelay();
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
@@ -861,8 +861,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         newTripTimes.setCancelled(stopIndex);
       }
 
-      final int arrivalDelay = addedStopTime.arrivalDelay().orElse(0);
-      final int departureDelay = addedStopTime.departureDelay().orElse(0);
+      final int arrivalDelay = addedStopTime.arrivalDelay();
+      final int departureDelay = addedStopTime.departureDelay();
       newTripTimes.updateArrivalTime(
         stopIndex,
         newTripTimes.getScheduledArrivalTime(stopIndex) + arrivalDelay
