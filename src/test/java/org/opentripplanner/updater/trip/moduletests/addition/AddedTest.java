@@ -128,8 +128,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var env = RealtimeTestEnvironment.gtfs();
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
+    var env = RealtimeTestEnvironment.gtfs().build();
+    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
     builder
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
@@ -159,8 +159,8 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithDelay() {
-    var env = RealtimeTestEnvironment.gtfs();
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, env.timeZone);
+    var env = RealtimeTestEnvironment.gtfs().build();
+    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
 
     // A1: scheduled 08:30:00
     // B1: scheduled 08:40:00, delay 300 seconds (actual 08:45:00)
