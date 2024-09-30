@@ -7,7 +7,7 @@
   margin-right: 14px;
 }
 
-@media (min-width: 1790px) {
+@media (min-width: 1895px) {
   .top-content {
     height: 75px;
   }
@@ -17,7 +17,7 @@
   }
 }
 
-@media (max-width: 1791px) {
+@media (max-width: 1896px) {
   .top-content {
     height: 150px;
   }
