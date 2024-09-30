@@ -8,6 +8,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Extra leg when transferring at the same stop [#5984](https://github.com/opentripplanner/OpenTripPlanner/pull/5984)
 - Filter vector tiles stops by current service week [#6003](https://github.com/opentripplanner/OpenTripPlanner/pull/6003)
 - Add a matcher API for filters in the transit service used for datedServiceJourneyQuery [#5713](https://github.com/opentripplanner/OpenTripPlanner/pull/5713)
+- Refetch transit leg with a leg query of GTFS GraphQL API [#6045](https://github.com/opentripplanner/OpenTripPlanner/pull/6045)
+- Remove deprecated support for GTFS flex stop areas [#6074](https://github.com/opentripplanner/OpenTripPlanner/pull/6074)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

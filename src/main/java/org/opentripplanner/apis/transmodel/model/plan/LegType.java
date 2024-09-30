@@ -63,7 +63,9 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("id")
-          .description("An identifier for the leg, which can be used to re-fetch the information.")
+          .description(
+            "An identifier for the leg, which can be used to re-fetch transit leg information."
+          )
           .type(Scalars.GraphQLID)
           .dataFetcher(env -> LegReferenceSerializer.encode(leg(env).getLegReference()))
           .build()
