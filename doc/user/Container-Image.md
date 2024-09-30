@@ -21,9 +21,9 @@ curl -L https://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf -o be
 curl -L https://vbb.de/vbbgtfs -o berlin/vbb-gtfs.zip
 # build graph and save it onto the host system via the volume
 docker run --rm \
-		--memory=8g \
-		-e JAVA_OPTS='-Xmx8g' \
-		-v "$(pwd)/berlin:/var/opentripplanner" docker.io/opentripplanner/opentripplanner:latest --build --save
+    --memory=8g \
+    -e JAVA_OPTS='-Xmx8g' \
+    -v "$(pwd)/berlin:/var/opentripplanner" docker.io/opentripplanner/opentripplanner:latest --build --save
 # load and serve graph
 docker run -it --rm -p 8080:8080 \
     --memory=8g \
