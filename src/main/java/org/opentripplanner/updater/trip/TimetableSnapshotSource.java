@@ -548,7 +548,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final var addedStopTime = new AddedStopTime(stopTimeUpdates.get(index));
 
       // Check stop sequence
-      final var optionalStopSequence = addedStopTime.getStopSequence();
+      final var optionalStopSequence = addedStopTime.stopSequence();
       if (optionalStopSequence.isPresent()) {
         final var stopSequence = optionalStopSequence.getAsInt();
 
@@ -569,7 +569,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       // Find stops
-      final var optionalStopId = addedStopTime.getStopId();
+      final var optionalStopId = addedStopTime.stopId();
       if (optionalStopId.isPresent()) {
         final var stopId = optionalStopId.get();
         // Find stop
@@ -589,7 +589,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       // Check arrival time
-      final var arrival = addedStopTime.getArrivalTime();
+      final var arrival = addedStopTime.arrivalTime();
       if (arrival.isPresent()) {
         final var time = arrival.getAsLong();
         // Check for increasing time
@@ -604,7 +604,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       // Check departure time
-      final var departure = addedStopTime.getDepartureTime();
+      final var departure = addedStopTime.departureTime();
       if (departure.isPresent()) {
         final var time = departure.getAsLong();
         // Check for increasing time
@@ -795,9 +795,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stopTime.setTrip(trip);
       stopTime.setStop(stop);
       // Set arrival time
-      final var arrival = added.getArrivalTime();
+      final var arrival = added.arrivalTime();
       if (arrival.isPresent()) {
-        final var delay = added.getArrivalDelay().orElse(0);
+        final var delay = added.arrivalDelay().orElse(0);
         final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
@@ -810,9 +810,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         stopTime.setArrivalTime((int) arrivalTime);
       }
       // Set departure time
-      final var departure = added.getDepartureTime();
+      final var departure = added.departureTime();
       if (departure.isPresent()) {
-        final var delay = added.getDepartureDelay().orElse(0);
+        final var delay = added.departureDelay().orElse(0);
         final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
@@ -825,7 +825,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         stopTime.setDepartureTime((int) departureTime);
       }
       stopTime.setTimepoint(1); // Exact time
-      added.getStopSequence().ifPresent(stopTime::setStopSequence);
+      added.stopSequence().ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(added.pickup());
       stopTime.setDropOffType(added.dropOff());
       // Add stop time to list
@@ -861,8 +861,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         newTripTimes.setCancelled(stopIndex);
       }
 
-      final int arrivalDelay = addedStopTime.getArrivalDelay().orElse(0);
-      final int departureDelay = addedStopTime.getDepartureDelay().orElse(0);
+      final int arrivalDelay = addedStopTime.arrivalDelay().orElse(0);
+      final int departureDelay = addedStopTime.departureDelay().orElse(0);
       newTripTimes.updateArrivalTime(
         stopIndex,
         newTripTimes.getScheduledArrivalTime(stopIndex) + arrivalDelay

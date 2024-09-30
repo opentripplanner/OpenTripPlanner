@@ -63,13 +63,13 @@ final class AddedStopTime {
       : Optional.empty();
   }
 
-  OptionalLong getArrivalTime() {
+  OptionalLong arrivalTime() {
     return stopTimeUpdate.hasArrival()
       ? getTime(stopTimeUpdate.getArrival())
       : OptionalLong.empty();
   }
 
-  OptionalLong getDepartureTime() {
+  OptionalLong departureTime() {
     return stopTimeUpdate.hasDeparture()
       ? getTime(stopTimeUpdate.getDeparture())
       : OptionalLong.empty();
@@ -81,13 +81,13 @@ final class AddedStopTime {
       : OptionalLong.empty();
   }
 
-  OptionalInt getArrivalDelay() {
+  OptionalInt arrivalDelay() {
     return stopTimeUpdate.hasArrival()
       ? getDelay(stopTimeUpdate.getArrival())
       : OptionalInt.empty();
   }
 
-  OptionalInt getDepartureDelay() {
+  OptionalInt departureDelay() {
     return stopTimeUpdate.hasDeparture()
       ? getDelay(stopTimeUpdate.getDeparture())
       : OptionalInt.empty();
@@ -106,13 +106,13 @@ final class AddedStopTime {
     );
   }
 
-  OptionalInt getStopSequence() {
+  OptionalInt stopSequence() {
     return stopTimeUpdate.hasStopSequence()
       ? OptionalInt.of(stopTimeUpdate.getStopSequence())
       : OptionalInt.empty();
   }
 
-  Optional<String> getStopId() {
+  Optional<String> stopId() {
     return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
   }
 
