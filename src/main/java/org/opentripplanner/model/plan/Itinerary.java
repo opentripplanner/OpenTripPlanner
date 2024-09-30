@@ -183,7 +183,9 @@ public class Itinerary implements ItinerarySortKey {
    * Returns true if this itinerary has only flex and walking legs.
    */
   public boolean isDirectFlex() {
-    return legs.stream().allMatch(l -> l.isFlexibleTrip() || l.isWalkingLeg());
+    var containsFlex = legs.stream().anyMatch(Leg::isFlexibleTrip);
+    var flexOrWalkOnly = legs.stream().allMatch(l -> l.isFlexibleTrip() || l.isWalkingLeg());
+    return containsFlex && flexOrWalkOnly;
   }
 
   /** TRUE if at least one leg is a transit leg. */

@@ -259,9 +259,14 @@ public class ItineraryTest implements PlanTestConstants {
     }
 
     @Test
-    void flexAndWalk() {
+    void directFlex() {
       assertFalse(itinerary().isDirectFlex());
       assertTrue(newItinerary(A).flex(T11_10, T11_20, B).build().isDirectFlex());
+    }
+
+    @Test
+    void walkOnlyIsNotDirectFlex() {
+      assertFalse(TestItineraryBuilder.newItinerary(A, T11_00).walk(10, B).build().isDirectFlex());
     }
 
     private static Itinerary itinerary() {
