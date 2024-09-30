@@ -13,7 +13,7 @@ underway to converge on a single European standard profile. This is based in lar
 Nordic profile used by Entur.
 
 The Nordic profile is the only profile that has been thoroughly tested in production in OTP and is 
-used in Norway and Sweden.
+used in Norway, Finland and Sweden.
 
 ### EPIP
 
