@@ -266,7 +266,9 @@ removed from list.
         c
           .of("filterDirectFlexByEarliestDeparture")
           .since(V2_7)
-          .summary("Filter direct flex results by the earliestDepartureTime of the search window.")
+          .summary(
+            "Filter direct flex results by the earliest-departure-time of the search window."
+          )
           .description(
             """
             When direct flex is mixed with a transit search in the same request, then the direct flex results are filtered by the
