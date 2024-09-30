@@ -1,4 +1,4 @@
-import { Button, Spinner } from 'react-bootstrap';
+import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
 import { ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
 import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';
@@ -15,6 +15,7 @@ import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
 import { useRef, useState } from 'react';
 import logo from '../../static/img/otp-logo.svg';
 import GraphiQLRouteButton from './GraphiQLRouteButton.tsx';
+import WheelchairAccessibleCheckBox from './WheelchairAccessibleCheckBox.tsx';
 
 type SearchBarProps = {
   onRoute: () => void;
@@ -50,17 +51,24 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
         tripQueryVariables={tripQueryVariables}
         setTripQueryVariables={setTripQueryVariables}
       />
+      <WheelchairAccessibleCheckBox
+        tripQueryVariables={tripQueryVariables}
+        setTripQueryVariables={setTripQueryVariables}
+      />
+
       <div className="search-bar-route-button-wrapper">
-        <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
-          {loading && (
-            <>
-              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
-            </>
-          )}
-          Route
-        </Button>
+        <ButtonGroup>
+          <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
+            {loading && (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
+              </>
+            )}
+            Route
+          </Button>
+          <GraphiQLRouteButton tripQueryVariables={tripQueryVariables}></GraphiQLRouteButton>
+        </ButtonGroup>
       </div>
-      <GraphiQLRouteButton tripQueryVariables={tripQueryVariables}></GraphiQLRouteButton>
     </div>
   );
 }

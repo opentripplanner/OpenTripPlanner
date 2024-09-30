@@ -11,7 +11,7 @@ export function NumTripPatternsInput({
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor="numTripPatternsInput">
-        Number of trip patterns
+        Num. results
       </Form.Label>
       <Form.Control
         type="number"
@@ -19,6 +19,7 @@ export function NumTripPatternsInput({
         size="sm"
         placeholder="12"
         min={1}
+        className="input-small"
         value={tripQueryVariables.numTripPatterns || ''}
         onChange={(event) =>
           setTripQueryVariables({
