@@ -32,5 +32,5 @@ xmllint --noout --schema NeTEx-Profile-EPIP/NeTEx_publication_EPIP.xsd your-file
 
 ### Other profiles
 
-It is the goal of the community to support both the Nordic profile and EPIP but not [other profiles](https://data4pt.org/w/index.php?title=National_Implementations),
-as this would be against the spirit of standarisation.
+It is the goal of the community to support both the Nordic profile and EPIP. If you have another
+profile, we encourage to get in touch with the community to find a way forward.
