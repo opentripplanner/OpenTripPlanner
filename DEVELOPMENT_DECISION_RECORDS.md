@@ -32,7 +32,7 @@ notes on `private` members and as inline comments.
 
 **See also**
  - [Developers-Guide &gt; Code comments](doc/user/Developers-Guide.md#code-comments).
- - [Codestyle &gt; Javadoc Guidlines](doc/dev/decisionrecords/Codestyle.md#javadoc-guidlines) - JavaDoc checklist
+ - [Codestyle &gt; Javadoc Guidelines](doc/dev/decisionrecords/Codestyle.md#javadoc-guidlines) - JavaDoc checklist
 
 
 ## Document-Config-and-APIs

@@ -205,6 +205,7 @@ so they are a bit easier to maintain that way. The primary audience is also acti
 that have the code checked out locally.
 
  - [Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
+ - [Code Style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/Codestyle.md)
  - [Naming Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/NamingConventions.md)
  - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DEVELOPMENT_DECISION_RECORDS.md)
 
