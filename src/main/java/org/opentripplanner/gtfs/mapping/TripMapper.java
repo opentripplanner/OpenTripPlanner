@@ -81,7 +81,7 @@ class TripMapper {
     if (rhs.getSafeDurationFactor() == null && rhs.getSafeDurationOffset() == null) {
       return Optional.empty();
     } else {
-      var offset = Duration.ofSeconds(rhs.getSafeDurationOffset().longValue());
+      var offset = Duration.ofMinutes(rhs.getSafeDurationOffset().longValue());
       return Optional.of(TimePenalty.of(offset, rhs.getSafeDurationFactor().doubleValue()));
     }
   }

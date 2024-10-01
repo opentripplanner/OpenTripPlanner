@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Configuring OpenTripPlanner
@@ -146,7 +146,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.5.0 of OTP:
+Here is an example including variable substitution, assuming version 2.6.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -170,7 +170,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.5.0.obj"
+          "source": "netex-v2.6.0.obj"
         }
       ]
 } 

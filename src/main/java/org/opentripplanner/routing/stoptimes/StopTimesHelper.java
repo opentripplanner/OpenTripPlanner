@@ -62,7 +62,7 @@ public class StopTimesHelper {
     Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, true);
 
     for (TripPattern pattern : patterns) {
-      Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
+      Queue<TripTimeOnDate> pq = listTripTimeOnDatesForPatternAtStop(
         transitService,
         stop,
         pattern,
@@ -154,7 +154,7 @@ public class StopTimesHelper {
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   ) {
-    Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
+    Queue<TripTimeOnDate> pq = listTripTimeOnDatesForPatternAtStop(
       transitService,
       stop,
       pattern,
@@ -184,7 +184,7 @@ public class StopTimesHelper {
     return result;
   }
 
-  private static Queue<TripTimeOnDate> listTripTimeShortsForPatternAtStop(
+  private static Queue<TripTimeOnDate> listTripTimeOnDatesForPatternAtStop(
     TransitService transitService,
     StopLocation stop,
     TripPattern pattern,

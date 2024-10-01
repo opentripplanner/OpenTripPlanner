@@ -2432,6 +2432,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeLegArgs {
+
+    private String id;
+
+    public GraphQLQueryTypeLegArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
+
+    public String getGraphQLId() {
+      return this.id;
+    }
+
+    public void setGraphQLId(String id) {
+      this.id = id;
+    }
+  }
+
   public static class GraphQLQueryTypeNearestArgs {
 
     private String after;
@@ -4228,6 +4247,26 @@ public class GraphQLTypes {
 
     public void setGraphQLLanguage(String language) {
       this.language = language;
+    }
+  }
+
+  public static class GraphQLStopRoutesArgs {
+
+    private GraphQLLocalDateRangeInput serviceDates;
+
+    public GraphQLStopRoutesArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.serviceDates =
+          new GraphQLLocalDateRangeInput((Map<String, Object>) args.get("serviceDates"));
+      }
+    }
+
+    public GraphQLLocalDateRangeInput getGraphQLServiceDates() {
+      return this.serviceDates;
+    }
+
+    public void setGraphQLServiceDates(GraphQLLocalDateRangeInput serviceDates) {
+      this.serviceDates = serviceDates;
     }
   }
 

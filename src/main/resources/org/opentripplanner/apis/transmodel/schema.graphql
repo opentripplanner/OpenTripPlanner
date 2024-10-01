@@ -325,7 +325,7 @@ type Leg {
   fromPlace: Place!
   "Generalized cost or weight of the leg. Used for debugging."
   generalizedCost: Int
-  "An identifier for the leg, which can be used to re-fetch the information."
+  "An identifier for the leg, which can be used to re-fetch transit leg information."
   id: ID
   interchangeFrom: Interchange
   interchangeTo: Interchange
@@ -647,7 +647,7 @@ type QueryType {
   groupOfLines(id: String!): GroupOfLines
   "Get all groups of lines"
   groupsOfLines: [GroupOfLines!]!
-  "Refetch a single leg based on its id"
+  "Refetch a single transit leg based on its id"
   leg(id: ID!): Leg @timingData
   "Get a single line based on its id"
   line(id: ID!): Line @timingData
@@ -730,7 +730,7 @@ type QueryType {
   ): quayAtDistanceConnection @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
-  "Get OTP server information"
+  "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
   serverInfo: ServerInfo! @timingData
   "Get a single service journey based on its id"
   serviceJourney(id: String!): ServiceJourney @timingData
@@ -1067,6 +1067,11 @@ type RoutingParameters {
   wheelChairAccessible: Boolean
 }
 
+"""
+Information about the deployment. This is only useful to developers of OTP itself.
+It is not recommended for regular API consumers to use this type as it has no
+stability guarantees.
+"""
 type ServerInfo {
   "The 'configVersion' of the build-config.json file."
   buildConfigVersion: String
@@ -1075,6 +1080,12 @@ type ServerInfo {
   gitBranch: String
   gitCommit: String
   gitCommitTime: String
+  """
+    The internal time zone of the transit data.
+  
+    Note: The input data can be in several time zones, but OTP internally operates on a single one.
+  """
+  internalTransitModelTimeZone: String
   "The 'configVersion' of the otp-config.json file."
   otpConfigVersion: String
   "The otp-serialization-version-id used to check graphs for compatibility with current version of OTP."

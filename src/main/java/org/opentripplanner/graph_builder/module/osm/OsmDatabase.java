@@ -651,10 +651,12 @@ public class OsmDatabase {
       OSMLevel level = OSMLevel.DEFAULT;
       if (way.hasTag("level")) { // TODO: floating-point levels &c.
         levelName = way.getTag("level");
-        level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, issueStore);
+        level =
+          OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, issueStore, way);
       } else if (way.hasTag("layer")) {
         levelName = way.getTag("layer");
-        level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, issueStore);
+        level =
+          OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, issueStore, way);
       }
       if (level == null || (!level.reliable)) {
         issueStore.add(new LevelAmbiguous(levelName, way));
@@ -980,7 +982,8 @@ public class OsmDatabase {
       levelsTag,
       Source.LEVEL_MAP,
       true,
-      issueStore
+      issueStore,
+      relation
     );
     for (OSMRelationMember member : relation.getMembers()) {
       if (member.hasTypeWay() && waysById.containsKey(member.getRef())) {

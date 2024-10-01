@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -86,6 +87,7 @@ import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -114,6 +116,7 @@ class GraphQLIntegrationTest {
     .of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
     .toList();
+  private static final Route ROUTE = TransitModelForTest.route("a-route").build();
 
   private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
     .withVehicles(10)
@@ -160,11 +163,13 @@ class GraphQLIntegrationTest {
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
-    final TripPattern pattern = TEST_MODEL.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
-    pattern.add(tripTimes);
+    final TripPattern pattern = TEST_MODEL
+      .pattern(BUS)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
 
@@ -208,6 +213,11 @@ class GraphQLIntegrationTest {
       @Override
       public TransitAlertService getTransitAlertService() {
         return alertService;
+      }
+
+      @Override
+      public Set<Route> getRoutesForStop(StopLocation stop) {
+        return Set.of(ROUTE);
       }
     };
     routes.forEach(transitService::addRoutes);

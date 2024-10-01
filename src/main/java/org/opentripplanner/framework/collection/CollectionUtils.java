@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.collection;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -36,6 +37,9 @@ public class CollectionUtils {
   /**
    * A null-safe version of isEmpty() for a collection.
    * <p>
+   * The main strategy handling collections in OTP is to avoid nullable collection fields and use empty
+   * collections instead. So, before using this method check if the variable/field is indeed `@Nullable`.
+   * <p>
    * If the collection is {@code null} then {@code true} is returned.
    * <p>
    * If the collection is empty then {@code true} is returned.
@@ -44,5 +48,19 @@ public class CollectionUtils {
    */
   public static boolean isEmpty(@Nullable Collection<?> c) {
     return c == null || c.isEmpty();
+  }
+
+  /**
+   * Look up the given key in a Map, return null if the key is null.
+   * This prevents a NullPointerException if the underlying implementation of the map does not
+   * accept querying with null keys (e.g. ImmutableMap).
+   *
+   **/
+  @Nullable
+  public static <K, V> V getByNullableKey(K key, Map<K, ? extends V> map) {
+    if (key == null) {
+      return null;
+    }
+    return map.get(key);
   }
 }

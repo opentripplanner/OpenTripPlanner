@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
@@ -105,9 +106,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     Leg transitLeg = null;
 
+    PathLeg<T> previousLeg = null;
     while (!pathLeg.isEgressLeg()) {
       // Map transit leg
       if (pathLeg.isTransitLeg()) {
+        if (
+          OTPFeature.ExtraTransferLegOnSameStop.isOn() &&
+          isPathTransferAtSameStop(previousLeg, pathLeg)
+        ) {
+          legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));
+        }
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
@@ -123,6 +131,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         }
       }
 
+      previousLeg = pathLeg;
       pathLeg = pathLeg.nextLeg();
     }
 
@@ -162,6 +171,19 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()) - penaltyCost);
 
     return itinerary;
+  }
+
+  private static <T extends TripSchedule> boolean isPathTransferAtSameStop(
+    PathLeg<T> previousLeg,
+    PathLeg<T> currentLeg
+  ) {
+    return (
+      previousLeg != null &&
+      previousLeg.isTransitLeg() &&
+      currentLeg.isTransitLeg() &&
+      !previousLeg.asTransitLeg().isStaySeatedOntoNextLeg() &&
+      (previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop())
+    );
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
@@ -262,6 +284,27 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private boolean isFree(EgressPathLeg<T> egressPathLeg) {
     return egressPathLeg.egress().isFree();
+  }
+
+  /**
+   * If a routing result transfers at the very same stop, RAPTOR doesn't add a path leg. However,
+   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would
+   * be considered backwards-incompatible, this is an opt-in feature.
+   */
+  private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
+    var transferStop = Place.forStop(transitLayer.getStopByIndex(previousLeg.toStop()));
+    return StreetLeg
+      .create()
+      .withMode(TraverseMode.WALK)
+      .withStartTime(createZonedDateTime(previousLeg.toTime()))
+      .withEndTime(createZonedDateTime(nextLeg.fromTime()))
+      .withFrom(transferStop)
+      .withTo(transferStop)
+      .withDistanceMeters(0)
+      .withGeneralizedCost(0)
+      .withGeometry(GeometryUtils.makeLineString(transferStop.coordinate, transferStop.coordinate))
+      .withWalkSteps(List.of())
+      .build();
   }
 
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {

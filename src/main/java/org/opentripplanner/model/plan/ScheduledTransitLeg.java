@@ -34,6 +34,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -225,6 +226,11 @@ public class ScheduledTransitLeg implements TransitLeg {
         !tripTimes.isNoDataStop(alightStopPosInPattern)
       )
     );
+  }
+
+  @Override
+  public RealTimeState getRealTimeState() {
+    return tripTimes.getRealTimeState();
   }
 
   @Override

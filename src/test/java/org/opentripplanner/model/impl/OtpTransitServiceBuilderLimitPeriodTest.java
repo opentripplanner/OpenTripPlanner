@@ -1,6 +1,7 @@
 package org.opentripplanner.model.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -141,16 +143,27 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     assertTrue(patterns.contains(patternInT1), patterns.toString());
     assertTrue(patterns.contains(patternInT2), patterns.toString());
 
-    // Verify trips in pattern (one trip is removed from patternInT1)
-    assertEquals(1, patternInT1.scheduledTripsAsStream().count());
-    assertEquals(tripCSIn, patternInT1.scheduledTripsAsStream().findFirst().orElseThrow());
+    // Verify patternInT1 is replaced by a copy that contains one less trip
+    TripPattern copyOfTripPattern1 = subject
+      .getTripPatterns()
+      .values()
+      .stream()
+      .filter(p -> p.getId().equals(patternInT1.getId()))
+      .findFirst()
+      .orElseThrow();
+    assertNotSame(patternInT1, copyOfTripPattern1);
+    assertEquals(1, copyOfTripPattern1.scheduledTripsAsStream().count());
+    assertEquals(tripCSIn, copyOfTripPattern1.scheduledTripsAsStream().findFirst().orElseThrow());
 
-    // Verify trips in pattern is unchanged (one trip)
+    // Verify trips in patternInT2 is unchanged (one trip)
     assertEquals(1, patternInT2.scheduledTripsAsStream().count());
 
-    // Verify scheduledTimetable trips (one trip is removed from patternInT1)
-    assertEquals(1, patternInT1.getScheduledTimetable().getTripTimes().size());
-    assertEquals(tripCSIn, patternInT1.getScheduledTimetable().getTripTimes().get(0).getTrip());
+    // Verify scheduledTimetable trips (one trip is removed from the copy of patternInT1)
+    assertEquals(1, copyOfTripPattern1.getScheduledTimetable().getTripTimes().size());
+    assertEquals(
+      tripCSIn,
+      copyOfTripPattern1.getScheduledTimetable().getTripTimes().get(0).getTrip()
+    );
 
     // Verify scheduledTimetable trips in pattern is unchanged (one trip)
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
@@ -186,16 +199,17 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
-    TripPattern p = TripPattern
+    TripPatternBuilder tpb = TripPattern
       .of(patternId)
       .withRoute(route)
-      .withStopPattern(STOP_PATTERN)
-      .build();
+      .withStopPattern(STOP_PATTERN);
 
     for (Trip trip : trips) {
-      p.add(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR));
+      tpb.withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR))
+      );
     }
-    return p;
+    return tpb.build();
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {

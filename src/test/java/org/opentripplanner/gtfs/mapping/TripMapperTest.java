@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -122,12 +123,12 @@ public class TripMapperTest {
     var flexTrip = new Trip();
     flexTrip.setId(new AgencyAndId("1", "1"));
     flexTrip.setSafeDurationFactor(1.5);
-    flexTrip.setSafeDurationOffset(600d);
+    flexTrip.setSafeDurationOffset(60d);
     flexTrip.setRoute(new GtfsTestData().route);
     var mapper = defaultTripMapper();
     var mapped = mapper.map(flexTrip);
     var penalty = mapper.flexSafeTimePenalties().get(mapped);
     assertEquals(1.5f, penalty.coefficient());
-    assertEquals(600, penalty.constant().toSeconds());
+    assertEquals(Duration.ofHours(1), penalty.constant());
   }
 }

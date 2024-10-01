@@ -4,10 +4,8 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 
 class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
@@ -19,7 +17,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
    */
   private final List<TripUpdate> updates;
 
-  private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final boolean fuzzyTripMatching;
 
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
@@ -29,7 +27,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
   TripUpdateGraphWriterRunnable(
     TimetableSnapshotSource snapshotSource,
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    boolean fuzzyTripMatching,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
@@ -37,7 +35,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     Consumer<UpdateResult> sendMetrics
   ) {
     this.snapshotSource = snapshotSource;
-    this.fuzzyTripMatcher = fuzzyTripMatcher;
+    this.fuzzyTripMatching = fuzzyTripMatching;
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
     this.updateIncrementality = updateIncrementality;
     this.updates = Objects.requireNonNull(updates);
@@ -46,9 +44,9 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
   }
 
   @Override
-  public void run(Graph graph, TransitModel transitModel) {
+  public void run(RealTimeUpdateContext context) {
     var result = snapshotSource.applyTripUpdates(
-      fuzzyTripMatcher,
+      fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
       backwardsDelayPropagationType,
       updateIncrementality,
       updates,

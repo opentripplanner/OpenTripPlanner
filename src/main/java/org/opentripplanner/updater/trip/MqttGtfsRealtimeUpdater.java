@@ -17,9 +17,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -60,13 +57,12 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final Consumer<UpdateResult> recordMetrics;
   private WriteToGraphCallback saveResultOnGraph;
 
-  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher = null;
+  private final boolean fuzzyTripMatching;
 
   private MqttClient client;
 
   public MqttGtfsRealtimeUpdater(
     MqttGtfsRealtimeUpdaterParameters parameters,
-    TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
     this.configRef = parameters.configRef();
@@ -77,10 +73,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
     // Set properties of realtime data snapshot source
-    if (parameters.getFuzzyTripMatching()) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
+    this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
     LOG.info("Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url);
   }
@@ -178,7 +171,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         saveResultOnGraph.execute(
           new TripUpdateGraphWriterRunnable(
             snapshotSource,
-            fuzzyTripMatcher,
+            fuzzyTripMatching,
             backwardsDelayPropagationType,
             updateIncrementality,
             updates,

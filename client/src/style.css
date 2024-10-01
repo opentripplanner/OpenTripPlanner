@@ -7,7 +7,7 @@
   margin-right: 14px;
 }
 
-@media (min-width: 2160px) {
+@media (min-width: 1895px) {
   .top-content {
     height: 75px;
   }
@@ -17,7 +17,7 @@
   }
 }
 
-@media (max-width: 2159px) {
+@media (max-width: 1896px) {
   .top-content {
     height: 150px;
   }
@@ -50,14 +50,32 @@
   margin-right: 1rem;
 }
 
+.search-bar input.input-small {
+  max-width: 100px;
+}
+
+.search-bar input.input-medium {
+  max-width: 130px;
+}
+
 .search-bar-route-button-wrapper {
   height: 5rem;
   padding-top: 25px;
 }
 
+.search-bar-route-button-wrapper a.btn img {
+  margin-top: -2px;
+}
+
 .itinerary-list-container {
   width: 36rem;
   overflow-y: auto;
+}
+
+.itinerary-list-container .time-zone-info {
+  margin: 10px 20px;
+  font-size: 12px;
+  text-align: right;
 }
 
 .itinerary-header-wrapper {

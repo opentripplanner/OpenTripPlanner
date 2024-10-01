@@ -24,6 +24,8 @@ public class OrcaFareFactory extends DefaultFareServiceFactory {
   @Override
   public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
     fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
+    // ORCA agencies don't rely on fare attributes without rules, so let's remove them.
+    regularFareRules.entrySet().removeIf(entry -> !entry.getValue().hasRules());
   }
 
   /**

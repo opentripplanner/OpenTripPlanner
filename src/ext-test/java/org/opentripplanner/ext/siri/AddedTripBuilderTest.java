@@ -32,7 +32,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -135,15 +135,16 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
+    TripUpdate tripUpdate = addedTrip.successValue();
     // Assert trip
-    Trip trip = addedTrip.successValue().tripTimes().getTrip();
+    Trip trip = tripUpdate.tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
     assertEquals(OPERATOR, trip.getOperator(), "operator should be mapped");
     assertEquals(TRANSIT_MODE, trip.getMode(), "transitMode should be mapped");
     assertEquals(SubMode.of(SUB_MODE), trip.getNetexSubMode(), "submode should be mapped");
     assertNotNull(trip.getHeadsign(), "Headsign should be mapped");
     assertEquals(HEADSIGN, trip.getHeadsign().toString(), "Headsign should be mapped");
-    assertEquals(SERVICE_DATE, addedTrip.successValue().serviceDate());
+    assertEquals(SERVICE_DATE, tripUpdate.serviceDate());
 
     // Assert route
     Route route = trip.getRoute();
@@ -154,17 +155,11 @@ class AddedTripBuilderTest {
     assertEquals(SubMode.of(SUB_MODE), route.getNetexSubmode(), "submode should be mapped");
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
-    assertEquals(
-      route,
-      transitService.getRouteForId(TransitModelForTest.id(LINE_REF)),
-      "Route should be added to transit index"
-    );
-    assertEquals(
-      trip,
-      transitService.getTripForId(TRIP_ID),
-      "Route should be added to transit index"
-    );
-    var pattern = transitService.getPatternForTrip(trip);
+    assertTrue(tripUpdate.routeCreation(), "The route is marked as created by real time updater");
+
+    assertTrue(tripUpdate.tripCreation(), "The trip is marked as created by real time updater");
+
+    TripPattern pattern = tripUpdate.addedTripPattern();
     assertNotNull(pattern);
     assertEquals(route, pattern.getRoute());
     assertTrue(
@@ -173,19 +168,11 @@ class AddedTripBuilderTest {
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
       "serviceId should be running on service date"
     );
-    assertNotNull(
-      transitService.getTripOnServiceDateById(TRIP_ID),
-      "TripOnServiceDate should be added to transit index by id"
-    );
-    assertNotNull(
-      transitService.getTripOnServiceDateForTripAndDay(
-        new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)
-      ),
-      "TripOnServiceDate should be added to transit index for trip and day"
-    );
+    TripOnServiceDate tripOnServiceDate = tripUpdate.addedTripOnServiceDate();
+    assertNotNull(tripOnServiceDate, "The TripUpdate should contain a new TripOnServiceDate");
 
     // Assert stop pattern
-    var stopPattern = addedTrip.successValue().stopPattern();
+    var stopPattern = tripUpdate.stopPattern();
     assertEquals(stopPattern, pattern.getStopPattern());
     assertEquals(3, stopPattern.getSize());
     assertEquals(STOP_A, stopPattern.getStop(0));
@@ -215,7 +202,7 @@ class AddedTripBuilderTest {
     assertEquals(0, scheduledTimes.getArrivalDelay(2));
 
     // Assert updated trip times
-    var times = addedTrip.successValue().tripTimes();
+    var times = tripUpdate.tripTimes();
     assertEquals(trip, times.getTrip());
     assertEquals(RealTimeState.ADDED, times.getRealTimeState());
     assertFalse(times.isScheduled());
@@ -259,6 +246,8 @@ class AddedTripBuilderTest {
       .build();
 
     assertTrue(firstAddedTrip.isSuccess(), "Trip creation should succeed");
+    assertTrue(firstAddedTrip.successValue().routeCreation());
+
     var firstTrip = firstAddedTrip.successValue().tripTimes().getTrip();
 
     var tripId2 = TransitModelForTest.id("TRIP_ID_2");
@@ -290,12 +279,6 @@ class AddedTripBuilderTest {
     Trip secondTrip = secondAddedTrip.successValue().tripTimes().getTrip();
     assertEquals(tripId2, secondTrip.getId(), "Trip should be mapped");
     assertNotEquals(firstTrip, secondTrip);
-
-    // Assert route
-    Route route = secondTrip.getRoute();
-    assertSame(firstTrip.getRoute(), route, "route be reused from the first trip");
-
-    assertEquals(2, transitService.getPatternsForRoute(route).size());
 
     // Assert trip times
     var times = secondAddedTrip.successValue().tripTimes();
@@ -338,6 +321,9 @@ class AddedTripBuilderTest {
     Trip trip = addedTrip.successValue().tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
     assertSame(REPLACED_ROUTE, trip.getRoute());
+
+    // Assert route
+    assertFalse(addedTrip.successValue().routeCreation(), "The existing route should be reused");
   }
 
   @Test
@@ -370,6 +356,7 @@ class AddedTripBuilderTest {
     assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
 
     // Assert route
+    assertTrue(addedTrip.successValue().routeCreation(), "A new route should be created");
     Route route = trip.getRoute();
     assertEquals(LINE_REF, route.getId().getId(), "route should be mapped");
     assertEquals(AGENCY, route.getAgency(), "Agency should be taken from replaced route");
