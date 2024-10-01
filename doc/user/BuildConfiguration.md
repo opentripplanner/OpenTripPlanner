@@ -113,7 +113,7 @@ Sections follow that describe particular settings in more depth.
 |       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |      `regexp`      | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |       source                                                             |        `uri`       | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |     `string[]`     | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
-| [transitRouteToStationCentroid](#transitRouteToStationCentroid)          | `feed-scoped-id[]` | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.6  |
+| [transitRouteToStationCentroid](#transitRouteToStationCentroid)          | `feed-scoped-id[]` | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -1070,7 +1070,7 @@ case where this is not the case.
 
 <h3 id="transitRouteToStationCentroid">transitRouteToStationCentroid</h3>
 
-**Since version:** `2.6` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.7` ∙ **Type:** `feed-scoped-id[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 List stations that should route to centroid.

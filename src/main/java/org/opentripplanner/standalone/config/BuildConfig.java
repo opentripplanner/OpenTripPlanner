@@ -6,7 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_6;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -439,7 +439,7 @@ Use an empty string to make it unbounded.
     transitRouteToStationCentroid =
       root
         .of("transitRouteToStationCentroid")
-        .since(V2_6)
+        .since(V2_7)
         .summary("List stations that should route to centroid.")
         .description(
           """
