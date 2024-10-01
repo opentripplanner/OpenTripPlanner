@@ -167,6 +167,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.emissionsModule());
     }
 
+    graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
+
     if (config.dataImportReport) {
       graphBuilder.addModule(factory.dataImportIssueReporter());
     }
@@ -175,7 +177,6 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
 
-    graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
     return graphBuilder;

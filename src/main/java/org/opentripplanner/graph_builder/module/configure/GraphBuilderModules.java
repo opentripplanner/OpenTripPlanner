@@ -45,7 +45,6 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -313,15 +312,9 @@ public class GraphBuilderModules {
     TransitModel transitModel
   ) {
     var ids = config.transitRouteToStationCentroid();
-    var stationIds = transitModel
-      .getStopModel()
-      .listStations()
-      .stream()
-      .map(AbstractTransitEntity::getId)
-      .toList();
     return ids.isEmpty()
       ? null
-      : new RouteToCentroidStationIdsValidator(issueStore, ids, stationIds);
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, transitModel);
   }
 
   /* private methods */
