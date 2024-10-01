@@ -82,21 +82,15 @@ final class AddedStopTime {
   }
 
   int arrivalDelay() {
-    return stopTimeUpdate.hasArrival()
-      ? getDelay(stopTimeUpdate.getArrival())
-      : 0;
+    return stopTimeUpdate.hasArrival() ? getDelay(stopTimeUpdate.getArrival()) : 0;
   }
 
   int departureDelay() {
-    return stopTimeUpdate.hasDeparture()
-      ? getDelay(stopTimeUpdate.getDeparture())
-      : 0;
+    return stopTimeUpdate.hasDeparture() ? getDelay(stopTimeUpdate.getDeparture()) : 0;
   }
 
   private int getDelay(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
-    return stopTimeEvent.hasDelay()
-      ? stopTimeEvent.getDelay()
-      : 0;
+    return stopTimeEvent.hasDelay() ? stopTimeEvent.getDelay() : 0;
   }
 
   boolean isSkipped() {
