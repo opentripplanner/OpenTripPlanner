@@ -6,6 +6,6 @@
 /*
  * Hide the deprecated queries from the left hand navigation panel.
  */
-nav .deprecated {
+nav ul li .deprecated {
   display: none;
 }
