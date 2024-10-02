@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
@@ -42,7 +43,7 @@ class EscalatorEdgeTest {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
     var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
     var res = edge.traverse(new State(from, req.build()));
-    assertEquals(res.length, 0);
+    assertThat(res).isEmpty();
   }
 
   @Test
@@ -50,7 +51,7 @@ class EscalatorEdgeTest {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchair(true);
     var res = edge.traverse(new State(from, req.build()));
-    assertEquals(res.length, 0);
+    assertThat(res).isEmpty();
   }
 
   @Test
@@ -58,5 +59,11 @@ class EscalatorEdgeTest {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
     assertEquals("Rolltreppe", edge.getName().toString(Locale.GERMANY));
     assertEquals("escalator", edge.getName().toString(Locale.ENGLISH));
+  }
+
+  @Test
+  void geometry() {
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
+    assertThat(edge.getGeometry().getCoordinates()).isNotEmpty();
   }
 }
