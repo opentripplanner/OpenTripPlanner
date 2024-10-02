@@ -39,16 +39,16 @@ class LayerControl implements IControl {
         .reverse()
         .forEach((layer) => {
           if (layer) {
-            const meta: { group: string | undefined } = layer.metadata as { group: string | undefined };
-            console.log(meta);
+            const meta: { group: string } = layer.metadata as { group: string };
 
-            let groupName: string = 'Other';
+            let groupName: string = 'Misc';
             if (meta.group) {
               groupName = meta.group;
             }
             console.log(groupName);
 
             const layerDiv = document.createElement('div');
+            layerDiv.className = 'layer';
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.value = layer.id;
@@ -74,10 +74,18 @@ class LayerControl implements IControl {
               const g = groups.get(groupName);
               g?.appendChild(layerDiv);
             } else {
-              const h4 = document.createElement('h6');
-              h4.textContent = groupName;
+              const input = document.createElement('input');
+              input.type = 'checkbox';
+              input.id = groupName;
+
+              const label = document.createElement('label');
+              label.textContent = groupName;
+              label.htmlFor = groupName;
+
               const groupDiv = document.createElement('div');
-              groupDiv.appendChild(h4);
+              groupDiv.className = 'group';
+              groupDiv.appendChild(input);
+              groupDiv.appendChild(label);
               groupDiv.appendChild(layerDiv);
               groups.set(groupName, groupDiv);
               this.container.appendChild(groupDiv);

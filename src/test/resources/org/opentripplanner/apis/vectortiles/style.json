@@ -22,7 +22,298 @@
       "id" : "background",
       "type" : "raster",
       "source" : "background",
-      "minzoom" : 0
+      "minzoom" : 0,
+      "metadata" : {
+        "group" : "Other"
+      }
+    },
+    {
+      "id" : "NONE",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#000",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "NONE"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "PEDESTRIAN",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#0EE38B",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "PEDESTRIAN"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "BICYCLE",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#E3A10E",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "BICYCLE"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "PEDESTRIAN_AND_BICYCLE",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#00EB68",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "PEDESTRIAN_AND_BICYCLE"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "CAR",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#EB131F",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "CAR"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "PEDESTRIAN_AND_CAR",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#963E4A",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "PEDESTRIAN_AND_CAR"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "BICYCLE_AND_CAR",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#3E5D6B",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "BICYCLE_AND_CAR"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "ALL",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#413031",
+        "line-width" : {
+          "base" : 2.3,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              14.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "==",
+        "permission",
+        "ALL"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
     },
     {
       "id" : "edge",
@@ -198,6 +489,9 @@
       },
       "layout" : {
         "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Vertices"
       }
     },
     {
@@ -244,6 +538,9 @@
       ],
       "layout" : {
         "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Vertices"
       }
     },
     {
@@ -257,6 +554,9 @@
         "fill-color" : "#22DD9E",
         "fill-opacity" : 0.5,
         "fill-outline-color" : "#140d0e"
+      },
+      "metadata" : {
+        "group" : "Stops"
       }
     },
     {
@@ -270,6 +570,9 @@
         "fill-color" : "#22DD9E",
         "fill-opacity" : 0.5,
         "fill-outline-color" : "#140d0e"
+      },
+      "metadata" : {
+        "group" : "Stops"
       }
     },
     {
@@ -308,6 +611,9 @@
           ]
         },
         "circle-color" : "#fcf9fa"
+      },
+      "metadata" : {
+        "group" : "Stops"
       }
     }
   ],

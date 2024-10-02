@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -39,6 +40,11 @@ public class StyleBuilder {
     return sourceLayer(source.vectorLayer());
   }
 
+  public StyleBuilder offsetFromProperty() {
+    line.put("line-offset", List.of("get", "offset"));
+    return this;
+  }
+
   public enum LayerType {
     Circle,
     Line,
@@ -49,7 +55,7 @@ public class StyleBuilder {
 
   private StyleBuilder(String id) {
     props.put("id", id);
-    metadata.put("group", "Misc");
+    metadata.put("group", "Other");
   }
 
   public StyleBuilder minZoom(int i) {
@@ -203,6 +209,11 @@ public class StyleBuilder {
     return filterClasses(classToFilter);
   }
 
+  public final StyleBuilder permissionsFilter(StreetTraversalPermission p) {
+    filter = List.of("==", "permission", p.name());
+    return this;
+  }
+
   /**
    * Only apply the style to the given vertices.
    */
@@ -227,9 +238,7 @@ public class StyleBuilder {
     if (!line.isEmpty()) {
       copy.put("line", line);
     }
-    if (!metadata.isEmpty()) {
-      copy.put("metadata", metadata);
-    }
+    copy.put("metadata", metadata);
     return OBJECT_MAPPER.valueToTree(copy);
   }
 
