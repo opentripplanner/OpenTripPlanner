@@ -1,6 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
 import javax.annotation.Nonnull;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -34,6 +36,11 @@ public class EscalatorEdge extends Edge {
       s1.incrementWalkDistance(getDistanceMeters());
       return s1.makeStateArray();
     } else return State.empty();
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return GeometryUtils.makeLineString(fromv.getCoordinate(), tov.getCoordinate());
   }
 
   @Override
