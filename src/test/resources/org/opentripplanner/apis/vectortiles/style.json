@@ -61,6 +61,9 @@
       "layout" : {
         "line-cap" : "round",
         "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {
@@ -111,6 +114,9 @@
         "text-keep-upright" : true,
         "text-rotation-alignment" : "map",
         "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {
@@ -148,6 +154,9 @@
       "layout" : {
         "line-cap" : "round",
         "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {

@@ -61,6 +61,7 @@ public class DebugStyleSpec {
     TemporaryPartialStreetEdge.class,
     TemporaryFreeEdge.class,
   };
+  private static final String EDGES_GROUP = "Edges";
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -82,6 +83,7 @@ public class DebugStyleSpec {
         StyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0),
         StyleBuilder
           .ofId("edge")
+          .group(EDGES_GROUP)
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(MAGENTA)
@@ -92,6 +94,7 @@ public class DebugStyleSpec {
           .intiallyHidden(),
         StyleBuilder
           .ofId("edge-name")
+          .group(EDGES_GROUP)
           .typeSymbol()
           .lineText("name")
           .vectorSourceLayer(edges)
@@ -101,6 +104,7 @@ public class DebugStyleSpec {
           .intiallyHidden(),
         StyleBuilder
           .ofId("link")
+          .group(EDGES_GROUP)
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(BRIGHT_GREEN)

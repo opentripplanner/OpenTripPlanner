@@ -26,6 +26,7 @@ public class StyleBuilder {
   private final Map<String, Object> props = new LinkedHashMap<>();
   private final Map<String, Object> paint = new LinkedHashMap<>();
   private final Map<String, Object> layout = new LinkedHashMap<>();
+  private final Map<String, Object> metadata = new LinkedHashMap<>();
   private final Map<String, Object> line = new LinkedHashMap<>();
   private List<String> filter = List.of();
 
@@ -48,6 +49,7 @@ public class StyleBuilder {
 
   private StyleBuilder(String id) {
     props.put("id", id);
+    metadata.put("group", "Misc");
   }
 
   public StyleBuilder minZoom(int i) {
@@ -89,6 +91,11 @@ public class StyleBuilder {
   public StyleBuilder typeLine() {
     type(LayerType.Line);
     layout.put("line-cap", "round");
+    return this;
+  }
+
+  public StyleBuilder group(String group) {
+    metadata.put("group", group);
     return this;
   }
 
@@ -219,6 +226,9 @@ public class StyleBuilder {
     }
     if (!line.isEmpty()) {
       copy.put("line", line);
+    }
+    if (!metadata.isEmpty()) {
+      copy.put("metadata", metadata);
     }
     return OBJECT_MAPPER.valueToTree(copy);
   }
