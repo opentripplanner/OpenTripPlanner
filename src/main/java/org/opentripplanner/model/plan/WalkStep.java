@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.opentripplanner.apis.gtfs.model.StepEntity;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -44,7 +45,7 @@ public final class WalkStep {
   private final boolean walkingBike;
 
   private final String exit;
-  private final String entrance;
+  private final StepEntity entity;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -57,7 +58,7 @@ public final class WalkStep {
     I18NString directionText,
     Set<StreetNote> streetNotes,
     String exit,
-    String entrance,
+    StepEntity entity,
     ElevationProfile elevationProfile,
     boolean bogusName,
     boolean walkingBike,
@@ -78,7 +79,7 @@ public final class WalkStep {
     this.walkingBike = walkingBike;
     this.area = area;
     this.exit = exit;
-    this.entrance = entrance;
+    this.entity = entity;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -134,10 +135,10 @@ public final class WalkStep {
   }
 
   /**
-   * When entering or exiting a public transport station, the entrance name
+   * Entity related to a step e.g. building entrance/exit.
    */
-  public String getEntrance() {
-    return entrance;
+  public Object getEntity() {
+    return entity;
   }
 
   /**

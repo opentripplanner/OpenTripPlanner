@@ -2607,6 +2607,15 @@ type serviceTimeRange {
   start: Long
 }
 
+"Station entrance/exit"
+type Entrance {
+  "Name of a station entrance/exit"
+  name: String
+}
+
+"Entity to a step"
+union StepEntity = Entrance
+
 type step {
   "The cardinal (compass) direction (e.g. north, northeast) taken when engaging this step."
   absoluteDirection: AbsoluteDirection
@@ -2628,8 +2637,6 @@ type step {
   elevationProfile: [elevationProfileComponent]
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
-  "Name of entrance to a public transport station"
-  entrance: String
   "The latitude of the start of the step."
   lat: Float
   "The longitude of the start of the step."
@@ -2642,6 +2649,8 @@ type step {
   streetName: String
   "Is this step walking with a bike?"
   walkingBike: Boolean
+  "Step entity e.g. an entrance"
+  entity: StepEntity
 }
 
 type stopAtDistance implements Node {

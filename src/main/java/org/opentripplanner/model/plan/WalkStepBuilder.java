@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.model.StepEntity;
+import org.opentripplanner.apis.gtfs.model.StepEntity.Entrance;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -25,7 +27,7 @@ public class WalkStepBuilder {
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
-  private String entrance;
+  private StepEntity entity;
   private boolean stayOn = false;
   /**
    * Distance used for appending elevation profiles
@@ -75,8 +77,8 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder withEntrance(String entrance) {
-    this.entrance = entrance;
+  public WalkStepBuilder withEntrance(Entrance entrance) {
+    this.entity = entrance;
     return this;
   }
 
@@ -162,7 +164,7 @@ public class WalkStepBuilder {
       directionText,
       streetNotes,
       exit,
-      entrance,
+      entity,
       elevationProfile,
       bogusName,
       walkingBike,

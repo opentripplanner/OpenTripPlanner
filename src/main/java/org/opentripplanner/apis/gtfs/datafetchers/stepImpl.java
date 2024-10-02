@@ -54,8 +54,8 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
   }
 
   @Override
-  public DataFetcher<String> entrance() {
-    return environment -> getSource(environment).getEntrance();
+  public DataFetcher<Object> entity() {
+    return environment -> getSource(environment).getEntity();
   }
 
   @Override

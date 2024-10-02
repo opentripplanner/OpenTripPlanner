@@ -81,6 +81,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.placeAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
+import org.opentripplanner.apis.gtfs.model.StepEntity;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
@@ -124,6 +125,7 @@ class GtfsGraphQLIndex {
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
+        .type("StepEntity", type -> type.typeResolver(new StepEntity() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))

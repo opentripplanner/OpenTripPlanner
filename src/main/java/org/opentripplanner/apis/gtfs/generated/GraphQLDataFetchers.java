@@ -365,6 +365,11 @@ public class GraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
   }
 
+  /** Station entrance/exit */
+  public interface GraphQLEntrance {
+    public DataFetcher<String> name();
+  }
+
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
   public interface GraphQLFareMedium {
     public DataFetcher<String> id();
@@ -977,6 +982,9 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLInputField> inputField();
   }
 
+  /** Entity to a step */
+  public interface GraphQLStepEntity extends TypeResolver {}
+
   /**
    * Stop can represent either a single public transport stop, where passengers can
    * board and/or disembark vehicles, or a station, which contains multiple stops.
@@ -1428,7 +1436,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
-    public DataFetcher<String> entrance();
+    public DataFetcher<Object> entity();
 
     public DataFetcher<String> exit();
 
