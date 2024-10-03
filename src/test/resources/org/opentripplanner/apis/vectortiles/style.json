@@ -37,7 +37,7 @@
       "paint" : {
         "line-color" : "#000",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -45,7 +45,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -71,9 +71,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#0EE38B",
+        "line-color" : "#2ba812",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -81,7 +81,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -107,9 +107,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#E3A10E",
+        "line-color" : "#10d3b6",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -117,7 +117,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -143,9 +143,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#00EB68",
+        "line-color" : "#10d3b6",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -153,7 +153,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -179,9 +179,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#EB131F",
+        "line-color" : "#f92e13",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -189,7 +189,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -215,9 +215,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#963E4A",
+        "line-color" : "#e25f8f",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -225,7 +225,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -251,9 +251,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#3E5D6B",
+        "line-color" : "#e25f8f",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -261,7 +261,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -287,9 +287,9 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#413031",
+        "line-color" : "#adb2b0",
         "line-width" : {
-          "base" : 2.3,
+          "base" : 1.3,
           "stops" : [
             [
               11,
@@ -297,7 +297,7 @@
             ],
             [
               23,
-              14.0
+              12.0
             ]
           ]
         }
@@ -309,6 +309,59 @@
       ],
       "layout" : {
         "line-cap" : "round",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Traversal permissions"
+      }
+    },
+    {
+      "id" : "permission-text",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line",
+        "symbol-spacing" : 500,
+        "text-field" : "{permission}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : {
+          "base" : 14.0,
+          "stops" : [
+            [
+              14,
+              12.0
+            ],
+            [
+              20,
+              14.0
+            ]
+          ]
+        },
+        "text-max-width" : 5,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
         "visibility" : "none"
       },
       "metadata" : {

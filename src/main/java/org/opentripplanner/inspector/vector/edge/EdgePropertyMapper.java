@@ -30,9 +30,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
   private static List<KeyValue> mapStreetEdge(StreetEdge se) {
     var props = Lists.newArrayList(
       kv("permission", se.getPermission().toString()),
-      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
-      kv("back", se.isBack()),
-      kv("offset", se.isBack() ? -10 : 10)
+      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor()))
     );
     if (se.hasBogusName()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));

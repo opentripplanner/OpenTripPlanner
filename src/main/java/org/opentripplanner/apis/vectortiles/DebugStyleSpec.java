@@ -217,7 +217,6 @@ public class DebugStyleSpec {
           .lineColor(permissionColor(p))
           .permissionsFilter(p)
           .lineWidth(FAT_LINE_WIDTH)
-          .offsetFromProperty()
           .minZoom(6)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden()

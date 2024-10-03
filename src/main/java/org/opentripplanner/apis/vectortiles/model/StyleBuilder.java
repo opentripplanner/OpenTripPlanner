@@ -40,11 +40,6 @@ public class StyleBuilder {
     return sourceLayer(source.vectorLayer());
   }
 
-  public StyleBuilder offsetFromProperty() {
-    line.put("line-offset", List.of("get", "offset"));
-    return this;
-  }
-
   public enum LayerType {
     Circle,
     Line,
