@@ -2609,8 +2609,12 @@ type serviceTimeRange {
 
 "Station entrance/exit"
 type Entrance {
-  "Name of a station entrance/exit"
+  "Code of entrance/exit eg A or B"
+  code: String
+  "Name of entrance/exit"
   name: String
+  "Gtfs id of entrance/exit"
+  gtfsId: String
 }
 
 "Entity to a step"
