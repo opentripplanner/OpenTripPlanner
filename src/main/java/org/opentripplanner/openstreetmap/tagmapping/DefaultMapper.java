@@ -613,7 +613,10 @@ class DefaultMapper implements OsmTagMapper {
     // slope overrides
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("cutting=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {

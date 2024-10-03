@@ -84,7 +84,7 @@ config:
     PlanConnection: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     PlanEdge: graphql.relay.DefaultEdge#DefaultEdge<Itinerary>
     PlanPageInfo: org.opentripplanner.apis.gtfs.model.PlanPageInfo#PlanPageInfo
-    RealtimeState: String
+    RealtimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState#GraphQLRealtimeState
     RelativeDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection#GraphQLRelativeDirection
     Route: org.opentripplanner.transit.model.network.Route#Route
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError

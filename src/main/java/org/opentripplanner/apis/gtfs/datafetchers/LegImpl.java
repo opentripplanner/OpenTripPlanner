@@ -10,6 +10,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
+import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -191,10 +192,10 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<String> realtimeState() {
+  public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
     return environment -> {
       var state = getSource(environment).getRealTimeState();
-      return (state != null) ? state.name() : null;
+      return RealtimeStateMapper.map(state);
     };
   }
 

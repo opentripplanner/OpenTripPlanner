@@ -60,13 +60,13 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
-        <jackson.version>2.17.2</jackson.version>
+        <jackson.version>2.18.0</jackson.version>
         <jersey.version>3.1.8</jersey.version>
         <junit.version>5.11.0</junit.version>
         <micrometer.version>1.13.4</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.7</logback.version>
-        <lucene.version>9.11.1</lucene.version>
+        <lucene.version>9.12.0</lucene.version>
         <slf4j.version>2.0.16</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.27</siri-java-model.version>
