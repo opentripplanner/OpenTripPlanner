@@ -175,8 +175,9 @@
   font-size: 17px;
 }
 
-.maplibregl-ctrl-group.layer-select h6 {
+.maplibregl-ctrl-group.layer-select .group-label {
   font-size: 15px;
+  margin-bottom: 5px;
 }
 
 .maplibregl-ctrl-group.layer-select div.group {

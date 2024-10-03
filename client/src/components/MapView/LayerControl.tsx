@@ -89,12 +89,13 @@ class LayerControl implements IControl {
               groupInput.type = 'checkbox';
               groupInput.id = groupName;
 
-              const label = document.createElement('label');
-              label.textContent = groupName;
-              label.htmlFor = groupName;
+              const groupLabel = document.createElement('label');
+              groupLabel.textContent = groupName;
+              groupLabel.htmlFor = groupName;
+              groupLabel.className = 'group-label';
 
               groupDiv.appendChild(groupInput);
-              groupDiv.appendChild(label);
+              groupDiv.appendChild(groupLabel);
               groupDiv.appendChild(layerDiv);
               groups.set(groupName, groupDiv);
               this.container.appendChild(groupDiv);
