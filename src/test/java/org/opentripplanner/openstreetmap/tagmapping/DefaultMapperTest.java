@@ -1,6 +1,7 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -187,6 +188,15 @@ public class DefaultMapperTest {
     assertEquals(ALL, useSidepathBackwardProps.getPermission());
     assertEquals(0.98, useSidepathBackwardProps.bicycleSafety().forward(), epsilon);
     assertEquals(4.9, useSidepathBackwardProps.bicycleSafety().back(), epsilon);
+  }
+
+  @Test
+  void slopeOverrides() {
+    var regular = WayTestData.southeastLaBonitaWay();
+    assertFalse(wps.getSlopeOverride(regular));
+
+    var indoor = WayTestData.southeastLaBonitaWay().addTag("indoor", "yes");
+    assertTrue(wps.getSlopeOverride(indoor));
   }
 
   /**
