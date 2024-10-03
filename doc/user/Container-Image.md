@@ -22,7 +22,8 @@ curl -L https://vbb.de/vbbgtfs -o berlin/vbb-gtfs.zip
 # build graph and save it onto the host system via the volume
 docker run --rm \
     -e JAVA_TOOL_OPTIONS='-Xmx8g' \
-    -v "$(pwd)/berlin:/var/opentripplanner" docker.io/opentripplanner/opentripplanner:latest --build --save
+    -v "$(pwd)/berlin:/var/opentripplanner" \
+    docker.io/opentripplanner/opentripplanner:latest --build --save
 # load and serve graph
 docker run -it --rm -p 8080:8080 \
     -e JAVA_TOOL_OPTIONS='-Xmx8g' \
