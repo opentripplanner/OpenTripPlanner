@@ -214,7 +214,7 @@ public class RealtimeVehiclePatternMatcher {
     if (vehiclePositionFeatures.contains(POSITION) && vehiclePosition.hasPosition()) {
       var position = vehiclePosition.getPosition();
       newVehicle.withCoordinates(
-        new WgsCoordinate(position.getLatitude(), position.getLongitude())
+        WgsCoordinate.normalized(position.getLatitude(), position.getLongitude())
       );
 
       if (position.hasSpeed()) {

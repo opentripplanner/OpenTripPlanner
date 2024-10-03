@@ -78,7 +78,7 @@ public abstract class StationElementBuilder<
   }
 
   public B withCoordinate(double latitude, double longitude) {
-    this.coordinate = new WgsCoordinate(latitude, longitude);
+    this.coordinate = WgsCoordinate.normalized(latitude, longitude);
     return instance();
   }
 

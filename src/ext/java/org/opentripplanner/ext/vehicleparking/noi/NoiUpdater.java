@@ -42,7 +42,7 @@ public class NoiUpdater extends GenericJsonDataSource<VehicleParking> {
     var name = new NonLocalizedString(jsonNode.path("name").asText());
     double lat = jsonNode.path("lat").asDouble();
     double lon = jsonNode.path("lon").asDouble();
-    var coordinate = new WgsCoordinate(lat, lon);
+    var coordinate = WgsCoordinate.normalized(lat, lon);
     VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
       builder
         .entranceId(new FeedScopedId(params.feedId(), vehicleParkId.getId() + "/entrance"))

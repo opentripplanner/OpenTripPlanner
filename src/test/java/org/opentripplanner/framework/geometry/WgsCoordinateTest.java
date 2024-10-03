@@ -15,7 +15,7 @@ public class WgsCoordinateTest {
 
   @Test
   void normalize() {
-    WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
+    WgsCoordinate c = WgsCoordinate.normalized(1.123456789, 2.987654321);
     assertEquals(1.1234568, c.latitude());
     assertEquals(2.9876543, c.longitude());
   }
@@ -29,21 +29,21 @@ public class WgsCoordinateTest {
 
   @Test
   void testCoordinateEquals() {
-    WgsCoordinate a = new WgsCoordinate(5.000_000_3, 3.0);
+    WgsCoordinate a = WgsCoordinate.normalized(5.000_000_3, 3.0);
 
     // Test latitude
-    WgsCoordinate sameLatitudeUpper = new WgsCoordinate(5.000_000_349, 3.0);
-    WgsCoordinate sameLatitudeLower = new WgsCoordinate(5.000_000_250, 3.0);
-    WgsCoordinate differentLatitude = new WgsCoordinate(5.000_000_350, 3.0);
+    WgsCoordinate sameLatitudeUpper = WgsCoordinate.normalized(5.000_000_349, 3.0);
+    WgsCoordinate sameLatitudeLower = WgsCoordinate.normalized(5.000_000_250, 3.0);
+    WgsCoordinate differentLatitude = WgsCoordinate.normalized(5.000_000_350, 3.0);
 
     assertTrue(a.sameLocation(sameLatitudeUpper));
     assertTrue(a.sameLocation(sameLatitudeLower));
     assertFalse(a.sameLocation(differentLatitude));
 
     // Test longitude
-    WgsCoordinate sameLongitudeUpper = new WgsCoordinate(5.000_000_3, 3.000_000_049);
-    WgsCoordinate sameLongitudeLover = new WgsCoordinate(5.000_000_3, 2.999_999_95);
-    WgsCoordinate differentLongitude = new WgsCoordinate(5.000_000_30, 3.000_000_05);
+    WgsCoordinate sameLongitudeUpper = WgsCoordinate.normalized(5.000_000_3, 3.000_000_049);
+    WgsCoordinate sameLongitudeLover = WgsCoordinate.normalized(5.000_000_3, 2.999_999_95);
+    WgsCoordinate differentLongitude = WgsCoordinate.normalized(5.000_000_30, 3.000_000_05);
 
     assertTrue(a.sameLocation(sameLongitudeUpper));
     assertTrue(a.sameLocation(sameLongitudeLover));
@@ -107,7 +107,7 @@ public class WgsCoordinateTest {
 
   @Test
   void roundingTo10m() {
-    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var hamburg = WgsCoordinate.of(Coordinates.HAMBURG);
     var rounded = hamburg.roundToApproximate10m();
     assertEquals(10.0003, rounded.longitude());
     assertEquals(53.5566, rounded.latitude());
@@ -115,7 +115,7 @@ public class WgsCoordinateTest {
 
   @Test
   void roundingTo100m() {
-    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var hamburg = WgsCoordinate.of(Coordinates.HAMBURG);
     var rounded = hamburg.roundToApproximate100m();
     assertEquals(10, rounded.longitude());
     assertEquals(53.557, rounded.latitude());

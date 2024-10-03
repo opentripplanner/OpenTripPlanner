@@ -94,7 +94,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     newGeometries[numGeometries] = location.getGeometry();
 
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
-    centroid = new WgsCoordinate(geometry.getCentroid());
+    centroid = WgsCoordinate.normalized(geometry.getCentroid());
 
     return this;
   }

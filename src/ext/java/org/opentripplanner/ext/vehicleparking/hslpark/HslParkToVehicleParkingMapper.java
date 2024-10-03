@@ -114,7 +114,7 @@ public class HslParkToVehicleParkingMapper {
         .id(vehicleParkId)
         .name(name)
         .state(state)
-        .coordinate(new WgsCoordinate(geometry.getCentroid()))
+        .coordinate(WgsCoordinate.normalized(geometry.getCentroid()))
         .capacity(capacity)
         .bicyclePlaces(bicyclePlaces)
         .carPlaces(carPlaces)
@@ -125,7 +125,7 @@ public class HslParkToVehicleParkingMapper {
           builder
             .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
             .name(name)
-            .coordinate(new WgsCoordinate(geometry.getCentroid()))
+            .coordinate(WgsCoordinate.normalized(geometry.getCentroid()))
             .walkAccessible(true)
             .carAccessible(carPlaces || wheelChairAccessiblePlaces)
         )

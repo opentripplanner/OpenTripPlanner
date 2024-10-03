@@ -429,7 +429,7 @@ public abstract class GraphRoutingTest {
         builder
           .entranceId(TransitModelForTest.id(id))
           .name(new NonLocalizedString(id))
-          .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
+          .coordinate(WgsCoordinate.of(streetVertex.getCoordinate()))
           .vertex(streetVertex)
           .carAccessible(carAccessible)
           .walkAccessible(walkAccessible);

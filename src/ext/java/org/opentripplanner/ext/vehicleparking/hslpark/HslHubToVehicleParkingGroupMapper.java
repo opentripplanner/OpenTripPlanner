@@ -57,7 +57,7 @@ public class HslHubToVehicleParkingGroupMapper {
       var vehicleParkingGroup = VehicleParkingGroup
         .of(hubId)
         .withName(name)
-        .withCoordinate(new WgsCoordinate(geometry.getCentroid()))
+        .withCoordinate(WgsCoordinate.normalized(geometry.getCentroid()))
         .build();
       var vehicleParkingIds = getVehicleParkingIds((ArrayNode) jsonNode.get("facilityIds"), hubId);
       if (vehicleParkingIds == null) {

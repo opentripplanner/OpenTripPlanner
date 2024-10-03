@@ -119,7 +119,7 @@ class StreetLinkerModuleTest {
       stop =
         builder
           .regularStop(id("platform-1"))
-          .withCoordinate(new WgsCoordinate(KONGSBERG_PLATFORM_1))
+          .withCoordinate(WgsCoordinate.of(KONGSBERG_PLATFORM_1))
           .build();
       builder.withRegularStop(stop);
 

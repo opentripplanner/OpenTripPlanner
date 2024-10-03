@@ -34,7 +34,7 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
   protected VehicleParking parseElement(JsonNode jsonNode) {
     try {
       var coords = jsonNode.path("geometry").path("coordinates");
-      var coordinate = new WgsCoordinate(coords.get(1).asDouble(), coords.get(0).asDouble());
+      var coordinate = WgsCoordinate.normalized(coords.get(1).asDouble(), coords.get(0).asDouble());
 
       var props = jsonNode.path("properties");
       var vehicleParkId = new FeedScopedId(params.feedId(), props.path("code").asText());
