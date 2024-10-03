@@ -56,14 +56,14 @@ class LayerControl implements IControl {
             input.onchange = (e) => {
               e.preventDefault();
               e.stopPropagation();
-
-              if (this.layerVisible(map, layer)) {
-                map.setLayoutProperty(layer.id, 'visibility', 'none');
-              } else {
+              if (input.checked) {
                 map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              } else {
+                map.setLayoutProperty(layer.id, 'visibility', 'none');
               }
             };
             input.checked = this.layerVisible(map, layer);
+            input.className = 'layer';
             const label = document.createElement('label');
             label.textContent = layer.id;
             label.htmlFor = layer.id;
@@ -74,17 +74,26 @@ class LayerControl implements IControl {
               const g = groups.get(groupName);
               g?.appendChild(layerDiv);
             } else {
-              const input = document.createElement('input');
-              input.type = 'checkbox';
-              input.id = groupName;
+              const groupDiv = document.createElement('div');
+              groupDiv.className = 'group';
+
+              const groupInput = document.createElement('input');
+              groupInput.onchange = () => {
+                groupDiv.querySelectorAll('input.layer').forEach((i) => {
+                  const input = i as HTMLInputElement;
+                  input.checked = groupInput.checked;
+                  var event = new Event('change');
+                  i.dispatchEvent(event);
+                });
+              };
+              groupInput.type = 'checkbox';
+              groupInput.id = groupName;
 
               const label = document.createElement('label');
               label.textContent = groupName;
               label.htmlFor = groupName;
 
-              const groupDiv = document.createElement('div');
-              groupDiv.className = 'group';
-              groupDiv.appendChild(input);
+              groupDiv.appendChild(groupInput);
               groupDiv.appendChild(label);
               groupDiv.appendChild(layerDiv);
               groups.set(groupName, groupDiv);

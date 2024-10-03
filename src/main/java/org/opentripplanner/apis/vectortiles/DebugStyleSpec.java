@@ -72,7 +72,7 @@ public class DebugStyleSpec {
   private static final String EDGES_GROUP = "Edges";
   private static final String STOPS = "Stops";
   private static final String VERTICES = "Vertices";
-  private static final String TRAVERSAL_PERMISSIONS_GROU = "Traversal permissions";
+  private static final String TRAVERSAL_PERMISSIONS_GROUP = "Traversal permissions";
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -211,7 +211,7 @@ public class DebugStyleSpec {
       .map(p ->
         StyleBuilder
           .ofId(p.name())
-          .group(TRAVERSAL_PERMISSIONS_GROU)
+          .group(TRAVERSAL_PERMISSIONS_GROUP)
           .typeLine()
           .vectorSourceLayer(edges)
           .lineColor(permissionColor(p))
@@ -225,13 +225,14 @@ public class DebugStyleSpec {
       .toList();
     var textStyle = StyleBuilder
       .ofId("permission-text")
-      .group(TRAVERSAL_PERMISSIONS_GROU)
+      .group(TRAVERSAL_PERMISSIONS_GROUP)
       .typeSymbol()
       .lineText("permission")
       .vectorSourceLayer(edges)
       .edgeFilter(EDGES_TO_DISPLAY)
       .minZoom(17)
-      .maxZoom(MAX_ZOOM);
+      .maxZoom(MAX_ZOOM)
+      .intiallyHidden();
     return ListUtils.combine(permissionStyles, List.of(textStyle));
   }
 
