@@ -443,18 +443,18 @@ Use an empty string to make it unbounded.
         .summary("List stations that should route to centroid.")
         .description(
           """
-        This field contains a list of station ids for which the centroid will be used instead
-        of the stop coordinates.
-        
-        When doing street routing from/to a station the default behaviour is to route to any of
-        the stations child stops. This can cause strange results for stations that have stops
-        spread over a large area.
-        
-        For some stations you might instead wish to use the centroid of the station as the
-        source/destination for street routing. In this case the centroid will be  used both for
-        direct street search and for access/egress street search where the station is used as
-        the start/end of the access/egress.
-        """
+This field contains a list of station ids for which street legs will start/end at the station
+centroid instead of the child stops.
+
+When searching from/to a station the default behaviour is to route from/to any of the stations child
+stops. This can cause strange results for stations that have stops spread over a large area.
+
+For some stations you might instead wish to use the centroid of the station as the
+origin/destination. In this case the centroid will be used both for direct street search and for
+access/egress street search where the station is used as the start/end of the access/egress. But
+transit that starts/ends at the station will work as usual without any additional street leg from/to
+the centroid.
+"""
         )
         .asFeedScopedIds(List.of());
 

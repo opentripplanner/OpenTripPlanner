@@ -263,7 +263,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkStationCentroids(Graph graph) {
-    BiFunction<Vertex, StreetVertex, List<Edge>> createLinkEdges = (theStation, streetVertex) ->
+    BiFunction<Vertex, StreetVertex, List<Edge>> linkStationAndStreetVertex = (
+        theStation,
+        streetVertex
+      ) ->
       List.of(
         StreetStationCentroidLink.createStreetStationLink(
           (StationCentroidVertex) theStation,
@@ -282,7 +285,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
           station,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
-          createLinkEdges
+          linkStationAndStreetVertex
         );
     }
   }
