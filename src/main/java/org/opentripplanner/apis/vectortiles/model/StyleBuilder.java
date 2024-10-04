@@ -95,11 +95,6 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder group(String group) {
-    metadata.put("group", group);
-    return this;
-  }
-
   public StyleBuilder typeFill() {
     type(LayerType.Fill);
     return this;
@@ -112,6 +107,15 @@ public class StyleBuilder {
 
   private StyleBuilder type(LayerType type) {
     props.put(TYPE, type.name().toLowerCase());
+    return this;
+  }
+
+  /**
+   * Puts the layer into an arbitrarily defined group in the layer selector. This allows you
+   * to switch the entire group on and off.
+   */
+  public StyleBuilder group(String group) {
+    metadata.put("group", group);
     return this;
   }
 
@@ -204,6 +208,9 @@ public class StyleBuilder {
     return filterClasses(classToFilter);
   }
 
+  /**
+   * Filter the entities by their "permission" property.
+   */
   public final StyleBuilder permissionsFilter(StreetTraversalPermission p) {
     filter = List.of("==", "permission", p.name());
     return this;
