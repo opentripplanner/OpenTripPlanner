@@ -16,7 +16,6 @@ public class AvailabilityDatasourceFactory {
         BICYCLE_PARK_API,
         HSL_PARK,
         BIKEEP,
-        NOI_OPEN_DATA_HUB,
         BIKELY -> throw new IllegalArgumentException("Cannot instantiate SIRI-FM data source");
     };
   }
