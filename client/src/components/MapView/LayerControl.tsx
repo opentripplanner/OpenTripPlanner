@@ -45,7 +45,6 @@ class LayerControl implements IControl {
             if (meta.group) {
               groupName = meta.group;
             }
-            console.log(groupName);
 
             const layerDiv = document.createElement('div');
             layerDiv.className = 'layer';
@@ -74,29 +73,7 @@ class LayerControl implements IControl {
               const g = groups.get(groupName);
               g?.appendChild(layerDiv);
             } else {
-              const groupDiv = document.createElement('div');
-              groupDiv.className = 'group';
-
-              const groupInput = document.createElement('input');
-              groupInput.onchange = () => {
-                groupDiv.querySelectorAll('input.layer').forEach((i) => {
-                  const input = i as HTMLInputElement;
-                  input.checked = groupInput.checked;
-                  var event = new Event('change');
-                  i.dispatchEvent(event);
-                });
-              };
-              groupInput.type = 'checkbox';
-              groupInput.id = groupName;
-
-              const groupLabel = document.createElement('label');
-              groupLabel.textContent = groupName;
-              groupLabel.htmlFor = groupName;
-              groupLabel.className = 'group-label';
-
-              groupDiv.appendChild(groupInput);
-              groupDiv.appendChild(groupLabel);
-              groupDiv.appendChild(layerDiv);
+              const groupDiv = this.buildgGroupDiv(groupName, layerDiv);
               groups.set(groupName, groupDiv);
               this.container.appendChild(groupDiv);
             }
@@ -105,6 +82,33 @@ class LayerControl implements IControl {
     });
 
     return this.container;
+  }
+
+  private buildgGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'group';
+
+    const groupInput = document.createElement('input');
+    groupInput.onchange = () => {
+      groupDiv.querySelectorAll('input.layer').forEach((i) => {
+        const input = i as HTMLInputElement;
+        input.checked = groupInput.checked;
+        const event = new Event('change');
+        i.dispatchEvent(event);
+      });
+    };
+    groupInput.type = 'checkbox';
+    groupInput.id = groupName;
+
+    const groupLabel = document.createElement('label');
+    groupLabel.textContent = groupName;
+    groupLabel.htmlFor = groupName;
+    groupLabel.className = 'group-label';
+
+    groupDiv.appendChild(groupInput);
+    groupDiv.appendChild(groupLabel);
+    groupDiv.appendChild(layerDiv);
+    return groupDiv;
   }
 
   private layerVisible(map: WebMap, layer: { id: string }) {
