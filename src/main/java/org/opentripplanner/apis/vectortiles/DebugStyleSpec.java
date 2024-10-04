@@ -93,115 +93,129 @@ public class DebugStyleSpec {
       ListUtils.combine(
         List.of(StyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0)),
         traversalPermissions(edges),
-        List.of(
-          StyleBuilder
-            .ofId("edge")
-            .group(EDGES_GROUP)
-            .typeLine()
-            .vectorSourceLayer(edges)
-            .lineColor(MAGENTA)
-            .edgeFilter(EDGES_TO_DISPLAY)
-            .lineWidth(LINE_WIDTH)
-            .minZoom(6)
-            .maxZoom(MAX_ZOOM)
-            .intiallyHidden(),
-          StyleBuilder
-            .ofId("edge-name")
-            .group(EDGES_GROUP)
-            .typeSymbol()
-            .lineText("name")
-            .vectorSourceLayer(edges)
-            .edgeFilter(EDGES_TO_DISPLAY)
-            .minZoom(17)
-            .maxZoom(MAX_ZOOM)
-            .intiallyHidden(),
-          StyleBuilder
-            .ofId("link")
-            .group(EDGES_GROUP)
-            .typeLine()
-            .vectorSourceLayer(edges)
-            .lineColor(BRIGHT_GREEN)
-            .edgeFilter(
-              StreetTransitStopLink.class,
-              StreetTransitEntranceLink.class,
-              BoardingLocationToStopLink.class,
-              StreetVehicleRentalLink.class,
-              StreetVehicleParkingLink.class
-            )
-            .lineWidth(LINE_WIDTH)
-            .minZoom(13)
-            .maxZoom(MAX_ZOOM)
-            .intiallyHidden(),
-          StyleBuilder
-            .ofId("vertex")
-            .group(VERTICES)
-            .typeCircle()
-            .vectorSourceLayer(vertices)
-            .circleStroke(BLACK, CIRCLE_STROKE)
-            .circleRadius(
-              new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
-            )
-            .circleColor(PURPLE)
-            .minZoom(15)
-            .maxZoom(MAX_ZOOM)
-            .intiallyHidden(),
-          StyleBuilder
-            .ofId("parking-vertex")
-            .group(VERTICES)
-            .typeCircle()
-            .vectorSourceLayer(vertices)
-            .vertexFilter(VehicleParkingEntranceVertex.class)
-            .circleStroke(BLACK, CIRCLE_STROKE)
-            .circleRadius(
-              new ZoomDependentNumber(
-                1,
-                List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10))
-              )
-            )
-            .circleColor(DARK_GREEN)
-            .minZoom(13)
-            .maxZoom(MAX_ZOOM)
-            .intiallyHidden(),
-          StyleBuilder
-            .ofId("area-stop")
-            .group(STOPS)
-            .typeFill()
-            .vectorSourceLayer(areaStops)
-            .fillColor(BRIGHT_GREEN)
-            .fillOpacity(0.5f)
-            .fillOutlineColor(BLACK)
-            .minZoom(6)
-            .maxZoom(MAX_ZOOM),
-          StyleBuilder
-            .ofId("group-stop")
-            .group(STOPS)
-            .typeFill()
-            .vectorSourceLayer(groupStops)
-            .fillColor(BRIGHT_GREEN)
-            .fillOpacity(0.5f)
-            .fillOutlineColor(BLACK)
-            .minZoom(6)
-            .maxZoom(MAX_ZOOM),
-          StyleBuilder
-            .ofId("regular-stop")
-            .group(STOPS)
-            .typeCircle()
-            .vectorSourceLayer(regularStops)
-            .circleStroke(
-              BLACK,
-              new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
-            )
-            .circleRadius(
-              new ZoomDependentNumber(
-                1,
-                List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10))
-              )
-            )
-            .circleColor("#fcf9fa")
-            .minZoom(10)
-            .maxZoom(MAX_ZOOM)
-        )
+        edges(edges),
+        vertices(vertices),
+        stops(regularStops, areaStops, groupStops)
       )
+    );
+  }
+
+  private static List<StyleBuilder> stops(
+    VectorSourceLayer regularStops,
+    VectorSourceLayer areaStops,
+    VectorSourceLayer groupStops
+  ) {
+    return List.of(
+      StyleBuilder
+        .ofId("area-stop")
+        .group(STOPS)
+        .typeFill()
+        .vectorSourceLayer(areaStops)
+        .fillColor(BRIGHT_GREEN)
+        .fillOpacity(0.5f)
+        .fillOutlineColor(BLACK)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM),
+      StyleBuilder
+        .ofId("group-stop")
+        .group(STOPS)
+        .typeFill()
+        .vectorSourceLayer(groupStops)
+        .fillColor(BRIGHT_GREEN)
+        .fillOpacity(0.5f)
+        .fillOutlineColor(BLACK)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM),
+      StyleBuilder
+        .ofId("regular-stop")
+        .group(STOPS)
+        .typeCircle()
+        .vectorSourceLayer(regularStops)
+        .circleStroke(
+          BLACK,
+          new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
+        )
+        .circleRadius(
+          new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10)))
+        )
+        .circleColor("#fcf9fa")
+        .minZoom(10)
+        .maxZoom(MAX_ZOOM)
+    );
+  }
+
+  private static List<StyleBuilder> vertices(VectorSourceLayer vertices) {
+    return List.of(
+      StyleBuilder
+        .ofId("vertex")
+        .group(VERTICES)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+        )
+        .circleColor(PURPLE)
+        .minZoom(15)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("parking-vertex")
+        .group(VERTICES)
+        .typeCircle()
+        .vectorSourceLayer(vertices)
+        .vertexFilter(VehicleParkingEntranceVertex.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(
+          new ZoomDependentNumber(1, List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10)))
+        )
+        .circleColor(DARK_GREEN)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> edges(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("edge")
+        .group(EDGES_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColor(MAGENTA)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .lineWidth(LINE_WIDTH)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("edge-name")
+        .group(EDGES_GROUP)
+        .typeSymbol()
+        .lineText("name")
+        .vectorSourceLayer(edges)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("link")
+        .group(EDGES_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColor(BRIGHT_GREEN)
+        .edgeFilter(
+          StreetTransitStopLink.class,
+          StreetTransitEntranceLink.class,
+          BoardingLocationToStopLink.class,
+          StreetVehicleRentalLink.class,
+          StreetVehicleParkingLink.class
+        )
+        .lineWidth(LINE_WIDTH)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
     );
   }
 
