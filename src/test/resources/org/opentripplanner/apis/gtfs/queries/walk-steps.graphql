@@ -1,18 +1,26 @@
 {
-  plan(
-    fromPlace: "from"
-    toPlace: "to"
-    date: "2023-02-15"
-    time: "11:37"
-    transportModes: [{ mode: WALK }]
+  planConnection(
+    origin: {
+      location: { coordinate: { latitude: 45.5552, longitude: -122.6534 } }
+    }
+    destination: {
+      location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
+    }
+    dateTime: { earliestDeparture: "2023-06-13T14:30-07:00" }
+    modes: {
+      direct: [WALK]
+      transit: { transit: [{ mode: BUS }, { mode: RAIL }] }
+    }
   ) {
-    itineraries {
-      legs {
-        steps {
-          streetName
-          area
-          relativeDirection
-          absoluteDirection
+    edges {
+      node {
+        legs {
+          steps {
+            streetName
+            area
+            relativeDirection
+            absoluteDirection
+          }
         }
       }
     }
