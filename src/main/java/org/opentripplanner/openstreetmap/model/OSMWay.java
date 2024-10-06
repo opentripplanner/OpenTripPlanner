@@ -138,7 +138,11 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean isArea() {
-    return isTag("area", "yes");
+    return (
+      !isTag("area", "no") &&
+      (isTag("area", "yes") || isParking() || isBikeParking() || isBoardingArea()) &&
+      getNodeRefs().size() > 2
+    );
   }
 
   /**

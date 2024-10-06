@@ -424,13 +424,20 @@ public class OSMWithTags {
   }
 
   /**
+   * @return True if this node / area is a parking.
+   */
+  public boolean isParking() {
+    return isTag("amenity", "parking");
+  }
+
+  /**
    * @return True if this node / area is a park and ride.
    */
   public boolean isParkAndRide() {
     String parkingType = getTag("parking");
     String parkAndRide = getTag("park_ride");
     return (
-      isTag("amenity", "parking") &&
+      isParking() &&
       (
         (parkingType != null && parkingType.contains("park_and_ride")) ||
         (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
