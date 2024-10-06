@@ -35,6 +35,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `public_transport=platform`                             | `PEDESTRIAN`             |                               |             |
 | `railway=platform`                                      | `PEDESTRIAN`             |                               |             |
 | `footway=sidewalk; highway=footway`                     | `PEDESTRIAN`             |                               |             |
+| `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
+| `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=1`                                           | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=2`                                           | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=0`                                           | `PEDESTRIAN_AND_BICYCLE` |                               |             |
