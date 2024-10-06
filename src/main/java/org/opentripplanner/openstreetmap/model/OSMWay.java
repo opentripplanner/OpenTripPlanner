@@ -140,9 +140,15 @@ public class OSMWay extends OSMWithTags {
   public boolean isArea() {
     return (
       !isTag("area", "no") &&
-      (isTag("area", "yes") || isParking() || isBikeParking() || isBoardingArea()) &&
+      (
+        isTag("area", "yes") || isParking() || isBikeParking() || isBoardingArea() || isIndoorArea()
+      ) &&
       getNodeRefs().size() > 2
     );
+  }
+
+  public boolean isIndoorArea() {
+    return isTag("indoor", "room") || isTag("indoor", "area") || isTag("indoor", "corridor");
   }
 
   /**

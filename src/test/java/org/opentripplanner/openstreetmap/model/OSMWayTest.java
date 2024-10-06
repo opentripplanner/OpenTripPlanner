@@ -34,11 +34,11 @@ public class OSMWayTest {
 
   @Test
   void testAreaTags() {
-    OSMWay platform = getClosedPolygon();
-    platform.addTag("public_transport", "platform");
-    assertTrue(platform.isArea());
-    platform.addTag("area", "no");
-    assertFalse(platform.isArea());
+    OSMWay way1 = getClosedPolygon();
+    way1.addTag("public_transport", "platform");
+    assertTrue(way1.isArea());
+    way1.addTag("area", "no");
+    assertFalse(way1.isArea());
 
     OSMWay roundabout = getClosedPolygon();
     roundabout.addTag("highway", "roundabout");
@@ -50,13 +50,21 @@ public class OSMWayTest {
     pedestrian.addTag("area", "yes");
     assertTrue(pedestrian.isArea());
 
-    OSMWay parking = getClosedPolygon();
-    parking.addTag("amenity", "parking");
-    assertTrue(parking.isArea());
+    OSMWay indoorArea = getClosedPolygon();
+    indoorArea.addTag("indoor", "area");
+    assertTrue(indoorArea.isArea());
 
     OSMWay bikeParking = getClosedPolygon();
     bikeParking.addTag("amenity", "bicycle_parking");
     assertTrue(bikeParking.isArea());
+
+    OSMWay corridor = getClosedPolygon();
+    corridor.addTag("indoor", "corridor");
+    assertTrue(corridor.isArea());
+
+    OSMWay door = getClosedPolygon();
+    door.addTag("indoor", "door");
+    assertFalse(door.isArea());
   }
 
   @Test
