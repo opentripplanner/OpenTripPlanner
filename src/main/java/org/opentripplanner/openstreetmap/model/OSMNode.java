@@ -64,6 +64,15 @@ public class OSMNode extends OSMWithTags {
   }
 
   /**
+   * Checks if this node is an subway station entrance
+   *
+   * @return true if it does
+   */
+  public boolean isSubwayEntrance() {
+    return hasTag("railway") && "subway_entrance".equals(getTag("railway"));
+  }
+
+  /**
    * Consider barrier tag in  permissions. Leave the rest for the super class.
    */
   @Override

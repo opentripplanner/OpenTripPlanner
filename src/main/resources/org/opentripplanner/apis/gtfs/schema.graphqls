@@ -2626,6 +2626,19 @@ type serviceTimeRange {
   start: Long
 }
 
+"Station entrance/exit"
+type Entrance {
+  "Code of entrance/exit eg A or B"
+  code: String
+  "Name of entrance/exit"
+  name: String
+  "Gtfs id of entrance/exit"
+  gtfsId: String
+}
+
+"Entity to a step"
+union StepEntity = Entrance
+
 type step {
   "The cardinal (compass) direction (e.g. north, northeast) taken when engaging this step."
   absoluteDirection: AbsoluteDirection
@@ -2659,6 +2672,8 @@ type step {
   streetName: String
   "Is this step walking with a bike?"
   walkingBike: Boolean
+  "Step entity e.g. an entrance"
+  entity: StepEntity
 }
 
 type stopAtDistance implements Node {
