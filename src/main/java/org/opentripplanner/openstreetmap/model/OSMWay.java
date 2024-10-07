@@ -137,6 +137,11 @@ public class OSMWay extends OSMWithTags {
     return isEscalator() && "backward".equals(this.getTag("conveying"));
   }
 
+  /**
+   * Returns true if the way is considered an area.
+   *
+   * An area can be specified as such, or be one by default as an amenity.
+   */
   public boolean isArea() {
     return (
       !isTag("area", "no") &&

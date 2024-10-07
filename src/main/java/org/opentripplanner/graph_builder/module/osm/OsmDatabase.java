@@ -253,7 +253,6 @@ public class OsmDatabase {
 
     applyLevelsForWay(way);
 
-    /* An area can be specified as such, or be one by default as an amenity */
     if (way.isArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
       // to the areas, if it's not part of a relation.
