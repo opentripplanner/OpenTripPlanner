@@ -34,11 +34,11 @@ public class OSMWayTest {
 
   @Test
   void testAreaTags() {
-    OSMWay way1 = getClosedPolygon();
-    way1.addTag("public_transport", "platform");
-    assertTrue(way1.isArea());
-    way1.addTag("area", "no");
-    assertFalse(way1.isArea());
+    OSMWay platform = getClosedPolygon();
+    platform.addTag("public_transport", "platform");
+    assertTrue(platform.isArea());
+    platform.addTag("area", "no");
+    assertFalse(platform.isArea());
 
     OSMWay roundabout = getClosedPolygon();
     roundabout.addTag("highway", "roundabout");
