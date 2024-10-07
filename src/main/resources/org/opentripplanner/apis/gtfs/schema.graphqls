@@ -3081,6 +3081,12 @@ enum PlanAccessMode {
   """
   BICYCLE_RENTAL
   """
+  Driving to a stop and boarding a vehicle with the car.
+  Access can use driving only if the mode used for transfers
+  and egress is also `CAR`.
+  """
+  CAR
+  """
   Getting dropped off by a car to a location that is accessible with a car.
   Note, this can include walking after the drop-off.
   """
@@ -3190,6 +3196,11 @@ enum PlanEgressMode {
   """
   BICYCLE_RENTAL
   """
+  Driving from a stop to the destination. Egress can use driving only if the mode
+  used for access and transfers is also `CAR`.
+  """
+  CAR
+  """
   Getting picked up by a car from a location that is accessible with a car.
   Note, this can include walking before the pickup.
   """
@@ -3227,6 +3238,11 @@ enum PlanTransferMode {
   cycling if the mode used for access and egress is also `BICYCLE`.
   """
   BICYCLE
+  """
+  Driving between transit vehicles. Transfers can only use driving if the mode
+  used for access and egress is also `CAR`.
+  """
+  CAR
   "Walking between transit vehicles (typically between stops)."
   WALK
 }
