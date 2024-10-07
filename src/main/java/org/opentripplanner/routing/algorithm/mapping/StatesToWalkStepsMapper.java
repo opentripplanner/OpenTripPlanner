@@ -10,11 +10,11 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.apis.gtfs.model.StepEntity;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.Entrance;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.plan.WalkStepBuilder;
@@ -396,9 +396,7 @@ public class StatesToWalkStepsMapper {
     }
     if (entranceState.getVertex() instanceof StationEntranceVertex) {
       current.withEntrance(
-        StepEntity.Entrance.withCode(
-          ((StationEntranceVertex) entranceState.getVertex()).getEntranceName()
-        )
+        Entrance.withCode(((StationEntranceVertex) entranceState.getVertex()).getEntranceName())
       );
     }
   }
