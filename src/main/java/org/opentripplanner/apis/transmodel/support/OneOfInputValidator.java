@@ -8,7 +8,8 @@ import java.util.Objects;
 /**
  * Validate @oneOf directive, this validation is NOT done by the Java GraphQL library at the
  * moment(v22.1). Remove this when enforced by the library. The {@code @oneOf} is an experimental
- * feature in this version of the library.
+ * feature in this version of the library. This applies to the code-first approach, not the
+ * schema-first approach.
  * <p>
  * See {@link graphql.Directives#OneOfDirective}
  */
