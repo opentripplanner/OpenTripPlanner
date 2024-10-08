@@ -3,7 +3,6 @@ package org.opentripplanner.datastore.api;
 import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
 
@@ -48,7 +47,6 @@ public interface OtpDataStoreConfig {
    * <p>
    * This parameter is optional. If {@code null} GTFS files are loaded from {@code baseDirectory}.
    */
-  @Nonnull
   List<URI> gtfsFiles();
 
   /**
@@ -56,7 +54,6 @@ public interface OtpDataStoreConfig {
    * <p>
    * This parameter is optional. If {@code null} Netex files are loaded from {@code baseDirectory}.
    */
-  @Nonnull
   List<URI> netexFiles();
 
   /**

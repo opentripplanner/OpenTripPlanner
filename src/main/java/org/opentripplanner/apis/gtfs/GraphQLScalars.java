@@ -16,7 +16,6 @@ import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.graphql.scalar.DateScalarFactory;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
@@ -65,8 +64,7 @@ public class GraphQLScalars {
     .coercing(
       new Coercing<OffsetDateTime, String>() {
         @Override
-        public String serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
+        public String serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof ZonedDateTime zdt) {
             return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
           } else if (dataFetcherResult instanceof OffsetDateTime odt) {
@@ -123,8 +121,7 @@ public class GraphQLScalars {
         private static final String VALIDATION_ERROR_MESSAGE = "Not a valid WGS84 coordinate value";
 
         @Override
-        public Double serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
+        public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Double doubleValue) {
             return doubleValue;
           } else if (dataFetcherResult instanceof Float floatValue) {
@@ -188,8 +185,7 @@ public class GraphQLScalars {
           "Cost cannot be negative or greater than %d".formatted(MAX_COST);
 
         @Override
-        public Integer serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
+        public Integer serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Integer intValue) {
             return intValue;
           } else if (dataFetcherResult instanceof Cost costValue) {
@@ -358,8 +354,7 @@ public class GraphQLScalars {
           "Value is under 0 or greater than 1.";
 
         @Override
-        public Double serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
+        public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           var validationException = new CoercingSerializeException(VALIDATION_ERROR_MESSAGE);
           if (dataFetcherResult instanceof Double doubleValue) {
             return validateRatio(doubleValue).orElseThrow(() -> validationException);
@@ -425,8 +420,7 @@ public class GraphQLScalars {
           "Reluctance needs to be between %s and %s".formatted(MIN_Reluctance, MAX_Reluctance);
 
         @Override
-        public Double serialize(@Nonnull Object dataFetcherResult)
-          throws CoercingSerializeException {
+        public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Double doubleValue) {
             return doubleValue;
           } else if (dataFetcherResult instanceof Float floatValue) {

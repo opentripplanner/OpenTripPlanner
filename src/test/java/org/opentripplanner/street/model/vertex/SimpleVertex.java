@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 
 public class SimpleVertex extends StreetVertex {
@@ -12,7 +11,6 @@ public class SimpleVertex extends StreetVertex {
     this.label = label;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return I18NString.of(label);

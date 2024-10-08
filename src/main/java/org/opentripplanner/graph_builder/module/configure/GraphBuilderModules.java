@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
@@ -300,6 +301,20 @@ public class GraphBuilderModules {
       .stopConsolidation()
       .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
       .orElse(null);
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
+    DataImportIssueStore issueStore,
+    BuildConfig config,
+    TransitModel transitModel
+  ) {
+    var ids = config.transitRouteToStationCentroid();
+    return ids.isEmpty()
+      ? null
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, transitModel);
   }
 
   /* private methods */

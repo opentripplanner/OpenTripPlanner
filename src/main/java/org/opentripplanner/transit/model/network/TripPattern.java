@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -147,7 +146,7 @@ public final class TripPattern
     this.routingTripPattern = new RoutingTripPattern(this, builder);
   }
 
-  public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
+  public static TripPatternBuilder of(FeedScopedId id) {
     return new TripPatternBuilder(id);
   }
 
@@ -461,7 +460,7 @@ public final class TripPattern
   }
 
   @Override
-  public boolean sameAs(@Nonnull TripPattern other) {
+  public boolean sameAs(TripPattern other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.route, other.route) &&

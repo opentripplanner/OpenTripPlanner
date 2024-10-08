@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
@@ -277,7 +276,6 @@ public class TestStateBuilder {
     return this;
   }
 
-  @Nonnull
   private TestStateBuilder arriveAtStop(RegularStop stop) {
     var from = (StreetVertex) currentState.vertex;
     var to = TransitStopVertex.of().withStop(stop).build();
@@ -296,7 +294,6 @@ public class TestStateBuilder {
     return this;
   }
 
-  @Nonnull
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
     return new ElevatorOffboardVertex(
       StreetModelForTest.intersectionVertex(count, count),
@@ -305,7 +302,6 @@ public class TestStateBuilder {
     );
   }
 
-  @Nonnull
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
     return new ElevatorOnboardVertex(
       StreetModelForTest.intersectionVertex(count, count),

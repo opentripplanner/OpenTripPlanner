@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -24,7 +23,6 @@ public class EscalatorEdge extends Edge {
     this.length = length;
   }
 
-  @Nonnull
   @Override
   public State[] traverse(State s0) {
     // Only allow traversal by walking

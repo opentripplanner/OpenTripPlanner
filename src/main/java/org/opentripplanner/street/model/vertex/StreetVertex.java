@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -84,7 +83,6 @@ public abstract class StreetVertex extends Vertex {
   /**
    * Returns the list of area stops that this vertex is inside of.
    */
-  @Nonnull
   public Set<AreaStop> areaStops() {
     return areaStops;
   }
@@ -92,7 +90,7 @@ public abstract class StreetVertex extends Vertex {
   /**
    * Add a collection of area stops to this vertex.
    */
-  public void addAreaStops(@Nonnull Collection<AreaStop> toBeAdded) {
+  public void addAreaStops(Collection<AreaStop> toBeAdded) {
     Objects.requireNonNull(toBeAdded);
     synchronized (this) {
       if (areaStops == EMPTY_SET) {

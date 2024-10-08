@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -39,7 +38,6 @@ public class TransitIdMapper {
    * Return an empty collection if the collection of ids is null.
    * If the collection of ids contains null or blank elements, they are ignored.
    */
-  @Nonnull
   public static List<FeedScopedId> mapIDsToDomainNullSafe(@Nullable Collection<String> ids) {
     if (ids == null) {
       return List.of();

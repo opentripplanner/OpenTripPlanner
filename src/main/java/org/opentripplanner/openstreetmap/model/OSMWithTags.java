@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -199,7 +198,6 @@ public class OSMWithTags {
    *
    * @return A tags value converted to lower case. An empty Optional if tags is not present.
    */
-  @Nonnull
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
   }
@@ -513,7 +511,6 @@ public class OSMWithTags {
    * <p>
    * Values are split by semicolons.
    */
-  @Nonnull
   public Set<String> getMultiTagValues(Set<String> refTags) {
     return refTags
       .stream()
@@ -622,7 +619,6 @@ public class OSMWithTags {
    * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
    * Some entities can have a semicolon separated list of levels (e.g. elevators)
    */
-  @Nonnull
   public Set<String> getLevels() {
     var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {

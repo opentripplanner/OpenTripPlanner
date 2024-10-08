@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -286,7 +285,6 @@ class AddedTripBuilder {
    *
    * @return a new Route
    */
-  @Nonnull
   private Route createRoute(Agency agency) {
     var routeBuilder = Route.of(entityResolver.resolveId(lineRef));
 

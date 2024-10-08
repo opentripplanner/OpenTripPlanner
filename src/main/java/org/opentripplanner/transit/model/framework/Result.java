@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.framework;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 
 /**
  * A type for containing either a success or a failure type as the result of a computation.
@@ -29,11 +28,11 @@ public abstract sealed class Result<T, E> {
 
   private Result() {}
 
-  public static <T, E> Result<T, E> failure(@Nonnull E failure) {
+  public static <T, E> Result<T, E> failure(E failure) {
     return new Failure<>(failure);
   }
 
-  public static <T, E> Result<T, E> success(@Nonnull T success) {
+  public static <T, E> Result<T, E> success(T success) {
     return new Success<>(success);
   }
 

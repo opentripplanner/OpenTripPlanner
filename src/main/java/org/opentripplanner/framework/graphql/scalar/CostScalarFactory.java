@@ -10,7 +10,6 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.DurationUtils;
 
@@ -54,7 +53,7 @@ public class CostScalarFactory {
   private static Coercing<Cost, String> createCoercing() {
     return new Coercing<>() {
       @Override
-      public String serialize(@Nonnull Object result, GraphQLContext c, Locale l) {
+      public String serialize(Object result, GraphQLContext c, Locale l) {
         return serializeCost((Cost) result);
       }
 
@@ -74,7 +73,6 @@ public class CostScalarFactory {
       }
 
       @Override
-      @Nonnull
       public Value<?> valueToLiteral(Object input, GraphQLContext c, Locale l) {
         return StringValue.of((String) input);
       }

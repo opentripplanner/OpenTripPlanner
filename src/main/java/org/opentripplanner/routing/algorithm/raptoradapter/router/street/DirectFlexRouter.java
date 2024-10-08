@@ -28,27 +28,28 @@ public class DirectFlexRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
-        request,
+        request.from(),
+        request.to(),
         request.journey().direct().mode(),
         request.journey().direct().mode()
       )
     ) {
       // Prepare access/egress transfers
-      Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
+      Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
         request,
         temporaryVertices,
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
-        false,
+        AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
         0
       );
-      Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
+      Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
         request,
         temporaryVertices,
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
-        true,
+        AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
         0
       );

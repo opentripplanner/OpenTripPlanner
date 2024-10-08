@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
@@ -20,7 +19,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   private final int earliestBoardTime;
 
   public ConstrainedTransferBoarding(
-    @Nonnull RaptorTransferConstraint constraint,
+    RaptorTransferConstraint constraint,
     int tripIndex,
     T trip,
     int stopPositionInPattern,
@@ -41,7 +40,6 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  @Nonnull
   public T trip() {
     return trip;
   }
@@ -62,7 +60,6 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
   }
 
   @Override
-  @Nonnull
   public RaptorTransferConstraint transferConstraint() {
     return constraint;
   }

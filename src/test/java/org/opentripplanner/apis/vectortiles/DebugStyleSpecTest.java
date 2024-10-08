@@ -16,6 +16,9 @@ class DebugStyleSpecTest {
 
   private final ResourceLoader RESOURCES = ResourceLoader.of(this);
 
+  /**
+   * Remove the style.json file and re-run this test in order to regenerate the file.
+   */
   @Test
   void spec() throws IOException {
     var vectorSource = new VectorSource("vectorSource", "https://example.com");

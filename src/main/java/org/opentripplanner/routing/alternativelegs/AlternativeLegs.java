@@ -16,7 +16,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -138,7 +137,6 @@ public class AlternativeLegs {
    * This has been copied and slightly modified from StopTimesHelper.
    * TODO: Adapt after new transit model is in place
    */
-  @Nonnull
   private static Stream<ScheduledTransitLeg> generateLegs(
     TransitService transitService,
     TripPatternBetweenStops tripPatternBetweenStops,
@@ -224,7 +222,6 @@ public class AlternativeLegs {
     return res.stream();
   }
 
-  @Nonnull
   private static ScheduledTransitLeg mapToLeg(
     ZoneId timeZone,
     TripPattern pattern,
@@ -264,7 +261,6 @@ public class AlternativeLegs {
       .build();
   }
 
-  @Nonnull
   private static Stream<TripPatternBetweenStops> withBoardingAlightingPositions(
     Collection<StopLocation> origins,
     Collection<StopLocation> destinations,

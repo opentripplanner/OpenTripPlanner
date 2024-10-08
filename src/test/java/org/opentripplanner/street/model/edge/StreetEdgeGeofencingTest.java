@@ -14,7 +14,6 @@ import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RE
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -297,7 +296,6 @@ class StreetEdgeGeofencingTest {
     }
   }
 
-  @Nonnull
   private static GeofencingZoneExtension noDropOffRestriction(String networkTier) {
     return new GeofencingZoneExtension(
       new GeofencingZone(new FeedScopedId(networkTier, "a-park"), null, true, false)
@@ -309,12 +307,10 @@ class StreetEdgeGeofencingTest {
     return edge.traverse(state);
   }
 
-  @Nonnull
   private State forwardState(String network) {
     return initialState(V1, network, false);
   }
 
-  @Nonnull
   private State initialState(Vertex startVertex, String network, boolean arriveBy) {
     var req = StreetSearchRequest
       .of()

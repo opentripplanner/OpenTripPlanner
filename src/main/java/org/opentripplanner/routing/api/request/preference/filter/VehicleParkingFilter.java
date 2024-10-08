@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
@@ -87,7 +86,6 @@ public class VehicleParkingFilter implements Serializable {
     return Arrays.hashCode(not) + Arrays.hashCode(select);
   }
 
-  @Nonnull
   private static VehicleParkingSelect[] makeFilter(Collection<VehicleParkingSelect> select) {
     return select.stream().filter(f -> !f.isEmpty()).toArray(VehicleParkingSelect[]::new);
   }

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
@@ -196,7 +195,6 @@ public class SiriFuzzyTripMatcher {
     return lastStopId + ":" + lastStopArrivalTime;
   }
 
-  @Nonnull
   private Set<Trip> getMatchingTripsOnStopOrSiblings(
     String lastStopPoint,
     ZonedDateTime arrivalTime,

@@ -30,7 +30,8 @@ public class DirectStreetRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
-        directRequest,
+        directRequest.from(),
+        directRequest.to(),
         request.journey().direct().mode(),
         request.journey().direct().mode()
       )

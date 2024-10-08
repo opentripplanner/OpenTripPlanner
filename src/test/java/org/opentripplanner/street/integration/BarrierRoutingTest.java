@@ -179,7 +179,7 @@ public class BarrierRoutingTest {
 
     options.accept(request);
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, request, streetMode, streetMode);
+    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode, streetMode);
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 

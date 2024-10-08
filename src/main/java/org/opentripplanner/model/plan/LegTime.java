@@ -3,24 +3,21 @@ package org.opentripplanner.model.plan;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * A scheduled time of a transit vehicle at a certain location with a optional realtime information.
  */
-public record LegTime(@Nonnull ZonedDateTime scheduledTime, @Nullable RealTimeEstimate estimated) {
+public record LegTime(ZonedDateTime scheduledTime, @Nullable RealTimeEstimate estimated) {
   public LegTime {
     Objects.requireNonNull(scheduledTime);
   }
 
-  @Nonnull
   public static LegTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
     return new LegTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
   }
 
-  @Nonnull
   public static LegTime ofStatic(ZonedDateTime staticTime) {
     return new LegTime(staticTime, null);
   }

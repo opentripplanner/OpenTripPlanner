@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -40,7 +39,6 @@ public class GroupOfStations
     return new GroupOfStationsBuilder(id);
   }
 
-  @Nonnull
   public I18NString getName() {
     return name;
   }
@@ -51,12 +49,10 @@ public class GroupOfStations
     return coordinate;
   }
 
-  @Nonnull
   public Collection<StopLocation> getChildStops() {
     return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
   }
 
-  @Nonnull
   public Collection<StopLocationsGroup> getChildStations() {
     return this.childStations;
   }
@@ -70,7 +66,7 @@ public class GroupOfStations
   }
 
   @Override
-  public boolean sameAs(@Nonnull GroupOfStations other) {
+  public boolean sameAs(GroupOfStations other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
@@ -80,7 +76,6 @@ public class GroupOfStations
     );
   }
 
-  @Nonnull
   @Override
   public GroupOfStationsBuilder copy() {
     return new GroupOfStationsBuilder(this);

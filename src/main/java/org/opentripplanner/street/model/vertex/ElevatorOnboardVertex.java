@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 
@@ -21,7 +20,6 @@ public class ElevatorOnboardVertex extends StreetVertex {
     return VertexLabel.string(LABEL_TEMPLATE.formatted(label, level));
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return I18NString.of(label);

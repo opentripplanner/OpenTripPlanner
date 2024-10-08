@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNullElse;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
@@ -20,7 +19,6 @@ public class GbfsFreeVehicleStatusMapper {
 
   private final VehicleRentalSystem system;
 
-  @Nonnull
   private final Map<String, RentalVehicleType> vehicleTypes;
 
   public GbfsFreeVehicleStatusMapper(

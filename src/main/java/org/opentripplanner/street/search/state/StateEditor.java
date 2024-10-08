@@ -1,7 +1,6 @@
 package org.opentripplanner.street.search.state;
 
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
@@ -135,7 +134,6 @@ public class StateEditor {
    * Calls {@link StateEditor#makeState()} and wraps the result in an array of {@link State}.
    * If the state is null, then a zero-length array is returned.
    */
-  @Nonnull
   public State[] makeStateArray() {
     return State.ofNullable(makeState());
   }

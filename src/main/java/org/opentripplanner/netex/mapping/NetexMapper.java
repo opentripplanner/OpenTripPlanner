@@ -66,6 +66,7 @@ public class NetexMapper {
   private final CalendarServiceBuilder calendarServiceBuilder;
   private final TripCalendarBuilder tripCalendarBuilder;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
   private final boolean noTransfersOnIsolatedStops;
 
@@ -93,6 +94,7 @@ public class NetexMapper {
     Deduplicator deduplicator,
     DataImportIssueStore issueStore,
     Set<String> ferryIdsNotAllowedForBicycle,
+    Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops
   ) {
@@ -101,6 +103,7 @@ public class NetexMapper {
     this.idFactory = new FeedScopedIdFactory(feedId);
     this.issueStore = issueStore;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
+    this.routeToCentroidStopPlaceIds = Set.copyOf(routeToCentroidStopPlaceIds);
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
@@ -309,7 +312,8 @@ public class NetexMapper {
       transitBuilder.stopModel(),
       zoneId,
       issueStore,
-      noTransfersOnIsolatedStops
+      noTransfersOnIsolatedStops,
+      routeToCentroidStopPlaceIds
     );
     for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
       Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex

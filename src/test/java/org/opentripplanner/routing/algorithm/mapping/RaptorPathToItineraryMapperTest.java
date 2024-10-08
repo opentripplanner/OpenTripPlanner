@@ -45,6 +45,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
@@ -193,7 +194,10 @@ public class RaptorPathToItineraryMapperTest {
       true,
       RoutingBookingInfo.NOT_SET
     );
-    RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
+    RaptorAccessEgress access = new FlexAccessEgressAdapter(
+      flexAccessEgress,
+      AccessEgressType.ACCESS
+    );
     Transfer transfer = new Transfer(S2.getIndex(), 0);
     RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);
     RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);

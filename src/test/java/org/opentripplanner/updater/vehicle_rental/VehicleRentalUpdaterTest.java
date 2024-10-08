@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
@@ -81,7 +80,6 @@ class VehicleRentalUpdaterTest {
 
   static class FakeParams implements VehicleRentalDataSourceParameters {
 
-    @Nonnull
     @Override
     public String url() {
       return "https://example.com";
@@ -93,13 +91,11 @@ class VehicleRentalUpdaterTest {
       return "Test";
     }
 
-    @Nonnull
     @Override
     public VehicleRentalSourceType sourceType() {
       return VehicleRentalSourceType.GBFS;
     }
 
-    @Nonnull
     @Override
     public HttpHeaders httpHeaders() {
       return HttpHeaders.empty();

@@ -13,7 +13,6 @@ import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RE
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -167,7 +166,6 @@ class RentalRestrictionExtensionTest {
     return edge.traverse(state);
   }
 
-  @Nonnull
   private State state(String network) {
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
     var editor = new StateEditor(V1, req);

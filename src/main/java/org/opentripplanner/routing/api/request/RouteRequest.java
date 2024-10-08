@@ -110,8 +110,9 @@ public class RouteRequest implements Cloneable, Serializable {
     return preferences;
   }
 
-  public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
+  public RouteRequest withPreferences(Consumer<RoutingPreferences.Builder> body) {
     this.preferences = preferences.copyOf().apply(body).build();
+    return this;
   }
 
   /**

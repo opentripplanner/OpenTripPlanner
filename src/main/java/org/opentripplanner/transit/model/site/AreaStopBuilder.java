@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
 import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -26,7 +25,7 @@ public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBui
     this.indexCounter = Objects.requireNonNull(indexCounter);
   }
 
-  AreaStopBuilder(@Nonnull AreaStop original) {
+  AreaStopBuilder(AreaStop original) {
     super(original);
     this.indexCounter = original::getIndex;
     // Optional fields

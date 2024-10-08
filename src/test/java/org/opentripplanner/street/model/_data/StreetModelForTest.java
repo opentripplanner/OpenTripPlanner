@@ -2,7 +2,6 @@ package org.opentripplanner.street.model._data;
 
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -42,7 +41,6 @@ public class StreetModelForTest {
     return new LabelledIntersectionVertex(label, lon, lat, false, false);
   }
 
-  @Nonnull
   public static TransitEntranceVertex transitEntranceVertex(String id, double lat, double lon) {
     var entrance = Entrance
       .of(id(id))

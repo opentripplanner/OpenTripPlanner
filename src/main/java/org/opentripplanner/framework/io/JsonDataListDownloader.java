@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,20 +24,20 @@ public class JsonDataListDownloader<T> {
   private final OtpHttpClient otpHttpClient;
 
   public JsonDataListDownloader(
-    @Nonnull String url,
-    @Nonnull String jsonParsePath,
-    @Nonnull Function<JsonNode, T> elementParser,
-    @Nonnull Map<String, String> headers
+    String url,
+    String jsonParsePath,
+    Function<JsonNode, T> elementParser,
+    Map<String, String> headers
   ) {
     this(url, jsonParsePath, elementParser, headers, new OtpHttpClientFactory().create(LOG));
   }
 
   public JsonDataListDownloader(
-    @Nonnull String url,
-    @Nonnull String jsonParsePath,
-    @Nonnull Function<JsonNode, T> elementParser,
-    @Nonnull Map<String, String> headers,
-    @Nonnull OtpHttpClient OtpHttpClient
+    String url,
+    String jsonParsePath,
+    Function<JsonNode, T> elementParser,
+    Map<String, String> headers,
+    OtpHttpClient OtpHttpClient
   ) {
     this.url = Objects.requireNonNull(url);
     this.jsonParsePath = Objects.requireNonNull(jsonParsePath);

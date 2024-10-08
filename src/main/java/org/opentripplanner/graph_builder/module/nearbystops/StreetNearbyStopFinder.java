@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.nearbystops;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,18 +41,39 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   private final Duration durationLimit;
   private final int maxStopCount;
   private final DataOverlayContext dataOverlayContext;
+  private final Set<Vertex> ignoreVertices;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
+   *
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
+   *                     we will always return all the directly connected stops.
    */
   public StreetNearbyStopFinder(
     Duration durationLimit,
     int maxStopCount,
     DataOverlayContext dataOverlayContext
   ) {
+    this(durationLimit, maxStopCount, dataOverlayContext, Set.of());
+  }
+
+  /**
+   * Construct a NearbyStopFinder for the given graph and search radius.
+   *
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
+   *                     we will always return all the directly connected stops.
+   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
+   */
+  public StreetNearbyStopFinder(
+    Duration durationLimit,
+    int maxStopCount,
+    DataOverlayContext dataOverlayContext,
+    Set<Vertex> ignoreVertices
+  ) {
     this.dataOverlayContext = dataOverlayContext;
     this.durationLimit = durationLimit;
     this.maxStopCount = maxStopCount;
+    this.ignoreVertices = ignoreVertices;
   }
 
   /**
@@ -66,36 +88,40 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     StreetRequest streetRequest,
     boolean reverseDirection
   ) {
-    return findNearbyStops(Set.of(vertex), reverseDirection, routingRequest, streetRequest);
+    return findNearbyStops(Set.of(vertex), routingRequest, streetRequest, reverseDirection);
   }
 
   /**
    * Return all stops within a certain radius of the given vertex, using network distance along
    * streets. If the origin vertex is a StopVertex, the result will include it.
    *
-   * @param originVertices   the origin point of the street search
+   * @param originVertices   the origin point of the street search.
    * @param reverseDirection if true the paths returned instead originate at the nearby stops and
-   *                         have the originVertex as the destination
+   *                         have the originVertex as the destination.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
-    boolean reverseDirection,
     RouteRequest request,
-    StreetRequest streetRequest
+    StreetRequest streetRequest,
+    boolean reverseDirection
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = createDirectlyConnectedStops(
-      originVertices,
+    List<NearbyStop> stopsFound = NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
+      Sets.difference(originVertices, ignoreVertices),
       reverseDirection,
       request,
       streetRequest
     );
 
     // Return only the origin vertices if there are no valid street modes
-    if (streetRequest.mode() == StreetMode.NOT_SET) {
+    if (
+      streetRequest.mode() == StreetMode.NOT_SET ||
+      (maxStopCount != 0 && stopsFound.size() >= maxStopCount)
+    ) {
       return stopsFound;
     }
+    stopsFound = new ArrayList<>(stopsFound);
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
@@ -116,7 +142,9 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
       for (State state : spt.getAllStates()) {
         Vertex targetVertex = state.getVertex();
-        if (originVertices.contains(targetVertex)) continue;
+        if (originVertices.contains(targetVertex) || ignoreVertices.contains(targetVertex)) {
+          continue;
+        }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
           stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
         }
@@ -162,44 +190,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
     if (maxStopCount > 0) {
-      var strategy = new MaxCountSkipEdgeStrategy<>(
-        maxStopCount,
-        StreetNearbyStopFinder::hasReachedStop
-      );
+      var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, this::hasReachedStop);
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     }
     return durationSkipEdgeStrategy;
-  }
-
-  private static List<NearbyStop> createDirectlyConnectedStops(
-    Set<Vertex> originVertices,
-    boolean reverseDirection,
-    RouteRequest request,
-    StreetRequest streetRequest
-  ) {
-    List<NearbyStop> stopsFound = new ArrayList<>();
-
-    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
-      .mapToTransferRequest(request)
-      .withArriveBy(reverseDirection)
-      .withMode(streetRequest.mode())
-      .build();
-
-    /* Add the origin vertices if they are stops */
-    for (Vertex vertex : originVertices) {
-      if (vertex instanceof TransitStopVertex tsv) {
-        stopsFound.add(
-          new NearbyStop(
-            tsv.getStop(),
-            0,
-            Collections.emptyList(),
-            new State(vertex, streetSearchRequest)
-          )
-        );
-      }
-    }
-
-    return stopsFound;
   }
 
   private boolean canBoardFlex(State state, boolean reverse) {
@@ -224,7 +218,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * states that speculatively rent a vehicle move the walk states down the A* priority queue until
    * the required number of stops are reached to abort the search, leading to zero egress results.
    */
-  public static boolean hasReachedStop(State state) {
-    return state.getVertex() instanceof TransitStopVertex && state.isFinal();
+  public boolean hasReachedStop(State state) {
+    var vertex = state.getVertex();
+    return (
+      vertex instanceof TransitStopVertex && state.isFinal() && !ignoreVertices.contains(vertex)
+    );
   }
 }

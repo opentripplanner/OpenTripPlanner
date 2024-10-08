@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -99,8 +101,28 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return Objects.hash(fromv, tov);
   }
 
+  @Override
   public String toString() {
-    return String.format("%s (%s -> %s)", getClass().getName(), fromv, tov);
+    return buildToString(null, b -> {});
+  }
+
+  /**
+   * Use this to construct a {@code toString()} in derived classes. The result will be:
+   * {@code "%simple-class-name%(%name%, %fromv% -> %tov%" + body + ")"}. Note! There is no space
+   * between {@code tov} and {@code body}. Both name and body are optional.
+   *
+   * @param name Will add name to the string if not null.
+   * @param body Use this callback to add local content.
+   */
+  protected String buildToString(@Nullable String name, Consumer<StringBuilder> body) {
+    var buf = new StringBuilder();
+    buf.append(getClass().getSimpleName()).append("(");
+    if (name != null) {
+      buf.append(name).append(", ");
+    }
+    buf.append(fromv).append(" -> ").append(tov);
+    body.accept(buf);
+    return buf.append(')').toString();
   }
 
   /**

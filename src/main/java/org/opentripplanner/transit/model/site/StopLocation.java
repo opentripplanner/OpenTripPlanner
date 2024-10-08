@@ -4,7 +4,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -44,7 +43,6 @@ public interface StopLocation extends LogInfo {
   @Nullable
   I18NString getUrl();
 
-  @Nonnull
   StopType getStopType();
 
   /**
@@ -68,7 +66,6 @@ public interface StopLocation extends LogInfo {
     return null;
   }
 
-  @Nonnull
   default SubMode getNetexVehicleSubmode() {
     return SubMode.UNKNOWN;
   }
@@ -86,12 +83,10 @@ public interface StopLocation extends LogInfo {
     return null;
   }
 
-  @Nonnull
   default Collection<FareZone> getFareZones() {
     return List.of();
   }
 
-  @Nonnull
   default Accessibility getWheelchairAccessibility() {
     return Accessibility.NO_INFORMATION;
   }
@@ -112,7 +107,6 @@ public interface StopLocation extends LogInfo {
    * Representative location for the StopLocation. Can either be the actual location of the stop, or
    * the centroid of an area or line.
    */
-  @Nonnull
   WgsCoordinate getCoordinate();
 
   /**
@@ -140,7 +134,6 @@ public interface StopLocation extends LogInfo {
 
   boolean isPartOfStation();
 
-  @Nonnull
   default StopTransferPriority getPriority() {
     return StopTransferPriority.defaultValue();
   }

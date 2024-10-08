@@ -36,8 +36,4 @@ public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVe
       ? 0
       : getTransitEntityVertex().getStreetToStopTime();
   }
-
-  public String toString() {
-    return "StreetTransitStopLink(" + fromv + " -> " + tov + ")";
-  }
 }
