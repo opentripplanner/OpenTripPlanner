@@ -306,7 +306,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getTripForId().values(),
-        currentSnapshot.getAllRealTimeAddedTrips()
+        currentSnapshot.listRealTimeAddedTrips()
       );
     }
     return Collections.unmodifiableCollection(transitModelIndex.getTripForId().values());
@@ -319,7 +319,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getAllRoutes(),
-        currentSnapshot.getAllRealTimeAddedRoutes()
+        currentSnapshot.listRealTimeAddedRoutes()
       );
     }
     return Collections.unmodifiableCollection(transitModelIndex.getAllRoutes());
@@ -570,7 +570,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getTripOnServiceDateForTripAndDay().values(),
-        currentSnapshot.getAllRealTimeAddedTripOnServiceDate()
+        currentSnapshot.listRealTimeAddedTripOnServiceDate()
       );
     }
     return Collections.unmodifiableCollection(

@@ -227,7 +227,7 @@ public class TimetableSnapshot {
     return getByNullableKey(id, realtimeAddedRoutes);
   }
 
-  public Collection<Route> getAllRealTimeAddedRoutes() {
+  public Collection<Route> listRealTimeAddedRoutes() {
     return Collections.unmodifiableCollection(realtimeAddedRoutes.values());
   }
 
@@ -239,7 +239,7 @@ public class TimetableSnapshot {
     return getByNullableKey(id, realTimeAddedTrips);
   }
 
-  public Collection<Trip> getAllRealTimeAddedTrips() {
+  public Collection<Trip> listRealTimeAddedTrips() {
     return Collections.unmodifiableCollection(realTimeAddedTrips.values());
   }
 
@@ -276,7 +276,7 @@ public class TimetableSnapshot {
     return getByNullableKey(tripIdAndServiceDate, realTimeAddedTripOnServiceDateForTripAndDay);
   }
 
-  public Collection<? extends TripOnServiceDate> getAllRealTimeAddedTripOnServiceDate() {
+  public Collection<? extends TripOnServiceDate> listRealTimeAddedTripOnServiceDate() {
     return Collections.unmodifiableCollection(realTimeAddedTripOnServiceDateForTripAndDay.values());
   }
 
