@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.StringUtils;
@@ -513,7 +512,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Remove any stop that is not know in the static transit data.
    */
-  @Nonnull
   private List<StopTimeUpdate> removeUnknownStops(TripUpdate tripUpdate, FeedScopedId tripId) {
     return tripUpdate
       .getStopTimeUpdateList()

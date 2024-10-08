@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -175,7 +174,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
       );
   }
 
-  @Nonnull
   private static List<Edge> createStopLinkEdges(
     TransitStopVertex vertex,
     StreetVertex streetVertex

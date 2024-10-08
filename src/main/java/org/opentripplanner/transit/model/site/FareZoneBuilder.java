@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.site;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -12,7 +11,7 @@ public class FareZoneBuilder extends AbstractEntityBuilder<FareZone, FareZoneBui
     super(id);
   }
 
-  FareZoneBuilder(@Nonnull FareZone original) {
+  FareZoneBuilder(FareZone original) {
     super(original);
     this.name = original.getName();
   }

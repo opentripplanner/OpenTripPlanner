@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -106,7 +105,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
 

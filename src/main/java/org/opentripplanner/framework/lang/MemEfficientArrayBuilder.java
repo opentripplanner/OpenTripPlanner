@@ -2,7 +2,6 @@ package org.opentripplanner.framework.lang;
 
 import java.util.Arrays;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 
 /**
  * This array builder is used to minimize the creation of new objects (arrays). It takes an array as base,
@@ -20,7 +19,7 @@ public final class MemEfficientArrayBuilder<T> {
   private final T[] original;
   private T[] array = null;
 
-  private MemEfficientArrayBuilder(@Nonnull T[] original) {
+  private MemEfficientArrayBuilder(T[] original) {
     this.original = Objects.requireNonNull(original);
   }
 

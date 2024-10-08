@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.organization;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -18,7 +17,7 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
     super(id);
   }
 
-  AgencyBuilder(@Nonnull Agency original) {
+  AgencyBuilder(Agency original) {
     super(original);
     this.name = original.getName();
     this.timezone = original.getTimezone().getId();

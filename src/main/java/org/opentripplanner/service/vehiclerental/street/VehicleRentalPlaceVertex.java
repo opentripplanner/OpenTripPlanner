@@ -1,6 +1,5 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -20,7 +19,6 @@ public class VehicleRentalPlaceVertex extends Vertex {
     this.station = station;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return station.getName();

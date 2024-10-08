@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,7 +56,6 @@ class FareProductTest {
     assertEquals(expectedInstanceId, instanceId);
   }
 
-  @Nonnull
   private static FareProduct fareProduct(Duration duration, RiderCategory cat, FareMedium medium) {
     return new FareProduct(
       new FeedScopedId("fares", "daypass"),

@@ -4,7 +4,6 @@ import java.time.ZonedDateTime;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -200,7 +199,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     };
   }
 
-  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     return (int stopIndex) -> {

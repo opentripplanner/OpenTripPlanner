@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -214,7 +213,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   }
 
   @Override
-  public boolean sameAs(@Nonnull TransitAlert other) {
+  public boolean sameAs(TransitAlert other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(headerText, other.headerText) &&
@@ -237,7 +236,6 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     );
   }
 
-  @Nonnull
   @Override
   public TransitBuilder<TransitAlert, TransitAlertBuilder> copy() {
     return new TransitAlertBuilder(this);

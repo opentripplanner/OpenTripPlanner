@@ -2,7 +2,6 @@ package org.opentripplanner.framework.concurrent;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.concurrent.ThreadFactory;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.LogMDCSupport;
 
 /**
@@ -34,7 +33,7 @@ public class OtpRequestThreadFactory implements ThreadFactory {
   }
 
   @Override
-  public Thread newThread(@Nonnull Runnable r) {
+  public Thread newThread(Runnable r) {
     if (LogMDCSupport.isRequestTracingInLoggingEnabled()) {
       return delegate.newThread(new LogMDCRunnableDecorator(r));
     }

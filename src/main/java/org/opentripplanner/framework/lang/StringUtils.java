@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.lang;
 
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 
 /**
  * OTP String utils extending the Java lang String...
@@ -120,7 +119,7 @@ public class StringUtils {
   }
 
   /** Replace single quotes with double quotes.  */
-  public static String quoteReplace(@Nonnull String text) {
+  public static String quoteReplace(String text) {
     return text.replace('\'', '\"');
   }
 

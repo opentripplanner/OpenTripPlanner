@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.framework;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class AbstractBuilder<
@@ -29,7 +28,7 @@ public abstract class AbstractBuilder<
   protected abstract E buildFromValues();
 
   @Override
-  public final @Nonnull E build() {
+  public final E build() {
     var b = buildFromValues();
 
     if (original == null) {

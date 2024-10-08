@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -77,7 +76,6 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  @Nonnull
   private static Stream<MatchResult> matchingVerticesForStop(
     StreetIndex streetIndex,
     AreaStop areaStop

@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.services.osm;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
@@ -33,7 +32,7 @@ public interface EdgeNamer {
    */
   void postprocess();
 
-  default I18NString getNameForWay(OSMWithTags way, @Nonnull String id) {
+  default I18NString getNameForWay(OSMWithTags way, String id) {
     var name = name(way);
 
     if (name == null) {

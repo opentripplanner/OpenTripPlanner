@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -84,11 +83,10 @@ public class EntityByIdTest {
     }
 
     @Override
-    public boolean sameAs(@Nonnull TestEntity other) {
+    public boolean sameAs(TestEntity other) {
       return getId().equals(other.getId());
     }
 
-    @Nonnull
     @Override
     public TransitBuilder<TestEntity, TestEntityBuilder> copy() {
       return new TestEntityBuilder(this);

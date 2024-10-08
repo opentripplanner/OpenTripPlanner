@@ -3,7 +3,6 @@ package org.opentripplanner.street.search;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
@@ -65,7 +64,6 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     return this;
   }
 
-  @Nonnull
   @Override
   protected Duration streetRoutingTimeout() {
     return routeRequest.preferences().street().routingTimeout();

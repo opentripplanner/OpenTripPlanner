@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.network;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -21,7 +20,7 @@ public class GroupOfRoutesBuilder
     super(id);
   }
 
-  GroupOfRoutesBuilder(@Nonnull GroupOfRoutes original) {
+  GroupOfRoutesBuilder(GroupOfRoutes original) {
     super(original);
     this.privateCode = original.getPrivateCode();
     this.shortName = original.getShortName();

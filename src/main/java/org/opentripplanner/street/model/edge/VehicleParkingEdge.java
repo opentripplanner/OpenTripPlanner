@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
 import java.time.Duration;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -67,7 +66,6 @@ public class VehicleParkingEdge extends Edge {
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesParking()) {
       return State.empty();

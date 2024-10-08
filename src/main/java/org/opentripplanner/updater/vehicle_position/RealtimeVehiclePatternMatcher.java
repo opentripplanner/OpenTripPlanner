@@ -29,7 +29,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -206,8 +205,8 @@ public class RealtimeVehiclePatternMatcher {
   private RealtimeVehicle mapRealtimeVehicle(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
-    @Nonnull Trip trip,
-    @Nonnull Function<Integer, OptionalInt> stopIndexOfGtfsSequence
+    Trip trip,
+    Function<Integer, OptionalInt> stopIndexOfGtfsSequence
   ) {
     var newVehicle = RealtimeVehicle.builder();
 

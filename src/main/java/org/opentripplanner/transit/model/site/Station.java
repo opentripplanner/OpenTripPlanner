@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
@@ -77,12 +76,10 @@ public class Station
     return childStops.contains(stop);
   }
 
-  @Nonnull
   public I18NString getName() {
     return name;
   }
 
-  @Nonnull
   public Collection<StopLocation> getChildStops() {
     return childStops;
   }
@@ -97,7 +94,6 @@ public class Station
     return coordinate.longitude();
   }
 
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     return coordinate;
   }
@@ -132,7 +128,6 @@ public class Station
    * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding
    * 0 - zero cost.
    */
-  @Nonnull
   public StopTransferPriority getPriority() {
     return priority;
   }
@@ -153,7 +148,6 @@ public class Station
    * A geometry collection that contains the center point and the convex hull of all the child
    * stops.
    */
-  @Nonnull
   public GeometryCollection getGeometry() {
     return geometry;
   }
@@ -165,13 +159,12 @@ public class Station
   }
 
   @Override
-  @Nonnull
   public StationBuilder copy() {
     return new StationBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Station other) {
+  public boolean sameAs(Station other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

@@ -15,7 +15,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -65,7 +64,6 @@ class ItineraryFaresTest {
     assertTrue(ItineraryFares.empty().isEmpty());
   }
 
-  @Nonnull
   private static FareProduct fareProduct(String id) {
     return new FareProduct(id(id), id, Money.euros(10), null, null, null);
   }

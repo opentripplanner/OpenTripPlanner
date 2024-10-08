@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -51,7 +50,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
@@ -135,7 +133,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     };
   }
 
-  @Nonnull
   private State[] buildState(State s0, StateEditor s1, RoutingPreferences pref) {
     if (s0.isRentingVehicleFromStation() && s0.mayKeepRentedVehicleAtDestination()) {
       var rentalPreferences = s0.getRequest().preferences().rental(s0.getRequest().mode());

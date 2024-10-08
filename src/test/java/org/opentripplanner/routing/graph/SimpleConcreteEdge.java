@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -24,7 +23,6 @@ public class SimpleConcreteEdge extends Edge {
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();

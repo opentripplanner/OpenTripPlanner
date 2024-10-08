@@ -4,7 +4,6 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 
 public class GraphQLUtils {
@@ -65,7 +64,7 @@ public class GraphQLUtils {
     return Optional.ofNullable((Locale) localContext.get("locale"));
   }
 
-  private static boolean acceptAnyLocale(@Nonnull Locale locale) {
+  private static boolean acceptAnyLocale(Locale locale) {
     return locale.getLanguage().equals("*");
   }
 }

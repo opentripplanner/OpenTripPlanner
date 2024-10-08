@@ -10,7 +10,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
@@ -101,7 +100,6 @@ public class TripPatternForDateMapperTest {
     assertNull(mapper.map(timetable, SERVICE_DATE));
   }
 
-  @Nonnull
   private static TIntHashSet tintHashSet(int... numbers) {
     var set = new TIntHashSet();
     set.addAll(numbers);

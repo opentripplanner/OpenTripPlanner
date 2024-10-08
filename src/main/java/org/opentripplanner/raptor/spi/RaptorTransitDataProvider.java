@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Iterator;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
@@ -120,7 +119,6 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * method is used by Raptor to translate from the stop index to a string which should be short and
    * identify the stop given the related pattern, for example the stop name would be great.
    */
-  @Nonnull
   RaptorStopNameResolver stopNameResolver();
 
   /**

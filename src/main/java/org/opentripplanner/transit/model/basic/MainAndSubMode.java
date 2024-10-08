@@ -4,13 +4,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Tupple of main- and sub-mode.
  */
-public record MainAndSubMode(@Nonnull TransitMode mainMode, @Nullable SubMode subMode) {
+public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
   private static final List<MainAndSubMode> ALL = Stream
     .of(TransitMode.values())
     .map(MainAndSubMode::new)

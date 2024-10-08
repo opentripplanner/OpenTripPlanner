@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -44,11 +43,7 @@ public class GraphBuilder implements Runnable {
   private boolean hasTransitData = false;
 
   @Inject
-  public GraphBuilder(
-    @Nonnull Graph baseGraph,
-    @Nonnull TransitModel transitModel,
-    @Nonnull DataImportIssueStore issueStore
-  ) {
+  public GraphBuilder(Graph baseGraph, TransitModel transitModel, DataImportIssueStore issueStore) {
     this.graph = baseGraph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;

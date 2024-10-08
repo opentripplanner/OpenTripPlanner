@@ -8,7 +8,6 @@ import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
@@ -114,7 +113,6 @@ public class VehicleRentalLayerTest {
     assertEquals(3, map.get("spacesAvailable"));
   }
 
-  @Nonnull
   private static RentalVehicleType vehicleType(RentalFormFactor formFactor) {
     return new RentalVehicleType(
       new FeedScopedId("1", formFactor.name()),

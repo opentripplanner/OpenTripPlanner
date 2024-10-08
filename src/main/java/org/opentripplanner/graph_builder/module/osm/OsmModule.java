@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -63,7 +62,7 @@ public class OsmModule implements GraphBuilderModule {
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
-    @Nonnull StreetLimitationParameters streetLimitationParameters,
+    StreetLimitationParameters streetLimitationParameters,
     OsmProcessingParameters params
   ) {
     this.providers = List.copyOf(providers);

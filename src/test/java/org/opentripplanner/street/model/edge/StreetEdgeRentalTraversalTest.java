@@ -14,7 +14,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -31,7 +30,6 @@ public class StreetEdgeRentalTraversalTest {
   StreetVertex v0 = intersectionVertex(0.0, 0.0);
   StreetVertex v1 = intersectionVertex(2.0, 2.0);
 
-  @Nonnull
   private static Stream<Arguments> baseCases(StreetTraversalPermission p) {
     return Stream.of(
       of(SCOOTER, SCOOTER_RENTAL, p),
