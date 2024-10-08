@@ -46,10 +46,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
-  }
-
   @Override
   @Nonnull
   public State[] traverse(State s0) {

@@ -101,11 +101,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
-  }
-
-  @Override
   @Nonnull
   public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();

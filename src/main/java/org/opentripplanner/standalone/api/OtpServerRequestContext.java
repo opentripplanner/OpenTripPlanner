@@ -129,6 +129,7 @@ public interface OtpServerRequestContext {
 
   VectorTileConfig vectorTileConfig();
 
+  @Nullable
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->
       new DataOverlayContext(

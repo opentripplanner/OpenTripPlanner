@@ -3,6 +3,8 @@ package org.opentripplanner.routing.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -29,12 +31,14 @@ import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
@@ -56,6 +60,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -108,6 +113,10 @@ public abstract class GraphRoutingTest {
       return vertexFactory.intersection(label, longitude, latitude);
     }
 
+    public IntersectionVertex intersection(String label, WgsCoordinate coordinate) {
+      return intersection(label, coordinate.latitude(), coordinate.longitude());
+    }
+
     public StreetEdgeBuilder<?> streetBuilder(
       StreetVertex from,
       StreetVertex to,
@@ -124,6 +133,13 @@ public abstract class GraphRoutingTest {
         .withMeterLength(length)
         .withPermission(permissions)
         .withBack(false);
+    }
+
+    /**
+     * Create a street with all permissions in both directions
+     */
+    public List<StreetEdge> biStreet(StreetVertex from, StreetVertex to, int length) {
+      return street(from, to, length, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
     }
 
     public StreetEdge street(
@@ -220,20 +236,18 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    RegularStop stopEntity(String id, double latitude, double longitude, boolean noTransfers) {
+    RegularStop stopEntity(
+      String id,
+      double latitude,
+      double longitude,
+      @Nullable Station parentStation
+    ) {
       var stopModelBuilder = transitModel.getStopModel().withContext();
       var testModel = new TransitModelForTest(stopModelBuilder);
 
       var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
-      if (noTransfers) {
-        stopBuilder.withParentStation(
-          Station
-            .of(TransitModelForTest.id("1"))
-            .withName(new NonLocalizedString("Malmö C"))
-            .withCoordinate(latitude, longitude)
-            .withTransfersNotAllowed(true)
-            .build()
-        );
+      if (parentStation != null) {
+        stopBuilder.withParentStation(parentStation);
       }
 
       var stop = stopBuilder.build();
@@ -241,23 +255,47 @@ public abstract class GraphRoutingTest {
       return stop;
     }
 
+    public Station stationEntity(String id, Consumer<StationBuilder> stationBuilder) {
+      var stopModelBuilder = transitModel.getStopModel().withContext();
+      var testModel = new TransitModelForTest(stopModelBuilder);
+
+      var builder = testModel.station(id);
+      stationBuilder.accept(builder);
+      var station = builder.build();
+
+      transitModel.mergeStopModels(stopModelBuilder.withStation(station).build());
+      return station;
+    }
+
+    public TransitStopVertex stop(String id, WgsCoordinate coordinate, Station parentStation) {
+      return stop(id, coordinate.latitude(), coordinate.longitude(), parentStation);
+    }
+
+    public TransitStopVertex stop(String id, WgsCoordinate coordinate) {
+      return stop(id, coordinate, null);
+    }
+
     public TransitStopVertex stop(String id, double latitude, double longitude) {
-      return stop(id, latitude, longitude, false);
+      return stop(id, latitude, longitude, null);
     }
 
     public TransitStopVertex stop(
       String id,
       double latitude,
       double longitude,
-      boolean noTransfers
+      @Nullable Station parentStation
     ) {
       return vertexFactory.transitStop(
-        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, noTransfers))
+        TransitStopVertex.of().withStop(stopEntity(id, latitude, longitude, parentStation))
       );
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
       return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
+    }
+
+    public StationCentroidVertex stationCentroid(Station station) {
+      return vertexFactory.stationCentroid(station);
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
@@ -281,6 +319,18 @@ public abstract class GraphRoutingTest {
     }
 
     public List<StreetTransitStopLink> biLink(StreetVertex from, TransitStopVertex to) {
+      return List.of(link(from, to), link(to, from));
+    }
+
+    public StreetStationCentroidLink link(StreetVertex from, StationCentroidVertex to) {
+      return StreetStationCentroidLink.createStreetStationLink(from, to);
+    }
+
+    public StreetStationCentroidLink link(StationCentroidVertex from, StreetVertex to) {
+      return StreetStationCentroidLink.createStreetStationLink(from, to);
+    }
+
+    public List<StreetStationCentroidLink> biLink(StreetVertex from, StationCentroidVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 

@@ -30,4 +30,8 @@ public abstract class StationElementVertex extends Vertex {
   public I18NString getName() {
     return name;
   }
+
+  public FeedScopedId getId() {
+    return id;
+  }
 }

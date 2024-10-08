@@ -56,10 +56,6 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     return connectToGraph(new ElevatorAlightEdge(from, to, level));
   }
 
-  public String toString() {
-    return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
-  }
-
   @Override
   @Nonnull
   public State[] traverse(State s0) {

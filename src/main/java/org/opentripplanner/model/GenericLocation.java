@@ -17,23 +17,32 @@ public class GenericLocation {
    * A label for the place, if provided. This is pass-through information and does not affect
    * routing in any way.
    */
+  @Nullable
   public final String label;
 
   /**
    * Refers to a specific element in the OTP model. This can currently be a regular stop, area stop,
    * group stop, station, multi-modal station or group of stations.
    */
+  @Nullable
   public final FeedScopedId stopId;
 
   /**
    * Coordinates of the location. These can be used by themselves or as a fallback if placeId is not
    * found.
    */
+  @Nullable
   public final Double lat;
 
+  @Nullable
   public final Double lng;
 
-  public GenericLocation(String label, FeedScopedId stopId, Double lat, Double lng) {
+  public GenericLocation(
+    @Nullable String label,
+    @Nullable FeedScopedId stopId,
+    @Nullable Double lat,
+    @Nullable Double lng
+  ) {
     this.label = label;
     this.stopId = stopId;
     this.lat = lat;

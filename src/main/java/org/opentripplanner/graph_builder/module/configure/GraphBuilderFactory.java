@@ -19,6 +19,7 @@ import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
 import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
+import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
@@ -57,6 +58,9 @@ public interface GraphBuilderFactory {
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
   StreetLimitationParameters streetLimitationParameters();
+
+  @Nullable
+  RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
 
   @Nullable
   StopConsolidationModule stopConsolidationModule();

@@ -601,8 +601,8 @@ public class TestHalfEdges {
     assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
 
     // test that the closest vertex finder returns the closest vertex
-    TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-      new GenericLocation(40.00, -74.00),
+    TemporaryStreetLocation some = (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
+      new Coordinate(-74.00, 40.00),
       StreetMode.WALK,
       true,
       tempEdges
@@ -610,8 +610,8 @@ public class TestHalfEdges {
     assertNotNull(some);
 
     // test that the closest vertex finder correctly splits streets
-    TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-      new GenericLocation(40.004, -74.01),
+    TemporaryStreetLocation start = (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
+      new Coordinate(-74.01, 40.004),
       StreetMode.WALK,
       false,
       tempEdges
@@ -625,8 +625,8 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-      new GenericLocation(40.008, -74.0),
+    TemporaryStreetLocation end = (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
+      new Coordinate(-74.0, 40.008),
       StreetMode.BIKE,
       true,
       tempEdges
@@ -648,7 +648,8 @@ public class TestHalfEdges {
     try (
       var container = new TemporaryVerticesContainer(
         graph,
-        walking,
+        walking.from(),
+        walking.to(),
         StreetMode.WALK,
         StreetMode.WALK
       )

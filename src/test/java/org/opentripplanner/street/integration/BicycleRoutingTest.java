@@ -82,7 +82,8 @@ public class BicycleRoutingTest {
     request.journey().direct().setMode(StreetMode.BIKE);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      request,
+      request.from(),
+      request.to(),
       request.journey().direct().mode(),
       request.journey().direct().mode()
     );

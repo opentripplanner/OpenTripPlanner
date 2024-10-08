@@ -31,11 +31,6 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
   }
 
   @Override
-  public String toString() {
-    return "Temporary" + super.toString();
-  }
-
-  @Override
   @Nonnull
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
