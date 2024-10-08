@@ -38,24 +38,27 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   /**
    * Set the time at a transit index if it is optimal. This sets both the best time and the
-   * transfer time
+   * transfer time.
+   *
+   * @param nextLeg When chaining two Raptor searches together, the next-leg is the next
+   *                search we are copying state into.
    */
   public McStopArrivals(
     int nStops,
     @Nullable EgressPaths egressPaths,
     ViaConnections viaConnections,
     DestinationArrivalPaths<T> paths,
-    McStopArrivals<T> next,
+    McStopArrivals<T> nextLeg,
     McStopArrivalFactory<T> stopArrivalFactory,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     // Assert only-one-of next or egressPaths is set
-    if (next == null) {
+    if (nextLeg == null) {
       Objects.requireNonNull(egressPaths);
     } else if (egressPaths != null) {
       throw new IllegalArgumentException(
-        "Can not delegate to next and at the same have egress paths."
+        "Can not delegate to next-leg and at the same have egress paths."
       );
     }
 
@@ -66,7 +69,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initViaConnections(viaConnections, stopArrivalFactory, next);
+    initViaConnections(viaConnections, stopArrivalFactory, nextLeg);
     initEgressStopAndGlueItToDestinationArrivals(egressPaths, paths);
   }
 
@@ -152,7 +155,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private void initViaConnections(
     @Nullable ViaConnections viaConnections,
     McStopArrivalFactory<T> stopArrivalFactory,
-    McStopArrivals<T> next
+    McStopArrivals<T> nextLeg
   ) {
     if (viaConnections == null) {
       return;
@@ -165,7 +168,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
             .of(comparator)
             .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
             .withNextSearchListener(
-              new ViaConnectionStopArrivalEventListener<>(stopArrivalFactory, connections, next)
+              new ViaConnectionStopArrivalEventListener<>(stopArrivalFactory, connections, nextLeg)
             )
             .build();
         return true;
