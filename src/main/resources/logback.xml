@@ -102,8 +102,8 @@
   <!-- If you want to debug realtime updates set these loggers to debug -->
   <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />
   <logger name="org.opentripplanner.model.Timetable" level="warn" />
-  <logger name="org.opentripplanner.ext.siri.SiriTimetableSnapshotSource" level="warn" />
-  <logger name="org.opentripplanner.ext.siri.TimetableHelper" level="warn" />
+  <logger name="org.opentripplanner.updater.siri.SiriTimetableSnapshotSource" level="warn" />
+  <logger name="org.opentripplanner.updater.siri.TimetableHelper" level="warn" />
 
   <!-- optional logging configuration to define your own custom logging needs -->
   <!-- add it to the root of OTP runtime folder -->
