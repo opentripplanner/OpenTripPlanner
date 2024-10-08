@@ -14,7 +14,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalPare
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -43,7 +42,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    */
   public McStopArrivals(
     int nStops,
-    AccessPaths accessPaths,
     @Nullable EgressPaths egressPaths,
     ViaConnections viaConnections,
     DestinationArrivalPaths<T> paths,

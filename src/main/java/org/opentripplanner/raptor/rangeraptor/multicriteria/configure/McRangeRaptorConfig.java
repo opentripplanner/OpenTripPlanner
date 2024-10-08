@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
-import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -110,7 +109,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       this.arrivals =
         new McStopArrivals<>(
           context().nStops(),
-          contextLeg.accessPaths(),
           contextLeg.egressPaths(),
           contextLeg.viaConnections(),
           createDestinationArrivalPaths(),
