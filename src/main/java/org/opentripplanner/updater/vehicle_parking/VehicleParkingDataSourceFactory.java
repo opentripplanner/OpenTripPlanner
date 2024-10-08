@@ -6,8 +6,6 @@ import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdater;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.noi.NoiUpdater;
-import org.opentripplanner.ext.vehicleparking.noi.NoiUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.CarParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -40,7 +38,6 @@ public class VehicleParkingDataSourceFactory {
         openingHoursCalendarService
       );
       case BIKELY -> new BikelyUpdater((BikelyUpdaterParameters) parameters);
-      case NOI_OPEN_DATA_HUB -> new NoiUpdater((NoiUpdaterParameters) parameters);
       case BIKEEP -> new BikeepUpdater((BikeepUpdaterParameters) parameters);
       case SIRI_FM -> throw new IllegalArgumentException("Cannot instantiate SIRI-FM data source");
     };

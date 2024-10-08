@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
@@ -34,6 +33,7 @@ public class Station
   private final String code;
   private final I18NString description;
   private final WgsCoordinate coordinate;
+  private final boolean shouldRouteToCentroid;
   private final StopTransferPriority priority;
   private final I18NString url;
   private final ZoneId timezone;
@@ -50,6 +50,7 @@ public class Station
     // Required fields
     this.name = Objects.requireNonNull(builder.getName());
     this.coordinate = Objects.requireNonNull(builder.getCoordinate());
+    this.shouldRouteToCentroid = builder.shouldRouteToCentroid();
     this.priority =
       Objects.requireNonNullElse(builder.getPriority(), StopTransferPriority.defaultValue());
     this.transfersNotAllowed = builder.isTransfersNotAllowed();
@@ -77,12 +78,10 @@ public class Station
     return childStops.contains(stop);
   }
 
-  @Nonnull
   public I18NString getName() {
     return name;
   }
 
-  @Nonnull
   public Collection<StopLocation> getChildStops() {
     return childStops;
   }
@@ -97,9 +96,16 @@ public class Station
     return coordinate.longitude();
   }
 
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     return coordinate;
+  }
+
+  /**
+   * When doing a street search from/to the station, we can either route to the centroid of the station
+   * or from/to any child stop. This feature is inactive unless configured.
+   */
+  public boolean shouldRouteToCentroid() {
+    return shouldRouteToCentroid;
   }
 
   /** Public facing station code (short text or number) */
@@ -132,7 +138,6 @@ public class Station
    * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of adding
    * 0 - zero cost.
    */
-  @Nonnull
   public StopTransferPriority getPriority() {
     return priority;
   }
@@ -153,7 +158,6 @@ public class Station
    * A geometry collection that contains the center point and the convex hull of all the child
    * stops.
    */
-  @Nonnull
   public GeometryCollection getGeometry() {
     return geometry;
   }
@@ -165,19 +169,19 @@ public class Station
   }
 
   @Override
-  @Nonnull
   public StationBuilder copy() {
     return new StationBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Station other) {
+  public boolean sameAs(Station other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(code, other.code) &&
       Objects.equals(description, other.description) &&
       Objects.equals(coordinate, other.coordinate) &&
+      Objects.equals(shouldRouteToCentroid, other.shouldRouteToCentroid) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timezone, other.timezone)

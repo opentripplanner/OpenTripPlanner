@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -69,7 +68,6 @@ public class AreaStop
    * communication, eg. the name of the village where the service stops.
    */
   @Override
-  @Nonnull
   public I18NString getName() {
     return name;
   }
@@ -85,7 +83,6 @@ public class AreaStop
     return url;
   }
 
-  @Nonnull
   @Override
   public StopType getStopType() {
     return StopType.FLEXIBLE_AREA;
@@ -97,7 +94,6 @@ public class AreaStop
   }
 
   @Override
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     return centroid;
   }
@@ -137,7 +133,7 @@ public class AreaStop
   }
 
   @Override
-  public boolean sameAs(@Nonnull AreaStop other) {
+  public boolean sameAs(AreaStop other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
@@ -149,7 +145,6 @@ public class AreaStop
   }
 
   @Override
-  @Nonnull
   public AreaStopBuilder copy() {
     return new AreaStopBuilder(this);
   }

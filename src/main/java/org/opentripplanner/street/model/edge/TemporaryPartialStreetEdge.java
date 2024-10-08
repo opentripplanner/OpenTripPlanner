@@ -55,20 +55,10 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
 
   @Override
   public String toString() {
-    return (
-      "TemporaryPartialStreetEdge(" +
-      this.getDefaultName() +
-      ", " +
-      this.getFromVertex() +
-      " -> " +
-      this.getToVertex() +
-      " length=" +
-      this.getDistanceMeters() +
-      " carSpeed=" +
-      this.getCarSpeed() +
-      " parentEdge=" +
-      parentEdge +
-      ")"
+    return buildToString(
+      this.getDefaultName(),
+      b ->
+        b.append(", length=").append(this.getCarSpeed()).append(", parentEdge=").append(parentEdge)
     );
   }
 

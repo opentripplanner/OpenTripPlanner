@@ -383,10 +383,10 @@ public class RealtimeVehicleMatcherTest {
       .of(trip.getId())
       .withStopPattern(stopPattern)
       .withRoute(ROUTE)
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
+      )
       .build();
-    pattern
-      .getScheduledTimetable()
-      .addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()));
     return pattern;
   }
 

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +73,6 @@ public class DataImportIssueSummary implements Serializable {
       .forEach(issueType -> ISSUE_LOG.info(String.format(FMT, issueType, summary.get(issueType))));
   }
 
-  @Nonnull
   public Map<String, Long> asMap() {
     return summary;
   }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -254,7 +253,6 @@ class VehicleRentalEdgeTest {
       assertEquals(VehicleRentalState.BEFORE_RENTING, afterTraversal.getVehicleRentalState());
     }
 
-    @Nonnull
     private GeofencingZoneExtension noDropOffZone() {
       return new GeofencingZoneExtension(
         new GeofencingZone(new FeedScopedId(NETWORK, "zone"), null, true, false)

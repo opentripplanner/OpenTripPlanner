@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.Nonnull;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
@@ -27,7 +26,6 @@ public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<Vehi
     return basicMapping(vehicleParking);
   }
 
-  @Nonnull
   protected ArrayList<KeyValue> basicMapping(VehicleParking vehicleParking) {
     return new ArrayList<>(
       List.of(

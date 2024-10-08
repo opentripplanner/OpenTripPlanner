@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -190,7 +189,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
       assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     });
 
@@ -217,7 +216,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip arrival time only
@@ -246,7 +245,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip departure time only
@@ -273,7 +272,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
 
     // update trip using stop id
@@ -299,7 +298,7 @@ public class TimetableTest {
     result.ifSuccess(p -> {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
-      timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
+      timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
     });
   }
 
@@ -975,7 +974,6 @@ public class TimetableTest {
       });
     }
 
-    @Nonnull
     private static StopTimeUpdate emptyStopTime(
       int sequence,
       BiConsumer<TripUpdate.StopTimeUpdate.Builder, StopTimeEvent> setEmptyEvent

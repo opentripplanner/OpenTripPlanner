@@ -5,7 +5,6 @@ import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 
 import java.time.ZoneId;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -47,16 +46,14 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
     this.brandingUrl = builder.getBrandingUrl();
   }
 
-  public static AgencyBuilder of(@Nonnull FeedScopedId id) {
+  public static AgencyBuilder of(FeedScopedId id) {
     return new AgencyBuilder(id);
   }
 
-  @Nonnull
   public String getName() {
     return logName();
   }
 
-  @Nonnull
   public ZoneId getTimezone() {
     return timezone;
   }
@@ -87,19 +84,17 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
   }
 
   @Override
-  @Nonnull
   public AgencyBuilder copy() {
     return new AgencyBuilder(this);
   }
 
   @Override
-  @Nonnull
   public String logName() {
     return name;
   }
 
   @Override
-  public boolean sameAs(@Nonnull Agency other) {
+  public boolean sameAs(Agency other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

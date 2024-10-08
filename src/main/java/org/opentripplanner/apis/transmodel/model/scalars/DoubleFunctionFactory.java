@@ -10,7 +10,6 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 
 public class DoubleFunctionFactory {
@@ -40,9 +39,9 @@ public class DoubleFunctionFactory {
         new Coercing<DoubleFunction, String>() {
           @Override
           public String serialize(
-            @Nonnull Object dataFetcherResult,
-            @Nonnull GraphQLContext graphQLContext,
-            @Nonnull Locale locale
+            Object dataFetcherResult,
+            GraphQLContext graphQLContext,
+            Locale locale
           ) {
             var value = (DoubleFunction) dataFetcherResult;
             return LinearFunctionSerialization.serialize(value.constant(), value.coefficient());
@@ -50,9 +49,9 @@ public class DoubleFunctionFactory {
 
           @Override
           public DoubleFunction parseValue(
-            @Nonnull Object input,
-            @Nonnull GraphQLContext graphQLContext,
-            @Nonnull Locale locale
+            Object input,
+            GraphQLContext graphQLContext,
+            Locale locale
           ) throws CoercingParseValueException {
             try {
               String text = (String) input;
@@ -64,10 +63,10 @@ public class DoubleFunctionFactory {
 
           @Override
           public DoubleFunction parseLiteral(
-            @Nonnull Value<?> input,
-            @Nonnull CoercedVariables variables,
-            @Nonnull GraphQLContext graphQLContext,
-            @Nonnull Locale locale
+            Value<?> input,
+            CoercedVariables variables,
+            GraphQLContext graphQLContext,
+            Locale locale
           ) throws CoercingParseLiteralException {
             if (input instanceof StringValue stringValue) {
               return parseValue(stringValue.getValue(), graphQLContext, locale);

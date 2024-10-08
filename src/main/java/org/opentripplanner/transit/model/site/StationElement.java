@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -50,7 +49,6 @@ public abstract class StationElement<
   /**
    * Name of the station element if provided.
    */
-  @Nonnull
   public I18NString getName() {
     return name;
   }
@@ -85,7 +83,6 @@ public abstract class StationElement<
    * Center point/location for the station element. Returns the coordinate of the parent station, if
    * the coordinate is not defined for this station element.
    */
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     if (coordinate != null) {
       return coordinate;
@@ -99,7 +96,6 @@ public abstract class StationElement<
   /**
    * Returns whether this station element is accessible for wheelchair users.
    */
-  @Nonnull
   public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
@@ -145,7 +141,7 @@ public abstract class StationElement<
   }
 
   @Override
-  public boolean sameAs(@Nonnull E other) {
+  public boolean sameAs(E other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&

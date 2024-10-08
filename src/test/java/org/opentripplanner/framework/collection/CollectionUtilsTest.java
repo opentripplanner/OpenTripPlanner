@@ -20,6 +20,13 @@ class CollectionUtilsTest {
   public static final String NULL_STRING = "<null>";
 
   @Test
+  void testIsEmpty() {
+    assertTrue(CollectionUtils.isEmpty((List) null));
+    assertTrue(CollectionUtils.isEmpty(List.of()));
+    assertFalse(CollectionUtils.isEmpty(List.of(1)));
+  }
+
+  @Test
   void testToString() {
     assertEquals("<null>", CollectionUtils.toString(null, NULL_STRING));
     assertEquals("[]", CollectionUtils.toString(Set.of(), NULL_STRING));

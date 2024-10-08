@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.util.Currency;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.ridehailing.CachingRideHailingService;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
@@ -191,7 +190,6 @@ public class UberService extends CachingRideHailingService {
     }
   }
 
-  @Nonnull
   private Map<String, String> headers() throws IOException {
     return Map.ofEntries(
       entry(AUTHORIZATION, "Bearer %s".formatted(oauthService.getToken())),

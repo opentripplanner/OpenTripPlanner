@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
@@ -86,7 +85,6 @@ public class DefaultStopConsolidationService implements StopConsolidationService
     }
   }
 
-  @Nonnull
   private Optional<StopLocation> findAgencySpecificStop(StopLocation stop, Agency agency) {
     return repo
       .groups()

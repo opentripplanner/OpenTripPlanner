@@ -14,7 +14,6 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 
 /**
  * Time utility methods. See the unit test for examples on how to use this class.
@@ -108,7 +107,7 @@ public class TimeUtils {
    * very helpful when specifying a schedule using a sting instead of using a int array with seconds
    * past midnight.
    */
-  public static int[] times(@Nonnull String input) {
+  public static int[] times(String input) {
     return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
   }
 

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
@@ -65,7 +64,6 @@ class FareTransferRuleMapperTest {
     assertEquals(groupId2.getId(), transferRule.toLegGroup().getId());
   }
 
-  @Nonnull
   private FareProduct fareProduct() {
     var fareProduct = new FareProduct();
     fareProduct.setId(id);

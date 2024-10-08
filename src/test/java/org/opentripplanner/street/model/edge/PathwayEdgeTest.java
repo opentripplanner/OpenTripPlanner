@@ -7,7 +7,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -241,7 +240,6 @@ class PathwayEdgeTest {
       assertEquals(PathwayEdge.DEFAULT_NAME, edge.getName());
     }
 
-    @Nonnull
     private PathwayEdge pathwayEdge(I18NString sign) {
       return PathwayEdge.createPathwayEdge(
         from,

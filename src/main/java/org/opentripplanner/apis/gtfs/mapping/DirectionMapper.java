@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
@@ -9,7 +8,6 @@ import org.opentripplanner.model.plan.RelativeDirection;
 
 public final class DirectionMapper {
 
-  @Nonnull
   public static GraphQLAbsoluteDirection map(AbsoluteDirection dir) {
     return switch (dir) {
       case NORTH -> GraphQLAbsoluteDirection.NORTH;
@@ -23,7 +21,6 @@ public final class DirectionMapper {
     };
   }
 
-  @Nonnull
   public static GraphQLRelativeDirection map(RelativeDirection relativeDirection) {
     return switch (relativeDirection) {
       case DEPART -> GraphQLRelativeDirection.DEPART;

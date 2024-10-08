@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nonnull;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -58,7 +57,7 @@ public class DefaultRealtimeVehicleService
    * @see DefaultRealtimeVehicleService#setRealtimeVehicles(TripPattern, List)
    */
   @Override
-  public List<RealtimeVehicle> getRealtimeVehicles(@Nonnull TripPattern pattern) {
+  public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
     if (pattern.getOriginalTripPattern() != null) {
       pattern = pattern.getOriginalTripPattern();
     }
@@ -66,9 +65,8 @@ public class DefaultRealtimeVehicleService
     return vehicles.getOrDefault(pattern, List.of());
   }
 
-  @Nonnull
   @Override
-  public OccupancyStatus getVehicleOccupancyStatus(@Nonnull Trip trip) {
+  public OccupancyStatus getVehicleOccupancyStatus(Trip trip) {
     return getOccupancyStatus(trip.getId(), transitService.getPatternForTrip(trip));
   }
 

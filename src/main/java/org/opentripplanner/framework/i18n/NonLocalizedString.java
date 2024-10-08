@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -18,7 +17,7 @@ public class NonLocalizedString implements I18NString, Serializable {
 
   private final String name;
 
-  public NonLocalizedString(@Nonnull String name) {
+  public NonLocalizedString(String name) {
     this.name = Objects.requireNonNull(name);
   }
 
@@ -40,7 +39,7 @@ public class NonLocalizedString implements I18NString, Serializable {
    */
   public static <W> NonLocalizedString ofNullable(
     @Nullable W wrapper,
-    @Nonnull Function<W, String> getValueOp
+    Function<W, String> getValueOp
   ) {
     return wrapper == null ? null : new NonLocalizedString(getValueOp.apply(wrapper));
   }
@@ -51,8 +50,8 @@ public class NonLocalizedString implements I18NString, Serializable {
    */
   public static <W> NonLocalizedString ofNullable(
     @Nullable W wrapper,
-    @Nonnull Function<W, String> getValueOp,
-    @Nonnull String defaultValue
+    Function<W, String> getValueOp,
+    String defaultValue
   ) {
     return new NonLocalizedString(wrapper == null ? defaultValue : getValueOp.apply(wrapper));
   }
@@ -61,11 +60,7 @@ public class NonLocalizedString implements I18NString, Serializable {
    * Check if name is non-null and returns an instance of {@link NonLocalizedString}, otherwise
    * returns a {@link NonLocalizedString} with the default name.
    */
-  @Nonnull
-  public static NonLocalizedString ofNullableOrElse(
-    @Nullable String name,
-    @Nonnull String defaultName
-  ) {
+  public static NonLocalizedString ofNullableOrElse(@Nullable String name, String defaultName) {
     return new NonLocalizedString(name == null ? defaultName : name);
   }
 
@@ -73,11 +68,7 @@ public class NonLocalizedString implements I18NString, Serializable {
    * Check if name is non-null and returns an instance of {@link NonLocalizedString},  otherwise
    * returns a {@link I18NString} with the default name.
    */
-  @Nonnull
-  public static I18NString ofNullableOrElse(
-    @Nullable String name,
-    @Nonnull I18NString defaultName
-  ) {
+  public static I18NString ofNullableOrElse(@Nullable String name, I18NString defaultName) {
     return name == null ? defaultName : new NonLocalizedString(name);
   }
 

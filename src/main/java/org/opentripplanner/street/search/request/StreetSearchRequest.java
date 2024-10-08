@@ -1,7 +1,6 @@
 package org.opentripplanner.street.search.request;
 
 import java.time.Instant;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -76,12 +75,10 @@ public class StreetSearchRequest implements AStarRequest {
     this.toEnvelope = createEnvelope(to);
   }
 
-  @Nonnull
   public static StreetSearchRequestBuilder of() {
     return new StreetSearchRequestBuilder(DEFAULT).withStartTime(Instant.now());
   }
 
-  @Nonnull
   public static StreetSearchRequestBuilder copyOf(StreetSearchRequest original) {
     return new StreetSearchRequestBuilder(original);
   }

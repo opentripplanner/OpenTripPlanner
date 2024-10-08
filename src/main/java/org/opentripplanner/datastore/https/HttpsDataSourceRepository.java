@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.apache.hc.core5.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -33,7 +32,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   public void open() {}
 
   @Override
-  public DataSource findSource(@Nonnull URI uri, @Nonnull FileType type) {
+  public DataSource findSource(URI uri, FileType type) {
     if (skipUri(uri)) {
       return null;
     }
@@ -41,7 +40,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public CompositeDataSource findCompositeSource(@Nonnull URI uri, @Nonnull FileType type) {
+  public CompositeDataSource findCompositeSource(URI uri, FileType type) {
     if (skipUri(uri)) {
       return null;
     }

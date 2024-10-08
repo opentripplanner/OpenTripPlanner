@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
@@ -62,7 +61,6 @@ public class StopConsolidationModule implements GraphBuilderModule {
       });
   }
 
-  @Nonnull
   private TripPattern modifyStopsInPattern(
     TripPattern pattern,
     List<StopReplacement> replacements

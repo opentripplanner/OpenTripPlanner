@@ -1568,7 +1568,7 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("leg")
-          .description("Refetch a single leg based on its id")
+          .description("Refetch a single transit leg based on its id")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(LegType.REF)
           .argument(
@@ -1595,7 +1595,9 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serverInfo")
-          .description("Get OTP server information")
+          .description(
+            "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
+          )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(serverInfoType))
           .dataFetcher(e -> projectInfo())

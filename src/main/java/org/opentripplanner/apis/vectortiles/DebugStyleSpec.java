@@ -18,6 +18,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -109,7 +110,8 @@ public class DebugStyleSpec {
             StreetTransitEntranceLink.class,
             BoardingLocationToStopLink.class,
             StreetVehicleRentalLink.class,
-            StreetVehicleParkingLink.class
+            StreetVehicleParkingLink.class,
+            StreetStationCentroidLink.class
           )
           .lineWidth(LINE_WIDTH)
           .minZoom(13)

@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -60,7 +59,6 @@ public class AreaEdgeList implements Serializable {
   /**
    * Returns the list of visibility vertices.
    */
-  @Nonnull
   public Set<IntersectionVertex> visibilityVertices() {
     return visibilityVertices;
   }
@@ -68,7 +66,7 @@ public class AreaEdgeList implements Serializable {
   /**
    * Add a visibility vertex to this edge.
    */
-  public void addVisibilityVertex(@Nonnull IntersectionVertex toBeAdded) {
+  public void addVisibilityVertex(IntersectionVertex toBeAdded) {
     Objects.requireNonNull(toBeAdded);
     synchronized (this) {
       if (visibilityVertices == EMPTY_SET) {

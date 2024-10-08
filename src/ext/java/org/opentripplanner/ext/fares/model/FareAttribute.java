@@ -2,7 +2,6 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -77,7 +76,7 @@ public final class FareAttribute
   }
 
   @Override
-  public boolean sameAs(@Nonnull FareAttribute other) {
+  public boolean sameAs(FareAttribute other) {
     return (
       getId().equals(other.getId()) &&
       getPrice().equals(other.getPrice()) &&
@@ -88,7 +87,6 @@ public final class FareAttribute
     );
   }
 
-  @Nonnull
   @Override
   public FareAttributeBuilder copy() {
     return new FareAttributeBuilder(this);

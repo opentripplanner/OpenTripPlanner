@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -135,25 +134,21 @@ public class OtpDataStore {
    * @return The collection may contain elements of type {@link DataSource} or {@link
    * CompositeDataSource}.
    */
-  @Nonnull
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
     assertDataStoreIsOpened();
     return sources.get(type).stream().filter(DataSource::exists).collect(Collectors.toList());
   }
 
-  @Nonnull
   public DataSource getStreetGraph() {
     assertDataStoreIsOpened();
     return streetGraph;
   }
 
-  @Nonnull
   public DataSource getGraph() {
     assertDataStoreIsOpened();
     return graph;
   }
 
-  @Nonnull
   public CompositeDataSource getBuildReportDir() {
     assertDataStoreIsOpened();
     return buildReportDir;
@@ -188,11 +183,7 @@ public class OtpDataStore {
     return localRepos.get(0);
   }
 
-  private DataSource findSingleSource(
-    @Nullable URI uri,
-    @Nonnull String filename,
-    @Nonnull FileType type
-  ) {
+  private DataSource findSingleSource(@Nullable URI uri, String filename, FileType type) {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findSource(uri, type));
     }
@@ -201,8 +192,8 @@ public class OtpDataStore {
 
   private CompositeDataSource findCompositeSource(
     @Nullable URI uri,
-    @Nonnull String filename,
-    @Nonnull FileType type
+    String filename,
+    FileType type
   ) {
     if (uri != null) {
       return findSourceUsingAllRepos(it -> it.findCompositeSource(uri, type));
@@ -211,10 +202,7 @@ public class OtpDataStore {
     }
   }
 
-  private List<DataSource> findMultipleSources(
-    @Nonnull Collection<URI> uris,
-    @Nonnull FileType type
-  ) {
+  private List<DataSource> findMultipleSources(Collection<URI> uris, FileType type) {
     if (uris == null || uris.isEmpty()) {
       return localRepository.listExistingSources(type);
     }
@@ -227,8 +215,8 @@ public class OtpDataStore {
   }
 
   private List<CompositeDataSource> findMultipleCompositeSources(
-    @Nonnull Collection<URI> uris,
-    @Nonnull FileType type
+    Collection<URI> uris,
+    FileType type
   ) {
     if (uris.isEmpty()) {
       return localRepository

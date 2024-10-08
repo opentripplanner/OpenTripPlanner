@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class RequestModes {
@@ -18,16 +17,12 @@ public class RequestModes {
     StreetMode.WALK
   );
 
-  @Nonnull
   public final StreetMode accessMode;
 
-  @Nonnull
   public final StreetMode egressMode;
 
-  @Nonnull
   public final StreetMode directMode;
 
-  @Nonnull
   public final StreetMode transferMode;
 
   private RequestModes(

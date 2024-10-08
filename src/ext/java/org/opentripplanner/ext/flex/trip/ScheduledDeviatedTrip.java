@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
@@ -152,7 +151,7 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public boolean sameAs(@Nonnull ScheduledDeviatedTrip other) {
+  public boolean sameAs(ScheduledDeviatedTrip other) {
     return (
       super.sameAs(other) &&
       Arrays.equals(stopTimes, other.stopTimes) &&
@@ -161,7 +160,6 @@ public class ScheduledDeviatedTrip
     );
   }
 
-  @Nonnull
   @Override
   public TransitBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> copy() {
     return new ScheduledDeviatedTripBuilder(this);

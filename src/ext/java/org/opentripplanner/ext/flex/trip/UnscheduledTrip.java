@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
 import org.opentripplanner.framework.lang.DoubleUtils;
@@ -197,7 +196,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   @Override
-  public boolean sameAs(@Nonnull UnscheduledTrip other) {
+  public boolean sameAs(UnscheduledTrip other) {
     return (
       super.sameAs(other) &&
       Arrays.equals(stopTimes, other.stopTimes) &&
@@ -206,7 +205,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     );
   }
 
-  @Nonnull
   @Override
   public TransitBuilder<UnscheduledTrip, UnscheduledTripBuilder> copy() {
     return new UnscheduledTripBuilder(this);

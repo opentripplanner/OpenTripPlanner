@@ -206,7 +206,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest,
+          routingRequest.from(),
+          routingRequest.to(),
           streetMode,
           streetMode
         )
@@ -230,7 +231,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest,
+          routingRequest.from(),
+          routingRequest.to(),
           streetMode,
           streetMode
         )

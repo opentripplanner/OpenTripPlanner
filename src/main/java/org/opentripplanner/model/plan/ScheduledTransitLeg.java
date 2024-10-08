@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -34,6 +33,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -181,7 +181,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  @Nonnull
   public TransitMode getMode() {
     return getTrip().getMode();
   }
@@ -225,6 +224,11 @@ public class ScheduledTransitLeg implements TransitLeg {
         !tripTimes.isNoDataStop(alightStopPosInPattern)
       )
     );
+  }
+
+  @Override
+  public RealTimeState getRealTimeState() {
+    return tripTimes.getRealTimeState();
   }
 
   @Override

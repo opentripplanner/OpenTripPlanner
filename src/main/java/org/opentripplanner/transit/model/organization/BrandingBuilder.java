@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.organization;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,7 +15,7 @@ public class BrandingBuilder extends AbstractEntityBuilder<Branding, BrandingBui
     super(id);
   }
 
-  BrandingBuilder(@Nonnull Branding original) {
+  BrandingBuilder(Branding original) {
     super(original);
     this.shortName = original.getShortName();
     this.name = original.getName();
@@ -70,7 +69,6 @@ public class BrandingBuilder extends AbstractEntityBuilder<Branding, BrandingBui
     return this;
   }
 
-  @Nonnull
   @Override
   protected Branding buildFromValues() {
     return new Branding(this);

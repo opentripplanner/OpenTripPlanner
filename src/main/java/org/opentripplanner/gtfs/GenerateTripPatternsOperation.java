@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -40,13 +42,18 @@ public class GenerateTripPatternsOperation {
 
   private final Map<String, Integer> tripPatternIdCounters = new HashMap<>();
 
-  private final OtpTransitServiceBuilder transitDaoBuilder;
+  private final OtpTransitServiceBuilder transitServiceBuilder;
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
   private final GeometryProcessor geometryProcessor;
 
-  private final Multimap<StopPattern, TripPattern> tripPatterns;
+  // TODO the linked hashset configuration ensures that TripPatterns are created in the same order
+  //  as Trips are imported, as a workaround for issue #6067
+  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders = MultimapBuilder
+    .linkedHashKeys()
+    .linkedHashSetValues()
+    .build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
   private int freqCount = 0;
@@ -59,18 +66,17 @@ public class GenerateTripPatternsOperation {
     Set<FeedScopedId> calendarServiceIds,
     GeometryProcessor geometryProcessor
   ) {
-    this.transitDaoBuilder = builder;
+    this.transitServiceBuilder = builder;
     this.issueStore = issueStore;
     this.deduplicator = deduplicator;
     this.calendarServiceIds = calendarServiceIds;
     this.geometryProcessor = geometryProcessor;
-    this.tripPatterns = transitDaoBuilder.getTripPatterns();
   }
 
   public void run() {
     collectFrequencyByTrip();
 
-    final Collection<Trip> trips = transitDaoBuilder.getTripsById().values();
+    final Collection<Trip> trips = transitServiceBuilder.getTripsById().values();
     var progressLogger = ProgressTracker.track("build trip patterns", 50_000, trips.size());
     LOG.info(progressLogger.startMessage());
 
@@ -84,6 +90,14 @@ public class GenerateTripPatternsOperation {
         issueStore.add(e.error());
       }
     }
+
+    tripPatternBuilders
+      .values()
+      .stream()
+      .map(TripPatternBuilder::build)
+      .forEach(tripPattern ->
+        transitServiceBuilder.getTripPatterns().put(tripPattern.getStopPattern(), tripPattern)
+      );
 
     LOG.info(progressLogger.completeMessage());
     LOG.info(
@@ -107,7 +121,7 @@ public class GenerateTripPatternsOperation {
    * the same trip can be added at once to the same Timetable/TripPattern.
    */
   private void collectFrequencyByTrip() {
-    for (Frequency freq : transitDaoBuilder.getFrequencies()) {
+    for (Frequency freq : transitServiceBuilder.getFrequencies()) {
       frequenciesForTrip.put(freq.getTrip(), freq);
     }
   }
@@ -119,7 +133,7 @@ public class GenerateTripPatternsOperation {
       return; // Invalid trip, skip it, it will break later
     }
 
-    List<StopTime> stopTimes = transitDaoBuilder.getStopTimesSortedByTrip().get(trip);
+    List<StopTime> stopTimes = transitServiceBuilder.getStopTimesSortedByTrip().get(trip);
 
     // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
     var staticTripWithFewerThan2Stops =
@@ -134,8 +148,7 @@ public class GenerateTripPatternsOperation {
     // Get the existing TripPattern for this filtered StopPattern, or create one.
     StopPattern stopPattern = new StopPattern(stopTimes);
 
-    Direction direction = trip.getDirection();
-    TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip, direction);
+    TripPatternBuilder tripPatternBuilder = findOrCreateTripPattern(stopPattern, trip);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
@@ -144,44 +157,42 @@ public class GenerateTripPatternsOperation {
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
     if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
-        tripPattern.add(new FrequencyEntry(freq, tripTimes));
+        tripPatternBuilder.withScheduledTimeTableBuilder(builder ->
+          builder.addFrequencyEntry(new FrequencyEntry(freq, tripTimes))
+        );
         freqCount++;
       }
     }
     // This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled timetable.
     else {
-      tripPattern.add(tripTimes);
+      tripPatternBuilder.withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes));
       scheduledCount++;
     }
   }
 
-  private TripPattern findOrCreateTripPattern(
-    StopPattern stopPattern,
-    Trip trip,
-    Direction direction
-  ) {
+  private TripPatternBuilder findOrCreateTripPattern(StopPattern stopPattern, Trip trip) {
     Route route = trip.getRoute();
-    for (TripPattern tripPattern : tripPatterns.get(stopPattern)) {
+    Direction direction = trip.getDirection();
+    for (TripPatternBuilder tripPatternBuilder : tripPatternBuilders.get(stopPattern)) {
       if (
-        tripPattern.getRoute().equals(route) &&
-        tripPattern.getDirection().equals(direction) &&
-        tripPattern.getMode().equals(trip.getMode()) &&
-        tripPattern.getNetexSubmode().equals(trip.getNetexSubMode())
+        tripPatternBuilder.getRoute().equals(route) &&
+        tripPatternBuilder.getDirection().equals(direction) &&
+        tripPatternBuilder.getMode().equals(trip.getMode()) &&
+        tripPatternBuilder.getNetexSubmode().equals(trip.getNetexSubMode())
       ) {
-        return tripPattern;
+        return tripPatternBuilder;
       }
     }
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
-    TripPattern tripPattern = TripPattern
+    TripPatternBuilder tripPatternBuilder = TripPattern
       .of(patternId)
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode())
-      .withHopGeometries(geometryProcessor.createHopGeometries(trip))
-      .build();
-    tripPatterns.put(stopPattern, tripPattern);
-    return tripPattern;
+      .withHopGeometries(geometryProcessor.createHopGeometries(trip));
+    tripPatternBuilders.put(stopPattern, tripPatternBuilder);
+    return tripPatternBuilder;
   }
 
   /**

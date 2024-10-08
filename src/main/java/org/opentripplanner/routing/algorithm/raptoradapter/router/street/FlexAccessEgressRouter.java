@@ -27,31 +27,31 @@ public class FlexAccessEgressRouter {
     AdditionalSearchDays searchDays,
     FlexParameters config,
     DataOverlayContext dataOverlayContext,
-    boolean isEgress
+    AccessEgressType accessOrEgress
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
     TransitService transitService = serverContext.transitService();
 
-    Collection<NearbyStop> accessStops = !isEgress
-      ? AccessEgressRouter.streetSearch(
+    Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
+      ? AccessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
-        false,
+        AccessEgressType.ACCESS,
         serverContext.flexParameters().maxAccessWalkDuration(),
         0
       )
       : List.of();
 
-    Collection<NearbyStop> egressStops = isEgress
-      ? AccessEgressRouter.streetSearch(
+    Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
+      ? AccessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
-        true,
+        AccessEgressType.EGRESS,
         serverContext.flexParameters().maxEgressWalkDuration(),
         0
       )
@@ -69,6 +69,8 @@ public class FlexAccessEgressRouter {
       egressStops
     );
 
-    return isEgress ? flexRouter.createFlexEgresses() : flexRouter.createFlexAccesses();
+    return accessOrEgress.isEgress()
+      ? flexRouter.createFlexEgresses()
+      : flexRouter.createFlexAccesses();
   }
 }

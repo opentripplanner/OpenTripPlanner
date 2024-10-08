@@ -670,6 +670,11 @@ type Leg {
   """
   headsign: String
   """
+  An identifier for the leg, which can be used to re-fetch transit leg information.
+  Re-fetching fails when the underlying transit data no longer exists.
+  """
+  id: String
+  """
   Interlines with previous leg.
   This is true when the same vehicle is used for the previous leg as for this leg
   and passenger can stay inside the vehicle.
@@ -1166,6 +1171,11 @@ type QueryType {
     time: Int!
   ): Trip
   """
+  Try refetching the current state of a transit leg using its id.
+  This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
+  """
+  leg(id: String!): Leg
+  """
   Get all places (stops, stations, etc. with coordinates) within the specified
   radius from a location. The returned type is a Relay connection (see
   https://facebook.github.io/relay/graphql/connections.htm). The placeAtDistance
@@ -1512,7 +1522,7 @@ type QueryType {
     walkSpeed: Float,
     "Whether the itinerary must be wheelchair accessible. Default value: false"
     wheelchair: Boolean
-  ): Plan @async
+  ): Plan @async @deprecated(reason : "Use `planConnection` instead.")
   """
   Plan (itinerary) search that follows
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
@@ -1597,7 +1607,7 @@ type QueryType {
     number of itineraries in each search.
     """
     searchWindow: Duration
-  ): PlanConnection @async @deprecated(reason : "Experimental and can include breaking changes, use plan instead")
+  ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle
   "Get all rental vehicles"

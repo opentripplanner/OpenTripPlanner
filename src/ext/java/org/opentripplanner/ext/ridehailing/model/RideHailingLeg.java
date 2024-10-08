@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.ridehailing.model;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.StreetLegBuilder;
 
@@ -27,7 +26,6 @@ public class RideHailingLeg extends StreetLeg {
     return provider;
   }
 
-  @Nonnull
   public RideEstimate rideEstimate() {
     return estimate;
   }

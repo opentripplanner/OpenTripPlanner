@@ -2,7 +2,6 @@ package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -91,7 +90,6 @@ public class RealtimeVehicle {
     return Optional.ofNullable(stop);
   }
 
-  @Nonnull
   public Trip trip() {
     return trip;
   }

@@ -6,7 +6,6 @@ import static java.time.LocalDate.MIN;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 
 /**
@@ -52,7 +51,6 @@ public final class ServiceDateInterval {
    * Return the interval start, inclusive. If the period start is unbounded the {@link
    * LocalDate#MIN} is returned.
    */
-  @Nonnull
   public LocalDate getStart() {
     return start;
   }
@@ -61,7 +59,6 @@ public final class ServiceDateInterval {
    * Return the interval end, inclusive. If the period start is unbounded the {@link
    * LocalDate#MAX} is returned.
    */
-  @Nonnull
   public LocalDate getEnd() {
     return end;
   }

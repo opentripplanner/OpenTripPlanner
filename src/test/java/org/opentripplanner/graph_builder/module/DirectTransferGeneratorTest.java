@@ -290,13 +290,18 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          S0 = stop("S0", 47.495, 19.001, withNoTransfersOnStations);
-          S11 = stop("S11", 47.500, 19.001, withNoTransfersOnStations);
-          S12 = stop("S12", 47.520, 19.001, withNoTransfersOnStations);
-          S13 = stop("S13", 47.540, 19.001, withNoTransfersOnStations);
-          S21 = stop("S21", 47.500, 19.011, withNoTransfersOnStations);
-          S22 = stop("S22", 47.520, 19.011, withNoTransfersOnStations);
-          S23 = stop("S23", 47.540, 19.011, withNoTransfersOnStations);
+          var station = stationEntity(
+            "1",
+            builder -> builder.withTransfersNotAllowed(withNoTransfersOnStations)
+          );
+
+          S0 = stop("S0", 47.495, 19.001, station);
+          S11 = stop("S11", 47.500, 19.001, station);
+          S12 = stop("S12", 47.520, 19.001, station);
+          S13 = stop("S13", 47.540, 19.001, station);
+          S21 = stop("S21", 47.500, 19.011, station);
+          S22 = stop("S22", 47.520, 19.011, station);
+          S23 = stop("S23", 47.540, 19.011, station);
 
           V0 = intersection("V0", 47.495, 19.000);
           V11 = intersection("V11", 47.500, 19.000);

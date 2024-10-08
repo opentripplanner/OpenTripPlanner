@@ -14,6 +14,8 @@ export function ItineraryPaginationControl({
   return (
     <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: '1rem 0 ' }}>
       <Button
+        variant="outline-primary"
+        size="sm"
         disabled={!previousPageCursor || loading}
         onClick={() => {
           previousPageCursor && onPagination(previousPageCursor);
@@ -22,6 +24,8 @@ export function ItineraryPaginationControl({
         Previous page
       </Button>{' '}
       <Button
+        variant="outline-primary"
+        size="sm"
         disabled={!nextPageCursor || loading}
         onClick={() => {
           nextPageCursor && onPagination(nextPageCursor);

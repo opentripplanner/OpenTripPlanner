@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
@@ -57,8 +56,7 @@ public class RaptorRequestTransferCache {
   private CacheLoader<CacheKey, RaptorTransferIndex> cacheLoader() {
     return new CacheLoader<>() {
       @Override
-      @Nonnull
-      public RaptorTransferIndex load(@Nonnull CacheKey cacheKey) {
+      public RaptorTransferIndex load(CacheKey cacheKey) {
         LOG.info("Adding runtime request to cache: {}", cacheKey.options);
         return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.request);
       }

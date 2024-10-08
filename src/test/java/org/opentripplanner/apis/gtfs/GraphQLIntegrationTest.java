@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -163,11 +162,13 @@ class GraphQLIntegrationTest {
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
-    final TripPattern pattern = TEST_MODEL.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
-    pattern.add(tripTimes);
+    final TripPattern pattern = TEST_MODEL
+      .pattern(BUS)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
 
@@ -383,7 +384,6 @@ class GraphQLIntegrationTest {
     assertEqualJson(expectedJson, actualJson);
   }
 
-  @Nonnull
   private static List<TransitAlert> getTransitAlert(EntitySelector.Stop entitySelector) {
     var alertWithoutDescription = TransitAlert
       .of(id("no-description"))
@@ -404,7 +404,6 @@ class GraphQLIntegrationTest {
       .toList();
   }
 
-  @Nonnull
   private static WalkStepBuilder walkStep(String name) {
     return WalkStep
       .builder()
@@ -413,7 +412,6 @@ class GraphQLIntegrationTest {
       .withAngle(10);
   }
 
-  @Nonnull
   private static FareProduct fareProduct(String name) {
     return new FareProduct(
       id(name),
@@ -429,7 +427,6 @@ class GraphQLIntegrationTest {
    * Locate 'expectations' relative to the given query input file. The 'expectations' and 'queries'
    * subdirectories are expected to be in the same directory.
    */
-  @Nonnull
   private static Path getExpectation(Path path) {
     return path
       .getParent()

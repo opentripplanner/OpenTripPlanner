@@ -255,8 +255,10 @@ class TripPatternMapper {
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
       )
+      .withScheduledTimeTableBuilder(builder ->
+        builder.addAllTripTimes(createTripTimes(trips, tripStopTimes))
+      )
       .build();
-    createTripTimes(trips, tripStopTimes).forEach(tripPattern::add);
 
     return Optional.of(
       new TripPatternMapperResult(

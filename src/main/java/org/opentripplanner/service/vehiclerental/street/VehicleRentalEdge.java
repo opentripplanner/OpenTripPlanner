@@ -2,7 +2,6 @@ package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collections;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -33,7 +32,6 @@ public class VehicleRentalEdge extends Edge {
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesRenting()) {
       return State.empty();

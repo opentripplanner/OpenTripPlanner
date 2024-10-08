@@ -60,13 +60,8 @@ public class TemporaryVerticesContainerTest {
 
   @Test
   public void temporaryChangesRemovedOnClose() {
-    // Given - A request
-    RouteRequest request = new RouteRequest();
-    request.setFrom(from);
-    request.setTo(to);
-
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, request, StreetMode.WALK, StreetMode.WALK);
+    subject = new TemporaryVerticesContainer(g, from, to, StreetMode.WALK, StreetMode.WALK);
 
     // Then:
     originAndDestinationInsertedCorrect();

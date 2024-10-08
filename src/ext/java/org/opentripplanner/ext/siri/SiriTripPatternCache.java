@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -71,9 +70,9 @@ public class SiriTripPatternCache {
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @Nonnull final StopPattern stopPattern,
-    @Nonnull final Trip trip,
-    @Nonnull LocalDate serviceDate
+    final StopPattern stopPattern,
+    final Trip trip,
+    LocalDate serviceDate
   ) {
     TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 

@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # GraphQL tutorial
@@ -70,53 +70,61 @@ Most people want to get routing results out of OTP, so lets see the query for th
 
 ```graphql
 {
-  plan(
-    # these coordinates are in Portland, change this to YOUR origin
-    from: { lat: 45.5552, lon: -122.6534 }
-    # these coordinates are in Portland, change this to YOUR destination
-    to: { lat: 45.4908, lon: -122.5519 }
+  planConnection(
+    origin: {
+      # these coordinates are in Portland, change this to YOUR origin
+      location: { coordinate: { latitude: 45.5552, longitude: -122.6534 } }
+    }
+    destination: {
+      # these coordinates are in Portland, change this to YOUR destination
+      location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
+    }
     # use the correct date and time of your request
-    date: "2023-02-15"
-    time: "11:37"
+    dateTime: { earliestDeparture: "2023-06-13T14:30-07:00" }
     # choose the transport modes you need
-    transportModes: [{ mode: WALK }, { mode: TRANSIT }]
+    modes: {
+      direct: [WALK]
+      transit: { transit: [{ mode: BUS }, { mode: RAIL }] }
+    }
   ) {
-    itineraries {
-      start
-      end
-      legs {
-        mode
-        from {
-          name
-          lat
-          lon
-          departure {
-            scheduledTime
-            estimated {
-              time
-              delay
+    edges {
+      node {
+        start
+        end
+        legs {
+          mode
+          from {
+            name
+            lat
+            lon
+            departure {
+              scheduledTime
+              estimated {
+                time
+                delay
+              }
             }
           }
-        }
-        to {
-          name
-          lat
-          lon
-          arrival {
-            scheduledTime
-            estimated {
-              time
-              delay
+          to {
+            name
+            lat
+            lon
+            arrival {
+              scheduledTime
+              estimated {
+                time
+                delay
+              }
             }
           }
-        }
-        route {
-          gtfsId
-          longName
-          shortName
-        }
-        legGeometry {
-          points
+          route {
+            gtfsId
+            longName
+            shortName
+          }
+          legGeometry {
+            points
+          }
         }
       }
     }
