@@ -118,18 +118,15 @@ The provided formatter will group class members in this order:
     1. `static` `final` fields
     2. `static` fields
     3. `static` initializer
-    4. `final` fields
-    5. fields
-    6. class initializer (avoid using it)
-    7. Constructor
-    8. `static` methods
-    9. `static` getter and setters
-    10. methods
-    11. getter and setters
-    12. enums
-    13. interfaces
-    14. `static` classes
-    15. classes
+    4. other fields
+    5. class initializer (avoid using it)
+    6. Constructor
+    7. methods
+    8. getter and setters
+    9. enums
+    10. interfaces
+    11. `static` classes
+    12. classes
 5. Each section of members are sorted by visibility:
     1. ´public´
     2. package private
