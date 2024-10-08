@@ -304,8 +304,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       pattern = tripUpdate.addedTripPattern();
     } else {
       // Get cached trip pattern or create one if it doesn't exist yet
-      pattern =
-        tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip, serviceDate);
+      pattern = tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip);
     }
 
     // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
