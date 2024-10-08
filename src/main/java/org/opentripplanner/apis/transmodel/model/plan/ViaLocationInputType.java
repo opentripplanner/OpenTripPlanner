@@ -15,9 +15,9 @@ public class ViaLocationInputType {
 
   /* type constants */
 
-  private static final String INPUT_VIA_LOCATION = "PlanViaLocationInput";
-  private static final String INPUT_VISIT_VIA_LOCATION = "PlanVisitViaLocationInput";
-  private static final String INPUT_PASS_THROUGH_VIA_LOCATION = "PlanPassThroughViaLocationInput";
+  private static final String INPUT_VIA_LOCATION = "TripViaLocationInput";
+  private static final String INPUT_VISIT_VIA_LOCATION = "TripVisitViaLocationInput";
+  private static final String INPUT_PASS_THROUGH_VIA_LOCATION = "TripPassThroughViaLocationInput";
 
   private static final String DOC_VISIT_VIA_LOCATION =
     """

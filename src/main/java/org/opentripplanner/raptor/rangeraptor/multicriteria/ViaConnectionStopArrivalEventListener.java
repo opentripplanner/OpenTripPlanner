@@ -8,18 +8,23 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArriv
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
-
 /**
  * This class is used to listen for stop arrivals in one raptor state and then copy
  * over the arrival event to another state. This is used to chain the Raptor searches
  * together to force the paths through the given via connections.
  */
-class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule> implements ParetoSetEventListener<ArrivalView<T>> {
+class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
+  implements ParetoSetEventListener<ArrivalView<T>> {
+
   private final McStopArrivalFactory<T> stopArrivalFactory;
   private final List<RaptorViaConnection> connections;
   private final McStopArrivals<T> next;
 
-  public ViaConnectionStopArrivalEventListener(McStopArrivalFactory<T> stopArrivalFactory, List<RaptorViaConnection> connections, McStopArrivals<T> next) {
+  public ViaConnectionStopArrivalEventListener(
+    McStopArrivalFactory<T> stopArrivalFactory,
+    List<RaptorViaConnection> connections,
+    McStopArrivals<T> next
+  ) {
     this.stopArrivalFactory = stopArrivalFactory;
     this.connections = connections;
     this.next = next;
