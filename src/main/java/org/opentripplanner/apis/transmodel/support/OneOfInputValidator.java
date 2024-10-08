@@ -18,11 +18,16 @@ public class OneOfInputValidator {
   /**
    * Validate that the {@code parent} {@code map} only has one entry.
    *
+   * @param map           The input to validate.
+   * @param inputTypeName The name of the type annotated with @oneOf. The name is used in
+   *                      the error message only, in case the validation fails.
+   * @param definedFields The name of the fields the @oneOf directive apply to.
+   *
    * @return the field with a value set.
    */
   public static String validateOneOf(
     Map<String, Object> map,
-    String parent,
+    String inputTypeName,
     String... definedFields
   ) {
     var fieldsInInput = Arrays
@@ -34,7 +39,7 @@ public class OneOfInputValidator {
     if (fieldsInInput.isEmpty()) {
       throw new IllegalArgumentException(
         "No entries in '%s @oneOf'. One of '%s' must be set.".formatted(
-            parent,
+            inputTypeName,
             String.join("', '", definedFields)
           )
       );
@@ -42,7 +47,7 @@ public class OneOfInputValidator {
     if (fieldsInInput.size() > 1) {
       throw new IllegalArgumentException(
         "Only one entry in '%s @oneOf' is allowed. Set: '%s'".formatted(
-            parent,
+            inputTypeName,
             String.join("', '", fieldsInInput)
           )
       );
@@ -52,7 +57,7 @@ public class OneOfInputValidator {
     if (map.get(field) instanceof Collection<?> c) {
       if (c.isEmpty()) {
         throw new IllegalArgumentException(
-          "'%s' can not be empty in '%s @oneOf'.".formatted(field, parent)
+          "'%s' can not be empty in '%s @oneOf'.".formatted(field, inputTypeName)
         );
       }
     }
