@@ -36,7 +36,7 @@ class TripViaLocationMapper {
   private static ViaLocation mapViaLocation(Map<String, Object> inputMap) {
     var fieldName = OneOfInputValidator.validateOneOf(
       inputMap,
-      TripQuery.FIELD_VIA,
+      TripQuery.TRIP_VIA_PARAMETER,
       ViaLocationInputType.FIELD_VISIT,
       ViaLocationInputType.FIELD_PASS_THROUGH
     );

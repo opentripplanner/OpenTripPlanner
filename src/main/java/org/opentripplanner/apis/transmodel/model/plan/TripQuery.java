@@ -28,7 +28,7 @@ public class TripQuery {
   public static final String ACCESS_EGRESS_PENALTY = "accessEgressPenalty";
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
-  public static final String FIELD_VIA = "via";
+  public static final String TRIP_VIA_PARAMETER = "via";
   public static final String DOC_VIA =
     """
     The list of via locations the journey is required to visit. All locations are
@@ -188,7 +188,7 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name(FIELD_VIA)
+          .name(TRIP_VIA_PARAMETER)
           .description(DOC_VIA)
           .type(new GraphQLList(new GraphQLNonNull(ViaLocationInputType.VIA_LOCATION_INPUT)))
           .build()
