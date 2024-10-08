@@ -6,11 +6,33 @@ import org.opentripplanner.routing.api.request.RequestModes;
 // TODO VIA: Javadoc
 public class JourneyRequest implements Cloneable, Serializable {
 
-  private TransitRequest transit = new TransitRequest();
-  private StreetRequest access = new StreetRequest();
-  private StreetRequest egress = new StreetRequest();
-  private StreetRequest transfer = new StreetRequest();
-  private StreetRequest direct = new StreetRequest();
+  private final TransitRequest transit;
+  private final StreetRequest access;
+  private final StreetRequest egress;
+  private final StreetRequest transfer;
+  private final StreetRequest direct;
+
+  public JourneyRequest() {
+    this.transit = new TransitRequest();
+    this.access = new StreetRequest();
+    this.egress = new StreetRequest();
+    this.transfer = new StreetRequest();
+    this.direct = new StreetRequest();
+  }
+
+  public JourneyRequest(
+    TransitRequest transit,
+    StreetRequest access,
+    StreetRequest egress,
+    StreetRequest transfer,
+    StreetRequest direct
+  ) {
+    this.transit = transit;
+    this.access = access;
+    this.egress = egress;
+    this.transfer = transfer;
+    this.direct = direct;
+  }
 
   public TransitRequest transit() {
     return transit;
@@ -49,19 +71,14 @@ public class JourneyRequest implements Cloneable, Serializable {
       .build();
   }
 
+  @Override
   public JourneyRequest clone() {
-    try {
-      var clone = (JourneyRequest) super.clone();
-      clone.transit = this.transit.clone();
-      clone.access = this.access.clone();
-      clone.egress = this.egress.clone();
-      clone.transfer = this.transfer.clone();
-      clone.direct = this.direct.clone();
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
+    return new JourneyRequest(
+      this.transit.clone(),
+      this.access.clone(),
+      this.egress.clone(),
+      this.transfer.clone(),
+      this.direct.clone()
+    );
   }
 }
