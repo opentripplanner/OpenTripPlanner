@@ -2209,22 +2209,20 @@ input TripPassThroughViaLocationInput {
 
 """
 A via-location is used to specifying a location as an intermediate place the router must
-route through. The via-location must be either a pass-through-location or a
-visit-via-location. An on-board "visit" is only allowed for pass-through-via-locations, while
-the visit-via-location can visit a stop-location or a coordinate and specify a
-minimum-wait-time.
+route through. The via-location is either a pass-through-location or a visit-via-location.
 """
 input TripViaLocationInput @oneOf {
+  "Board, alight or pass-through(on-board) at the stop location."
   passThrough: TripPassThroughViaLocationInput
+  "Board or alight at the stop-locations/coordinate."
   visit: TripVisitViaLocationInput
 }
 
 """
-A visit-via-location is a physical visit to one of the stops or coordinates listed. An
-on-board visit does not count, the traveler must alight or board at the given stop for
-it to to be accepted. To visit a coordinate, the traveler must walk(bike or drive) to
-the closest point in the street network from a stop and back to another stop to join
-the transit network.
+A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for it to to
+be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+in the street network from a stop and back to another stop to join the transit network.
 
 NOTE! Coordinates are NOT supported yet.
 """
