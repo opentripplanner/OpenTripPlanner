@@ -22,10 +22,6 @@ public class FreeEdge extends Edge {
     return connectToGraph(new FreeEdge(from, to));
   }
 
-  public String toString() {
-    return "FreeEdge(" + fromv + " -> " + tov + ")";
-  }
-
   @Override
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);

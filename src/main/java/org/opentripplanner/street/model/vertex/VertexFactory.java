@@ -14,6 +14,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.Station;
 
 /**
  * This class is the central point where all vertices that are supposed to be permanently part
@@ -112,6 +113,10 @@ public class VertexFactory {
 
   public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
     return addToGraph(transitStopVertexBuilder.build());
+  }
+
+  public StationCentroidVertex stationCentroid(Station station) {
+    return addToGraph(new StationCentroidVertex(station));
   }
 
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {

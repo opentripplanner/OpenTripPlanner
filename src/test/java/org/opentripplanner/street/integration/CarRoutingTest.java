@@ -133,7 +133,8 @@ public class CarRoutingTest {
     request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      request,
+      from,
+      to,
       StreetMode.CAR,
       StreetMode.CAR
     );

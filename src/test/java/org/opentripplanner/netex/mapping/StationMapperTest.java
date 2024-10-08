@@ -5,6 +5,7 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
 import java.time.ZoneId;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -27,6 +28,7 @@ class StationMapperTest {
         new FeedScopedIdFactory("FEED_ID"),
         ZoneId.of("UTC"),
         false,
+        Set.of(),
         StopModel.of()
       );
   }

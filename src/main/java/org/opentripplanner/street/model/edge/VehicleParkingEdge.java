@@ -61,10 +61,6 @@ public class VehicleParkingEdge extends Edge {
     return false;
   }
 
-  public String toString() {
-    return "VehicleParkingEdge(" + fromv + " -> " + tov + ")";
-  }
-
   @Override
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesParking()) {

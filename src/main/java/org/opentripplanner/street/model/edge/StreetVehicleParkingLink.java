@@ -44,11 +44,6 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("fromv", fromv).addObj("tov", tov).toString();
-  }
-
-  @Override
   public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeParkLinks in a row.
     // Prevents router using bike rental stations as shortcuts to get around

@@ -33,6 +33,7 @@ public class Station
   private final String code;
   private final I18NString description;
   private final WgsCoordinate coordinate;
+  private final boolean shouldRouteToCentroid;
   private final StopTransferPriority priority;
   private final I18NString url;
   private final ZoneId timezone;
@@ -49,6 +50,7 @@ public class Station
     // Required fields
     this.name = Objects.requireNonNull(builder.getName());
     this.coordinate = Objects.requireNonNull(builder.getCoordinate());
+    this.shouldRouteToCentroid = builder.shouldRouteToCentroid();
     this.priority =
       Objects.requireNonNullElse(builder.getPriority(), StopTransferPriority.defaultValue());
     this.transfersNotAllowed = builder.isTransfersNotAllowed();
@@ -96,6 +98,14 @@ public class Station
 
   public WgsCoordinate getCoordinate() {
     return coordinate;
+  }
+
+  /**
+   * When doing a street search from/to the station, we can either route to the centroid of the station
+   * or from/to any child stop. This feature is inactive unless configured.
+   */
+  public boolean shouldRouteToCentroid() {
+    return shouldRouteToCentroid;
   }
 
   /** Public facing station code (short text or number) */
@@ -171,6 +181,7 @@ public class Station
       Objects.equals(code, other.code) &&
       Objects.equals(description, other.description) &&
       Objects.equals(coordinate, other.coordinate) &&
+      Objects.equals(shouldRouteToCentroid, other.shouldRouteToCentroid) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timezone, other.timezone)
