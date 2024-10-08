@@ -1522,7 +1522,7 @@ type QueryType {
     walkSpeed: Float,
     "Whether the itinerary must be wheelchair accessible. Default value: false"
     wheelchair: Boolean
-  ): Plan @async
+  ): Plan @async @deprecated(reason : "Use `planConnection` instead.")
   """
   Plan (itinerary) search that follows
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
@@ -1607,7 +1607,7 @@ type QueryType {
     number of itineraries in each search.
     """
     searchWindow: Duration
-  ): PlanConnection @async @deprecated(reason : "Experimental and can include breaking changes, use plan instead")
+  ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle
   "Get all rental vehicles"

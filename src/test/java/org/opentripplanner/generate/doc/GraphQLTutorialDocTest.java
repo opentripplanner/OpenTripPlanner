@@ -38,7 +38,7 @@ public class GraphQLTutorialDocTest {
     String original = readFile(OUT_FILE);
 
     var routeQuery = getGraphQlQuery("routes-tutorial.graphql");
-    var planQuery = getGraphQlQuery("plan-tutorial.graphql");
+    var planQuery = getGraphQlQuery("planConnection-tutorial.graphql");
 
     doc = replaceSection(doc, "route-query", routeQuery);
     doc = replaceSection(doc, "plan-query", planQuery);
