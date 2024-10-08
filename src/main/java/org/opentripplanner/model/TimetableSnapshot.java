@@ -110,9 +110,12 @@ public class TimetableSnapshot {
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
    * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
    * trip ID and the service date.
+   * This index includes only modified trip patterns for existing trips.
+   * It does not include trip patterns for new trips created by real-time updates (extra journeys).
+   * .
    * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
-  private final Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern;
+  private final Map<TripIdAndServiceDate, TripPattern> realTimeModifiedTripPattern;
 
   /**
    * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
@@ -124,6 +127,11 @@ public class TimetableSnapshot {
    */
   private final SetMultimap<StopLocation, TripPattern> patternsForStop;
 
+  /**
+   * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
+   * Route, TripPattern, TripOnServiceDate they refer to.
+   * They are meant to override the corresponding indexes in TransitModelIndex.
+   */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
   private final Map<Trip, TripPattern> realTimeAddedPatternForTrip;
@@ -160,7 +168,7 @@ public class TimetableSnapshot {
 
   private TimetableSnapshot(
     Map<TripPattern, SortedSet<Timetable>> timetables,
-    Map<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern,
+    Map<TripIdAndServiceDate, TripPattern> realTimeModifiedTripPattern,
     Map<FeedScopedId, Route> realtimeAddedRoutes,
     Map<FeedScopedId, Trip> realtimeAddedTrips,
     Map<Trip, TripPattern> realTimeAddedPatternForTrip,
@@ -171,7 +179,7 @@ public class TimetableSnapshot {
     boolean readOnly
   ) {
     this.timetables = timetables;
-    this.realtimeAddedTripPattern = realtimeAddedTripPattern;
+    this.realTimeModifiedTripPattern = realTimeModifiedTripPattern;
     this.realtimeAddedRoutes = realtimeAddedRoutes;
     this.realTimeAddedTrips = realtimeAddedTrips;
     this.realTimeAddedPatternForTrip = realTimeAddedPatternForTrip;
@@ -207,16 +215,16 @@ public class TimetableSnapshot {
    * @return trip pattern created by the updater; null if trip is on the original trip pattern
    */
   @Nullable
-  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+  public TripPattern getRealtimeModifiedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
-    return realtimeAddedTripPattern.get(tripIdAndServiceDate);
+    return realTimeModifiedTripPattern.get(tripIdAndServiceDate);
   }
 
   /**
-   * @return if any trip patterns were added.
+   * @return if any trip patterns were modified
    */
-  public boolean hasRealtimeAddedTripPatterns() {
-    return !realtimeAddedTripPattern.isEmpty();
+  public boolean hasRealtimeModifiedTripPatterns() {
+    return !realTimeModifiedTripPattern.isEmpty();
   }
 
   /**
@@ -309,7 +317,7 @@ public class TimetableSnapshot {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = trip.getId();
       TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
-      realtimeAddedTripPattern.put(tripIdAndServiceDate, pattern);
+      realTimeModifiedTripPattern.put(tripIdAndServiceDate, pattern);
     }
 
     // To make these trip patterns visible for departureRow searches.
@@ -363,7 +371,7 @@ public class TimetableSnapshot {
     }
     TimetableSnapshot ret = new TimetableSnapshot(
       Map.copyOf(timetables),
-      Map.copyOf(realtimeAddedTripPattern),
+      Map.copyOf(realTimeModifiedTripPattern),
       Map.copyOf(realtimeAddedRoutes),
       Map.copyOf(realTimeAddedTrips),
       Map.copyOf(realTimeAddedPatternForTrip),
@@ -392,11 +400,10 @@ public class TimetableSnapshot {
   public void clear(String feedId) {
     validateReadOnly();
     // Clear all data from snapshot.
-    boolean timetableWasModified = clearTimetable(feedId);
-    boolean realtimeAddedWasModified = clearRealtimeAddedTripPattern(feedId);
-
+    boolean timetablesWereCleared = clearTimetables(feedId);
+    boolean realtimeModifiedTripPatternsWereCleared = clearRealTimeModifiedTripPatterns(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
-    if (timetableWasModified || realtimeAddedWasModified) {
+    if (timetablesWereCleared || realtimeModifiedTripPatternsWereCleared) {
       dirty = true;
     }
   }
@@ -417,11 +424,11 @@ public class TimetableSnapshot {
 
     boolean success = false;
 
-    final TripPattern pattern = getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = getRealtimeModifiedTripPattern(tripId, serviceDate);
     if (pattern != null) {
       // Dissociate the given trip from any realtime-added pattern.
       // The trip will then fall back to its original scheduled pattern.
-      realtimeAddedTripPattern.remove(new TripIdAndServiceDate(tripId, serviceDate));
+      realTimeModifiedTripPattern.remove(new TripIdAndServiceDate(tripId, serviceDate));
       // Remove times for the trip from any timetables
       // under that now-obsolete realtime-added pattern.
       SortedSet<Timetable> sortedTimetables = this.timetables.get(pattern);
@@ -488,7 +495,7 @@ public class TimetableSnapshot {
 
     // Also remove last added trip pattern for days that are purged
     for (
-      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = realtimeAddedTripPattern
+      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = realTimeModifiedTripPattern
         .entrySet()
         .iterator();
       iterator.hasNext();
@@ -523,7 +530,9 @@ public class TimetableSnapshot {
    * Does this snapshot contain any realtime data or is it completely empty?
    */
   public boolean isEmpty() {
-    return dirtyTimetables.isEmpty() && timetables.isEmpty() && realtimeAddedTripPattern.isEmpty();
+    return (
+      dirtyTimetables.isEmpty() && timetables.isEmpty() && realTimeModifiedTripPattern.isEmpty()
+    );
   }
 
   /**
@@ -532,7 +541,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear out
    * @return true if the timetable changed as a result of the call
    */
-  private boolean clearTimetable(String feedId) {
+  private boolean clearTimetables(String feedId) {
     return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
   }
 
@@ -540,14 +549,12 @@ public class TimetableSnapshot {
    * Clear all realtime added trip patterns matching the provided feed id.
    *
    * @param feedId feed id to clear out
-   * @return true if the realtimeAddedTripPattern changed as a result of the call
+   * @return true if the realTimeModifiedTripPattern changed as a result of the call
    */
-  private boolean clearRealtimeAddedTripPattern(String feedId) {
-    return realtimeAddedTripPattern
+  private boolean clearRealTimeModifiedTripPatterns(String feedId) {
+    return realTimeModifiedTripPattern
       .keySet()
-      .removeIf(realtimeAddedTripPattern ->
-        feedId.equals(realtimeAddedTripPattern.tripId().getFeedId())
-      );
+      .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
   }
 
   /**

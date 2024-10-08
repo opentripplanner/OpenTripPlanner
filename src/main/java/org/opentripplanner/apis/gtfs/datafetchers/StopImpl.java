@@ -278,7 +278,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             return null;
           }
 
-          if (transitService.hasRealtimeAddedTripPatterns()) {
+          if (transitService.hasRealtimeModifiedTripPatterns()) {
             return getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
               pattern,
               stop,
@@ -562,7 +562,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   ) {
     return originalPattern
       .scheduledTripsAsStream()
-      .map(trip -> transitService.getRealtimeAddedTripPattern(trip.getId(), date))
+      .map(trip -> transitService.getRealtimeModifiedTripPattern(trip.getId(), date))
       .filter(tripPattern ->
         tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );

@@ -118,8 +118,8 @@ public final class TimetableSnapshotManager {
    * @return trip pattern created by the updater; null if pattern has not been changed for this trip.
    */
   @Nullable
-  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    return buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
+  public TripPattern getRealtimeModifiedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+    return buffer.getRealtimeModifiedTripPattern(tripId, serviceDate);
   }
 
   /**
