@@ -289,13 +289,11 @@ public class TimetableSnapshot {
    * @return whether the update was actually applied
    */
   public Result<UpdateSuccess, UpdateError> update(RealTimeTripUpdate realTimeTripUpdate) {
+    validateReadOnly();
+
     TripPattern pattern = realTimeTripUpdate.pattern();
     LocalDate serviceDate = realTimeTripUpdate.serviceDate();
     TripTimes updatedTripTimes = realTimeTripUpdate.updatedTripTimes();
-
-    if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
-    }
 
     Timetable tt = resolve(pattern, serviceDate);
     TimetableBuilder ttb = tt.copyOf().withServiceDate(serviceDate);
@@ -358,9 +356,7 @@ public class TimetableSnapshot {
   }
 
   public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
-    if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
-    }
+    validateReadOnly();
 
     if (!force && !this.isDirty()) {
       return null;
@@ -394,9 +390,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear the snapshot for
    */
   public void clear(String feedId) {
-    if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
-    }
+    validateReadOnly();
     // Clear all data from snapshot.
     boolean timetableWasModified = clearTimetable(feedId);
     boolean realtimeAddedWasModified = clearRealtimeAddedTripPattern(feedId);
@@ -419,9 +413,7 @@ public class TimetableSnapshot {
    * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
-    }
+    validateReadOnly();
 
     boolean success = false;
 
@@ -472,9 +464,7 @@ public class TimetableSnapshot {
    * @return true if any data has been modified and false if no purging has happened.
    */
   public boolean purgeExpiredData(LocalDate serviceDate) {
-    if (readOnly) {
-      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
-    }
+    validateReadOnly();
 
     boolean modified = false;
     for (Iterator<TripPattern> it = timetables.keySet().iterator(); it.hasNext();) {
@@ -601,6 +591,12 @@ public class TimetableSnapshot {
     timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
     dirtyTimetables.add(updated);
     dirty = true;
+  }
+
+  private void validateReadOnly() {
+    if (readOnly) {
+      throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+    }
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {
