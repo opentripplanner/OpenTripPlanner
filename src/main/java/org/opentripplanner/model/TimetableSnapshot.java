@@ -357,7 +357,6 @@ public class TimetableSnapshot {
     return commit(null, false);
   }
 
-  @SuppressWarnings("unchecked")
   public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
@@ -483,7 +482,7 @@ public class TimetableSnapshot {
       SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
       SortedSet<Timetable> toKeepTimetables = new TreeSet<>(new SortedTimetableComparator());
       for (Timetable timetable : sortedTimetables) {
-        if (serviceDate.compareTo(timetable.getServiceDate()) < 0) {
+        if (serviceDate.isBefore(timetable.getServiceDate())) {
           toKeepTimetables.add(timetable);
         } else {
           modified = true;
@@ -505,7 +504,7 @@ public class TimetableSnapshot {
       iterator.hasNext();
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
-      if (serviceDate.compareTo(tripIdAndServiceDate.serviceDate()) >= 0) {
+      if (!serviceDate.isBefore(tripIdAndServiceDate.serviceDate())) {
         iterator.remove();
         modified = true;
       }
