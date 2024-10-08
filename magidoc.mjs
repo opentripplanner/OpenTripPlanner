@@ -5,11 +5,11 @@ export default {
   },
   website: {
     template: 'carbon-multi-page',
-    customStyles: ['https://docs.opentripplanner.org/en/dev-2.x/css/magidoc-overrides.css'],
     output: 'target/magidoc/api/graphql-gtfs/',
     options: {
       siteRoot: '/api/dev-2.x/graphql-gtfs',
       appLogo: 'https://docs.opentripplanner.org/en/dev-2.x/images/otp-logo.svg',
+      customStyles: ['https://docs.opentripplanner.org/en/dev-2.x/css/magidoc-overrides.css'],
       pages: [{
         title: 'Introduction',
         content: `

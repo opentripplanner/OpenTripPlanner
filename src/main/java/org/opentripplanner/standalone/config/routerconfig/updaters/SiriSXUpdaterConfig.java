@@ -4,8 +4,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import java.time.Duration;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
 
 public class SiriSXUpdaterConfig {
 
