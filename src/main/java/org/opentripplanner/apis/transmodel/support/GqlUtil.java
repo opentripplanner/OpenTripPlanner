@@ -27,7 +27,6 @@ public class GqlUtil {
 
   public final GraphQLScalarType dateTimeScalar;
 
-  /** private to prevent util class from instantiation */
   public GqlUtil(ZoneId timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
