@@ -1,11 +1,11 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
-import static org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters.INITIAL_GET_DATA_TIMEOUT;
-import static org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters.RECONNECT_PERIOD;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters.INITIAL_GET_DATA_TIMEOUT;
+import static org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters.RECONNECT_PERIOD;
 
-import org.opentripplanner.ext.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 
 public class SiriETGooglePubsubUpdaterConfig {
 
