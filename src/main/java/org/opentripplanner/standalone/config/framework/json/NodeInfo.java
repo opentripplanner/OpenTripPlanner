@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.OB
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
@@ -187,7 +186,7 @@ public record NodeInfo(
    * </ol>
    */
   @Override
-  public int compareTo(@Nonnull NodeInfo other) {
+  public int compareTo(NodeInfo other) {
     // Put type qualifier first
     if (isTypeQualifier()) {
       return -1;

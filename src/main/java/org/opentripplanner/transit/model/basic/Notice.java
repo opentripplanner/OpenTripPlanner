@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -34,7 +33,7 @@ public class Notice extends AbstractTransitEntity<Notice, NoticeBuilder> {
   }
 
   @Override
-  public boolean sameAs(@Nonnull Notice other) {
+  public boolean sameAs(Notice other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(publicCode, other.publicCode) &&
@@ -43,7 +42,6 @@ public class Notice extends AbstractTransitEntity<Notice, NoticeBuilder> {
   }
 
   @Override
-  @Nonnull
   public NoticeBuilder copy() {
     return new NoticeBuilder(this);
   }

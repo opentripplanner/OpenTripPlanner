@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -57,7 +56,6 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     s1.incrementWeight(1);

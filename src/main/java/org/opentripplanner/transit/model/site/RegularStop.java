@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -81,7 +80,6 @@ public final class RegularStop
     return url;
   }
 
-  @Nonnull
   @Override
   public StopType getStopType() {
     return StopType.REGULAR;
@@ -108,13 +106,11 @@ public final class RegularStop
     return gtfsVehicleType;
   }
 
-  @Nonnull
   public SubMode getNetexVehicleSubmode() {
     return netexVehicleSubmode;
   }
 
   @Override
-  @Nonnull
   public Point getGeometry() {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
@@ -125,7 +121,6 @@ public final class RegularStop
    */
   @SuppressWarnings("ConstantConditions")
   @Override
-  @Nonnull
   public StopTransferPriority getPriority() {
     return isPartOfStation()
       ? getParentStation().getPriority()
@@ -133,24 +128,21 @@ public final class RegularStop
   }
 
   @Override
-  @Nonnull
   public Collection<FareZone> getFareZones() {
     return fareZones;
   }
 
-  @Nonnull
   public Collection<BoardingArea> getBoardingAreas() {
     return boardingAreas;
   }
 
   @Override
-  @Nonnull
   public RegularStopBuilder copy() {
     return new RegularStopBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull RegularStop other) {
+  public boolean sameAs(RegularStop other) {
     return (
       super.sameAs(other) &&
       Objects.equals(platformCode, other.platformCode) &&

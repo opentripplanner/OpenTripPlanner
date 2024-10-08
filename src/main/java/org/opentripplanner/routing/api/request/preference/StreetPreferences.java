@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -100,7 +99,6 @@ public final class StreetPreferences implements Serializable {
    * CAR). So the default timeout for a street search is set quite high. This is used to abort the
    * search if the max distance is not reached within the timeout.
    */
-  @Nonnull
   public Duration routingTimeout() {
     return routingTimeout;
   }

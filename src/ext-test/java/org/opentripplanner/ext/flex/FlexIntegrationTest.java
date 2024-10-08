@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -216,7 +215,6 @@ public class FlexIntegrationTest {
     return itineraries.get(index);
   }
 
-  @Nonnull
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,

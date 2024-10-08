@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.TransitObject;
@@ -28,7 +27,6 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     this.additionalDetails = builder.getAdditionalDetails();
   }
 
-  @Nonnull
   public static ContactInfoBuilder of() {
     return new ContactInfoBuilder();
   }
@@ -68,13 +66,12 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
     return additionalDetails;
   }
 
-  @Nonnull
   public ContactInfoBuilder copy() {
     return new ContactInfoBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull ContactInfo other) {
+  public boolean sameAs(ContactInfo other) {
     return equals(other);
   }
 

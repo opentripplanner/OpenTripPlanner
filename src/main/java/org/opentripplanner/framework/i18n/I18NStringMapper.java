@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.i18n;
 
 import java.util.Locale;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class I18NStringMapper {
@@ -17,7 +16,6 @@ public class I18NStringMapper {
     return string == null ? null : string.toString(locale);
   }
 
-  @Nonnull
   public String mapNonnullToApi(I18NString string) {
     return string.toString(locale);
   }

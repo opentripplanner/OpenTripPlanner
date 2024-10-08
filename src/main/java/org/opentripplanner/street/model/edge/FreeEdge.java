@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.edge;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -24,7 +23,6 @@ public class FreeEdge extends Edge {
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);

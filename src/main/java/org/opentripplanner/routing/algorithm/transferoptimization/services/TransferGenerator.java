@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -229,12 +228,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     return from.time() + transferDuration;
   }
 
-  @Nonnull
   private StopTime getFromStopTime(final TransitPathLeg<T> leg) {
     return StopTime.stopTime(leg.fromStop(), leg.fromTime());
   }
 
-  @Nonnull
   private TripStopTime<T> findMinimumToStopTime(List<TripToTripTransfer<T>> transfers) {
     return transfers
       .stream()

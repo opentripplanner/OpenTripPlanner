@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.OffsetDateTimeParser;
 
 public final class DateTimeScalarFactory {
@@ -41,7 +40,7 @@ public final class DateTimeScalarFactory {
       .coercing(
         new Coercing<>() {
           @Override
-          public String serialize(@Nonnull Object input) {
+          public String serialize(Object input) {
             if (input instanceof Long inputAsLong) {
               return Instant.ofEpochMilli(inputAsLong).atZone(timeZone).format(FORMATTER);
             }
@@ -49,7 +48,7 @@ public final class DateTimeScalarFactory {
           }
 
           @Override
-          public Long parseValue(@Nonnull Object input) {
+          public Long parseValue(Object input) {
             Instant instant = null;
             if (input instanceof CharSequence inputAsCharSequence) {
               try {
@@ -80,7 +79,7 @@ public final class DateTimeScalarFactory {
           }
 
           @Override
-          public Long parseLiteral(@Nonnull Object input) {
+          public Long parseLiteral(Object input) {
             if (input instanceof StringValue inputAsStringValue) {
               return parseValue(inputAsStringValue.getValue());
             }

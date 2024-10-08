@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -372,7 +371,7 @@ public class ToStringBuilder {
     return addIt(name, mapToString.apply(value));
   }
 
-  private ToStringBuilder addIt(String name, @Nonnull String value) {
+  private ToStringBuilder addIt(String name, String value) {
     addLabel(name);
     addValue(value);
     return this;
@@ -387,7 +386,7 @@ public class ToStringBuilder {
     sb.append(name);
   }
 
-  private void addValue(@Nonnull String value) {
+  private void addValue(String value) {
     sb.append(FIELD_VALUE_SEP);
     sb.append(value);
   }

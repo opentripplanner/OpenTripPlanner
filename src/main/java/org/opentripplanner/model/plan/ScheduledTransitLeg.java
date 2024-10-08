@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -182,7 +181,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  @Nonnull
   public TransitMode getMode() {
     return getTrip().getMode();
   }

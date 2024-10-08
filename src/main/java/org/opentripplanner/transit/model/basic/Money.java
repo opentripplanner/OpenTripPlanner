@@ -8,7 +8,6 @@ import java.util.Currency;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.lang.IntUtils;
 
 /**
@@ -26,7 +25,7 @@ public class Money implements Comparable<Money>, Serializable {
    * @param currency The currency of the money amount
    * @param minorUnitAmount The amount in the smaller currency unit, so for 1.50 EUR pass 150.
    */
-  private Money(@Nonnull Currency currency, int minorUnitAmount) {
+  private Money(Currency currency, int minorUnitAmount) {
     this.currency = Objects.requireNonNull(currency);
     this.amount = minorUnitAmount;
   }
@@ -65,7 +64,7 @@ public class Money implements Comparable<Money>, Serializable {
    * Take a fractional amount of money, ie 1.5 and convert it to amount using the number of default
    * fraction digits of the currency.
    */
-  public static Money ofFractionalAmount(@Nonnull Currency currency, float fractionalAmount) {
+  public static Money ofFractionalAmount(Currency currency, float fractionalAmount) {
     Objects.requireNonNull(currency);
     var fractionDigits = currency.getDefaultFractionDigits();
     int amount = IntUtils.round(fractionalAmount * Math.pow(10, fractionDigits));
@@ -181,7 +180,6 @@ public class Money implements Comparable<Money>, Serializable {
     return result;
   }
 
-  @Nonnull
   private Money op(Money other, Function<Money, Money> op) {
     checkCurrencyOrThrow(other);
     return op.apply(other);

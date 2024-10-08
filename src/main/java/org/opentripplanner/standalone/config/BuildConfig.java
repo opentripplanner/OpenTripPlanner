@@ -17,7 +17,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
@@ -675,13 +674,11 @@ Netex data is also often supplied in a ZIP file.
     return dem.demFiles();
   }
 
-  @Nonnull
   @Override
   public List<URI> gtfsFiles() {
     return transitFeeds.gtfsFiles();
   }
 
-  @Nonnull
   @Override
   public List<URI> netexFiles() {
     return transitFeeds.netexFiles();

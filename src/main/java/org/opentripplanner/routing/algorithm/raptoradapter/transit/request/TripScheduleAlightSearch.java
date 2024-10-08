@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -76,7 +75,6 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
   }
 
   @Override
-  @Nonnull
   public RaptorTransferConstraint transferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
   }

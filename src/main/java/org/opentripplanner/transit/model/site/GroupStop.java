@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -65,7 +64,6 @@ public class GroupStop
   }
 
   @Override
-  @Nonnull
   public StopType getStopType() {
     return StopType.FLEXIBLE_GROUP;
   }
@@ -79,7 +77,6 @@ public class GroupStop
    * Returns the centroid of all stops and areas belonging to this location group.
    */
   @Override
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     return centroid;
   }
@@ -116,13 +113,12 @@ public class GroupStop
    * Returns all the locations belonging to this location group.
    */
   @Override
-  @Nonnull
   public List<StopLocation> getChildLocations() {
     return stopLocations;
   }
 
   @Override
-  public boolean sameAs(@Nonnull GroupStop other) {
+  public boolean sameAs(GroupStop other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
@@ -131,7 +127,6 @@ public class GroupStop
   }
 
   @Override
-  @Nonnull
   public GroupStopBuilder copy() {
     return new GroupStopBuilder(this);
   }

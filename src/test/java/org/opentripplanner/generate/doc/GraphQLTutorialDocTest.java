@@ -12,7 +12,6 @@ import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.TemplateUtil;
@@ -47,7 +46,6 @@ public class GraphQLTutorialDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  @Nonnull
   private static String getGraphQlQuery(String resourceName) throws IOException {
     var url = Resources.getResource("org/opentripplanner/apis/gtfs/queries/" + resourceName);
     var query = TemplateUtil.graphQlExample(Resources.toString(url, StandardCharsets.UTF_8));

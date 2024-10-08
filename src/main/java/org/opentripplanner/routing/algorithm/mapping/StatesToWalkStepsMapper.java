@@ -7,7 +7,6 @@ import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
@@ -296,7 +295,6 @@ public class StatesToWalkStepsMapper {
     current.addEdge(edge);
   }
 
-  @Nonnull
   private static RelativeDirection relativeDirectionForTransitLink(StreetTransitEntranceLink link) {
     if (link.isExit()) {
       return EXIT_STATION;

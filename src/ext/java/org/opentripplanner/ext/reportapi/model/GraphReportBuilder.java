@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class GraphReportBuilder {
@@ -50,13 +49,11 @@ public class GraphReportBuilder {
     );
   }
 
-  @Nonnull
   private static String firstLetterToLowerCase(Object instance) {
     var className = instance.getClass().getSimpleName();
     return Character.toLowerCase(className.charAt(0)) + className.substring(1);
   }
 
-  @Nonnull
   private static <T> TypeStats countValues(Collection<T> input, Function<T, String> classify) {
     Map<String, Integer> result = new HashMap<>();
     input.forEach(item -> {

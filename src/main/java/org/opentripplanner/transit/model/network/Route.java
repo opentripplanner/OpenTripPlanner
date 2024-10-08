@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNullElse;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.IntUtils;
@@ -65,12 +64,12 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     this.textColor = builder.getTextColor();
   }
 
-  public static RouteBuilder of(@Nonnull FeedScopedId id) {
+  public static RouteBuilder of(FeedScopedId id) {
     return new RouteBuilder(id);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Route other) {
+  public boolean sameAs(Route other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.agency, other.agency) &&
@@ -101,7 +100,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
    * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does
    * NOT map 1-1 to Authority, it is rather a mix between Authority and Operator.
    */
-  @Nonnull
   public Agency getAgency() {
     return agency;
   }
@@ -119,7 +117,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return branding;
   }
 
-  @Nonnull
   public List<GroupOfRoutes> getGroupsOfRoutes() {
     return groupsOfRoutes;
   }
@@ -134,7 +131,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return longName;
   }
 
-  @Nonnull
   public TransitMode getMode() {
     return mode;
   }
@@ -160,7 +156,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return gtfsSortOrder;
   }
 
-  @Nonnull
   public SubMode getNetexSubmode() {
     return netexSubmode;
   }
@@ -180,7 +175,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return textColor;
   }
 
-  @Nonnull
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;
   }
@@ -194,13 +188,11 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   }
 
   /** @return the route's short name, or the long name if the short name is null. */
-  @Nonnull
   public String getName(Locale locale) {
     return shortName == null ? longName.toString(locale) : shortName;
   }
 
   /** @return the route's short name, or the long name if the short name is null. */
-  @Nonnull
   public String getName() {
     return shortName == null ? longName.toString() : shortName;
   }

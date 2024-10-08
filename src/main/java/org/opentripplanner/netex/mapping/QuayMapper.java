@@ -1,7 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -39,7 +38,7 @@ class QuayMapper {
    */
   @Nullable
   RegularStop mapQuayToStop(
-    @Nonnull Quay quay,
+    Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
     NetexMainAndSubMode transitMode,
@@ -54,7 +53,7 @@ class QuayMapper {
 
   private RegularStop map(
     FeedScopedId id,
-    @Nonnull Quay quay,
+    Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
     NetexMainAndSubMode transitMode,

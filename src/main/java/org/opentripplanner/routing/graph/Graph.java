@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
@@ -363,7 +362,6 @@ public class Graph implements Serializable {
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
   }
 
-  @Nonnull
   public VehicleParkingService getVehicleParkingService() {
     return vehicleParkingService;
   }

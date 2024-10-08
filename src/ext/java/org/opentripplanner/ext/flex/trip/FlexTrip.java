@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex.trip;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -140,7 +139,7 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   );
 
   @Override
-  public boolean sameAs(@Nonnull T other) {
+  public boolean sameAs(T other) {
     return getId().equals(other.getId()) && Objects.equals(trip, other.getTrip());
   }
 }

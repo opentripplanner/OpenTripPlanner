@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
@@ -210,7 +209,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .orElse(false);
   }
 
-  private Optional<FareLegRule> getFareLegRuleByGroupId(@Nonnull FeedScopedId groupId) {
+  private Optional<FareLegRule> getFareLegRuleByGroupId(FeedScopedId groupId) {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 

@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.Collection;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
@@ -25,7 +24,6 @@ public class VehicleParkingEntranceVertex extends Vertex {
     this.parkingEntrance = parkingEntrance;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return Objects.requireNonNullElse(parkingEntrance.getName(), NO_NAME);

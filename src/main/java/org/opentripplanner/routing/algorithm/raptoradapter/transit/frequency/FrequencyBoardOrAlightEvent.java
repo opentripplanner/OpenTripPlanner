@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
@@ -90,7 +89,6 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   }
 
   @Override
-  @Nonnull
   public RaptorTransferConstraint transferConstraint() {
     return RaptorTransferConstraint.REGULAR_TRANSFER;
   }

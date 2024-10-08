@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -142,7 +141,6 @@ class GeofencingVertexUpdater {
    * When finding the edges near the business area border in Oslo this speeds up the computation
    * from ~25 seconds to ~3 seconds (on 2021 hardware).
    */
-  @Nonnull
   private Set<Edge> getEdgesAlongLineStrings(Collection<LineString> lineStrings) {
     return lineStrings
       .stream()

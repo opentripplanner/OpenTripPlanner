@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -151,7 +150,6 @@ public class TestTransitData
     };
   }
 
-  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     // Index is translated: 1->'A', 2->'B', 3->'C' ...
