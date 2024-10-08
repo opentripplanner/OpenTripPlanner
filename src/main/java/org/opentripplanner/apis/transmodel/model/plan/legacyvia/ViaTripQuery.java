@@ -30,7 +30,7 @@ public class ViaTripQuery {
       .description(
         "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
       )
-      .deprecate("The the regular plan query with via stop instead.")
+      .deprecate("Use the regular trip query with via stop instead.")
       .type(new GraphQLNonNull(viaTripType))
       .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(

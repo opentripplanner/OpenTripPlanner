@@ -11,8 +11,8 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  * A via-connection is used to define one of the physical locations in a via location Raptor must
  * visit. At least one connection in a {@link RaptorViaLocation} must be used. A connection can be
  * a single stop or a stop and a transfer to another stop. The last is useful if you want to use
- * the connection to visit something other than a stop, like a street location. The result should be
- * 100 connections. This is not an alternative to transfers. Raptor supports several use-cases
+ * the connection to visit something other than a stop, like a street location.
+ * This is not an alternative to transfers. Raptor supports several use-cases
  * through via-connections:
  *
  * <h4>Route via a pass-through-stop</h4>
@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.api.model.RaptorTransfer;
  * <h4>Route via a coordinate</h4>
  *
  * To route through a coordinate you need to find all nearby stops, then find all access and egress
- * paths to and from the street location. The combine all access and egress paths to form
+ * paths to and from the street location. Then combine all access and egress paths to form
  * complete transfers. Raptor does not know/see the actual via street location, it only uses the
  * connection from a stop to another, the total time it takes and the total cost. You must generate
  * a transfer with two "legs" in it. One leg going from the 'from-stop' to the street location, and

@@ -11,11 +11,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * A visit-via-location is a physical visit to one of the stops or coordinates listed. An on-board
- * visit does not count , the traveler must alight or board at the given stop for it to to be
+ * visit does not count. The traveler must alight or board at the given stop for it to to be
  * accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point in
  * the street network from a stop and back to another stop to join the transit network.
  * <p>
- * TODO: NOTE! Coordinates are NOT supported jet.
+ * TODO: NOTE! Coordinates are NOT supported yet.
  */
 public class VisitViaLocation extends AbstractViaLocation {
 

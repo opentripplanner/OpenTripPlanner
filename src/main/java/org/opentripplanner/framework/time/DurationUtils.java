@@ -187,7 +187,7 @@ public class DurationUtils {
   }
 
   /**
-   * Checks that duration is in positive and less than the given {@code maxLimit}(exclusive).
+   * Checks that duration is positive and less than the given {@code maxLimit} (exclusive).
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */

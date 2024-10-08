@@ -38,7 +38,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private final ParetoComparator<McStopArrival<T>> comparator;
 
   /**
-   * Set the time at a transit index iff it is optimal. This sets both the best time and the
+   * Set the time at a transit index if it is optimal. This sets both the best time and the
    * transfer time
    */
   public McStopArrivals(
@@ -179,7 +179,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * the "glue" make sure new destination arrivals are added to the destination arrivals.
    */
   private void initEgressStopAndGlueItToDestinationArrivals(
-    EgressPaths egressPaths,
+    @Nullable EgressPaths egressPaths,
     DestinationArrivalPaths<T> paths
   ) {
     if (egressPaths == null) {

@@ -71,7 +71,7 @@ public class RoundTracker {
    * Before each iteration, initialize the round to 0.
    */
   public void setupIteration() {
-    round = 0;
+    round = ROUND_ZERO;
   }
 
   /**

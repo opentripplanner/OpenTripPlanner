@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -22,6 +23,7 @@ public interface McStopArrivalFactory<T extends RaptorTripSchedule> {
     int arrivalTime
   );
 
+  @Nullable
   default McStopArrival<T> createViaStopArrival(
     McStopArrival<T> previous,
     RaptorViaConnection viaConnection

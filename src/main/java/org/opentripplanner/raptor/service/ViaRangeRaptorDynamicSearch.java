@@ -281,7 +281,7 @@ public class ViaRangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
     // We do not set the latest-arrival-time, because we do not want to limit the forward
     // multi-criteria search, it does not have much effect on the performance - we only risk
-    // loosing optimal results.
+    // losing optimal results.
     return builder.build();
   }
 
