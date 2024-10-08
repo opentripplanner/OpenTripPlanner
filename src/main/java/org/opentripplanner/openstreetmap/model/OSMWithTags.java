@@ -549,7 +549,7 @@ public class OSMWithTags {
   public boolean isRoutable() {
     if (isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
       return false;
-    } else if (hasTag("highway") || isPlatform()) {
+    } else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
       if (isGeneralAccessDenied()) {
         // There are exceptions.
         return (
@@ -564,6 +564,10 @@ public class OSMWithTags {
     }
 
     return false;
+  }
+
+  public boolean isIndoorRoutable() {
+    return isTag("indoor", "area") || isTag("indoor", "corridor");
   }
 
   /**
