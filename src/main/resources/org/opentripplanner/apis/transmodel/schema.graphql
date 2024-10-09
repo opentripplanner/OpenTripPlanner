@@ -2214,7 +2214,7 @@ route through. The via-location is either a pass-through-location or a visit-via
 input TripViaLocationInput @oneOf {
   "Board, alight or pass-through(on-board) at the stop location."
   passThrough: TripPassThroughViaLocationInput
-  "Board or alight at the stop-locations/coordinate."
+  "Board or alight at a stop location or visit a coordinate."
   visit: TripVisitViaLocationInput
 }
 

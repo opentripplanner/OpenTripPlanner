@@ -47,7 +47,8 @@ public class ViaLocationInputType {
   // TODO : Add coordinates
   //private static final String FIELD_COORDINATES = "coordinates";
   public static final String FIELD_VISIT = "visit";
-  public static final String DOC_FIELD_VISIT = "Board or alight at the stop-locations/coordinate.";
+  public static final String DOC_FIELD_VISIT =
+    "Board or alight at a stop location or visit a coordinate.";
   public static final String FIELD_PASS_THROUGH = "passThrough";
   public static final String DOC_FIELD_PASS_THROUGH =
     "Board, alight or pass-through(on-board) at the stop location.";
