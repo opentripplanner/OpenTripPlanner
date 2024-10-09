@@ -119,7 +119,7 @@ public class RouteRequest implements Cloneable, Serializable {
   /**
    * The booking time is used to exclude services which are not bookable at the
    * requested booking time. If a service is bookable at this time or later, the service
-   * is included. This apply to FLEX access, egress and direct services.
+   * is included. This applies to FLEX access, egress and direct services.
    */
   public Instant bookingTime() {
     return bookingTime;
@@ -297,10 +297,10 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /**
    * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-   * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+   * latest-departure-time(LDT). In case of a reverse search, it will be the time from earliest to
    * latest arrival time (LAT - EAT).
    * <p>
-   * All optimal travels that depart within the search window are guaranteed to be found.
+   * All optimal itineraries that depart within the search window are guaranteed to be found.
    * <p>
    * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
    * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
@@ -312,7 +312,7 @@ public class RouteRequest implements Cloneable, Serializable {
    * infrequent long distant journeys, the best option is normally to use the dynamic auto
    * assignment.
    * <p>
-   * There is no need to set this when going to the next/previous page any more.
+   * There is no need to set this when going to the next/previous page anymore.
    */
   public Duration searchWindow() {
     return searchWindow;

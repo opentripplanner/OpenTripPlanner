@@ -47,8 +47,8 @@ public interface ViaLocation {
   List<FeedScopedId> stopLocationIds();
 
   /**
-   * Get the one or multiple stop locations. This is optional to implement, an empty
-   * list is returned if this is not available.
+   * A list of coordinates used together with the {@code stopLocationIds} as the via location.
+   * This is optional, an empty list is returned if no coordinates are available.
    */
   default List<WgsCoordinate> coordinates() {
     return List.of();

@@ -12,27 +12,26 @@ import javax.annotation.Nullable;
 public class CompositeUtil {
 
   /**
-   * Take a list of children and return a composite instance. Input children witch is {@code null}
-   * is skipped. If no none {@code null} children are provided, {@code null} is retuned
-   * thrown. If just one listener is passed in the listener it-self is returned (without any wrapper).
+   * Take a list of children and return a composite instance. {@code null} values are skipped. If
+   * the result is empty {@code null} is returned. If just one listener is passed in the listener
+   * it-self is returned (without any composite wrapper).
    *
    * @param <T> The base type which the composite inherit from.
-   * @param makeComposite Factory method to create a new composite.
-   * @param isComposite see the {@code listChildren} parameter.
-   * @param listChildren is a function used together with the {@code isComposite} test to extract
-   *                     all children out of a composite. This is used to produce one flat list of
-   *                     concrete children, without any composite instances in it. The order is
-   *                     kept; the composite children are inserted in the new list of children in
-   *                     the same place as the composite instance appeared.
-   * @return {@code null} if all children are {@code null}, the child it-self if only one child
-   *                      exist, and a new composite instance if more than one child exist.
+   * @param compositeFactory Factory method to create a new composite.
+   * @param isComposite used to test if an instance is of a composite type.
+   * @param listCompositeChildren is a function used to extract all children out of a composite
+   *                              instance.
+   * @return {@code null} if the list of children is empty - ignoring {@code null} elements.
+   *         Returning THE element if just one element exists. And returning a composite with a
+   *         list of children if more than one element exists. The order is kept "as is". Any
+   *         composite children flattened, the children are inserted in it place.
    */
   @Nullable
   @SafeVarargs
   public static <T> T of(
-    Function<List<T>, T> makeComposite,
+    Function<List<T>, T> compositeFactory,
     Predicate<T> isComposite,
-    Function<T, Collection<T>> listChildren,
+    Function<T, Collection<T>> listCompositeChildren,
     T... children
   ) {
     Objects.requireNonNull(children);
@@ -40,7 +39,8 @@ public class CompositeUtil {
     var list = Arrays
       .stream(children)
       .filter(Objects::nonNull)
-      .flatMap(it -> isComposite.test(it) ? listChildren.apply(it).stream() : Stream.of(it))
+      .flatMap(it -> isComposite.test(it) ? listCompositeChildren.apply(it).stream() : Stream.of(it)
+      )
       .toList();
 
     if (list.isEmpty()) {
@@ -49,6 +49,6 @@ public class CompositeUtil {
     if (list.size() == 1) {
       return list.getFirst();
     }
-    return makeComposite.apply(list);
+    return compositeFactory.apply(list);
   }
 }
