@@ -145,7 +145,7 @@ class ParkingProcessor {
         );
       } catch (OpeningHoursParseException e) {
         issueStore.add(
-          "OSMOpeningHoursUnparsed",
+          "OsmOpeningHoursUnparsed",
           "OSM object with id '%s' (%s) has an invalid opening_hours value, it will always be open",
           id,
           link
