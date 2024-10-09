@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DU
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
@@ -266,9 +267,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private EgressPaths egressPaths() {
-    var egressPaths = ctx.legs().getLast().egressPaths();
-    Objects.requireNonNull(egressPaths, "Last leg must have non-null egressPaths");
-    return egressPaths;
+    return Objects.requireNonNull(
+      ctx.legs().getLast().egressPaths(),
+      "Last leg must have non-null egressPaths"
+    );
   }
 
   private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(S value) {
