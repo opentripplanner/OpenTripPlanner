@@ -266,7 +266,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private EgressPaths egressPaths() {
-    return ctx.legs().getLast().egressPaths();
+    var egressPaths = ctx.legs().getLast().egressPaths();
+    Objects.requireNonNull(egressPaths, "Last leg must have non-null egressPaths");
+    return egressPaths;
   }
 
   private <S extends BestNumberOfTransfers> S withBestNumberOfTransfers(S value) {
