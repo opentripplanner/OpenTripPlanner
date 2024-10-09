@@ -49,6 +49,10 @@ public class DebugStyleSpec {
     1.3f,
     List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
+  private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
+    1.3f,
+    List.of(new ZoomStop(13, 0.3f), new ZoomStop(MAX_ZOOM, 6))
+  );
   private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
     1,
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
@@ -88,6 +92,7 @@ public class DebugStyleSpec {
           .lineColor(MAGENTA)
           .edgeFilter(EDGES_TO_DISPLAY)
           .lineWidth(LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
           .minZoom(6)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
@@ -114,6 +119,7 @@ public class DebugStyleSpec {
             StreetStationCentroidLink.class
           )
           .lineWidth(LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
           .minZoom(13)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
