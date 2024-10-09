@@ -17,20 +17,20 @@ import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.CoordinateArrayListSequence;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OsmNode;
 
 class Ring {
 
   private final LinearRing shell;
   private final List<Ring> holes = new ArrayList<>();
-  public List<OSMNode> nodes;
+  public List<OsmNode> nodes;
   // equivalent to the ring representation, but used for JTS operations
   public Polygon jtsPolygon;
 
-  public Ring(List<OSMNode> osmNodes) {
+  public Ring(List<OsmNode> osmNodes) {
     ArrayList<Coordinate> vertices = new ArrayList<>();
     nodes = osmNodes;
-    for (OSMNode node : osmNodes) {
+    for (OsmNode node : osmNodes) {
       Coordinate point = new Coordinate(node.lon, node.lat);
       vertices.add(point);
     }
@@ -49,7 +49,7 @@ class Ring {
     jtsPolygon = calculateJtsPolygon();
   }
 
-  public Ring(TLongList osmNodes, TLongObjectMap<OSMNode> _nodes) {
+  public Ring(TLongList osmNodes, TLongObjectMap<OsmNode> _nodes) {
     // The collection needs to be mutable, so collect into an ArrayList
     this(
       LongStream
@@ -73,9 +73,9 @@ class Ring {
    */
   boolean isNodeConvex(int i) {
     int n = nodes.size() - 1;
-    OSMNode cur = nodes.get(i);
-    OSMNode prev = nodes.get((i + n - 1) % n);
-    OSMNode next = nodes.get((i + 1) % n);
+    OsmNode cur = nodes.get(i);
+    OsmNode prev = nodes.get((i + n - 1) % n);
+    OsmNode next = nodes.get((i + 1) % n);
     return (
       (cur.lon - prev.lon) * (next.lat - cur.lat) - (cur.lat - prev.lat) * (next.lon - cur.lon) > 0
     );

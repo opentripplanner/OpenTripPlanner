@@ -20,9 +20,9 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
-import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.OsmOpeningHoursParser;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
@@ -43,26 +43,26 @@ class ParkingProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(ParkingProcessor.class);
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
   private final DataImportIssueStore issueStore;
-  private final OSMOpeningHoursParser osmOpeningHoursParser;
-  private final BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode;
+  private final OsmOpeningHoursParser osmOpeningHoursParser;
+  private final BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode;
   private final VertexFactory vertexFactory;
   private final VehicleParkingHelper vehicleParkingHelper;
 
   public ParkingProcessor(
     Graph graph,
     DataImportIssueStore issueStore,
-    BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode
+    BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode
   ) {
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
     this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
+      new OsmOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
     this.vertexFactory = new VertexFactory(graph);
     this.vehicleParkingHelper = new VehicleParkingHelper(graph);
   }
 
   public List<VehicleParking> buildParkAndRideNodes(
-    Collection<OSMNode> nodes,
+    Collection<OsmNode> nodes,
     boolean isCarParkAndRide
   ) {
     LOG.info("Processing {} P+R nodes.", isCarParkAndRide ? "car" : "bike");
@@ -70,7 +70,7 @@ class ParkingProcessor {
 
     List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
 
-    for (OSMNode node : nodes) {
+    for (OsmNode node : nodes) {
       n++;
 
       I18NString creativeName = nameParkAndRideEntity(node);
@@ -130,7 +130,7 @@ class ParkingProcessor {
     return vehicleParkingToAdd;
   }
 
-  private OHCalendar parseOpeningHours(OSMWithTags entity) {
+  private OHCalendar parseOpeningHours(OsmWithTags entity) {
     final var openingHoursTag = entity.getTag("opening_hours");
     if (openingHoursTag != null) {
       final ZoneId zoneId = entity.getOsmProvider().getZoneId();
@@ -164,11 +164,11 @@ class ParkingProcessor {
 
   private List<VertexAndName> processVehicleParkingArea(
     Ring ring,
-    OSMWithTags entity,
+    OsmWithTags entity,
     Envelope envelope
   ) {
     List<VertexAndName> accessVertices = new ArrayList<>();
-    for (OSMNode node : ring.nodes) {
+    for (OsmNode node : ring.nodes) {
       envelope.expandToInclude(new Coordinate(node.lon, node.lat));
       var accessVertex = getVertexForOsmNode.apply(node, entity);
       if (accessVertex.getIncoming().isEmpty() || accessVertex.getOutgoing().isEmpty()) {
@@ -192,7 +192,7 @@ class ParkingProcessor {
     Envelope envelope = new Envelope();
     Set<VertexAndName> accessVertices = new HashSet<>();
 
-    OSMWithTags entity = null;
+    OsmWithTags entity = null;
 
     // Process all nodes from outer rings
     // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
@@ -288,7 +288,7 @@ class ParkingProcessor {
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
     AreaGroup group,
     I18NString vehicleParkingName,
-    OSMWithTags entity,
+    OsmWithTags entity,
     boolean isCarPark
   ) {
     LOG.debug(
@@ -315,7 +315,7 @@ class ParkingProcessor {
   private VehicleParking createVehicleParkingObjectFromOsmEntity(
     boolean isCarParkAndRide,
     Coordinate coordinate,
-    OSMWithTags entity,
+    OsmWithTags entity,
     I18NString creativeName,
     List<VehicleParking.VehicleParkingEntranceCreator> entrances
   ) {
@@ -395,7 +395,7 @@ class ParkingProcessor {
       .build();
   }
 
-  private I18NString nameParkAndRideEntity(OSMWithTags osmWithTags) {
+  private I18NString nameParkAndRideEntity(OsmWithTags osmWithTags) {
     // If there is an explicit name user that. The explicit name is used so that tag-based
     // translations are used, which are not handled by "CreativeNamer"s.
     I18NString creativeName = osmWithTags.getAssumedName();
@@ -416,11 +416,11 @@ class ParkingProcessor {
     return creativeName;
   }
 
-  private OptionalInt parseCapacity(OSMWithTags element) {
+  private OptionalInt parseCapacity(OsmWithTags element) {
     return parseCapacity(element, "capacity");
   }
 
-  private OptionalInt parseCapacity(OSMWithTags element, String capacityTag) {
+  private OptionalInt parseCapacity(OsmWithTags element, String capacityTag) {
     return element.getTagAsInt(
       capacityTag,
       v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
@@ -430,7 +430,7 @@ class ParkingProcessor {
   private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
     Set<VertexAndName> accessVertices,
     I18NString vehicleParkingName,
-    OSMWithTags entity
+    OsmWithTags entity
   ) {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
     var sortedAccessVertices = accessVertices

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -37,7 +37,7 @@ public class WayPropertySet {
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
   /** Sets 1.0 as default safety value for all permissions. */
-  private final TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> DEFAULT_SAFETY_RESOLVER =
+  private final TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> DEFAULT_SAFETY_RESOLVER =
     ((permission, speedLimit, osmWay) -> 1.0);
 
   private final List<WayPropertyPicker> wayProperties;
@@ -64,9 +64,9 @@ public class WayPropertySet {
    */
   public float maxUsedCarSpeed = 0f;
   /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
-  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> defaultWalkSafetyForPermission;
   /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
-  private TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission;
+  private TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
   private final DataImportIssueStore issueStore;
@@ -105,7 +105,7 @@ public class WayPropertySet {
    * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties
    * that are mixins will have their safety values applied if they match at all.
    */
-  public WayProperties getDataForWay(OSMWithTags way) {
+  public WayProperties getDataForWay(OsmWithTags way) {
     WayProperties backwardResult = defaultProperties;
     WayProperties forwardResult = defaultProperties;
     int bestBackwardScore = 0;
@@ -187,7 +187,7 @@ public class WayPropertySet {
     return result;
   }
 
-  public I18NString getCreativeNameForWay(OSMWithTags way) {
+  public I18NString getCreativeNameForWay(OsmWithTags way) {
     CreativeNamer bestNamer = null;
     int bestScore = 0;
     for (CreativeNamerPicker picker : creativeNamers) {
@@ -208,7 +208,7 @@ public class WayPropertySet {
   /**
    * Calculate the automobile speed, in meters per second, for this way.
    */
-  public float getCarSpeedForWay(OSMWithTags way, boolean backward) {
+  public float getCarSpeedForWay(OsmWithTags way, boolean backward) {
     // first, check for maxspeed tags
     Float speed = null;
     Float currentSpeed;
@@ -288,7 +288,7 @@ public class WayPropertySet {
     }
   }
 
-  public Set<StreetNoteAndMatcher> getNoteForWay(OSMWithTags way) {
+  public Set<StreetNoteAndMatcher> getNoteForWay(OsmWithTags way) {
     HashSet<StreetNoteAndMatcher> out = new HashSet<>();
     for (NotePicker picker : notes) {
       OsmSpecifier specifier = picker.specifier;
@@ -300,7 +300,7 @@ public class WayPropertySet {
     return out;
   }
 
-  public boolean getSlopeOverride(OSMWithTags way) {
+  public boolean getSlopeOverride(OsmWithTags way) {
     boolean result = false;
     int bestScore = 0;
     for (SlopeOverridePicker picker : slopeOverrides) {
@@ -418,7 +418,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultWalkSafetyForPermission(
-    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultWalkSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
@@ -431,7 +431,7 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultBicycleSafetyForPermission(
-    TriFunction<StreetTraversalPermission, Float, OSMWithTags, Double> defaultBicycleSafetyForPermission
+    TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
@@ -481,7 +481,7 @@ public class WayPropertySet {
     return Collections.unmodifiableList(wayProperties);
   }
 
-  private String dumpTags(OSMWithTags way) {
+  private String dumpTags(OsmWithTags way) {
     /* generate warning message */
     String all_tags = null;
     Map<String, String> tags = way.getTags();

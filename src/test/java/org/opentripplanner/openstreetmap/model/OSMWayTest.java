@@ -10,7 +10,7 @@ public class OSMWayTest {
 
   @Test
   void testIsBicycleDismountForced() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isBicycleDismountForced());
 
     way.addTag("bicycle", "dismount");
@@ -19,7 +19,7 @@ public class OSMWayTest {
 
   @Test
   void testIsSteps() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isSteps());
 
     way.addTag("highway", "primary");
@@ -31,12 +31,12 @@ public class OSMWayTest {
 
   @Test
   void wheelchairAccessibleStairs() {
-    var osm1 = new OSMWay();
+    var osm1 = new OsmWay();
     osm1.addTag("highway", "steps");
     assertFalse(osm1.isWheelchairAccessible());
 
     // explicitly suitable for wheelchair users, perhaps because of a ramp
-    var osm2 = new OSMWay();
+    var osm2 = new OsmWay();
     osm2.addTag("highway", "steps");
     osm2.addTag("wheelchair", "yes");
     assertTrue(osm2.isWheelchairAccessible());
@@ -44,7 +44,7 @@ public class OSMWayTest {
 
   @Test
   void testIsRoundabout() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isRoundabout());
 
     way.addTag("junction", "dovetail");
@@ -56,7 +56,7 @@ public class OSMWayTest {
 
   @Test
   void testIsOneWayDriving() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isOneWayForwardDriving());
     assertFalse(way.isOneWayReverseDriving());
 
@@ -75,7 +75,7 @@ public class OSMWayTest {
 
   @Test
   void testIsOneWayBicycle() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isOneWayForwardBicycle());
     assertFalse(way.isOneWayReverseBicycle());
 
@@ -94,7 +94,7 @@ public class OSMWayTest {
 
   @Test
   void testIsOpposableCycleway() {
-    OSMWay way = new OSMWay();
+    OsmWay way = new OsmWay();
     assertFalse(way.isOpposableCycleway());
 
     way.addTag("cycleway", "notatagvalue");
@@ -115,7 +115,7 @@ public class OSMWayTest {
   void escalator() {
     assertFalse(WayTestData.cycleway().isEscalator());
 
-    var escalator = new OSMWay();
+    var escalator = new OsmWay();
     escalator.addTag("highway", "steps");
     assertFalse(escalator.isEscalator());
 

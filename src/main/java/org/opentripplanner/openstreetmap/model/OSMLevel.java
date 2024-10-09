@@ -54,7 +54,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
-    OSMWithTags osmObj
+    OsmWithTags osmObj
   ) {
     /*  extract any altitude information after the @ character */
     Double altitude = null;
@@ -134,7 +134,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
-    OSMWithTags osmObj
+    OsmWithTags osmObj
   ) {
     List<String> levelSpecs = new ArrayList<>();
 
@@ -165,7 +165,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
-    OSMWithTags osmObj
+    OsmWithTags osmObj
   ) {
     Map<String, OSMLevel> map = new HashMap<>();
     for (OSMLevel level : fromSpecList(

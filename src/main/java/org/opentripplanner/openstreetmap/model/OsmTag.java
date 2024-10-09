@@ -1,13 +1,13 @@
 package org.opentripplanner.openstreetmap.model;
 
-public class OSMTag {
+public class OsmTag {
 
   private String k;
   private String v;
 
-  public OSMTag() {}
+  public OsmTag() {}
 
-  public OSMTag(String k, String v) {
+  public OsmTag(String k, String v) {
     this.k = k;
     this.v = v;
   }

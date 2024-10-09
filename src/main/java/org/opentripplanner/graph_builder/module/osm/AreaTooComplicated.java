@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 
 public record AreaTooComplicated(AreaGroup areaGroup, int nbNodes, int maxAreaNodes)
   implements DataImportIssue {
@@ -16,7 +16,7 @@ public record AreaTooComplicated(AreaGroup areaGroup, int nbNodes, int maxAreaNo
 
   @Override
   public String getHTMLMessage() {
-    OSMWithTags entity = areaGroup.getSomeOSMObject();
+    OsmWithTags entity = areaGroup.getSomeOSMObject();
     return String.format(HTMLFMT, entity.url(), entity.getId(), nbNodes, maxAreaNodes);
   }
 

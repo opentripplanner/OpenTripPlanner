@@ -10,7 +10,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.function.BiFunction;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition;
@@ -121,7 +121,7 @@ class NorwayMapper implements OsmTagMapper {
       "residential"
     );
 
-    BiFunction<Float, OSMWithTags, Double> cycleSafetyHighway = (speedLimit, way) -> {
+    BiFunction<Float, OsmWithTags, Double> cycleSafetyHighway = (speedLimit, way) -> {
       if (way.isPedestrianExplicitlyDenied()) {
         return cycleSafetyVeryHighTraffic;
       }

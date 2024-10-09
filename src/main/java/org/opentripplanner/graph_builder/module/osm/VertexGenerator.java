@@ -9,9 +9,9 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
@@ -51,7 +51,7 @@ class VertexGenerator {
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  IntersectionVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
+  IntersectionVertex getVertexForOsmNode(OsmNode node, OsmWithTags way) {
     // If the node should be decomposed to multiple levels,
     // use the numeric level because it is unique, the human level may not be (although
     // it will likely lead to some head-scratching if it is not).
@@ -121,7 +121,7 @@ class VertexGenerator {
 
   void initIntersectionNodes() {
     Set<Long> possibleIntersectionNodes = new HashSet<>();
-    for (OSMWay way : osmdb.getWays()) {
+    for (OsmWay way : osmdb.getWays()) {
       TLongList nodes = way.getNodeRefs();
       nodes.forEach(node -> {
         if (possibleIntersectionNodes.contains(node)) {
@@ -159,7 +159,7 @@ class VertexGenerator {
    * @param node the node to record for
    * @author mattwigway
    */
-  private OsmVertex recordLevel(OSMNode node, OSMWithTags way) {
+  private OsmVertex recordLevel(OsmNode node, OsmWithTags way) {
     OSMLevel level = osmdb.getLevelForWay(way);
     Map<OSMLevel, OsmVertex> vertices;
     long nodeId = node.getId();
@@ -179,7 +179,7 @@ class VertexGenerator {
   }
 
   private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
-    for (OSMNode node : outerRing.nodes) {
+    for (OsmNode node : outerRing.nodes) {
       long nodeId = node.getId();
       if (possibleIntersectionNodes.contains(nodeId)) {
         intersectionNodes.put(nodeId, null);

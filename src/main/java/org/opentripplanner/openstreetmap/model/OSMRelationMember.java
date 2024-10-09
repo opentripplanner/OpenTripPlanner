@@ -1,20 +1,20 @@
 package org.opentripplanner.openstreetmap.model;
 
-import static org.opentripplanner.openstreetmap.model.OSMMemberType.WAY;
+import static org.opentripplanner.openstreetmap.model.OsmMemberType.WAY;
 
 public class OSMRelationMember {
 
-  private OSMMemberType type;
+  private OsmMemberType type;
 
   private long ref;
 
   private String role;
 
-  public OSMMemberType getType() {
+  public OsmMemberType getType() {
     return type;
   }
 
-  public void setType(OSMMemberType type) {
+  public void setType(OsmMemberType type) {
     this.type = type;
   }
 

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.Equals;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.Condition.GreaterThan;
@@ -71,7 +71,7 @@ class ConditionTest {
   )
   @MethodSource("equalsCases")
   void leftRight(
-    OSMWithTags way,
+    OsmWithTags way,
     Condition op,
     MatchResult backwardExpectation,
     MatchResult forwardExpectation
@@ -108,7 +108,7 @@ class ConditionTest {
 
   @ParameterizedTest(name = "way {0} with op {1} should have a result {2}")
   @MethodSource("otherCases")
-  void otherTests(OSMWithTags way, Condition op, MatchResult expectation) {
+  void otherTests(OsmWithTags way, Condition op, MatchResult expectation) {
     assertEquals(expectation, op.match(way));
   }
 

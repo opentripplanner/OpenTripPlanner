@@ -8,8 +8,8 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OpenStreetMapParserTest {
@@ -24,7 +24,7 @@ public class OpenStreetMapParserTest {
 
     assertEquals(2297, osmdb.nodeCount());
 
-    OSMNode nodeA = osmdb.getNode(314192918L);
+    OsmNode nodeA = osmdb.getNode(314192918L);
     assertEquals(314192918, nodeA.getId());
     assertEquals(52.3750447, nodeA.lat, 0.0000001);
     assertEquals(16.8431974, nodeA.lon, 0.0000001);
@@ -33,7 +33,7 @@ public class OpenStreetMapParserTest {
 
     assertEquals(545, osmdb.wayCount());
 
-    OSMWay wayA = osmdb.getWay(13490353L);
+    OsmWay wayA = osmdb.getWay(13490353L);
     assertEquals(13490353, wayA.getId());
     TLongList nodeRefsA = wayA.getNodeRefs();
     assertEquals(2, nodeRefsA.size());

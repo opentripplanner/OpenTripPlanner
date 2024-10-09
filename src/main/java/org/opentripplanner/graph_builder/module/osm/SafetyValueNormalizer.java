@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.Graphwide;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
@@ -77,7 +77,7 @@ class SafetyValueNormalizer {
     StreetEdge street,
     StreetEdge backStreet,
     WayProperties wayData,
-    OSMWithTags way
+    OsmWithTags way
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 

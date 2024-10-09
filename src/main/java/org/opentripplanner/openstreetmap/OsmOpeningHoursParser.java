@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
  *
  * Part of the code is copied from https://github.com/leonardehrenfried/opening-hours-evaluator
  */
-public class OSMOpeningHoursParser {
+public class OsmOpeningHoursParser {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OSMOpeningHoursParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OsmOpeningHoursParser.class);
 
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
@@ -76,14 +76,14 @@ public class OSMOpeningHoursParser {
     entry(Month.DEC, java.time.Month.DECEMBER)
   );
 
-  public OSMOpeningHoursParser(
+  public OsmOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
     DataImportIssueStore issueStore
   ) {
     this(openingHoursCalendarService, () -> null, issueStore);
   }
 
-  public OSMOpeningHoursParser(
+  public OsmOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
     Supplier<ZoneId> zoneIdSupplier,
     DataImportIssueStore issueStore
@@ -94,7 +94,7 @@ public class OSMOpeningHoursParser {
     this.issueStore = issueStore;
   }
 
-  public OSMOpeningHoursParser(
+  public OsmOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
     ZoneId zoneId
   ) {

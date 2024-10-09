@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
@@ -18,7 +18,7 @@ class EscalatorProcessor {
     this.intersectionNodes = intersectionNodes;
   }
 
-  public void buildEscalatorEdge(OSMWay escalatorWay, double length) {
+  public void buildEscalatorEdge(OsmWay escalatorWay, double length) {
     List<Long> nodes = Arrays
       .stream(escalatorWay.getNodeRefs().toArray())
       .filter(nodeRef ->

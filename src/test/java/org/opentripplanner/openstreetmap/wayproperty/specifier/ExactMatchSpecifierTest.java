@@ -1,7 +1,7 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 
 class ExactMatchSpecifierTest extends SpecifierTest {
 
@@ -23,7 +23,7 @@ class ExactMatchSpecifierTest extends SpecifierTest {
 
   @Test
   public void pedestrianTunnelSpecificity() {
-    OSMWithTags tunnel = WayTestData.pedestrianTunnel();
+    OsmWithTags tunnel = WayTestData.pedestrianTunnel();
     assertScore(0, highwayPrimarySpec, tunnel);
     assertScore(600, pedestrianUndergroundTunnelSpec, tunnel);
     assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel);

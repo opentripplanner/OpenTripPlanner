@@ -20,8 +20,8 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
 import org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
@@ -159,7 +159,7 @@ public class OsmModuleTest {
 
   @Test
   public void testWayDataSet() {
-    OSMWithTags way = new OSMWay();
+    OsmWithTags way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("surface", "gravel");
@@ -213,7 +213,7 @@ public class OsmModuleTest {
     assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
 
     // test a left-right distinction
-    way = new OSMWay();
+    way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("cycleway:right", "track");
@@ -231,7 +231,7 @@ public class OsmModuleTest {
     // left comes from lane
     assertEquals(0.75, dataForWay.bicycleSafety().back());
 
-    way = new OSMWay();
+    way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("footway", "sidewalk");
     way.addTag("RLIS:reviewed", "no");
@@ -248,7 +248,7 @@ public class OsmModuleTest {
 
   @Test
   public void testCreativeNaming() {
-    OSMWithTags way = new OSMWay();
+    OsmWithTags way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("access", "no");

@@ -1,7 +1,7 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
 import java.util.Arrays;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 
 /**
  * An interface for assigning match scores for OSM entities (mostly ways). The higher the score the
@@ -33,14 +33,14 @@ public interface OsmSpecifier {
    *
    * @param way an OSM tagged object to compare to this specifier
    */
-  Scores matchScores(OSMWithTags way);
+  Scores matchScores(OsmWithTags way);
 
   /**
    * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
-   * exactly the same thing as {@link OsmSpecifier#matchScores(OSMWithTags)} but without regard for
+   * exactly the same thing as {@link OsmSpecifier#matchScores(OsmWithTags)} but without regard for
    * :left, :right, :forward, :backward and :both.
    */
-  int matchScore(OSMWithTags way);
+  int matchScore(OsmWithTags way);
 
   /**
    * Convert this specifier to a human-readable identifier that represents this in (generated)

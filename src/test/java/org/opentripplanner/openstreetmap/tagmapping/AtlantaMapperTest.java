@@ -3,7 +3,7 @@ package org.opentripplanner.openstreetmap.tagmapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -27,7 +27,7 @@ class AtlantaMapperTest {
   public void peachtreeRoad() {
     // Peachtree Rd in Atlanta has sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/144429544
-    OSMWithTags peachtreeRd = new OSMWithTags();
+    OsmWithTags peachtreeRd = new OsmWithTags();
     peachtreeRd.addTag("highway", "trunk");
     peachtreeRd.addTag("lanes", "6");
     peachtreeRd.addTag("name", "Peachtree Road");
@@ -42,7 +42,7 @@ class AtlantaMapperTest {
   public void deKalbAvenue() {
     // "Outer" ramps from DeKalb Ave onto Moreland Ave in Atlanta have sidewalks, and bikes are allowed.
     // https://www.openstreetmap.org/way/9164434
-    OSMWithTags morelandRamp = new OSMWithTags();
+    OsmWithTags morelandRamp = new OsmWithTags();
     morelandRamp.addTag("highway", "trunk_link");
     morelandRamp.addTag("lanes", "1");
     morelandRamp.addTag("oneway", "yes");
@@ -57,7 +57,7 @@ class AtlantaMapperTest {
   public void tenthStreetNE() {
     // For sanity check, secondary roads (e.g. 10th Street) should remain allowed for all modes.
     // https://www.openstreetmap.org/way/505912700
-    OSMWithTags tenthSt = new OSMWithTags();
+    OsmWithTags tenthSt = new OsmWithTags();
     tenthSt.addTag("highway", "secondary");
     tenthSt.addTag("lanes", "4");
     tenthSt.addTag("maxspeed", "30 mph");

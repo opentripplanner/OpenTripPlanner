@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 /**
@@ -22,7 +22,7 @@ public interface OsmTagMapper {
     );
   }
 
-  default float getCarSpeedForWay(OSMWithTags way, boolean backward) {
+  default float getCarSpeedForWay(OsmWithTags way, boolean backward) {
     return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, backward);
   }
 
@@ -30,12 +30,12 @@ public interface OsmTagMapper {
     return wayPropertySet.maxUsedCarSpeed;
   }
 
-  default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
+  default boolean isGeneralNoThroughTraffic(OsmWithTags way) {
     String access = way.getTag("access");
     return doesTagValueDisallowThroughTraffic(access);
   }
 
-  default boolean isVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+  default boolean isVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String vehicle = way.getTag("vehicle");
     if (vehicle != null) {
       return doesTagValueDisallowThroughTraffic(vehicle);
@@ -47,7 +47,7 @@ public interface OsmTagMapper {
   /**
    * Returns true if through traffic for motor vehicles is not allowed.
    */
-  default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+  default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String motorVehicle = way.getTag("motor_vehicle");
     if (motorVehicle != null) {
       return doesTagValueDisallowThroughTraffic(motorVehicle);
@@ -59,7 +59,7 @@ public interface OsmTagMapper {
   /**
    * Returns true if through traffic for bicycle is not allowed.
    */
-  default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+  default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String bicycle = way.getTag("bicycle");
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
@@ -71,7 +71,7 @@ public interface OsmTagMapper {
   /**
    * Returns true if through traffic for walk is not allowed.
    */
-  default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+  default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);

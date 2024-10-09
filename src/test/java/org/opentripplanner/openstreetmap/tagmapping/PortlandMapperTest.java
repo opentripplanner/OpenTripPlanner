@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class PortlandMapperTest {
@@ -53,7 +53,7 @@ public class PortlandMapperTest {
 
   @ParameterizedTest(name = "way {0} should have walk safety factor {1}")
   @MethodSource("cases")
-  void walkSafety(OSMWithTags way, double expected) {
+  void walkSafety(OsmWithTags way, double expected) {
     var score = wps.getDataForWay(way);
 
     var ws = score.walkSafety();

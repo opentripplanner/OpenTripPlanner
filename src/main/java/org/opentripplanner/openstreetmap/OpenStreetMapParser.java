@@ -7,12 +7,12 @@ import java.util.Objects;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
-import org.opentripplanner.openstreetmap.model.OSMMemberType;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OsmMemberType;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMTag;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OsmTag;
+import org.opentripplanner.openstreetmap.model.OsmWay;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
@@ -63,12 +63,12 @@ class OpenStreetMapParser extends BinaryParser {
     }
 
     for (Osmformat.Relation i : rels) {
-      OSMRelation tmp = new OSMRelation();
+      OsmRelation tmp = new OsmRelation();
       tmp.setId(i.getId());
       tmp.setOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
-        OSMTag tag = new OSMTag();
+        OsmTag tag = new OsmTag();
         String key = internalize(getStringById(i.getKeys(j)));
         String value = internalize(getStringById(i.getVals(j)));
         tag.setK(key);
@@ -87,11 +87,11 @@ class OpenStreetMapParser extends BinaryParser {
         relMember.setRole(internalize(getStringById(i.getRolesSid(j))));
 
         if (i.getTypes(j) == Osmformat.Relation.MemberType.NODE) {
-          relMember.setType(OSMMemberType.NODE);
+          relMember.setType(OsmMemberType.NODE);
         } else if (i.getTypes(j) == Osmformat.Relation.MemberType.WAY) {
-          relMember.setType(OSMMemberType.WAY);
+          relMember.setType(OsmMemberType.WAY);
         } else if (i.getTypes(j) == Osmformat.Relation.MemberType.RELATION) {
-          relMember.setType(OSMMemberType.RELATION);
+          relMember.setType(OsmMemberType.RELATION);
         } else {
           assert false; // TODO; Illegal file?
         }
@@ -113,7 +113,7 @@ class OpenStreetMapParser extends BinaryParser {
     }
 
     for (int i = 0; i < nodes.getIdCount(); i++) {
-      OSMNode tmp = new OSMNode();
+      OsmNode tmp = new OsmNode();
 
       long lat = nodes.getLat(i) + lastLat;
       lastLat = lat;
@@ -134,7 +134,7 @@ class OpenStreetMapParser extends BinaryParser {
           int keyid = nodes.getKeysVals(j++);
           int valid = nodes.getKeysVals(j++);
 
-          OSMTag tag = new OSMTag();
+          OsmTag tag = new OsmTag();
           String key = internalize(getStringById(keyid));
           String value = internalize(getStringById(valid));
           tag.setK(key);
@@ -155,7 +155,7 @@ class OpenStreetMapParser extends BinaryParser {
     }
 
     for (Osmformat.Node i : nodes) {
-      OSMNode tmp = new OSMNode();
+      OsmNode tmp = new OsmNode();
       tmp.setId(i.getId());
       tmp.setOsmProvider(provider);
       tmp.lat = parseLat(i.getLat());
@@ -165,7 +165,7 @@ class OpenStreetMapParser extends BinaryParser {
         String key = internalize(getStringById(i.getKeys(j)));
         // if handler.retain_tag(key) // TODO: filter tags
         String value = internalize(getStringById(i.getVals(j)));
-        OSMTag tag = new OSMTag();
+        OsmTag tag = new OsmTag();
         tag.setK(key);
         tag.setV(value);
         tmp.addTag(tag);
@@ -182,12 +182,12 @@ class OpenStreetMapParser extends BinaryParser {
     }
 
     for (Osmformat.Way i : ways) {
-      OSMWay tmp = new OSMWay();
+      OsmWay tmp = new OsmWay();
       tmp.setId(i.getId());
       tmp.setOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
-        OSMTag tag = new OSMTag();
+        OsmTag tag = new OsmTag();
         String key = internalize(getStringById(i.getKeys(j)));
         String value = internalize(getStringById(i.getVals(j)));
         tag.setK(key);

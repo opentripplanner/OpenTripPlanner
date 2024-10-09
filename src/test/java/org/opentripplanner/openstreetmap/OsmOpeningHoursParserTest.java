@@ -17,7 +17,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class OSMOpeningHoursParserTest {
+public class OsmOpeningHoursParserTest {
 
   static OpeningHoursCalendarService openingHoursCalendarService = new OpeningHoursCalendarService(
     new Deduplicator(),
@@ -25,7 +25,7 @@ public class OSMOpeningHoursParserTest {
     LocalDate.of(2023, Month.DECEMBER, 31)
   );
 
-  static OSMOpeningHoursParser osmOpeningHoursParser = new OSMOpeningHoursParser(
+  static OsmOpeningHoursParser osmOpeningHoursParser = new OsmOpeningHoursParser(
     openingHoursCalendarService,
     ZoneIds.PARIS
   );

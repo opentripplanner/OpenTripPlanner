@@ -3,7 +3,7 @@ package org.opentripplanner.openstreetmap.wayproperty.specifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 
 /**
  * Specifies a class of OSM tagged entities (e.g. ways) by a list of tags and their values (which
@@ -31,7 +31,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OSMWithTags way) {
+  public Scores matchScores(OsmWithTags way) {
     int backwardScore = 0, forwardScore = 0;
     int backwardMatches = 0, forwardMatches = 0;
 
@@ -59,7 +59,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public int matchScore(OSMWithTags way) {
+  public int matchScore(OsmWithTags way) {
     int score = 0;
     int matches = 0;
     for (var test : conditions) {

@@ -11,9 +11,9 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -57,7 +57,7 @@ class ElevatorProcessor {
   public void buildElevatorEdges(Graph graph) {
     /* build elevator edges */
     for (Long nodeId : vertexGenerator.multiLevelNodes().keySet()) {
-      OSMNode node = osmdb.getNode(nodeId);
+      OsmNode node = osmdb.getNode(nodeId);
       // this allows skipping levels, e.g., an elevator that stops
       // at floor 0, 2, 3, and 5.
       // Converting to an Array allows us to
@@ -107,10 +107,10 @@ class ElevatorProcessor {
     } // END elevator edge loop
 
     // Add highway=elevators to graph as elevators
-    Iterator<OSMWay> elevators = osmdb.getWays().stream().filter(this::isElevatorWay).iterator();
+    Iterator<OsmWay> elevators = osmdb.getWays().stream().filter(this::isElevatorWay).iterator();
 
     while (elevators.hasNext()) {
-      OSMWay elevatorWay = elevators.next();
+      OsmWay elevatorWay = elevators.next();
 
       List<Long> nodes = Arrays
         .stream(elevatorWay.getNodeRefs().toArray())
@@ -206,7 +206,7 @@ class ElevatorProcessor {
     }
   }
 
-  private boolean isElevatorWay(OSMWay way) {
+  private boolean isElevatorWay(OsmWay way) {
     if (!way.isElevator()) {
       return false;
     }
@@ -222,7 +222,7 @@ class ElevatorProcessor {
     return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
   }
 
-  private OptionalInt parseDuration(OSMWithTags element) {
+  private OptionalInt parseDuration(OsmWithTags element) {
     return element.getTagAsInt(
       "duration",
       v ->

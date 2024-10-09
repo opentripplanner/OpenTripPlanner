@@ -12,11 +12,11 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 
-public class OSMWithTagsTest {
+public class OsmWithTagsTest {
 
   @Test
   void testHasTag() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     assertFalse(o.hasTag("foo"));
     assertFalse(o.hasTag("FOO"));
     o.addTag("foo", "bar");
@@ -27,7 +27,7 @@ public class OSMWithTagsTest {
 
   @Test
   void testGetTag() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     assertNull(o.getTag("foo"));
     assertNull(o.getTag("FOO"));
 
@@ -38,35 +38,35 @@ public class OSMWithTagsTest {
 
   @Test
   void testIsFalse() {
-    assertTrue(OSMWithTags.isFalse("no"));
-    assertTrue(OSMWithTags.isFalse("0"));
-    assertTrue(OSMWithTags.isFalse("false"));
+    assertTrue(OsmWithTags.isFalse("no"));
+    assertTrue(OsmWithTags.isFalse("0"));
+    assertTrue(OsmWithTags.isFalse("false"));
 
-    assertFalse(OSMWithTags.isFalse("yes"));
-    assertFalse(OSMWithTags.isFalse("1"));
-    assertFalse(OSMWithTags.isFalse("true"));
-    assertFalse(OSMWithTags.isFalse("foo"));
-    assertFalse(OSMWithTags.isFalse("bar"));
-    assertFalse(OSMWithTags.isFalse("baz"));
+    assertFalse(OsmWithTags.isFalse("yes"));
+    assertFalse(OsmWithTags.isFalse("1"));
+    assertFalse(OsmWithTags.isFalse("true"));
+    assertFalse(OsmWithTags.isFalse("foo"));
+    assertFalse(OsmWithTags.isFalse("bar"));
+    assertFalse(OsmWithTags.isFalse("baz"));
   }
 
   @Test
   void testIsTrue() {
-    assertTrue(OSMWithTags.isTrue("yes"));
-    assertTrue(OSMWithTags.isTrue("1"));
-    assertTrue(OSMWithTags.isTrue("true"));
+    assertTrue(OsmWithTags.isTrue("yes"));
+    assertTrue(OsmWithTags.isTrue("1"));
+    assertTrue(OsmWithTags.isTrue("true"));
 
-    assertFalse(OSMWithTags.isTrue("no"));
-    assertFalse(OSMWithTags.isTrue("0"));
-    assertFalse(OSMWithTags.isTrue("false"));
-    assertFalse(OSMWithTags.isTrue("foo"));
-    assertFalse(OSMWithTags.isTrue("bar"));
-    assertFalse(OSMWithTags.isTrue("baz"));
+    assertFalse(OsmWithTags.isTrue("no"));
+    assertFalse(OsmWithTags.isTrue("0"));
+    assertFalse(OsmWithTags.isTrue("false"));
+    assertFalse(OsmWithTags.isTrue("foo"));
+    assertFalse(OsmWithTags.isTrue("bar"));
+    assertFalse(OsmWithTags.isTrue("baz"));
   }
 
   @Test
   void testIsTagFalseOrTrue() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     assertFalse(o.isTagFalse("foo"));
     assertFalse(o.isTagFalse("FOO"));
     assertFalse(o.isTagTrue("foo"));
@@ -88,7 +88,7 @@ public class OSMWithTagsTest {
   @Test
   void isTag() {
     var name = "Brendan";
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("NAME", name);
 
     assertTrue(osm.isTag("name", name));
@@ -98,7 +98,7 @@ public class OSMWithTagsTest {
 
   @Test
   void testDoesAllowTagAccess() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     assertFalse(o.doesTagAllowAccess("foo"));
 
     o.addTag("foo", "bar");
@@ -113,7 +113,7 @@ public class OSMWithTagsTest {
 
   @Test
   void testIsGeneralAccessDenied() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     assertFalse(o.isGeneralAccessDenied());
 
     o.addTag("access", "something");
@@ -128,7 +128,7 @@ public class OSMWithTagsTest {
 
   @Test
   void testBicycleDenied() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     assertFalse(tags.isBicycleExplicitlyDenied());
 
     for (var allowedValue : List.of("yes", "unknown", "somevalue")) {
@@ -144,7 +144,7 @@ public class OSMWithTagsTest {
 
   @Test
   void getReferenceTags() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref", "A");
 
     assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref", "test")));
@@ -153,7 +153,7 @@ public class OSMWithTagsTest {
 
   @Test
   void getEmptyRefList() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref", "A");
 
     assertEquals(Set.of(), osm.getMultiTagValues(Set.of()));
@@ -161,7 +161,7 @@ public class OSMWithTagsTest {
 
   @Test
   void ignoreRefCase() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref:IFOPT", "A");
 
     assertEquals(Set.of("A"), osm.getMultiTagValues(Set.of("ref:ifopt")));
@@ -169,7 +169,7 @@ public class OSMWithTagsTest {
 
   @Test
   void readSemicolonSeparated() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref:A", "A;A;B");
 
     assertEquals(Set.of("A", "B"), osm.getMultiTagValues(Set.of("ref:A")));
@@ -177,7 +177,7 @@ public class OSMWithTagsTest {
 
   @Test
   void removeBlankRef() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref1", " ");
     osm.addTag("ref2", "");
 
@@ -187,7 +187,7 @@ public class OSMWithTagsTest {
 
   @Test
   void shouldNotReturnNull() {
-    var osm = new OSMWithTags();
+    var osm = new OsmWithTags();
     osm.addTag("ref1", " ");
     osm.addTag("ref2", "");
 
@@ -197,14 +197,14 @@ public class OSMWithTagsTest {
 
   @Test
   void isWheelchairAccessible() {
-    var osm1 = new OSMWithTags();
+    var osm1 = new OsmWithTags();
     assertTrue(osm1.isWheelchairAccessible());
 
-    var osm2 = new OSMWithTags();
+    var osm2 = new OsmWithTags();
     osm2.addTag("wheelchair", "no");
     assertFalse(osm2.isWheelchairAccessible());
 
-    var osm3 = new OSMWithTags();
+    var osm3 = new OsmWithTags();
     osm3.addTag("wheelchair", "yes");
     assertTrue(osm3.isWheelchairAccessible());
   }
@@ -221,7 +221,7 @@ public class OSMWithTagsTest {
 
   @Test
   void testGenerateI18NForPattern() {
-    OSMWithTags osmTags = new OSMWithTags();
+    OsmWithTags osmTags = new OsmWithTags();
     osmTags.addTag("note", "Note EN");
     osmTags.addTag("description:fr", "Description FR");
     osmTags.addTag("wheelchair:description", "Wheelchair description EN");

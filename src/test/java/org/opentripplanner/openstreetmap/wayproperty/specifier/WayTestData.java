@@ -1,13 +1,13 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 
 public class WayTestData {
 
-  public static OSMWithTags carTunnel() {
+  public static OsmWithTags carTunnel() {
     // https://www.openstreetmap.org/way/598694756
-    OSMWithTags tunnel = new OSMWithTags();
+    OsmWithTags tunnel = new OsmWithTags();
     tunnel.addTag("highway", "primary");
     tunnel.addTag("hov", "lane");
     tunnel.addTag("lanes", "4");
@@ -22,9 +22,9 @@ public class WayTestData {
     return tunnel;
   }
 
-  public static OSMWithTags pedestrianTunnel() {
+  public static OsmWithTags pedestrianTunnel() {
     // https://www.openstreetmap.org/way/127288293
-    OSMWithTags tunnel = new OSMWithTags();
+    OsmWithTags tunnel = new OsmWithTags();
     tunnel.addTag("highway", "footway");
     tunnel.addTag("indoor", "yes");
     tunnel.addTag("layer", "-1");
@@ -34,10 +34,10 @@ public class WayTestData {
     return tunnel;
   }
 
-  public static OSMWithTags streetOnBikeRoute() {
+  public static OsmWithTags streetOnBikeRoute() {
     // https://www.openstreetmap.org/way/26443041 is part of both an lcn relation
 
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("lit", "yes");
     way.addTag("maxspeed", "30");
@@ -50,9 +50,9 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags stairs() {
+  public static OsmWithTags stairs() {
     // https://www.openstreetmap.org/way/1058669389
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("handrail", "yes");
     way.addTag("highway", "steps");
     way.addTag("incline", "down");
@@ -65,9 +65,9 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags southeastLaBonitaWay() {
+  public static OsmWithTags southeastLaBonitaWay() {
     // https://www.openstreetmap.org/way/5302874
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("name", "Southeast la Bonita Way");
     way.addTag("sidewalk", "both");
@@ -75,9 +75,9 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags southwestMayoStreet() {
+  public static OsmWithTags southwestMayoStreet() {
     //https://www.openstreetmap.org/way/425004690
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("name", "Southwest Mayo Street");
     way.addTag("maxspeed", "25 mph");
@@ -86,124 +86,124 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags fiveLanes() {
-    OSMWithTags way = new OSMWithTags();
+  public static OsmWithTags fiveLanes() {
+    OsmWithTags way = new OsmWithTags();
     way.addTag("highway", "primary");
     way.addTag("lanes", "5");
     return way;
   }
 
-  public static OSMWithTags threeLanes() {
-    OSMWithTags way = new OSMWithTags();
+  public static OsmWithTags threeLanes() {
+    OsmWithTags way = new OsmWithTags();
     way.addTag("highway", "primary");
     way.addTag("lanes", "3");
     return way;
   }
 
-  public static OSMWay cycleway() {
-    var way = new OSMWay();
+  public static OsmWay cycleway() {
+    var way = new OsmWay();
     way.addTag("highway", "residential");
     way.addTag("cycleway", "lane");
     return way;
   }
 
-  public static OSMWithTags cyclewayLeft() {
-    var way = new OSMWithTags();
+  public static OsmWithTags cyclewayLeft() {
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("cycleway:left", "lane");
     return way;
   }
 
-  public static OSMWithTags cyclewayBoth() {
-    var way = new OSMWithTags();
+  public static OsmWithTags cyclewayBoth() {
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("cycleway:both", "lane");
     return way;
   }
 
-  public static OSMWay footwaySidewalk() {
-    var way = new OSMWay();
+  public static OsmWay footwaySidewalk() {
+    var way = new OsmWay();
     way.addTag("footway", "sidewalk");
     way.addTag("highway", "footway");
     return way;
   }
 
-  public static OSMWithTags sidewalkBoth() {
-    var way = new OSMWithTags();
+  public static OsmWithTags sidewalkBoth() {
+    var way = new OsmWithTags();
     way.addTag("highway", "both");
     way.addTag("sidewalk", "both");
     return way;
   }
 
-  public static OSMWithTags noSidewalk() {
-    var way = new OSMWithTags();
+  public static OsmWithTags noSidewalk() {
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("sidewalk", "no");
     return way;
   }
 
-  public static OSMWithTags noSidewalkHighSpeed() {
-    var way = new OSMWithTags();
+  public static OsmWithTags noSidewalkHighSpeed() {
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("sidewalk", "no");
     way.addTag("maxspeed", "55 mph");
     return way;
   }
 
-  public static OSMWithTags highwayTrunk() {
-    var way = new OSMWithTags();
+  public static OsmWithTags highwayTrunk() {
+    var way = new OsmWithTags();
     way.addTag("highway", "trunk");
     return way;
   }
 
-  public static OSMWay highwayTertiary() {
-    var way = new OSMWay();
+  public static OsmWay highwayTertiary() {
+    var way = new OsmWay();
     way.addTag("highway", "tertiary");
     return way;
   }
 
-  public static OSMWithTags highwayTertiaryWithSidewalk() {
-    var way = new OSMWithTags();
+  public static OsmWithTags highwayTertiaryWithSidewalk() {
+    var way = new OsmWithTags();
     way.addTag("highway", "tertiary");
     way.addTag("sidewalk", "both");
     return way;
   }
 
-  public static OSMWithTags cobblestones() {
-    var way = new OSMWithTags();
+  public static OsmWithTags cobblestones() {
+    var way = new OsmWithTags();
     way.addTag("highway", "residential");
     way.addTag("surface", "cobblestones");
     return way;
   }
 
-  public static OSMWithTags cyclewayLaneTrack() {
-    var way = new OSMWithTags();
+  public static OsmWithTags cyclewayLaneTrack() {
+    var way = new OsmWithTags();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("cycleway:right", "track");
     return way;
   }
 
-  public static OSMWithTags tramsForward() {
+  public static OsmWithTags tramsForward() {
     // https://www.openstreetmap.org/way/108037345
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "tertiary");
     way.addTag("embedded_rails:forward", "tram");
     return way;
   }
 
-  public static OSMWithTags veryBadSmoothness() {
+  public static OsmWithTags veryBadSmoothness() {
     // https://www.openstreetmap.org/way/11402648
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "footway");
     way.addTag("surface", "sett");
     way.addTag("smoothness", "very_bad");
     return way;
   }
 
-  public static OSMWithTags excellentSmoothness() {
+  public static OsmWithTags excellentSmoothness() {
     // https://www.openstreetmap.org/way/437167371
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("highway", "cycleway");
     way.addTag("segregated", "no");
     way.addTag("surface", "asphalt");
@@ -211,9 +211,9 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags zooPlatform() {
+  public static OsmWithTags zooPlatform() {
     // https://www.openstreetmap.org/way/119108622
-    var way = new OSMWithTags();
+    var way = new OsmWithTags();
     way.addTag("public_transport", "platform");
     way.addTag("usage", "tourism");
     return way;

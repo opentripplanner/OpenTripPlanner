@@ -1,15 +1,7 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
-import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
-import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
-import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
-import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
  * OSM way properties for optimizing distance (not traveling time) in routing.
@@ -37,7 +29,7 @@ class ConstantSpeedFinlandMapper implements OsmTagMapper {
   }
 
   @Override
-  public float getCarSpeedForWay(OSMWithTags way, boolean backward) {
+  public float getCarSpeedForWay(OsmWithTags way, boolean backward) {
     /*
      * Set the same 80 km/h speed for all roads, so that car routing finds shortest path
      */

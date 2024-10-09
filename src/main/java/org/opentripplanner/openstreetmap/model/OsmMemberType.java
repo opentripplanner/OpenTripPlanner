@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap.model;
 
-public enum OSMMemberType {
+public enum OsmMemberType {
   NODE,
   WAY,
   RELATION,

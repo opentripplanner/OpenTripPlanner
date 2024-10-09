@@ -4,7 +4,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
-public class OSMNode extends OSMWithTags {
+public class OsmNode extends OsmWithTags {
 
   static final Set<String> MOTOR_VEHICLE_BARRIERS = Set.of("bollard", "bar", "chain");
 

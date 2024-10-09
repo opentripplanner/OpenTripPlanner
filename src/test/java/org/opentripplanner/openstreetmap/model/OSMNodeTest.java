@@ -9,7 +9,7 @@ public class OSMNodeTest {
 
   @Test
   public void testIsMultiLevel() {
-    OSMNode node = new OSMNode();
+    OsmNode node = new OsmNode();
     assertFalse(node.isMultiLevel());
 
     node.addTag("highway", "var");

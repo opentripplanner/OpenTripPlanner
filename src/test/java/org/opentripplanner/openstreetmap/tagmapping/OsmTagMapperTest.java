@@ -8,14 +8,14 @@ import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class OsmTagMapperTest {
 
   @Test
   public void isMotorThroughTrafficExplicitlyDisallowed() {
-    OSMWithTags o = new OSMWithTags();
+    OsmWithTags o = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     assertFalse(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
@@ -40,11 +40,11 @@ public class OsmTagMapperTest {
   public void constantSpeedCarRouting() {
     OsmTagMapper osmTagMapper = new ConstantSpeedFinlandMapper(20f);
 
-    var slowWay = new OSMWithTags();
+    var slowWay = new OsmWithTags();
     slowWay.addTag("highway", "residential");
     assertEquals(20f, osmTagMapper.getCarSpeedForWay(slowWay, true));
 
-    var fastWay = new OSMWithTags();
+    var fastWay = new OsmWithTags();
     fastWay.addTag("highway", "motorway");
     fastWay.addTag("maxspeed", "120 kmph");
     assertEquals(20f, osmTagMapper.getCarSpeedForWay(fastWay, true));
@@ -80,12 +80,12 @@ public class OsmTagMapperTest {
     wps.setMixinProperties("foo=bar", ofBicycleSafety(0.5));
     source.populateProperties(wps);
 
-    var withoutFoo = new OSMWithTags();
+    var withoutFoo = new OsmWithTags();
     withoutFoo.addTag("tag", "imaginary");
     assertEquals(2, wps.getDataForWay(withoutFoo).bicycleSafety().back());
 
     // the mixin for foo=bar reduces the bike safety factor
-    var withFoo = new OSMWithTags();
+    var withFoo = new OsmWithTags();
     withFoo.addTag("tag", "imaginary");
     withFoo.addTag("foo", "bar");
     assertEquals(1, wps.getDataForWay(withFoo).bicycleSafety().back());
@@ -93,7 +93,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testAccessNo() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "no");
@@ -105,7 +105,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testAccessPrivate() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "private");
@@ -117,7 +117,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testFootModifier() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "private");
@@ -130,7 +130,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testVehicleDenied() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("vehicle", "destination");
@@ -142,7 +142,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testVehicleDeniedMotorVehiclePermissive() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("vehicle", "destination");
@@ -155,7 +155,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testVehicleDeniedBicyclePermissive() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("vehicle", "destination");
@@ -168,7 +168,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testMotorcycleModifier() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "private");
@@ -181,7 +181,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testBicycleModifier() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "private");
@@ -194,7 +194,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void testBicyclePermissive() {
-    OSMWithTags tags = new OSMWithTags();
+    OsmWithTags tags = new OsmWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
 
     tags.addTag("access", "private");
@@ -205,8 +205,8 @@ public class OsmTagMapperTest {
     assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
   }
 
-  public OSMWithTags way(String key, String value) {
-    var way = new OSMWithTags();
+  public OsmWithTags way(String key, String value) {
+    var way = new OsmWithTags();
     way.addTag(key, value);
     return way;
   }

@@ -3,7 +3,7 @@ package org.opentripplanner.openstreetmap.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OSMRelation extends OSMWithTags {
+public class OsmRelation extends OsmWithTags {
 
   private final List<OSMRelationMember> members = new ArrayList<>();
 

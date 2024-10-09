@@ -11,8 +11,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
@@ -25,7 +25,7 @@ class WayPropertySetTest {
 
     @Test
     public void carTunnel() {
-      OSMWithTags tunnel = WayTestData.carTunnel();
+      OsmWithTags tunnel = WayTestData.carTunnel();
       WayPropertySet wps = wps();
       assertEquals(CAR, wps.getDataForWay(tunnel).getPermission());
     }
@@ -42,7 +42,7 @@ class WayPropertySetTest {
       assertEquals(0f, wps.maxUsedCarSpeed, delta);
 
       // Speed limit that is within limits should be used as the max used car speed
-      OSMWithTags streetWithSpeedLimit = new OSMWithTags();
+      OsmWithTags streetWithSpeedLimit = new OsmWithTags();
       streetWithSpeedLimit.addTag("highway", "motorway");
       streetWithSpeedLimit.addTag("maxspeed", "120");
       var waySpeed = wps.getCarSpeedForWay(streetWithSpeedLimit, false);
@@ -51,7 +51,7 @@ class WayPropertySetTest {
 
       // Speed limit that is higher than maxPossibleCarSpeed should be ignored and regular motorway
       // speed limit should be used instead
-      OSMWithTags streetWithTooHighSpeedLimit = new OSMWithTags();
+      OsmWithTags streetWithTooHighSpeedLimit = new OsmWithTags();
       streetWithTooHighSpeedLimit.addTag("highway", "motorway");
       streetWithTooHighSpeedLimit.addTag("maxspeed", "200");
       waySpeed = wps.getCarSpeedForWay(streetWithTooHighSpeedLimit, false);
@@ -60,7 +60,7 @@ class WayPropertySetTest {
 
       // Speed limit that is too low should be ignored and regular motorway speed limit should
       // be used instead
-      OSMWithTags streetWithTooLowSpeedLimit = new OSMWithTags();
+      OsmWithTags streetWithTooLowSpeedLimit = new OsmWithTags();
       streetWithTooLowSpeedLimit.addTag("highway", "motorway");
       streetWithTooLowSpeedLimit.addTag("maxspeed", "0");
       waySpeed = wps.getCarSpeedForWay(streetWithTooLowSpeedLimit, false);
@@ -111,7 +111,7 @@ class WayPropertySetTest {
      */
     @Test
     void testCarPermission() {
-      OSMWay way = new OSMWay();
+      OsmWay way = new OsmWay();
       way.addTag("highway", "unclassified");
 
       var permissionPair = getWayProperties(way);
@@ -128,7 +128,7 @@ class WayPropertySetTest {
      */
     @Test
     void testMotorCarTagAllowedPermissions() {
-      OSMWay way = new OSMWay();
+      OsmWay way = new OsmWay();
       way.addTag("highway", "residential");
       var permissionPair = getWayProperties(way);
       assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
@@ -162,7 +162,7 @@ class WayPropertySetTest {
      */
     @Test
     void testMotorCarTagDeniedPermissions() {
-      OSMWay way = new OSMWay();
+      OsmWay way = new OsmWay();
       way.addTag("highway", "residential");
       var permissionPair = getWayProperties(way);
       assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
@@ -194,7 +194,7 @@ class WayPropertySetTest {
      */
     @Test
     void testMotorVehicleTagAllowedPermissions() {
-      OSMWay way = new OSMWay();
+      OsmWay way = new OsmWay();
       way.addTag("highway", "residential");
       var permissionPair = getWayProperties(way);
       assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
@@ -230,7 +230,7 @@ class WayPropertySetTest {
      */
     @Test
     void testMotorVehicleTagDeniedPermissions() {
-      OSMWay way = new OSMWay();
+      OsmWay way = new OsmWay();
       way.addTag("highway", "residential");
       var permissionPair = getWayProperties(way);
       assertTrue(permissionPair.main().allows(StreetTraversalPermission.ALL));
@@ -254,7 +254,7 @@ class WayPropertySetTest {
         assertTrue(permissionPair.main().allowsNothing());*/
     }
 
-    private StreetTraversalPermissionPair getWayProperties(OSMWay way) {
+    private StreetTraversalPermissionPair getWayProperties(OsmWay way) {
       WayPropertySet wayPropertySet = new WayPropertySet();
       WayProperties wayData = wayPropertySet.getDataForWay(way);
 

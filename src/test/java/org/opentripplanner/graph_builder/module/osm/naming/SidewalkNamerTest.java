@@ -14,7 +14,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OsmWay;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -111,5 +111,5 @@ class SidewalkNamerTest {
     }
   }
 
-  private record EdgePair(OSMWay way, StreetEdge edge) {}
+  private record EdgePair(OsmWay way, StreetEdge edge) {}
 }

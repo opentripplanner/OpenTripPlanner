@@ -15,7 +15,7 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
+import org.opentripplanner.openstreetmap.OsmOpeningHoursParser;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
@@ -36,7 +36,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
   private final String feedId;
   private final Collection<String> staticTags;
 
-  private final OSMOpeningHoursParser osmOpeningHoursParser;
+  private final OsmOpeningHoursParser osmOpeningHoursParser;
   private final String url;
 
   public ParkAPIUpdater(
@@ -47,7 +47,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     this.feedId = parameters.feedId();
     this.staticTags = parameters.tags();
     this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(openingHoursCalendarService, parameters.timeZone());
+      new OsmOpeningHoursParser(openingHoursCalendarService, parameters.timeZone());
     this.url = parameters.url();
   }
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -24,7 +24,7 @@ public class BarrierVertexTest {
 
   @Test
   public void testBarrierPermissions() {
-    OSMNode simpleBarrier = new OSMNode();
+    OsmNode simpleBarrier = new OsmNode();
     assertFalse(simpleBarrier.isMotorVehicleBarrier());
     simpleBarrier.addTag("barrier", "bollard");
     assertTrue(simpleBarrier.isMotorVehicleBarrier());
@@ -63,7 +63,7 @@ public class BarrierVertexTest {
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
 
-    OSMNode complexBarrier = new OSMNode();
+    OsmNode complexBarrier = new OsmNode();
     complexBarrier.addTag("barrier", "bollard");
     complexBarrier.addTag("access", "no");
 
@@ -72,7 +72,7 @@ public class BarrierVertexTest {
     );
     assertEquals(StreetTraversalPermission.NONE, bv.getBarrierPermissions());
 
-    OSMNode noBikeBollard = new OSMNode();
+    OsmNode noBikeBollard = new OsmNode();
     noBikeBollard.addTag("barrier", "bollard");
     noBikeBollard.addTag("bicycle", "no");
 
@@ -82,7 +82,7 @@ public class BarrierVertexTest {
     assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
 
     /* test that traversal limitations work also without barrier tag  */
-    OSMNode accessBarrier = new OSMNode();
+    OsmNode accessBarrier = new OsmNode();
     accessBarrier.addTag("access", "no");
 
     bv.setBarrierPermissions(

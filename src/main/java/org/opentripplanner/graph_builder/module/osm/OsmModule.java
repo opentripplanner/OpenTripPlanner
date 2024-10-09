@@ -20,9 +20,9 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.openstreetmap.model.OsmWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -249,7 +249,7 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info(progress.startMessage());
     var escalatorProcessor = new EscalatorProcessor(vertexGenerator.intersectionNodes());
 
-    WAY:for (OSMWay way : osmdb.getWays()) {
+    WAY:for (OsmWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
 
@@ -267,7 +267,7 @@ public class OsmModule implements GraphBuilderModule {
       String lastLevel = null;
       for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
         long nodeId = iter.next();
-        OSMNode node = osmdb.getNode(nodeId);
+        OsmNode node = osmdb.getNode(nodeId);
         if (node == null) continue WAY;
         boolean levelsDiffer = false;
         String level = node.getTag("level");
@@ -302,10 +302,10 @@ public class OsmModule implements GraphBuilderModule {
        */
       Long startNode = null;
       // where the current edge should start
-      OSMNode osmStartNode = null;
+      OsmNode osmStartNode = null;
 
       for (int i = 0; i < nodes.size() - 1; i++) {
-        OSMNode segmentStartOSMNode = osmdb.getNode(nodes.get(i));
+        OsmNode segmentStartOSMNode = osmdb.getNode(nodes.get(i));
 
         if (segmentStartOSMNode == null) {
           continue;
@@ -318,7 +318,7 @@ public class OsmModule implements GraphBuilderModule {
           osmStartNode = segmentStartOSMNode;
         }
         // where the current edge might end
-        OSMNode osmEndNode = osmdb.getNode(endNode);
+        OsmNode osmEndNode = osmdb.getNode(endNode);
 
         LineString geometry;
 
@@ -412,7 +412,7 @@ public class OsmModule implements GraphBuilderModule {
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 
-  private void setWayName(OSMWithTags way) {
+  private void setWayName(OsmWithTags way) {
     if (!way.hasTag("name")) {
       I18NString creativeName = way.getOsmProvider().getWayPropertySet().getCreativeNameForWay(way);
       if (creativeName != null) {
@@ -422,7 +422,7 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private void applyEdgesToTurnRestrictions(
-    OSMWay way,
+    OsmWay way,
     long startNode,
     long endNode,
     StreetEdge street,
@@ -461,7 +461,7 @@ public class OsmModule implements GraphBuilderModule {
   private StreetEdgePair getEdgesForStreet(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
-    OSMWay way,
+    OsmWay way,
     int index,
     StreetTraversalPermission permissions,
     LineString geometry
@@ -515,7 +515,7 @@ public class OsmModule implements GraphBuilderModule {
   private StreetEdge getEdgeForStreet(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
-    OSMWay way,
+    OsmWay way,
     int index,
     double length,
     StreetTraversalPermission permissions,
