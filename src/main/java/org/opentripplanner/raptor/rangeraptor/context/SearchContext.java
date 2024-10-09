@@ -81,7 +81,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorTransitDataProvider<T> transit,
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
-    @Nullable EgressPaths egressPaths,
+    EgressPaths egressPaths,
     @Nullable IntPredicate acceptC2AtDestination
   ) {
     this.request = request;

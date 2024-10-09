@@ -1,7 +1,5 @@
 package org.opentripplanner.raptor.rangeraptor;
 
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessPaths.calculateMaxNumberOfRides;
-
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
@@ -76,14 +74,16 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   @Nullable
   private final AccessPaths accessPaths;
 
-  private final int minNumberOfRounds;
-
   private final boolean enableTransferConstraints;
 
   private int iterationDepartureTime;
 
   private int round;
 
+  /**
+   * @param accessPaths can be null in case the worker is chained - only the first worker has
+   *                    access.
+   */
   public DefaultRangeRaptorWorker(
     RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
@@ -102,7 +102,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
     this.calculator = calculator;
     this.timers = timers;
     this.accessPaths = accessPaths;
-    this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
     this.enableTransferConstraints = enableTransferConstraints;
 
     lifeCycle.onSetupIteration(time -> this.iterationDepartureTime = time);

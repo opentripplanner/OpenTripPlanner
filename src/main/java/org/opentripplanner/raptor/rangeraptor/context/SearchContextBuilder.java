@@ -40,7 +40,7 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   private SearchContext<T> createContext(
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
-    @Nullable EgressPaths egressPaths
+    EgressPaths egressPaths
   ) {
     return new SearchContext<>(
       request,
