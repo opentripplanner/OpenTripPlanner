@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
-import { ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
+import { Location, ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
 import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';
 import { DateTimeInputField } from './DateTimeInputField.tsx';
@@ -12,7 +12,7 @@ import { NumTripPatternsInput } from './NumTripPatternsInput.tsx';
 import { ItineraryFilterDebugSelect } from './ItineraryFilterDebugSelect.tsx';
 import Navbar from 'react-bootstrap/Navbar';
 import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import logo from '../../static/img/otp-logo.svg';
 import GraphiQLRouteButton from './GraphiQLRouteButton.tsx';
 import WheelchairAccessibleCheckBox from './WheelchairAccessibleCheckBox.tsx';
@@ -29,6 +29,26 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
   const [showServerInfo, setShowServerInfo] = useState(false);
   const target = useRef(null);
 
+  const setFromLocation = useCallback(
+    (location: Location) => {
+      setTripQueryVariables({
+        ...tripQueryVariables,
+        from: location,
+      });
+    },
+    [tripQueryVariables, setTripQueryVariables],
+  );
+
+  const setToLocation = useCallback(
+    (location: Location) => {
+      setTripQueryVariables({
+        ...tripQueryVariables,
+        to: location,
+      });
+    },
+    [tripQueryVariables, setTripQueryVariables],
+  );
+
   return (
     <div className="search-bar top-content">
       <Navbar.Brand onClick={() => setShowServerInfo((v) => !v)}>
@@ -37,8 +57,18 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
           {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target} />}
         </div>
       </Navbar.Brand>
-      <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
-      <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />
+      <LocationInputField
+        location={tripQueryVariables.from}
+        onLocationChange={setFromLocation}
+        label="From"
+        id="fromInputField"
+      />
+      <LocationInputField
+        location={tripQueryVariables.to}
+        onLocationChange={setToLocation}
+        label="To"
+        id="toInputField"
+      />
       <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <DateTimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />

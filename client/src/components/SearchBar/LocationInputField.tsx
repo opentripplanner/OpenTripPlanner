@@ -1,8 +1,22 @@
 import { Form } from 'react-bootstrap';
-import { COORDINATE_PRECISION } from './constants.ts';
+import { toString, parseLocation } from '../../util/locationConverter.ts';
 import { Location } from '../../gql/graphql.ts';
+import { useEffect, useState } from 'react';
 
-export function LocationInputField({ location, id, label }: { location: Location; id: string; label: string }) {
+interface Props {
+  location: Location;
+  onLocationChange: (location: Location) => void;
+  id: string;
+  label: string;
+}
+
+export function LocationInputField({ location, onLocationChange, id, label }: Props) {
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    setValue(toString(location) || '');
+  }, [location]);
+
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor={id}>
@@ -16,14 +30,16 @@ export function LocationInputField({ location, id, label }: { location: Location
         className="input-medium"
         // Intentionally empty for now, but needed because of
         // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
-        onChange={() => {}}
-        value={
-          location.coordinates
-            ? `${location.coordinates?.latitude.toPrecision(
-                COORDINATE_PRECISION,
-              )} ${location.coordinates?.longitude.toPrecision(COORDINATE_PRECISION)}`
-            : ''
-        }
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        onBlur={(event) => {
+          const location = parseLocation(event.target.value);
+          if (location) {
+            onLocationChange(location);
+          }
+        }}
+        value={value}
       />
     </Form.Group>
   );
