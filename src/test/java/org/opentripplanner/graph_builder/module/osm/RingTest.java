@@ -6,25 +6,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.osm.model.OsmNode;
 
 class RingTest {
 
   @Test
   void testIsNodeConvex() {
-    OSMNode a = new OSMNode();
+    OsmNode a = new OsmNode();
     a.lat = 0.0;
     a.lon = 0.0;
-    OSMNode b = new OSMNode();
+    OsmNode b = new OsmNode();
     b.lat = 1.0;
     b.lon = 0.0;
-    OSMNode c = new OSMNode();
+    OsmNode c = new OsmNode();
     c.lat = 1.0;
     c.lon = 1.0;
-    OSMNode d = new OSMNode();
+    OsmNode d = new OsmNode();
     d.lat = 0.0;
     d.lon = 1.0;
-    OSMNode e = new OSMNode();
+    OsmNode e = new OsmNode();
     e.lat = 0.5;
     e.lon = 0.5;
 

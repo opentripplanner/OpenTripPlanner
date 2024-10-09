@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmDatabaseTest {
@@ -21,7 +21,7 @@ public class OsmDatabaseTest {
   void bicycleRouteRelations() {
     var osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
     var provider = new OsmProvider(RESOURCE_LOADER.file("ehningen-minimal.osm.pbf"), true);
-    provider.readOSM(osmdb);
+    provider.readOsm(osmdb);
     osmdb.postLoad();
 
     var way = osmdb.getWay(13876983L);
@@ -41,7 +41,7 @@ public class OsmDatabaseTest {
     var osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
     var file = RESOURCE_LOADER.file("brenner-invalid-relation-reference.osm.pbf");
     var provider = new OsmProvider(file, true);
-    provider.readOSM(osmdb);
+    provider.readOsm(osmdb);
     osmdb.postLoad();
 
     var way = osmdb.getWay(302732658L);

@@ -4,7 +4,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
@@ -96,7 +96,7 @@ public class VertexFactory {
 
   public OsmVertex osm(
     Coordinate coordinate,
-    OSMNode node,
+    OsmNode node,
     boolean highwayTrafficLight,
     boolean crossingTrafficLight
   ) {
@@ -139,7 +139,7 @@ public class VertexFactory {
     return addToGraph(new TransitEntranceVertex(entrance));
   }
 
-  public OsmVertex levelledOsm(OSMNode node, String level) {
+  public OsmVertex levelledOsm(OsmNode node, String level) {
     return addToGraph(new OsmVertexOnLevel(node, level));
   }
 

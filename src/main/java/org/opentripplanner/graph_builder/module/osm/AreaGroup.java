@@ -17,9 +17,9 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.model.OsmLevel;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWithTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +51,15 @@ class AreaGroup {
     List<Polygon> allRings = new ArrayList<>();
 
     // However, JTS will lose the coord<->osmnode mapping, and we will have to reconstruct it.
-    HashMap<Coordinate, OSMNode> nodeMap = new HashMap<>();
+    HashMap<Coordinate, OsmNode> nodeMap = new HashMap<>();
     for (Area area : areas) {
       for (Ring ring : area.outermostRings) {
         allRings.add(ring.jtsPolygon);
-        for (OSMNode node : ring.nodes) {
+        for (OsmNode node : ring.nodes) {
           nodeMap.put(new Coordinate(node.lon, node.lat), node);
         }
         for (Ring inner : ring.getHoles()) {
-          for (OSMNode node : inner.nodes) {
+          for (OsmNode node : inner.nodes) {
             nodeMap.put(new Coordinate(node.lon, node.lat), node);
           }
         }
@@ -86,28 +86,28 @@ class AreaGroup {
     }
   }
 
-  public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels) {
+  public static List<AreaGroup> groupAreas(Map<Area, OsmLevel> areasLevels) {
     DisjointSet<Area> groups = new DisjointSet<>();
-    Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
+    Multimap<OsmNode, Area> areasForNode = LinkedListMultimap.create();
     for (Area area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
-          for (OSMNode node : inner.nodes) {
+          for (OsmNode node : inner.nodes) {
             areasForNode.put(node, area);
           }
         }
-        for (OSMNode node : ring.nodes) {
+        for (OsmNode node : ring.nodes) {
           areasForNode.put(node, area);
         }
       }
     }
 
     // areas that can be joined must share nodes and levels
-    for (OSMNode osmNode : areasForNode.keySet()) {
+    for (OsmNode osmNode : areasForNode.keySet()) {
       for (Area area1 : areasForNode.get(osmNode)) {
-        OSMLevel level1 = areasLevels.get(area1);
+        OsmLevel level1 = areasLevels.get(area1);
         for (Area area2 : areasForNode.get(osmNode)) {
-          OSMLevel level2 = areasLevels.get(area2);
+          OsmLevel level2 = areasLevels.get(area2);
           if ((level1 == null && level2 == null) || (level1 != null && level1.equals(level2))) {
             groups.union(area1, area2);
           }
@@ -133,14 +133,14 @@ class AreaGroup {
     return out;
   }
 
-  public OSMWithTags getSomeOSMObject() {
+  public OsmWithTags getSomeOsmObject() {
     return areas.iterator().next().parent;
   }
 
-  private Ring toRing(Polygon polygon, HashMap<Coordinate, OSMNode> nodeMap) {
-    List<OSMNode> shell = new ArrayList<>();
+  private Ring toRing(Polygon polygon, HashMap<Coordinate, OsmNode> nodeMap) {
+    List<OsmNode> shell = new ArrayList<>();
     for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
-      OSMNode node = nodeMap.get(coord);
+      OsmNode node = nodeMap.get(coord);
       if (node == null) {
         throw new RingConstructionException();
       }
@@ -150,9 +150,9 @@ class AreaGroup {
     // now the holes
     for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
       LineString interior = polygon.getInteriorRingN(i);
-      List<OSMNode> hole = new ArrayList<>();
+      List<OsmNode> hole = new ArrayList<>();
       for (Coordinate coord : interior.getCoordinates()) {
-        OSMNode node = nodeMap.get(coord);
+        OsmNode node = nodeMap.get(coord);
         if (node == null) {
           throw new RingConstructionException();
         }

@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.time.ZoneId;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 
 /**
  * Configure an OpenStreetMap extract.

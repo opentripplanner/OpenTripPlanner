@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.model.OsmWithTags;
 
-public record TurnRestrictionUnknown(OSMWithTags entity, String tagval) implements DataImportIssue {
+public record TurnRestrictionUnknown(OsmWithTags entity, String tagval) implements DataImportIssue {
   private static final String FMT = "Invalid turn restriction tag %s in turn restriction %d";
   private static final String HTMLFMT = "Invalid turn restriction tag %s in <a href='%s'>'%s'</a>";
 

@@ -14,25 +14,25 @@ class TurnRestrictionUnifier {
       for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
         if (restrictionTag.possibleFrom.isEmpty()) {
           issueStore.add(
-            new TurnRestrictionBad(restrictionTag.relationOSMID, "No from edge found")
+            new TurnRestrictionBad(restrictionTag.relationOsmID, "No from edge found")
           );
           continue;
         }
         if (restrictionTag.possibleTo.isEmpty()) {
-          issueStore.add(new TurnRestrictionBad(restrictionTag.relationOSMID, "No to edge found"));
+          issueStore.add(new TurnRestrictionBad(restrictionTag.relationOsmID, "No to edge found"));
           continue;
         }
         for (StreetEdge from : restrictionTag.possibleFrom) {
           if (from == null) {
             issueStore.add(
-              new TurnRestrictionBad(restrictionTag.relationOSMID, "from-edge is null")
+              new TurnRestrictionBad(restrictionTag.relationOsmID, "from-edge is null")
             );
             continue;
           }
           for (StreetEdge to : restrictionTag.possibleTo) {
             if (to == null) {
               issueStore.add(
-                new TurnRestrictionBad(restrictionTag.relationOSMID, "to-edge is null")
+                new TurnRestrictionBad(restrictionTag.relationOsmID, "to-edge is null")
               );
               continue;
             }
@@ -45,7 +45,7 @@ class TurnRestrictionUnifier {
                 if (angleDiff >= 160) {
                   issueStore.add(
                     new TurnRestrictionBad(
-                      restrictionTag.relationOSMID,
+                      restrictionTag.relationOsmID,
                       "Left turn restriction is not on edges which turn left"
                     )
                   );
@@ -56,7 +56,7 @@ class TurnRestrictionUnifier {
                 if (angleDiff <= 200) {
                   issueStore.add(
                     new TurnRestrictionBad(
-                      restrictionTag.relationOSMID,
+                      restrictionTag.relationOsmID,
                       "Right turn restriction is not on edges which turn right"
                     )
                   );
@@ -67,7 +67,7 @@ class TurnRestrictionUnifier {
                 if ((angleDiff <= 150 || angleDiff > 210)) {
                   issueStore.add(
                     new TurnRestrictionBad(
-                      restrictionTag.relationOSMID,
+                      restrictionTag.relationOsmID,
                       "U-turn restriction is not on U-turn"
                     )
                   );
@@ -78,7 +78,7 @@ class TurnRestrictionUnifier {
                 if (angleDiff >= 30 && angleDiff < 330) {
                   issueStore.add(
                     new TurnRestrictionBad(
-                      restrictionTag.relationOSMID,
+                      restrictionTag.relationOsmID,
                       "Straight turn restriction is not on edges which go straight"
                     )
                   );

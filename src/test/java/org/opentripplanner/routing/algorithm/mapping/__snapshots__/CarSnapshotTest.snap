@@ -98,13 +98,13 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             "lon" : -122.7016859,
             "name" : "P+R (#2)",
             "vehicleParking" : {
-              "entranceId" : "OSM:OSMWay/-102488/osm:node:-102438",
+              "entranceId" : "OSM:OsmWay/-102488/osm:node:-102438",
               "entranceName" : "P+R (#2)",
               "hasAnyCarPlaces" : true,
               "hasBicyclePlaces" : false,
               "hasCarPlaces" : true,
               "hasWheelchairAccessibleCarPlaces" : false,
-              "id" : "OSM:OSMWay/-102488",
+              "id" : "OSM:OsmWay/-102488",
               "name" : "P+R",
               "realtime" : false,
               "tags" : [
@@ -129,13 +129,13 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
             "lon" : -122.7016931,
             "name" : "P+R (#1)",
             "vehicleParking" : {
-              "entranceId" : "OSM:OSMWay/-102488/osm:node:-102437",
+              "entranceId" : "OSM:OsmWay/-102488/osm:node:-102437",
               "entranceName" : "P+R (#1)",
               "hasAnyCarPlaces" : true,
               "hasBicyclePlaces" : false,
               "hasCarPlaces" : true,
               "hasWheelchairAccessibleCarPlaces" : false,
-              "id" : "OSM:OSMWay/-102488",
+              "id" : "OSM:OsmWay/-102488",
               "name" : "P+R",
               "realtime" : false,
               "tags" : [
