@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
-import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;

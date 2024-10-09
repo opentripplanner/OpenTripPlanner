@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.osm.model.OsmNode;
 
 class RingTest {
 

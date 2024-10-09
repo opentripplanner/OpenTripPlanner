@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmDatabaseTest {

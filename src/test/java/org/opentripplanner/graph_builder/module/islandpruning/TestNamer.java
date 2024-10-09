@@ -4,7 +4,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 class TestNamer implements EdgeNamer {
 

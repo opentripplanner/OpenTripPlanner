@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 

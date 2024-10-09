@@ -7,9 +7,9 @@ import gnu.trove.list.TLongList;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.openstreetmap.model.OsmNode;
-import org.opentripplanner.openstreetmap.model.OsmWay;
+import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class OsmParserTest {

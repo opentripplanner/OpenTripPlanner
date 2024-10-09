@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.issues;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OsmNode;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 public record DisconnectedOsmNode(OsmNode node, OsmWithTags way, OsmWithTags area)
   implements DataImportIssue {

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 public record InvalidVehicleParkingCapacity(OsmWithTags entity, String capacityValue)
   implements DataImportIssue {

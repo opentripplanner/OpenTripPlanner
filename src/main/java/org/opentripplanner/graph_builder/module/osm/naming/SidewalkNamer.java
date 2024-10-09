@@ -31,7 +31,7 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

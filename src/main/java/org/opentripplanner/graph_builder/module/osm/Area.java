@@ -12,9 +12,9 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OsmNode;
-import org.opentripplanner.openstreetmap.model.OsmWay;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on

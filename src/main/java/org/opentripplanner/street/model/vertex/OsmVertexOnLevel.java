@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.openstreetmap.model.OsmNode;
+import org.opentripplanner.osm.model.OsmNode;
 
 /**
  * A vertex that represents an OSM node in conjunction with its level tag like both ends of an

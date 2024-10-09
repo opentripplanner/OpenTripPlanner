@@ -15,7 +15,7 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.openstreetmap.OsmOpeningHoursParser;
+import org.opentripplanner.osm.OsmOpeningHoursParser;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;

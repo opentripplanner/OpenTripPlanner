@@ -6,11 +6,11 @@ import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.ATLANTA;
-import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.CONSTANT_SPEED_FINLAND;
-import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.HAMBURG;
-import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.HOUSTON;
-import static org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource.PORTLAND;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.ATLANTA;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.CONSTANT_SPEED_FINLAND;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HAMBURG;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.HOUSTON;
+import static org.opentripplanner.osm.tagmapping.OsmTagMapperSource.PORTLAND;
 
 import java.io.File;
 import java.util.Arrays;
@@ -20,12 +20,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
-import org.opentripplanner.generate.doc.framework.DocsTestConstants;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
-import org.opentripplanner.openstreetmap.wayproperty.SafetyFeatures;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.tagmapping.OsmTagMapper;
+import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.osm.wayproperty.SafetyFeatures;
+import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 @GeneratesDocumentation
 public class OsmMapperDocTest {

@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.openstreetmap.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 public record AreaTooComplicated(AreaGroup areaGroup, int nbNodes, int maxAreaNodes)
   implements DataImportIssue {
