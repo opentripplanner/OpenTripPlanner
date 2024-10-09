@@ -53,6 +53,8 @@ public class OneOfInputValidator {
       );
     }
 
+    // This is not done in the "standard" validator, so if this is replaced by another validator
+    // we should consider adding this validation.
     var field = fieldsInInput.getFirst();
     if (map.get(field) instanceof Collection<?> c) {
       if (c.isEmpty()) {
