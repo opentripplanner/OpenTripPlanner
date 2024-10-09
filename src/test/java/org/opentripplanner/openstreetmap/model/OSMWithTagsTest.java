@@ -212,6 +212,8 @@ public class OSMWithTagsTest {
   @Test
   void isRoutable() {
     assertFalse(WayTestData.zooPlatform().isRoutable());
+    assertTrue(WayTestData.indoor("area").isRoutable());
+    assertFalse(WayTestData.indoor("room").isRoutable());
   }
 
   @Test

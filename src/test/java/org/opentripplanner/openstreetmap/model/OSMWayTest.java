@@ -18,6 +18,56 @@ public class OSMWayTest {
   }
 
   @Test
+  void testAreaMustContain3Nodes() {
+    OSMWay way = new OSMWay();
+    way.addTag("area", "yes");
+    assertFalse(way.isArea());
+    way.addNodeRef(1);
+    assertFalse(way.isArea());
+    way.addNodeRef(2);
+    assertFalse(way.isArea());
+    way.addNodeRef(3);
+    assertTrue(way.isArea());
+    way.addNodeRef(4);
+    assertTrue(way.isArea());
+  }
+
+  @Test
+  void testAreaTags() {
+    OSMWay platform = getClosedPolygon();
+    platform.addTag("public_transport", "platform");
+    assertTrue(platform.isArea());
+    platform.addTag("area", "no");
+    assertFalse(platform.isArea());
+
+    OSMWay roundabout = getClosedPolygon();
+    roundabout.addTag("highway", "roundabout");
+    assertFalse(roundabout.isArea());
+
+    OSMWay pedestrian = getClosedPolygon();
+    pedestrian.addTag("highway", "pedestrian");
+    assertFalse(pedestrian.isArea());
+    pedestrian.addTag("area", "yes");
+    assertTrue(pedestrian.isArea());
+
+    OSMWay indoorArea = getClosedPolygon();
+    indoorArea.addTag("indoor", "area");
+    assertTrue(indoorArea.isArea());
+
+    OSMWay bikeParking = getClosedPolygon();
+    bikeParking.addTag("amenity", "bicycle_parking");
+    assertTrue(bikeParking.isArea());
+
+    OSMWay corridor = getClosedPolygon();
+    corridor.addTag("indoor", "corridor");
+    assertTrue(corridor.isArea());
+
+    OSMWay door = getClosedPolygon();
+    door.addTag("indoor", "door");
+    assertFalse(door.isArea());
+  }
+
+  @Test
   void testIsSteps() {
     OSMWay way = new OSMWay();
     assertFalse(way.isSteps());
@@ -124,5 +174,14 @@ public class OSMWayTest {
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
+  }
+
+  private OSMWay getClosedPolygon() {
+    var way = new OSMWay();
+    way.addNodeRef(1);
+    way.addNodeRef(2);
+    way.addNodeRef(3);
+    way.addNodeRef(1);
+    return way;
   }
 }

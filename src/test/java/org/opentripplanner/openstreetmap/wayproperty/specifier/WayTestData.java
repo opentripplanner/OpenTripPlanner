@@ -218,4 +218,10 @@ public class WayTestData {
     way.addTag("usage", "tourism");
     return way;
   }
+
+  public static OSMWithTags indoor(String value) {
+    var way = new OSMWithTags();
+    way.addTag("indoor", value);
+    return way;
+  }
 }

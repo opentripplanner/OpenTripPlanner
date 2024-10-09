@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
@@ -120,6 +121,14 @@ public class DefaultMapperTest {
     // there is no special handling for stairs with ramps yet
     var props = wps.getDataForWay(WayTestData.stairs());
     assertEquals(PEDESTRIAN, props.getPermission());
+  }
+
+  @Test
+  void indoor() {
+    var corridor = wps.getDataForWay(WayTestData.indoor("corridor"));
+    assertEquals(PEDESTRIAN, corridor.getPermission());
+    var area = wps.getDataForWay(WayTestData.indoor("area"));
+    assertEquals(PEDESTRIAN, area.getPermission());
   }
 
   @Test
