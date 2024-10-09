@@ -7,10 +7,10 @@ import java.util.Objects;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OsmMemberType;
 import org.opentripplanner.openstreetmap.model.OsmNode;
 import org.opentripplanner.openstreetmap.model.OsmRelation;
-import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OsmTag;
 import org.opentripplanner.openstreetmap.model.OsmWay;
 
