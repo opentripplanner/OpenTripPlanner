@@ -79,9 +79,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Set the next leg state. This is used to connect the state created by this config with the
-   * next leg. If this is the last leg, the next leg should be {@code null}. Calling this method
-   * is optional - if not called.
+   * Sets the next leg state. This is used to connect the state created by this config with the
+   * next leg. If this is the last leg, the next leg should be {@code null}. This is optional.
    */
   public McRangeRaptorConfig<T> connectWithNextLegArrivals(
     @Nullable McStopArrivals<T> nextLegArrivals

@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorViaConnection;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -34,9 +35,33 @@ class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
   public void notifyElementAccepted(ArrivalView<T> newElement) {
     for (RaptorViaConnection c : connections) {
       var e = (McStopArrival<T>) newElement;
-      var n = stopArrivalFactory.createViaStopArrival(e, c);
+      var n = createViaStopArrival(e, c);
       if (n != null) {
         next.addStopArrival(n);
+      }
+    }
+  }
+
+  @Nullable
+  private McStopArrival<T> createViaStopArrival(
+    McStopArrival<T> previous,
+    RaptorViaConnection viaConnection
+  ) {
+    if (viaConnection.isSameStop()) {
+      if (viaConnection.durationInSeconds() == 0) {
+        return previous;
+      } else {
+        return previous.addSlackToArrivalTime(viaConnection.durationInSeconds());
+      }
+    } else {
+      if (previous.arrivedOnBoard()) {
+        return stopArrivalFactory.createTransferStopArrival(
+          previous,
+          viaConnection.transfer(),
+          previous.arrivalTime() + viaConnection.durationInSeconds()
+        );
+      } else {
+        return null;
       }
     }
   }
