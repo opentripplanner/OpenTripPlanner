@@ -297,7 +297,7 @@ public class TimetableSnapshot {
    * @return whether the update was actually applied
    */
   public Result<UpdateSuccess, UpdateError> update(RealTimeTripUpdate realTimeTripUpdate) {
-    validateReadOnly();
+    validateNotReadOnly();
 
     TripPattern pattern = realTimeTripUpdate.pattern();
     LocalDate serviceDate = realTimeTripUpdate.serviceDate();
@@ -364,7 +364,7 @@ public class TimetableSnapshot {
   }
 
   public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
-    validateReadOnly();
+    validateNotReadOnly();
 
     if (!force && !this.isDirty()) {
       return null;
@@ -398,7 +398,7 @@ public class TimetableSnapshot {
    * @param feedId feed id to clear the snapshot for
    */
   public void clear(String feedId) {
-    validateReadOnly();
+    validateNotReadOnly();
     // Clear all data from snapshot.
     boolean timetablesWereCleared = clearTimetables(feedId);
     boolean newTripPatternsForModifiedTripsWereCleared = clearNewTripPatternsForModifiedTrips(
@@ -422,7 +422,7 @@ public class TimetableSnapshot {
    * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
-    validateReadOnly();
+    validateNotReadOnly();
 
     boolean success = false;
 
@@ -473,7 +473,7 @@ public class TimetableSnapshot {
    * @return true if any data has been modified and false if no purging has happened.
    */
   public boolean purgeExpiredData(LocalDate serviceDate) {
-    validateReadOnly();
+    validateNotReadOnly();
 
     boolean modified = false;
     for (Iterator<TripPattern> it = timetables.keySet().iterator(); it.hasNext();) {
@@ -604,7 +604,7 @@ public class TimetableSnapshot {
     dirty = true;
   }
 
-  private void validateReadOnly() {
+  private void validateNotReadOnly() {
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
     }
