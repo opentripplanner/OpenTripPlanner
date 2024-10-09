@@ -10,7 +10,7 @@ import java.util.OptionalInt;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
-import org.opentripplanner.osm.model.OSMLevel;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -64,7 +64,7 @@ class ElevatorProcessor {
       // subscript it so we can loop over it in twos. Assumedly, it will stay
       // sorted when we convert it to an Array.
       // The objects are Integers, but toArray returns Object[]
-      Map<OSMLevel, OsmVertex> vertices = vertexGenerator.multiLevelNodes().get(nodeId);
+      Map<OsmLevel, OsmVertex> vertices = vertexGenerator.multiLevelNodes().get(nodeId);
 
       /*
        * first, build FreeEdges to disconnect from the graph, GenericVertices to serve as attachment points, and ElevatorBoard and
@@ -77,10 +77,10 @@ class ElevatorProcessor {
        * + GenericVertex, X EndpointVertex, ~~ FreeEdge, == ElevatorBoardEdge/ElevatorAlightEdge Another loop will fill in the
        * ElevatorHopEdges.
        */
-      OSMLevel[] levels = vertices.keySet().toArray(new OSMLevel[0]);
+      OsmLevel[] levels = vertices.keySet().toArray(new OsmLevel[0]);
       Arrays.sort(levels);
       ArrayList<Vertex> onboardVertices = new ArrayList<>();
-      for (OSMLevel level : levels) {
+      for (OsmLevel level : levels) {
         // get the node to build the elevator out from
         OsmVertex sourceVertex = vertices.get(level);
         String levelName = level.longName;

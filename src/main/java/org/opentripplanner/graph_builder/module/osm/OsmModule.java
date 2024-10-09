@@ -19,7 +19,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.model.OSMLevel;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -189,7 +189,7 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private List<AreaGroup> groupAreas(Collection<Area> areas) {
-    Map<Area, OSMLevel> areasLevels = new HashMap<>(areas.size());
+    Map<Area, OsmLevel> areasLevels = new HashMap<>(areas.size());
     for (Area area : areas) {
       areasLevels.put(area, osmdb.getLevelForWay(area.parent));
     }

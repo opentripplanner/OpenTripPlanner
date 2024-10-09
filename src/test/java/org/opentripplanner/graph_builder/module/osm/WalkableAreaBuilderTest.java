@@ -20,7 +20,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.model.OSMLevel;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -57,7 +57,7 @@ public class WalkableAreaBuilderTest {
       boardingAreaRefTags
     );
 
-    final Map<Area, OSMLevel> areasLevels = osmdb
+    final Map<Area, OsmLevel> areasLevels = osmdb
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));

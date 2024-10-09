@@ -17,7 +17,7 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
-import org.opentripplanner.osm.model.OSMLevel;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.slf4j.Logger;
@@ -86,7 +86,7 @@ class AreaGroup {
     }
   }
 
-  public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels) {
+  public static List<AreaGroup> groupAreas(Map<Area, OsmLevel> areasLevels) {
     DisjointSet<Area> groups = new DisjointSet<>();
     Multimap<OsmNode, Area> areasForNode = LinkedListMultimap.create();
     for (Area area : areasLevels.keySet()) {
@@ -105,9 +105,9 @@ class AreaGroup {
     // areas that can be joined must share nodes and levels
     for (OsmNode osmNode : areasForNode.keySet()) {
       for (Area area1 : areasForNode.get(osmNode)) {
-        OSMLevel level1 = areasLevels.get(area1);
+        OsmLevel level1 = areasLevels.get(area1);
         for (Area area2 : areasForNode.get(osmNode)) {
-          OSMLevel level2 = areasLevels.get(area2);
+          OsmLevel level2 = areasLevels.get(area2);
           if ((level1 == null && level2 == null) || (level1 != null && level1.equals(level2))) {
             groups.union(area1, area2);
           }

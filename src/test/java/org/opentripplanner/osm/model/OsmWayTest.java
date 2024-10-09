@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
-public class OSMWayTest {
+public class OsmWayTest {
 
   @Test
   void testIsBicycleDismountForced() {

@@ -5,13 +5,13 @@ import java.util.List;
 
 public class OsmRelation extends OsmWithTags {
 
-  private final List<OSMRelationMember> members = new ArrayList<>();
+  private final List<OsmRelationMember> members = new ArrayList<>();
 
-  public void addMember(OSMRelationMember member) {
+  public void addMember(OsmRelationMember member) {
     members.add(member);
   }
 
-  public List<OSMRelationMember> getMembers() {
+  public List<OsmRelationMember> getMembers() {
     return members;
   }
 

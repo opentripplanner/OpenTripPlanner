@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
-import org.opentripplanner.osm.model.OSMRelationMember;
+import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmMemberType;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
@@ -78,7 +78,7 @@ class OsmParser extends BinaryParser {
 
       long lastMid = 0;
       for (int j = 0; j < i.getMemidsCount(); j++) {
-        OSMRelationMember relMember = new OSMRelationMember();
+        OsmRelationMember relMember = new OsmRelationMember();
         long mid = lastMid + i.getMemids(j);
 
         relMember.setRef(mid);

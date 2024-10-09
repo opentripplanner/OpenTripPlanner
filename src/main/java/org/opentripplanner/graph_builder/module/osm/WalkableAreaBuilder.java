@@ -26,7 +26,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.osm.model.OSMRelationMember;
+import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -195,7 +195,7 @@ class WalkableAreaBuilder {
       .map(area -> area.parent)
       .flatMap(osmWithTags ->
         osmWithTags instanceof OsmRelation
-          ? ((OsmRelation) osmWithTags).getMembers().stream().map(OSMRelationMember::getRef)
+          ? ((OsmRelation) osmWithTags).getMembers().stream().map(OsmRelationMember::getRef)
           : Stream.of(osmWithTags.getId())
       )
       .collect(Collectors.toSet());

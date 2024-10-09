@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.osm.model.OSMLevel;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -30,7 +30,7 @@ class VertexGenerator {
 
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
-  private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
+  private final HashMap<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
   private final Set<String> boardingAreaRefTags;
   private final VertexFactory vertexFactory;
@@ -115,7 +115,7 @@ class VertexGenerator {
    * Tracks OSM nodes which are decomposed into multiple graph vertices because they are
    * elevators. They can then be iterated over to build {@link ElevatorEdge} between them.
    */
-  Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes() {
+  Map<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes() {
     return multiLevelNodes;
   }
 
@@ -160,8 +160,8 @@ class VertexGenerator {
    * @author mattwigway
    */
   private OsmVertex recordLevel(OsmNode node, OsmWithTags way) {
-    OSMLevel level = osmdb.getLevelForWay(way);
-    Map<OSMLevel, OsmVertex> vertices;
+    OsmLevel level = osmdb.getLevelForWay(way);
+    Map<OsmLevel, OsmVertex> vertices;
     long nodeId = node.getId();
     if (multiLevelNodes.containsKey(nodeId)) {
       vertices = multiLevelNodes.get(nodeId);

@@ -2,7 +2,7 @@ package org.opentripplanner.osm.model;
 
 import static org.opentripplanner.osm.model.OsmMemberType.WAY;
 
-public class OSMRelationMember {
+public class OsmRelationMember {
 
   private OsmMemberType type;
 

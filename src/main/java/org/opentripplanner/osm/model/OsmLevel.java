@@ -10,11 +10,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.issues.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.osm.issues.FloorNumberUnknownGuessedFromAltitude;
 
-public class OSMLevel implements Comparable<OSMLevel> {
+public class OsmLevel implements Comparable<OsmLevel> {
 
   public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+-[0-9]+$");
   public static final double METERS_PER_FLOOR = 3;
-  public static final OSMLevel DEFAULT = new OSMLevel(
+  public static final OsmLevel DEFAULT = new OsmLevel(
     0,
     0.0,
     "default level",
@@ -29,7 +29,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
   public final Source source;
   public final boolean reliable;
 
-  public OSMLevel(
+  public OsmLevel(
     int floorNumber,
     double altitudeMeters,
     String shortName,
@@ -49,7 +49,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
    * makes an OSMLevel from one of the semicolon-separated fields in an OSM level map relation's
    * levels= tag.
    */
-  public static OSMLevel fromString(
+  public static OsmLevel fromString(
     String spec,
     Source source,
     boolean incrementNonNegative,
@@ -126,10 +126,10 @@ public class OSMLevel implements Comparable<OSMLevel> {
       issueStore.add(new FloorNumberUnknownAssumedGroundLevel(spec, osmObj));
       reliable = false;
     }
-    return new OSMLevel(floorNumber, altitude, shortName, longName, source, reliable);
+    return new OsmLevel(floorNumber, altitude, shortName, longName, source, reliable);
   }
 
-  public static List<OSMLevel> fromSpecList(
+  public static List<OsmLevel> fromSpecList(
     String specList,
     Source source,
     boolean incrementNonNegative,
@@ -153,22 +153,22 @@ public class OSMLevel implements Comparable<OSMLevel> {
     }
 
     /* build an OSMLevel for each level spec in the list */
-    List<OSMLevel> levels = new ArrayList<>();
+    List<OsmLevel> levels = new ArrayList<>();
     for (String spec : levelSpecs) {
       levels.add(fromString(spec, source, incrementNonNegative, issueStore, osmObj));
     }
     return levels;
   }
 
-  public static Map<String, OSMLevel> mapFromSpecList(
+  public static Map<String, OsmLevel> mapFromSpecList(
     String specList,
     Source source,
     boolean incrementNonNegative,
     DataImportIssueStore issueStore,
     OsmWithTags osmObj
   ) {
-    Map<String, OSMLevel> map = new HashMap<>();
-    for (OSMLevel level : fromSpecList(
+    Map<String, OsmLevel> map = new HashMap<>();
+    for (OsmLevel level : fromSpecList(
       specList,
       source,
       incrementNonNegative,
@@ -181,7 +181,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
   }
 
   @Override
-  public int compareTo(OSMLevel other) {
+  public int compareTo(OsmLevel other) {
     return this.floorNumber - other.floorNumber;
   }
 
@@ -195,10 +195,10 @@ public class OSMLevel implements Comparable<OSMLevel> {
     if (other == null) {
       return false;
     }
-    if (!(other instanceof OSMLevel)) {
+    if (!(other instanceof OsmLevel)) {
       return false;
     }
-    return this.floorNumber == ((OSMLevel) other).floorNumber;
+    return this.floorNumber == ((OsmLevel) other).floorNumber;
   }
 
   public enum Source {

@@ -37,9 +37,9 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.osm.model.OSMLevel;
-import org.opentripplanner.osm.model.OSMLevel.Source;
-import org.opentripplanner.osm.model.OSMRelationMember;
+import org.opentripplanner.osm.model.OsmLevel;
+import org.opentripplanner.osm.model.OsmLevel.Source;
+import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmTag;
@@ -104,7 +104,7 @@ public class OsmDatabase {
   private final TLongSet areaNodeIds = new TLongHashSet();
 
   /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-  private final Map<OsmWithTags, OSMLevel> wayLevels = new HashMap<>();
+  private final Map<OsmWithTags, OsmLevel> wayLevels = new HashMap<>();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap.create();
@@ -194,8 +194,8 @@ public class OsmDatabase {
     return stopsInAreas.get(areaParent);
   }
 
-  public OSMLevel getLevelForWay(OsmWithTags way) {
-    return Objects.requireNonNullElse(wayLevels.get(way), OSMLevel.DEFAULT);
+  public OsmLevel getLevelForWay(OsmWithTags way) {
+    return Objects.requireNonNullElse(wayLevels.get(way), OsmLevel.DEFAULT);
   }
 
   public Set<OsmWay> getAreasForNode(Long nodeId) {
@@ -294,7 +294,7 @@ public class OsmDatabase {
       if (!relation.isRoutable() && !relation.isParkAndRide() && !relation.isBikeParking()) {
         return;
       }
-      for (OSMRelationMember member : relation.getMembers()) {
+      for (OsmRelationMember member : relation.getMembers()) {
         areaWayIds.add(member.getRef());
       }
       applyLevelsForWay(relation);
@@ -386,7 +386,7 @@ public class OsmDatabase {
     // For each way, intersect with areas
     int nCreatedNodes = 0;
     for (OsmWay way : waysById.valueCollection()) {
-      OSMLevel wayLevel = getLevelForWay(way);
+      OsmLevel wayLevel = getLevelForWay(way);
 
       // For each segment of the way
       for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
@@ -417,7 +417,7 @@ public class OsmDatabase {
           }
 
           // Skip if area and way are from "incompatible" levels
-          OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+          OsmLevel areaLevel = getLevelForWay(ringSegment.area.parent);
           if (!wayLevel.equals(areaLevel)) {
             continue;
           }
@@ -648,19 +648,19 @@ public class OsmDatabase {
 
       /* try to find a level name in tags */
       String levelName = null;
-      OSMLevel level = OSMLevel.DEFAULT;
+      OsmLevel level = OsmLevel.DEFAULT;
       if (way.hasTag("level")) { // TODO: floating-point levels &c.
         levelName = way.getTag("level");
         level =
-          OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, issueStore, way);
+          OsmLevel.fromString(levelName, OsmLevel.Source.LEVEL_TAG, noZeroLevels, issueStore, way);
       } else if (way.hasTag("layer")) {
         levelName = way.getTag("layer");
         level =
-          OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, issueStore, way);
+          OsmLevel.fromString(levelName, OsmLevel.Source.LAYER_TAG, noZeroLevels, issueStore, way);
       }
       if (level == null || (!level.reliable)) {
         issueStore.add(new LevelAmbiguous(levelName, way));
-        level = OSMLevel.DEFAULT;
+        level = OsmLevel.DEFAULT;
       }
       wayLevels.put(way, level);
     }
@@ -728,7 +728,7 @@ public class OsmDatabase {
       // Area multipolygons -- pedestrian plazas
       ArrayList<OsmWay> innerWays = new ArrayList<>();
       ArrayList<OsmWay> outerWays = new ArrayList<>();
-      for (OSMRelationMember member : relation.getMembers()) {
+      for (OsmRelationMember member : relation.getMembers()) {
         OsmWay way = areaWaysById.get(member.getRef());
         if (way == null) {
           // relation includes way which does not exist in the data. Skip.
@@ -761,7 +761,7 @@ public class OsmDatabase {
         continue;
       }
 
-      for (OSMRelationMember member : relation.getMembers()) {
+      for (OsmRelationMember member : relation.getMembers()) {
         // multipolygons for attribute mapping
         if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
           continue;
@@ -857,7 +857,7 @@ public class OsmDatabase {
    */
   private void processRestriction(OsmRelation relation) {
     long from = -1, to = -1, via = -1;
-    for (OSMRelationMember member : relation.getMembers()) {
+    for (OsmRelationMember member : relation.getMembers()) {
       String role = member.getRole();
       if (role.equals("from")) {
         from = member.getRef();
@@ -978,14 +978,14 @@ public class OsmDatabase {
       return;
     }
 
-    Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(
+    Map<String, OsmLevel> levels = OsmLevel.mapFromSpecList(
       levelsTag,
       Source.LEVEL_MAP,
       true,
       issueStore,
       relation
     );
-    for (OSMRelationMember member : relation.getMembers()) {
+    for (OsmRelationMember member : relation.getMembers()) {
       if (member.hasTypeWay() && waysById.containsKey(member.getRef())) {
         OsmWay way = waysById.get(member.getRef());
         if (way != null) {
@@ -1008,7 +1008,7 @@ public class OsmDatabase {
    * Handle route=road and route=bicycle relations.
    */
   private void processRoute(OsmRelation relation) {
-    for (OSMRelationMember member : relation.getMembers()) {
+    for (OsmRelationMember member : relation.getMembers()) {
       if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
         continue;
       }
@@ -1056,7 +1056,7 @@ public class OsmDatabase {
   private void processPublicTransportStopArea(OsmRelation relation) {
     Set<OsmWithTags> platformAreas = new HashSet<>();
     Set<OsmNode> platformNodes = new HashSet<>();
-    for (OSMRelationMember member : relation.getMembers()) {
+    for (OsmRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
         case NODE -> {
           var node = nodesById.get(member.getRef());
