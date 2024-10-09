@@ -60,7 +60,7 @@ public class BicyclePreferencesMapper {
     var mountTime = args.getGraphQLMountDismountTime();
     if (mountTime != null) {
       preferences.withMountDismountTime(
-        DurationUtils.requireNonNegativeShort(mountTime, "bicycle mount dismount time")
+        DurationUtils.requireNonNegativeMax30minutes(mountTime, "bicycle mount dismount time")
       );
     }
     var cost = args.getGraphQLCost();

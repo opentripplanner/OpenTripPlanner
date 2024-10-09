@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeLong;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMedium;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeShort;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2days;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2hours;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax30minutes;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -153,40 +153,40 @@ public class DurationUtilsTest {
 
   @Test
   public void testRequireNonNegativeLong() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeLong(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax2days(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeLong(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax2days(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeLong(Duration.ofDays(3), "test")
+      () -> requireNonNegativeMax2days(Duration.ofDays(3), "test")
     );
   }
 
   @Test
   public void testRequireNonNegativeMedium() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeMedium(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax2hours(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeMedium(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax2hours(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeMedium(Duration.ofHours(3), "test")
+      () -> requireNonNegativeMax2hours(Duration.ofHours(3), "test")
     );
   }
 
   @Test
   public void testRequireNonNegativeShort() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeShort(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax30minutes(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeShort(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax30minutes(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeShort(Duration.ofMinutes(31), "test")
+      () -> requireNonNegativeMax30minutes(Duration.ofMinutes(31), "test")
     );
   }
 

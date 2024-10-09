@@ -41,7 +41,7 @@ public class RouteRequestMapper {
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
     if (args.getGraphQLSearchWindow() != null) {
       request.setSearchWindow(
-        DurationUtils.requireNonNegativeLong(args.getGraphQLSearchWindow(), "searchWindow")
+        DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
       );
     }
 
