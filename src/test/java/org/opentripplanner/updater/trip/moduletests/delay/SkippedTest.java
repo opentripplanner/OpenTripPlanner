@@ -88,7 +88,7 @@ class SkippedTest implements RealtimeTestConstants {
     // stoptime updates have gone through
     var snapshot = env.getTimetableSnapshot();
 
-    assertNull(snapshot.getRealtimeModifiedTripPattern(id(TRIP_2_ID), SERVICE_DATE));
+    assertNull(snapshot.getNewTripPatternForModifiedTrip(id(TRIP_2_ID), SERVICE_DATE));
 
     assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 

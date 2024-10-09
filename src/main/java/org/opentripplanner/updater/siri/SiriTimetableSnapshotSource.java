@@ -244,7 +244,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney,
         entityResolver,
         this::getCurrentTimetable,
-        snapshotManager::getRealtimeModifiedTripPattern
+        snapshotManager::getNewTripPatternForModifiedTrip
       );
 
       if (tripAndPattern == null) {

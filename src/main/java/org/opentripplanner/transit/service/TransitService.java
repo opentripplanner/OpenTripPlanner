@@ -234,12 +234,12 @@ public interface TransitService {
    * this date (that is: it is still using its scheduled trip pattern for this date).
    */
   @Nullable
-  TripPattern getRealtimeModifiedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
+  TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate);
 
   /**
    * Return true if at least one trip pattern has been modified by a real-time update.
    */
-  boolean hasRealtimeModifiedTripPatterns();
+  boolean hasNewTripPatternsForModifiedTrips();
 
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 

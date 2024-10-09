@@ -339,7 +339,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
-    TripPattern realtimePattern = getRealtimeModifiedTripPattern(trip.getId(), serviceDate);
+    TripPattern realtimePattern = getNewTripPatternForModifiedTrip(trip.getId(), serviceDate);
     if (realtimePattern != null) {
       return realtimePattern;
     }
@@ -520,21 +520,21 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripPattern getRealtimeModifiedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+  public TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate) {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot == null) {
       return null;
     }
-    return currentSnapshot.getRealtimeModifiedTripPattern(tripId, serviceDate);
+    return currentSnapshot.getNewTripPatternForModifiedTrip(tripId, serviceDate);
   }
 
   @Override
-  public boolean hasRealtimeModifiedTripPatterns() {
+  public boolean hasNewTripPatternsForModifiedTrips() {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot == null) {
       return false;
     }
-    return currentSnapshot.hasRealtimeModifiedTripPatterns();
+    return currentSnapshot.hasNewTripPatternsForModifiedTrips();
   }
 
   /**

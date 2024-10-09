@@ -250,7 +250,7 @@ public class TimetableSnapshotSourceTest {
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getRealtimeModifiedTripPattern(
+      final TripPattern newTripPattern = snapshot.getNewTripPatternForModifiedTrip(
         new FeedScopedId(feedId, modifiedTripId),
         SERVICE_DATE
       );
