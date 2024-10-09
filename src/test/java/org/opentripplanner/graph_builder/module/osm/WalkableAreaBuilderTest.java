@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
-import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
+import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -42,7 +42,7 @@ public class WalkableAreaBuilderTest {
 
     final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
-    new OsmProvider(file, false).readOSM(osmdb);
+    new OsmProvider(file, false).readOsm(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
@@ -57,7 +57,7 @@ public class WalkableAreaBuilderTest {
       boardingAreaRefTags
     );
 
-    final Map<Area, OSMLevel> areasLevels = osmdb
+    final Map<Area, OsmLevel> areasLevels = osmdb
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));

@@ -15,7 +15,7 @@ class TurnRestrictionTag {
 
   long via;
   //Used only for issues so that it can be visualized in a map
-  long relationOSMID;
+  long relationOsmID;
   TurnRestrictionType type;
   Direction direction;
   RepeatingTimePeriod time;
@@ -23,11 +23,11 @@ class TurnRestrictionTag {
   public List<StreetEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;
 
-  TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {
+  TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOsmID) {
     this.via = via;
     this.type = type;
     this.direction = direction;
-    this.relationOSMID = relationOSMID;
+    this.relationOsmID = relationOsmID;
   }
 
   @Override

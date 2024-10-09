@@ -40,7 +40,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -55,7 +55,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static OsmModule provideOpenStreetMapModule(
+  static OsmModule provideOsmModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
