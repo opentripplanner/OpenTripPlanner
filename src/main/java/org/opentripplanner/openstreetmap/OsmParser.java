@@ -19,14 +19,14 @@ import org.opentripplanner.openstreetmap.model.OsmWay;
  *
  * @since 0.4
  */
-class OpenStreetMapParser extends BinaryParser {
+class OsmParser extends BinaryParser {
 
   private final OsmDatabase osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
   private final OsmProvider provider;
   private OsmParserPhase parsePhase;
 
-  public OpenStreetMapParser(OsmDatabase osmdb, OsmProvider provider) {
+  public OsmParser(OsmDatabase osmdb, OsmProvider provider) {
     this.osmdb = Objects.requireNonNull(osmdb);
     this.provider = Objects.requireNonNull(provider);
   }

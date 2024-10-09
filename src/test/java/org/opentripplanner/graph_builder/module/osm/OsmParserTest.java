@@ -12,7 +12,7 @@ import org.opentripplanner.openstreetmap.model.OsmNode;
 import org.opentripplanner.openstreetmap.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
 
-public class OpenStreetMapParserTest {
+public class OsmParserTest {
 
   @Test
   public void testBinaryParser() {

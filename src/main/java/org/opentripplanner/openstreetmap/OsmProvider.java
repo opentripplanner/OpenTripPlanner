@@ -68,7 +68,7 @@ public class OsmProvider {
 
   public void readOSM(OsmDatabase osmdb) {
     try {
-      OpenStreetMapParser parser = new OpenStreetMapParser(osmdb, this);
+      OsmParser parser = new OsmParser(osmdb, this);
 
       parsePhase(parser, OsmParserPhase.Relations);
       osmdb.doneFirstPhaseRelations();
@@ -105,7 +105,7 @@ public class OsmProvider {
     return ProgressTracker.track("Parse OSM " + phase, 1000, size, inputStream, m -> LOG.info(m));
   }
 
-  private void parsePhase(OpenStreetMapParser parser, OsmParserPhase phase) throws IOException {
+  private void parsePhase(OsmParser parser, OsmParserPhase phase) throws IOException {
     parser.setPhase(phase);
     BlockInputStream in = null;
     try {
