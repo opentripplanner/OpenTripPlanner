@@ -13,9 +13,9 @@ public class NoteProperties {
 
   private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
 
-  public String notePattern;
+  private final String notePattern;
 
-  public StreetNoteMatcher noteMatcher;
+  private final StreetNoteMatcher noteMatcher;
 
   public NoteProperties(String notePattern, StreetNoteMatcher noteMatcher) {
     this.notePattern = notePattern;

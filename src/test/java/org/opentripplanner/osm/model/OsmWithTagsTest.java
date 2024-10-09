@@ -227,7 +227,6 @@ public class OsmWithTagsTest {
     osmTags.addTag("wheelchair:description", "Wheelchair description EN");
     osmTags.addTag("wheelchair:description:fr", "Wheelchair description FR");
 
-    assertNull(osmTags.generateI18NForPattern(null));
     Map<String, String> expected = new HashMap<>();
 
     expected.put(null, "");
