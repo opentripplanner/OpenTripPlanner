@@ -55,7 +55,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static OsmModule provideOpenStreetMapModule(
+  static OsmModule provideOsmModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,

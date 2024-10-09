@@ -91,7 +91,7 @@ public class OsmModule implements GraphBuilderModule {
         "Using OSM way configuration from {}.",
         provider.getOsmTagMapper().getClass().getSimpleName()
       );
-      provider.readOSM(osmdb);
+      provider.readOsm(osmdb);
     }
     osmdb.postLoad();
 
@@ -305,9 +305,9 @@ public class OsmModule implements GraphBuilderModule {
       OsmNode osmStartNode = null;
 
       for (int i = 0; i < nodes.size() - 1; i++) {
-        OsmNode segmentStartOSMNode = osmdb.getNode(nodes.get(i));
+        OsmNode segmentStartOsmNode = osmdb.getNode(nodes.get(i));
 
-        if (segmentStartOSMNode == null) {
+        if (segmentStartOsmNode == null) {
           continue;
         }
 
@@ -315,7 +315,7 @@ public class OsmModule implements GraphBuilderModule {
 
         if (osmStartNode == null) {
           startNode = nodes.get(i);
-          osmStartNode = segmentStartOSMNode;
+          osmStartNode = segmentStartOsmNode;
         }
         // where the current edge might end
         OsmNode osmEndNode = osmdb.getNode(endNode);
@@ -355,7 +355,7 @@ public class OsmModule implements GraphBuilderModule {
           // make or get a shared vertex for flat intersections,
           // one vertex per level for multilevel nodes like elevators
           startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way);
-          String ele = segmentStartOSMNode.getTag("ele");
+          String ele = segmentStartOsmNode.getTag("ele");
           if (ele != null) {
             Double elevation = ElevationUtils.parseEleTag(ele);
             if (elevation != null) {

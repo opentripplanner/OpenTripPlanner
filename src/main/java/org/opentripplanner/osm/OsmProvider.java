@@ -66,7 +66,7 @@ public class OsmProvider {
     this.cacheDataInMem = cacheDataInMem;
   }
 
-  public void readOSM(OsmDatabase osmdb) {
+  public void readOsm(OsmDatabase osmdb) {
     try {
       OsmParser parser = new OsmParser(osmdb, this);
 

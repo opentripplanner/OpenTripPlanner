@@ -219,7 +219,7 @@ class WalkableAreaBuilder {
 
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-      OsmWithTags areaEntity = group.getSomeOSMObject();
+      OsmWithTags areaEntity = group.getSomeOsmObject();
 
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause

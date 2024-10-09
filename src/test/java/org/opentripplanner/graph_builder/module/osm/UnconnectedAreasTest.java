@@ -39,7 +39,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedCarParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
+    Graph gg = buildOsmGraph("P+R.osm.pbf", issueStore);
 
     assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -56,7 +56,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedBikeParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
+    Graph gg = buildOsmGraph("B+R.osm.pbf", issueStore);
 
     assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -151,11 +151,11 @@ public class UnconnectedAreasTest {
     assertTrue(connections.contains(VertexLabel.osm(-102284)));
   }
 
-  private Graph buildOSMGraph(String osmFileName) {
-    return buildOSMGraph(osmFileName, DataImportIssueStore.NOOP);
+  private Graph buildOsmGraph(String osmFileName) {
+    return buildOsmGraph(osmFileName, DataImportIssueStore.NOOP);
   }
 
-  private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
+  private Graph buildOsmGraph(String osmFileName, DataImportIssueStore issueStore) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
@@ -185,7 +185,7 @@ public class UnconnectedAreasTest {
     int prCount,
     int prlCount
   ) {
-    Graph graph = buildOSMGraph(fileName);
+    Graph graph = buildOsmGraph(fileName);
 
     var vehicleParkingVertices = graph.getVerticesOfType(VehicleParkingEntranceVertex.class);
     int nParkAndRide = vehicleParkingVertices.size();

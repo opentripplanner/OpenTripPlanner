@@ -42,7 +42,7 @@ public class WalkableAreaBuilderTest {
 
     final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
-    new OsmProvider(file, false).readOSM(osmdb);
+    new OsmProvider(file, false).readOsm(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(

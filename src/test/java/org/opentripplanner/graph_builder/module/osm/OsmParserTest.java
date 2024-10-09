@@ -20,7 +20,7 @@ public class OsmParserTest {
     OsmProvider pr = new OsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 
-    pr.readOSM(osmdb);
+    pr.readOsm(osmdb);
 
     assertEquals(2297, osmdb.nodeCount());
 

@@ -176,7 +176,7 @@ public class OsmOpeningHoursParserTest {
 
   @ParameterizedTest(name = "{0} should be open on {1} but not on {2}")
   @MethodSource("osmOpeningHoursTestCases")
-  void testOSMOpeningHoursParsing(
+  void testOsmOpeningHoursParsing(
     String openingHours,
     List<String> openTimes,
     List<String> closedTimes

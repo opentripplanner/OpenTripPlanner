@@ -133,7 +133,7 @@ class AreaGroup {
     return out;
   }
 
-  public OsmWithTags getSomeOSMObject() {
+  public OsmWithTags getSomeOsmObject() {
     return areas.iterator().next().parent;
   }
 
