@@ -49,13 +49,13 @@ public class DebugStyleSpec {
   private static final String BLACK = "#140d0e";
 
   private static final int MAX_ZOOM = 23;
-  private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
-    1.3f,
-    List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
-  );
   private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
     1.3f,
     List.of(new ZoomStop(13, 0.3f), new ZoomStop(MAX_ZOOM, 6))
+  );
+  private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
+    1.3f,
+    List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
   private static final ZoomDependentNumber FAT_LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
@@ -191,7 +191,7 @@ public class DebugStyleSpec {
         .lineColor(MAGENTA)
         .edgeFilter(EDGES_TO_DISPLAY)
         .lineWidth(LINE_WIDTH)
-          .lineOffset(LINE_OFFSET)
+        .lineOffset(LINE_OFFSET)
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -216,11 +216,11 @@ public class DebugStyleSpec {
           StreetTransitEntranceLink.class,
           BoardingLocationToStopLink.class,
           StreetVehicleRentalLink.class,
-            StreetVehicleParkingLink.class,
-            StreetStationCentroidLink.class
+          StreetVehicleParkingLink.class,
+          StreetStationCentroidLink.class
         )
         .lineWidth(LINE_WIDTH)
-          .lineOffset(LINE_OFFSET)
+        .lineOffset(LINE_OFFSET)
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
@@ -239,6 +239,7 @@ public class DebugStyleSpec {
           .lineColor(permissionColor(p))
           .permissionsFilter(p)
           .lineWidth(FAT_LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
           .minZoom(6)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden()
@@ -251,6 +252,7 @@ public class DebugStyleSpec {
       .lineText("permission")
       .vectorSourceLayer(edges)
       .edgeFilter(EDGES_TO_DISPLAY)
+      .lineOffset(LINE_OFFSET)
       .minZoom(17)
       .maxZoom(MAX_ZOOM)
       .intiallyHidden();
