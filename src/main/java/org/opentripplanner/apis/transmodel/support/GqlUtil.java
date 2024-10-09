@@ -6,13 +6,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLScalarType;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -25,12 +22,8 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class GqlUtil {
 
-  public final GraphQLScalarType dateTimeScalar;
-
-  public GqlUtil(ZoneId timeZone) {
-    this.dateTimeScalar =
-      DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
-  }
+  /** private constructor, prevent instantiation of utility class */
+  private GqlUtil() {}
 
   public static TransitService getTransitService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getTransitService();

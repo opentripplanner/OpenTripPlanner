@@ -10,6 +10,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Duration;
 import java.time.Instant;
@@ -45,7 +46,7 @@ public class QuayType {
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType tariffZoneType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -207,7 +208,7 @@ public class QuayType {
             GraphQLArgument
               .newArgument()
               .name("startTime")
-              .type(gqlUtil.dateTimeScalar)
+              .type(dateTimeScalar)
               .description(
                 "DateTime for when to fetch estimated calls from. Default value is current time"
               )

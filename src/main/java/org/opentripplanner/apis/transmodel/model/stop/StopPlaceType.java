@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Duration;
 import java.time.Instant;
@@ -57,7 +58,7 @@ public class StopPlaceType {
     GraphQLOutputType tariffZoneType,
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType ptSituationElementType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -293,7 +294,7 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("startTime")
-              .type(gqlUtil.dateTimeScalar)
+              .type(dateTimeScalar)
               .description(
                 "DateTime for when to fetch estimated calls from. Default value is current time"
               )

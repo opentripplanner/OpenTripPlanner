@@ -9,6 +9,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -43,7 +44,7 @@ public class EstimatedCallType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType datedServiceJourneyType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -64,7 +65,7 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("aimedArrivalTime")
           .description("Scheduled time of arrival at quay. Not affected by read time updated")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(environment ->
             1000 *
             (
@@ -78,7 +79,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedArrivalTime")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .description(
             "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
           )
@@ -94,7 +95,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("actualArrivalTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description(
             "Actual time of arrival at quay. Updated from real time information if available."
           )
@@ -114,7 +115,7 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("aimedDepartureTime")
           .description("Scheduled time of departure from quay. Not affected by read time updated")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(environment ->
             1000 *
             (
@@ -128,7 +129,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedDepartureTime")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .description(
             "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
           )
@@ -145,7 +146,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("actualDepartureTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description(
             "Actual time of departure from quay. Updated with real time information if available."
           )

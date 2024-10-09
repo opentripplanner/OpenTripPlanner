@@ -11,6 +11,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -19,7 +20,6 @@ import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
@@ -40,7 +40,7 @@ public class TripQuery {
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType penaltyForStreetMode,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 
@@ -62,7 +62,7 @@ public class TripQuery {
             "(if `false` or not set) or the latest acceptable time of arriving " +
             "(`true`). Defaults to now."
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(
@@ -79,7 +79,7 @@ public class TripQuery {
             restrictions are applied - all journeys are listed.
             """
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(

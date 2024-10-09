@@ -7,13 +7,13 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
 
 public class ViaTripQuery {
 
@@ -22,7 +22,7 @@ public class ViaTripQuery {
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
     GraphQLInputObjectType viaSegmentInputType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLFieldDefinition
       .newFieldDefinition()
@@ -42,7 +42,7 @@ public class ViaTripQuery {
             "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
             "(arriveBy=true). Defaults to now"
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(

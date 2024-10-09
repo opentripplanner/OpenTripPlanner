@@ -7,6 +7,7 @@ import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDs
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -24,8 +25,10 @@ import graphql.schema.GraphQLNamedOutputType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -130,24 +133,27 @@ public class TransmodelGraphQLSchema {
 
   private final DefaultRouteRequestType routing;
 
-  private final GqlUtil gqlUtil;
+  private final ZoneId timeZoneId;
 
   private final Relay relay = new Relay();
 
-  private TransmodelGraphQLSchema(RouteRequest defaultRequest, GqlUtil gqlUtil) {
-    this.gqlUtil = gqlUtil;
+  private TransmodelGraphQLSchema(RouteRequest defaultRequest, ZoneId timeZoneId) {
+    this.timeZoneId = timeZoneId;
     this.routing = new DefaultRouteRequestType(defaultRequest);
   }
 
-  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil gqlUtil) {
-    return new TransmodelGraphQLSchema(defaultRequest, gqlUtil).create();
+  public static GraphQLSchema create(RouteRequest defaultRequest, ZoneId timeZoneId) {
+    return new TransmodelGraphQLSchema(defaultRequest, timeZoneId).create();
   }
 
   @SuppressWarnings("unchecked")
   private GraphQLSchema create() {
     // Framework
+    GraphQLScalarType dateTimeScalar = createMillisecondsSinceEpochAsDateTimeStringScalar(
+      timeZoneId
+    );
     GraphQLOutputType multilingualStringType = MultilingualStringType.create();
-    GraphQLObjectType validityPeriodType = ValidityPeriodType.create(gqlUtil);
+    GraphQLObjectType validityPeriodType = ValidityPeriodType.create(dateTimeScalar);
     GraphQLObjectType infoLinkType = InfoLinkType.create();
     GraphQLOutputType bookingArrangementType = BookingArrangementType.create();
     GraphQLOutputType systemNoticeType = SystemNoticeType.create();
@@ -177,7 +183,7 @@ public class TransmodelGraphQLSchema {
       tariffZoneType,
       EstimatedCallType.REF,
       PtSituationElementType.REF,
-      gqlUtil
+      dateTimeScalar
     );
     GraphQLOutputType quayType = QuayType.create(
       placeInterface,
@@ -187,7 +193,7 @@ public class TransmodelGraphQLSchema {
       EstimatedCallType.REF,
       PtSituationElementType.REF,
       tariffZoneType,
-      gqlUtil
+      dateTimeScalar
     );
 
     GraphQLOutputType stopToStopGeometryType = StopToStopGeometryType.create(
@@ -236,7 +242,7 @@ public class TransmodelGraphQLSchema {
       validityPeriodType,
       infoLinkType,
       affectsType,
-      gqlUtil,
+      dateTimeScalar,
       relay
     );
     GraphQLOutputType journeyPatternType = JourneyPatternType.create(
@@ -256,7 +262,7 @@ public class TransmodelGraphQLSchema {
       ptSituationElementType,
       ServiceJourneyType.REF,
       DatedServiceJourneyType.REF,
-      gqlUtil
+      dateTimeScalar
     );
 
     GraphQLOutputType serviceJourneyType = ServiceJourneyType.create(
@@ -288,7 +294,7 @@ public class TransmodelGraphQLSchema {
     );
 
     GraphQLObjectType tripPatternTimePenaltyType = TripPatternTimePenaltyType.create();
-    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
+    GraphQLObjectType tripMetadataType = TripMetadataType.create(dateTimeScalar);
     GraphQLObjectType placeType = PlanPlaceType.create(
       bikeRentalStationType,
       rentalVehicleType,
@@ -311,13 +317,13 @@ public class TransmodelGraphQLSchema {
       placeType,
       pathGuidanceType,
       elevationStepType,
-      gqlUtil
+      dateTimeScalar
     );
     GraphQLObjectType tripPatternType = TripPatternType.create(
       systemNoticeType,
       legType,
       tripPatternTimePenaltyType,
-      gqlUtil
+      dateTimeScalar
     );
     GraphQLObjectType routingErrorType = RoutingErrorType.create();
 
@@ -326,10 +332,10 @@ public class TransmodelGraphQLSchema {
       tripPatternType,
       tripMetadataType,
       routingErrorType,
-      gqlUtil
+      dateTimeScalar
     );
 
-    GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create(gqlUtil);
+    GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create();
     GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create();
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(
@@ -337,7 +343,7 @@ public class TransmodelGraphQLSchema {
       tripType,
       durationPerStreetModeInput,
       penaltyForStreetMode,
-      gqlUtil
+      dateTimeScalar
     );
 
     GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
@@ -349,7 +355,7 @@ public class TransmodelGraphQLSchema {
       viaTripType,
       viaLocationInputType,
       viaSegmentInputType,
-      gqlUtil
+      dateTimeScalar
     );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType
