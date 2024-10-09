@@ -50,19 +50,12 @@ public class DebugStyleSpec {
 
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
-    1.3f,
     List.of(new ZoomStop(13, 0.3f), new ZoomStop(MAX_ZOOM, 6))
   );
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
-    1.3f,
-    List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
-  );
-  private static final ZoomDependentNumber FAT_LINE_WIDTH = new ZoomDependentNumber(
-    1.3f,
-    List.of(new ZoomStop(11, 1f), new ZoomStop(MAX_ZOOM, 12))
+    List.of(new ZoomStop(13, 0.2f), new ZoomStop(MAX_ZOOM, 8))
   );
   private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
-    1,
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
   );
   private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
@@ -75,8 +68,8 @@ public class DebugStyleSpec {
     TemporaryFreeEdge.class,
   };
   private static final String EDGES_GROUP = "Edges";
-  private static final String STOPS = "Stops";
-  private static final String VERTICES = "Vertices";
+  private static final String STOPS_GROUP = "Stops";
+  private static final String VERTICES_GROUP = "Vertices";
   private static final String TRAVERSAL_PERMISSIONS_GROUP = "Traversal permissions";
 
   static StyleSpec build(
@@ -113,7 +106,7 @@ public class DebugStyleSpec {
     return List.of(
       StyleBuilder
         .ofId("area-stop")
-        .group(STOPS)
+        .group(STOPS_GROUP)
         .typeFill()
         .vectorSourceLayer(areaStops)
         .fillColor(BRIGHT_GREEN)
@@ -123,7 +116,7 @@ public class DebugStyleSpec {
         .maxZoom(MAX_ZOOM),
       StyleBuilder
         .ofId("group-stop")
-        .group(STOPS)
+        .group(STOPS_GROUP)
         .typeFill()
         .vectorSourceLayer(groupStops)
         .fillColor(BRIGHT_GREEN)
@@ -133,15 +126,15 @@ public class DebugStyleSpec {
         .maxZoom(MAX_ZOOM),
       StyleBuilder
         .ofId("regular-stop")
-        .group(STOPS)
+        .group(STOPS_GROUP)
         .typeCircle()
         .vectorSourceLayer(regularStops)
         .circleStroke(
           BLACK,
-          new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
+          new ZoomDependentNumber(List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
         )
         .circleRadius(
-          new ZoomDependentNumber(1, List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10)))
+          new ZoomDependentNumber(List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10)))
         )
         .circleColor("#fcf9fa")
         .minZoom(10)
@@ -153,12 +146,12 @@ public class DebugStyleSpec {
     return List.of(
       StyleBuilder
         .ofId("vertex")
-        .group(VERTICES)
+        .group(VERTICES_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
         .circleStroke(BLACK, CIRCLE_STROKE)
         .circleRadius(
-          new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
+          new ZoomDependentNumber(List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
         )
         .circleColor(PURPLE)
         .minZoom(15)
@@ -166,13 +159,13 @@ public class DebugStyleSpec {
         .intiallyHidden(),
       StyleBuilder
         .ofId("parking-vertex")
-        .group(VERTICES)
+        .group(VERTICES_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
         .vertexFilter(VehicleParkingEntranceVertex.class)
         .circleStroke(BLACK, CIRCLE_STROKE)
         .circleRadius(
-          new ZoomDependentNumber(1, List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10)))
+          new ZoomDependentNumber(List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10)))
         )
         .circleColor(DARK_GREEN)
         .minZoom(13)
@@ -233,12 +226,12 @@ public class DebugStyleSpec {
       .map(p ->
         StyleBuilder
           .ofId(p.name())
+          .vectorSourceLayer(edges)
           .group(TRAVERSAL_PERMISSIONS_GROUP)
           .typeLine()
-          .vectorSourceLayer(edges)
           .lineColor(permissionColor(p))
           .permissionsFilter(p)
-          .lineWidth(FAT_LINE_WIDTH)
+          .lineWidth(LINE_WIDTH)
           .lineOffset(LINE_OFFSET)
           .minZoom(6)
           .maxZoom(MAX_ZOOM)
@@ -247,12 +240,12 @@ public class DebugStyleSpec {
       .toList();
     var textStyle = StyleBuilder
       .ofId("permission-text")
+      .vectorSourceLayer(edges)
       .group(TRAVERSAL_PERMISSIONS_GROUP)
       .typeSymbol()
       .lineText("permission")
-      .vectorSourceLayer(edges)
+      .textOffset(1)
       .edgeFilter(EDGES_TO_DISPLAY)
-      .lineOffset(LINE_OFFSET)
       .minZoom(17)
       .maxZoom(MAX_ZOOM)
       .intiallyHidden();
