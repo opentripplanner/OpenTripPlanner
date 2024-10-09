@@ -109,7 +109,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorRouterResult<T> results() {
+  public RaptorRouterResult<T> result() {
     return state.results();
   }
 

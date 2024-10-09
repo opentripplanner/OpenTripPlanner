@@ -40,8 +40,8 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorRouterResult<T> results() {
-    return tail().results();
+  public RaptorRouterResult<T> result() {
+    return tail().result();
   }
 
   @Override

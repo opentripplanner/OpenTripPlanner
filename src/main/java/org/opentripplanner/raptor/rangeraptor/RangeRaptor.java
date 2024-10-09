@@ -111,7 +111,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
         }
       }
     });
-    return worker.results();
+    return worker.result();
   }
 
   /**
