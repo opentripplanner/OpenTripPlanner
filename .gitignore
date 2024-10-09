@@ -17,8 +17,8 @@
 *.snap.debug
 dependency-reduced-pom.xml
 interactive_otp_main.json
-/otp
-/otp-ui
+/modules/otp/otp
+/modules/otp/otp-ui
 Dockerfile
 .java-version
 o_o_standalone_config_IncludeFileDirectiveTest_part.json
