@@ -167,7 +167,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
           StopArrivalParetoSet
             .of(comparator)
             .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-            .withNextSearchListener(
+            .withNextLegListener(
               new ViaConnectionStopArrivalEventListener<>(stopArrivalFactory, connections, nextLeg)
             )
             .build();

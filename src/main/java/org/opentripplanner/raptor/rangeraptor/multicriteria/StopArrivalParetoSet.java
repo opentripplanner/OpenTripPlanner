@@ -47,7 +47,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
     }
 
     /**
-     * Attach an optional {@code paretoSetEventListener} debug handler.
+     * Attach an optional debug handler.
      */
     Builder<T> withDebugListener(ParetoSetEventListener<ArrivalView<T>> debugListener) {
       this.debugListener = debugListener;
@@ -66,7 +66,10 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
       return this;
     }
 
-    Builder<T> withNextSearchListener(ParetoSetEventListener<ArrivalView<T>> nextSearchListener) {
+    /**
+     * Attach an optional listener for copy state over to the next-leg Raptor search.
+     */
+    Builder<T> withNextLegListener(ParetoSetEventListener<ArrivalView<T>> nextSearchListener) {
       this.nextSearchListener = nextSearchListener;
       return this;
     }
