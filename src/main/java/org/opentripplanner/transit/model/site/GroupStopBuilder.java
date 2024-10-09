@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -34,7 +33,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     this.indexCounter = indexCounter;
   }
 
-  GroupStopBuilder(@Nonnull GroupStop original) {
+  GroupStopBuilder(GroupStop original) {
     super(original);
     this.indexCounter = original::getIndex;
     // Optional fields

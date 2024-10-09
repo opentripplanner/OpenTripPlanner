@@ -22,7 +22,12 @@ import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 @GeneratesDocumentation
 public class ExampleConfigTest {
 
-  @FilePatternSource(pattern = "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME)
+  @FilePatternSource(
+    pattern = {
+      "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME,
+      "src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
+    }
+  )
   @ParameterizedTest(name = "Check validity of {0}")
   void routerConfig(Path filename) {
     testConfig(filename, a -> new RouterConfig(a, true));
@@ -31,7 +36,8 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
-      "test/performance/**/" + BUILD_CONFIG_FILENAME,
+      "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
+      "src/test/resources/standalone/config/**/" + BUILD_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")

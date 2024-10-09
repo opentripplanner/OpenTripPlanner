@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 
@@ -42,7 +41,6 @@ public class StreetLocation extends StreetVertex {
     return getName();
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return name;

@@ -1,6 +1,5 @@
 package org.opentripplanner.service.vehiclerental.model;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -65,7 +64,6 @@ public class TestFreeFloatingRentalVehicleBuilder {
     return buildVehicleType(RentalFormFactor.CAR);
   }
 
-  @Nonnull
   private TestFreeFloatingRentalVehicleBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
     this.vehicleType =
       new RentalVehicleType(

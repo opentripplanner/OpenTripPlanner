@@ -2,7 +2,6 @@ package org.opentripplanner.openstreetmap.wayproperty;
 
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -13,7 +12,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  */
 public class WayProperties {
 
-  @Nonnull
   private final StreetTraversalPermission permission;
 
   @Nullable
@@ -31,7 +29,6 @@ public class WayProperties {
   /**
    * The value for the bicycle safety. If none has been set a default value of 1 is returned.
    */
-  @Nonnull
   public SafetyFeatures bicycleSafety() {
     return Objects.requireNonNullElse(bicycleSafetyFeatures, SafetyFeatures.DEFAULT);
   }
@@ -39,12 +36,10 @@ public class WayProperties {
   /**
    * The value for the walk safety. If none has been set a default value of 1 is returned.
    */
-  @Nonnull
   public SafetyFeatures walkSafety() {
     return Objects.requireNonNullElse(walkSafetyFeatures, SafetyFeatures.DEFAULT);
   }
 
-  @Nonnull
   public StreetTraversalPermission getPermission() {
     return permission;
   }
@@ -52,7 +47,6 @@ public class WayProperties {
   /**
    * An optional value for the walk safety. If none has been set an empty Optional is returned.
    */
-  @Nonnull
   protected Optional<SafetyFeatures> walkSafetyOpt() {
     return Optional.ofNullable(walkSafetyFeatures);
   }
@@ -60,7 +54,6 @@ public class WayProperties {
   /**
    * An optional value for the bicycle safety. If none has been set an empty Optional is returned.
    */
-  @Nonnull
   protected Optional<SafetyFeatures> bicycleSafetyOpt() {
     return Optional.ofNullable(bicycleSafetyFeatures);
   }

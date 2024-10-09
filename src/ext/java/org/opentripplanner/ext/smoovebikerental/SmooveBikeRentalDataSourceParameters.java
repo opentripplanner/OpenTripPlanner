@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.smoovebikerental;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
@@ -26,7 +25,6 @@ public record SmooveBikeRentalDataSourceParameters(
     return network == null || network.isEmpty() ? defaultValue : network;
   }
 
-  @Nonnull
   @Override
   public VehicleRentalSourceType sourceType() {
     return VehicleRentalSourceType.SMOOVE;

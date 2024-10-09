@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNullElse;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.StringUtils;
@@ -80,7 +79,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
   }
 
-  public static TripBuilder of(@Nonnull FeedScopedId id) {
+  public static TripBuilder of(FeedScopedId id) {
     return new TripBuilder(id);
   }
 
@@ -93,7 +92,6 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     return operator;
   }
 
-  @Nonnull
   public Route getRoute() {
     return route;
   }
@@ -117,12 +115,10 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     return shortName;
   }
 
-  @Nonnull
   public TransitMode getMode() {
     return mode;
   }
 
-  @Nonnull
   public SubMode getNetexSubMode() {
     return netexSubmode;
   }
@@ -140,17 +136,14 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   /**
    * The direction for this Trip (and all other Trips in this TripPattern).
    */
-  @Nonnull
   public Direction getDirection() {
     return direction;
   }
 
-  @Nonnull
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;
   }
 
-  @Nonnull
   public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
@@ -175,7 +168,6 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
    * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
    */
-  @Nonnull
   public TripAlteration getNetexAlteration() {
     return netexAlteration;
   }
@@ -198,7 +190,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   @Override
-  public boolean sameAs(@Nonnull Trip other) {
+  public boolean sameAs(Trip other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.operator, other.operator) &&

@@ -8,7 +8,6 @@ import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
@@ -84,7 +83,6 @@ class WayPropertySetTest {
       assertEquals(expected, wps.getDataForWay(cycleway).bicycleSafety());
     }
 
-    @Nonnull
     private static WayPropertySet wps() {
       var wps = new WayPropertySet();
       var source = new OsmTagMapper() {

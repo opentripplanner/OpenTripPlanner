@@ -3,7 +3,6 @@ package org.opentripplanner.ext.reportapi.model;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 
 /**
  * The purpose of this class is to be a generic container for caching expensive computations.
@@ -16,7 +15,7 @@ public class CachedValue<T> {
   private T value;
   private Instant timeout;
 
-  public CachedValue(@Nonnull Duration cacheInterval) {
+  public CachedValue(Duration cacheInterval) {
     this.value = null;
     this.cacheInterval = cacheInterval;
     this.timeout = calculateTimeout();
@@ -27,7 +26,7 @@ public class CachedValue<T> {
    * <p>
    * Otherwise, recompute and return it.
    */
-  public T get(@Nonnull Supplier<T> supplier) {
+  public T get(Supplier<T> supplier) {
     synchronized (this) {
       if (hasExpired()) {
         this.value = supplier.get();

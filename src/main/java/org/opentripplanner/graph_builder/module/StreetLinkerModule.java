@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.module;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -15,14 +15,17 @@ import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -70,6 +73,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     if (graph.hasStreets) {
       linkTransitStops(graph, transitModel);
       linkTransitEntrances(graph);
+      linkStationCentroids(graph);
       linkVehicleParks(graph, issueStore);
     }
 
@@ -175,7 +179,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
       );
   }
 
-  @Nonnull
   private static List<Edge> createStopLinkEdges(
     TransitStopVertex vertex,
     StreetVertex streetVertex
@@ -253,6 +256,34 @@ public class StreetLinkerModule implements GraphBuilderModule {
                 (TransitEntranceVertex) vertex
               )
             )
+        );
+    }
+  }
+
+  private void linkStationCentroids(Graph graph) {
+    BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
+        theStation,
+        streetVertex
+      ) ->
+      List.of(
+        StreetStationCentroidLink.createStreetStationLink(
+          (StationCentroidVertex) theStation,
+          streetVertex
+        ),
+        StreetStationCentroidLink.createStreetStationLink(
+          streetVertex,
+          (StationCentroidVertex) theStation
+        )
+      );
+
+    for (StationCentroidVertex station : graph.getVerticesOfType(StationCentroidVertex.class)) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          station,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BOTH_WAYS,
+          stationAndStreetVertexLinker
         );
     }
   }

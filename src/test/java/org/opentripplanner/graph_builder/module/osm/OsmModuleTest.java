@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
@@ -323,7 +322,6 @@ public class OsmModuleTest {
     assertEquals(barrier.getBarrierPermissions(), ALL);
   }
 
-  @Nonnull
   private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream

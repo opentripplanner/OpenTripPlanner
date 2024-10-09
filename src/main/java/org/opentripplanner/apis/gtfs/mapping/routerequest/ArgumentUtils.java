@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 
@@ -63,7 +62,6 @@ public class ArgumentUtils {
    * <p>
    * TODO this ugliness can be removed when the bug gets fixed
    */
-  @Nonnull
   static Collection<Map<String, Object>> getParkingFilters(
     DataFetchingEnvironment environment,
     String type
@@ -83,7 +81,6 @@ public class ArgumentUtils {
    * <p>
    * TODO this ugliness can be removed when the bug gets fixed
    */
-  @Nonnull
   static Collection<Map<String, Object>> getParkingPreferred(
     DataFetchingEnvironment environment,
     String type
@@ -103,7 +100,6 @@ public class ArgumentUtils {
     return parseFilters(filters, "select");
   }
 
-  @Nonnull
   private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
     return filters
       .stream()

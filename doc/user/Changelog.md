@@ -11,6 +11,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Refetch transit leg with a leg query of GTFS GraphQL API [#6045](https://github.com/opentripplanner/OpenTripPlanner/pull/6045)
 - Remove deprecated support for GTFS flex stop areas [#6074](https://github.com/opentripplanner/OpenTripPlanner/pull/6074)
 - Don't use elevation data directly for ways with cutting=*, location=underground or indoor=yes tags in the default mapper [#6093](https://github.com/opentripplanner/OpenTripPlanner/pull/6093)
+- Un-deprecate GTFS API's `planConnection`, deprecate `plan` [#6110](https://github.com/opentripplanner/OpenTripPlanner/pull/6110)
+- Support for routing to Station centroid instead of child stops [#6047](https://github.com/opentripplanner/OpenTripPlanner/pull/6047)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

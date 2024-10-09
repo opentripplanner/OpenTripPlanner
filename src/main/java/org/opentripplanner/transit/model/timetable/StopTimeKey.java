@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.model.timetable;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,18 +15,17 @@ public class StopTimeKey extends AbstractTransitEntity<StopTimeKey, StopTimeKeyB
     super(builder.getId());
   }
 
-  public static StopTimeKeyBuilder of(@Nonnull FeedScopedId tripId, int stopSequenceNumber) {
+  public static StopTimeKeyBuilder of(FeedScopedId tripId, int stopSequenceNumber) {
     return new StopTimeKeyBuilder(
       new FeedScopedId(tripId.getFeedId(), tripId.getId() + "_#" + stopSequenceNumber)
     );
   }
 
   @Override
-  public boolean sameAs(@Nonnull StopTimeKey other) {
+  public boolean sameAs(StopTimeKey other) {
     return getId().equals(other.getId());
   }
 
-  @Nonnull
   @Override
   public StopTimeKeyBuilder copy() {
     return new StopTimeKeyBuilder(this);

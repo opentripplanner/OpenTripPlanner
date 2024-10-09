@@ -21,6 +21,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -51,6 +52,10 @@ public class DebugStyleSpec {
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
     List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
+  );
+  private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
+    1.3f,
+    List.of(new ZoomStop(13, 0.3f), new ZoomStop(MAX_ZOOM, 6))
   );
   private static final ZoomDependentNumber FAT_LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
@@ -186,6 +191,7 @@ public class DebugStyleSpec {
         .lineColor(MAGENTA)
         .edgeFilter(EDGES_TO_DISPLAY)
         .lineWidth(LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -210,9 +216,11 @@ public class DebugStyleSpec {
           StreetTransitEntranceLink.class,
           BoardingLocationToStopLink.class,
           StreetVehicleRentalLink.class,
-          StreetVehicleParkingLink.class
+            StreetVehicleParkingLink.class,
+            StreetStationCentroidLink.class
         )
         .lineWidth(LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()

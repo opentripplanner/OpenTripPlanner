@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.LocationGroup;
@@ -45,7 +44,6 @@ class LocationGroupMapperTest {
     );
   }
 
-  @Nonnull
   private static AgencyAndId id(String id) {
     return new AgencyAndId("1", id);
   }

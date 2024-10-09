@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
-import javax.annotation.Nonnull;
 
 public interface TransitObject<E extends TransitObject<E, T>, T extends TransitBuilder<E, T>>
   extends Serializable {
@@ -10,7 +9,7 @@ public interface TransitObject<E extends TransitObject<E, T>, T extends TransitB
    * the same value. This is used to avoid creating new objects during transit model construction
    * and during RealTime updates.
    */
-  boolean sameAs(@Nonnull E other);
+  boolean sameAs(E other);
 
   /**
    * The copy method is used to mutate the existing object by creating a builder and setting
@@ -25,6 +24,5 @@ public interface TransitObject<E extends TransitObject<E, T>, T extends TransitB
    * <p>
    * TODO RTM - Document design "rules" in a package readme, when the design is set.
    */
-  @Nonnull
   TransitBuilder<E, T> copy();
 }

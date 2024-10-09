@@ -177,6 +177,11 @@ public class StyleBuilder {
     return this;
   }
 
+  public StyleBuilder lineOffset(ZoomDependentNumber zoomStops) {
+    paint.put("line-offset", zoomStops.toJson());
+    return this;
+  }
+
   public StyleBuilder fillColor(String color) {
     paint.put("fill-color", validateColor(color));
     return this;

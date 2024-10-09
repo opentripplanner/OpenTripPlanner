@@ -4,7 +4,6 @@ import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -196,7 +195,6 @@ public class TransfersReport {
     return r;
   }
 
-  @Nonnull
   private static String getName(Operator operator) {
     return Optional.ofNullable(operator).map(o -> o.getId().getId()).orElse("");
   }

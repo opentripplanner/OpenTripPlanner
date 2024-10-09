@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -975,7 +974,6 @@ public class TimetableTest {
       });
     }
 
-    @Nonnull
     private static StopTimeUpdate emptyStopTime(
       int sequence,
       BiConsumer<TripUpdate.StopTimeUpdate.Builder, StopTimeEvent> setEmptyEvent

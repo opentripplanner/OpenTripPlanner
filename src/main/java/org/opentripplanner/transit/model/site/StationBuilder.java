@@ -16,6 +16,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
   private I18NString url;
   private ZoneId timezone;
   private boolean transfersNotAllowed = false;
+  private boolean shouldRouteToCentroid = false;
 
   StationBuilder(FeedScopedId id) {
     super(id);
@@ -31,6 +32,7 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
     this.url = original.getUrl();
     this.timezone = original.getTimezone();
     this.transfersNotAllowed = original.isTransfersNotAllowed();
+    this.shouldRouteToCentroid = original.shouldRouteToCentroid();
   }
 
   public I18NString getName() {
@@ -71,6 +73,15 @@ public class StationBuilder extends AbstractEntityBuilder<Station, StationBuilde
 
   public StationBuilder withCoordinate(double latitude, double longitude) {
     this.coordinate = new WgsCoordinate(latitude, longitude);
+    return this;
+  }
+
+  public boolean shouldRouteToCentroid() {
+    return shouldRouteToCentroid;
+  }
+
+  public StationBuilder withShouldRouteToCentroid(boolean shouldRouteToCentroid) {
+    this.shouldRouteToCentroid = shouldRouteToCentroid;
     return this;
   }
 

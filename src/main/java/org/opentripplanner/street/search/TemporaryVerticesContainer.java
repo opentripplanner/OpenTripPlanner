@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -32,14 +31,16 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class TemporaryVerticesContainer implements AutoCloseable {
 
   private final Graph graph;
-  private final RouteRequest opt;
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
+  private final GenericLocation from;
+  private final GenericLocation to;
 
   public TemporaryVerticesContainer(
     Graph graph,
-    RouteRequest opt,
+    GenericLocation from,
+    GenericLocation to,
     StreetMode accessMode,
     StreetMode egressMode
   ) {
@@ -47,9 +48,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     this.graph = graph;
     StreetIndex index = this.graph.getStreetIndex();
-    this.opt = opt;
-    fromVertices = index.getVerticesForLocation(opt.from(), accessMode, false, tempEdges);
-    toVertices = index.getVerticesForLocation(opt.to(), egressMode, true, tempEdges);
+    this.from = from;
+    this.to = to;
+    fromVertices = index.getStreetVerticesForLocation(from, accessMode, false, tempEdges);
+    toVertices = index.getStreetVerticesForLocation(to, egressMode, true, tempEdges);
 
     checkIfVerticesFound();
 
@@ -80,22 +82,48 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return toVertices;
   }
 
+  /**
+   * Get the stop vertices that corresponds to the from location. If the from location only contains
+   * coordinates, this will return an empty set. If the from location is a station id this will
+   * return the child stops of that station.
+   */
+  public Set<TransitStopVertex> getFromStopVertices() {
+    StreetIndex index = this.graph.getStreetIndex();
+    if (from.stopId == null) {
+      return Set.of();
+    }
+    return index.getStopOrChildStopsVertices(from.stopId);
+  }
+
+  /**
+   * Get the stop vertices that corresponds to the to location. If the to location only contains
+   * coordinates, this will return an empty set. If the to location is a station id this will
+   * return the child stops of that station.
+   */
+  public Set<TransitStopVertex> getToStopVertices() {
+    StreetIndex index = this.graph.getStreetIndex();
+    if (to.stopId == null) {
+      return Set.of();
+    }
+    return index.getStopOrChildStopsVertices(to.stopId);
+  }
+
   /* PRIVATE METHODS */
 
   private void checkIfVerticesFound() {
     List<RoutingError> routingErrors = new ArrayList<>();
 
     // check that vertices where found if from-location was specified
-    if (opt.from().isSpecified() && isDisconnected(fromVertices, true)) {
+    if (from.isSpecified() && isDisconnected(fromVertices, true)) {
       routingErrors.add(
-        new RoutingError(getRoutingErrorCodeForDisconnected(opt.from()), InputField.FROM_PLACE)
+        new RoutingError(getRoutingErrorCodeForDisconnected(from), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (opt.to().isSpecified() && isDisconnected(toVertices, false)) {
+    if (to.isSpecified() && isDisconnected(toVertices, false)) {
       routingErrors.add(
-        new RoutingError(getRoutingErrorCodeForDisconnected(opt.to()), InputField.TO_PLACE)
+        new RoutingError(getRoutingErrorCodeForDisconnected(to), InputField.TO_PLACE)
       );
     }
 

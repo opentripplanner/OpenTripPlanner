@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -38,7 +37,6 @@ class OsmVertexTest {
     assertEquals(2, vertex.areaStops().size());
   }
 
-  @Nonnull
   private static OsmVertex vertex() {
     return new OsmVertex(1, 2, 1);
   }

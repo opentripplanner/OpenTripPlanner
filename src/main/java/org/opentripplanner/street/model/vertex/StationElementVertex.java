@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StationElement;
@@ -22,12 +21,14 @@ public abstract class StationElementVertex extends Vertex {
   }
 
   /** Get the corresponding StationElement */
-  @Nonnull
   public abstract StationElement getStationElement();
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return name;
+  }
+
+  public FeedScopedId getId() {
+    return id;
   }
 }

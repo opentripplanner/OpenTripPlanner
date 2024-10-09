@@ -2,7 +2,6 @@ package org.opentripplanner.updater.trip;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -47,8 +46,8 @@ public class TripPatternCache {
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @Nonnull final StopPattern stopPattern,
-    @Nonnull final Trip trip,
+    final StopPattern stopPattern,
+    final Trip trip,
     final TripPattern originalTripPattern
   ) {
     Route route = trip.getRoute();

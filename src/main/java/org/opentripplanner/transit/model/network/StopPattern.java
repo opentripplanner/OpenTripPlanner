@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.MemEfficientArrayBuilder;
 import org.opentripplanner.model.PickDrop;
@@ -272,7 +271,7 @@ public final class StopPattern implements Serializable {
    * @param index Given index for stop
    * @return true if stop and next stop are equal on both stop patterns, else false
    */
-  boolean sameStops(@Nonnull StopPattern other, int index) {
+  boolean sameStops(StopPattern other, int index) {
     var otherOrigin = other.getStop(index);
     var otherDestination = other.getStop(index + 1);
     var origin = getStop(index);
@@ -289,7 +288,7 @@ public final class StopPattern implements Serializable {
    * @return true if the stops have the same stations, else false. If any station is null then
    * false.
    */
-  boolean sameStations(@Nonnull StopPattern other, int index) {
+  boolean sameStations(StopPattern other, int index) {
     var otherOrigin = other.getStop(index).getParentStation();
     var otherDestination = other.getStop(index + 1).getParentStation();
     var origin = getStop(index).getParentStation();

@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -199,7 +198,6 @@ public class OSMWithTags {
    *
    * @return A tags value converted to lower case. An empty Optional if tags is not present.
    */
-  @Nonnull
   public Optional<String> getTagOpt(String network) {
     return Optional.ofNullable(getTag(network));
   }
@@ -243,6 +241,7 @@ public class OSMWithTags {
    * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
    * by {@link OsmModule}
    */
+  @Nullable
   public I18NString getAssumedName() {
     if (tags == null) {
       return null;
@@ -275,10 +274,6 @@ public class OSMWithTags {
    * other language found in OSM tag.
    */
   public Map<String, String> generateI18NForPattern(String pattern) {
-    if (pattern == null) {
-      return null;
-    }
-
     Map<String, StringBuffer> i18n = new HashMap<>();
     i18n.put(null, new StringBuffer());
     Matcher matcher = Pattern.compile("\\{(.*?)}").matcher(pattern);
@@ -292,17 +287,15 @@ public class OSMWithTags {
       String defKey = matcher.group(1);
       // scan all translated tags
       Map<String, String> i18nTags = getTagsByPrefix(defKey);
-      if (i18nTags != null) {
-        for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
-          if (!kv.getKey().equals(defKey)) {
-            String lang = kv.getKey().substring(defKey.length() + 1);
-            if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
-          }
+      for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
+        if (!kv.getKey().equals(defKey)) {
+          String lang = kv.getKey().substring(defKey.length() + 1);
+          if (!i18n.containsKey(lang)) i18n.put(lang, new StringBuffer(i18n.get(null)));
         }
       }
       // get the simple value (eg: description=...)
       String defTag = getTag(defKey);
-      if (defTag == null && i18nTags != null && i18nTags.size() != 0) {
+      if (defTag == null && !i18nTags.isEmpty()) {
         defTag = i18nTags.values().iterator().next();
       }
       // get the translated value, if exists
@@ -320,16 +313,13 @@ public class OSMWithTags {
     return out;
   }
 
-  public Map<String, String> getTagsByPrefix(String prefix) {
+  private Map<String, String> getTagsByPrefix(String prefix) {
     Map<String, String> out = new HashMap<>();
     for (Map.Entry<String, String> entry : tags.entrySet()) {
       String k = entry.getKey();
       if (k.equals(prefix) || k.startsWith(prefix + ":")) {
         out.put(k, entry.getValue());
       }
-    }
-    if (out.isEmpty()) {
-      return null;
     }
 
     return out;
@@ -504,6 +494,7 @@ public class OSMWithTags {
     this.creativeName = creativeName;
   }
 
+  @Nullable
   public String url() {
     return null;
   }
@@ -513,7 +504,6 @@ public class OSMWithTags {
    * <p>
    * Values are split by semicolons.
    */
-  @Nonnull
   public Set<String> getMultiTagValues(Set<String> refTags) {
     return refTags
       .stream()
@@ -622,7 +612,6 @@ public class OSMWithTags {
    * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
    * Some entities can have a semicolon separated list of levels (e.g. elevators)
    */
-  @Nonnull
   public Set<String> getLevels() {
     var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {

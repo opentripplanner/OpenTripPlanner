@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -20,13 +19,12 @@ public final class Entrance extends StationElement<Entrance, EntranceBuilder> {
   }
 
   @Override
-  @Nonnull
   public EntranceBuilder copy() {
     return new EntranceBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Entrance other) {
+  public boolean sameAs(Entrance other) {
     return super.sameAs(other);
   }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -38,7 +37,6 @@ public record GraphQLRequestContext(
    * Returns a clone of the default route request. The clone is necessary because one HTTP
    * request can lead to several GraphQL queries, for example through batch or alias queries.
    */
-  @Nonnull
   @Override
   public RouteRequest defaultRouteRequest() {
     return defaultRouteRequest.clone();

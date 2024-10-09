@@ -250,20 +250,19 @@ public class TransitRouter {
       .valueOf(streetRequest.mode());
     int stopCountLimit = accessRequest.preferences().street().accessEgress().maxStopCount();
 
-    var nearbyStops = AccessEgressRouter.streetSearch(
+    var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
       temporaryVerticesContainer,
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
-      type.isEgress(),
+      type,
       durationLimit,
       stopCountLimit
     );
+    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
+    accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
-    List<RoutingAccessEgress> results = new ArrayList<>(
-      AccessEgressMapper.mapNearbyStops(nearbyStops, type.isEgress())
-    );
-    results = timeshiftRideHailing(streetRequest, type, results);
+    var results = new ArrayList<>(accessEgresses);
 
     // Special handling of flex accesses
     if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
@@ -274,10 +273,10 @@ public class TransitRouter {
         additionalSearchDays,
         serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
-        type.isEgress()
+        type
       );
 
-      results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type.isEgress()));
+      results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
     }
 
     return results;
@@ -363,7 +362,8 @@ public class TransitRouter {
   ) {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
-      request,
+      request.from(),
+      request.to(),
       request.journey().access().mode(),
       request.journey().egress().mode()
     );

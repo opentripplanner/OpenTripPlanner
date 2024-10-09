@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -137,7 +136,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   /**
    * Longer human-readable name for the client
    */
-  @Nonnull
   public abstract I18NString getName();
 
   /**
@@ -161,6 +159,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    */
   public String getLabelString() {
     return getLabel().toString();
+  }
+
+  /**
+   * Return the position of the vertex as a WgsCoordinate.
+   */
+  public WgsCoordinate toWgsCoordinate() {
+    return new WgsCoordinate(y, x);
   }
 
   public Coordinate getCoordinate() {

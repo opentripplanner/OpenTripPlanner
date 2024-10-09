@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.StationElement;
@@ -30,7 +29,6 @@ public class TransitBoardingAreaVertex extends StationElementVertex {
     return wheelchairAccessible;
   }
 
-  @Nonnull
   @Override
   public StationElement getStationElement() {
     return this.boardingArea;

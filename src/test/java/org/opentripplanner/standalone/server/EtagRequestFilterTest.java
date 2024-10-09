@@ -7,7 +7,6 @@ import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.glassfish.jersey.message.internal.OutboundMessageContext;
 import org.glassfish.jersey.message.internal.Statuses;
@@ -84,7 +83,6 @@ class EtagRequestFilterTest {
     assertArrayEquals(expectedEntity, (byte[]) response.getEntity());
   }
 
-  @Nonnull
   private static ContainerResponse response(int status, ContainerRequest request) {
     return new ContainerResponse(
       request,
@@ -92,7 +90,6 @@ class EtagRequestFilterTest {
     );
   }
 
-  @Nonnull
   private static byte[] bytes(String input) {
     return input.getBytes(StandardCharsets.UTF_8);
   }
