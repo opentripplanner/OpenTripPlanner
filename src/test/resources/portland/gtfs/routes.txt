@@ -1,0 +1,92 @@
+route_id,route_short_name,route_long_name,route_type,route_url
+1,1,Vermont,3,http://trimet.org/schedules/r001.htm
+4,4,Division/Fessenden,3,http://trimet.org/schedules/r004.htm
+6,6,Martin Luther King Jr Blvd,3,http://trimet.org/schedules/r006.htm
+8,8,Jackson Park/NE 15th,3,http://trimet.org/schedules/r008.htm
+9,9,Powell/Broadway,3,http://trimet.org/schedules/r009.htm
+10,10,Harold St,3,http://trimet.org/schedules/r010.htm
+12,12,Barbur/Sandy Blvd,3,http://trimet.org/schedules/r012.htm
+13,,Washington Park Shuttle,3,http://trimet.org/schedules/r013.htm
+14,14,Hawthorne,3,http://trimet.org/schedules/r014.htm
+15,15,Belmont/NW 23rd,3,http://trimet.org/schedules/r015.htm
+16,16,Front Ave/St Johns,3,http://trimet.org/schedules/r016.htm
+17,17,Holgate/NW 21st,3,http://trimet.org/schedules/r017.htm
+18,18,Hillside,3,http://trimet.org/schedules/r018.htm
+19,19,Woodstock/Glisan,3,http://trimet.org/schedules/r019.htm
+20,20,Burnside/Stark,3,http://trimet.org/schedules/r020.htm
+22,22,Parkrose,3,http://trimet.org/schedules/r022.htm
+23,23,San Rafael,3,http://trimet.org/schedules/r023.htm
+24,24,Fremont,3,http://trimet.org/schedules/r024.htm
+25,25,Glisan/Rockwood,3,http://trimet.org/schedules/r025.htm
+27,27,Market/Main,3,http://trimet.org/schedules/r027.htm
+28,28,Linwood,3,http://trimet.org/schedules/r028.htm
+29,29,Lake/Webster Rd,3,http://trimet.org/schedules/r029.htm
+30,30,Estacada,3,http://trimet.org/schedules/r030.htm
+31,31,King Rd,3,http://trimet.org/schedules/r031.htm
+32,32,Oatfield,3,http://trimet.org/schedules/r032.htm
+33,33,McLoughlin,3,http://trimet.org/schedules/r033.htm
+34,34,River Rd,3,http://trimet.org/schedules/r034.htm
+35,35,Macadam/Greeley,3,http://trimet.org/schedules/r035.htm
+36,36,South Shore,3,http://trimet.org/schedules/r036.htm
+37,37,Lake Grove,3,http://trimet.org/schedules/r037.htm
+38,38,Boones Ferry Rd,3,http://trimet.org/schedules/r038.htm
+39,39,Lewis & Clark,3,http://trimet.org/schedules/r039.htm
+43,43,Taylors Ferry Rd,3,http://trimet.org/schedules/r043.htm
+44,44,Capitol Hwy/Mocks Crest,3,http://trimet.org/schedules/r044.htm
+45,45,Garden Home,3,http://trimet.org/schedules/r045.htm
+46,46,North Hillsboro,3,http://trimet.org/schedules/r046.htm
+47,47,Baseline/Evergreen,3,http://trimet.org/schedules/r047.htm
+48,48,Cornell,3,http://trimet.org/schedules/r048.htm
+50,50,Cedar Mill,3,http://trimet.org/schedules/r050.htm
+51,51,Vista,3,http://trimet.org/schedules/r051.htm
+52,52,Farmington/185th,3,http://trimet.org/schedules/r052.htm
+53,53,Arctic/Allen,3,http://trimet.org/schedules/r053.htm
+54,54,Beaverton-Hillsdale Hwy,3,http://trimet.org/schedules/r054.htm
+55,55,Hamilton,3,http://trimet.org/schedules/r055.htm
+56,56,Scholls Ferry Rd,3,http://trimet.org/schedules/r056.htm
+57,57,TV Hwy/Forest Grove,3,http://trimet.org/schedules/r057.htm
+58,58,Canyon Rd,3,http://trimet.org/schedules/r058.htm
+59,59,Walker/Park Way,3,http://trimet.org/schedules/r059.htm
+61,61,Marquam Hill/Beaverton,3,http://trimet.org/schedules/r061.htm
+62,62,Murray Blvd,3,http://trimet.org/schedules/r062.htm
+63,63,Washington Park ,3,http://trimet.org/schedules/r063.htm
+64,64,Marquam Hill/Tigard,3,http://trimet.org/schedules/r064.htm
+65,65,Marquam Hill/Barbur Blvd,3,http://trimet.org/schedules/r065.htm
+66,66,Marquam Hill/Hollywood,3,http://trimet.org/schedules/r066.htm
+67,67,Jenkins/158th,3,http://trimet.org/schedules/r067.htm
+68,68,Marquam Hill/Collins Circle,3,http://trimet.org/schedules/r068.htm
+70,70,12th Ave,3,http://trimet.org/schedules/r070.htm
+71,71,60th/122nd Ave,3,http://trimet.org/schedules/r071.htm
+72,72,Killingsworth/82nd,3,http://trimet.org/schedules/r072.htm
+73,73,NE 33rd Ave,3,http://trimet.org/schedules/r073.htm
+75,75,Lombard/39th,3,http://trimet.org/schedules/r075.htm
+76,76,Beaverton/Tualatin,3,http://trimet.org/schedules/r076.htm
+77,77,Broadway/Halsey,3,http://trimet.org/schedules/r077.htm
+78,78,Beaverton/Lake Oswego,3,http://trimet.org/schedules/r078.htm
+79,79,Clackamas/Oregon City,3,http://trimet.org/schedules/r079.htm
+80,80,Kane/Troutdale Rd,3,http://trimet.org/schedules/r080.htm
+81,81,Kane/257th,3,http://trimet.org/schedules/r081.htm
+82,82,Eastman/182nd,3,http://trimet.org/schedules/r082.htm
+84,84,Kelso/Boring,3,http://trimet.org/schedules/r084.htm
+85,85,Swan Island,3,http://trimet.org/schedules/r085.htm
+87,87,Airport Way/181st,3,http://trimet.org/schedules/r087.htm
+88,88,Hart/198th,3,http://trimet.org/schedules/r088.htm
+89,89,Tanasbourne,3,http://trimet.org/schedules/r089.htm
+90,,MAX Red Line,0,http://trimet.org/schedules/r090.htm
+92,92,South Beaverton Express,3,http://trimet.org/schedules/r092.htm
+93,,Vintage Trolley,0,http://trimet.org/schedules/r093.htm
+94,94,Sherwood/Pacific Hwy Express,3,http://trimet.org/schedules/r094.htm
+96,96,Tualatin/I-5,3,http://trimet.org/schedules/r096.htm
+99,99,McLoughlin Express,3,http://trimet.org/schedules/r099.htm
+100,,MAX Blue Line,0,http://trimet.org/schedules/r100.htm
+150,,MAX Mall Shuttle,0,http://trimet.org/schedules/r150.htm
+152,152,Milwaukie,3,http://trimet.org/schedules/r152.htm
+154,154,Willamette,3,http://trimet.org/schedules/r154.htm
+155,155,Sunnyside,3,http://trimet.org/schedules/r155.htm
+156,156,Mather Rd,3,http://trimet.org/schedules/r156.htm
+157,157,Happy Valley,3,http://trimet.org/schedules/r157.htm
+190,,MAX Yellow Line,0,http://trimet.org/schedules/r190.htm
+193,,Portland Streetcar,0,http://trimet.org/schedules/r193.htm
+200,,MAX Green Line,0,http://trimet.org/schedules/r200.htm
+203,,WES Commuter Rail,2,http://trimet.org/schedules/r203.htm
+208,,Portland Aerial Tram,6,http://trimet.org/schedules/r208.htm
