@@ -340,7 +340,7 @@ public class TimetableSnapshotTest {
 
     assertNotNull(snapshot.getRealTimeAddedTrip(trip.getId()));
     assertNotNull(snapshot.getRealTimeAddedPatternForTrip(trip));
-    assertNotNull(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()));
+    assertFalse(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()).isEmpty());
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
     assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
@@ -359,7 +359,7 @@ public class TimetableSnapshotTest {
 
     assertNotNull(snapshot.getRealTimeAddedTrip(trip.getId()));
     assertNotNull(snapshot.getRealTimeAddedPatternForTrip(trip));
-    assertNotNull(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()));
+    assertFalse(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()).isEmpty());
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
     assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
     assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
