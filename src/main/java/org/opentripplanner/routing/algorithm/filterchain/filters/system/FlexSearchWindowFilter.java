@@ -17,7 +17,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  */
 public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
 
-  public static final String TAG = "outside-flex-window";
+  public static final String TAG = "flex-outside-search-window";
 
   private final Instant earliestDepartureTime;
   private final Instant latestArrivalTime;
