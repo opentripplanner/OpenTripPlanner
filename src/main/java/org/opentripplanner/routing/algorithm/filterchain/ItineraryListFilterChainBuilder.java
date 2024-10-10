@@ -473,7 +473,10 @@ public class ItineraryListFilterChainBuilder {
       }
 
       if (earliestDepartureTime != null && filterDirectFlexByEarliestDeparture) {
-        addRemoveFilter(filters, new FlexSearchWindowFilter(earliestDepartureTime));
+        addRemoveFilter(
+          filters,
+          new FlexSearchWindowFilter(earliestDepartureTime, searchWindow, sortOrder)
+        );
       }
 
       // Remove itineraries present in the page retrieved before this page/search.

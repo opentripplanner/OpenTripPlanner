@@ -1,8 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
@@ -18,9 +20,17 @@ public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
   public static final String TAG = "outside-flex-window";
 
   private final Instant earliestDepartureTime;
+  private final Instant latestArrivalTime;
+  private final SortOrder sortOrder;
 
-  public FlexSearchWindowFilter(Instant earliestDepartureTime) {
+  public FlexSearchWindowFilter(
+    Instant earliestDepartureTime,
+    Duration searchWindow,
+    SortOrder sortOrder
+  ) {
     this.earliestDepartureTime = earliestDepartureTime;
+    this.latestArrivalTime = earliestDepartureTime.plus(searchWindow);
+    this.sortOrder = sortOrder;
   }
 
   @Override
@@ -31,9 +41,12 @@ public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return it -> {
-      if (it.isDirectFlex()) {
+      if (it.isDirectFlex() && sortOrder.isSortedByDescendingDepartureTime()) {
         var time = it.startTime().toInstant();
         return time.isBefore(earliestDepartureTime);
+      } else if (it.isDirectFlex() && sortOrder.isSortedByAscendingArrivalTime()) {
+        var time = it.startTime().toInstant();
+        return time.isAfter(latestArrivalTime);
       } else {
         return false;
       }

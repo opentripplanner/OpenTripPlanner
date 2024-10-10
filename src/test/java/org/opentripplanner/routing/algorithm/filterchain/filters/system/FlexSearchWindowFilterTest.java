@@ -1,14 +1,17 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 class FlexSearchWindowFilterTest implements PlanTestConstants {
@@ -19,9 +22,13 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
 
   @ParameterizedTest
   @ValueSource(strings = { "09:20", "09:21", "13:20" })
-  void keepFlexItinerariesAfterLDT(String startTime) {
+  void keepArriveByFlexItinerariesAfterEDT(String startTime) {
     var edt = "9:20";
-    var subject = new FlexSearchWindowFilter(TestItineraryBuilder.newTime(time(edt)).toInstant());
+    var subject = new FlexSearchWindowFilter(
+      TestItineraryBuilder.newTime(time(edt)).toInstant(),
+      Duration.ofMinutes(30),
+      SortOrder.STREET_AND_DEPARTURE_TIME
+    );
 
     var itin = newItinerary(A, time(startTime))
       .flex(T11_00, T11_30, B)
@@ -33,8 +40,12 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
 
   @ParameterizedTest
   @ValueSource(strings = { "00:00", "00:01", "09:19" })
-  void removeFlexItinerariesBeforeLDT(String startTime) {
-    var subject = new FlexSearchWindowFilter(LATEST_DEPARTURE_TIME);
+  void removeArriveByFlexItinerariesBeforeEDT(String startTime) {
+    var subject = new FlexSearchWindowFilter(
+      LATEST_DEPARTURE_TIME,
+      Duration.ofMinutes(30),
+      SortOrder.STREET_AND_DEPARTURE_TIME
+    );
 
     var itin = newItinerary(A, time(startTime))
       .flex(T11_00, T11_30, B)
@@ -42,5 +53,22 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
       .build();
 
     assertThat(subject.flagForRemoval(List.of(itin))).isEmpty();
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "12:00" })
+  void removeDepartAtFlexItinerariesAfterLAT(String startTime) {
+    var subject = new FlexSearchWindowFilter(
+      LATEST_DEPARTURE_TIME,
+      Duration.ofMinutes(30),
+      SortOrder.STREET_AND_ARRIVAL_TIME
+    );
+
+    var itin = newItinerary(A, time(startTime))
+      .flex(T11_00, T11_30, B)
+      .withIsSearchWindowAware(false)
+      .build();
+
+    assertEquals(subject.flagForRemoval(List.of(itin)), List.of(itin));
   }
 }
