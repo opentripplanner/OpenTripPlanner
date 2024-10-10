@@ -9,6 +9,7 @@ import org.apache.hc.client5.http.utils.DateUtils;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
@@ -87,8 +88,8 @@ class HttpsDataSourceMetadata {
     return ToStringBuilder
       .of(this.getClass())
       .addObj("contentType", contentType)
-      .addObj("contentLength", contentLength)
-      .addObj("lastModified", lastModified)
+      .addObj("contentLength", FileSizeToTextConverter.fileSizeToString(contentLength))
+      .addObj("lastModified", Instant.ofEpochMilli(lastModified).toString())
       .toString();
   }
 }
