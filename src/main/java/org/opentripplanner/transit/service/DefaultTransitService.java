@@ -322,7 +322,7 @@ public class DefaultTransitService implements TransitEditorService {
         currentSnapshot.listRealTimeAddedRoutes()
       );
     }
-    return Collections.unmodifiableCollection(transitModelIndex.getAllRoutes());
+    return transitModelIndex.getAllRoutes();
   }
 
   @Override

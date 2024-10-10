@@ -166,7 +166,7 @@ class TransitModelIndex {
   }
 
   Collection<Route> getAllRoutes() {
-    return routeForId.values();
+    return Collections.unmodifiableCollection(routeForId.values());
   }
 
   TripPattern getPatternForTrip(Trip trip) {
@@ -174,7 +174,7 @@ class TransitModelIndex {
   }
 
   Collection<TripPattern> getPatternsForRoute(Route route) {
-    return patternsForRoute.get(route);
+    return Collections.unmodifiableCollection(patternsForRoute.get(route));
   }
 
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
