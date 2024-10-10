@@ -71,8 +71,6 @@ public interface TransitService {
 
   FeedInfo getFeedInfo(String feedId);
 
-  Collection<Operator> getOperators();
-
   Collection<Notice> getNoticesByEntity(AbstractTransitEntity<?, ?> entity);
 
   /**
