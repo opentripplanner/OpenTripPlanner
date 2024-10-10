@@ -123,11 +123,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Operator> getOperators() {
-    return this.transitModel.getOperators();
-  }
-
-  @Override
   public Collection<Notice> getNoticesByEntity(AbstractTransitEntity<?, ?> entity) {
     return this.transitModel.getNoticesByElement().get(entity);
   }
