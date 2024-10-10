@@ -24,7 +24,9 @@ class TripPatternTest {
 
   private static final Route ROUTE = TransitModelForTest.route("routeId").build();
   public static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
+  public static final RegularStop STOP_X = TEST_MODEL.stop("X").build();
   public static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
+  public static final RegularStop STOP_Y = TEST_MODEL.stop("Y").build();
   public static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
   private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
     STOP_A,
@@ -33,8 +35,8 @@ class TripPatternTest {
   );
 
   private static final List<LineString> HOP_GEOMETRIES = List.of(
-    makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()),
-    makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate())
+    makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
+    makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
   );
 
   private static final TripPattern subject = TripPattern
@@ -116,5 +118,20 @@ class TripPatternTest {
     assertFalse(subject.containsAnyStopId(List.of(id("not-in-pattern"))));
     assertTrue(subject.containsAnyStopId(List.of(STOP_A.getId())));
     assertTrue(subject.containsAnyStopId(List.of(STOP_A.getId(), id("not-in-pattern"))));
+  }
+
+  @Test
+  void outOfBounds() {
+    var testSubject = TripPattern
+      .of(id("extended"))
+      .withName(NAME)
+      .withRoute(ROUTE)
+      .withStopPattern(TransitModelForTest.stopPattern(STOP_A, STOP_B, STOP_C, STOP_X))
+      .withHopGeometries(HOP_GEOMETRIES)
+      .build();
+    assertEquals(
+      makeLineString(STOP_C.getCoordinate(), STOP_X.getCoordinate()),
+      testSubject.getHopGeometry(2)
+    );
   }
 }
