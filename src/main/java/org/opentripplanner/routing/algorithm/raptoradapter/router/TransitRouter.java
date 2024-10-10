@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.stream.IntStream;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
@@ -41,7 +42,10 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.transit.model.framework.EntityNotFoundException;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class TransitRouter {
 
@@ -133,7 +137,8 @@ public class TransitRouter {
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
-      serverContext.meterRegistry()
+      serverContext.meterRegistry(),
+      this::listStopIndexes
     );
 
     // Route transit
@@ -367,5 +372,19 @@ public class TransitRouter {
       request.journey().access().mode(),
       request.journey().egress().mode()
     );
+  }
+
+  private IntStream listStopIndexes(FeedScopedId stopLocationId) {
+    Collection<StopLocation> stops = serverContext
+      .transitService()
+      .getStopOrChildStops(stopLocationId);
+
+    if (stops.isEmpty()) {
+      throw new EntityNotFoundException(
+        "Stop, station, multimodal station or group of stations",
+        stopLocationId
+      );
+    }
+    return stops.stream().mapToInt(StopLocation::getIndex);
   }
 }

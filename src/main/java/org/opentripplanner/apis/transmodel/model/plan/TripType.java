@@ -7,10 +7,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLScalarType;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 
@@ -21,7 +21,7 @@ public class TripType {
     GraphQLObjectType tripPatternType,
     GraphQLObjectType tripMetadataType,
     GraphQLObjectType routingErrorType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -32,7 +32,7 @@ public class TripType {
           .newFieldDefinition()
           .name("dateTime")
           .description("The time and date of travel")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.toEpochMilli())
           .build()
       )

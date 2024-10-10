@@ -7,7 +7,7 @@ import graphql.schema.GraphQLNonNull;
 
 public class FilterInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
     .name("TripFilterInput")
     .description(

@@ -47,7 +47,7 @@ public class PenaltyForStreetModeType {
   private static final String FIELD_TIME_PENALTY = "timePenalty";
   private static final String FIELD_COST_FACTOR = "costFactor";
 
-  public static GraphQLInputObjectType create(GqlUtil gqlUtil) {
+  public static GraphQLInputObjectType create() {
     return GraphQLInputObjectType
       .newInputObject()
       .name("PenaltyForStreetMode")
@@ -70,7 +70,7 @@ public class PenaltyForStreetModeType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name(FIELD_TIME_PENALTY)
-          .type(new GraphQLNonNull(gqlUtil.doubleFunctionScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
           .description(
             """
             Penalty applied to the time for the given list of modes.

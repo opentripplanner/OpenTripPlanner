@@ -9,7 +9,7 @@ import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
-import org.opentripplanner.routing.api.request.ViaLocation;
+import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -27,7 +27,10 @@ public class ViaRequestMapper {
     RouteRequest request = serverContext.defaultRouteRequest();
 
     List<Map<String, Object>> viaInput = environment.getArgument("via");
-    List<ViaLocation> vias = viaInput.stream().map(ViaLocationMapper::mapViaLocation).toList();
+    List<ViaLocationDeprecated> vias = viaInput
+      .stream()
+      .map(ViaLocationDeprecatedMapper::mapViaLocation)
+      .toList();
 
     List<JourneyRequest> requests;
     if (environment.containsArgument("segments")) {

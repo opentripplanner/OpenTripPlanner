@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
+import static org.opentripplanner.raptor.api.model.AbstractAccessEgressDecorator.accessEgressWithExtraSlack;
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import org.opentripplanner.raptor.api.model.PathLegType;
@@ -16,6 +17,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArriv
  */
 final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArrival<T> {
 
+  private final int departureTime;
   private final RaptorAccessEgress access;
 
   AccessStopArrival(int departureTime, RaptorAccessEgress access) {
@@ -26,6 +28,7 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
       access.c1(),
       access.numberOfRides()
     );
+    this.departureTime = departureTime;
     this.access = access;
   }
 
@@ -42,6 +45,11 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
   @Override
   public AccessPathView accessPath() {
     return () -> access;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 
   @Override
@@ -62,7 +70,7 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
   }
 
   @Override
-  public boolean arrivedOnBoard() {
-    return access.stopReachedOnBoard();
+  public McStopArrival<T> addSlackToArrivalTime(int slack) {
+    return new AccessStopArrival<>(departureTime, accessEgressWithExtraSlack(access, slack));
   }
 }

@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.plan.Leg;
@@ -51,7 +54,7 @@ public class LegType {
     GraphQLObjectType placeType,
     GraphQLObjectType pathGuidanceType,
     GraphQLType elevationStepType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -75,7 +78,7 @@ public class LegType {
           .newFieldDefinition()
           .name("aimedStartTime")
           .description("The aimed date and time this leg starts.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
             // startTime is already adjusted for real-time - need to subtract delay to get aimed time
             leg(env)
@@ -91,7 +94,7 @@ public class LegType {
           .newFieldDefinition()
           .name("expectedStartTime")
           .description("The expected, real-time adjusted date and time this leg starts.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env -> leg(env).getStartTime().toInstant().toEpochMilli())
           .build()
       )
@@ -100,7 +103,7 @@ public class LegType {
           .newFieldDefinition()
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env -> // endTime is already adjusted for real-time - need to subtract delay to get aimed time
             leg(env)
               .getEndTime()
@@ -115,7 +118,7 @@ public class LegType {
           .newFieldDefinition()
           .name("expectedEndTime")
           .description("The expected, real-time adjusted date and time this leg ends.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env -> leg(env).getEndTime().toInstant().toEpochMilli())
           .build()
       )
@@ -270,7 +273,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("fromEstimatedCall")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg originates.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForFromPlace(env.getSource()))
@@ -280,7 +283,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("toEstimatedCall")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("EstimatedCall for the quay where the leg ends.")
           .type(estimatedCallType)
           .dataFetcher(env -> TripTimeOnDateHelper.getTripTimeOnDateForToPlace(env.getSource()))
@@ -320,7 +323,7 @@ public class LegType {
           .description(
             "For transit legs, the service date of the trip. For non-transit legs, null."
           )
-          .type(gqlUtil.dateScalar)
+          .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
             Optional.of((Leg) environment.getSource()).map(Leg::getServiceDate).orElse(null)
           )
@@ -354,7 +357,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("intermediateEstimatedCalls")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
           )
@@ -368,7 +371,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneyEstimatedCalls")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )

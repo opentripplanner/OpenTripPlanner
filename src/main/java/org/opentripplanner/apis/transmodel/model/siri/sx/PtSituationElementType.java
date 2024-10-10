@@ -10,6 +10,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
@@ -41,7 +42,7 @@ public class PtSituationElementType {
     GraphQLObjectType validityPeriodType,
     GraphQLObjectType infoLinkType,
     GraphQLOutputType affectsType,
-    GqlUtil gqlUtil,
+    GraphQLScalarType dateTimeScalar,
     Relay relay
   ) {
     return GraphQLObjectType
@@ -304,7 +305,7 @@ public class PtSituationElementType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("creationTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description("Timestamp for when the situation was created.")
           .dataFetcher(environment -> {
             final ZonedDateTime creationTime = environment.<TransitAlert>getSource().creationTime();
@@ -316,7 +317,7 @@ public class PtSituationElementType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("versionedAtTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description("Timestamp when the situation element was updated.")
           .dataFetcher(environment -> {
             final ZonedDateTime updatedTime = environment.<TransitAlert>getSource().updatedTime();

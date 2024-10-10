@@ -11,6 +11,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -18,7 +19,7 @@ import org.opentripplanner.apis.transmodel.model.TransportModeSlack;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
@@ -27,13 +28,19 @@ public class TripQuery {
   public static final String ACCESS_EGRESS_PENALTY = "accessEgressPenalty";
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
+  public static final String TRIP_VIA_PARAMETER = "via";
+  public static final String DOC_VIA =
+    """
+    The list of via locations the journey is required to visit. All locations are
+    visited in the order they are listed.
+    """;
 
   public static GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType penaltyForStreetMode,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 
@@ -45,7 +52,7 @@ public class TripQuery {
         "trip patterns describing suggested alternatives for the trip."
       )
       .type(new GraphQLNonNull(tripType))
-      .withDirective(gqlUtil.timingData)
+      .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
         GraphQLArgument
           .newArgument()
@@ -55,7 +62,7 @@ public class TripQuery {
             "(if `false` or not set) or the latest acceptable time of arriving " +
             "(`true`). Defaults to now."
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(
@@ -72,7 +79,7 @@ public class TripQuery {
             restrictions are applied - all journeys are listed.
             """
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(
@@ -173,8 +180,17 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("passThroughPoints")
+          .deprecate("Use via instead")
           .description("The list of points the journey is required to pass through.")
           .type(new GraphQLList(new GraphQLNonNull(PassThroughPointInputType.INPUT_TYPE)))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name(TRIP_VIA_PARAMETER)
+          .description(DOC_VIA)
+          .type(new GraphQLList(new GraphQLNonNull(ViaLocationInputType.VIA_LOCATION_INPUT)))
           .build()
       )
       .argument(
@@ -572,7 +588,7 @@ public class TripQuery {
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
-          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
+          .type(ItineraryFiltersInputType.create(preferences.itineraryFilter()))
           .build()
       )
       .argument(

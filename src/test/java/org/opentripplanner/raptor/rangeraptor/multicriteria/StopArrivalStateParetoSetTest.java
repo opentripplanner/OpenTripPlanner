@@ -1,8 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet.createEgressStopArrivalSet;
-import static org.opentripplanner.raptor.rangeraptor.multicriteria.StopArrivalParetoSet.createStopArrivalSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +18,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalPare
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1.StopArrivalFactoryC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
+import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 public class StopArrivalStateParetoSetTest {
 
@@ -33,9 +32,9 @@ public class StopArrivalStateParetoSetTest {
     .schedule("10:00 10:30")
     .build();
 
-  // In this test each stop is used to identify the pareto vector - it is just one
-  // ParetoSet "subject" with multiple "stops" in it. The stop have no effect on
-  // the Pareto functionality.
+  // In this test, each stop is used to identify the pareto vector - it is just one
+  // ParetoSet "subject" with multiple "stops" in it. The stop has no effect on
+  // the Pareto functionality - the stop is not a criteria in the pareto-function.
   private static final int STOP_1 = 1;
   private static final int STOP_2 = 2;
   private static final int STOP_3 = 3;
@@ -72,19 +71,12 @@ public class StopArrivalStateParetoSetTest {
   );
 
   private static Stream<Arguments> testCases() {
+    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator = COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
     return Stream.of(
-      Arguments.of(
-        "Stop Arrival - regular",
-        createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null)
-      ),
+      Arguments.of("Stop Arrival - regular", StopArrivalParetoSet.of(comparator).build()),
       Arguments.of(
         "Stop Arrival - w/egress",
-        createEgressStopArrivalSet(
-          COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
-          List.of(),
-          null,
-          null
-        )
+        StopArrivalParetoSet.of(comparator).withEgressListener(List.of(), null).build()
       )
     );
   }
@@ -169,7 +161,8 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
-    var subject = createStopArrivalSet(COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost(), null);
+    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator = COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
+    var subject = StopArrivalParetoSet.of(comparator).build();
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));
@@ -184,12 +177,10 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesAffectDominanceForStopArrivalsWithEgress() {
-    var subject = createEgressStopArrivalSet(
-      COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival(),
-      List.of(),
-      null,
-      null
-    );
+    var subject = StopArrivalParetoSet
+      .of(COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival())
+      .withEgressListener(List.of(), null)
+      .build();
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
     subject.add(newTransferStopState(ROUND_1, STOP_4, 8, ANY));

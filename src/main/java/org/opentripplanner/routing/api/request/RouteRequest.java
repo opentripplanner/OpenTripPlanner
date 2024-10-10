@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -56,7 +57,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private GenericLocation to;
 
-  private List<PassThroughPoint> passThroughPoints = Collections.emptyList();
+  private List<ViaLocation> via = Collections.emptyList();
 
   private Instant dateTime = Instant.now();
 
@@ -118,7 +119,7 @@ public class RouteRequest implements Cloneable, Serializable {
   /**
    * The booking time is used to exclude services which are not bookable at the
    * requested booking time. If a service is bookable at this time or later, the service
-   * is included. This apply to FLEX access, egress and direct services.
+   * is included. This applies to FLEX access, egress and direct services.
    */
   public Instant bookingTime() {
     return bookingTime;
@@ -279,32 +280,39 @@ public class RouteRequest implements Cloneable, Serializable {
     this.to = to;
   }
 
-  public List<PassThroughPoint> getPassThroughPoints() {
-    return passThroughPoints;
+  /**
+   * Return {@code true} if at least one via location is set!
+   */
+  public boolean isViaSearch() {
+    return !via.isEmpty();
   }
 
-  public void setPassThroughPoints(final List<PassThroughPoint> passThroughPoints) {
-    this.passThroughPoints = passThroughPoints;
+  public List<ViaLocation> getViaLocations() {
+    return via;
+  }
+
+  public void setViaLocations(final List<ViaLocation> via) {
+    this.via = via;
   }
 
   /**
    * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-   * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+   * latest-departure-time(LDT). In case of a reverse search, it will be the time from earliest to
    * latest arrival time (LAT - EAT).
    * <p>
-   * All optimal travels that depart within the search window is guaranteed to be found.
+   * All optimal itineraries that depart within the search window are guaranteed to be found.
    * <p>
    * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
    * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not
    * confuse this with the travel-window, which is the time between EDT to LAT.
    * <p>
    * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
-   * dynamically  assigned a suitable value, if not set. In a small to medium size operation you may
-   * use a fixed value, like 60 minutes. If you have a mixture of high frequency cities routes and
+   * dynamically assigned a suitable value, if not set. In a small-to-medium size operation, you may
+   * use a fixed value, like 60 minutes. If you have a mixture of high-frequency city routes and
    * infrequent long distant journeys, the best option is normally to use the dynamic auto
    * assignment.
    * <p>
-   * There is no need to set this when going to the next/previous page any more.
+   * There is no need to set this when going to the next/previous page anymore.
    */
   public Duration searchWindow() {
     return searchWindow;

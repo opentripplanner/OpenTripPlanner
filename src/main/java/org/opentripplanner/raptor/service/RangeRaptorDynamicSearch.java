@@ -19,8 +19,8 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private final RaptorConfig<T> config;
   private final RaptorTransitDataProvider<T> transitData;
   private final RaptorRequest<T> originalRequest;
-  private final RaptorSearchWindowCalculator dynamicSearchParamsCalculator;
+  private final RaptorSearchWindowCalculator dynamicSearchWindowCalculator;
 
   private final HeuristicSearchTask<T> fwdHeuristics;
   private final HeuristicSearchTask<T> revHeuristics;
@@ -56,7 +56,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.config = config;
     this.transitData = transitData;
     this.originalRequest = originalRequest;
-    this.dynamicSearchParamsCalculator =
+    this.dynamicSearchWindowCalculator =
       config.searchWindowCalculator().withSearchParams(originalRequest.searchParams());
 
     this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
@@ -67,19 +67,18 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     try {
       enableHeuristicSearchBasedOnOptimizationsAndSearchParameters();
 
-      // Run heuristics, if no destination is reached
+      // Run the heuristics if no destination is reached
       runHeuristics();
 
       // Set search-window and other dynamic calculated parameters
-      RaptorRequest<T> dynamicRequest = originalRequest;
-      dynamicRequest = requestWithDynamicSearchParams(dynamicRequest);
+      var dynamicRequest = requestWithDynamicSearchParams(originalRequest);
 
       return createAndRunDynamicRRWorker(dynamicRequest);
     } catch (DestinationNotReachedException e) {
       return new RaptorResponse<>(
         Collections.emptyList(),
         null,
-        // If a trip exist(forward heuristics succeed), but is outside the calculated
+        // If a trip exists(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
         // performed. This enables the client to page to the next window
         requestWithDynamicSearchParams(originalRequest),
@@ -130,17 +129,18 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
     LOG.debug("Main request: {}", request);
-    RaptorWorker<T> raptorWorker;
+    RangeRaptor<T> rangeRaptorRouter;
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      raptorWorker = config.createMcWorker(transitData, request, getDestinationHeuristics());
+      rangeRaptorRouter =
+        config.createRangeRaptorWithMcWorker(transitData, request, getDestinationHeuristics());
     } else {
-      raptorWorker = config.createStdWorker(transitData, request);
+      rangeRaptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
 
     // Route
-    var result = raptorWorker.route();
+    var result = rangeRaptorRouter.route();
 
     // create and return response
     return new RaptorResponse<>(
@@ -274,10 +274,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     SearchParamsBuilder<T> builder = request.mutate().searchParams();
 
     if (!request.searchParams().isEarliestDepartureTimeSet()) {
-      builder.earliestDepartureTime(dynamicSearchParamsCalculator.getEarliestDepartureTime());
+      builder.earliestDepartureTime(dynamicSearchWindowCalculator.getEarliestDepartureTime());
     }
     if (!request.searchParams().isSearchWindowSet()) {
-      builder.searchWindowInSeconds(dynamicSearchParamsCalculator.getSearchWindowSeconds());
+      builder.searchWindowInSeconds(dynamicSearchWindowCalculator.getSearchWindowSeconds());
     }
     // We do not set the latest-arrival-time, because we do not want to limit the forward
     // multi-criteria search, it does not have much effect on the performance - we only risk
@@ -287,7 +287,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private void calculateDynamicSearchParametersFromHeuristics(@Nullable Heuristics heuristics) {
     if (heuristics != null) {
-      dynamicSearchParamsCalculator
+      dynamicSearchWindowCalculator
         .withHeuristics(
           heuristics.bestOverallJourneyTravelDuration(),
           heuristics.minWaitTimeForJourneysReachingDestination()

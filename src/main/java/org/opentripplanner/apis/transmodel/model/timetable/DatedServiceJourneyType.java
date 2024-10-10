@@ -14,6 +14,8 @@ import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.TripTimeOnDateHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -33,8 +35,7 @@ public class DatedServiceJourneyType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType journeyPatternType,
     GraphQLType estimatedCallType,
-    GraphQLType quayType,
-    GqlUtil gqlUtil
+    GraphQLType quayType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -48,7 +49,7 @@ public class DatedServiceJourneyType {
           .description(
             "The date this service runs. The date used is based on the service date as opposed to calendar date."
           )
-          .type(gqlUtil.dateScalar)
+          .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
             Optional
               .of(tripOnServiceDate(environment))
@@ -142,7 +143,7 @@ public class DatedServiceJourneyType {
           .newFieldDefinition()
           .name("estimatedCalls")
           .type(new GraphQLList(estimatedCallType))
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this dated service journey, " +
             "updated with real-time-updates (if available). "

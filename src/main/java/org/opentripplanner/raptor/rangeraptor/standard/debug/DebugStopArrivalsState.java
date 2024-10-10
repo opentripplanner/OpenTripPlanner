@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 
@@ -28,12 +28,12 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule>
    * Create a Standard range raptor state for the given context
    */
   public DebugStopArrivalsState(
-    RoundProvider roundProvider,
+    WorkerLifeCycle lifeCycle,
     DebugHandlerFactory<T> dFactory,
     StopsCursor<T> stopsCursor,
     StopArrivalsState<T> delegate
   ) {
-    this.debug = new StateDebugger<>(stopsCursor, roundProvider, dFactory);
+    this.debug = new StateDebugger<>(stopsCursor, lifeCycle, dFactory);
     this.delegate = delegate;
   }
 

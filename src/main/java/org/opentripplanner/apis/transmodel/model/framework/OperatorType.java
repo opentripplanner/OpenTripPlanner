@@ -14,8 +14,7 @@ public class OperatorType {
 
   public static GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType,
-    GqlUtil gqlUtil
+    GraphQLOutputType serviceJourneyType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -48,7 +47,7 @@ public class OperatorType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
             GqlUtil
@@ -64,7 +63,7 @@ public class OperatorType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourney")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment ->
             GqlUtil

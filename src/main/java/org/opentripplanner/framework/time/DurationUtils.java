@@ -187,23 +187,36 @@ public class DurationUtils {
   }
 
   /**
+   * Checks that duration is positive and less than the given {@code maxLimit} (exclusive).
+   *
+   * @param subject used to identify name of the problematic value when throwing an exception.
+   */
+  public static Duration requireNonNegative(Duration value, Duration maxLimit, String subject) {
+    Objects.requireNonNull(value);
+    if (value.isNegative()) {
+      throw new IllegalArgumentException(
+        "Duration %s can't be negative: %s".formatted(subject, value)
+      );
+    }
+    if (value.compareTo(maxLimit) >= 0) {
+      throw new IllegalArgumentException(
+        "Duration %s can't be longer or equals too %s: %s".formatted(
+            subject,
+            durationToStr(maxLimit),
+            value
+          )
+      );
+    }
+    return value;
+  }
+
+  /**
    * Checks that duration is not negative and not over 2 days.
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */
-  public static Duration requireNonNegativeLong(Duration value, String subject) {
-    Objects.requireNonNull(value);
-    if (value.isNegative()) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be negative: %s.".formatted(subject, value)
-      );
-    }
-    if (value.compareTo(Duration.ofDays(2)) > 0) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be longer than two days: %s.".formatted(subject, value)
-      );
-    }
-    return value;
+  public static Duration requireNonNegativeMax2days(Duration value, String subject) {
+    return requireNonNegative(value, Duration.ofDays(2), subject);
   }
 
   /**
@@ -211,19 +224,8 @@ public class DurationUtils {
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */
-  public static Duration requireNonNegativeMedium(Duration value, String subject) {
-    Objects.requireNonNull(value);
-    if (value.isNegative()) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be negative: %s.".formatted(subject, value)
-      );
-    }
-    if (value.compareTo(Duration.ofHours(2)) > 0) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be longer than two hours: %s.".formatted(subject, value)
-      );
-    }
-    return value;
+  public static Duration requireNonNegativeMax2hours(Duration value, String subject) {
+    return requireNonNegative(value, Duration.ofHours(2), subject);
   }
 
   /**
@@ -231,19 +233,8 @@ public class DurationUtils {
    *
    * @param subject used to identify name of the problematic value when throwing an exception.
    */
-  public static Duration requireNonNegativeShort(Duration value, String subject) {
-    Objects.requireNonNull(value);
-    if (value.isNegative()) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be negative: %s.".formatted(subject, value)
-      );
-    }
-    if (value.compareTo(Duration.ofMinutes(30)) > 0) {
-      throw new IllegalArgumentException(
-        "Duration %s can't be longer than 30 minutes: %s.".formatted(subject, value)
-      );
-    }
-    return value;
+  public static Duration requireNonNegativeMax30minutes(Duration value, String subject) {
+    return requireNonNegative(value, Duration.ofMinutes(30), subject);
   }
 
   /**

@@ -17,8 +17,7 @@ public class AuthorityType {
 
   public static GraphQLObjectType create(
     GraphQLOutputType lineType,
-    GraphQLOutputType ptSituationElementType,
-    GqlUtil gqlUtil
+    GraphQLOutputType ptSituationElementType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -65,7 +64,7 @@ public class AuthorityType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
             getTransitService(environment)
@@ -80,7 +79,7 @@ public class AuthorityType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("situations")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Get all situations active for the authority.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->

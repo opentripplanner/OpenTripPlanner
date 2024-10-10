@@ -2,20 +2,23 @@ package org.opentripplanner.raptor.configure;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorkerComposite;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
@@ -49,44 +52,62 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
     // The passThroughPointsService is needed to create the context, so we initialize it here.
     this.passThroughPointsService = createPassThroughPointsService(request);
-    return new SearchContext<>(request, tuningParameters, transit, acceptC2AtDestination());
+    var acceptC2AtDestination = passThroughPointsService.isNoop()
+      ? null
+      : passThroughPointsService.acceptC2AtDestination();
+    return SearchContext.of(request, tuningParameters, transit, acceptC2AtDestination).build();
   }
 
-  public RaptorWorker<T> createStdWorker(
+  public RangeRaptor<T> createRangeRaptorWithStdWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
     var context = context(transitData, request);
     var stdConfig = new StdRangeRaptorConfig<>(context);
-    return createWorker(context, stdConfig.state(), stdConfig.strategy());
+    return createRangeRaptor(
+      context,
+      createWorker(context.legs().getFirst(), stdConfig.state(), stdConfig.strategy())
+    );
   }
 
-  public RaptorWorker<T> createMcWorker(
+  public RangeRaptor<T> createRangeRaptorWithMcWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
   ) {
-    final SearchContext<T> context = context(transitData, request);
-    return new McRangeRaptorConfig<>(context, passThroughPointsService)
-      .createWorker(
-        heuristics,
-        (state, routingStrategy) -> createWorker(context, state, routingStrategy)
-      );
+    var context = context(transitData, request);
+    RangeRaptorWorker<T> worker = null;
+    McStopArrivals<T> nextStopArrivals = null;
+
+    if (request.searchParams().hasViaLocations()) {
+      for (SearchContextViaLeg<T> cxLeg : context.legs().reversed()) {
+        var c = new McRangeRaptorConfig<>(cxLeg, passThroughPointsService)
+          .connectWithNextLegArrivals(nextStopArrivals);
+        var w = createWorker(cxLeg, c.state(), c.strategy());
+        worker = RangeRaptorWorkerComposite.of(w, worker);
+        nextStopArrivals = c.stopArrivals();
+      }
+    } else {
+      // The first leg is the only leg
+      var leg = context.legs().getFirst();
+      var c = new McRangeRaptorConfig<>(leg, passThroughPointsService).withHeuristics(heuristics);
+      worker = createWorker(leg, c.state(), c.strategy());
+    }
+
+    return createRangeRaptor(context, worker);
   }
 
-  public RaptorWorker<T> createHeuristicSearch(
+  public RangeRaptor<T> createRangeRaptorWithHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    var context = context(transitData, request);
-    var stdConfig = new StdRangeRaptorConfig<>(context);
-    return createWorker(context, stdConfig.state(), stdConfig.strategy());
+    return createRangeRaptorWithStdWorker(transitData, request);
   }
 
   public Heuristics createHeuristic(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
-    RaptorWorkerResult<T> results
+    RaptorRouterResult<T> results
   ) {
     var context = context(transitData, request);
     return new StdRangeRaptorConfig<>(context).createHeuristics(results);
@@ -116,29 +137,35 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return McRangeRaptorConfig.passThroughPointsService(request.multiCriteria());
   }
 
-  private RaptorWorker<T> createWorker(
-    SearchContext<T> ctx,
+  private RangeRaptorWorker<T> createWorker(
+    SearchContextViaLeg<T> ctxLeg,
     RaptorWorkerState<T> workerState,
     RoutingStrategy<T> routingStrategy
   ) {
+    var ctx = ctxLeg.parent();
     return new DefaultRangeRaptorWorker<>(
       workerState,
       routingStrategy,
       ctx.transit(),
       ctx.slackProvider(),
-      ctx.accessPaths(),
-      ctx.roundProvider(),
+      ctxLeg.accessPaths(),
       ctx.calculator(),
-      ctx.createLifeCyclePublisher(),
+      ctx.lifeCycle(),
       ctx.performanceTimers(),
       ctx.useConstrainedTransfers()
     );
   }
 
-  private IntPredicate acceptC2AtDestination() {
-    return passThroughPointsService.isNoop()
-      ? null
-      : passThroughPointsService.acceptC2AtDestination();
+  private RangeRaptor<T> createRangeRaptor(SearchContext<T> ctx, RangeRaptorWorker<T> worker) {
+    return new RangeRaptor<>(
+      worker,
+      ctx.transit(),
+      ctx.legs().getFirst().accessPaths(),
+      ctx.roundTracker(),
+      ctx.calculator(),
+      ctx.createLifeCyclePublisher(),
+      ctx.performanceTimers()
+    );
   }
 
   @Nullable

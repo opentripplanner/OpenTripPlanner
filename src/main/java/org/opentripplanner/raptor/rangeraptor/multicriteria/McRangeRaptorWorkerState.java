@@ -6,7 +6,7 @@ import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
@@ -110,9 +110,9 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public RaptorWorkerResult<T> results() {
+  public RaptorRouterResult<T> results() {
     arrivals.debugStateInfo();
-    return new McRaptorWorkerResult<T>(arrivals, paths);
+    return new McRaptorRouterResult<T>(arrivals, paths);
   }
 
   Iterable<? extends McStopArrival<T>> listStopArrivalsPreviousRound(int stop) {

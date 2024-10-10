@@ -7,14 +7,14 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
 public class BookingArrangementType {
 
-  public static GraphQLObjectType create(GqlUtil gqlUtil) {
+  public static GraphQLObjectType create() {
     GraphQLOutputType contactType = GraphQLObjectType
       .newObject()
       .name("Contact")
@@ -82,7 +82,7 @@ public class BookingArrangementType {
           .newFieldDefinition()
           .name("latestBookingTime")
           .description("Latest time the service can be booked. ISO 8601 timestamp")
-          .type(gqlUtil.localTimeScalar)
+          .type(TransmodelScalars.LOCAL_TIME_SCALAR)
           .dataFetcher(environment -> {
             final BookingTime latestBookingTime = (bookingInfo(environment)).getLatestBookingTime();
             return latestBookingTime == null ? null : latestBookingTime.getTime();

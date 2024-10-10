@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeLong;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMedium;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeShort;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2days;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2hours;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax30minutes;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -23,6 +23,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class DurationUtilsTest {
 
+  private final Duration NEG_1s = Duration.ofSeconds(-1);
+  private final Duration D1s = Duration.ofSeconds(1);
   private final Duration D3d = Duration.ofDays(3);
   private final Duration D2h = Duration.ofHours(2);
   private final Duration D5m = Duration.ofMinutes(5);
@@ -128,41 +130,63 @@ public class DurationUtilsTest {
   }
 
   @Test
+  public void testRequireNonNegativeAndMaxLimit() {
+    // Firs make sure legal values are accepted
+    requireNonNegative(Duration.ZERO, D2h, "test");
+    requireNonNegative(D2h.minus(D1s), D2h, "test");
+
+    // null is not supported
+    assertThrows(NullPointerException.class, () -> requireNonNegative(null, D2h, "test"));
+
+    // Test max limit
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> requireNonNegative(D2h, D2h, "test")
+    );
+    assertEquals("Duration test can't be longer or equals too 2h: PT2H", ex.getMessage());
+
+    // Test non-negative
+    ex =
+      assertThrows(IllegalArgumentException.class, () -> requireNonNegative(NEG_1s, D2h, "test"));
+    assertEquals("Duration test can't be negative: PT-1S", ex.getMessage());
+  }
+
+  @Test
   public void testRequireNonNegativeLong() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeLong(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax2days(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeLong(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax2days(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeLong(Duration.ofDays(3), "test")
+      () -> requireNonNegativeMax2days(Duration.ofDays(3), "test")
     );
   }
 
   @Test
   public void testRequireNonNegativeMedium() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeMedium(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax2hours(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeMedium(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax2hours(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeMedium(Duration.ofHours(3), "test")
+      () -> requireNonNegativeMax2hours(Duration.ofHours(3), "test")
     );
   }
 
   @Test
   public void testRequireNonNegativeShort() {
-    assertThrows(NullPointerException.class, () -> requireNonNegativeShort(null, "test"));
+    assertThrows(NullPointerException.class, () -> requireNonNegativeMax30minutes(null, "test"));
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeShort(Duration.ofSeconds(-1), "test")
+      () -> requireNonNegativeMax30minutes(Duration.ofSeconds(-1), "test")
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> requireNonNegativeShort(Duration.ofMinutes(31), "test")
+      () -> requireNonNegativeMax30minutes(Duration.ofMinutes(31), "test")
     );
   }
 

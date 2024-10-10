@@ -21,7 +21,12 @@ public class RaptorArchitectureTest {
   private static final Package API_PATH = API.subPackage("path");
   private static final Package RAPTOR_UTIL = RAPTOR.subPackage("util");
   private static final Package RAPTOR_UTIL_PARETO_SET = RAPTOR_UTIL.subPackage("paretoset");
-  private static final Module RAPTOR_UTILS = Module.of(RAPTOR_UTIL, RAPTOR_UTIL_PARETO_SET);
+  private static final Package RAPTOR_UTIL_COMPOSITE = RAPTOR_UTIL.subPackage("composite");
+  private static final Module RAPTOR_UTILS = Module.of(
+    RAPTOR_UTIL,
+    RAPTOR_UTIL_PARETO_SET,
+    RAPTOR_UTIL_COMPOSITE
+  );
   private static final Package RAPTOR_SPI = RAPTOR.subPackage("spi");
   private static final Package RAPTOR_PATH = RAPTOR.subPackage("path");
   private static final Package CONFIGURE = RAPTOR.subPackage("configure");
@@ -78,7 +83,8 @@ public class RaptorArchitectureTest {
   @Test
   void enforcePackageDependenciesUtil() {
     RAPTOR_UTIL.dependsOn(FRAMEWORK_UTILS, RAPTOR_SPI).verify();
-    RAPTOR_UTIL_PARETO_SET.verify();
+    RAPTOR_UTIL_PARETO_SET.dependsOn(RAPTOR_UTIL_COMPOSITE).verify();
+    RAPTOR_UTIL_COMPOSITE.verify();
   }
 
   @Test
@@ -200,7 +206,8 @@ public class RaptorArchitectureTest {
         RAPTOR_UTIL,
         CONFIGURE,
         RR_INTERNAL_API,
-        RR_TRANSIT
+        RR_TRANSIT,
+        RANGE_RAPTOR
       )
       .verify();
   }

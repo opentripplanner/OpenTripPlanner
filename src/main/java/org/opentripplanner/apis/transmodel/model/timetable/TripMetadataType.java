@@ -4,14 +4,14 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 public class TripMetadataType {
 
   private TripMetadataType() {}
 
-  public static GraphQLObjectType create(GqlUtil gqlUtil) {
+  public static GraphQLObjectType create(GraphQLScalarType dateTimeScalar) {
     return GraphQLObjectType
       .newObject()
       .name("TripSearchData")
@@ -43,7 +43,7 @@ public class TripMetadataType {
             "AFTER the current search."
           )
           .deprecate("Use pageCursor instead")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).nextDateTime.toEpochMilli())
           .build()
       )
@@ -58,7 +58,7 @@ public class TripMetadataType {
             "time-window BEFORE the current search."
           )
           .deprecate("Use pageCursor instead")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).prevDateTime.toEpochMilli())
           .build()
       )

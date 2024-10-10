@@ -9,6 +9,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.apis.transmodel.mapping.OccupancyStatusMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -41,7 +44,7 @@ public class EstimatedCallType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType datedServiceJourneyType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -62,7 +65,7 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("aimedArrivalTime")
           .description("Scheduled time of arrival at quay. Not affected by read time updated")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(environment ->
             1000 *
             (
@@ -76,7 +79,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedArrivalTime")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .description(
             "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
           )
@@ -92,7 +95,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("actualArrivalTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description(
             "Actual time of arrival at quay. Updated from real time information if available."
           )
@@ -112,7 +115,7 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("aimedDepartureTime")
           .description("Scheduled time of departure from quay. Not affected by read time updated")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(environment ->
             1000 *
             (
@@ -126,7 +129,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedDepartureTime")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .description(
             "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
           )
@@ -143,7 +146,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("actualDepartureTime")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .description(
             "Actual time of departure from quay. Updated with real time information if available."
           )
@@ -271,7 +274,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("date")
-          .type(new GraphQLNonNull(gqlUtil.dateScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR))
           .description("The date the estimated call is valid for.")
           .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getServiceDay())
           .build()
@@ -326,7 +329,7 @@ public class EstimatedCallType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("situations")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .description("Get all relevant situations for this EstimatedCall.")
           .dataFetcher(environment ->

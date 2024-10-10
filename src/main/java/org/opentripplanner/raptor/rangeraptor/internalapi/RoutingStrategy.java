@@ -2,13 +2,13 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 
 /**
- * Provides alternative implementations of some logic within the {@link DefaultRangeRaptorWorker}.
+ * Provides alternative implementations of some logic within the {@link RangeRaptor}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.util;
+package org.opentripplanner.apis.transmodel.model.framework;
 
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.site.StopLocation;

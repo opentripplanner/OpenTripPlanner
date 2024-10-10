@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -41,8 +43,7 @@ public class ServiceJourneyType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
-    GraphQLOutputType timetabledPassingTimeType,
-    GqlUtil gqlUtil
+    GraphQLOutputType timetabledPassingTimeType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -61,8 +62,8 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("activeDates")
-          .withDirective(gqlUtil.timingData)
-          .type(new GraphQLNonNull(new GraphQLList(gqlUtil.dateScalar)))
+          .withDirective(TransmodelDirectives.TIMING_DATA)
+          .type(new GraphQLNonNull(new GraphQLList(TransmodelScalars.DATE_SCALAR)))
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
@@ -235,7 +236,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("passingTimes")
           .type(new GraphQLNonNull(new GraphQLList(timetabledPassingTimeType)))
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passing times only - without real-time-updates, for realtime-data use 'estimatedCalls'"
           )
@@ -254,7 +255,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("estimatedCalls")
           .type(new GraphQLList(estimatedCallType))
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). " +
             "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
@@ -264,7 +265,7 @@ public class ServiceJourneyType {
             GraphQLArgument
               .newArgument()
               .name("date")
-              .type(gqlUtil.dateScalar)
+              .type(TransmodelScalars.DATE_SCALAR)
               .description("Date to get estimated calls for. Defaults to today.")
               .build()
           )

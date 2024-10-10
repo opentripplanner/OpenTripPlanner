@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.support;
 
+import static org.opentripplanner.raptor.rangeraptor.transit.RoundTracker.isFirstRound;
 import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_TRIP_INDEX;
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
-import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -23,25 +23,24 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
 
   private final SlackProvider slackProvider;
   private final RaptorTransitCalculator<T> calculator;
-  private final RoundProvider roundProvider;
   private final boolean hasTimeDependentAccess;
   private boolean inFirstIteration = true;
   private RaptorTimeTable<T> timeTable;
   private RaptorTripScheduleSearch<T> tripSearch;
+  private int round;
 
   public TimeBasedBoardingSupport(
     boolean hasTimeDependentAccess,
     SlackProvider slackProvider,
     RaptorTransitCalculator<T> calculator,
-    RoundProvider roundProvider,
     WorkerLifeCycle subscriptions
   ) {
     this.hasTimeDependentAccess = hasTimeDependentAccess;
     this.slackProvider = slackProvider;
     this.calculator = calculator;
-    this.roundProvider = roundProvider;
 
     subscriptions.onIterationComplete(() -> inFirstIteration = false);
+    subscriptions.onPrepareForNextRound(r -> this.round = r);
   }
 
   public void prepareForTransitWith(RaptorTimeTable<T> timeTable) {
@@ -124,7 +123,7 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
    * Create a trip search using {@link TripScheduleBoardSearch}.
    */
   private RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
-    if (!inFirstIteration && roundProvider.isFirstRound() && !hasTimeDependentAccess) {
+    if (!inFirstIteration && isFirstRound(round) && !hasTimeDependentAccess) {
       // For the first round of every iteration(except the first) we restrict the first
       // departure to happen within the time-window of the iteration. Another way to put this,
       // is to say that we allow for the access path to be time-shifted to a later departure,

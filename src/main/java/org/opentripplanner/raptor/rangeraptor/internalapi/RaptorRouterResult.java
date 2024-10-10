@@ -5,9 +5,9 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 
 /**
- * This is the result of the {@link RaptorWorker#route()} call.
+ * This is the result of a RangeRaptor route call.
  */
-public interface RaptorWorkerResult<T extends RaptorTripSchedule> {
+public interface RaptorRouterResult<T extends RaptorTripSchedule> {
   /**
    * Return all paths found.
    */

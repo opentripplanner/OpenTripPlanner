@@ -8,7 +8,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.model.plan.Itinerary;
 
 public class TripPatternType {
@@ -17,7 +17,7 @@ public class TripPatternType {
     GraphQLOutputType systemNoticeType,
     GraphQLObjectType legType,
     GraphQLObjectType timePenaltyType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType
       .newObject()
@@ -30,7 +30,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("startTime")
           .description("Time that the trip departs.")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .deprecate("Replaced with expectedStartTime")
           .dataFetcher(env -> itinerary(env).startTime().toInstant().toEpochMilli())
           .build()
@@ -40,7 +40,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("endTime")
           .description("Time that the trip arrives.")
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .deprecate("Replaced with expectedEndTime")
           .dataFetcher(env -> itinerary(env).endTime().toInstant().toEpochMilli())
           .build()
@@ -50,7 +50,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("aimedStartTime")
           .description("The aimed date and time the trip starts.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
             // startTime is already adjusted for real-time - need to subtract delay to get aimed time
             itinerary(env)
@@ -66,7 +66,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("expectedStartTime")
           .description("The expected, real-time adjusted date and time the trip starts.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env -> itinerary(env).startTime().toInstant().toEpochMilli())
           .build()
       )
@@ -75,7 +75,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("aimedEndTime")
           .description("The aimed date and time the trip ends.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env ->
             // endTime is already adjusted for real-time - need to subtract delay to get aimed time
             itinerary(env)
@@ -91,7 +91,7 @@ public class TripPatternType {
           .newFieldDefinition()
           .name("expectedEndTime")
           .description("The expected, real-time adjusted date and time the trip ends.")
-          .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
+          .type(new GraphQLNonNull(dateTimeScalar))
           .dataFetcher(env -> itinerary(env).endTime().toInstant().toEpochMilli())
           .build()
       )

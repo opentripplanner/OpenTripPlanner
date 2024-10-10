@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model.plan.legacyvia;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;

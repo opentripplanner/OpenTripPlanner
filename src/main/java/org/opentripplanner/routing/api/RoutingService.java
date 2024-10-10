@@ -8,5 +8,10 @@ import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 public interface RoutingService {
   RoutingResponse route(RouteRequest request);
 
+  /**
+   * @deprecated We will replace the complex via-search with a simpler version part of the
+   *      existing trip search.
+   */
+  @Deprecated
   ViaRoutingResponse route(RouteViaRequest request);
 }

@@ -26,7 +26,7 @@ public class StreetModeDurationInputType {
   private static final String FIELD_STREET_MODE = "streetMode";
   private static final String FIELD_DURATION = "duration";
 
-  public static GraphQLInputObjectType create(GqlUtil gqlUtil) {
+  public static GraphQLInputObjectType create() {
     return GraphQLInputObjectType
       .newInputObject()
       .name("StreetModeDurationInput")
@@ -42,7 +42,7 @@ public class StreetModeDurationInputType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name(FIELD_DURATION)
-          .type(new GraphQLNonNull(gqlUtil.durationScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DURATION_SCALAR))
       )
       .build();
   }

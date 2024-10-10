@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.transmodel.model.plan;
+package org.opentripplanner.apis.transmodel.model.plan.legacyvia;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
@@ -7,11 +7,13 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.LocationInputType;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 
 public class ViaTripQuery {
 
@@ -20,7 +22,7 @@ public class ViaTripQuery {
     GraphQLOutputType viaTripType,
     GraphQLInputObjectType viaLocationInputType,
     GraphQLInputObjectType viaSegmentInputType,
-    GqlUtil gqlUtil
+    GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLFieldDefinition
       .newFieldDefinition()
@@ -28,8 +30,9 @@ public class ViaTripQuery {
       .description(
         "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
       )
+      .deprecate("Use the regular trip query with via stop instead.")
       .type(new GraphQLNonNull(viaTripType))
-      .withDirective(gqlUtil.timingData)
+      .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
         GraphQLArgument
           .newArgument()
@@ -39,7 +42,7 @@ public class ViaTripQuery {
             "(if arriveBy=false/not set) or the latest acceptable time of arriving " +
             "(arriveBy=true). Defaults to now"
           )
-          .type(gqlUtil.dateTimeScalar)
+          .type(dateTimeScalar)
           .build()
       )
       .argument(
@@ -72,7 +75,7 @@ public class ViaTripQuery {
             "The search-window used is returned to the response metadata as `searchWindowUsed` for " +
             "debugging purposes."
           )
-          .type(new GraphQLNonNull(gqlUtil.durationScalar))
+          .type(new GraphQLNonNull(TransmodelScalars.DURATION_SCALAR))
           .build()
       )
       .argument(

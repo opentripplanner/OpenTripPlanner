@@ -16,6 +16,18 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
     this.delegate = delegate;
   }
 
+  public static RaptorAccessEgress accessEgressWithExtraSlack(
+    RaptorAccessEgress delegate,
+    int slack
+  ) {
+    return new AbstractAccessEgressDecorator(delegate) {
+      @Override
+      public int durationInSeconds() {
+        return super.durationInSeconds() + slack;
+      }
+    };
+  }
+
   protected RaptorAccessEgress delegate() {
     return delegate;
   }

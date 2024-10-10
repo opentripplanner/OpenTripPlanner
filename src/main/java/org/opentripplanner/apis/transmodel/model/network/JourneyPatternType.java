@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.apis.transmodel.mapping.GeometryMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
+import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -33,8 +35,7 @@ public class JourneyPatternType {
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType stopToStopGeometryType,
-    GraphQLNamedOutputType ptSituationElementType,
-    GqlUtil gqlUtil
+    GraphQLNamedOutputType ptSituationElementType
   ) {
     return GraphQLObjectType
       .newObject()
@@ -68,7 +69,7 @@ public class JourneyPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneys")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(e ->
             ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList())
@@ -79,9 +80,11 @@ public class JourneyPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneysForDate")
-          .withDirective(gqlUtil.timingData)
+          .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of service journeys for the journey pattern for a given date")
-          .argument(GraphQLArgument.newArgument().name("date").type(gqlUtil.dateScalar).build())
+          .argument(
+            GraphQLArgument.newArgument().name("date").type(TransmodelScalars.DATE_SCALAR).build()
+          )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(environment -> {
             TIntSet services = GqlUtil

@@ -2,7 +2,7 @@ package org.opentripplanner.apis.transmodel.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.apis.transmodel.model.util.EncodedPolylineBeanWithStops;
+import org.opentripplanner.apis.transmodel.model.framework.EncodedPolylineBeanWithStops;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.transit.model.network.TripPattern;
 
