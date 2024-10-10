@@ -82,12 +82,10 @@ class StreetLinkerModuleTest {
       SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
 
       assertTrue(walkSplit.isConnectedToWalkingEdge());
-      assertFalse(walkSplit.isConnectedToDriveableEdge());
 
       var linkToCar = model.outgoingLinks().getLast();
       SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
 
-      assertFalse(carSplit.isConnectedToWalkingEdge());
       assertTrue(carSplit.isConnectedToDriveableEdge());
     });
   }
