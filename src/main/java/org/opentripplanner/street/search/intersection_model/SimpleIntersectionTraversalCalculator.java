@@ -56,6 +56,14 @@ public class SimpleIntersectionTraversalCalculator
     return 315;
   }
 
+  public int getMinUTurnAngle() {
+    return 170;
+  }
+
+  public int getMaxUTurnAngle() {
+    return 190;
+  }
+
   /**
    * Expected time it takes to make a right at a light.
    */
@@ -78,10 +86,24 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
+   * Expected time it perform a U-turn at a light.
+   */
+  public double getExpectedUTurnAtLightTimeSec() {
+    return 20.0;
+  }
+
+  /**
    * Expected time it takes to make a right without a stop light.
    */
   public double getExpectedRightNoLightTimeSec() {
     return 8.0;
+  }
+
+  /**
+   * Expected time it takes to make a u-turn without a stop light.
+   */
+  public double getExpectedUTurnNoLightTimeSec() {
+    return 40.0;
   }
 
   /**
@@ -159,6 +181,8 @@ public class SimpleIntersectionTraversalCalculator
         return getExpectedRightAtLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
         return getExpectedLeftAtLightTimeSec();
+      } else if (isUTurn(turnAngle)) {
+        return getExpectedUTurnAtLightTimeSec();
       } else {
         return getExpectedStraightAtLightTimeSec();
       }
@@ -173,6 +197,8 @@ public class SimpleIntersectionTraversalCalculator
         return getExpectedRightNoLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
         return getExpectedLeftNoLightTimeSec();
+      } else if (isUTurn(turnAngle)) {
+        return getExpectedUTurnNoLightTimeSec();
       } else {
         return getExpectedStraightNoLightTimeSec();
       }
@@ -217,5 +243,9 @@ public class SimpleIntersectionTraversalCalculator
 
   private boolean isRightTurn(int turnAngle) {
     return turnAngle >= getMinRightTurnAngle() && turnAngle < getMaxRightTurnAngle();
+  }
+
+  private boolean isUTurn(int turnAngle) {
+    return turnAngle >= getMinUTurnAngle() && turnAngle < getMaxUTurnAngle();
   }
 }
