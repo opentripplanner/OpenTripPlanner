@@ -43,7 +43,7 @@ class TransitModelTest {
     // Then trip times should be same as in input data
     TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
     Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
-    Timetable timetable = transitModelIndex.getPatternForTrip().get(trip).getScheduledTimetable();
+    Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
 
     // Should throw on second bundle, with different agency time zone
@@ -102,7 +102,7 @@ class TransitModelTest {
 
     // Then trip times should be on hour less than in input data
     Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
-    Timetable timetable = transitModelIndex.getPatternForTrip().get(trip).getScheduledTimetable();
+    Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
   }
 }

@@ -7,6 +7,7 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,7 +48,7 @@ class TransitModelIndex {
 
   private final Map<Trip, TripPattern> patternForTrip = new HashMap<>();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-  private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
+  private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
@@ -77,7 +78,7 @@ class TransitModelIndex {
           tripForId.put(trip.getId(), trip);
         });
       for (StopLocation stop : pattern.getStops()) {
-        patternsForStopId.put(stop, pattern);
+        patternsForStop.put(stop, pattern);
       }
     }
     for (Route route : patternsForRoute.asMap().keySet()) {
@@ -130,32 +131,25 @@ class TransitModelIndex {
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
   Set<Route> getRoutesForStop(StopLocation stop) {
     Set<Route> routes = new HashSet<>();
-    for (TripPattern p : getPatternsForStop(stop)) {
+    for (TripPattern p : patternsForStop.get(stop)) {
       routes.add(p.getRoute());
     }
     return routes;
   }
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop) {
-    return patternsForStopId.get(stop);
+    return Collections.unmodifiableCollection(patternsForStop.get(stop));
   }
 
   Collection<Trip> getTripsForStop(StopLocation stop) {
-    return getPatternsForStop(stop)
+    return patternsForStop.get(stop)
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toList());
   }
 
-  /**
-   * Get a list of all operators spanning across all feeds.
-   */
-  Collection<Operator> getAllOperators() {
-    return getOperatorForId().values();
-  }
-
-  Map<FeedScopedId, Operator> getOperatorForId() {
-    return operatorForId;
+  Operator getOperatorForId(FeedScopedId operatorId) {
+    return operatorForId.get(operatorId);
   }
 
   Map<FeedScopedId, Trip> getTripForId() {
@@ -170,8 +164,8 @@ class TransitModelIndex {
     return routeForId.values();
   }
 
-  Map<Trip, TripPattern> getPatternForTrip() {
-    return patternForTrip;
+  TripPattern getPatternForTrip(Trip trip) {
+    return patternForTrip.get(trip);
   }
 
   Collection<TripPattern> getPatternsForRoute(Route route) {
@@ -223,11 +217,15 @@ class TransitModelIndex {
     }
   }
 
-  Multimap<GroupOfRoutes, Route> getRoutesForGroupOfRoutes() {
-    return routesForGroupOfRoutes;
+  Collection<GroupOfRoutes> getAllGroupOfRoutes() {
+    return Collections.unmodifiableCollection(groupOfRoutesForId.values());
   }
 
-  Map<FeedScopedId, GroupOfRoutes> getGroupOfRoutesForId() {
-    return groupOfRoutesForId;
+  Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes) {
+    return Collections.unmodifiableCollection(routesForGroupOfRoutes.get(groupOfRoutes));
+  }
+
+  GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id) {
+    return groupOfRoutesForId.get(id);
   }
 }

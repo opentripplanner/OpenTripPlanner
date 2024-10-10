@@ -234,12 +234,12 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Operator> getAllOperators() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.transitModelIndex.getAllOperators();
+    return this.transitModel.getOperators();
   }
 
   @Override
   public Operator getOperatorForId(FeedScopedId id) {
-    return this.transitModelIndex.getOperatorForId().get(id);
+    return this.transitModelIndex.getOperatorForId(id);
   }
 
   @Override
@@ -334,7 +334,7 @@ public class DefaultTransitService implements TransitEditorService {
         return realtimeAddedTripPattern;
       }
     }
-    return this.transitModelIndex.getPatternForTrip().get(trip);
+    return this.transitModelIndex.getPatternForTrip(trip);
   }
 
   @Override
@@ -491,18 +491,18 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<GroupOfRoutes> getGroupsOfRoutes() {
     OTPRequestTimeoutException.checkForTimeout();
-    return transitModelIndex.getRoutesForGroupOfRoutes().keySet();
+    return transitModelIndex.getAllGroupOfRoutes();
   }
 
   @Override
   public Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes) {
     OTPRequestTimeoutException.checkForTimeout();
-    return transitModelIndex.getRoutesForGroupOfRoutes().get(groupOfRoutes);
+    return transitModelIndex.getRoutesForGroupOfRoutes(groupOfRoutes);
   }
 
   @Override
   public GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id) {
-    return transitModelIndex.getGroupOfRoutesForId().get(id);
+    return transitModelIndex.getGroupOfRoutesForId(id);
   }
 
   /**
