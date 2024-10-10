@@ -164,9 +164,7 @@ What to put in Javadoc:
     - Method should be marked as `@Nullable` if they can return null values
     - Method parameters should be marked as `@Nullable` if they can take null values.
 - On fields:
-    - Fields should often be marked as `@Nullable` if they are nullable. If the class
-    only exposes the field through a simple getter method, using the annotation on field is optional,
-    but on the getter method it is required.
+    - Fields should be marked as `@Nullable` if they are nullable.
 
 Use of `@Nonnull` annotation is not allowed. It should be assumed methods/parameters/fields
 are non-null if they are not marked as `@Nullable`. However, there are places where the

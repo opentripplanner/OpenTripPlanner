@@ -25,7 +25,6 @@ roots_.
 
 #### Non-null and nullable entity fields
 
-All fields getters(except primitive types) should be annotated with `@Nullable` if they can return null.
 Non-nullability of fields should be enforced in the Entity constructor by using `Objects.requireNonNull`,
 `Objects.requireNonNullElse` or `ObjectUtils.ifNotNull`. We should enforce this for all fields 
 required in both GTFS and in the Nordic NeTEx Profile. For enumeration types using a special value
