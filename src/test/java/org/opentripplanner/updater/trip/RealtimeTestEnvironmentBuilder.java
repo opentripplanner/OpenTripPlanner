@@ -65,7 +65,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       .withServiceDate(SERVICE_DATE)
       .build();
 
-    transitModel.addTripOnServiceDate(tripOnServiceDate.getId(), tripOnServiceDate);
+    transitModel.addTripOnServiceDate(tripOnServiceDate);
 
     if (tripInput.route().getOperator() != null) {
       transitModel.getOperators().add(tripInput.route().getOperator());

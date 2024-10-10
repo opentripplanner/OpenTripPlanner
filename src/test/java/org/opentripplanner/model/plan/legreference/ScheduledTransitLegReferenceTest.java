@@ -87,7 +87,6 @@ class ScheduledTransitLegReferenceTest {
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
     transitModel.addTripOnServiceDate(
-      TRIP_ON_SERVICE_DATE_ID,
       TripOnServiceDate
         .of(TRIP_ON_SERVICE_DATE_ID)
         .withTrip(trip)
