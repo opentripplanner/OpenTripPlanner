@@ -42,8 +42,8 @@ public class FlexSearchWindowFilter implements RemoveItineraryFlagger {
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return it -> {
       if (it.isDirectFlex()) {
-        return switch(sortOrder) {
-          case STREET_AND_DEPARTURE_TIME ->  {
+        return switch (sortOrder) {
+          case STREET_AND_DEPARTURE_TIME -> {
             // arive by
             var time = it.startTime().toInstant();
             yield time.isBefore(earliestDepartureTime);
