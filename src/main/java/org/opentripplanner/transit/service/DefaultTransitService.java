@@ -296,7 +296,7 @@ public class DefaultTransitService implements TransitEditorService {
   @Nullable
   @Override
   public Trip getScheduledTripForId(FeedScopedId id) {
-    return this.transitModelIndex.getTripForId().get(id);
+    return this.transitModelIndex.getTripForId(id);
   }
 
   @Override
@@ -305,11 +305,11 @@ public class DefaultTransitService implements TransitEditorService {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       return new CollectionsView<>(
-        transitModelIndex.getTripForId().values(),
+        transitModelIndex.getAllTrips(),
         currentSnapshot.listRealTimeAddedTrips()
       );
     }
-    return Collections.unmodifiableCollection(transitModelIndex.getTripForId().values());
+    return Collections.unmodifiableCollection(transitModelIndex.getAllTrips());
   }
 
   @Override

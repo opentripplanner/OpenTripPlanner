@@ -142,7 +142,8 @@ class TransitModelIndex {
   }
 
   Collection<Trip> getTripsForStop(StopLocation stop) {
-    return patternsForStop.get(stop)
+    return patternsForStop
+      .get(stop)
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toList());
@@ -152,8 +153,12 @@ class TransitModelIndex {
     return operatorForId.get(operatorId);
   }
 
-  Map<FeedScopedId, Trip> getTripForId() {
-    return tripForId;
+  Collection<Trip> getAllTrips() {
+    return Collections.unmodifiableCollection(tripForId.values());
+  }
+
+  Trip getTripForId(FeedScopedId tripId) {
+    return tripForId.get(tripId);
   }
 
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate) {

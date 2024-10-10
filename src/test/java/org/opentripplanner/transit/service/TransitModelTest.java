@@ -42,7 +42,7 @@ class TransitModelTest {
 
     // Then trip times should be same as in input data
     TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
-    Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
+    Trip trip = transitModelIndex.getTripForId(SAMPLE_TRIP_ID);
     Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
 
@@ -101,7 +101,7 @@ class TransitModelTest {
     assertEquals("America/Chicago", transitModel.getTimeZone().getId());
 
     // Then trip times should be on hour less than in input data
-    Trip trip = transitModelIndex.getTripForId().get(SAMPLE_TRIP_ID);
+    Trip trip = transitModelIndex.getTripForId(SAMPLE_TRIP_ID);
     Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
   }
