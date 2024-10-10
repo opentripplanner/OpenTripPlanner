@@ -262,17 +262,18 @@ removed from list.
           )
           .asDouble(dft.minBikeParkingDistance())
       )
-      .withFilterDirectFlexByEarliestDeparture(
+      .withFilterDirectFlexBySearchWindow(
         c
-          .of("filterDirectFlexByEarliestDeparture")
+          .of("filterDirectFlexBySearchWindow")
           .since(V2_7)
-          .summary(
-            "Filter direct flex results by the earliest-departure-time of the search window."
-          )
+          .summary("Filter direct flex results by the search window.")
           .description(
             """
             When direct flex is mixed with a transit search in the same request, then the direct flex results are filtered by the
-            earliest departure time of the transit search window.
+            search window of the transit results.
+            
+            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are filtered 
+            by earliest-departure-time and .
             
             Use this configuration to turn this feature off.
             """

@@ -111,7 +111,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [accessibilityScore](#rd_if_accessibilityScore)                                                           |        `boolean`       | An experimental feature contributed by IBI which adds a sandbox accessibility *score* between 0 and 1 for each leg and itinerary.              | *Optional* | `false`          |  2.2  |
 |    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                                 |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.                         | *Optional* | `0.0`            |  2.1  |
 |    [debug](#rd_if_debug)                                                                                     |         `enum`         | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the itinerary-filter-chain. | *Optional* | `"off"`          |  2.0  |
-|    [filterDirectFlexByEarliestDeparture](#rd_if_filterDirectFlexByEarliestDeparture)                         |        `boolean`       | Filter direct flex results by the earliest-departure-time of the search window.                                                                | *Optional* | `true`           |  2.7  |
+|    [filterDirectFlexBySearchWindow](#rd_if_filterDirectFlexBySearchWindow)                         |        `boolean`       | Filter direct flex results by the earliest-departure-time of the search window.                                                                | *Optional* | `true`           |  2.7  |
 |    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)               |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.                        | *Optional* | `false`          |  2.2  |
 |    groupSimilarityKeepOne                                                                                    |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                                    | *Optional* | `0.85`           |  2.1  |
 |    groupSimilarityKeepThree                                                                                  |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.                         | *Optional* | `0.68`           |  2.1  |
@@ -732,7 +732,7 @@ convenient when tuning the itinerary-filter-chain.
    moving to the next page.
 
 
-<h3 id="rd_if_filterDirectFlexByEarliestDeparture">filterDirectFlexByEarliestDeparture</h3>
+<h3 id="rd_if_filterDirectFlexBySearchWindow">filterDirectFlexBySearchWindow</h3>
 
 **Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`   
 **Path:** /routingDefaults/itineraryFilters 

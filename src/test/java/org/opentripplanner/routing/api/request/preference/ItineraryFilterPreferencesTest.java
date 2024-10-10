@@ -130,7 +130,7 @@ class ItineraryFilterPreferencesTest {
     var same = other
       .copyOf()
       .withGroupSimilarityKeepOne(GROUP_SIMILARITY_KEEP_ONE)
-      .withFilterDirectFlexByEarliestDeparture(true)
+      .withFilterDirectFlexBySearchWindow(true)
       .build();
     assertEqualsAndHashCode(subject, other, same);
   }
@@ -138,7 +138,7 @@ class ItineraryFilterPreferencesTest {
   @Test
   void testToString() {
     assertEquals(
-      "ItineraryFilterPreferences{filterDirectFlexByEarliestDeparture}",
+      "ItineraryFilterPreferences{filterDirectFlexBySearchWindow}",
       ItineraryFilterPreferences.DEFAULT.toString()
     );
     assertEquals(
@@ -155,7 +155,7 @@ class ItineraryFilterPreferencesTest {
       "parkAndRideDurationRatio: 0.44, " +
       "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
       "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
-      "filterDirectFlexByEarliestDeparture" +
+      "filterDirectFlexBySearchWindow" +
       "}",
       subject.toString()
     );

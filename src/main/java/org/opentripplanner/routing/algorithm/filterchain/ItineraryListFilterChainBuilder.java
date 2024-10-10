@@ -90,7 +90,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
   private boolean transitGroupPriorityUsed = false;
-  private boolean filterDirectFlexByEarliestDeparture = true;
+  private boolean filterDirectFlexBySearchWindow = true;
 
   /**
    * Sandbox filters which decorate the itineraries with extra information.
@@ -472,7 +472,7 @@ public class ItineraryListFilterChainBuilder {
         );
       }
 
-      if (earliestDepartureTime != null && filterDirectFlexByEarliestDeparture) {
+      if (earliestDepartureTime != null && filterDirectFlexBySearchWindow) {
         addRemoveFilter(
           filters,
           new FlexSearchWindowFilter(earliestDepartureTime, searchWindow, sortOrder)
@@ -542,8 +542,8 @@ public class ItineraryListFilterChainBuilder {
     return new ItineraryListFilterChain(filters, debugHandler);
   }
 
-  public ItineraryListFilterChainBuilder withFilterDirectFlexByEarliestDeparture(boolean b) {
-    this.filterDirectFlexByEarliestDeparture = b;
+  public ItineraryListFilterChainBuilder withFilterDirectFlexBySearchWindow(boolean b) {
+    this.filterDirectFlexBySearchWindow = b;
     return this;
   }
 

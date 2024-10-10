@@ -319,7 +319,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     @Test
     void keepDirectFlexWhenFilteringByEarliestDepartureIsDisabled() {
       ItineraryListFilterChain chain = createBuilder(true, false, 10)
-        .withFilterDirectFlexByEarliestDeparture(false)
+        .withFilterDirectFlexBySearchWindow(false)
         .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
         .build();
       assertEquals(toStr(List.of(FLEX)), toStr(chain.filter(List.of(FLEX))));
@@ -328,7 +328,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     @Test
     void removeDirectFlexWhenFilteringByEarliestDepartureIsEnabled() {
       ItineraryListFilterChain chain = createBuilder(true, false, 10)
-        .withFilterDirectFlexByEarliestDeparture(true)
+        .withFilterDirectFlexBySearchWindow(true)
         .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
         .build();
       assertEquals(toStr(List.of()), toStr(chain.filter(List.of(FLEX))));

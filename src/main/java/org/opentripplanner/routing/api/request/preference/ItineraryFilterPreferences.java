@@ -31,7 +31,7 @@ public final class ItineraryFilterPreferences {
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
-  private final boolean filterDirectFlexByEarliestDeparture;
+  private final boolean filterDirectFlexBySearchWindow;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
@@ -52,7 +52,7 @@ public final class ItineraryFilterPreferences {
       );
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
-    this.filterDirectFlexByEarliestDeparture = true;
+    this.filterDirectFlexBySearchWindow = true;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -73,7 +73,7 @@ public final class ItineraryFilterPreferences {
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       Objects.requireNonNull(builder.removeTransitWithHigherCostThanBestOnStreetOnly);
-    this.filterDirectFlexByEarliestDeparture = builder.filterDirectFlexByEarliestDeparture;
+    this.filterDirectFlexBySearchWindow = builder.filterDirectFlexBySearchWindow;
   }
 
   public static Builder of() {
@@ -136,8 +136,8 @@ public final class ItineraryFilterPreferences {
     return removeTransitWithHigherCostThanBestOnStreetOnly;
   }
 
-  public boolean filterDirectFlexByEarliestDeparture() {
-    return filterDirectFlexByEarliestDeparture;
+  public boolean filterDirectFlexBySearchWindow() {
+    return filterDirectFlexBySearchWindow;
   }
 
   @Override
@@ -187,7 +187,7 @@ public final class ItineraryFilterPreferences {
         "removeItinerariesWithSameRoutesAndStops",
         removeItinerariesWithSameRoutesAndStops
       )
-      .addBoolIfTrue("filterDirectFlexByEarliestDeparture", filterDirectFlexByEarliestDeparture)
+      .addBoolIfTrue("filterDirectFlexBySearchWindow", filterDirectFlexBySearchWindow)
       .toString();
   }
 
@@ -217,7 +217,7 @@ public final class ItineraryFilterPreferences {
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
-      filterDirectFlexByEarliestDeparture == that.filterDirectFlexByEarliestDeparture
+      filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
     );
   }
 
@@ -237,7 +237,7 @@ public final class ItineraryFilterPreferences {
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
       removeTransitWithHigherCostThanBestOnStreetOnly,
-      filterDirectFlexByEarliestDeparture
+      filterDirectFlexBySearchWindow
     );
   }
 
@@ -257,7 +257,7 @@ public final class ItineraryFilterPreferences {
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
-    private boolean filterDirectFlexByEarliestDeparture;
+    private boolean filterDirectFlexBySearchWindow;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -360,7 +360,7 @@ public final class ItineraryFilterPreferences {
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
-      this.filterDirectFlexByEarliestDeparture = original.filterDirectFlexByEarliestDeparture;
+      this.filterDirectFlexBySearchWindow = original.filterDirectFlexBySearchWindow;
     }
 
     public Builder apply(Consumer<Builder> body) {
@@ -373,10 +373,8 @@ public final class ItineraryFilterPreferences {
       return original.equals(value) ? original : value;
     }
 
-    public Builder withFilterDirectFlexByEarliestDeparture(
-      boolean filterDirectFlexByEarliestDeparture
-    ) {
-      this.filterDirectFlexByEarliestDeparture = filterDirectFlexByEarliestDeparture;
+    public Builder withFilterDirectFlexBySearchWindow(boolean filterDirectFlexBySearchWindow) {
+      this.filterDirectFlexBySearchWindow = filterDirectFlexBySearchWindow;
       return this;
     }
   }

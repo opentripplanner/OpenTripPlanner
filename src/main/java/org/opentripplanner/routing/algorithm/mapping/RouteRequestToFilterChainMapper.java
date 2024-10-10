@@ -92,7 +92,7 @@ public class RouteRequestToFilterChainMapper {
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
-      .withFilterDirectFlexByEarliestDeparture(params.filterDirectFlexByEarliestDeparture())
+      .withFilterDirectFlexBySearchWindow(params.filterDirectFlexBySearchWindow())
       .withDebugEnabled(params.debug());
 
     if (!request.preferences().transit().relaxTransitGroupPriority().isNormal()) {
