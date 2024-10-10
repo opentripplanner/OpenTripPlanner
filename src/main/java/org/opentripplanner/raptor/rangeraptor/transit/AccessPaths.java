@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.SearchDirection;
@@ -118,13 +117,11 @@ public class AccessPaths {
     return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
-  public static int calculateMaxNumberOfRides(@Nullable AccessPaths paths) {
-    return paths == null
-      ? 0
-      : Math.max(
-        Arrays.stream(paths.arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
-        Arrays.stream(paths.arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
-      );
+  public int calculateMaxNumberOfRides() {
+    return Math.max(
+      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
+      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
+    );
   }
 
   /**
