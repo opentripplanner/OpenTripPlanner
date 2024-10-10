@@ -129,11 +129,6 @@ The provided formatter will group class members in this order:
     11. interfaces
     12. `private static` classes (avoid `public`)
     13. instance classes (avoid)
-5. Each section of members are sorted by visibility:
-    1. ´public´
-    2. package private
-    3. ´protected´
-    4. ´private´
 
 ### JavaDoc Guidlines
 
