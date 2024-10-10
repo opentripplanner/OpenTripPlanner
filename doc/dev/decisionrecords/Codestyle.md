@@ -115,18 +115,19 @@ The provided formatter will group class members in this order:
 2. Overridden methods are kept together
 3. Dependent methods are sorted in a breadth-first order.
 4. Members are sorted like this:
-    1. `static` `final` fields
-    2. `static` fields
-    3. `static` initializer
-    4. other fields
-    5. class initializer (avoid using it)
-    6. Constructor
-    7. methods
-    8. getter and setters
-    9. enums
-    10. interfaces
-    11. `static` classes
-    12. classes
+    1. `static` `final` fields (constants)
+    2. `static` fields (avoid)
+    3. instance fields
+    4. static initializer
+    5. class initializer
+    6. constructor
+    7. `static` factory methods
+    8. methods
+    9. getter and setters
+    10. `private` enums (avoid `public`)
+    11. interfaces
+    12. `private static` classes (avoid `public`)
+    13. instance classes (avoid)
 5. Each section of members are sorted by visibility:
     1. ´public´
     2. package private
