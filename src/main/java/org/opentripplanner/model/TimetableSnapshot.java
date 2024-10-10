@@ -404,8 +404,13 @@ public class TimetableSnapshot {
     boolean newTripPatternsForModifiedTripsWereCleared = clearNewTripPatternsForModifiedTrips(
       feedId
     );
+    boolean addedTripPatternsWereCleared = clearRealtimeAddedTripPatterns(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
-    if (timetablesWereCleared || newTripPatternsForModifiedTripsWereCleared) {
+    if (
+      timetablesWereCleared ||
+      newTripPatternsForModifiedTripsWereCleared ||
+      addedTripPatternsWereCleared
+    ) {
       dirty = true;
     }
   }
@@ -550,7 +555,7 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Clear all realtime added trip patterns matching the provided feed id.
+   * Clear new trip patterns for modified trips matching the provided feed id.
    *
    * @param feedId feed id to clear out
    * @return true if the newTripPatternForModifiedTrip changed as a result of the call
@@ -559,6 +564,26 @@ public class TimetableSnapshot {
     return realTimeNewTripPatternsForModifiedTrips
       .keySet()
       .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
+  }
+
+  /**
+   * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
+   *
+   * */
+  private boolean clearRealtimeAddedTripPatterns(String feedId) {
+    boolean removedEntry = realTimeAddedTrips
+      .keySet()
+      .removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
+    realTimeAddedTripOnServiceDateForTripAndDay
+      .keySet()
+      .removeIf(tripOnServiceDate -> feedId.equals(tripOnServiceDate.tripId().getFeedId()));
+    realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternsForRoute
+      .keySet()
+      .removeIf(route -> feedId.equals(route.getId().getFeedId()));
+    realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    return removedEntry;
   }
 
   /**
