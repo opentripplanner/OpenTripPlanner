@@ -924,7 +924,7 @@ msgstr "Tranvía"
 #. Used for street-level cable cars where the cable runs
 #. beneath the car.
 #: src/client/js/otp/util/Itin.js:226
-msgid "Cable Car"
+msgid "Cable Tram"
 msgstr "Bus Tranvía"
 
 #. Any rail system designed for steep inclines.

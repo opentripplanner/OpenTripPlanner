@@ -931,7 +931,7 @@ msgstr ""
 #. beneath the car.
 #: src/client/js/otp/util/Itin.js:226
 #, fuzzy
-msgid "Cable Car"
+msgid "Cable Tram"
 msgstr "PONT PENJANT"
 
 #. Any rail system designed for steep inclines.
