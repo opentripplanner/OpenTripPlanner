@@ -1,6 +1,6 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { IControl, Map } from 'maplibre-gl';
+import { IControl, Map as WebMap } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
@@ -15,7 +15,7 @@ type LayerControlProps = {
 class LayerControl implements IControl {
   private readonly container: HTMLDivElement = document.createElement('div');
 
-  onAdd(map: Map) {
+  onAdd(map: WebMap) {
     this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
 
     map.on('load', () => {
@@ -24,10 +24,11 @@ class LayerControl implements IControl {
         this.container.removeChild(this.container.firstChild);
       }
 
-      const title = document.createElement('h6');
+      const title = document.createElement('h4');
       title.textContent = 'Debug layers';
       this.container.appendChild(title);
 
+      const groups: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>();
       map
         .getLayersOrder()
         .map((l) => map.getLayer(l))
@@ -38,7 +39,15 @@ class LayerControl implements IControl {
         .reverse()
         .forEach((layer) => {
           if (layer) {
-            const div = document.createElement('div');
+            const meta: { group: string } = layer.metadata as { group: string };
+
+            let groupName: string = 'Misc';
+            if (meta.group) {
+              groupName = meta.group;
+            }
+
+            const layerDiv = document.createElement('div');
+            layerDiv.className = 'layer';
             const input = document.createElement('input');
             input.type = 'checkbox';
             input.value = layer.id;
@@ -46,20 +55,28 @@ class LayerControl implements IControl {
             input.onchange = (e) => {
               e.preventDefault();
               e.stopPropagation();
-
-              if (this.layerVisible(map, layer)) {
-                map.setLayoutProperty(layer.id, 'visibility', 'none');
-              } else {
+              if (input.checked) {
                 map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              } else {
+                map.setLayoutProperty(layer.id, 'visibility', 'none');
               }
             };
             input.checked = this.layerVisible(map, layer);
+            input.className = 'layer';
             const label = document.createElement('label');
             label.textContent = layer.id;
             label.htmlFor = layer.id;
-            div.appendChild(input);
-            div.appendChild(label);
-            this.container.appendChild(div);
+            layerDiv.appendChild(input);
+            layerDiv.appendChild(label);
+
+            if (groups.has(groupName)) {
+              const g = groups.get(groupName);
+              g?.appendChild(layerDiv);
+            } else {
+              const groupDiv = this.buildgGroupDiv(groupName, layerDiv);
+              groups.set(groupName, groupDiv);
+              this.container.appendChild(groupDiv);
+            }
           }
         });
     });
@@ -67,7 +84,34 @@ class LayerControl implements IControl {
     return this.container;
   }
 
-  private layerVisible(map: Map, layer: { id: string }) {
+  private buildgGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'group';
+
+    const groupInput = document.createElement('input');
+    groupInput.onchange = () => {
+      groupDiv.querySelectorAll('input.layer').forEach((i) => {
+        const input = i as HTMLInputElement;
+        input.checked = groupInput.checked;
+        const event = new Event('change');
+        i.dispatchEvent(event);
+      });
+    };
+    groupInput.type = 'checkbox';
+    groupInput.id = groupName;
+
+    const groupLabel = document.createElement('label');
+    groupLabel.textContent = groupName;
+    groupLabel.htmlFor = groupName;
+    groupLabel.className = 'group-label';
+
+    groupDiv.appendChild(groupInput);
+    groupDiv.appendChild(groupLabel);
+    groupDiv.appendChild(layerDiv);
+    return groupDiv;
+  }
+
+  private layerVisible(map: WebMap, layer: { id: string }) {
     return map.getLayoutProperty(layer.id, 'visibility') !== 'none';
   }
 
