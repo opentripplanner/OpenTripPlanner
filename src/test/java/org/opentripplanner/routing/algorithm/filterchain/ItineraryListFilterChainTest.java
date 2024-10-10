@@ -42,7 +42,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
  * unit test. This is just a some test on top of the other filter unit-tests.
  */
-public class ItineraryListFilterChainTest implements PlanTestConstants {
+class ItineraryListFilterChainTest implements PlanTestConstants {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
@@ -59,7 +59,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   private Itinerary i3;
 
   @BeforeEach
-  public void setUpItineraries() {
+  void setUpItineraries() {
     // Add some itineraries, with some none optimal options
     // Short walk - 2 minutes - to destination:
     i1 = newItinerary(A, T11_06).walk(D2m, E).build();
@@ -72,7 +72,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDefaultFilterChain() {
+  void testDefaultFilterChain() {
     // Given a default chain
     ItineraryListFilterChain chain = createBuilder(false, false, 10).build();
 
@@ -80,7 +80,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void testFilterChainWithSearchWindowFilterSet() {
+  void testFilterChainWithSearchWindowFilterSet() {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
       .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), SW_D10m)
       .build();
@@ -89,7 +89,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void withMinBikeParkingDistance() {
+  void withMinBikeParkingDistance() {
     // Given a "default" chain
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
       .withMinBikeParkingDistance(500)
@@ -105,7 +105,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDebugFilterChain() {
+  void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
     ItineraryListFilterChain chain = createBuilder(false, true, 3)
       .withSearchWindow(newTime(T11_00).toInstant(), SW_D10m)
@@ -122,7 +122,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void removeAllWalkingOnly() {
+  void removeAllWalkingOnly() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .withRemoveWalkAllTheWayResults(true)
       .build();
@@ -134,7 +134,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void groupByTheLongestItineraryAndTwoGroups() {
+  void groupByTheLongestItineraryAndTwoGroups() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
       .build();
@@ -157,7 +157,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void testSameFirstOrLastTripFilter() {
+  void testSameFirstOrLastTripFilter() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .withSameFirstOrLastTripFilter(true)
       .build();
@@ -238,7 +238,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void removeItinerariesWithSameRoutesAndStops() {
+  void removeItinerariesWithSameRoutesAndStops() {
     var i1 = newItinerary(A).bus(21, T11_06, T11_28, E).bus(41, T11_30, T11_32, D).build();
     var i2 = newItinerary(A).bus(22, T11_09, T11_30, E).bus(42, T11_32, T11_33, D).build();
     var i3 = newItinerary(A).bus(23, T11_10, T11_32, E).bus(43, T11_33, T11_50, D).build();
@@ -274,31 +274,64 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   class MaxItinerariesBuilderTest {
 
     @BeforeEach
-    public void setUpItineraries() {
+    void setUpItineraries() {
       i1 = newItinerary(A).bus(21, T11_05, T11_10, E).build();
       i2 = newItinerary(A).bus(31, T11_07, T11_12, E).build();
       i3 = newItinerary(A).bus(41, T11_09, T11_14, E).build();
     }
 
     @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
+    void testPostProcessorWithMaxItinerariesFilterSetToTwo() {
       // Given a default postProcessor with 'numOfItineraries=2'
       ItineraryListFilterChain chain = createBuilder(false, false, 2).build();
       assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
     }
 
     @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
+    void testPostProcessorWithMaxItinerariesFilterSetToOneDepartAt() {
       // Given a default postProcessor with 'numOfItineraries=1'
       ItineraryListFilterChain chain = createBuilder(false, false, 1).build();
       assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
     }
 
     @Test
-    public void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
+    void testPostProcessorWithMaxItinerariesFilterSetToOneArriveBy() {
       // Given a postProcessor with 'numOfItineraries=1' and 'arriveBy=true'
       ItineraryListFilterChain chain = createBuilder(true, false, 1).build();
       assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
+    }
+  }
+
+  @Nested
+  class FlexSearchWindow {
+
+    private static final Itinerary FLEX = newItinerary(A, T11_00)
+      .flex(T11_00, T11_30, B)
+      .withIsSearchWindowAware(false)
+      .build();
+    private static final Instant EARLIEST_DEPARTURE = FLEX.startTime().plusMinutes(10).toInstant();
+    private static final Duration SEARCH_WINDOW = Duration.ofHours(7);
+
+    /**
+     * When the filtering of direct flex by the transit search window is deactivated, the direct
+     * flex result should _not_ be filtered even though it starts before the earliest departure time.
+     */
+    @Test
+    void keepDirectFlexWhenFilteringByEarliestDepartureIsDisabled() {
+      ItineraryListFilterChain chain = createBuilder(true, false, 10)
+        .withFilterDirectFlexBySearchWindow(false)
+        .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
+        .build();
+      assertEquals(toStr(List.of(FLEX)), toStr(chain.filter(List.of(FLEX))));
+    }
+
+    @Test
+    void removeDirectFlexWhenFilteringByEarliestDepartureIsEnabled() {
+      ItineraryListFilterChain chain = createBuilder(true, false, 10)
+        .withFilterDirectFlexBySearchWindow(true)
+        .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
+        .build();
+      assertEquals(toStr(List.of()), toStr(chain.filter(List.of(FLEX))));
     }
   }
 
@@ -310,7 +343,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     ItineraryListFilterChainBuilder builder = createBuilder(true, false, 20);
 
     @BeforeEach
-    public void setUpItineraries() {
+    void setUpItineraries() {
       // given
       // Walk for 12 minute
       walk = newItinerary(A, T11_06).walk(D12m, E).build();
@@ -319,7 +352,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     }
 
     @Test
-    public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
+    void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
       // Allow non-optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(null)
@@ -329,7 +362,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     }
 
     @Test
-    public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
+    void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
       // Enable filter and remove bus itinerary
       ItineraryListFilterChain chain = builder
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
@@ -355,7 +388,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     EmissionsService eService;
 
     @BeforeEach
-    public void setUpItineraries() {
+    void setUpItineraries() {
       bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
       car = newItinerary(A).drive(T11_30, T11_50, B).build();
       Map<FeedScopedId, Double> emissions = new HashMap<>();
@@ -364,7 +397,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     }
 
     @Test
-    public void emissionsTest() {
+    void emissionsTest() {
       ItineraryListFilterChain chain = builder
         .withEmissions(new DecorateWithEmission(eService))
         .build();

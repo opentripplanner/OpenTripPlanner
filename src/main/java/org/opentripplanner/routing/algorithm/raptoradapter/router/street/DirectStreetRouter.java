@@ -18,6 +18,12 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 
+/**
+ * Generates "direct" street routes, i.e. those that do not use transit and are on the street
+ * network for the entire itinerary.
+ *
+ * @see DirectFlexRouter
+ */
 public class DirectStreetRouter {
 
   public static List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request) {

@@ -79,7 +79,7 @@ public class OrcaFareServiceTest {
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
-    var itinerary = new Itinerary(legs);
+    var itinerary = Itinerary.createScheduledTransitItinerary(legs);
     var itineraryFares = orcaFareService.calculateFares(itinerary);
     assertEquals(
       expectedPrice,

@@ -13,7 +13,7 @@ moving on to the next.
 
 ## Terminology
 
-- **search-window (sw)**  The search window is the minutes Raptor iterate over and the time-window
+- **search-window (sw)**  The search window is the minutes Raptor iterates over and the time-window
   the itinerary must start within to be included in the result. The search-window may change from a
   request to the next page.  **sw'** is the search window for the new next/previous page. The search
   window may change between requests, so we need to account for it when computing the next/previous
@@ -28,7 +28,7 @@ moving on to the next.
 - **<< previous page**  The trip search constructed to retrieve itineraries AFTER the original
   search.
 - **crop-search-window** If the `maxNumOfItineraries` limit is reached in the
-  `ItineraryFilterChain`, then one or more itineraries are removed. The filter remove itineraries
+  `ItineraryFilterChain`, then one or more itineraries are removed. The filter removes itineraries
   from the beginning or end of the list depending on the page cursor type (next/previous) and the
   sort order(arrival/departure time).
 
@@ -55,8 +55,8 @@ _previous-page_ must reverse the itinerary-filtering: `crop itineraries at START
 - In this case the `<< Previous page` is the same as in [sort-by-arrival](#sort-by-arrival) and not
   shown.
 - For the `Next page >>` we must adjust the `edt'`.
-- In rare cases we get duplicate itineraries. This happens if the `removed itinerary` depart before,
-  but arrive after the `duplicate`.
+- In rare cases we get duplicate itineraries. This happens if the `removed itinerary` departs before,
+  but arrives after the `duplicate`.
 
 ### sort-by-arrival, crop-search-window & original-prev-page
 
@@ -99,7 +99,7 @@ This is the basic `sort-by-departure` (arrive-by search) without removing itiner
 In this case the itineraries are dropped from the search results in the `Original Search` and the
 `<< Previous page` must be adjusted. We use the first removed itinerary to set both the `edt'` and
 the `lat'`. An `optimal itinarary` in the original search is lost (not found) in the previous page
-if it departs AFTER the `remoed itinerary` and arrive before - hopefully this is a rare case.
+if it departs AFTER the `removed itinerary` and arrives before - hopefully this is a rare case.
 
 The `Next page >>` is the same as the basic case [sort-by-departure](#sort-by-departure).
 

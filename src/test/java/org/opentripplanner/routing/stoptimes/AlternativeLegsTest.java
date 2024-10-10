@@ -55,9 +55,7 @@ class AlternativeLegsTest extends GtfsTest {
       AlternativeLegsFilter.NO_FILTER
     );
 
-    var legs = Itinerary.toStr(
-      alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
-    );
+    var legs = toString(alternativeLegs);
 
     var expected =
       "B ~ BUS 2 0:20 0:30 ~ C [C₁-1], " +
@@ -91,9 +89,7 @@ class AlternativeLegsTest extends GtfsTest {
       AlternativeLegsFilter.NO_FILTER
     );
 
-    var legs = Itinerary.toStr(
-      alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
-    );
+    var legs = toString(alternativeLegs);
 
     var expected =
       "B ~ BUS 3 1:00 1:10 ~ C [C₁-1], " +
@@ -126,9 +122,8 @@ class AlternativeLegsTest extends GtfsTest {
       false,
       AlternativeLegsFilter.NO_FILTER
     );
-    var legs = Itinerary.toStr(
-      alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
-    );
+
+    var legs = toString(alternativeLegs);
 
     assertEquals("X ~ BUS 19 10:30 10:40 ~ Y [C₁-1], X ~ BUS 19 10:00 10:10 ~ Y [C₁-1]", legs);
   }
@@ -155,11 +150,20 @@ class AlternativeLegsTest extends GtfsTest {
       false,
       AlternativeLegsFilter.NO_FILTER
     );
-    var legs = Itinerary.toStr(
-      alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
-    );
+    var legs = toString(alternativeLegs);
 
     var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B [C₁-1]"));
     assertEquals(expected, legs);
+  }
+
+  private static String toString(List<ScheduledTransitLeg> alternativeLegs) {
+    return Itinerary.toStr(
+      alternativeLegs
+        .stream()
+        .map(Leg.class::cast)
+        .map(List::of)
+        .map(Itinerary::createScheduledTransitItinerary)
+        .toList()
+    );
   }
 }
