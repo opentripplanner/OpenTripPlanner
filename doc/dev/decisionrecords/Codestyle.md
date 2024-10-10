@@ -132,7 +132,12 @@ The provided formatter will group class members in this order:
 
 ### JavaDoc Guidlines
 
-What to put in Javadoc:
+As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new
+methods, classes, and fields should include comments explaining what they are for and any other
+pertinent information. For Java code, the comments should follow industry standards. It is best to
+provide comments that not only explain *what* you did but also *why you did it* while providing some
+context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
+`@param` annotations with no description.
 
 - On methods:
     - Side effects on instance state (is it a pure function)
