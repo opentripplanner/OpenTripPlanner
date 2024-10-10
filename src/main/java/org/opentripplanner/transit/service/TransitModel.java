@@ -406,9 +406,9 @@ public class TransitModel implements Serializable {
     return tripPatternForId.get(id);
   }
 
-  public void addTripOnServiceDate(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+  public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
     invalidateIndex();
-    tripOnServiceDates.put(id, tripOnServiceDate);
+    tripOnServiceDates.put(tripOnServiceDate.getId(), tripOnServiceDate);
   }
 
   /**
@@ -440,6 +440,10 @@ public class TransitModel implements Serializable {
    */
   public Collection<TripPattern> getAllTripPatterns() {
     return tripPatternForId.values();
+  }
+
+  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId tripOnServiceDateId) {
+    return tripOnServiceDates.get(tripOnServiceDateId);
   }
 
   public Collection<TripOnServiceDate> getAllTripOnServiceDates() {

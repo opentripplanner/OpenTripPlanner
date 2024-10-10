@@ -50,7 +50,6 @@ class TransitModelIndex {
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
-  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
 
   private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes = ArrayListMultimap.create();
@@ -92,7 +91,6 @@ class TransitModelIndex {
     }
 
     for (TripOnServiceDate tripOnServiceDate : transitModel.getAllTripOnServiceDates()) {
-      tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),
@@ -164,12 +162,8 @@ class TransitModelIndex {
     return tripForId;
   }
 
-  Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
-    return tripOnServiceDateById;
-  }
-
-  Map<TripIdAndServiceDate, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
-    return tripOnServiceDateForTripAndDay;
+  TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate) {
+    return tripOnServiceDateForTripAndDay.get(tripIdAndServiceDate);
   }
 
   Collection<Route> getAllRoutes() {
@@ -180,8 +174,8 @@ class TransitModelIndex {
     return patternForTrip;
   }
 
-  Multimap<Route, TripPattern> getPatternsForRoute() {
-    return patternsForRoute;
+  Collection<TripPattern> getPatternsForRoute(Route route) {
+    return patternsForRoute.get(route);
   }
 
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
