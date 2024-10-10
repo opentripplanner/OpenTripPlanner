@@ -276,7 +276,16 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<Iterable<Leg>> previousLegs() {
+    return nextOrPreviousLegs(true);
+  }
+
+  @Override
   public DataFetcher<Iterable<Leg>> nextLegs() {
+    return nextOrPreviousLegs(false);
+  }
+
+  private DataFetcher<Iterable<Leg>> nextOrPreviousLegs(boolean includeDepartBefore) {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
@@ -311,7 +320,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
             environment.getSource(),
             numberOfLegs,
             environment.<GraphQLRequestContext>getContext().transitService(),
-            false,
+            includeDepartBefore,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
             limitToExactDestinationStop
