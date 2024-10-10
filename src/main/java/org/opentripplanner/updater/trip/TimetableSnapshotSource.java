@@ -294,7 +294,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
-    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
+      tripId,
+      serviceDate
+    );
     if (
       !isPreviouslyAddedTrip(tripId, pattern, serviceDate) ||
       (
@@ -946,7 +949,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     boolean cancelledAddedTrip = false;
 
-    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
+      tripId,
+      serviceDate
+    );
     if (isPreviouslyAddedTrip(tripId, pattern, serviceDate)) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = snapshotManager.resolve(pattern, serviceDate);

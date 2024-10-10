@@ -87,7 +87,7 @@ public class SiriFuzzyTripMatcher {
     EstimatedVehicleJourney journey,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
-    BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
+    BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
   ) {
     List<CallWrapper> calls = CallWrapper.of(journey);
 
@@ -136,7 +136,7 @@ public class SiriFuzzyTripMatcher {
       calls,
       entityResolver,
       getCurrentTimetable,
-      getRealtimeAddedTripPattern
+      getNewTripPatternForModifiedTrip
     );
   }
 
@@ -259,7 +259,7 @@ public class SiriFuzzyTripMatcher {
     List<CallWrapper> calls,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
-    BiFunction<FeedScopedId, LocalDate, TripPattern> getRealtimeAddedTripPattern
+    BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
   ) {
     var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
     var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
@@ -282,9 +282,12 @@ public class SiriFuzzyTripMatcher {
         continue;
       }
 
-      var realTimeAddedTripPattern = getRealtimeAddedTripPattern.apply(trip.getId(), serviceDate);
-      TripPattern tripPattern = realTimeAddedTripPattern != null
-        ? realTimeAddedTripPattern
+      var newTripPatternForModifiedTrip = getNewTripPatternForModifiedTrip.apply(
+        trip.getId(),
+        serviceDate
+      );
+      TripPattern tripPattern = newTripPatternForModifiedTrip != null
+        ? newTripPatternForModifiedTrip
         : transitService.getPatternForTrip(trip);
 
       var firstStop = tripPattern.firstStop();
