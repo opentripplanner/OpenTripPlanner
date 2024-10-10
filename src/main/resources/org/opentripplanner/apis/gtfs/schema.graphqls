@@ -88,6 +88,8 @@ type Agency implements Node {
     """
     types: [AgencyAlertType]
   ): [Alert]
+  "URL to the logo of the agency"
+  brandingUrl: String
   "URL to a web page which has information of fares used by this agency"
   fareUrl: String
   "Agency feed and id"

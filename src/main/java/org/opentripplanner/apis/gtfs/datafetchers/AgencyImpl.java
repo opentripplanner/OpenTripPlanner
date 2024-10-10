@@ -105,6 +105,11 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
     return environment -> getSource(environment).getUrl();
   }
 
+  @Override
+  public DataFetcher<String> brandingUrl() {
+    return environment -> getSource(environment).getBrandingUrl();
+  }
+
   private List<Route> getRoutes(DataFetchingEnvironment environment) {
     return getTransitService(environment)
       .getAllRoutes()
