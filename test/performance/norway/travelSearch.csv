@@ -86,3 +86,4 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 240,Eiksmarka to Kvadraturen,10:00,,,Eiksmarka,,59.9463,10.6263,Kvadraturen,,59.9109,10.7423,scooter-rent,WALK|SCOOTER_RENT
 241,Eiksmarka to Bergskogen,10:00,,,Eiksmarka,,59.9463,10.6263,Bergskogen,,59.94770,10.74223,scooter-rent,WALK|SCOOTER_RENT
 242,Eiksmarka to Refstad,10:00,,,Eiksmarka,,59.9463,10.6263,Refstad,,59.9388,10.8012,scooter-rent,WALK|SCOOTER_RENT
+243,Oslo to Ekeberg,10:00,,,Oslo,,59.917696,10.735079,Ekeberg,,59.8896,10.79424,scooter-rent,WALK|SCOOTER_RENT

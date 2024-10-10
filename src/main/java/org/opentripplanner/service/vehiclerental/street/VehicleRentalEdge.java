@@ -1,10 +1,12 @@
 package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
@@ -18,10 +20,12 @@ import org.opentripplanner.street.search.state.StateEditor;
 public class VehicleRentalEdge extends Edge {
 
   public final RentalFormFactor formFactor;
+  private final VehicleRentalPlaceVertex vertex;
 
   private VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
     this.formFactor = formFactor;
+    this.vertex = vertex;
   }
 
   public static VehicleRentalEdge createVehicleRentalEdge(
@@ -167,6 +171,7 @@ public class VehicleRentalEdge extends Edge {
         ? (int) preferences.pickupTime().toSeconds()
         : (int) preferences.dropOffTime().toSeconds()
     );
+    s1.setCurrentRangeMeters(getCurrentRangeMeters());
     s1.setBackMode(null);
     return s1.makeStateArray();
   }
@@ -203,5 +208,9 @@ public class VehicleRentalEdge extends Edge {
       case CAR_RENTAL -> Set.of(RentalFormFactor.CAR);
       default -> Set.of();
     };
+  }
+
+  public double getCurrentRangeMeters() {
+    return vertex.getStation().getCurrentRangeMeters();
   }
 }

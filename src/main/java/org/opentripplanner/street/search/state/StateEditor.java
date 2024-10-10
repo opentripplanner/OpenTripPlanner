@@ -194,6 +194,19 @@ public class StateEditor {
     child.walkDistance += length;
   }
 
+  public void incrementTraversedBatteryMeters(double length) {
+    if (length < 0) {
+      LOG.warn("A state's battery distance is being incremented by a negative amount.");
+      defectiveTraversal = true;
+      return;
+    }
+    child.traversedBatteryMeters += length;
+  }
+
+  public void setCurrentRangeMeters(double currentRangeMeters) {
+    child.currentRangeMeters = currentRangeMeters;
+  }
+
   /* Basic Setters */
 
   public void resetEnteredNoThroughTrafficArea() {
@@ -386,5 +399,9 @@ public class StateEditor {
   private void cloneStateDataAsNeeded() {
     if (child.backState != null && child.stateData == child.backState.stateData) child.stateData =
       child.stateData.clone();
+  }
+
+  public boolean isRentingVehicle() {
+    return child.isRentingVehicle();
   }
 }

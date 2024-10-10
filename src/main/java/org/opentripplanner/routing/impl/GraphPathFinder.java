@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.astar.strategy.BatteryDistanceSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
@@ -88,9 +91,7 @@ public class GraphPathFinder {
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
-        new DurationSkipEdgeStrategy(
-          preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
-        )
+        getSkipEdgeStrategy(request, preferences)
       )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
@@ -117,6 +118,24 @@ public class GraphPathFinder {
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
     paths.sort(new PathComparator(request.arriveBy()));
     return paths;
+  }
+
+  /**
+   * chooses which SkipEdge Strategies to use, based on if the Mode includes rental
+   * @return a ComposingSkipEdgeStrategy if mode includes rental, else selects the DurationSkipStrategy
+   */
+  private static SkipEdgeStrategy getSkipEdgeStrategy(RouteRequest request, StreetPreferences preferences) {
+    if(request.journey().direct().mode().includesRenting()){
+      return new ComposingSkipEdgeStrategy<>(
+        new DurationSkipEdgeStrategy(
+          preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+        ),
+        new BatteryDistanceSkipEdgeStrategy(BatteryValidator::wouldBatteryRunOut)
+      );
+    }
+    return new DurationSkipEdgeStrategy(
+      preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
+    );
   }
 
   /**

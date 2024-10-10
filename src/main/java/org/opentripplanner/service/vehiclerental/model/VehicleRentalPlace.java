@@ -101,4 +101,6 @@ public interface VehicleRentalPlace {
 
     return !preferences.allowedNetworks().contains(getNetwork());
   }
+
+  double getCurrentRangeMeters();
 }

@@ -150,3 +150,4 @@ tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,rout
 240,0,00:50:54,8937,994,10:00:00,10:50:54,,,,,Walk 13m37s ~ YTI:Vehicle:de703d2ea4b03d6af6b8837fd90e5e5ef95f3b9490c194fc8617924314c5427d Rental  37m17s
 241,0,00:46:40,7954,994,10:00:00,10:46:40,,,,,Walk 13m37s ~ YTI:Vehicle:de703d2ea4b03d6af6b8837fd90e5e5ef95f3b9490c194fc8617924314c5427d Rental  33m3s
 242,0,01:03:31,9788,994,10:00:00,11:03:31,,,,,Walk 13m37s ~ YTI:Vehicle:de703d2ea4b03d6af6b8837fd90e5e5ef95f3b9490c194fc8617924314c5427d Rental  49m54s
+243,0,2:03:31,13000,13000,10:00:00,12:03:31,,,,,Walk 2h03m31s
