@@ -122,8 +122,9 @@ The provided formatter will group class members in this order:
     5. class initializer
     6. constructor
     7. `static` factory methods
-    8. methods
+    8. `public` methods
     9. getter and setters
+    8. `private`/package methods
     10. `private` enums (avoid `public`)
     11. interfaces
     12. `private static` classes (avoid `public`)
