@@ -68,7 +68,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     transitModel.addTripOnServiceDate(tripOnServiceDate);
 
     if (tripInput.route().getOperator() != null) {
-      transitModel.getOperators().add(tripInput.route().getOperator());
+      transitModel.addOperators(List.of(tripInput.route().getOperator()));
     }
 
     var stopTimes = IntStream

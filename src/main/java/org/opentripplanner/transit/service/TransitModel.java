@@ -350,7 +350,11 @@ public class TransitModel implements Serializable {
   }
 
   public Collection<Operator> getOperators() {
-    return operators;
+    return Collections.unmodifiableCollection(operators);
+  }
+
+  public void addOperators(Collection<Operator> operators) {
+    this.operators.addAll(operators);
   }
 
   /**
