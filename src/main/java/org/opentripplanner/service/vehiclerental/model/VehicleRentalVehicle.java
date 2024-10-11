@@ -1,6 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -132,5 +133,13 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   @Override
   public VehicleRentalSystem getVehicleRentalSystem() {
     return system;
+  }
+
+  @Override
+  public double getCurrentRangeMeters() {
+    if (currentRangeMeters == null) {
+      return Double.POSITIVE_INFINITY;
+    }
+    return currentRangeMeters;
   }
 }

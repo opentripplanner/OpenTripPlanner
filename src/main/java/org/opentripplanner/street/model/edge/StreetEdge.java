@@ -1176,6 +1176,10 @@ public class StreetEdge
       s1.incrementWalkDistance(getDistanceWithElevation());
     }
 
+    if (s1.isRentingVehicle()) {
+      s1.incrementTraversedBatteryMeters(getDistanceWithElevation());
+    }
+
     if (costExtension != null) {
       weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }

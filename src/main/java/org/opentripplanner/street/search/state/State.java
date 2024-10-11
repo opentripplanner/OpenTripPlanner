@@ -51,6 +51,13 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   // we should DEFINITELY rename this variable and the associated methods.
   public double walkDistance;
 
+  // how far a sharing vehicle powered by battery has driven
+  public double traversedBatteryMeters;
+
+  //the available battery distance of a currently selected sharing vehicle
+  //setting a magic value of 0.0 to make sure
+  public double currentRangeMeters;
+
   /* CONSTRUCTORS */
 
   /**
@@ -76,6 +83,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         vertex.rentalRestrictions().noDropOffNetworks();
     }
     this.walkDistance = 0;
+    this.traversedBatteryMeters = 0;
+    this.currentRangeMeters = Double.POSITIVE_INFINITY;
     this.time = startTime.getEpochSecond();
   }
 
@@ -354,6 +363,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
       editor.incrementWeight(orig.getWeightDelta());
       editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+      editor.incrementTraversedBatteryMeters(orig.getBatteryDistanceDelta());
+      editor.setCurrentRangeMeters(orig.getCurrentRangeMeters());
 
       // propagate the modes through to the reversed edge
       editor.setBackMode(orig.getBackMode());
@@ -494,6 +505,22 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       return Math.abs(this.walkDistance - backState.walkDistance);
     } else {
       return 0.0;
+    }
+  }
+
+  private double getBatteryDistanceDelta() {
+    if (backState != null) {
+      return Math.abs(this.traversedBatteryMeters - backState.traversedBatteryMeters);
+    } else {
+      return 0.0;
+    }
+  }
+
+  private double getCurrentRangeMeters() {
+    if (backState != null) {
+      return backState.currentRangeMeters;
+    } else {
+      return Double.POSITIVE_INFINITY;
     }
   }
 

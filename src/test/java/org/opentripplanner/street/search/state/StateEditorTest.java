@@ -59,6 +59,34 @@ public class StateEditorTest {
     assertNull(stateEditor.makeState(), "Infinity weight increment");
   }
 
+  @Test
+  public final void testTraversedBatteryMetersIncrement() {
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
+
+    stateEditor.child.traversedBatteryMeters = 0;
+    stateEditor.incrementTraversedBatteryMeters(1);
+    assertEquals(1, stateEditor.child.traversedBatteryMeters);
+  }
+
+  @Test
+  public final void testDefectiveTraversedBatteryMetersIncrement() {
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
+
+    stateEditor.child.traversedBatteryMeters = 1;
+    stateEditor.incrementTraversedBatteryMeters(-1);
+    assertEquals(1, stateEditor.child.traversedBatteryMeters);
+  }
+
+  @Test
+  public final void testSetCurrentRangeMeters() {
+    StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
+
+    stateEditor.child.currentRangeMeters = 0;
+    stateEditor.setCurrentRangeMeters(1);
+    assertEquals(1, stateEditor.child.currentRangeMeters);
+  }
+
+
   @Nested
   class GeofencingZones {
 
