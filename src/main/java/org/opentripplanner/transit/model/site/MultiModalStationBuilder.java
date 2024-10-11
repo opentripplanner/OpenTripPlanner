@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
@@ -27,7 +26,7 @@ public class MultiModalStationBuilder
     super(id);
   }
 
-  MultiModalStationBuilder(@Nonnull MultiModalStation original) {
+  MultiModalStationBuilder(MultiModalStation original) {
     super(original);
     this.childStations = original.getChildStations();
     this.name = original.getName();

@@ -5,7 +5,6 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -39,19 +38,16 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     return first.getAgency();
   }
 
-  @Nonnull
   @Override
   public TransitMode getMode() {
     return first.getMode();
   }
 
-  @Nonnull
   @Override
   public Route getRoute() {
     return first.getRoute();
   }
 
-  @Nonnull
   @Override
   public Trip getTrip() {
     return first.getTrip();

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -13,9 +12,9 @@ class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCost
   private final RaptorCostLinearFunction unpreferredCost;
 
   PatternCostCalculator(
-    @Nonnull RaptorCostCalculator<T> delegate,
-    @Nonnull BitSet unpreferredPatterns,
-    @Nonnull RaptorCostLinearFunction unpreferredCost
+    RaptorCostCalculator<T> delegate,
+    BitSet unpreferredPatterns,
+    RaptorCostLinearFunction unpreferredCost
   ) {
     this.unpreferredPatterns = unpreferredPatterns;
     this.delegate = delegate;

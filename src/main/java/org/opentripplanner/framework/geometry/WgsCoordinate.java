@@ -164,6 +164,34 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
+   * Return a new coordinate that is moved an approximate number of meters east.
+   */
+  public WgsCoordinate moveEastMeters(double meters) {
+    return SphericalDistanceLibrary.moveMeters(this, 0, meters);
+  }
+
+  /**
+   * Return a new coordinate that is moved an approximate number of meters west.
+   */
+  public WgsCoordinate moveWestMeters(double meters) {
+    return SphericalDistanceLibrary.moveMeters(this, 0, -meters);
+  }
+
+  /**
+   * Return a new coordinate that is moved an approximate number of meters north.
+   */
+  public WgsCoordinate moveNorthMeters(double meters) {
+    return SphericalDistanceLibrary.moveMeters(this, meters, 0);
+  }
+
+  /**
+   * Return a new coordinate that is moved an approximate number of meters south.
+   */
+  public WgsCoordinate moveSouthMeters(double meters) {
+    return SphericalDistanceLibrary.moveMeters(this, -meters, 0);
+  }
+
+  /**
    * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used after the
    * period(.), even if the coordinate is specified with a higher precision.
    */

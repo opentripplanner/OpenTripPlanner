@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -35,7 +34,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class LegacyRouteRequestMapper {
 
-  @Nonnull
   public static RouteRequest toRouteRequest(
     DataFetchingEnvironment environment,
     GraphQLRequestContext context

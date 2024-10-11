@@ -78,7 +78,7 @@ public class ViaRangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       return new RaptorResponse<>(
         Collections.emptyList(),
         null,
-        // If a trip exist(forward heuristics succeed), but is outside the calculated
+        // If a trip exists(forward heuristics succeed), but is outside the calculated
         // search-window, then set the search-window params as if the request was
         // performed. This enables the client to page to the next window
         requestWithDynamicSearchParams(originalRequest),
@@ -232,7 +232,7 @@ public class ViaRangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
    *     <li>{@code FORWARD}</li>
    *     <li>{@code REVERSE}</li>
    * </ol>
-   * If not EDT is set, the latest-arrival-time is set, and the order should be the opposite,
+   * If no EDT is set, the latest-arrival-time is set, and the order should be the opposite,
    * with {@code REVERSE} first
    */
   private List<HeuristicSearchTask<T>> listTasksInOrder() {
@@ -281,7 +281,7 @@ public class ViaRangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
     // We do not set the latest-arrival-time, because we do not want to limit the forward
     // multi-criteria search, it does not have much effect on the performance - we only risk
-    // loosing optimal results.
+    // losing optimal results.
     return builder.build();
   }
 

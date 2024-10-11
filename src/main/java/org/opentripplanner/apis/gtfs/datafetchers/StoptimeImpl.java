@@ -3,10 +3,11 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
@@ -67,11 +68,11 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<String> realtimeState() {
+  public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
     return environment ->
       getSource(environment).isCanceledEffectively()
-        ? RealTimeState.CANCELED.name()
-        : getSource(environment).getRealTimeState().name();
+        ? GraphQLTypes.GraphQLRealtimeState.CANCELED
+        : RealtimeStateMapper.map(getSource(environment).getRealTimeState());
   }
 
   @Override

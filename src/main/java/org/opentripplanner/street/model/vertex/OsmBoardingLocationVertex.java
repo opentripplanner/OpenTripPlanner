@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.vertex;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -44,7 +43,6 @@ public class OsmBoardingLocationVertex extends LabelledIntersectionVertex {
     return (getOutgoing().size() + getIncoming().size()) > 0;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return name;

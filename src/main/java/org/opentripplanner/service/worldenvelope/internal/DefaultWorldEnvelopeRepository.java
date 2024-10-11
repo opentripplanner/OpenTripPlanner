@@ -4,7 +4,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.Serializable;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
@@ -26,7 +25,7 @@ public class DefaultWorldEnvelopeRepository implements WorldEnvelopeRepository, 
   }
 
   @Override
-  public void saveEnvelope(@Nonnull WorldEnvelope envelope) {
+  public void saveEnvelope(WorldEnvelope envelope) {
     this.envelope = envelope;
   }
 }

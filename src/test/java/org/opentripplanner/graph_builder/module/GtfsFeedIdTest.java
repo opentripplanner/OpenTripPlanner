@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -36,7 +35,6 @@ class GtfsFeedIdTest {
     assertEquals("feed_id_", feedId("feed_id_"));
   }
 
-  @Nonnull
   private static String feedId(String input) {
     var id = new GtfsFeedId.Builder().id(input).build().getId();
     assertNotNull(id);

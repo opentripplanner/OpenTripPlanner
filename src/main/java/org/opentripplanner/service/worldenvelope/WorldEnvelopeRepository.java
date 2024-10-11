@@ -2,7 +2,6 @@ package org.opentripplanner.service.worldenvelope;
 
 import java.io.Serializable;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
 /**
@@ -27,5 +26,5 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 public interface WorldEnvelopeRepository extends Serializable {
   Optional<WorldEnvelope> retrieveEnvelope();
 
-  void saveEnvelope(@Nonnull WorldEnvelope envelope);
+  void saveEnvelope(WorldEnvelope envelope);
 }

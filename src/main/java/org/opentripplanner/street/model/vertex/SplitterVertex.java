@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 
 /**
@@ -31,7 +30,6 @@ public class SplitterVertex extends IntersectionVertex {
     return true;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return name;

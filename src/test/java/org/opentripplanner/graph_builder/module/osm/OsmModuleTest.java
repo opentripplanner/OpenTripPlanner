@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
@@ -15,21 +15,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
-import org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder;
-import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
-import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
-import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
+import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.wayproperty.CreativeNamer;
+import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
+import org.opentripplanner.osm.wayproperty.WayProperties;
+import org.opentripplanner.osm.wayproperty.WayPropertiesBuilder;
+import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -160,7 +159,7 @@ public class OsmModuleTest {
 
   @Test
   public void testWayDataSet() {
-    OSMWithTags way = new OSMWay();
+    OsmWithTags way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("surface", "gravel");
@@ -214,7 +213,7 @@ public class OsmModuleTest {
     assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
 
     // test a left-right distinction
-    way = new OSMWay();
+    way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("cycleway:right", "track");
@@ -232,7 +231,7 @@ public class OsmModuleTest {
     // left comes from lane
     assertEquals(0.75, dataForWay.bicycleSafety().back());
 
-    way = new OSMWay();
+    way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("footway", "sidewalk");
     way.addTag("RLIS:reviewed", "no");
@@ -249,7 +248,7 @@ public class OsmModuleTest {
 
   @Test
   public void testCreativeNaming() {
-    OSMWithTags way = new OSMWay();
+    OsmWithTags way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("access", "no");
@@ -323,7 +322,6 @@ public class OsmModuleTest {
     assertEquals(barrier.getBarrierPermissions(), ALL);
   }
 
-  @Nonnull
   private Graph buildParkingLots() {
     var graph = new Graph();
     var providers = Stream

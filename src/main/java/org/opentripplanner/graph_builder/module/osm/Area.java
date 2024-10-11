@@ -12,9 +12,9 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWithTags;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
@@ -25,14 +25,14 @@ class Area {
 
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  final OSMWithTags parent;
+  final OsmWithTags parent;
   public MultiPolygon jtsMultiPolygon;
 
   Area(
-    OSMWithTags parent,
-    List<OSMWay> outerRingWays,
-    List<OSMWay> innerRingWays,
-    TLongObjectMap<OSMNode> nodes
+    OsmWithTags parent,
+    List<OsmWay> outerRingWays,
+    List<OsmWay> innerRingWays,
+    TLongObjectMap<OsmNode> nodes
   ) {
     this.parent = parent;
     // ring assignment
@@ -84,7 +84,7 @@ class Area {
     jtsMultiPolygon = calculateJTSMultiPolygon();
   }
 
-  public List<TLongList> constructRings(List<OSMWay> ways) {
+  public List<TLongList> constructRings(List<OsmWay> ways) {
     if (ways.size() == 0) {
       // no rings is no rings
       return Collections.emptyList();
@@ -92,8 +92,8 @@ class Area {
 
     List<TLongList> closedRings = new ArrayList<>();
 
-    ArrayListMultimap<Long, OSMWay> waysByEndpoint = ArrayListMultimap.create();
-    for (OSMWay way : ways) {
+    ArrayListMultimap<Long, OsmWay> waysByEndpoint = ArrayListMultimap.create();
+    for (OsmWay way : ways) {
       TLongList refs = way.getNodeRefs();
 
       long start = refs.get(0);
@@ -110,7 +110,7 @@ class Area {
     // Precheck for impossible situations, and remove those.
     TLongList endpointsToRemove = new TLongArrayList();
     for (Long endpoint : waysByEndpoint.keySet()) {
-      Collection<OSMWay> list = waysByEndpoint.get(endpoint);
+      Collection<OsmWay> list = waysByEndpoint.get(endpoint);
       if (list.size() % 2 == 1) {
         endpointsToRemove.add(endpoint);
       }
@@ -126,9 +126,9 @@ class Area {
     }
 
     long firstEndpoint = 0, otherEndpoint = 0;
-    OSMWay firstWay = null;
+    OsmWay firstWay = null;
     for (Long endpoint : waysByEndpoint.keySet()) {
-      List<OSMWay> list = waysByEndpoint.get(endpoint);
+      List<OsmWay> list = waysByEndpoint.get(endpoint);
       firstWay = list.get(0);
       TLongList nodeRefs = firstWay.getNodeRefs();
       partialRing.addAll(nodeRefs);
@@ -161,14 +161,14 @@ class Area {
   }
 
   private boolean constructRingsRecursive(
-    ArrayListMultimap<Long, OSMWay> waysByEndpoint,
+    ArrayListMultimap<Long, OsmWay> waysByEndpoint,
     TLongList ring,
     List<TLongList> closedRings,
     long endpoint
   ) {
-    List<OSMWay> ways = new ArrayList<>(waysByEndpoint.get(endpoint));
+    List<OsmWay> ways = new ArrayList<>(waysByEndpoint.get(endpoint));
 
-    for (OSMWay way : ways) {
+    for (OsmWay way : ways) {
       // remove this way from the map
       TLongList nodeRefs = way.getNodeRefs();
       long firstEndpoint = nodeRefs.get(0);
@@ -200,9 +200,9 @@ class Area {
 
         // otherwise, we need to start a new partial ring
         newRing = new TLongArrayList();
-        OSMWay firstWay = null;
+        OsmWay firstWay = null;
         for (Long entry : waysByEndpoint.keySet()) {
-          List<OSMWay> list = waysByEndpoint.get(entry);
+          List<OsmWay> list = waysByEndpoint.get(entry);
           firstWay = list.get(0);
           nodeRefs = firstWay.getNodeRefs();
           newRing.addAll(nodeRefs);

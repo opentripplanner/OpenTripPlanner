@@ -5,7 +5,6 @@ import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.StringUtils;
 
@@ -22,7 +21,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
   private final String id;
 
-  public FeedScopedId(@Nonnull String feedId, @Nonnull String id) {
+  public FeedScopedId(String feedId, String id) {
     this.feedId = assertHasValue(feedId, "Missing mandatory feedId on FeedScopeId");
     this.id = assertHasValue(id, "Missing mandatory id on FeedScopeId");
   }
@@ -32,7 +31,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * only.
    */
   @Nullable
-  public static FeedScopedId ofNullable(@Nonnull String feedId, @Nullable String id) {
+  public static FeedScopedId ofNullable(String feedId, @Nullable String id) {
     return id == null || id.isBlank() ? null : new FeedScopedId(feedId, id);
   }
 

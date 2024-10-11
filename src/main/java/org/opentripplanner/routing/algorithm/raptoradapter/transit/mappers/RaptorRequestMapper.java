@@ -87,7 +87,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     // TODO Fix the Raptor search so pass-through and via search can be used together.
     if (hasViaLocationsAndPassThroughLocations()) {
       throw new IllegalArgumentException(
-        "A mix of via-locations and pass-through is not allowed in this versionP."
+        "A mix of via-locations and pass-through is not allowed in this version."
       );
     }
 
@@ -130,7 +130,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
       // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
 
-      // TODO - We need handle via locations that are not pass-through-points here
+      // TODO - We need to handle via locations that are not pass-through-points here
       if (hasPassThroughOnly()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);

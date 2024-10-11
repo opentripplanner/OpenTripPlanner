@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters.azure;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;

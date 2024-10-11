@@ -143,7 +143,7 @@ public interface TransitService {
   /**
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
    * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
-   * stops, area stop or stop group, then a list with one item is returned.
+   * stop, area stop or stop group, then a list with one item is returned.
    * An empty list is if nothing is found.
    */
   Collection<StopLocation> getStopOrChildStops(FeedScopedId id);
@@ -240,12 +240,12 @@ public interface TransitService {
    * this date (that is: it is still using its scheduled trip pattern for this date).
    */
   @Nullable
-  TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
+  TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate);
 
   /**
-   * Return true if at least one trip pattern has been created by a real-time update.
+   * Return true if at least one trip pattern has been modified by a real-time update.
    */
-  boolean hasRealtimeAddedTripPatterns();
+  boolean hasNewTripPatternsForModifiedTrips();
 
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 

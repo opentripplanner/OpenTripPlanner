@@ -120,7 +120,6 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * method is used by Raptor to translate from the stop index to a string which should be short and
    * identify the stop given the related pattern, for example the stop name would be great.
    */
-  @Nonnull
   RaptorStopNameResolver stopNameResolver();
 
   /**

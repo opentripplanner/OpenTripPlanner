@@ -34,6 +34,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
+  private static final Set<String> ROUTE_TO_CENTROID_STATION_IDS = Collections.emptySet();
 
   public static final NetexFeedParameters DEFAULT = new NetexFeedParameters();
 
@@ -196,6 +197,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private String groupFilePattern;
     private String ignoreFilePattern;
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
+    private final Set<String> routeToCentroidStopPlaceIds = new HashSet<>();
     private boolean noTransfersOnIsolatedStops;
     private final Set<IgnorableFeature> ignoredFeatures;
 
@@ -248,6 +250,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
     public Builder addFerryIdsNotAllowedForBicycle(Collection<String> ferryId) {
       ferryIdsNotAllowedForBicycle.addAll(ferryId);
+      return this;
+    }
+
+    public Builder addRouteToCentroidStopPlaceIds(Collection<String> stationIds) {
+      routeToCentroidStopPlaceIds.addAll(stationIds);
       return this;
     }
 

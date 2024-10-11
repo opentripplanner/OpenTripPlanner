@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
@@ -20,7 +19,7 @@ public class GroupOfStationsBuilder
     super(id);
   }
 
-  GroupOfStationsBuilder(@Nonnull GroupOfStations original) {
+  GroupOfStationsBuilder(GroupOfStations original) {
     super(original);
     // Required fields
     this.name = I18NString.assertHasValue(original.getName());

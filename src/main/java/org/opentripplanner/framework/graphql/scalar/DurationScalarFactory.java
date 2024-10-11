@@ -8,7 +8,6 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.time.DurationUtils;
 
 public class DurationScalarFactory {
@@ -30,8 +29,7 @@ public class DurationScalarFactory {
   private static class DurationCoercing implements Coercing<Duration, String> {
 
     @Override
-    @Nonnull
-    public String serialize(@Nonnull Object input) throws CoercingSerializeException {
+    public String serialize(Object input) throws CoercingSerializeException {
       if (input instanceof Duration duration) {
         return DurationUtils.formatDurationWithLeadingMinus(duration);
       }
@@ -40,8 +38,7 @@ public class DurationScalarFactory {
     }
 
     @Override
-    @Nonnull
-    public Duration parseValue(@Nonnull Object input) throws CoercingParseValueException {
+    public Duration parseValue(Object input) throws CoercingParseValueException {
       try {
         return DurationUtils.duration(input.toString());
       } catch (DateTimeParseException dtpe) {
@@ -50,8 +47,7 @@ public class DurationScalarFactory {
     }
 
     @Override
-    @Nonnull
-    public Duration parseLiteral(@Nonnull Object input) throws CoercingParseLiteralException {
+    public Duration parseLiteral(Object input) throws CoercingParseLiteralException {
       if (input instanceof StringValue) {
         return parseValue(((StringValue) input).getValue());
       }

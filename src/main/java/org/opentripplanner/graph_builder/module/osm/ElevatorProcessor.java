@@ -7,14 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.model.OsmLevel;
+import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -46,9 +45,9 @@ class ElevatorProcessor {
   private final VertexGenerator vertexGenerator;
 
   public ElevatorProcessor(
-    @Nonnull DataImportIssueStore issueStore,
-    @Nonnull OsmDatabase osmdb,
-    @Nonnull VertexGenerator vertexGenerator
+    DataImportIssueStore issueStore,
+    OsmDatabase osmdb,
+    VertexGenerator vertexGenerator
   ) {
     this.issueStore = issueStore;
     this.osmdb = osmdb;
@@ -58,14 +57,14 @@ class ElevatorProcessor {
   public void buildElevatorEdges(Graph graph) {
     /* build elevator edges */
     for (Long nodeId : vertexGenerator.multiLevelNodes().keySet()) {
-      OSMNode node = osmdb.getNode(nodeId);
+      OsmNode node = osmdb.getNode(nodeId);
       // this allows skipping levels, e.g., an elevator that stops
       // at floor 0, 2, 3, and 5.
       // Converting to an Array allows us to
       // subscript it so we can loop over it in twos. Assumedly, it will stay
       // sorted when we convert it to an Array.
       // The objects are Integers, but toArray returns Object[]
-      Map<OSMLevel, OsmVertex> vertices = vertexGenerator.multiLevelNodes().get(nodeId);
+      Map<OsmLevel, OsmVertex> vertices = vertexGenerator.multiLevelNodes().get(nodeId);
 
       /*
        * first, build FreeEdges to disconnect from the graph, GenericVertices to serve as attachment points, and ElevatorBoard and
@@ -78,10 +77,10 @@ class ElevatorProcessor {
        * + GenericVertex, X EndpointVertex, ~~ FreeEdge, == ElevatorBoardEdge/ElevatorAlightEdge Another loop will fill in the
        * ElevatorHopEdges.
        */
-      OSMLevel[] levels = vertices.keySet().toArray(new OSMLevel[0]);
+      OsmLevel[] levels = vertices.keySet().toArray(new OsmLevel[0]);
       Arrays.sort(levels);
       ArrayList<Vertex> onboardVertices = new ArrayList<>();
-      for (OSMLevel level : levels) {
+      for (OsmLevel level : levels) {
         // get the node to build the elevator out from
         OsmVertex sourceVertex = vertices.get(level);
         String levelName = level.longName;
@@ -108,10 +107,10 @@ class ElevatorProcessor {
     } // END elevator edge loop
 
     // Add highway=elevators to graph as elevators
-    Iterator<OSMWay> elevators = osmdb.getWays().stream().filter(this::isElevatorWay).iterator();
+    Iterator<OsmWay> elevators = osmdb.getWays().stream().filter(this::isElevatorWay).iterator();
 
     while (elevators.hasNext()) {
-      OSMWay elevatorWay = elevators.next();
+      OsmWay elevatorWay = elevators.next();
 
       List<Long> nodes = Arrays
         .stream(elevatorWay.getNodeRefs().toArray())
@@ -207,7 +206,7 @@ class ElevatorProcessor {
     }
   }
 
-  private boolean isElevatorWay(OSMWay way) {
+  private boolean isElevatorWay(OsmWay way) {
     if (!way.isElevator()) {
       return false;
     }
@@ -223,7 +222,7 @@ class ElevatorProcessor {
     return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
   }
 
-  private OptionalInt parseDuration(OSMWithTags element) {
+  private OptionalInt parseDuration(OsmWithTags element) {
     return element.getTagAsInt(
       "duration",
       v ->

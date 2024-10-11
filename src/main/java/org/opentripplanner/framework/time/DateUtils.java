@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class DateUtils {
   }
 
   // TODO: could be replaced with Apache's DateFormat.parseDate ???
-  public static LocalDate parseDate(@Nonnull String input) {
+  public static LocalDate parseDate(String input) {
     LocalDate retVal = null;
     try {
       String newString = input

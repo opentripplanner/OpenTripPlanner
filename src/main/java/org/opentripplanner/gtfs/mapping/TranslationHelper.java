@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.schema.annotations.CsvField;
 import org.onebusaway.csv_entities.schema.annotations.CsvFieldNameConvention;
@@ -83,9 +82,9 @@ final class TranslationHelper {
 
   @Nullable
   I18NString getTranslation(
-    @Nonnull Class<?> clazz,
-    @Nonnull String fieldName,
-    @Nonnull String recordId,
+    Class<?> clazz,
+    String fieldName,
+    String recordId,
     @Nullable String defaultValue
   ) {
     return getTranslation(clazz, fieldName, recordId, null, defaultValue);
@@ -93,9 +92,9 @@ final class TranslationHelper {
 
   @Nullable
   I18NString getTranslation(
-    @Nonnull Class<?> clazz,
-    @Nonnull String fieldName,
-    @Nonnull String recordId,
+    Class<?> clazz,
+    String fieldName,
+    String recordId,
     @Nullable String recordSubId,
     @Nullable String defaultValue
   ) {

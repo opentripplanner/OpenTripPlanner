@@ -10,6 +10,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
+import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -23,6 +24,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
@@ -189,10 +191,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment -> getSource(environment).getRealTime();
   }
 
-  // TODO
   @Override
-  public DataFetcher<String> realtimeState() {
-    return environment -> null;
+  public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
+    return environment -> {
+      var state = getSource(environment).getRealTimeState();
+      return RealtimeStateMapper.map(state);
+    };
   }
 
   @Override
@@ -323,5 +327,16 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Double> accessibilityScore() {
     return environment -> NumberMapper.toDouble(getSource(environment).accessibilityScore());
+  }
+
+  @Override
+  public DataFetcher<String> id() {
+    return environment -> {
+      var ref = getSource(environment).getLegReference();
+      if (ref == null) {
+        return null;
+      }
+      return LegReferenceSerializer.encode(ref);
+    };
   }
 }

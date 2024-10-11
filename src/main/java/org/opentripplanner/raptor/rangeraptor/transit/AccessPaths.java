@@ -117,13 +117,11 @@ public class AccessPaths {
     return filterOnTimePenaltyLimitIfExist(arrivedOnBoardByNumOfRides.get(round));
   }
 
-  public static int calculateMaxNumberOfRides(AccessPaths paths) {
-    return paths == null
-      ? 0
-      : Math.max(
-        Arrays.stream(paths.arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
-        Arrays.stream(paths.arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
-      );
+  public int calculateMaxNumberOfRides() {
+    return Math.max(
+      Arrays.stream(arrivedOnStreetByNumOfRides.keys()).max().orElse(0),
+      Arrays.stream(arrivedOnBoardByNumOfRides.keys()).max().orElse(0)
+    );
   }
 
   /**

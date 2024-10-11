@@ -1,7 +1,5 @@
 package org.opentripplanner.astar.spi;
 
-import javax.annotation.Nonnull;
-
 /**
  * Represents an edge in the street network. Most edges have a one-to-one mapping to real world
  * things like street segments or stairs.
@@ -43,6 +41,5 @@ public interface AStarEdge<
    *         vehicle is speculatively dropped off and the passenger continues on foot in case
    *         that the destination is inside the zone.
    */
-  @Nonnull
   State[] traverse(State s0);
 }

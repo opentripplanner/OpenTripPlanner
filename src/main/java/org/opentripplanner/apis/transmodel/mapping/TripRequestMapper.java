@@ -47,7 +47,7 @@ public class TripRequestMapper {
       }
     );
     callWith.argument(
-      TripQuery.FIELD_VIA,
+      TripQuery.TRIP_VIA_PARAMETER,
       (List<Map<String, Object>> v) -> {
         request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
       }

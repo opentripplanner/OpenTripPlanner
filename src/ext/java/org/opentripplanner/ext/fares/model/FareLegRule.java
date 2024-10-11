@@ -3,19 +3,18 @@ package org.opentripplanner.ext.fares.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record FareLegRule(
-  @Nonnull FeedScopedId id,
+  FeedScopedId id,
   @Nullable FeedScopedId legGroupId,
   @Nullable String networkId,
   @Nullable String fromAreaId,
   @Nullable String toAreaId,
   @Nullable FareDistance fareDistance,
-  @Nonnull Collection<FareProduct> fareProducts
+  Collection<FareProduct> fareProducts
 ) {
   public FareLegRule {
     Objects.requireNonNull(id);

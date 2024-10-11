@@ -306,7 +306,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getTripForId().values(),
-        currentSnapshot.getAllRealTimeAddedTrips()
+        currentSnapshot.listRealTimeAddedTrips()
       );
     }
     return Collections.unmodifiableCollection(transitModelIndex.getTripForId().values());
@@ -319,7 +319,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getAllRoutes(),
-        currentSnapshot.getAllRealTimeAddedRoutes()
+        currentSnapshot.listRealTimeAddedRoutes()
       );
     }
     return Collections.unmodifiableCollection(transitModelIndex.getAllRoutes());
@@ -339,7 +339,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
-    TripPattern realtimePattern = getRealtimeAddedTripPattern(trip.getId(), serviceDate);
+    TripPattern realtimePattern = getNewTripPatternForModifiedTrip(trip.getId(), serviceDate);
     if (realtimePattern != null) {
       return realtimePattern;
     }
@@ -520,21 +520,21 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+  public TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate) {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot == null) {
       return null;
     }
-    return currentSnapshot.getRealtimeAddedTripPattern(tripId, serviceDate);
+    return currentSnapshot.getNewTripPatternForModifiedTrip(tripId, serviceDate);
   }
 
   @Override
-  public boolean hasRealtimeAddedTripPatterns() {
+  public boolean hasNewTripPatternsForModifiedTrips() {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot == null) {
       return false;
     }
-    return currentSnapshot.hasRealtimeAddedTripPatterns();
+    return currentSnapshot.hasNewTripPatternsForModifiedTrips();
   }
 
   /**
@@ -570,7 +570,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (currentSnapshot != null) {
       return new CollectionsView<>(
         transitModelIndex.getTripOnServiceDateForTripAndDay().values(),
-        currentSnapshot.getAllRealTimeAddedTripOnServiceDate()
+        currentSnapshot.listRealTimeAddedTripOnServiceDate()
       );
     }
     return Collections.unmodifiableCollection(

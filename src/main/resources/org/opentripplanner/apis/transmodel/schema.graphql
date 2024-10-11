@@ -325,7 +325,7 @@ type Leg {
   fromPlace: Place!
   "Generalized cost or weight of the leg. Used for debugging."
   generalizedCost: Int
-  "An identifier for the leg, which can be used to re-fetch the information."
+  "An identifier for the leg, which can be used to re-fetch transit leg information."
   id: ID
   interchangeFrom: Interchange
   interchangeTo: Interchange
@@ -647,7 +647,7 @@ type QueryType {
   groupOfLines(id: String!): GroupOfLines
   "Get all groups of lines"
   groupsOfLines: [GroupOfLines!]!
-  "Refetch a single leg based on its id"
+  "Refetch a single transit leg based on its id"
   leg(id: ID!): Leg @timingData
   "Get a single line based on its id"
   line(id: ID!): Line @timingData
@@ -904,7 +904,7 @@ type QueryType {
     The list of via locations the journey is required to visit. All locations are
     visited in the order they are listed.
     """
-    via: [PlanViaLocationInput!],
+    via: [TripViaLocationInput!],
     "Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting."
     waitReluctance: Float = 1.0,
     "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
@@ -948,7 +948,7 @@ type QueryType {
     via: [ViaLocationInput!]!,
     "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit yet."
     wheelchairAccessible: Boolean = false
-  ): ViaTrip! @deprecated(reason : "The the regular plan query with via stop instead.") @timingData
+  ): ViaTrip! @deprecated(reason : "Use the regular trip query with via stop instead.") @timingData
 }
 
 type RentalVehicle implements PlaceInterface {
@@ -2109,58 +2109,6 @@ input PenaltyForStreetMode {
 }
 
 """
-One of the listed stop locations must be visited on-board a transit vehicle or the journey must
-alight or board at the location.
-"""
-input PlanPassThroughViaLocationInput {
-  "The label/name of the location. This is pass-through information and is not used in routing."
-  label: String
-  """
-  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
-  stop place or a group of stop places. It is enough to visit ONE of the locations
-  listed.
-  """
-  stopLocationIds: [String]
-}
-
-"""
-A via-location is used to specifying a location as an intermediate place the router must
-route through. The via-location must be either a pass-through-location or a
-visit-via-location. An on-board "visit" is only allowed for pass-through-via-locations, while
-the visit-via-location can visit a stop-location or a coordinate and specify a
-minimum-wait-time.
-"""
-input PlanViaLocationInput @oneOf {
-  passThrough: PlanPassThroughViaLocationInput
-  visit: PlanVisitViaLocationInput
-}
-
-"""
-A visit-via-location is a physical visit to one of the stops or coordinates listed. An
-on-board visit does not count, the traveler must alight or board at the given stop for
-it to to be accepted. To visit a coordinate, the traveler must walk(bike or drive) to
-the closest point in the street network from a stop and back to another stop to join
-the transit network.
-
-NOTE! Coordinates are NOT supported jet.
-"""
-input PlanVisitViaLocationInput {
-  "The label/name of the location. This is pass-through information and is not used in routing."
-  label: String
-  """
-  The minimum wait time is used to force the trip to stay the given duration at the
-  via-location before the trip is continued.
-  """
-  minimumWaitTime: Duration = "PT0S"
-  """
-  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
-  stop place or a group of stop places. It is enough to visit ONE of the locations
-  listed.
-  """
-  stopLocationIds: [String]
-}
-
-"""
 A relax-cost is used to increase the limit when comparing one cost to another cost.
 This is used to include more results into the result. A `ratio=2.0` means a path(itinerary)
 with twice as high cost as another one, is accepted. A `constant=$300` means a "fixed"
@@ -2242,6 +2190,56 @@ input TripFilterSelectInput {
   serviceJourneys: [ID!]
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes!]
+}
+
+"""
+One of the listed stop locations must be visited on-board a transit vehicle or the journey must
+alight or board at the location.
+"""
+input TripPassThroughViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String!]
+}
+
+"""
+A via-location is used to specifying a location as an intermediate place the router must
+route through. The via-location is either a pass-through-location or a visit-via-location.
+"""
+input TripViaLocationInput @oneOf {
+  "Board, alight or pass-through(on-board) at the stop location."
+  passThrough: TripPassThroughViaLocationInput
+  "Board or alight at a stop location or visit a coordinate."
+  visit: TripVisitViaLocationInput
+}
+
+"""
+A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for it to to
+be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+in the street network from a stop and back to another stop to join the transit network.
+
+NOTE! Coordinates are NOT supported yet.
+"""
+input TripVisitViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  The minimum wait time is used to force the trip to stay the given duration at the
+  via-location before the trip is continued.
+  """
+  minimumWaitTime: Duration = "PT0S"
+  """
+  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
+  stop place or a group of stop places. It is enough to visit ONE of the locations
+  listed.
+  """
+  stopLocationIds: [String!]
 }
 
 "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. The location also contain information about the minimum and maximum time the user is willing to stay at the via location."

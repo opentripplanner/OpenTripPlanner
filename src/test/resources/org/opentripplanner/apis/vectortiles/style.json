@@ -45,6 +45,19 @@
               10.0
             ]
           ]
+        },
+        "line-offset" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.3
+            ],
+            [
+              23,
+              6.0
+            ]
+          ]
         }
       },
       "filter" : [
@@ -134,6 +147,19 @@
               10.0
             ]
           ]
+        },
+        "line-offset" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.3
+            ],
+            [
+              23,
+              6.0
+            ]
+          ]
         }
       },
       "filter" : [
@@ -143,7 +169,8 @@
         "StreetTransitEntranceLink",
         "BoardingLocationToStopLink",
         "StreetVehicleRentalLink",
-        "StreetVehicleParkingLink"
+        "StreetVehicleParkingLink",
+        "StreetStationCentroidLink"
       ],
       "layout" : {
         "line-cap" : "round",

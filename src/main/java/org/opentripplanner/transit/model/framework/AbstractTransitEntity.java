@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
@@ -30,7 +29,7 @@ public abstract class AbstractTransitEntity<
 
   private final FeedScopedId id;
 
-  public AbstractTransitEntity(@Nonnull FeedScopedId id) {
+  public AbstractTransitEntity(FeedScopedId id) {
     this.id = Objects.requireNonNull(id);
   }
 

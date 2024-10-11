@@ -55,7 +55,7 @@ public class SearchContextViaLeg<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The egress path for search, if and only if this is the last leg.
+   * The egress path for search. Non-null if and only if this is the last leg.
    */
   @Nullable
   public EgressPaths egressPaths() {

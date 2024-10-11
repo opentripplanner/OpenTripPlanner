@@ -1,12 +1,12 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.ext.siri.EntityResolver;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.siri.EntityResolver;
+import org.opentripplanner.updater.siri.SiriFuzzyTripMatcher;
 
 public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
 

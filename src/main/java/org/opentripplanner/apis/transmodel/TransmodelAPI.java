@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
@@ -75,8 +74,7 @@ public class TransmodelAPI {
     }
     tracingHeaderTags = config.tracingHeaderTags();
     maxNumberOfResultFields = config.maxNumberOfResultFields();
-    GqlUtil gqlUtil = new GqlUtil(transitModel.getTimeZone());
-    schema = TransmodelGraphQLSchema.create(defaultRouteRequest, gqlUtil);
+    schema = TransmodelGraphQLSchema.create(defaultRouteRequest, transitModel.getTimeZone());
   }
 
   @POST

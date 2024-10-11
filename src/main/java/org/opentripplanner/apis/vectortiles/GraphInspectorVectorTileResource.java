@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.apis.vectortiles.model.LayerParams;
@@ -164,7 +163,6 @@ public class GraphInspectorVectorTileResource {
       );
   }
 
-  @Nonnull
   private List<FeedInfo> feedInfos() {
     return serverContext
       .transitService()

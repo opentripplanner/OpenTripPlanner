@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -30,7 +29,7 @@ public class Branding extends AbstractTransitEntity<Branding, BrandingBuilder> i
     this.image = builder.getImage();
   }
 
-  public static BrandingBuilder of(@Nonnull FeedScopedId id) {
+  public static BrandingBuilder of(FeedScopedId id) {
     return new BrandingBuilder(id);
   }
 
@@ -66,13 +65,12 @@ public class Branding extends AbstractTransitEntity<Branding, BrandingBuilder> i
   }
 
   @Override
-  @Nonnull
   public BrandingBuilder copy() {
     return new BrandingBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Branding other) {
+  public boolean sameAs(Branding other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

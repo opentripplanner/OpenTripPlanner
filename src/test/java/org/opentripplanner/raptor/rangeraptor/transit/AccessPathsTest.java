@@ -78,9 +78,8 @@ class AccessPathsTest implements RaptorTestConstants {
 
   @Test
   void calculateMaxNumberOfRides() {
-    assertEquals(0, AccessPaths.calculateMaxNumberOfRides(null));
-    assertEquals(3, AccessPaths.calculateMaxNumberOfRides(create(STANDARD)));
-    assertEquals(3, AccessPaths.calculateMaxNumberOfRides(create(MULTI_CRITERIA)));
+    assertEquals(3, create(STANDARD).calculateMaxNumberOfRides());
+    assertEquals(3, create(MULTI_CRITERIA).calculateMaxNumberOfRides());
   }
 
   @Test

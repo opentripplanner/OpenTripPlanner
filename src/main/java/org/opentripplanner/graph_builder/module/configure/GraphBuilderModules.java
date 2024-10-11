@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
@@ -39,7 +40,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -54,7 +55,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static OsmModule provideOpenStreetMapModule(
+  static OsmModule provideOsmModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
@@ -300,6 +301,20 @@ public class GraphBuilderModules {
       .stopConsolidation()
       .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
       .orElse(null);
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
+    DataImportIssueStore issueStore,
+    BuildConfig config,
+    TransitModel transitModel
+  ) {
+    var ids = config.transitRouteToStationCentroid();
+    return ids.isEmpty()
+      ? null
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, transitModel);
   }
 
   /* private methods */

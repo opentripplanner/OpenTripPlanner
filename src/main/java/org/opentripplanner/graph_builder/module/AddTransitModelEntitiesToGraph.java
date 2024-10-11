@@ -39,6 +39,7 @@ import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
@@ -86,6 +87,7 @@ public class AddTransitModelEntitiesToGraph {
 
     addStopsToGraphAndGenerateStopVertexes(transitModel);
     addEntrancesToGraph();
+    addStationCentroidsToGraph();
     addPathwayNodesToGraph();
     addBoardingAreasToGraph();
 
@@ -139,6 +141,14 @@ public class AddTransitModelEntitiesToGraph {
     for (Entrance entrance : otpTransitService.getAllEntrances()) {
       TransitEntranceVertex entranceVertex = vertexFactory.transitEntrance(entrance);
       stationElementNodes.put(entrance, entranceVertex);
+    }
+  }
+
+  private void addStationCentroidsToGraph() {
+    for (Station station : otpTransitService.stopModel().listStations()) {
+      if (station.shouldRouteToCentroid()) {
+        vertexFactory.stationCentroid(station);
+      }
     }
   }
 

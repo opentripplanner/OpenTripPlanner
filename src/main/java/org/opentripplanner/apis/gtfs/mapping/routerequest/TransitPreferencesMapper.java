@@ -47,7 +47,7 @@ public class TransitPreferencesMapper {
       var slack = board.getGraphQLSlack();
       if (slack != null) {
         transitPreferences.withDefaultBoardSlackSec(
-          (int) DurationUtils.requireNonNegativeMedium(slack, "board slack").toSeconds()
+          (int) DurationUtils.requireNonNegativeMax2hours(slack, "board slack").toSeconds()
         );
       }
       var waitReluctance = board.getGraphQLWaitReluctance();
@@ -60,7 +60,7 @@ public class TransitPreferencesMapper {
       var slack = alight.getGraphQLSlack();
       if (slack != null) {
         transitPreferences.withDefaultAlightSlackSec(
-          (int) DurationUtils.requireNonNegativeMedium(slack, "alight slack").toSeconds()
+          (int) DurationUtils.requireNonNegativeMax2hours(slack, "alight slack").toSeconds()
         );
       }
     }
@@ -73,7 +73,7 @@ public class TransitPreferencesMapper {
       var slack = transfer.getGraphQLSlack();
       if (slack != null) {
         transferPreferences.withSlack(
-          DurationUtils.requireNonNegativeMedium(slack, "transfer slack")
+          DurationUtils.requireNonNegativeMax2hours(slack, "transfer slack")
         );
       }
       var maxTransfers = transfer.getGraphQLMaximumTransfers();

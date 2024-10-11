@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -308,20 +307,17 @@ public class StreetEdge
   }
 
   public String toString() {
-    return (
-      "StreetEdge(" +
-      name +
-      ", " +
-      fromv +
-      " -> " +
-      tov +
-      " length=" +
-      this.getDistanceMeters() +
-      " carSpeed=" +
-      this.getCarSpeed() +
-      " permission=" +
-      this.getPermission() +
-      ")"
+    var nameString = name != null ? name.toString() : null;
+    return buildToString(
+      nameString,
+      b ->
+        b
+          .append(", length=")
+          .append(this.getDistanceMeters())
+          .append(", carSpeed=")
+          .append(this.getCarSpeed())
+          .append(", permission=")
+          .append(this.getPermission())
     );
   }
 
@@ -330,7 +326,6 @@ public class StreetEdge
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     final StateEditor editor;
 
@@ -858,7 +853,6 @@ public class StreetEdge
    * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or
    * {@link StreetEdge#removeTurnRestriction} is called concurrently.
    */
-  @Nonnull
   public List<TurnRestriction> getTurnRestrictions() {
     // this can be safely returned as it's unmodifiable
     return turnRestrictions;
@@ -992,7 +986,6 @@ public class StreetEdge
    * When we then leave the no drop off zone on foot we generate a state for each network that the
    * zone applies to where we pick up a vehicle with a specific network.
    */
-  @Nonnull
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
     var networks = Stream.concat(
       // null is a special rental network that speculatively assumes that you can take any vehicle
@@ -1194,7 +1187,6 @@ public class StreetEdge
     return s1;
   }
 
-  @Nonnull
   private TraversalCosts otherTraversalCosts(
     RoutingPreferences preferences,
     TraverseMode traverseMode,
@@ -1213,7 +1205,6 @@ public class StreetEdge
     return new TraversalCosts(time, weight);
   }
 
-  @Nonnull
   private TraversalCosts bicycleOrScooterTraversalCost(
     RoutingPreferences pref,
     TraverseMode mode,
@@ -1258,7 +1249,6 @@ public class StreetEdge
     return new TraversalCosts(time, weight);
   }
 
-  @Nonnull
   private TraversalCosts walkingTraversalCosts(
     RoutingPreferences preferences,
     TraverseMode traverseMode,

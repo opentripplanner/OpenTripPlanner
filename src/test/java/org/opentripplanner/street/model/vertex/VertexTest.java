@@ -1,9 +1,11 @@
 package org.opentripplanner.street.model.vertex;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 class VertexTest {
 
@@ -24,5 +26,11 @@ class VertexTest {
     Vertex v1 = new SimpleVertex("", LAT, LON);
     Vertex v2 = new SimpleVertex("", LAT + EPSILON_10_E_MINUS_7, LON);
     assertFalse(v1.sameLocation(v2));
+  }
+
+  @Test
+  void testWgsCoordinate() {
+    Vertex v1 = new SimpleVertex("", LAT, LON);
+    assertEquals(new WgsCoordinate(LAT, LON), v1.toWgsCoordinate());
   }
 }

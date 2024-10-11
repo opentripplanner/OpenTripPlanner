@@ -9,20 +9,16 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorViaConnection;
-import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
-import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
@@ -35,46 +31,45 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private final StopArrivalParetoSet<T>[] arrivals;
   private final BitSet touchedStops;
-  private final McStopArrivals<T> next;
 
-  //private final ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory;
   private final DebugHandlerFactory<T> debugHandlerFactory;
   private final DebugStopArrivalsStatistics debugStats;
   private final ParetoComparator<McStopArrival<T>> comparator;
 
   /**
-   * Set the time at a transit index iff it is optimal. This sets both the best time and the
-   * transfer time
+   * Set the time at a transit index if it is optimal. This sets both the best time and the
+   * transfer time.
+   *
+   * @param nextLeg When chaining two Raptor searches together, the next-leg is the next
+   *                search we are copying state into.
    */
   public McStopArrivals(
     int nStops,
-    AccessPaths accessPaths,
     @Nullable EgressPaths egressPaths,
     ViaConnections viaConnections,
     DestinationArrivalPaths<T> paths,
-    McStopArrivals<T> next,
+    McStopArrivals<T> nextLeg,
     McStopArrivalFactory<T> stopArrivalFactory,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     // Assert only-one-of next or egressPaths is set
-    if (next == null) {
+    if (nextLeg == null) {
       Objects.requireNonNull(egressPaths);
     } else if (egressPaths != null) {
       throw new IllegalArgumentException(
-        "Can not delegate to next and at the same have egress paths."
+        "Can not delegate to next-leg and at the same have egress paths."
       );
     }
 
     //noinspection unchecked
     this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
     this.touchedStops = new BitSet(nStops);
-    this.next = next;
     this.comparator = comparatorFactory.compareArrivalTimeRoundCostAndOnBoardArrival();
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initViaConnections(viaConnections, stopArrivalFactory);
+    initViaConnections(viaConnections, stopArrivalFactory, nextLeg);
     initEgressStopAndGlueItToDestinationArrivals(egressPaths, paths);
   }
 
@@ -159,31 +154,21 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private void initViaConnections(
     @Nullable ViaConnections viaConnections,
-    McStopArrivalFactory<T> stopArrivalFactory
+    McStopArrivalFactory<T> stopArrivalFactory,
+    McStopArrivals<T> nextLeg
   ) {
     if (viaConnections == null) {
       return;
     }
     viaConnections
       .byFromStop()
-      .forEachEntry((stop, list) -> {
+      .forEachEntry((stop, connections) -> {
         this.arrivals[stop] =
           StopArrivalParetoSet
             .of(comparator)
             .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-            .withNextSearchListener(
-              new ParetoSetEventListener<>() {
-                @Override
-                public void notifyElementAccepted(ArrivalView<T> newElement) {
-                  for (RaptorViaConnection c : list) {
-                    var e = (McStopArrival<T>) newElement;
-                    var n = stopArrivalFactory.createViaStopArrival(e, c);
-                    if (n != null) {
-                      next.addStopArrival(n);
-                    }
-                  }
-                }
-              }
+            .withNextLegListener(
+              new ViaConnectionStopArrivalEventListener<>(stopArrivalFactory, connections, nextLeg)
             )
             .build();
         return true;
@@ -195,7 +180,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * the "glue" make sure new destination arrivals are added to the destination arrivals.
    */
   private void initEgressStopAndGlueItToDestinationArrivals(
-    EgressPaths egressPaths,
+    @Nullable EgressPaths egressPaths,
     DestinationArrivalPaths<T> paths
   ) {
     if (egressPaths == null) {

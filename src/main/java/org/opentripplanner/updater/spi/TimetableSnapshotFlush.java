@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.spi;
 
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

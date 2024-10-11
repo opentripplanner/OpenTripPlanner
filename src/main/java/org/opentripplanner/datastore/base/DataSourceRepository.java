@@ -1,7 +1,6 @@
 package org.opentripplanner.datastore.base;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -43,7 +42,7 @@ public interface DataSourceRepository {
    * @param type the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
-  DataSource findSource(@Nonnull URI uri, @Nonnull FileType type);
+  DataSource findSource(URI uri, FileType type);
 
   /**
    * Get the a composite data source (zip/directory) for the given uri and type.
@@ -54,5 +53,5 @@ public interface DataSourceRepository {
    * @param type the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
-  CompositeDataSource findCompositeSource(@Nonnull URI uri, @Nonnull FileType type);
+  CompositeDataSource findCompositeSource(URI uri, FileType type);
 }

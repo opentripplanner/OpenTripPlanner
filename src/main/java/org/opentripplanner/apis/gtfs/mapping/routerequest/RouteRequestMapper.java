@@ -9,7 +9,6 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.WalkPreferences
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
-import javax.annotation.Nonnull;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -22,7 +21,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class RouteRequestMapper {
 
-  @Nonnull
   public static RouteRequest toRouteRequest(
     DataFetchingEnvironment environment,
     GraphQLRequestContext context
@@ -43,7 +41,7 @@ public class RouteRequestMapper {
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
     if (args.getGraphQLSearchWindow() != null) {
       request.setSearchWindow(
-        DurationUtils.requireNonNegativeLong(args.getGraphQLSearchWindow(), "searchWindow")
+        DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
       );
     }
 

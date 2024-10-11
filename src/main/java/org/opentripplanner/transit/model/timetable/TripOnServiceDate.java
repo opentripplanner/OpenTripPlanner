@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.timetable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -26,7 +25,7 @@ public class TripOnServiceDate
     this.replacementFor = builder.getReplacementFor();
   }
 
-  public static TripOnServiceDateBuilder of(@Nonnull FeedScopedId id) {
+  public static TripOnServiceDateBuilder of(FeedScopedId id) {
     return new TripOnServiceDateBuilder(id);
   }
 
@@ -51,7 +50,7 @@ public class TripOnServiceDate
   }
 
   @Override
-  public boolean sameAs(@Nonnull TripOnServiceDate other) {
+  public boolean sameAs(TripOnServiceDate other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.trip, other.trip) &&
@@ -61,7 +60,6 @@ public class TripOnServiceDate
     );
   }
 
-  @Nonnull
   @Override
   public TripOnServiceDateBuilder copy() {
     return new TripOnServiceDateBuilder(this);

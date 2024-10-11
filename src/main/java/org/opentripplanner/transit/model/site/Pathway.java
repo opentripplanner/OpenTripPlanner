@@ -2,7 +2,6 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -94,7 +93,7 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
   }
 
   @Override
-  public boolean sameAs(@Nonnull Pathway other) {
+  public boolean sameAs(Pathway other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(pathwayMode, other.getPathwayMode()) &&
@@ -110,7 +109,6 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
     );
   }
 
-  @Nonnull
   @Override
   public PathwayBuilder copy() {
     return new PathwayBuilder(this);

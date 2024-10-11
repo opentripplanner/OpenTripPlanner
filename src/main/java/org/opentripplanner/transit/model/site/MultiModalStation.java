@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -90,7 +89,7 @@ public class MultiModalStation
   }
 
   @Override
-  public boolean sameAs(@Nonnull MultiModalStation other) {
+  public boolean sameAs(MultiModalStation other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(childStations, other.getChildStations()) &&
@@ -102,7 +101,6 @@ public class MultiModalStation
     );
   }
 
-  @Nonnull
   @Override
   public MultiModalStationBuilder copy() {
     return new MultiModalStationBuilder(this);

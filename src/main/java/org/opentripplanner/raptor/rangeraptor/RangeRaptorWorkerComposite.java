@@ -22,23 +22,26 @@ public class RangeRaptorWorkerComposite<T extends RaptorTripSchedule>
     this.children = List.copyOf(children);
   }
 
+  /**
+   * Concatenate the two given workers, flattening any composite workers into a list.
+   */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public static <T extends RaptorTripSchedule> RangeRaptorWorker<T> of(
-    @Nullable RangeRaptorWorker<T> head,
-    @Nullable RangeRaptorWorker<T> tail
+    @Nullable RangeRaptorWorker<T> a,
+    @Nullable RangeRaptorWorker<T> b
   ) {
     return CompositeUtil.of(
       RangeRaptorWorkerComposite::new,
       it -> it instanceof RangeRaptorWorkerComposite<T>,
       it -> ((RangeRaptorWorkerComposite) it).children,
-      head,
-      tail
+      a,
+      b
     );
   }
 
   @Override
-  public RaptorRouterResult<T> results() {
-    return tail().results();
+  public RaptorRouterResult<T> result() {
+    return tail().result();
   }
 
   @Override

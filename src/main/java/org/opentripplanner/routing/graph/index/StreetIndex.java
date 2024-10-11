@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graph.index;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -61,6 +63,11 @@ public class StreetIndex {
 
   private final Map<FeedScopedId, TransitStopVertex> transitStopVertices;
 
+  /**
+   * This list contains transitStationVertices for the stations that are configured to route to centroid
+   */
+  private final Map<FeedScopedId, StationCentroidVertex> stationCentroidVertices;
+
   private final EdgeSpatialIndex edgeSpatialIndex;
   private final HashGridSpatialIndex<Vertex> verticesTree;
 
@@ -73,6 +80,7 @@ public class StreetIndex {
     this.verticesTree = new HashGridSpatialIndex<>();
     this.vertexLinker = new VertexLinker(graph, stopModel, edgeSpatialIndex);
     this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
+    this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
   }
 
@@ -174,7 +182,8 @@ public class StreetIndex {
    *
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
-  public Set<Vertex> getVerticesForLocation(
+  @Nullable
+  public Set<Vertex> getStreetVerticesForLocation(
     GenericLocation location,
     StreetMode streetMode,
     boolean endVertex,
@@ -200,16 +209,24 @@ public class StreetIndex {
     } else {
       // Check if Stop/StopCollection is found by FeedScopeId
       if (location.stopId != null) {
-        Set<Vertex> transitStopVertices = getStopVerticesById(location.stopId);
-        if (transitStopVertices != null && !transitStopVertices.isEmpty()) {
-          return transitStopVertices;
+        var streetVertices = getStreetVerticesById(location.stopId);
+        if (!streetVertices.isEmpty()) {
+          return streetVertices;
         }
       }
     }
 
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
-      return Set.of(createVertexFromLocation(location, streetMode, endVertex, tempEdges));
+      return Set.of(
+        createVertexFromCoordinate(
+          location.getCoordinate(),
+          location.label,
+          streetMode,
+          endVertex,
+          tempEdges
+        )
+      );
     }
 
     return null;
@@ -227,28 +244,24 @@ public class StreetIndex {
   }
 
   /**
-   * Finds the appropriate vertex for this location.
+   * Create the appropriate vertex for this coordinate.
    *
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
-  public Vertex getVertexForLocationForTest(
-    GenericLocation location,
+  public Vertex createVertexForCoordinateForTest(
+    Coordinate location,
     StreetMode streetMode,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
-    // Check if coordinate is provided and connect it to graph
-    if (location.getCoordinate() == null) {
-      return null;
-    }
-    return createVertexFromLocation(location, streetMode, endVertex, tempEdges);
+    return createVertexFromCoordinate(location, null, streetMode, endVertex, tempEdges);
   }
 
   /**
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
-  private Set<Vertex> getStopVerticesById(FeedScopedId id) {
+  public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
     return stopModel
       .findStopOrChildStops(id)
       .stream()
@@ -256,6 +269,20 @@ public class StreetIndex {
       .map(RegularStop.class::cast)
       .map(it -> transitStopVertices.get(it.getId()))
       .collect(Collectors.toSet());
+  }
+
+  /**
+   * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
+   * coordinate for the stop.
+   * If the id corresponds to a station we will either return the coordinates of the child stops or
+   * the station centroid if the station is configured to route to centroid.
+   */
+  public Set<Vertex> getStreetVerticesById(FeedScopedId id) {
+    var stationVertex = stationCentroidVertices.get(id);
+    if (stationVertex != null) {
+      return Set.of(stationVertex);
+    }
+    return Collections.unmodifiableSet(getStopOrChildStopsVertices(id));
   }
 
   private static void createHalfLocationForTest(
@@ -326,32 +353,33 @@ public class StreetIndex {
     return geometry;
   }
 
-  private Vertex createVertexFromLocation(
-    GenericLocation location,
+  private Vertex createVertexFromCoordinate(
+    Coordinate coordinate,
+    @Nullable String label,
     StreetMode streetMode,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
     if (endVertex) {
-      LOG.debug("Finding end vertex for {}", location);
+      LOG.debug("Creating end vertex for {}", coordinate);
     } else {
-      LOG.debug("Finding start vertex for {}", location);
+      LOG.debug("Creating start vertex for {}", coordinate);
     }
 
     I18NString name;
-    if (location.label == null || location.label.isEmpty()) {
+    if (label == null || label.isEmpty()) {
       if (endVertex) {
         name = new LocalizedString("destination");
       } else {
         name = new LocalizedString("origin");
       }
     } else {
-      name = new NonLocalizedString(location.label);
+      name = new NonLocalizedString(label);
     }
 
     TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
       UUID.randomUUID().toString(),
-      location.getCoordinate(),
+      coordinate,
       name,
       endVertex
     );
@@ -385,7 +413,7 @@ public class StreetIndex {
       temporaryStreetLocation.getIncoming().isEmpty() &&
       temporaryStreetLocation.getOutgoing().isEmpty()
     ) {
-      LOG.warn("Couldn't link {}", location);
+      LOG.warn("Couldn't link {}", coordinate);
     }
 
     temporaryStreetLocation.setWheelchairAccessible(true);
@@ -434,5 +462,15 @@ public class StreetIndex {
       map.put(it.getStop().getId(), it);
     }
     return Map.copyOf(map);
+  }
+
+  private static Map<FeedScopedId, StationCentroidVertex> createStationCentroidVertexMap(
+    Graph graph
+  ) {
+    return graph
+      .getVerticesOfType(StationCentroidVertex.class)
+      .stream()
+      .filter(vertex -> vertex.getStation().shouldRouteToCentroid())
+      .collect(Collectors.toUnmodifiableMap(v -> v.getStation().getId(), v -> v));
   }
 }

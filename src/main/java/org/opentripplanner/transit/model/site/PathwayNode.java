@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -20,13 +19,12 @@ public final class PathwayNode extends StationElement<PathwayNode, PathwayNodeBu
   }
 
   @Override
-  @Nonnull
   public PathwayNodeBuilder copy() {
     return new PathwayNodeBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull PathwayNode other) {
+  public boolean sameAs(PathwayNode other) {
     return super.sameAs(other);
   }
 }

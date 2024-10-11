@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.StringUtils;
@@ -295,7 +294,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
-    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
+      tripId,
+      serviceDate
+    );
     if (
       !isPreviouslyAddedTrip(tripId, pattern, serviceDate) ||
       (
@@ -513,7 +515,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Remove any stop that is not know in the static transit data.
    */
-  @Nonnull
   private List<StopTimeUpdate> removeUnknownStops(TripUpdate tripUpdate, FeedScopedId tripId) {
     return tripUpdate
       .getStopTimeUpdateList()
@@ -948,7 +949,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     boolean cancelledAddedTrip = false;
 
-    final TripPattern pattern = snapshotManager.getRealtimeAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = snapshotManager.getNewTripPatternForModifiedTrip(
+      tripId,
+      serviceDate
+    );
     if (isPreviouslyAddedTrip(tripId, pattern, serviceDate)) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = snapshotManager.resolve(pattern, serviceDate);

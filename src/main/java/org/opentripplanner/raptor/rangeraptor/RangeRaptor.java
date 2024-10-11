@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
+import static java.util.Objects.requireNonNull;
+
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -75,14 +77,14 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
     LifeCycleEventPublisher lifeCyclePublisher,
     RaptorTimers timers
   ) {
-    this.worker = worker;
-    this.transitData = transitData;
-    this.calculator = calculator;
-    this.timers = timers;
-    this.accessPaths = accessPaths;
-    this.minNumberOfRounds = AccessPaths.calculateMaxNumberOfRides(accessPaths);
-    this.roundTracker = roundTracker;
-    this.lifeCycle = lifeCyclePublisher;
+    this.worker = requireNonNull(worker);
+    this.transitData = requireNonNull(transitData);
+    this.calculator = requireNonNull(calculator);
+    this.timers = requireNonNull(timers);
+    this.accessPaths = requireNonNull(accessPaths);
+    this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
+    this.roundTracker = requireNonNull(roundTracker);
+    this.lifeCycle = requireNonNull(lifeCyclePublisher);
   }
 
   public RaptorRouterResult<T> route() {
@@ -111,7 +113,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
         }
       }
     });
-    return worker.results();
+    return worker.result();
   }
 
   /**

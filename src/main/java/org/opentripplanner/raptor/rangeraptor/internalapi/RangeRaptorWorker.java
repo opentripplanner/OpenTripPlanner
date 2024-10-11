@@ -12,7 +12,7 @@ public interface RangeRaptorWorker<T extends RaptorTripSchedule> {
   /**
    * Fetch the result after the search is performed.
    */
-  RaptorRouterResult<T> results();
+  RaptorRouterResult<T> result();
 
   /**
    * Check if the RangeRaptor should continue with a new round.

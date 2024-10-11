@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.vertex;
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -84,7 +83,6 @@ public class TransitStopVertex extends StationElementVertex {
     return this.stop;
   }
 
-  @Nonnull
   @Override
   public StationElement getStationElement() {
     return this.stop;

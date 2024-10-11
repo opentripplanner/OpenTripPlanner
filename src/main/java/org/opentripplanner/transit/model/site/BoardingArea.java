@@ -2,7 +2,6 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -30,7 +29,6 @@ public final class BoardingArea extends StationElement<BoardingArea, BoardingAre
    * if the coordinate is not defined for this boarding area.
    */
   @Override
-  @Nonnull
   public WgsCoordinate getCoordinate() {
     return isCoordinateSet() ? super.getCoordinate() : parentStop.getCoordinate();
   }
@@ -38,19 +36,17 @@ public final class BoardingArea extends StationElement<BoardingArea, BoardingAre
   /**
    * Returns the parent stop this boarding area belongs to.
    */
-  @Nonnull
   public RegularStop getParentStop() {
     return parentStop;
   }
 
   @Override
-  @Nonnull
   public BoardingAreaBuilder copy() {
     return new BoardingAreaBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull BoardingArea other) {
+  public boolean sameAs(BoardingArea other) {
     return super.sameAs(other) && Objects.equals(parentStop, other.parentStop);
   }
 }

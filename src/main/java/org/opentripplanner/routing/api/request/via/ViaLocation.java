@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * coordinates were used as a fallback for when a stop was not found. But in this version, a
  * {@link org.opentripplanner.transit.model.framework.EntityNotFoundException} is thrown if
  * one of the stops does not exist. The search does NOT try to be smart and recover from an
- * entity no found exception.
+ * entity not found exception.
  */
 public interface ViaLocation {
   /**
@@ -41,14 +41,14 @@ public interface ViaLocation {
   boolean isPassThroughLocation();
 
   /**
-   * A list of stop witch can be used as via location together with the {@code coordinates}.A stop
+   * A list of stops which can be used as via location together with the {@code coordinates}. A stop
    * location can be a stop, a station, a multimodal station or a group of stations.
    */
   List<FeedScopedId> stopLocationIds();
 
   /**
-   * Get the one or multiple stop locations. This is optional to implement, an empty
-   * list is returned if this is not available.
+   * A list of coordinates used together with the {@code stopLocationIds} as the via location.
+   * This is optional, an empty list is returned if no coordinates are available.
    */
   default List<WgsCoordinate> coordinates() {
     return List.of();

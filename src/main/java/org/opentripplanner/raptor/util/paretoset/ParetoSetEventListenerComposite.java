@@ -17,8 +17,8 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
   private final List<ParetoSetEventListener<T>> listeners;
 
   /**
-   * Take a list of listeners and return a composite listener. Input listeners witch is {@code null}
-   * is skipped. If no listeners are provided, all listeners are {@code null}, then
+   * Take a list of listeners and return a composite listener. Input listeners, which are {@code null},
+   * are skipped. If no listeners are provided or all listeners are {@code null}, then
    * {@code null} is returned. If just one listener is passed in the listener it-self is returned
    * (without any wrapper). If more than one listener exists, a composite instance is returned.
    */

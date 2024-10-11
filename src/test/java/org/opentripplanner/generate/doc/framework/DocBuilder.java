@@ -99,6 +99,9 @@ public class DocBuilder {
     return endParagraph();
   }
 
+  /**
+   * Adds a JSON snippet which is formatted as a fenced code block.
+   */
   public void addExample(String comment, JsonNode body) {
     buffer.append(TemplateUtil.jsonExample(body, comment));
   }

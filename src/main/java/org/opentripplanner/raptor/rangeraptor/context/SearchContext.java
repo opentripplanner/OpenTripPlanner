@@ -44,7 +44,7 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 /**
- * The search context is used to hold search scoped instances and to pass these to whom ever need
+ * The search context is used to hold search scoped instances and to pass these to whom ever needs
  * them. It is one search-context pr RangeRaptor
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -81,7 +81,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorTransitDataProvider<T> transit,
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
-    @Nullable EgressPaths egressPaths,
+    EgressPaths egressPaths,
     @Nullable IntPredicate acceptC2AtDestination
   ) {
     this.request = request;

@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 
 /**
@@ -29,7 +28,6 @@ public class OsmVertex extends IntersectionVertex {
     this.nodeId = nodeId;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return NO_NAME;

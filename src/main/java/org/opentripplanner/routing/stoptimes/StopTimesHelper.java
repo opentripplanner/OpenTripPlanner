@@ -291,7 +291,7 @@ public class StopTimesHelper {
     TripPattern pattern,
     TransitService transitService
   ) {
-    final TripPattern replacement = transitService.getRealtimeAddedTripPattern(
+    final TripPattern replacement = transitService.getNewTripPatternForModifiedTrip(
       trip.getId(),
       serviceDate
     );

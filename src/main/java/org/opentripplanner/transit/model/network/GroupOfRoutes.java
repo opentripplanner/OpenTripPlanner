@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.model.network;
 
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -34,13 +33,11 @@ public class GroupOfRoutes
     return new GroupOfRoutesBuilder(id);
   }
 
-  @Nonnull
   public String getName() {
     return logName();
   }
 
   @Override
-  @Nonnull
   public String logName() {
     return name;
   }
@@ -66,7 +63,7 @@ public class GroupOfRoutes
   }
 
   @Override
-  public boolean sameAs(@Nonnull GroupOfRoutes other) {
+  public boolean sameAs(GroupOfRoutes other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&

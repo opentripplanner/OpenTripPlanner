@@ -6,7 +6,6 @@ import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.TraverseMode;
@@ -81,7 +80,6 @@ public final class RoutingPreferences implements Serializable {
   /**
    * Preferences for how strict wheel-accessibility settings are
    */
-  @Nonnull
   public WheelchairPreferences wheelchair() {
     return wheelchair;
   }
@@ -108,7 +106,6 @@ public final class RoutingPreferences implements Serializable {
   /**
    * Get rental preferences for the traverse mode. Note, only car, scooter and bike are supported.
    */
-  @Nonnull
   public VehicleRentalPreferences rental(TraverseMode mode) {
     return switch (mode) {
       case BICYCLE -> bike.rental();
@@ -131,7 +128,6 @@ public final class RoutingPreferences implements Serializable {
     };
   }
 
-  @Nonnull
   public ItineraryFilterPreferences itineraryFilter() {
     return itineraryFilter;
   }

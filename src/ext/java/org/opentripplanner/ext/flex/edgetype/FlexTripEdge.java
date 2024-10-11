@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.edgetype;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -92,7 +91,6 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  @Nonnull
   public State[] traverse(State s0) {
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.FLEX);

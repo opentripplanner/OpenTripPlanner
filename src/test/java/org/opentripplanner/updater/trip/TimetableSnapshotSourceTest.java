@@ -19,7 +19,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -251,7 +250,7 @@ public class TimetableSnapshotSourceTest {
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
+      final TripPattern newTripPattern = snapshot.getNewTripPatternForModifiedTrip(
         new FeedScopedId(feedId, modifiedTripId),
         SERVICE_DATE
       );
@@ -282,7 +281,6 @@ public class TimetableSnapshotSourceTest {
     }
   }
 
-  @Nonnull
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
       new TimetableSnapshotSourceParameters(Duration.ZERO, true),

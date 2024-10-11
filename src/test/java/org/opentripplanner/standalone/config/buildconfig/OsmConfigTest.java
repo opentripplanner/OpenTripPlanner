@@ -7,7 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.n
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
+import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 class OsmConfigTest {

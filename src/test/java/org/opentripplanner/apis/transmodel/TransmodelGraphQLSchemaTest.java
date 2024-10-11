@@ -9,7 +9,6 @@ import graphql.schema.idl.SchemaPrinter;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 class TransmodelGraphQLSchemaTest {
@@ -20,8 +19,7 @@ class TransmodelGraphQLSchemaTest {
 
   @Test
   void testSchemaBuild() {
-    GqlUtil gqlUtil = new GqlUtil(ZoneIds.OSLO);
-    var schema = TransmodelGraphQLSchema.create(new RouteRequest(), gqlUtil);
+    var schema = TransmodelGraphQLSchema.create(new RouteRequest(), ZoneIds.OSLO);
     assertNotNull(schema);
 
     String original = readFile(SCHEMA_FILE);
