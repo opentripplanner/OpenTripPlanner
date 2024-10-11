@@ -180,7 +180,7 @@ class AddedTripBuilder {
       }
       route = createRoute(agency);
       isAddedRoute = true;
-      LOG.info("Adding route {} to transitModel.", route);
+      LOG.info("Adding route {} to timetableRepository.", route);
     }
 
     Trip trip = createTrip(route, calServiceId);

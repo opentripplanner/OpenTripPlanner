@@ -8,32 +8,32 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Adjust all scheduled times to match the transit model timezone.
  */
 public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
 
   @Inject
-  public TimeZoneAdjusterModule(TransitModel transitModel) {
-    this.transitModel = transitModel;
+  public TimeZoneAdjusterModule(TimetableRepository timetableRepository) {
+    this.timetableRepository = timetableRepository;
   }
 
   @Override
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = transitModel.getTransitServiceStarts().toInstant();
+    final Instant serviceStart = timetableRepository.getTransitServiceStarts().toInstant();
     var graphOffset = Duration.ofSeconds(
-      transitModel.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
+      timetableRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );
 
     Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
-    transitModel
+    timetableRepository
       .getAllTripPatterns()
       .forEach(pattern -> {
         var timeShift = agencyShift.computeIfAbsent(
@@ -53,8 +53,8 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
           )
           .build();
         // replace the original pattern with the updated pattern in the transit model
-        transitModel.addTripPattern(updatedPattern.getId(), updatedPattern);
+        timetableRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
       });
-    transitModel.index();
+    timetableRepository.index();
   }
 }

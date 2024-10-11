@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 
 public final class TestTransitCaseData {
 
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   public static final Station STATION_A = TEST_MODEL
     .station("A")

@@ -7,7 +7,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class VehicleParkingTestGraphData {
 
@@ -15,13 +15,13 @@ public class VehicleParkingTestGraphData {
 
   protected Graph graph;
 
-  protected TransitModel transitModel;
+  protected TimetableRepository timetableRepository;
 
   public void initGraph() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    timetableRepository = new TimetableRepository(stopModel, deduplicator);
     graph.hasStreets = true;
 
     var factory = new VertexFactory(graph);
@@ -36,8 +36,8 @@ public class VehicleParkingTestGraphData {
     return graph;
   }
 
-  public TransitModel getTransitModel() {
-    return transitModel;
+  public TimetableRepository getTimetableRepository() {
+    return timetableRepository;
   }
 
   public IntersectionVertex getAVertex() {

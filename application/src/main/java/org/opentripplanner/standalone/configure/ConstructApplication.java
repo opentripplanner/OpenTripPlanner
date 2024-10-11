@@ -33,7 +33,7 @@ import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class ConstructApplication {
   ConstructApplication(
     CommandLineParameters cli,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
@@ -90,7 +90,7 @@ public class ConstructApplication {
         .builder()
         .configModel(config)
         .graph(graph)
-        .transitModel(transitModel)
+        .timetableRepository(timetableRepository)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
         .emissionsDataModel(emissionsDataModel)
@@ -125,7 +125,7 @@ public class ConstructApplication {
       buildConfig(),
       graphBuilderDataSources,
       graph(),
-      transitModel(),
+      timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
@@ -156,25 +156,25 @@ public class ConstructApplication {
     enableRequestTraceLogging();
     createMetricsLogging();
 
-    creatTransitLayerForRaptor(transitModel(), routerConfig().transitTuningConfig());
+    creatTransitLayerForRaptor(timetableRepository(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
-      transitModel(),
+      timetableRepository(),
       routerConfig().updaterConfig()
     );
 
     initEllipsoidToGeoidDifference();
 
-    initializeTransferCache(routerConfig().transitTuningConfig(), transitModel());
+    initializeTransferCache(routerConfig().transitTuningConfig(), timetableRepository());
 
     if (OTPFeature.TransmodelGraphQlApi.isOn()) {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
-        transitModel(),
+        timetableRepository(),
         routerConfig().routingRequestDefaults()
       );
     }
@@ -200,25 +200,29 @@ public class ConstructApplication {
    * Create transit layer for Raptor routing. Here we map the scheduled timetables.
    */
   public static void creatTransitLayerForRaptor(
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     TransitTuningParameters tuningParameters
   ) {
-    if (!transitModel.hasTransit() || !transitModel.isIndexed()) {
+    if (!timetableRepository.hasTransit() || !timetableRepository.isIndexed()) {
       LOG.warn(
         "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
       );
     }
     LOG.info("Creating transit layer for Raptor routing.");
-    transitModel.setTransitLayer(TransitLayerMapper.map(tuningParameters, transitModel));
-    transitModel.setRealtimeTransitLayer(new TransitLayer(transitModel.getTransitLayer()));
-    transitModel.setTransitLayerUpdater(
-      new TransitLayerUpdater(new DefaultTransitService(transitModel))
+    timetableRepository.setTransitLayer(
+      TransitLayerMapper.map(tuningParameters, timetableRepository)
+    );
+    timetableRepository.setRealtimeTransitLayer(
+      new TransitLayer(timetableRepository.getTransitLayer())
+    );
+    timetableRepository.setTransitLayerUpdater(
+      new TransitLayerUpdater(new DefaultTransitService(timetableRepository))
     );
   }
 
   public static void initializeTransferCache(
     TransitTuningParameters transitTuningConfig,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     var transferCacheRequests = transitTuningConfig.transferCacheRequests();
     if (!transferCacheRequests.isEmpty()) {
@@ -231,7 +235,7 @@ public class ConstructApplication {
       LOG.info(progress.startMessage());
 
       transferCacheRequests.forEach(request -> {
-        transitModel.getTransitLayer().initTransferCacheForRequest(request);
+        timetableRepository.getTransitLayer().initTransferCacheForRequest(request);
 
         //noinspection Convert2MethodRef
         progress.step(s -> LOG.info(s));
@@ -241,8 +245,8 @@ public class ConstructApplication {
     }
   }
 
-  public TransitModel transitModel() {
-    return factory.transitModel();
+  public TimetableRepository timetableRepository() {
+    return factory.timetableRepository();
   }
 
   public DataImportIssueSummary dataImportIssueSummary() {

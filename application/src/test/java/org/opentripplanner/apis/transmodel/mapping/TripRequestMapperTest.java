@@ -54,25 +54,25 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TripRequestMapperTest implements PlanTestConstants {
 
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
 
   private static final Function<StopLocation, String> STOP_TO_ID = s -> s.getId().toString();
 
-  private static final Route route1 = TransitModelForTest.route("route1").build();
-  private static final Route route2 = TransitModelForTest.route("route2").build();
+  private static final Route route1 = TimetableRepositoryForTest.route("route1").build();
+  private static final Route route2 = TimetableRepositoryForTest.route("route2").build();
 
   private static final RegularStop stop1 = TEST_MODEL.stop("ST:stop1", 1, 1).build();
   private static final RegularStop stop2 = TEST_MODEL.stop("ST:stop2", 2, 1).build();
@@ -96,20 +96,24 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .withRegularStop(stop3)
       .build();
 
-    var transitModel = new TransitModel(stopModel, new Deduplicator());
-    transitModel.initTimeZone(ZoneIds.STOCKHOLM);
+    var timetableRepository = new TimetableRepository(stopModel, new Deduplicator());
+    timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
-      transitModel.addTripPattern(pattern.getId(), pattern);
+      timetableRepository.addTripPattern(pattern.getId(), pattern);
       final int serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
-      transitModel.getServiceCodes().put(pattern.getId(), serviceCode);
+      timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
-    transitModel.index();
-    transitService = new DefaultTransitService(transitModel);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+    timetableRepository.index();
+    transitService = new DefaultTransitService(timetableRepository);
   }
 
   @BeforeEach

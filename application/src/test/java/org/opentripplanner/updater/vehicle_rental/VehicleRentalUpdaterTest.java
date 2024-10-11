@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -45,7 +45,10 @@ class VehicleRentalUpdaterTest {
   static class MockManager extends GraphUpdaterManager {
 
     public MockManager(VehicleRentalUpdater updater) {
-      super(new DefaultRealTimeUpdateContext(new Graph(), new TransitModel()), List.of(updater));
+      super(
+        new DefaultRealTimeUpdateContext(new Graph(), new TimetableRepository()),
+        List.of(updater)
+      );
     }
 
     @Override

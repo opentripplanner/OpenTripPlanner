@@ -20,7 +20,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -31,7 +31,7 @@ class VehicleParkingUpdaterTest {
 
   private DataSource<VehicleParking> dataSource;
   private Graph graph;
-  private TransitModel transitModel;
+  private TimetableRepository timetableRepository;
   private DefaultRealTimeUpdateContext realTimeUpdateContext;
 
   private VehicleParkingUpdater vehicleParkingUpdater;
@@ -42,14 +42,14 @@ class VehicleParkingUpdaterTest {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
     graphData.initGraph();
     graph = graphData.getGraph();
-    transitModel = graphData.getTransitModel();
-    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, transitModel);
+    timetableRepository = graphData.getTimetableRepository();
+    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, timetableRepository);
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
 
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
 
     var parameters = new VehicleParkingUpdaterParameters() {
       @Override
@@ -270,7 +270,11 @@ class VehicleParkingUpdaterTest {
   private void runUpdaterOnce() {
     class GraphUpdaterMock extends GraphUpdaterManager {
 
-      public GraphUpdaterMock(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
+      public GraphUpdaterMock(
+        Graph graph,
+        TimetableRepository timetableRepository,
+        List<GraphUpdater> updaters
+      ) {
         super(realTimeUpdateContext, updaters);
       }
 
@@ -283,7 +287,7 @@ class VehicleParkingUpdaterTest {
 
     var graphUpdaterManager = new GraphUpdaterMock(
       graph,
-      transitModel,
+      timetableRepository,
       List.of(vehicleParkingUpdater)
     );
     graphUpdaterManager.startUpdaters();

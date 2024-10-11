@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class AgencyTest {
 
@@ -21,7 +21,7 @@ class AgencyTest {
   private static final String LANG = "image";
 
   private static final Agency subject = Agency
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withTimezone(TIMEZONE)
@@ -60,7 +60,7 @@ class AgencyTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
     assertFalse(subject.sameAs(subject.copy().withTimezone("CET").build()));

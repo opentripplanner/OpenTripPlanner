@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -13,7 +13,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
@@ -101,7 +101,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   private TripTimes createTripTimesForTest() {
     return ScheduledTripTimes
       .of()
-      .withTrip(TransitModelForTest.trip("Test").build())
+      .withTrip(TimetableRepositoryForTest.trip("Test").build())
       .withDepartureTimes("00:00 02:00")
       .build();
   }
@@ -120,7 +120,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   private static RoutingTripPattern createTripPattern(FeedScopedId id) {
     return TripPattern
       .of(id)
-      .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())
+      .withRoute(TimetableRepositoryForTest.route("1").withMode(TransitMode.BUS).build())
       .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
       .build()
       .getRoutingTripPattern();

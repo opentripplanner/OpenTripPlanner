@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 
@@ -39,12 +39,12 @@ public class TimetableSnapshotTest {
   @BeforeAll
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    TransitModel transitModel = model.transitModel();
+    TimetableRepository timetableRepository = model.timetableRepository();
 
-    feedId = transitModel.getFeedIds().iterator().next();
+    feedId = timetableRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : transitModel.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));

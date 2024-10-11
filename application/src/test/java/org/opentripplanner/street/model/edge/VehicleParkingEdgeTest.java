@@ -14,7 +14,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class VehicleParkingEdgeTest {
 
@@ -133,7 +133,7 @@ class VehicleParkingEdgeTest {
   ) {
     return StreetModelForTest
       .vehicleParking()
-      .id(TransitModelForTest.id("VehicleParking"))
+      .id(TimetableRepositoryForTest.id("VehicleParking"))
       .bicyclePlaces(bicyclePlaces)
       .carPlaces(carPlaces)
       .availability(availability)
@@ -145,7 +145,7 @@ class VehicleParkingEdgeTest {
     String id = "Entrance";
     return builder ->
       builder
-        .entranceId(TransitModelForTest.id(id))
+        .entranceId(TimetableRepositoryForTest.id(id))
         .name(new NonLocalizedString(id))
         .coordinate(new WgsCoordinate(0, 0));
   }

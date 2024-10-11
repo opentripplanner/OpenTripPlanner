@@ -16,11 +16,13 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-class TransitModelTest {
+class TimetableRepositoryTest {
 
   public static final String FAKE_FEED_ID = "FAKE";
   public static final FeedScopedId SAMPLE_TRIP_ID = new FeedScopedId(FAKE_FEED_ID, "1.2");
-  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(TransitModelTest.class);
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(
+    TimetableRepositoryTest.class
+  );
 
   @Test
   void validateTimeZones() {
@@ -28,22 +30,22 @@ class TransitModelTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
     ConstantsForTests.addGtfsToGraph(
       graph,
-      transitModel,
+      timetableRepository,
       ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
     );
 
     // Then time zone should match the one provided in the feed
-    assertEquals("America/New_York", transitModel.getTimeZone().getId());
+    assertEquals("America/New_York", timetableRepository.getTimeZone().getId());
 
     // Then trip times should be same as in input data
-    TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
-    Trip trip = transitModelIndex.getTripForId(SAMPLE_TRIP_ID);
-    Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
+    TimetableRepositoryIndex timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
+    Trip trip = timetableRepositoryIndex.getTripForId(SAMPLE_TRIP_ID);
+    Timetable timetable = timetableRepositoryIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
 
     // Should throw on second bundle, with different agency time zone
@@ -52,7 +54,7 @@ class TransitModelTest {
       () ->
         ConstantsForTests.addGtfsToGraph(
           graph,
-          transitModel,
+          timetableRepository,
           RESOURCE_LOADER.file("kcm_gtfs.zip"),
           new DefaultFareServiceFactory(),
           null
@@ -70,15 +72,15 @@ class TransitModelTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
 
     // Whit explicit time zone
-    transitModel.initTimeZone(ZoneIds.CHICAGO);
+    timetableRepository.initTimeZone(ZoneIds.CHICAGO);
 
     // First GTFS bundle should be added successfully
     ConstantsForTests.addGtfsToGraph(
       graph,
-      transitModel,
+      timetableRepository,
       ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
@@ -87,22 +89,22 @@ class TransitModelTest {
     // Should load second bundle, with different agency time zone
     ConstantsForTests.addGtfsToGraph(
       graph,
-      transitModel,
+      timetableRepository,
       RESOURCE_LOADER.file("kcm_gtfs.zip"),
       new DefaultFareServiceFactory(),
       null
     );
 
-    new TimeZoneAdjusterModule(transitModel).buildGraph();
+    new TimeZoneAdjusterModule(timetableRepository).buildGraph();
 
-    TransitModelIndex transitModelIndex = transitModel.getTransitModelIndex();
+    TimetableRepositoryIndex timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
 
     // Then time zone should match the one provided in the feed
-    assertEquals("America/Chicago", transitModel.getTimeZone().getId());
+    assertEquals("America/Chicago", timetableRepository.getTimeZone().getId());
 
     // Then trip times should be on hour less than in input data
-    Trip trip = transitModelIndex.getTripForId(SAMPLE_TRIP_ID);
-    Timetable timetable = transitModelIndex.getPatternForTrip(trip).getScheduledTimetable();
+    Trip trip = timetableRepositoryIndex.getTripForId(SAMPLE_TRIP_ID);
+    Timetable timetable = timetableRepositoryIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
   }
 }

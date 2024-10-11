@@ -17,15 +17,15 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
 /**
- * This is a replica of public transportation data already present in TransitModel, but rearranged
+ * This is a replica of public transportation data already present in TimetableRepository, but rearranged
  * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
  * by days, retaining only the services actually running on any particular day.
  *
  * TODO RT_AB: this name may reflect usage in R5, where the TransportNetwork encompasses two
  *  sub-aggregates (one for the streets and one for the public transit data). Here, the TransitLayer
- *  seems to just be an indexed and rearranged copy of the main TransitModel instance. TG has
+ *  seems to just be an indexed and rearranged copy of the main TimetableRepository instance. TG has
  *  indicated that "layer" should be restricted in its standard OO meaning, and this class should
- *  really be merged into TransitModel.
+ *  really be merged into TimetableRepository.
  */
 public class TransitLayer {
 

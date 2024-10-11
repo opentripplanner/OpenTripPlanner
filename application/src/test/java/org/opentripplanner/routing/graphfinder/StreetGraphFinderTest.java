@@ -13,7 +13,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -39,7 +39,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          var a = TransitModelForTest.agency("Agency");
+          var a = TimetableRepositoryForTest.agency("Agency");
 
           R1 = route("R1", TransitMode.BUS, a);
           R2 = route("R2", TransitMode.TRAM, a);
@@ -99,7 +99,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP1 =
               TripPattern
-                .of(TransitModelForTest.id("TP1"))
+                .of(TimetableRepositoryForTest.id("TP1"))
                 .withRoute(R1)
                 .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
                 .build()
@@ -107,7 +107,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           tripPattern(
             TP2 =
               TripPattern
-                .of(TransitModelForTest.id("TP2"))
+                .of(TimetableRepositoryForTest.id("TP2"))
                 .withRoute(R2)
                 .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
                 .build()
@@ -116,7 +116,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
       }
     );
 
-    transitService = new DefaultTransitService(otpModel.transitModel());
+    transitService = new DefaultTransitService(otpModel.timetableRepository());
     graphFinder = new StreetGraphFinder(otpModel.graph());
   }
 

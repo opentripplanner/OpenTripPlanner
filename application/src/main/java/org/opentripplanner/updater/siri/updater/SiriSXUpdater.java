@@ -9,7 +9,7 @@ import org.opentripplanner.framework.retry.OtpRetry;
 import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -43,7 +43,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private final SiriHttpLoader siriHttpLoader;
   private final OtpRetry retry;
 
-  public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
+  public SiriSXUpdater(SiriSXUpdaterParameters config, TimetableRepository timetableRepository) {
     super(config);
     // TODO: add options to choose different patch services
     this.url = config.url();
@@ -56,7 +56,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
+    this.transitAlertService = new TransitAlertServiceImpl(timetableRepository);
     this.updateHandler =
       new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, config.earlyStart());
     siriHttpLoader = new SiriHttpLoader(url, config.timeout(), config.requestHeaders());
@@ -120,11 +120,11 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
           //   Such runnables should be illustrated in documentation as e.g. a little box labeled
           //   "change trip ABC123 by making stop 53 late by 2 minutes."
           //   Also clarify how this runnable works without even using the supplied
-          //   (graph, transitModel) parameters. There are multiple TransitAlertServices and they
+          //   (graph, timetableRepository) parameters. There are multiple TransitAlertServices and they
           //   are not versioned along with the Graph, they are attached to updaters.
           //
           // This is submitting a runnable to an executor, but that runnable only writes back to
-          // objects referenced by updateHandler itself, rather than the graph or transitModel
+          // objects referenced by updateHandler itself, rather than the graph or timetableRepository
           // supplied for writing, and apparently with no versioning. This seems like a
           // misinterpretation of the realtime design.
           // If this is an intentional choice to live-patch a single server-wide instance of an

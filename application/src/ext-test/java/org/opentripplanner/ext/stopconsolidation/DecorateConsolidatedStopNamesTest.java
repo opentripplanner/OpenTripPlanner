@@ -5,7 +5,7 @@ import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationMod
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -35,13 +35,13 @@ class DecorateConsolidatedStopNamesTest {
 
   @Test
   void changeNames() {
-    var transitModel = TestStopConsolidationModel.buildTransitModel();
+    var timetableRepository = TestStopConsolidationModel.buildTimetableRepository();
 
     var groups = List.of(new ConsolidatedStopGroup(STOP_C.getId(), List.of(STOP_D.getId())));
     var repo = new DefaultStopConsolidationRepository();
     repo.addGroups(groups);
 
-    var service = new DefaultStopConsolidationService(repo, transitModel);
+    var service = new DefaultStopConsolidationService(repo, timetableRepository);
     var filter = new DecorateConsolidatedStopNames(service);
 
     var itinerary = TestItineraryBuilder

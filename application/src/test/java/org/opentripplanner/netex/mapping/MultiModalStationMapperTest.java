@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.rutebanken.netex.model.StopPlace;
 
 class MultiModalStationMapperTest {
@@ -16,7 +17,9 @@ class MultiModalStationMapperTest {
   @Test
   void testMissingCoordinates() {
     DataImportIssueStore dataIssueStore = new DefaultDataImportIssueStore();
-    FeedScopedIdFactory feedScopeIdFactory = new FeedScopedIdFactory(TransitModelForTest.FEED_ID);
+    FeedScopedIdFactory feedScopeIdFactory = new FeedScopedIdFactory(
+      TimetableRepositoryForTest.FEED_ID
+    );
     MultiModalStationMapper multiModalStationMapper = new MultiModalStationMapper(
       dataIssueStore,
       feedScopeIdFactory

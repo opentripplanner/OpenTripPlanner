@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -22,7 +22,7 @@ class RegularStopTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
   private static final String CODE = "code";
 
@@ -32,12 +32,12 @@ class RegularStopTest {
   private static final String NETEX_SUBMODE_NAME = "submode";
   private static final SubMode NETEX_SUBMODE = SubMode.of(NETEX_SUBMODE_NAME);
   private static final TransitMode VEHICLE_TYPE = TransitMode.BUS;
-  public static final ZoneId TIME_ZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
+  public static final ZoneId TIME_ZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
   private static final RegularStop subject = StopModel
     .of()
-    .regularStop(TransitModelForTest.id(ID))
+    .regularStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)
@@ -86,7 +86,7 @@ class RegularStopTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
@@ -97,7 +97,10 @@ class RegularStopTest {
     assertFalse(subject.sameAs(subject.copy().withVehicleType(TransitMode.TRAM).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().withTimeZone(ZoneId.of(TransitModelForTest.OTHER_TIME_ZONE_ID)).build()
+        subject
+          .copy()
+          .withTimeZone(ZoneId.of(TimetableRepositoryForTest.OTHER_TIME_ZONE_ID))
+          .build()
       )
     );
     assertFalse(subject.sameAs(subject.copy().withPlatformCode("X").build()));

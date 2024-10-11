@@ -44,7 +44,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class ConstantsForTests {
 
@@ -124,7 +124,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(new StopModel(), deduplicator);
+      var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
       // Add street data from OSM
       {
         OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
@@ -137,10 +137,16 @@ public class ConstantsForTests {
       }
       // Add transit data from GTFS
       {
-        addGtfsToGraph(graph, transitModel, PORTLAND_GTFS, new DefaultFareServiceFactory(), "prt");
+        addGtfsToGraph(
+          graph,
+          timetableRepository,
+          PORTLAND_GTFS,
+          new DefaultFareServiceFactory(),
+          "prt"
+        );
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitModel);
+      TestStreetLinkerModule.link(graph, timetableRepository);
 
       // Add elevation data
       if (withElevation) {
@@ -155,10 +161,10 @@ public class ConstantsForTests {
 
       addPortlandVehicleRentals(graph);
 
-      transitModel.index();
-      graph.index(transitModel.getStopModel());
+      timetableRepository.index();
+      graph.index(timetableRepository.getStopModel());
 
-      return new TestOtpModel(graph, transitModel);
+      return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -169,12 +175,12 @@ public class ConstantsForTests {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(stopModel, deduplicator);
+      var timetableRepository = new TimetableRepository(stopModel, deduplicator);
       // Add street data from OSM
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
       osmModule.buildGraph();
-      return new TestOtpModel(graph, transitModel);
+      return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -185,14 +191,14 @@ public class ConstantsForTests {
 
     addGtfsToGraph(
       otpModel.graph(),
-      otpModel.transitModel(),
+      otpModel.timetableRepository(),
       gtfsPath,
       new DefaultFareServiceFactory(),
       null
     );
 
     // Link transit stops to streets
-    TestStreetLinkerModule.link(otpModel.graph(), otpModel.transitModel());
+    TestStreetLinkerModule.link(otpModel.graph(), otpModel.timetableRepository());
 
     return otpModel;
   }
@@ -205,9 +211,9 @@ public class ConstantsForTests {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-    addGtfsToGraph(graph, transitModel, gtfsFile, fareServiceFactory, null);
-    return new TestOtpModel(graph, transitModel);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    addGtfsToGraph(graph, timetableRepository, gtfsFile, fareServiceFactory, null);
+    return new TestOtpModel(graph, timetableRepository);
   }
 
   public static TestOtpModel buildNewMinimalNetexGraph() {
@@ -215,7 +221,7 @@ public class ConstantsForTests {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(stopModel, deduplicator);
+      var timetableRepository = new TimetableRepository(stopModel, deduplicator);
       // Add street data from OSM
       {
         OsmProvider osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
@@ -232,13 +238,13 @@ public class ConstantsForTests {
         var sources = List.of(new ConfiguredDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig));
 
         new NetexConfigure(buildConfig)
-          .createNetexModule(sources, transitModel, graph, DataImportIssueStore.NOOP)
+          .createNetexModule(sources, timetableRepository, graph, DataImportIssueStore.NOOP)
           .buildGraph();
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitModel);
+      TestStreetLinkerModule.link(graph, timetableRepository);
 
-      return new TestOtpModel(graph, transitModel);
+      return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -266,7 +272,7 @@ public class ConstantsForTests {
 
   public static void addGtfsToGraph(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     File file,
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
@@ -276,7 +282,7 @@ public class ConstantsForTests {
 
     var module = new GtfsModule(
       List.of(bundle),
-      transitModel,
+      timetableRepository,
       graph,
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
@@ -285,8 +291,8 @@ public class ConstantsForTests {
 
     module.buildGraph();
 
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {
