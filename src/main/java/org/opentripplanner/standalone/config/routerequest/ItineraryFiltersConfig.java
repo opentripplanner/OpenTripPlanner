@@ -273,7 +273,7 @@ removed from list.
             search window of the transit results.
             
             Depart-at searches are filtered by latest-arrival-time and arrive-by searches are filtered 
-            by earliest-departure-time and .
+            by earliest-departure-time.
             
             Use this configuration to turn this feature off.
             """
