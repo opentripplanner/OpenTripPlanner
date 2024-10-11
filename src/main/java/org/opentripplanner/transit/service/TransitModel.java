@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -406,9 +407,9 @@ public class TransitModel implements Serializable {
     return tripPatternForId.get(id);
   }
 
-  public void addTripOnServiceDate(FeedScopedId id, TripOnServiceDate tripOnServiceDate) {
+  public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
     invalidateIndex();
-    tripOnServiceDates.put(id, tripOnServiceDate);
+    tripOnServiceDates.put(tripOnServiceDate.getId(), tripOnServiceDate);
   }
 
   /**
@@ -442,8 +443,12 @@ public class TransitModel implements Serializable {
     return tripPatternForId.values();
   }
 
-  public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
-    return tripOnServiceDates.values();
+  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId tripOnServiceDateId) {
+    return tripOnServiceDates.get(tripOnServiceDateId);
+  }
+
+  public Collection<TripOnServiceDate> getAllTripsOnServiceDates() {
+    return Collections.unmodifiableCollection(tripOnServiceDates.values());
   }
 
   /**
