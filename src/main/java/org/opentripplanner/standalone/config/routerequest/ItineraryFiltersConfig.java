@@ -266,14 +266,18 @@ removed from list.
         c
           .of("filterDirectFlexBySearchWindow")
           .since(V2_7)
-          .summary("Filter direct flex results by the search window.")
+          .summary(
+            """
+            Filter direct flex results by the search window. The search-window is not used 
+            during flex routing, but we use one end to align it with transit results."""
+          )
           .description(
             """
-            When direct flex is mixed with a transit search in the same request, then the direct flex results are filtered by the
-            search window of the transit results.
+            When direct flex is mixed with a transit search in the same request, then the direct 
+            flex results are filtered by the search window of the transit results.
             
-            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are filtered 
-            by earliest-departure-time.
+            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are 
+            filtered by earliest-departure-time.
             
             Use this configuration to turn this feature off.
             """
