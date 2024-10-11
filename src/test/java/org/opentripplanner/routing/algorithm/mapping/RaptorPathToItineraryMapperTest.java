@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
 
 import java.time.Duration;
@@ -248,6 +249,16 @@ public class RaptorPathToItineraryMapperTest {
     data.withRoutes(TestRoute.route("TransferAtSameStop", 1, 2, 3, 2, 1).withTimetable(timetable));
 
     return data.getRoute(0).getTripSchedule(0);
+  }
+
+  @Test
+  void isSearchWindowAware() {
+    var mapper = getRaptorPathToItineraryMapper();
+
+    var path = createTestTripSchedulePath(getTestTripSchedule())
+      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(100)));
+    var itinerary = mapper.createItinerary(path);
+    assertTrue(itinerary.isSearchWindowAware());
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {

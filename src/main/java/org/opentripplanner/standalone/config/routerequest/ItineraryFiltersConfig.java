@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -260,6 +261,28 @@ removed from list.
             "Useful if you want to exclude those routes which have only a few meters of cycling before parking the bike and taking public transport."
           )
           .asDouble(dft.minBikeParkingDistance())
+      )
+      .withFilterDirectFlexBySearchWindow(
+        c
+          .of("filterDirectFlexBySearchWindow")
+          .since(V2_7)
+          .summary(
+            """
+            Filter direct flex results by the search window. The search-window is not used 
+            during flex routing, but we use one end to align it with transit results."""
+          )
+          .description(
+            """
+            When direct flex is mixed with a transit search in the same request, then the direct 
+            flex results are filtered by the search window of the transit results.
+            
+            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are 
+            filtered by earliest-departure-time.
+            
+            Use this configuration to turn this feature off.
+            """
+          )
+          .asBoolean(true)
       )
       .build();
   }

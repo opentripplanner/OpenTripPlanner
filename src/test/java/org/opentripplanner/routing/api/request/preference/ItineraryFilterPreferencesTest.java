@@ -127,13 +127,20 @@ class ItineraryFilterPreferencesTest {
 
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withGroupSimilarityKeepOne(0.95).build();
-    var same = other.copyOf().withGroupSimilarityKeepOne(GROUP_SIMILARITY_KEEP_ONE).build();
+    var same = other
+      .copyOf()
+      .withGroupSimilarityKeepOne(GROUP_SIMILARITY_KEEP_ONE)
+      .withFilterDirectFlexBySearchWindow(true)
+      .build();
     assertEqualsAndHashCode(subject, other, same);
   }
 
   @Test
   void testToString() {
-    assertEquals("ItineraryFilterPreferences{}", ItineraryFilterPreferences.DEFAULT.toString());
+    assertEquals(
+      "ItineraryFilterPreferences{filterDirectFlexBySearchWindow}",
+      ItineraryFilterPreferences.DEFAULT.toString()
+    );
     assertEquals(
       "ItineraryFilterPreferences{" +
       "accessibilityScore, " +
@@ -147,7 +154,8 @@ class ItineraryFilterPreferencesTest {
       "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
       "parkAndRideDurationRatio: 0.44, " +
       "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0], " +
-      "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t" +
+      "removeTransitWithHigherCostThanBestOnStreetOnly: 30s + 1.30 t, " +
+      "filterDirectFlexBySearchWindow" +
       "}",
       subject.toString()
     );

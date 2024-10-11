@@ -73,6 +73,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private int lastEndTime;
   private int c1 = 0;
   private int c2 = NOT_SET;
+  private boolean isSearchWindowAware = true;
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -199,9 +200,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost = 0;
     StopTime fromStopTime = new StopTime();
     fromStopTime.setStop(lastPlace.stop);
+    fromStopTime.setFlexWindowStart(start);
+    fromStopTime.setFlexWindowEnd(end);
 
     StopTime toStopTime = new StopTime();
     toStopTime.setStop(to.stop);
+    toStopTime.setFlexWindowStart(start);
+    toStopTime.setFlexWindowEnd(end);
 
     Trip trip = trip("1", route("flex").build());
 
@@ -398,6 +403,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
+  public TestItineraryBuilder withIsSearchWindowAware(boolean searchWindowAware) {
+    this.isSearchWindowAware = searchWindowAware;
+    return this;
+  }
+
   public Itinerary egress(int walkDuration) {
     walk(walkDuration, null);
     return build();
@@ -413,7 +423,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   public Itinerary build() {
-    Itinerary itinerary = new Itinerary(legs);
+    Itinerary itinerary;
+    if (isSearchWindowAware) {
+      itinerary = Itinerary.createScheduledTransitItinerary(legs);
+    } else {
+      itinerary = Itinerary.createDirectItinerary(legs);
+    }
     itinerary.setGeneralizedCost(c1);
     if (c2 != NOT_SET) {
       itinerary.setGeneralizedCost2(c2);

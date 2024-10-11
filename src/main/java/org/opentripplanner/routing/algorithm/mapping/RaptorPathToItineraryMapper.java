@@ -140,7 +140,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary mapped = mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.getLegs());
 
-    Itinerary itinerary = new Itinerary(legs);
+    Itinerary itinerary = Itinerary.createScheduledTransitItinerary(legs);
 
     // Map general itinerary fields
     itinerary.setArrivedAtDestinationWithRentedVehicle(
@@ -390,7 +390,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapDirectPath(RaptorPath<T> path) {
-    return new Itinerary(
+    return Itinerary.createScheduledTransitItinerary(
       List.of(
         new UnknownTransitPathLeg(
           mapPlace(request.from()),

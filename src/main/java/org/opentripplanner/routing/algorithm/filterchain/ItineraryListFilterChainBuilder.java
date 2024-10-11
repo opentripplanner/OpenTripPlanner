@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveBi
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveNonTransitItinerariesBasedOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.FlexSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
@@ -89,6 +90,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
   private boolean transitGroupPriorityUsed = false;
+  private boolean filterDirectFlexBySearchWindow = true;
 
   /**
    * Sandbox filters which decorate the itineraries with extra information.
@@ -470,6 +472,13 @@ public class ItineraryListFilterChainBuilder {
         );
       }
 
+      if (earliestDepartureTime != null && filterDirectFlexBySearchWindow) {
+        addRemoveFilter(
+          filters,
+          new FlexSearchWindowFilter(earliestDepartureTime, searchWindow, sortOrder)
+        );
+      }
+
       // Remove itineraries present in the page retrieved before this page/search.
       if (itineraryPageCut != null) {
         addRemoveFilter(
@@ -531,6 +540,11 @@ public class ItineraryListFilterChainBuilder {
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
 
     return new ItineraryListFilterChain(filters, debugHandler);
+  }
+
+  public ItineraryListFilterChainBuilder withFilterDirectFlexBySearchWindow(boolean b) {
+    this.filterDirectFlexBySearchWindow = b;
+    return this;
   }
 
   /**

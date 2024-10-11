@@ -64,12 +64,14 @@ public class Itinerary implements ItinerarySortKey {
   /* other properties */
 
   private final List<SystemNotice> systemNotices = new ArrayList<>();
+  private final boolean searchWindowAware;
   private List<Leg> legs;
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  public Itinerary(List<Leg> legs) {
+  private Itinerary(List<Leg> legs, boolean searchWindowAware) {
     setLegs(legs);
+    this.searchWindowAware = searchWindowAware;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
@@ -85,6 +87,21 @@ public class Itinerary implements ItinerarySortKey {
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
     this.setElevationLost(totals.totalElevationLost);
+  }
+
+  /**
+   * Creates an itinerary that contains scheduled transit which is aware of the search window.
+   */
+  public static Itinerary createScheduledTransitItinerary(List<Leg> legs) {
+    return new Itinerary(legs, true);
+  }
+
+  /**
+   * Creates an itinerary that creates only street or flex results which are not aware of the
+   * time window.
+   */
+  public static Itinerary createDirectItinerary(List<Leg> legs) {
+    return new Itinerary(legs, false);
   }
 
   /**
@@ -162,11 +179,28 @@ public class Itinerary implements ItinerarySortKey {
     return isStreetOnly();
   }
 
+  /**
+   * Returns true if this itinerary has only flex and walking legs.
+   */
+  public boolean isDirectFlex() {
+    var containsFlex = legs.stream().anyMatch(Leg::isFlexibleTrip);
+    var flexOrWalkOnly = legs.stream().allMatch(l -> l.isFlexibleTrip() || l.isWalkingLeg());
+    return containsFlex && flexOrWalkOnly;
+  }
+
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
     return legs
       .stream()
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
+  }
+
+  /**
+   * Returns true if this itinerary was produced by an algorithm that is aware of the search window.
+   * As of 2024 only the itineraries produced by RAPTOR that do that.
+   */
+  public boolean isSearchWindowAware() {
+    return searchWindowAware;
   }
 
   public Leg firstLeg() {
@@ -215,7 +249,7 @@ public class Itinerary implements ItinerarySortKey {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    var newItin = new Itinerary(timeShiftedLegs);
+    var newItin = new Itinerary(timeShiftedLegs, searchWindowAware);
     newItin.setGeneralizedCost(getGeneralizedCost());
     return newItin;
   }
