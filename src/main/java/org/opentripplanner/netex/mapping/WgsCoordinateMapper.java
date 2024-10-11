@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
@@ -21,10 +22,19 @@ class WgsCoordinateMapper {
     }
     LocationStructure loc = point.getLocation();
 
-    // This should not happen
     if (loc.getLongitude() == null || loc.getLatitude() == null) {
-      throw new IllegalArgumentException("Coordinate is not valid: " + loc);
+      if (loc.getPos() == null) {
+        throw new IllegalArgumentException("Coordinate is not valid: " + loc);
+      }
+
+      List<Double> coordinates = loc.getPos().getValue();
+      if (coordinates.size() != 2) {
+        throw new IllegalArgumentException("Coordinate is not valid: " + loc);
+      }
+
+      return new WgsCoordinate(coordinates.get(1), coordinates.get(0));
     }
+
     // Location is safe to process
     return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
   }
