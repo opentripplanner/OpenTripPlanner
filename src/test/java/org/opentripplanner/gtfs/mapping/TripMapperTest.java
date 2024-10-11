@@ -9,7 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -118,17 +122,32 @@ public class TripMapperTest {
     assertTrue(mapper.flexSafeTimePenalties().isEmpty());
   }
 
-  @Test
-  void flexTimePenalty() {
+  @ParameterizedTest
+  @MethodSource("provideOffsetAndFactor")
+  void testFlexFactorAndOffset(
+    Double inputFactor,
+    Double inputOffset,
+    double expectedCoefficient,
+    Duration expectedConstant
+  ) {
     var flexTrip = new Trip();
     flexTrip.setId(new AgencyAndId("1", "1"));
-    flexTrip.setSafeDurationFactor(1.5);
-    flexTrip.setSafeDurationOffset(60d);
+    flexTrip.setSafeDurationFactor(inputFactor);
+    flexTrip.setSafeDurationOffset(inputOffset);
     flexTrip.setRoute(new GtfsTestData().route);
     var mapper = defaultTripMapper();
     var mapped = mapper.map(flexTrip);
     var penalty = mapper.flexSafeTimePenalties().get(mapped);
-    assertEquals(1.5f, penalty.coefficient());
-    assertEquals(Duration.ofHours(1), penalty.constant());
+
+    assertEquals(expectedCoefficient, penalty.coefficient());
+    assertEquals(expectedConstant, penalty.constant());
+  }
+
+  private static Stream<Arguments> provideOffsetAndFactor() {
+    return Stream.of(
+      Arguments.of(1.5d, 60d, 1.5d, Duration.ofHours(1)),
+      Arguments.of(null, 120d, 1d, Duration.ofHours(2)),
+      Arguments.of(1.5d, null, 1.5d, Duration.ZERO)
+    );
   }
 }
