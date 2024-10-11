@@ -4077,7 +4077,7 @@ input PlanPassThroughViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String]
+  stopLocationIds: [String!]
 }
 
 "Wrapper type for different types of preferences related to plan query."
@@ -4175,24 +4175,22 @@ input PlanTransitModesInput {
 
 """
 A via-location is used to specifying a location as an intermediate place the router must
-route through. The via-location must be either a pass-through-location or a
-visit-via-location. An on-board "visit" is only allowed for pass-through-via-locations, while
-the visit-via-location can visit a stop-location or a coordinate and specify a
-minimum-wait-time.
+route through. The via-location is either a pass-through-location or a visit-via-location.
 """
 input PlanViaLocationInput @oneOf {
+  "Board, alight or pass-through(on-board) at the stop location."
   passThrough: PlanPassThroughViaLocationInput
+  "Board or alight at a stop location or visit a coordinate."
   visit: PlanVisitViaLocationInput
 }
 
 """
-A visit-via-location is a physical visit to one of the stops or coordinates listed. An
-on-board visit does not count, the traveler must alight or board at the given stop for
-it to to be accepted. To visit a coordinate, the traveler must walk(bike or drive) to
-the closest point in the street network from a stop and back to another stop to join
-the transit network.
+A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for it to to
+be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+in the street network from a stop and back to another stop to join the transit network.
 
-NOTE! Coordinates are NOT supported jet.
+NOTE! Coordinates are NOT supported yet.
 """
 input PlanVisitViaLocationInput {
   "The label/name of the location. This is pass-through information and is not used in routing."
@@ -4207,7 +4205,7 @@ input PlanVisitViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String]
+  stopLocationIds: [String!]
 }
 
 "What criteria should be used when optimizing a scooter route."
