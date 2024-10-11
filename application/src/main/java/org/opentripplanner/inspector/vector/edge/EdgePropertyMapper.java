@@ -9,6 +9,7 @@ import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -29,8 +30,9 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
   private static List<KeyValue> mapStreetEdge(StreetEdge se) {
     var props = Lists.newArrayList(
-      kv("permission", se.getPermission().toString()),
-      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor()))
+      kv("permission", streetPermissionAsString(se.getPermission())),
+      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
+      kv("noThruTraffic", noThruTrafficAsString(se))
     );
     if (se.hasBogusName()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
@@ -38,5 +40,27 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       props.addFirst(kv("name", se.getName().toString()));
     }
     return props;
+  }
+
+  public static String streetPermissionAsString(StreetTraversalPermission permission) {
+    return (
+      permission == StreetTraversalPermission.ALL
+        ? "PEDESTRIAN_AND_BICYCLE_AND_CAR"
+        : permission.toString()
+    ).replace("_AND_", " ");
+  }
+
+  private static String noThruTrafficAsString(StreetEdge se) {
+    var noThruPermission = StreetTraversalPermission.NONE;
+    if (se.isWalkNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+    if (se.isBicycleNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.BICYCLE);
+    }
+    if (se.isMotorVehicleNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.CAR);
+    }
+    return streetPermissionAsString(noThruPermission);
   }
 }
