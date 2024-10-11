@@ -1,7 +1,7 @@
 export default {
   introspection: {
     type: 'sdl',
-    paths: ['src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'],
+    paths: ['application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'],
   },
   website: {
     template: 'carbon-multi-page',
