@@ -91,7 +91,7 @@ class TransitModelIndex {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
 
-    for (TripOnServiceDate tripOnServiceDate : transitModel.getAllTripOnServiceDates()) {
+    for (TripOnServiceDate tripOnServiceDate : transitModel.getAllTripsOnServiceDates()) {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),

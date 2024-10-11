@@ -569,11 +569,11 @@ public class DefaultTransitService implements TransitEditorService {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       return new CollectionsView<>(
-        transitModel.getAllTripOnServiceDates(),
+        transitModel.getAllTripsOnServiceDates(),
         currentSnapshot.listRealTimeAddedTripOnServiceDate()
       );
     }
-    return Collections.unmodifiableCollection(transitModel.getAllTripOnServiceDates());
+    return transitModel.getAllTripsOnServiceDates();
   }
 
   @Override

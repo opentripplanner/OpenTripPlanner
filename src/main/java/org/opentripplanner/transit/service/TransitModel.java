@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -446,8 +447,8 @@ public class TransitModel implements Serializable {
     return tripOnServiceDates.get(tripOnServiceDateId);
   }
 
-  public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
-    return tripOnServiceDates.values();
+  public Collection<TripOnServiceDate> getAllTripsOnServiceDates() {
+    return Collections.unmodifiableCollection(tripOnServiceDates.values());
   }
 
   /**
