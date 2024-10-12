@@ -35,12 +35,12 @@ class FilePatternArgumentsProvider
   }
 
   private static Stream<Path> resolvePaths(String pattern) {
-    var pathMatcher = FileSystems.getDefault().getPathMatcher("glob:./" + pattern);
+    var pathMatcher = FileSystems.getDefault().getPathMatcher("glob:../" + pattern);
 
     var pathsFound = new ArrayList<Path>();
     try {
       Files.walkFileTree(
-        Paths.get("."),
+        Paths.get(".."),
         new SimpleFileVisitor<>() {
           @Override
           public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {

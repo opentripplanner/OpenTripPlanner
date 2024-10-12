@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface DocsTestConstants {
   Logger LOG = LoggerFactory.getLogger(DocsTestConstants.class);
-  File DOC_ROOT = new File("doc");
+  File DOC_ROOT = new File("../doc");
   File TEMPLATE_PATH = new File(DOC_ROOT, "templates");
   File USER_DOC_PATH = new File(DOC_ROOT, "user");
 
