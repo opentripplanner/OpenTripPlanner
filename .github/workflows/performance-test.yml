@@ -88,17 +88,18 @@ jobs:
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         run: |
-          cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
+          cp application/target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
       - name: Run speed test
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
+        working-directory: application
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           SPEEDTEST_LOCATION: ${{ matrix.location }}
           MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr -Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: |
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=../test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
 
       - name: Archive travel results file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
