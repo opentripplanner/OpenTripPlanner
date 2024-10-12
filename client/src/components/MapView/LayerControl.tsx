@@ -73,7 +73,7 @@ class LayerControl implements IControl {
               const g = groups.get(groupName);
               g?.appendChild(layerDiv);
             } else {
-              const groupDiv = this.buildgGroupDiv(groupName, layerDiv);
+              const groupDiv = this.buildGroupDiv(groupName, layerDiv);
               groups.set(groupName, groupDiv);
               this.container.appendChild(groupDiv);
             }
@@ -84,7 +84,7 @@ class LayerControl implements IControl {
     return this.container;
   }
 
-  private buildgGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
+  private buildGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
     const groupDiv = document.createElement('div');
     groupDiv.className = 'group';
 
