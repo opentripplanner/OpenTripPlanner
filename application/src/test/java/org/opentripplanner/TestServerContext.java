@@ -19,6 +19,7 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeSe
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
@@ -42,7 +43,10 @@ public class TestServerContext {
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
-      new RaptorConfig<>(routerConfig.transitTuningConfig()),
+      new RaptorConfig<>(
+        routerConfig.transitTuningConfig(),
+        RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
+      ),
       graph,
       new DefaultTransitService(transitModel),
       Metrics.globalRegistry,
