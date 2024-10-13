@@ -9,6 +9,7 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.WalkPreferences
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
+import java.util.List;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -63,6 +64,7 @@ public class RouteRequestMapper {
 
     setModes(request.journey(), args.getGraphQLModes(), environment);
 
+    mapViaPoints(request, args.getGraphQLVia());
     return request;
   }
 
@@ -177,5 +179,12 @@ public class RouteRequestMapper {
       coordinate.getGraphQLLatitude(),
       coordinate.getGraphQLLongitude()
     );
+  }
+
+  static void mapViaPoints(
+    RouteRequest request,
+    List<GraphQLTypes.GraphQLPlanViaLocationInput> locations
+  ) {
+    request.setViaLocations(ViaLocationMapper.mapToViaLocations(locations));
   }
 }

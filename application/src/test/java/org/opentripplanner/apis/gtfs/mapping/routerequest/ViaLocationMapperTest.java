@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 
 class ViaLocationMapperTest {
 
@@ -29,7 +30,7 @@ class ViaLocationMapperTest {
     Map<String, Object> input = Map.ofEntries(
       entry(FIELD_VISIT, visitInput(LABEL, MIN_WAIT_TIME, LIST_IDS_INPUT))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = ViaLocationMapper.mapToViaLocations(List.of());
 
     var via = result.getFirst();
 
@@ -43,13 +44,17 @@ class ViaLocationMapperTest {
     );
   }
 
+  private List<GraphQLTypes.GraphQLPlanViaLocationInput> toArgs(Map<String, Object> input) {
+    return new GraphQLTypes.GraphQLQueryTypePlanArgs(Map.of("via", List.of(input))).getGraphQLVia();
+  }
+
   @Test
   void testMapToVisitViaLocationsWithBareMinimum() {
     Map<String, Object> input = Map.of(
       FIELD_VISIT,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = ViaLocationMapper.mapToViaLocations(toArgs(input));
 
     var via = result.getFirst();
 
@@ -61,8 +66,12 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToPassThrough() {
-    Map<String, Object> input = Map.of(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT));
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    final List<GraphQLTypes.GraphQLPlanViaLocationInput> es = List.of(
+      new GraphQLTypes.GraphQLPlanViaLocationInput(
+        Map.of("passThrough", passThroughInput(LABEL, LIST_IDS_INPUT))
+      )
+    );
+    var result = ViaLocationMapper.mapToViaLocations(es);
     var via = result.getFirst();
 
     assertEquals(LABEL, via.label());
@@ -80,7 +89,7 @@ class ViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var result = ViaLocationMapper.mapToViaLocations(List.of(input));
+    var result = ViaLocationMapper.mapToViaLocations(toArgs(input));
     var via = result.getFirst();
 
     assertNull(via.label());
@@ -88,7 +97,11 @@ class ViaLocationMapperTest {
     assertTrue(via.isPassThroughLocation());
   }
 
-  private Map<String, Object> visitInput(String label, Duration minWaitTime, List<String> ids) {
+  private GraphQLTypes.GraphQLPlanVisitViaLocationInput visitInput(
+    String label,
+    Duration minWaitTime,
+    List<String> ids
+  ) {
     var map = new HashMap<String, Object>();
     if (label != null) {
       map.put(FIELD_LABEL, label);
@@ -99,10 +112,10 @@ class ViaLocationMapperTest {
     if (ids != null) {
       map.put(FIELD_STOP_LOCATION_IDS, ids);
     }
-    return map;
+    return new GraphQLTypes.GraphQLPlanVisitViaLocationInput(map);
   }
 
   private Map<String, Object> passThroughInput(String label, List<String> ids) {
-    return visitInput(label, null, ids);
+    return Map.ofEntries(entry(FIELD_LABEL, label), entry(FIELD_STOP_LOCATION_IDS, ids));
   }
 }

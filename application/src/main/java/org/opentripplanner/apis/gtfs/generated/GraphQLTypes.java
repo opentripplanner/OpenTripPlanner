@@ -3419,6 +3419,7 @@ public class GraphQLTypes {
     private GraphQLPlanLabeledLocationInput origin;
     private GraphQLPlanPreferencesInput preferences;
     private java.time.Duration searchWindow;
+    private List<GraphQLPlanViaLocationInput> via;
 
     public GraphQLQueryTypePlanConnectionArgs(Map<String, Object> args) {
       if (args != null) {
@@ -3437,6 +3438,9 @@ public class GraphQLTypes {
         this.preferences =
           new GraphQLPlanPreferencesInput((Map<String, Object>) args.get("preferences"));
         this.searchWindow = (java.time.Duration) args.get("searchWindow");
+        if (args.get("via") != null) {
+          this.via = (List<GraphQLPlanViaLocationInput>) args.get("via");
+        }
       }
     }
 
@@ -3488,6 +3492,10 @@ public class GraphQLTypes {
       return this.searchWindow;
     }
 
+    public List<GraphQLPlanViaLocationInput> getGraphQLVia() {
+      return this.via;
+    }
+
     public void setGraphQLAfter(String after) {
       this.after = after;
     }
@@ -3534,6 +3542,10 @@ public class GraphQLTypes {
 
     public void setGraphQLSearchWindow(java.time.Duration searchWindow) {
       this.searchWindow = searchWindow;
+    }
+
+    public void setGraphQLVia(List<GraphQLPlanViaLocationInput> via) {
+      this.via = via;
     }
   }
 

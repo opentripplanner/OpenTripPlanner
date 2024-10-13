@@ -1609,6 +1609,8 @@ type QueryType {
     number of itineraries in each search.
     """
     searchWindow: Duration
+    "The list of points the journey is required to pass through."
+    via: [PlanViaLocationInput!],
   ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle

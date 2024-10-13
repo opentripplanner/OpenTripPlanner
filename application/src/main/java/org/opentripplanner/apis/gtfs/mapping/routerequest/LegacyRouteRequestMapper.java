@@ -54,7 +54,7 @@ public class LegacyRouteRequestMapper {
     callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
     callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
-    mapViaPoints(request, callWith);
+    mapViaPoints(request, environment);
 
     request.setDateTime(
       environment.getArgument("date"),
@@ -257,12 +257,10 @@ public class LegacyRouteRequestMapper {
     return request;
   }
 
-  static void mapViaPoints(RouteRequest request, CallerWithEnvironment callWith) {
-    callWith.argument(
-      "via",
-      (List<Map<String, Object>> v) ->
-        request.setViaLocations(ViaLocationMapper.mapToViaLocations(v))
-    );
+  static void mapViaPoints(RouteRequest request, DataFetchingEnvironment env) {
+    var args = new GraphQLTypes.GraphQLQueryTypePlanArgs(env.getArguments());
+    var locs = ViaLocationMapper.mapToViaLocations(args.getGraphQLVia());
+    request.setViaLocations(locs);
   }
 
   private static <T> boolean hasArgument(Map<String, T> m, String name) {
