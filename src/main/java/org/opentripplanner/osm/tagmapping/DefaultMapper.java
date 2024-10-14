@@ -65,6 +65,7 @@ class DefaultMapper implements OsmTagMapper {
     props.setProperties("highway=crossing", pedestrianWayProperties);
     props.setProperties("highway=platform", pedestrianWayProperties);
     props.setProperties("public_transport=platform", pedestrianWayProperties);
+    props.setProperties("public_transport=platform;area=yes", pedestrianWayProperties);
     props.setProperties("railway=platform", pedestrianWayProperties);
     props.setProperties("footway=sidewalk;highway=footway", pedestrianWayProperties);
     props.setProperties("mtb:scale=1", pedestrianWayProperties);

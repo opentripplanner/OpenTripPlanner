@@ -91,6 +91,8 @@ class FinlandMapper implements OsmTagMapper {
 
     // No biking on designated footways/sidewalks
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
+    props.setProperties("highway=footway;area=yes", withModes(PEDESTRIAN));
+    //props.setProperties("public_transport=platform;area=yes", withModes(PEDESTRIAN));
     props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN));
 
     // Walking on segregated ways is safer than when cycling and walking happens on the same lane
