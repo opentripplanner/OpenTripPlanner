@@ -1,6 +1,6 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { IControl, Map as WebMap } from 'maplibre-gl';
+import { IControl, Map as WebMap, TypedStyleLayer } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
@@ -46,32 +46,10 @@ class LayerControl implements IControl {
               groupName = meta.group;
             }
 
-            const layerDiv = document.createElement('div');
-            layerDiv.className = 'layer';
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.value = layer.id;
-            input.id = layer.id;
-            input.onchange = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (input.checked) {
-                map.setLayoutProperty(layer.id, 'visibility', 'visible');
-              } else {
-                map.setLayoutProperty(layer.id, 'visibility', 'none');
-              }
-            };
-            input.checked = this.layerVisible(map, layer);
-            input.className = 'layer';
-            const label = document.createElement('label');
-            label.textContent = layer.id;
-            label.htmlFor = layer.id;
-            layerDiv.appendChild(input);
-            layerDiv.appendChild(label);
+            const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
 
             if (groups.has(groupName)) {
-              const g = groups.get(groupName);
-              g?.appendChild(layerDiv);
+              groups.get(groupName)?.appendChild(layerDiv);
             } else {
               const groupDiv = this.buildGroupDiv(groupName, layerDiv);
               groups.set(groupName, groupDiv);
@@ -82,6 +60,32 @@ class LayerControl implements IControl {
     });
 
     return this.container;
+  }
+
+  private buildLayerDiv(layer: TypedStyleLayer, map: WebMap) {
+    const layerDiv = document.createElement('div');
+    layerDiv.className = 'layer';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = layer.id;
+    input.id = layer.id;
+    input.onchange = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (input.checked) {
+        map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      } else {
+        map.setLayoutProperty(layer.id, 'visibility', 'none');
+      }
+    };
+    input.checked = this.layerVisible(map, layer);
+    input.className = 'layer';
+    const label = document.createElement('label');
+    label.textContent = layer.id;
+    label.htmlFor = layer.id;
+    layerDiv.appendChild(input);
+    layerDiv.appendChild(label);
+    return layerDiv;
   }
 
   private buildGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
