@@ -134,7 +134,7 @@ public final class TripPattern
 
     this.scheduledTimetable =
       builder.getScheduledTimetable() != null
-        ? builder.getScheduledTimetable()
+        ? new Timetable(builder.getScheduledTimetable(), this)
         : new Timetable(this);
 
     this.originalTripPattern = builder.getOriginalTripPattern();
@@ -512,7 +512,7 @@ public final class TripPattern
       Objects.equals(this.containsMultipleModes, other.containsMultipleModes) &&
       Objects.equals(this.name, other.name) &&
       Objects.equals(this.stopPattern, other.stopPattern) &&
-      Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
+      this.scheduledTimetable.sameAs(other.scheduledTimetable)
     );
   }
 

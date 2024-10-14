@@ -82,6 +82,17 @@ public class Timetable implements Serializable {
     this.pattern = tt.pattern;
   }
 
+  /**
+   * Copy the timetable with a replaced pattern.
+   * The new pattern should have the same number of stops as the original pattern.
+   */
+  public Timetable(Timetable original, TripPattern newPattern) {
+    pattern = newPattern;
+    tripTimes.addAll(original.tripTimes);
+    frequencyEntries.addAll(original.frequencyEntries);
+    serviceDate = original.serviceDate;
+  }
+
   /** @return the index of TripTimes for this trip ID in this particular Timetable */
   public int getTripIndex(FeedScopedId tripId) {
     int ret = 0;
@@ -492,5 +503,14 @@ public class Timetable implements Serializable {
       // Pattern is created only for real-time updates
       return null;
     }
+  }
+
+  public boolean sameAs(Timetable other) {
+    return (
+      Objects.equals(pattern, other.pattern) &&
+      Objects.equals(tripTimes, other.tripTimes) &&
+      Objects.equals(frequencyEntries, other.frequencyEntries) &&
+      Objects.equals(serviceDate, other.serviceDate)
+    );
   }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.PATTERN;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_A;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_B;
@@ -29,6 +30,7 @@ class StopConsolidationModuleTest {
     var modifiedPattern = transitModel.getTripPatternForId(PATTERN.getId());
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
+    assertTrue(modifiedPattern.getScheduledTimetable().getPattern().sameAs(modifiedPattern));
 
     var modifiedStop = modifiedPattern
       .getRoutingTripPattern()

@@ -68,6 +68,9 @@ class TripPatternTest {
     assertEquals(subject.getHopGeometry(0), copy.getHopGeometry(0));
     assertEquals(subject.getHopGeometry(1), copy.getHopGeometry(1));
     assertEquals(HOP_GEOMETRIES.get(1), copy.getHopGeometry(1));
+
+    // The linked timetable should link back to the new pattern
+    assertSame(copy, copy.getScheduledTimetable().getPattern());
   }
 
   @Test
