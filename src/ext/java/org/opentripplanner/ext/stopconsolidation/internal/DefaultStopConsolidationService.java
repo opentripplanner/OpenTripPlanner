@@ -9,8 +9,13 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -95,7 +100,25 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .flatMap(g -> g.secondaries().stream())
       .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
       .findAny()
-      .map(id -> transitModel.getStopModel().getRegularStop(id));
+      .map(id -> copyStopWithName(stop, transitModel.getStopModel().getRegularStop(id).getName()));
+  }
+
+  @Nonnull
+  private StopLocation copyStopWithName(StopLocation primaryStop, I18NString agencySpecificName) {
+    if (primaryStop instanceof RegularStop) {
+      return ((RegularStop) primaryStop).copy().withName(agencySpecificName).build();
+    }
+
+    if (primaryStop instanceof AreaStop) {
+      return ((AreaStop) primaryStop).copy().withName(agencySpecificName).build();
+    }
+
+    if (primaryStop instanceof GroupStop) {
+      return ((GroupStop) primaryStop).copy().withName(agencySpecificName).build();
+    }
+
+    // should not happen unless new stop types are added
+    throw new IllegalArgumentException("Unknown stop location type: " + primaryStop);
   }
 
   @Override

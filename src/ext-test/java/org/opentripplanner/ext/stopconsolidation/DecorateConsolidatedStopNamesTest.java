@@ -57,7 +57,9 @@ class DecorateConsolidatedStopNamesTest {
 
     var updatedLeg = itinerary.getLegs().getFirst();
     assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
+    assertEquals(STOP_C.getId(), updatedLeg.getFrom().stop.getId());
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
+    assertEquals(STOP_C.getId(), updatedLeg.getTo().stop.getId());
 
     // Check that the fares were carried over
     assertEquals(fpu, updatedLeg.fareProducts());
