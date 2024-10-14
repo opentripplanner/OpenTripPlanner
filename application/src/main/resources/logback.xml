@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+
+  <!-- by default we use the plain log format -->
+  <variable name="format" value="${otp.logging.format:-plain}" />
+
+  <!--
+    This suppresses the meta-log entries about Logback configuration (how Java).
+    This is a stopgap measure.
+    The right solution is to make sure there are no logback.xml files from our dependency libraries on the classpath.
+   -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+  <!-- This will push these level changes onto JUL. Otherwise, JUL defaults to a high threshold
+       for logging and debug log messages will never make it to slf4j. -->
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+  <appender name="plain" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <!-- print out file and line number in parentheses, which Eclipse and IDEA will link -->
+      <pattern>%d{HH:mm:ss.SSS} %level [%thread] %X{correlationId} \(%F:%L\) %msg%n</pattern>
+    </encoder>
+  </appender>
+
+
+  <!-- JSON format in the standard Logstash format understood by many log parsing tools  -->
+  <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <timestamp/>
+        <mdc/>
+        <context/>
+        <logLevel/>
+        <loggerName/>
+        <threadName/>
+        <message/>
+        <logstashMarkers/>
+        <arguments/>
+        <stackTrace/>
+      </providers>
+    </encoder>
+  </appender>
+
+  <!-- Change this to debug to let more messages through. -->
+  <root level="info">
+    <appender-ref ref="${format}" />
+  </root>
+
+  <!-- OTP LOGGERS -->
+
+  <!-- Graph builder data import logs a summary at INFO level and issues at DEBUG level -->
+  <logger name="DATA_IMPORT_ISSUES" level="info" />
+
+  <logger name="org.opentripplanner" level="info"/>
+
+  <logger name="org.opentripplanner.framework.application" level="info"/>
+  <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
+
+
+  <logger name="org.opentripplanner.routing" level="info"/>
+  <logger name="org.opentripplanner.routing.algorithm.transferoptimization" level="info"/>
+
+  <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="info"/>
+
+  <!-- Avoid printing debug messages when walk limits are exceeded -->
+  <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info"/>
+
+  <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="info"/>
+
+  <!-- Avoid printing debug messages about free-flowing vertices -->
+  <logger name="org.opentripplanner.street.model.vertex.IntersectionVertex" level="info"/>
+
+  <!-- Raptor request debug logging - Turn on/off: debug/info -->
+  <logger name="org.opentripplanner.raptor.RaptorService" level="info"/>
+
+  <!-- Turn on/off: debug/info to log OTP request/response -->
+  <logger name="org.opentripplanner.routing.service.DefaultRoutingService" level="info" />
+
+
+  <!-- THIRD PARTY LOGGERS -->
+
+  <logger name="ch.qos.logback" level="warn"/>
+  <logger name="com.amazonaws" level="info"/>
+  <logger name="org.apache.hc" level="info" />
+  <logger name="com.conveyal" level="info"/>
+
+  <!-- Avoid printing info messages about calendars when building graph -->
+  <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
+  <!-- Avoid printing ugly warning message when unable to create websocket connection -->
+  <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="error" />
+  <logger name="com.sun.jersey" level="warn" />
+  <!-- Suppress an inconsequential IOException that is logged at debug level. -->
+  <logger name="org.glassfish.grizzly" level="info" />
+  <!-- Suppress info logs from azure packages -->
+  <logger name="com.azure" level="warn" />
+
+  <!--Log errors in GraphQL data fetchers. This is disabled by default.
+     Set it to "warn" to log these errors.
+  -->
+  <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
+
+  <!-- If you want to debug realtime updates set these loggers to debug -->
+  <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />
+  <logger name="org.opentripplanner.model.Timetable" level="warn" />
+  <logger name="org.opentripplanner.updater.siri.SiriTimetableSnapshotSource" level="warn" />
+  <logger name="org.opentripplanner.updater.siri.TimetableHelper" level="warn" />
+
+  <!-- optional logging configuration to define your own custom logging needs -->
+  <!-- add it to the root of OTP runtime folder -->
+  <include optional="true" file="logback-include-extensions.xml" />
+
+</configuration>

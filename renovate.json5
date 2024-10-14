@@ -147,9 +147,18 @@
     {
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackagePrefixes": [
-        "com.google.dagger:"
+        "com.google.dagger:",
+        "com.fasterxml.jackson"
       ],
       "minimumReleaseAge": "1 week"
+    },
+    {
+      "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
+      "matchPackagePrefixes": [
+        "org.geotools:"
+      ],
+      "minimumReleaseAge": "1 week",
+      "labels": ["skip changelog", "bump serialization id"]
     }
   ],
   "timezone": "Europe/Berlin"
