@@ -86,7 +86,7 @@ public class TimetableSnapshot {
    * A real-time timetable overrides the scheduled timetable of a TripPattern for only a single
    * service date. There can be only one overriding timetable per TripPattern and per service date.
    * This is enforced by indexing the map with a pair (TripPattern, service date).
-   * This field will be set to null when the TimetableSnapshot becomes read-only.
+   * This map is cleared when the TimetableSnapshot becomes read-only.
    */
   private final Map<TripPatternAndServiceDate, Timetable> dirtyTimetables = new HashMap<>();
 

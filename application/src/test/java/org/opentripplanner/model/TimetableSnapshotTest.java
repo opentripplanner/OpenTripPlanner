@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -20,19 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -296,18 +296,23 @@ public class TimetableSnapshotTest {
     snapshot.update(realTimeTripUpdate);
     assertTrue(snapshot.isDirty());
 
+    AtomicBoolean updateIsCalled = new AtomicBoolean();
+
     TransitLayerUpdater transitLayer = new TransitLayerUpdater(null) {
       @Override
       public void update(
         Collection<Timetable> updatedTimetables,
         Map<TripPattern, SortedSet<Timetable>> timetables
       ) {
-        assertEquals(1, updatedTimetables.size());
-        assertEquals(1, timetables.size());
+        updateIsCalled.set(true);
+        assertThat(updatedTimetables).hasSize(1);
+        assertThat(timetables).hasSize(1);
       }
     };
 
     snapshot.commit(transitLayer, true);
+
+    assertTrue(updateIsCalled.get());
   }
 
   @Test
