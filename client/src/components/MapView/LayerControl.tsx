@@ -48,7 +48,7 @@ class LayerControl implements IControl {
 
             const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
 
-            if (groups.hasOwnProperty(groupName)) {
+            if (groups[groupName]) {
               groups[groupName]?.appendChild(layerDiv);
             } else {
               const groupDiv = this.buildGroupDiv(groupName, layerDiv);
