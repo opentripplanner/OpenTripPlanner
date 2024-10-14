@@ -94,8 +94,7 @@ class LayerControl implements IControl {
 
     const groupInput = document.createElement('input');
     groupInput.onchange = () => {
-      groupDiv.querySelectorAll('input.layer').forEach((i) => {
-        const input = i as HTMLInputElement;
+      groupDiv.querySelectorAll<HTMLInputElement>('input.layer').forEach((input) => {
         input.checked = groupInput.checked;
         const event = new Event('change');
         input.dispatchEvent(event);
