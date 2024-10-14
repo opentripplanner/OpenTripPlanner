@@ -26,7 +26,7 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * @see OsmTagMapper
  * @see DefaultMapper
  */
-class NorwayMapper implements OsmTagMapper {
+class NorwayMapper extends DefaultMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -621,7 +621,7 @@ class NorwayMapper implements OsmTagMapper {
     props.defaultCarSpeed = 22.22f; // 80 km/h
     props.maxPossibleCarSpeed = 30.56f; // 110 km/h
 
-    new DefaultMapper().populateNotesAndNames(props);
+    super.populateNotesAndNames(props);
 
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("cutting=*"), true);
