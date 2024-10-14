@@ -1,6 +1,6 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { IControl, Map as WebMap, TypedStyleLayer } from 'maplibre-gl';
+import { IControl, Map, TypedStyleLayer } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
@@ -15,7 +15,7 @@ type LayerControlProps = {
 class LayerControl implements IControl {
   private readonly container: HTMLDivElement = document.createElement('div');
 
-  onAdd(map: WebMap) {
+  onAdd(map: Map) {
     this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
 
     map.on('load', () => {
@@ -28,7 +28,7 @@ class LayerControl implements IControl {
       title.textContent = 'Debug layers';
       this.container.appendChild(title);
 
-      const groups: Map<string, HTMLDivElement> = new Map<string, HTMLDivElement>();
+      const groups: Record<string, HTMLDivElement> = {};
       map
         .getLayersOrder()
         .map((l) => map.getLayer(l))
@@ -48,11 +48,11 @@ class LayerControl implements IControl {
 
             const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
 
-            if (groups.has(groupName)) {
-              groups.get(groupName)?.appendChild(layerDiv);
+            if (groups.hasOwnProperty(groupName)) {
+              groups[groupName]?.appendChild(layerDiv);
             } else {
               const groupDiv = this.buildGroupDiv(groupName, layerDiv);
-              groups.set(groupName, groupDiv);
+              groups[groupName] = groupDiv;
               this.container.appendChild(groupDiv);
             }
           }
@@ -62,7 +62,7 @@ class LayerControl implements IControl {
     return this.container;
   }
 
-  private buildLayerDiv(layer: TypedStyleLayer, map: WebMap) {
+  private buildLayerDiv(layer: TypedStyleLayer, map: Map) {
     const layerDiv = document.createElement('div');
     layerDiv.className = 'layer';
     const input = document.createElement('input');
@@ -115,7 +115,7 @@ class LayerControl implements IControl {
     return groupDiv;
   }
 
-  private layerVisible(map: WebMap, layer: { id: string }) {
+  private layerVisible(map: Map, layer: { id: string }) {
     return map.getLayoutProperty(layer.id, 'visibility') !== 'none';
   }
 
