@@ -98,7 +98,7 @@ class LayerControl implements IControl {
         const input = i as HTMLInputElement;
         input.checked = groupInput.checked;
         const event = new Event('change');
-        i.dispatchEvent(event);
+        input.dispatchEvent(event);
       });
     };
     groupInput.type = 'checkbox';
