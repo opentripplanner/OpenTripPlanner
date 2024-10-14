@@ -4,10 +4,12 @@ import markerFlagStart from '../../static/img/marker-flag-start-shadowed.png';
 import markerFlagEnd from '../../static/img/marker-flag-end-shadowed.png';
 
 export function NavigationMarkers({
+  setCursor,
   tripQueryVariables,
   setTripQueryVariables,
   loading,
 }: {
+  setCursor: (cursor: string) => void;
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   loading: boolean;
@@ -19,7 +21,9 @@ export function NavigationMarkers({
           draggable
           latitude={tripQueryVariables.from.coordinates?.latitude}
           longitude={tripQueryVariables.from.coordinates?.longitude}
+          onDragStart={() => setCursor('grabbing')}
           onDragEnd={(e) => {
+            setCursor('auto');
             if (!loading) {
               setTripQueryVariables({
                 ...tripQueryVariables,
@@ -37,7 +41,9 @@ export function NavigationMarkers({
           draggable
           latitude={tripQueryVariables.to.coordinates?.latitude}
           longitude={tripQueryVariables.to.coordinates?.longitude}
+          onDragStart={() => setCursor('grabbing')}
           onDragEnd={(e) => {
+            setCursor('auto');
             if (!loading) {
               setTripQueryVariables({
                 ...tripQueryVariables,

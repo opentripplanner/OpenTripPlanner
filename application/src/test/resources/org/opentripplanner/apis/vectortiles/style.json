@@ -1,0 +1,334 @@
+{
+  "name" : "OTP Debug Tiles",
+  "sources" : {
+    "background" : {
+      "id" : "background",
+      "tiles" : [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      ],
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© OpenStreetMap Contributors",
+      "type" : "raster"
+    },
+    "vectorSource" : {
+      "id" : "vectorSource",
+      "url" : "https://example.com",
+      "type" : "vector"
+    }
+  },
+  "layers" : [
+    {
+      "id" : "background",
+      "type" : "raster",
+      "source" : "background",
+      "minzoom" : 0
+    },
+    {
+      "id" : "edge",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#f21d52",
+        "line-width" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.5
+            ],
+            [
+              23,
+              10.0
+            ]
+          ]
+        },
+        "line-offset" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.3
+            ],
+            [
+              23,
+              6.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "edge-name",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line",
+        "symbol-spacing" : 500,
+        "text-field" : "{name}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : {
+          "base" : 14.0,
+          "stops" : [
+            [
+              14,
+              12.0
+            ],
+            [
+              20,
+              14.0
+            ]
+          ]
+        },
+        "text-max-width" : 5,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "link",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#22DD9E",
+        "line-width" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.5
+            ],
+            [
+              23,
+              10.0
+            ]
+          ]
+        },
+        "line-offset" : {
+          "base" : 1.3,
+          "stops" : [
+            [
+              13,
+              0.3
+            ],
+            [
+              23,
+              6.0
+            ]
+          ]
+        }
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetTransitStopLink",
+        "StreetTransitEntranceLink",
+        "BoardingLocationToStopLink",
+        "StreetVehicleRentalLink",
+        "StreetVehicleParkingLink",
+        "StreetStationCentroidLink"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 15,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              15,
+              0.2
+            ],
+            [
+              23,
+              3.0
+            ]
+          ]
+        },
+        "circle-radius" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              15,
+              1.0
+            ],
+            [
+              23,
+              7.0
+            ]
+          ]
+        },
+        "circle-color" : "#BC55F2"
+      },
+      "layout" : {
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "parking-vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              15,
+              0.2
+            ],
+            [
+              23,
+              3.0
+            ]
+          ]
+        },
+        "circle-radius" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              13,
+              1.4
+            ],
+            [
+              23,
+              10.0
+            ]
+          ]
+        },
+        "circle-color" : "#136b04"
+      },
+      "filter" : [
+        "in",
+        "class",
+        "VehicleParkingEntranceVertex"
+      ],
+      "layout" : {
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "area-stop",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#22DD9E",
+        "fill-opacity" : 0.5,
+        "fill-outline-color" : "#140d0e"
+      }
+    },
+    {
+      "id" : "group-stop",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#22DD9E",
+        "fill-opacity" : 0.5,
+        "fill-outline-color" : "#140d0e"
+      }
+    },
+    {
+      "id" : "regular-stop",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 10,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              11,
+              0.5
+            ],
+            [
+              23,
+              5.0
+            ]
+          ]
+        },
+        "circle-radius" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              11,
+              0.5
+            ],
+            [
+              23,
+              10.0
+            ]
+          ]
+        },
+        "circle-color" : "#fcf9fa"
+      }
+    }
+  ],
+  "version" : 8,
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
+}
