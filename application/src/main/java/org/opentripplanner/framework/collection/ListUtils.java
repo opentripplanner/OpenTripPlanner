@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 
 public class ListUtils {
 
@@ -75,7 +76,7 @@ public class ListUtils {
    * {@code null} an empty collection is returned. If not the {@link List#copyOf(Collection)} is
    * called.
    */
-  public static <T> List<T> nullSafeImmutableList(Collection<T> c) {
+  public static <T> List<T> nullSafeImmutableList(@Nullable Collection<T> c) {
     return (c == null) ? List.of() : List.copyOf(c);
   }
 }

@@ -26,6 +26,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanViaLocationInput;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -37,6 +38,8 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -46,7 +49,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var transitModel = new TransitModel();
+    var testModel = TransitModelForTest.of();
+    var stopModelBuilder = testModel
+      .stopModelBuilder()
+      .withRegularStop(testModel.stop("stop1").build());
+    var transitModel = new TransitModel(stopModelBuilder.build(), new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(transitModel);
     context =
@@ -242,7 +249,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   @Test
   void transferSlack() {
-    var seconds = 119L;
+    var seconds = 119;
     Map<String, Object> arguments = Map.of("minTransferTime", seconds);
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
@@ -253,6 +260,28 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
     assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
+  }
+
+  @Test
+  void passThroughPoints() {
+    Map<String, Object> arguments = Map.of(
+      "via",
+      List.of(
+        new GraphQLPlanViaLocationInput(Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label")))
+      )
+    );
+
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
+    assertEquals(
+      "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
+      routeRequest.getViaLocations().toString()
+    );
+
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertEquals(List.of(), noParamsReq.getViaLocations());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
