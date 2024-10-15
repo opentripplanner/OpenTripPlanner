@@ -219,8 +219,8 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags indoor(String value) {
-    var way = new OSMWithTags();
+  public static OsmWithTags indoor(String value) {
+    var way = new OsmWithTags();
     way.addTag("indoor", value);
     return way;
   }
