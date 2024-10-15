@@ -14,7 +14,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 Certain settings can be provided on the command line, when starting OpenTripPlanner. See
 the `CommandLineParameters` class
-for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
+for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
 .
 
 ## Routing defaults
@@ -355,7 +355,7 @@ The provided array of durations is used to increase the search-window for the ne
 The search window is expanded when the current page return few options. If ZERO result is returned
 the first duration in the list is used, if ONE result is returned then the second duration is used
 and so on. The duration is added to the existing search-window and inserted into the next and
-previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
+previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
 for more info."
 
 
