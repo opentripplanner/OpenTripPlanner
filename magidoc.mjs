@@ -1,7 +1,7 @@
 export default {
   introspection: {
     type: 'sdl',
-    paths: ['src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'],
+    paths: ['application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'],
   },
   website: {
     template: 'carbon-multi-page',
@@ -9,6 +9,7 @@ export default {
     options: {
       siteRoot: '/api/dev-2.x/graphql-gtfs',
       appLogo: 'https://docs.opentripplanner.org/en/dev-2.x/images/otp-logo.svg',
+      customStyles: ['https://docs.opentripplanner.org/en/dev-2.x/css/magidoc-overrides.css'],
       pages: [{
         title: 'Introduction',
         content: `
