@@ -24,9 +24,9 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  *
  * @author seime
  * @see OsmTagMapper
- * @see DefaultMapper
+ * @see OsmTagMapper
  */
-class NorwayMapper extends DefaultMapper {
+class NorwayMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {

@@ -9,7 +9,7 @@ import org.opentripplanner.osm.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.GreaterThan;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 
-class PortlandMapper extends DefaultMapper {
+class PortlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {

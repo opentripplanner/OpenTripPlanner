@@ -13,10 +13,9 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author demory
  * @see OsmTagMapper
- * @see DefaultMapper
  */
 
-class AtlantaMapper extends DefaultMapper {
+class AtlantaMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {

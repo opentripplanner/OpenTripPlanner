@@ -14,7 +14,7 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
  * 1. In Houston we want to disallow usage of downtown pedestrian tunnel system.
  */
 
-class HoustonMapper extends DefaultMapper {
+class HoustonMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
