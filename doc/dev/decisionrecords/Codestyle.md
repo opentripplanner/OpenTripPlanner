@@ -115,30 +115,29 @@ The provided formatter will group class members in this order:
 2. Overridden methods are kept together
 3. Dependent methods are sorted in a breadth-first order.
 4. Members are sorted like this:
-    1. `static` `final` fields
-    2. `static` fields
-    3. `static` initializer
-    4. `final` fields
-    5. fields
-    6. class initializer (avoid using it)
-    7. Constructor
-    8. `static` methods
-    9. `static` getter and setters
-    10. methods
-    11. getter and setters
-    12. enums
-    13. interfaces
-    14. `static` classes
-    15. classes
-5. Each section of members are sorted by visibility:
-    1. ´public´
-    2. package private
-    3. ´protected´
-    4. ´private´
+    1. `static` `final` fields (constants)
+    2. `static` fields (avoid)
+    3. instance fields
+    4. static initializer
+    5. class initializer
+    6. constructor
+    7. `static` factory methods
+    8. `public` methods
+    9. getter and setters
+    8. `private`/package methods
+    10. `private` enums (avoid `public`)
+    11. interfaces
+    12. `private static` classes (avoid `public`)
+    13. instance classes (avoid)
 
 ### JavaDoc Guidlines
 
-What to put in Javadoc:
+As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new
+methods, classes, and fields should include comments explaining what they are for and any other
+pertinent information. For Java code, the comments should follow industry standards. It is best to
+provide comments that not only explain *what* you did but also *why you did it* while providing some
+context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
+`@param` annotations with no description.
 
 - On methods:
     - Side effects on instance state (is it a pure function)

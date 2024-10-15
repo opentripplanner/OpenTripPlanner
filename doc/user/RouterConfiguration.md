@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Router configuration
@@ -777,12 +777,6 @@ Used to group requests when monitoring OTP.
         "X-Bikely-Token" : "${BIKELY_TOKEN}",
         "Authorization" : "${BIKELY_AUTHORIZATION}"
       }
-    },
-    {
-      "type" : "vehicle-parking",
-      "feedId" : "noi",
-      "sourceType" : "noi-open-data-hub",
-      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
     },
     {
       "type" : "stop-time-updater",

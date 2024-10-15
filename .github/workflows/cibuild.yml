@@ -108,7 +108,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: Install Python dependencies
-        run: pip install -r doc/user/requirements.txt
+        run: pip install --break-system-packages -r doc/user/requirements.txt
         
 
       - name: Build main documentation
@@ -121,7 +121,7 @@ jobs:
 
       - name: Build GTFS GraphQL API documentation
         run: |
-          npm install -g @magidoc/cli@6.0.0
+          npm install -g @magidoc/cli@6.1.0
           magidoc generate --stacktrace
 
       - name: Deploy compiled HTML to Github pages
@@ -154,7 +154,7 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls`
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls`
           echo "schema modified at ${SCHEMA_FILE_MODIFIED}"
           git checkout $LOCAL_BRANCH
           DOCS_MODIFIED=`git log -n 1 --pretty=format:%ct api/dev-2.x/graphql-gtfs/introduction.html`
@@ -181,7 +181,7 @@ jobs:
         with:
           node-version: 16
       - name: Run code generator
-        working-directory: src/main/java/org/opentripplanner/apis/gtfs/generated
+        working-directory: application/src/main/java/org/opentripplanner/apis/gtfs/generated
         run: |
           yarn install
           yarn generate

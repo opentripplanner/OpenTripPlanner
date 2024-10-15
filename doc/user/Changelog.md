@@ -3,6 +3,21 @@
 The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
+## 2.7.0-SNAPSHOT (under development)
+
+- Extra leg when transferring at the same stop [#5984](https://github.com/opentripplanner/OpenTripPlanner/pull/5984)
+- Filter vector tiles stops by current service week [#6003](https://github.com/opentripplanner/OpenTripPlanner/pull/6003)
+- Add a matcher API for filters in the transit service used for datedServiceJourneyQuery [#5713](https://github.com/opentripplanner/OpenTripPlanner/pull/5713)
+- Refetch transit leg with a leg query of GTFS GraphQL API [#6045](https://github.com/opentripplanner/OpenTripPlanner/pull/6045)
+- Remove deprecated support for GTFS flex stop areas [#6074](https://github.com/opentripplanner/OpenTripPlanner/pull/6074)
+- Don't use elevation data directly for ways with cutting=*, location=underground or indoor=yes tags in the default mapper [#6093](https://github.com/opentripplanner/OpenTripPlanner/pull/6093)
+- Un-deprecate GTFS API's `planConnection`, deprecate `plan` [#6110](https://github.com/opentripplanner/OpenTripPlanner/pull/6110)
+- Support for routing to Station centroid instead of child stops [#6047](https://github.com/opentripplanner/OpenTripPlanner/pull/6047)
+- Add via to the Transmodel trip query and make a proper Raptor implementation for it [#6084](https://github.com/opentripplanner/OpenTripPlanner/pull/6084)
+- Fix GTFS-Flex duration offset and factor parsing when only one of them is set [#6138](https://github.com/opentripplanner/OpenTripPlanner/pull/6138)
+- Fix arrive by filtering for on-street/flex itineraries [#6050](https://github.com/opentripplanner/OpenTripPlanner/pull/6050)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
 ## 2.6.0 (2024-09-18)
 
 ### Notable Changes

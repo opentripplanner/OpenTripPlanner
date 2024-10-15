@@ -13,6 +13,7 @@ export function LocationInputField({ location, id, label }: { location: Location
         id={id}
         size="sm"
         placeholder="[Click in map]"
+        className="input-medium"
         // Intentionally empty for now, but needed because of
         // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
         onChange={() => {}}
