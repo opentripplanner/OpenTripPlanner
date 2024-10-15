@@ -1,9 +1,8 @@
-import { Button, Spinner } from 'react-bootstrap';
+import { Button, ButtonGroup, Spinner } from 'react-bootstrap';
 import { ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
 import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';
-import { TimeInputField } from './TimeInputField.tsx';
-import { DateInputField } from './DateInputField.tsx';
+import { DateTimeInputField } from './DateTimeInputField.tsx';
 import { SearchWindowInput } from './SearchWindowInput.tsx';
 import { AccessSelect } from './AccessSelect.tsx';
 import { EgressSelect } from './EgressSelect.tsx';
@@ -16,6 +15,7 @@ import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
 import { useRef, useState } from 'react';
 import logo from '../../static/img/otp-logo.svg';
 import GraphiQLRouteButton from './GraphiQLRouteButton.tsx';
+import WheelchairAccessibleCheckBox from './WheelchairAccessibleCheckBox.tsx';
 
 type SearchBarProps = {
   onRoute: () => void;
@@ -40,8 +40,7 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
       <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
       <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />
       <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-      <TimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-      <DateInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+      <DateTimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <AccessSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
@@ -52,17 +51,24 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
         tripQueryVariables={tripQueryVariables}
         setTripQueryVariables={setTripQueryVariables}
       />
+      <WheelchairAccessibleCheckBox
+        tripQueryVariables={tripQueryVariables}
+        setTripQueryVariables={setTripQueryVariables}
+      />
+
       <div className="search-bar-route-button-wrapper">
-        <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
-          {loading && (
-            <>
-              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
-            </>
-          )}
-          Route
-        </Button>
+        <ButtonGroup>
+          <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
+            {loading && (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
+              </>
+            )}
+            Route
+          </Button>
+          <GraphiQLRouteButton tripQueryVariables={tripQueryVariables}></GraphiQLRouteButton>
+        </ButtonGroup>
       </div>
-      <GraphiQLRouteButton tripQueryVariables={tripQueryVariables}></GraphiQLRouteButton>
     </div>
   );
 }

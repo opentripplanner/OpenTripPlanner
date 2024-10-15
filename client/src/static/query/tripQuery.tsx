@@ -11,6 +11,7 @@ export const query = graphql(`
     $searchWindow: Int
     $modes: Modes
     $itineraryFiltersDebug: ItineraryFilterDebugProfile
+    $wheelchairAccessible: Boolean
     $pageCursor: String
   ) {
     trip(
@@ -22,6 +23,7 @@ export const query = graphql(`
       searchWindow: $searchWindow
       modes: $modes
       itineraryFilters: { debug: $itineraryFiltersDebug }
+      wheelchairAccessible: $wheelchairAccessible
       pageCursor: $pageCursor
     ) {
       previousPageCursor
@@ -64,6 +66,9 @@ export const query = graphql(`
             publicCode
             name
             id
+            presentation {
+              colour
+            }
           }
           authority {
             name

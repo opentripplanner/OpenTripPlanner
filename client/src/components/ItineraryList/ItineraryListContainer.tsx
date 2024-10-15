@@ -5,6 +5,8 @@ import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
 import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
 import { ItineraryDetails } from './ItineraryDetails.tsx';
 import { ItineraryPaginationControl } from './ItineraryPaginationControl.tsx';
+import { useContext } from 'react';
+import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 
 export function ItineraryListContainer({
   tripQueryResult,
@@ -21,6 +23,7 @@ export function ItineraryListContainer({
 }) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
+  const timeZone = useContext(TimeZoneContext);
 
   return (
     <section className="itinerary-list-container below-content" ref={containerRef}>
@@ -56,6 +59,9 @@ export function ItineraryListContainer({
             </Accordion.Item>
           ))}
       </Accordion>
+      <div className="time-zone-info">
+        All times in <code>{timeZone}</code>
+      </div>
     </section>
   );
 }
