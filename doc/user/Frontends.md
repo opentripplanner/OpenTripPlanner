@@ -19,7 +19,7 @@ On the other hand, **production frontends** are intended to be a component of la
 The main OpenTripPlanner repository currently contains two debug web frontends: 
 
 - new one currently under development at [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
-- the classic one in [`/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/application/src/client/classic-debug) 
+- the classic one in [`/application/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/application/src/client/classic-debug) 
 
 The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
 Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).

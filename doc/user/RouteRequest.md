@@ -964,7 +964,7 @@ The defaults should work fine, but if you have results with short wait-times dom
 option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
 
-For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
 package documentation.
 
 
