@@ -14,13 +14,7 @@ public class OsmWay extends OsmWithTags {
     "backward",
     "reversible"
   );
-  
-  private static final Set<String> INDOOR_AREA_VALUES = Set.of(
-    "room",
-    "corridor",
-    "area"
-  );
-  
+
   private final TLongList nodes = new TLongArrayList();
 
   public void addNodeRef(long nodeRef) {
@@ -149,18 +143,18 @@ public class OsmWay extends OsmWithTags {
    *
    * An area can be specified as such, or be one by default as an amenity.
    */
-  public boolean isAreaWay() {
+  public boolean isRoutableArea() {
     return (
       !isTag("area", "no") &&
       (
-        isTag("area", "yes") || isParking() || isBikeParking() || isBoardingArea() || isIndoorArea()
+        isTag("area", "yes") ||
+        isParking() ||
+        isBikeParking() ||
+        isBoardingArea() ||
+        isIndoorRoutable()
       ) &&
       getNodeRefs().size() > 2
     );
-  }
-
-  public boolean isIndoorArea() {
-    return isOneOfTags("indoor", INDOOR_AREA_VALUES);
   }
 
   /**

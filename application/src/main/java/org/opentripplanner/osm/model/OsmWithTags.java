@@ -44,11 +44,8 @@ public class OsmWithTags {
     "bus_guideway",
     "escape"
   );
-  
-  private static final Set<String> INDOOR_ROUTABLE_VALUES = Set.of(
-    "corridor",
-    "area"
-  );
+
+  private static final Set<String> INDOOR_ROUTABLE_VALUES = Set.of("corridor", "area");
 
   private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
   private static final Set<String> DEFAULT_LEVEL = Set.of("0");
