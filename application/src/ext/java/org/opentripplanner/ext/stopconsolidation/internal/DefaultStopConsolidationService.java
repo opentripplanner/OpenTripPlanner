@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
@@ -67,8 +68,12 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   @Override
-  public boolean isPartOfConsolidatedStop(StopLocation sl) {
-    return isSecondaryStop(sl) || isPrimaryStop(sl);
+  public boolean isPartOfConsolidatedStop(@Nullable StopLocation sl) {
+    if (sl == null) {
+      return false;
+    } else {
+      return isSecondaryStop(sl) || isPrimaryStop(sl);
+    }
   }
 
   @Override
