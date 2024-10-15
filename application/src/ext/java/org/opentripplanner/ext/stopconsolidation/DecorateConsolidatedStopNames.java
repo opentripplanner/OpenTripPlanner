@@ -64,16 +64,14 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
     var first = legs.getFirst();
     if (
       service.isPartOfConsolidatedStop(first.getTo().stop) &&
-      first.isWalkingLeg() &&
-      first.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS
+        isShortWalkLeg(first)
     ) {
       legs.removeFirst();
     }
     var last = legs.getLast();
     if (
       service.isPartOfConsolidatedStop(last.getFrom().stop) &&
-      last.isWalkingLeg() &&
-      last.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS
+        isShortWalkLeg(last)
     ) {
       legs.removeLast();
     }
@@ -81,6 +79,11 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
     var transfersRemoved = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
 
     itinerary.setLegs(transfersRemoved);
+  }
+
+  private static boolean isShortWalkLeg(Leg leg) {
+    return leg.isWalkingLeg() &&
+      leg.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS;
   }
 
   private boolean isTransferWithinConsolidatedStop(Leg l) {
