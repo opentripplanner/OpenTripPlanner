@@ -25,7 +25,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   @Override
   public void decorate(Itinerary itinerary) {
     replaceConsolidatedStops(itinerary);
-    removeWalkLegs(itinerary);
+    removeShortWalkLegs(itinerary);
   }
 
   /**
@@ -59,7 +59,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * Removes walk legs from and to a consolidated stop if they are deemed "short". This means that
    * they are from a different element of the consolidated stop.
    */
-  private void removeWalkLegs(Itinerary itinerary) {
+  private void removeShortWalkLegs(Itinerary itinerary) {
     var legs = new ArrayList<>(itinerary.getLegs());
     var first = legs.getFirst();
     if (
