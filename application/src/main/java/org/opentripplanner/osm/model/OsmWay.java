@@ -14,6 +14,13 @@ public class OsmWay extends OsmWithTags {
     "backward",
     "reversible"
   );
+  
+  private static final Set<String> INDOOR_AREA_VALUES = Set.of(
+    "room",
+    "corridor",
+    "area"
+  );
+  
   private final TLongList nodes = new TLongArrayList();
 
   public void addNodeRef(long nodeRef) {
@@ -153,7 +160,7 @@ public class OsmWay extends OsmWithTags {
   }
 
   public boolean isIndoorArea() {
-    return isTag("indoor", "room") || isTag("indoor", "area") || isTag("indoor", "corridor");
+    return isOneOfTags("indoor", INDOOR_AREA_VALUES);
   }
 
   /**
