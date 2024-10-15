@@ -56,14 +56,16 @@ specified in terms of latitude and longitude coordinates. The debug frontend and
 Many different production OTP frontends exist. Any number of agencies and consultancies may have built new frontends, whether in Javascript or as native mobile apps, without the OpenTripPlanner development team even being aware of them.
 
 That said, there are two main Javascript-based web user interfaces that are generally recommended by members of the OTP development team who also work on professional, public-facing OpenTripPlanner deployments:
+
 - The [Digitransit UI](https://github.com/HSLdevcom/digitransit-ui), part of the Finnish Digitransit project.
 - The [OpenTripPlanner React UI](https://github.com/opentripplanner/otp-react-redux), developed and maintained by [Arcadis IBI](https://www.ibigroup.com)'s [transit routing team](https://www.ibigroup.com/ibi-products/transit-routing/).
 
 **Digitransit** is an open-source public transportation project, originally created in Finland to replace existing nationwide and regional journey planning solutions in 2014. Digitransit has since been used around the world in other projects, for example in Germany. It is a joint project of Helsinki Regional Transport Authority (HSL), Fintraffic, and Waltti Solutions.
 
 **Arcadis IBI** has for several years actively developed, deployed, and maintained instances of the React-based OTP UI, systematically contributing their improvements back to the original repositories under the OpenTripPlanner organization: 
-- https://github.com/opentripplanner/otp-ui
-- https://github.com/opentripplanner/otp-react-redux
+
+- [https://github.com/opentripplanner/otp-ui](https://github.com/opentripplanner/otp-ui)
+- [https://github.com/opentripplanner/otp-react-redux](https://github.com/opentripplanner/otp-react-redux)
 
 Both major frontend projects mentioned above support internationalization and have several translations already available.
 
