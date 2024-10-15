@@ -149,7 +149,7 @@ public class OsmWay extends OsmWithTags {
    *
    * An area can be specified as such, or be one by default as an amenity.
    */
-  public boolean isArea() {
+  public boolean isAreaWay() {
     return (
       !isTag("area", "no") &&
       (

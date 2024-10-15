@@ -253,7 +253,7 @@ public class OsmDatabase {
 
     applyLevelsForWay(way);
 
-    if (way.isArea()) {
+    if (way.isAreaWay()) {
       // this is an area that's a simple polygon. So we can just add it straight
       // to the areas, if it's not part of a relation.
       if (!areaWayIds.contains(wayId)) {
