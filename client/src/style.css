@@ -67,6 +67,11 @@
   margin-top: -2px;
 }
 
+.search-bar .swap-from-to {
+  width: 15px;
+  margin: 37px 0 auto 0;
+}
+
 .itinerary-list-container {
   width: 36rem;
   overflow-y: auto;
