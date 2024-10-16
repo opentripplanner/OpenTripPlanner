@@ -49,8 +49,6 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -71,9 +69,6 @@ import org.slf4j.LoggerFactory;
  * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  */
 class WalkableAreaBuilder {
-
-  private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
-
   private final DataImportIssueStore issueStore;
 
   private final int maxAreaNodes;
