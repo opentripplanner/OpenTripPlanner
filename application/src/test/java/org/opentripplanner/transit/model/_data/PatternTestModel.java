@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 public class PatternTestModel {
 
@@ -22,7 +22,7 @@ public class PatternTestModel {
     .withServiceId(SERVICE_ID)
     .build();
   private static final TimetableRepositoryForTest MODEL = new TimetableRepositoryForTest(
-    StopModel.of()
+    SiteRepository.of()
   );
   private static final RegularStop STOP_1 = MODEL.stop("1").build();
   private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(

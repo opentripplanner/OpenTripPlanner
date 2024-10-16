@@ -24,7 +24,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class StreetLinkerModuleTest {
@@ -115,7 +115,7 @@ class StreetLinkerModuleTest {
 
       var walkableEdge = StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
       var drivableEdge = StreetModelForTest.streetEdge(from, to, CAR);
-      var builder = StopModel.of();
+      var builder = SiteRepository.of();
       stop =
         builder
           .regularStop(id("platform-1"))

@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * Methods for accessing imported entities.
@@ -35,7 +35,7 @@ public interface OtpTransitService {
 
   Collection<FeedInfo> getAllFeedInfos();
 
-  StopModel stopModel();
+  SiteRepository siteRepository();
 
   /**
    * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of

@@ -33,7 +33,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.siri.mapper.SiriTransportModeMapper;
@@ -68,8 +68,8 @@ class AddedTripBuilderTest {
   private static final RegularStop STOP_B = MODEL_TEST.stop("B").build();
   private static final RegularStop STOP_C = MODEL_TEST.stop("C").build();
   private static final RegularStop STOP_D = MODEL_TEST.stop("D").build();
-  private final StopModel STOP_MODEL = MODEL_TEST
-    .stopModelBuilder()
+  private final SiteRepository STOP_MODEL = MODEL_TEST
+    .siteRepositoryBuilder()
     .withRegularStop(STOP_A)
     .withRegularStop(STOP_B)
     .withRegularStop(STOP_C)

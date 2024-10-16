@@ -15,7 +15,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public final class FlexIntegrationTestData {
@@ -43,7 +43,7 @@ public final class FlexIntegrationTestData {
   private static TestOtpModel buildFlexGraph(File file) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
-    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
@@ -54,7 +54,7 @@ public final class FlexIntegrationTestData {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(timetableRepository.hasFlexTrips());
     return new TestOtpModel(graph, timetableRepository);

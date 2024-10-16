@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class StopClusterMapperTest {
@@ -22,8 +22,8 @@ class StopClusterMapperTest {
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
   private static final List<RegularStop> STOPS = List.of(STOP_A, STOP_B, STOP_C);
-  private static final StopModel STOP_MODEL = TEST_MODEL
-    .stopModelBuilder()
+  private static final SiteRepository STOP_MODEL = TEST_MODEL
+    .siteRepositoryBuilder()
     .withRegularStops(STOPS)
     .build();
   private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
