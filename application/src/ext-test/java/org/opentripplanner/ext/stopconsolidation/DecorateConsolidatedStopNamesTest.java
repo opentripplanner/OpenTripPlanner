@@ -102,12 +102,12 @@ class DecorateConsolidatedStopNamesTest {
   }
 
   private static DecorateConsolidatedStopNames defaultFilter() {
-    var transitModel = TestStopConsolidationModel.buildTransitModel();
+    var timetableRepository = TestStopConsolidationModel.buildTimetableRepository();
 
     var repo = new DefaultStopConsolidationRepository();
     repo.addGroups(GROUPS);
 
-    var service = new DefaultStopConsolidationService(repo, transitModel);
+    var service = new DefaultStopConsolidationService(repo, timetableRepository);
     return new DecorateConsolidatedStopNames(service);
   }
 }
