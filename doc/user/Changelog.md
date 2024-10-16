@@ -16,6 +16,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add via to the Transmodel trip query and make a proper Raptor implementation for it [#6084](https://github.com/opentripplanner/OpenTripPlanner/pull/6084)
 - Fix GTFS-Flex duration offset and factor parsing when only one of them is set [#6138](https://github.com/opentripplanner/OpenTripPlanner/pull/6138)
 - Fix arrive by filtering for on-street/flex itineraries [#6050](https://github.com/opentripplanner/OpenTripPlanner/pull/6050)
+- Rename TransitModel to TransitRepository [#6148](https://github.com/opentripplanner/OpenTripPlanner/pull/6148)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
