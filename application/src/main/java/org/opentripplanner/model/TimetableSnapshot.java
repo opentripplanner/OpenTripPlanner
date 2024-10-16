@@ -13,11 +13,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
@@ -83,10 +81,14 @@ public class TimetableSnapshot {
 
   /**
    * During the construction phase of the TimetableSnapshot, before it is considered immutable and
-   * used in routing, this Set holds all timetables that have been modified and are waiting to be
-   * indexed. This field will be set to null when the TimetableSnapshot becomes read-only.
+   * used in routing, this Map holds all timetables that have been modified and are waiting to be
+   * indexed.
+   * A real-time timetable overrides the scheduled timetable of a TripPattern for only a single
+   * service date. There can be only one overriding timetable per TripPattern and per service date.
+   * This is enforced by indexing the map with a pair (TripPattern, service date).
+   * This map is cleared when the TimetableSnapshot becomes read-only.
    */
-  private final Set<Timetable> dirtyTimetables = new HashSet<>();
+  private final Map<TripPatternAndServiceDate, Timetable> dirtyTimetables = new HashMap<>();
 
   /**
    * For each TripPattern (sequence of stops on a particular Route) for which we have received a
@@ -383,7 +385,7 @@ public class TimetableSnapshot {
     );
 
     if (transitLayerUpdater != null) {
-      transitLayerUpdater.update(dirtyTimetables, timetables);
+      transitLayerUpdater.update(dirtyTimetables.values(), timetables);
     }
 
     this.dirtyTimetables.clear();
@@ -600,7 +602,12 @@ public class TimetableSnapshot {
     }
     sortedTimetables.add(updated);
     timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
-    dirtyTimetables.add(updated);
+
+    // if the timetable was already modified by a previous real-time update in the same snapshot
+    // and for the same service date,
+    // then the previously updated timetable is superseded by the new one
+    dirtyTimetables.put(new TripPatternAndServiceDate(pattern, updated.getServiceDate()), updated);
+
     dirty = true;
   }
 
@@ -617,4 +624,9 @@ public class TimetableSnapshot {
       return t1.getServiceDate().compareTo(t2.getServiceDate());
     }
   }
+
+  /**
+   * A pair made of a TripPattern and one of the service dates it is running on.
+   */
+  private record TripPatternAndServiceDate(TripPattern tripPattern, LocalDate serviceDate) {}
 }

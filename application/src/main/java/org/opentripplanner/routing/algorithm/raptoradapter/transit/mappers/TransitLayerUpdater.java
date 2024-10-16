@@ -60,7 +60,7 @@ public class TransitLayerUpdater {
   }
 
   public void update(
-    Set<Timetable> updatedTimetables,
+    Collection<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
   ) {
     if (!transitService.hasRealtimeTransitLayer()) {
