@@ -1,5 +1,6 @@
 package org.opentripplanner;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -7,7 +8,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
-import com.google.common.truth.Truth;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -179,7 +179,7 @@ public abstract class GtfsTest {
       assertEquals(1, leg.getStreetNotes().size());
       assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
     } else {
-      Truth.assertThat(leg.getStreetNotes()).isEmpty();
+      assertThat(leg.getStreetNotes()).isEmpty();
     }
   }
 
