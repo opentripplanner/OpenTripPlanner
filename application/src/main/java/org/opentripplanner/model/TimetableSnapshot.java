@@ -406,7 +406,7 @@ public class TimetableSnapshot {
     boolean newTripPatternsForModifiedTripsWereCleared = clearNewTripPatternsForModifiedTrips(
       feedId
     );
-    boolean addedTripPatternsWereCleared = clearRealtimeAddedTripPatterns(feedId);
+    boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
@@ -572,7 +572,9 @@ public class TimetableSnapshot {
    * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
    *
    * */
-  private boolean clearRealtimeAddedTripPatterns(String feedId) {
+  private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
+    // it is sufficient to test for the removal of added trips, since other indexed entities are
+    // added only if a new trip is added.
     boolean removedEntry = realTimeAddedTrips
       .keySet()
       .removeIf(id -> feedId.equals(id.getFeedId()));
