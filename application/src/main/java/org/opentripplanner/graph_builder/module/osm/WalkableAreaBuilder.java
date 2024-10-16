@@ -69,6 +69,7 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
  */
 class WalkableAreaBuilder {
+
   private final DataImportIssueStore issueStore;
 
   private final int maxAreaNodes;
