@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class AreaStopsLayerBuilderTest {
 
@@ -54,17 +54,17 @@ class AreaStopsLayerBuilderTest {
     .withGeometry(Polygons.BERLIN)
     .build();
 
-  private final TransitModel transitModel = new TransitModel(
+  private final TimetableRepository timetableRepository = new TimetableRepository(
     stopModelBuilder.withAreaStop(AREA_STOP).build(),
     new Deduplicator()
   );
 
   @Test
   void getAreaStops() {
-    transitModel.index();
+    timetableRepository.index();
 
     var subject = new AreaStopsLayerBuilder(
-      new DefaultTransitService(transitModel),
+      new DefaultTransitService(timetableRepository),
       LAYER_CONFIG,
       Locale.ENGLISH
     );

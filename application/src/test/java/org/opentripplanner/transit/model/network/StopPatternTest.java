@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 class StopPatternTest {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   @Test
   void boardingAlightingConditions() {
@@ -25,7 +25,7 @@ class StopPatternTest {
 
     var areaStop = testModel.areaStop("area").build();
 
-    Trip t = TransitModelForTest.trip("trip").build();
+    Trip t = TimetableRepositoryForTest.trip("trip").build();
 
     StopPattern stopPattern = new StopPattern(
       List.of(
@@ -54,7 +54,7 @@ class StopPatternTest {
     var s3 = testModel.stop("3").build();
     var s4 = testModel.stop("4").build();
 
-    var pattern = TransitModelForTest.stopPattern(s1, s2, s3);
+    var pattern = TimetableRepositoryForTest.stopPattern(s1, s2, s3);
 
     assertEquals(List.of(s1, s2, s3), pattern.getStops());
 

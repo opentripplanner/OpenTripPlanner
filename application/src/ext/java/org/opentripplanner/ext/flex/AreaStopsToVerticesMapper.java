@@ -12,7 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,31 +25,31 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(AreaStopsToVerticesMapper.class);
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
 
   @Inject
-  public AreaStopsToVerticesMapper(Graph graph, TransitModel transitModel) {
+  public AreaStopsToVerticesMapper(Graph graph, TimetableRepository timetableRepository) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
   }
 
   @Override
   @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
-    if (!transitModel.getStopModel().hasAreaStops()) {
+    if (!timetableRepository.getStopModel().hasAreaStops()) {
       return;
     }
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      transitModel.getStopModel().listAreaStops().size()
+      timetableRepository.getStopModel().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
-    var results = transitModel
+    var results = timetableRepository
       .getStopModel()
       .listAreaStops()
       .parallelStream()

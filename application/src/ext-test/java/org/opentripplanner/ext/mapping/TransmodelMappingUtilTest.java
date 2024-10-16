@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 
@@ -33,7 +33,7 @@ public class TransmodelMappingUtilTest {
 
   Agency agency(String feedScope, int id) {
     // We use the test builder to make sure we get back an agency with all required fields
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .agency("Agency " + id)
       .copy()
       .withId(new FeedScopedId(feedScope, Integer.toString(id)))

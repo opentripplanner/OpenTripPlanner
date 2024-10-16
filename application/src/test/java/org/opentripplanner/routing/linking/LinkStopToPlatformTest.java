@@ -29,11 +29,11 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +41,13 @@ public class LinkStopToPlatformTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     Graph graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
@@ -106,8 +106,8 @@ public class LinkStopToPlatformTest {
       transitStops[i] = testModel.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
     }
 
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
 
     for (RegularStop s : transitStops) {
       var v = TransitStopVertex.of().withStop(s).build();

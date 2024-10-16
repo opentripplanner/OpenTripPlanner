@@ -12,7 +12,7 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -63,8 +63,8 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(TransitMode.RAIL, route.getMode());
 
     TransitService transitService = env.getTransitService();
-    var fromTransitModel = transitService.getRouteForId(route.getId());
-    assertEquals(fromTransitModel, route);
+    var fromTimetableRepository = transitService.getRouteForId(route.getId());
+    assertEquals(fromTimetableRepository, route);
     var patternsForRoute = transitService.getPatternsForRoute(route);
     assertEquals(1, patternsForRoute.size());
     assertEquals(pattern, patternsForRoute.stream().findFirst().orElseThrow());
@@ -128,11 +128,11 @@ class AddedTest implements RealtimeTestConstants {
     var snapshot = env.getTimetableSnapshot();
 
     TransitService transitService = env.getTransitService();
-    Trip trip = transitService.getTripForId(TransitModelForTest.id(ADDED_TRIP_ID));
+    Trip trip = transitService.getTripForId(TimetableRepositoryForTest.id(ADDED_TRIP_ID));
     assertNotNull(trip);
     assertNotNull(transitService.getPatternForTrip(trip));
 
-    var stopA = env.transitModel.getStopModel().getRegularStop(STOP_A1.getId());
+    var stopA = env.timetableRepository.getStopModel().getRegularStop(STOP_A1.getId());
     // Get the trip pattern of the added trip which goes through stopA
     var patternsAtA = env.getTimetableSnapshot().getPatternsForStop(stopA);
 

@@ -132,7 +132,7 @@ public class TimetableSnapshot {
   /**
    * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
    * Route, TripPattern, TripOnServiceDate they refer to.
-   * They are meant to override the corresponding indexes in TransitModelIndex.
+   * They are meant to override the corresponding indexes in TimetableRepositoryIndex.
    */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;

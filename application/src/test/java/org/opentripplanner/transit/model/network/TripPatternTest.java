@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -20,13 +20,13 @@ class TripPatternTest {
 
   private static final String ID = "1";
   private static final String NAME = "short name";
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  private static final Route ROUTE = TransitModelForTest.route("routeId").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("routeId").build();
   public static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
   public static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
   public static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
-  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+  private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     STOP_A,
     STOP_B,
     STOP_C
@@ -77,7 +77,7 @@ class TripPatternTest {
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().withRoute(TransitModelForTest.route("anotherId").build()).build()
+        subject.copy().withRoute(TimetableRepositoryForTest.route("anotherId").build()).build()
       )
     );
     assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));

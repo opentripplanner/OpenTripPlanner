@@ -7,14 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class FareZoneTest {
 
   private static final String ID = "1";
   private static final String NAME = "name";
   private static final FareZone subject = FareZone
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .build();
 
@@ -41,7 +41,7 @@ class FareZoneTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
   }
 }

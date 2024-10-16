@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 
 class DefaultTransitServiceTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   static TransitService service;
   static Station STATION = TEST_MODEL.station("C").build();
@@ -40,7 +40,10 @@ class DefaultTransitServiceTest {
   static TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
   static TripPattern BUS_PATTERN = TEST_MODEL.pattern(BUS).build();
 
-  static StopPattern REAL_TIME_STOP_PATTERN = TransitModelForTest.stopPattern(STOP_A, STOP_B);
+  static StopPattern REAL_TIME_STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
+    STOP_A,
+    STOP_B
+  );
   static TripPattern REAL_TIME_PATTERN = TEST_MODEL
     .pattern(BUS)
     .withStopPattern(REAL_TIME_STOP_PATTERN)
@@ -56,16 +59,16 @@ class DefaultTransitServiceTest {
       .withStation(STATION)
       .build();
 
-    var transitModel = new TransitModel(stopModel, new Deduplicator());
-    transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
-    transitModel.index();
+    var timetableRepository = new TimetableRepository(stopModel, new Deduplicator());
+    timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableRepository.index();
 
-    transitModel.initTimetableSnapshotProvider(() -> {
+    timetableRepository.initTimetableSnapshotProvider(() -> {
       TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
       RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
         ScheduledTripTimes
           .of()
-          .withTrip(TransitModelForTest.trip("REAL_TIME_TRIP").build())
+          .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
           .withDepartureTimes(new int[] { 0, 1 })
           .build()
       );
@@ -77,7 +80,7 @@ class DefaultTransitServiceTest {
     });
 
     service =
-      new DefaultTransitService(transitModel) {
+      new DefaultTransitService(timetableRepository) {
         @Override
         public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
           if (stop.equals(STOP_B)) {

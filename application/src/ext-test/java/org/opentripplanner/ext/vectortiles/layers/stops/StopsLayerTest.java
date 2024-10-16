@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class StopsLayerTest {
 
@@ -59,9 +59,9 @@ public class StopsLayerTest {
   @Test
   public void digitransitStopPropertyMapperTest() {
     var deduplicator = new Deduplicator();
-    var transitModel = new TransitModel(new StopModel(), deduplicator);
-    transitModel.index();
-    var transitService = new TestTransitService(transitModel);
+    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    timetableRepository.index();
+    var transitService = new TestTransitService(timetableRepository);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,
@@ -81,9 +81,9 @@ public class StopsLayerTest {
   @Test
   public void digitransitStopPropertyMapperTranslationTest() {
     var deduplicator = new Deduplicator();
-    var transitModel = new TransitModel(new StopModel(), deduplicator);
-    transitModel.index();
-    var transitService = new DefaultTransitService(transitModel);
+    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    timetableRepository.index();
+    var transitService = new DefaultTransitService(timetableRepository);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,

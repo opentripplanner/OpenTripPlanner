@@ -32,7 +32,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.CsvFileSupport;
 import org.opentripplanner.transit.speed_test.model.testcase.ExpectedResults;
@@ -53,7 +53,7 @@ public class SpeedTest {
 
   private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
 
   private final SpeedTestTimer timer = new SpeedTestTimer();
 
@@ -73,11 +73,11 @@ public class SpeedTest {
     SpeedTestCmdLineOpts opts,
     SpeedTestConfig config,
     Graph graph,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     this.opts = opts;
     this.config = config;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
 
     this.tcIO =
       new CsvFileSupport(
@@ -91,17 +91,17 @@ public class SpeedTest {
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(timetableRepository);
 
     UpdaterConfigurator.configure(
       graph,
       new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
-      transitModel,
+      timetableRepository,
       config.updatersConfig
     );
-    if (transitModel.getUpdaterManager() != null) {
-      transitModel.getUpdaterManager().startUpdaters();
+    if (timetableRepository.getUpdaterManager() != null) {
+      timetableRepository.getUpdaterManager().startUpdaters();
     }
 
     this.serverContext =
@@ -110,7 +110,7 @@ public class SpeedTest {
         config.request,
         new RaptorConfig<>(config.transitRoutingParams),
         graph,
-        new DefaultTransitService(transitModel),
+        new DefaultTransitService(timetableRepository),
         timer.getRegistry(),
         VectorTileConfig.DEFAULT,
         TestServerContext.createWorldEnvelopeService(),
@@ -124,11 +124,11 @@ public class SpeedTest {
         null,
         null
       );
-    // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
+    // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    creatTransitLayerForRaptor(transitModel, config.transitRoutingParams);
+    creatTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
 
-    initializeTransferCache(config.transitRoutingParams, transitModel);
+    initializeTransferCache(config.transitRoutingParams, timetableRepository);
 
     timer.setUp(opts.groupResultsByCategory());
   }
@@ -145,20 +145,20 @@ public class SpeedTest {
       var config = SpeedTestConfig.config(opts.rootDir());
       loadOtpFeatures(opts);
       var model = loadGraph(opts.rootDir(), config.graph);
-      var transitModel = model.transitModel();
+      var timetableRepository = model.timetableRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
 
       // create a new test
-      var speedTest = new SpeedTest(opts, config, graph, transitModel);
+      var speedTest = new SpeedTest(opts, config, graph, timetableRepository);
 
-      assertTestDateHasData(transitModel, config, buildConfig);
+      assertTestDateHasData(timetableRepository, config, buildConfig);
 
       // and run it
       speedTest.runTest();
 
-      if (speedTest.transitModel.getUpdaterManager() != null) {
-        speedTest.transitModel.getUpdaterManager().stop();
+      if (speedTest.timetableRepository.getUpdaterManager() != null) {
+        speedTest.timetableRepository.getUpdaterManager().stop();
       }
     } catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
@@ -249,7 +249,7 @@ public class SpeedTest {
       opts,
       config,
       profile,
-      transitModel.getTimeZone()
+      timetableRepository.getTimeZone()
     );
     var routingRequest = speedTestRequest.toRouteRequest();
     return serverContext.routingService().route(routingRequest);
@@ -272,10 +272,10 @@ public class SpeedTest {
       throw new IllegalStateException();
     }
 
-    TransitModel transitModel = serializedGraphObject.transitModel;
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
-    return new LoadModel(graph, transitModel, serializedGraphObject.buildConfig);
+    TimetableRepository timetableRepository = serializedGraphObject.timetableRepository;
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
+    return new LoadModel(graph, timetableRepository, serializedGraphObject.buildConfig);
   }
 
   private void initProfileStatistics() {
@@ -361,5 +361,5 @@ public class SpeedTest {
 
   /* inline classes */
 
-  record LoadModel(Graph graph, TransitModel transitModel, BuildConfig buildConfig) {}
+  record LoadModel(Graph graph, TimetableRepository timetableRepository, BuildConfig buildConfig) {}
 }

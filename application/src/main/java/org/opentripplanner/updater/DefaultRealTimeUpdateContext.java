@@ -3,7 +3,7 @@ package org.opentripplanner.updater;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.siri.EntityResolver;
 import org.opentripplanner.updater.siri.SiriFuzzyTripMatcher;
@@ -16,18 +16,18 @@ public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
 
   public DefaultRealTimeUpdateContext(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     TimetableSnapshot timetableSnapshotBuffer
   ) {
     this.graph = graph;
-    this.transitService = new DefaultTransitService(transitModel, timetableSnapshotBuffer);
+    this.transitService = new DefaultTransitService(timetableRepository, timetableSnapshotBuffer);
   }
 
   /**
    * Constructor for unit tests only.
    */
-  public DefaultRealTimeUpdateContext(Graph graph, TransitModel transitModel) {
-    this(graph, transitModel, null);
+  public DefaultRealTimeUpdateContext(Graph graph, TimetableRepository timetableRepository) {
+    this(graph, timetableRepository, null);
   }
 
   @Override

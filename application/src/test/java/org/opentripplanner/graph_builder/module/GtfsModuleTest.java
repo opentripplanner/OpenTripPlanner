@@ -19,7 +19,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class GtfsModuleTest {
 
@@ -30,14 +30,14 @@ class GtfsModuleTest {
     var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS);
     var module = new GtfsModule(
       List.of(bundle),
-      model.transitModel,
+      model.timetableRepository,
       model.graph,
       ServiceDateInterval.unbounded()
     );
 
     module.buildGraph();
 
-    var frequencyTripPattern = model.transitModel
+    var frequencyTripPattern = model.timetableRepository
       .getAllTripPatterns()
       .stream()
       .filter(p -> !p.getScheduledTimetable().getFrequencyEntries().isEmpty())
@@ -49,7 +49,7 @@ class GtfsModuleTest {
     assertNotNull(tripPattern.getGeometry());
     assertNotNull(tripPattern.getHopGeometry(0));
 
-    var pattern = model.transitModel.getTripPatternForId(tripPattern.getId());
+    var pattern = model.timetableRepository.getTripPatternForId(tripPattern.getId());
     assertNotNull(pattern.getGeometry());
     assertNotNull(pattern.getHopGeometry(0));
   }
@@ -61,7 +61,7 @@ class GtfsModuleTest {
 
     var module = new GtfsModule(
       bundles,
-      model.transitModel,
+      model.timetableRepository,
       model.graph,
       ServiceDateInterval.unbounded()
     );
@@ -72,11 +72,11 @@ class GtfsModuleTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-    return new TestModels(graph, transitModel);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    return new TestModels(graph, timetableRepository);
   }
 
-  record TestModels(Graph graph, TransitModel transitModel) {}
+  record TestModels(Graph graph, TimetableRepository timetableRepository) {}
 
   static GtfsBundle bundle(String feedId) {
     var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
@@ -109,14 +109,17 @@ class GtfsModuleTest {
 
       var module = new GtfsModule(
         bundles,
-        model.transitModel,
+        model.timetableRepository,
         model.graph,
         ServiceDateInterval.unbounded()
       );
 
       module.buildGraph();
 
-      assertEquals(expectedTransfers, model.transitModel.getTransferService().listAll().size());
+      assertEquals(
+        expectedTransfers,
+        model.timetableRepository.getTransferService().listAll().size()
+      );
     }
   }
 }

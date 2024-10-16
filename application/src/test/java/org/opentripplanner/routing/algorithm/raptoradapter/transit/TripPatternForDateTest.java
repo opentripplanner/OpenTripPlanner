@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -24,11 +24,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TripPatternForDateTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
-  private static final Route ROUTE = TransitModelForTest.route("1").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
   private static final TripTimes tripTimes = TripTimesFactory.tripTimes(
-    TransitModelForTest.trip("1").withRoute(ROUTE).build(),
+    TimetableRepositoryForTest.trip("1").withRoute(ROUTE).build(),
     List.of(new StopTime()),
     new Deduplicator()
   );
@@ -46,7 +46,7 @@ class TripPatternForDateTest {
     stopTime.setStop(STOP);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
     RoutingTripPattern tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
+      .of(TimetableRepositoryForTest.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .build()

@@ -6,7 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class OtpTransitServiceImplTest {
 
-  private static final FeedScopedId STATION_ID = TransitModelForTest.id("station");
+  private static final FeedScopedId STATION_ID = TimetableRepositoryForTest.id("station");
 
   // The subject is used as read only; hence static is ok
   private static OtpTransitService subject;
@@ -132,7 +132,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    RegularStop stop = subject.stopModel().getRegularStop(TransitModelForTest.id("P"));
+    RegularStop stop = subject.stopModel().getRegularStop(TimetableRepositoryForTest.id("P"));
     assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
@@ -146,7 +146,9 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetShapePointsForShapeId() {
-    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(TransitModelForTest.id("5"));
+    List<ShapePoint> shapePoints = subject.getShapePointsForShapeId(
+      TimetableRepositoryForTest.id("5")
+    );
     assertEquals(
       "[#1 (41,-72), #2 (41,-72), #3 (40,-72), #4 (41,-73), #5 (41,-74)]",
       shapePoints.stream().map(OtpTransitServiceImplTest::toString).toList().toString()

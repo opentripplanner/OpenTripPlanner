@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-class TransitModelIndex {
+class TimetableRepositoryIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransitModelIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TimetableRepositoryIndex.class);
 
   // TODO: consistently key on model object or id string
   private final Map<FeedScopedId, Agency> agencyForId = new HashMap<>();
@@ -58,18 +58,18 @@ class TransitModelIndex {
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  TransitModelIndex(TransitModel transitModel) {
+  TimetableRepositoryIndex(TimetableRepository timetableRepository) {
     LOG.info("Transit model index init...");
 
-    for (Agency agency : transitModel.getAgencies()) {
+    for (Agency agency : timetableRepository.getAgencies()) {
       this.agencyForId.put(agency.getId(), agency);
     }
 
-    for (Operator operator : transitModel.getOperators()) {
+    for (Operator operator : timetableRepository.getOperators()) {
       this.operatorForId.put(operator.getId(), operator);
     }
 
-    for (TripPattern pattern : transitModel.getAllTripPatterns()) {
+    for (TripPattern pattern : timetableRepository.getAllTripPatterns()) {
       patternsForRoute.put(pattern.getRoute(), pattern);
       pattern
         .scheduledTripsAsStream()
@@ -91,7 +91,7 @@ class TransitModelIndex {
       groupOfRoutesForId.put(groupOfRoutes.getId(), groupOfRoutes);
     }
 
-    for (TripOnServiceDate tripOnServiceDate : transitModel.getAllTripsOnServiceDates()) {
+    for (TripOnServiceDate tripOnServiceDate : timetableRepository.getAllTripsOnServiceDates()) {
       tripOnServiceDateForTripAndDay.put(
         new TripIdAndServiceDate(
           tripOnServiceDate.getTrip().getId(),
@@ -101,10 +101,10 @@ class TransitModelIndex {
       );
     }
 
-    initalizeServiceCodesForDate(transitModel);
+    initalizeServiceCodesForDate(timetableRepository);
 
     if (OTPFeature.FlexRouting.isOn()) {
-      flexIndex = new FlexIndex(transitModel);
+      flexIndex = new FlexIndex(timetableRepository);
       for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
@@ -185,8 +185,8 @@ class TransitModelIndex {
     return flexIndex;
   }
 
-  private void initalizeServiceCodesForDate(TransitModel transitModel) {
-    CalendarService calendarService = transitModel.getCalendarService();
+  private void initalizeServiceCodesForDate(TimetableRepository timetableRepository) {
+    CalendarService calendarService = timetableRepository.getCalendarService();
 
     if (calendarService == null) {
       return;
@@ -216,7 +216,7 @@ class TransitModelIndex {
     for (LocalDate serviceDate : serviceIdsForServiceDate.keySet()) {
       TIntSet serviceCodesRunning = new TIntHashSet();
       for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-        serviceCodesRunning.add(transitModel.getServiceCodes().get(serviceId));
+        serviceCodesRunning.add(timetableRepository.getServiceCodes().get(serviceId));
       }
       serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
     }
