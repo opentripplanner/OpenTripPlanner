@@ -438,39 +438,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-                    <execution>
-                        <id>build-helper-generate-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/main/java</source>
-                                <source>src/ext/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>build-helper-generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/test/java</source>
-                                <source>src/ext-test/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!--
              There used to be a dependency-plugin:copy-dependencies plugin entry here, but the
              shade-plugin will explode the dependencies even if they aren't manually copied in.

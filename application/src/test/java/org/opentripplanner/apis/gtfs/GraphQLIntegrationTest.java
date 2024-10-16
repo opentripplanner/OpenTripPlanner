@@ -356,7 +356,9 @@ class GraphQLIntegrationTest {
     });
   }
 
-  @FilePatternSource(pattern = "src/test/resources/org/opentripplanner/apis/gtfs/queries/*.graphql")
+  @FilePatternSource(
+    pattern = "application/src/test/resources/org/opentripplanner/apis/gtfs/queries/*.graphql"
+  )
   @ParameterizedTest(name = "Check GraphQL query in {0}")
   void graphQL(Path path) throws IOException {
     var query = Files.readString(path);
