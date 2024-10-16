@@ -10,7 +10,7 @@ export function SwapLocationsButton({
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
 }) {
-  const onChange = () => {
+  const swapFromTo = () => {
     setTripQueryVariables({
       ...tripQueryVariables,
       from: tripQueryVariables.to,
@@ -18,5 +18,9 @@ export function SwapLocationsButton({
     });
   };
 
-  return <img className="swap-from-to" alt={HINT} title={HINT} src={swapImg} onClick={onChange} />;
+  return (
+    <button className="swap-from-to" onClick={swapFromTo} title={HINT}>
+      <img alt={HINT} src={swapImg} />
+    </button>
+  );
 }

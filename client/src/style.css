@@ -68,8 +68,13 @@
 }
 
 .search-bar .swap-from-to {
+  border: none;
+  background: none;
+  margin: 30px 0 auto 0;
+}
+
+.search-bar .swap-from-to img {
   width: 15px;
-  margin: 37px 0 auto 0;
 }
 
 .itinerary-list-container {
