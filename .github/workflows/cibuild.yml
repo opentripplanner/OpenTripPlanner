@@ -108,7 +108,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: Install Python dependencies
-        run: pip install --break-system-packages -r doc/user/requirements.txt
+        run: pip install -r doc/user/requirements.txt
         
 
       - name: Build main documentation
