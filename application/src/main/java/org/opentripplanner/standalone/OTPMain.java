@@ -17,7 +17,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.ConstructApplication;
 import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,7 +150,7 @@ public class OTPMain {
       // with using the embedded router config.
       new SerializedGraphObject(
         app.graph(),
-        app.transitModel(),
+        app.timetableRepository(),
         app.worldEnvelopeRepository(),
         config.buildConfig(),
         config.routerConfig(),
@@ -187,8 +187,8 @@ public class OTPMain {
 
   private static void startOtpWebServer(CommandLineParameters params, ConstructApplication app) {
     // Index graph for travel search
-    app.transitModel().index();
-    app.graph().index(app.transitModel().getStopModel());
+    app.timetableRepository().index();
+    app.graph().index(app.timetableRepository().getStopModel());
 
     // publishing the config version info make it available to the APIs
     setOtpConfigVersionsOnServerInfo(app);
@@ -205,7 +205,7 @@ public class OTPMain {
     if (params.doServe()) {
       GrizzlyServer grizzlyServer = app.createGrizzlyServer();
 
-      registerShutdownHookToGracefullyShutDownServer(app.transitModel(), app.raptorConfig());
+      registerShutdownHookToGracefullyShutDownServer(app.timetableRepository(), app.raptorConfig());
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
@@ -232,14 +232,14 @@ public class OTPMain {
    * </ol>
    */
   private static void registerShutdownHookToGracefullyShutDownServer(
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     RaptorConfig<?> raptorConfig
   ) {
     ApplicationShutdownSupport.addShutdownHook(
       "server-shutdown",
       () -> {
         LOG.info("OTP shutdown started...");
-        UpdaterConfigurator.shutdownGraph(transitModel);
+        UpdaterConfigurator.shutdownGraph(timetableRepository);
         raptorConfig.shutdown();
         WeakCollectionCleaner.DEFAULT.exit();
         DeferredAuthorityFactory.exit();

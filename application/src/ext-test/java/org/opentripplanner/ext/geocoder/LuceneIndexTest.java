@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.geocoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -31,11 +31,11 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class LuceneIndexTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   static final Agency BVG = Agency
     .of(id("bvg"))
@@ -126,9 +126,9 @@ class LuceneIndexTest {
     List
       .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
       .forEach(stopModel::withStation);
-    var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
-    transitModel.index();
-    var transitService = new DefaultTransitService(transitModel) {
+    var timetableRepository = new TimetableRepository(stopModel.build(), new Deduplicator());
+    timetableRepository.index();
+    var transitService = new DefaultTransitService(timetableRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
         .<StopLocation, TransitMode>builder()
         .putAll(WESTHAFEN, FERRY, BUS)
@@ -153,7 +153,7 @@ class LuceneIndexTest {
 
       @Override
       public Set<Route> getRoutesForStop(StopLocation stop) {
-        return Set.of(TransitModelForTest.route("route1").withAgency(BVG).build());
+        return Set.of(TimetableRepositoryForTest.route("route1").withAgency(BVG).build());
       }
 
       @Override
@@ -171,7 +171,7 @@ class LuceneIndexTest {
     };
     var stopConsolidationService = new DefaultStopConsolidationService(
       new DefaultStopConsolidationRepository(),
-      transitModel
+      timetableRepository
     );
     index = new LuceneIndex(transitService, stopConsolidationService);
     mapper = new StopClusterMapper(transitService, stopConsolidationService);

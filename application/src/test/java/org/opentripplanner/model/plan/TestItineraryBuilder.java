@@ -4,9 +4,9 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -440,7 +440,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(String id, Route route) {
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .trip(id)
       .withRoute(route)
       .withHeadsign(I18NString.of("Trip headsign %s".formatted(id)))

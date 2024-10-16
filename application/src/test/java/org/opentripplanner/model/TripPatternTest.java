@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -28,7 +28,7 @@ public class TripPatternTest {
    */
   @Test
   public void testSetHopGeometriesFromPattern() {
-    var testModel = TransitModelForTest.of();
+    var testModel = TimetableRepositoryForTest.of();
     var stationOrigin = testModel.station("S1").withCoordinate(0.0, 0.0).build();
     var stationDestination = testModel.station("S2").withCoordinate(1.0, 1.0).build();
     var stopOrigin = testModel
@@ -103,7 +103,7 @@ public class TripPatternTest {
     }
 
     var stopPattern = builder.build();
-    var route = TransitModelForTest.route("R1").build();
+    var route = TimetableRepositoryForTest.route("R1").build();
 
     return TripPattern
       .of(new FeedScopedId("Test", "T1"))

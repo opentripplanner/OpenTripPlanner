@@ -35,7 +35,7 @@ import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
+import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
@@ -51,7 +51,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,21 +77,21 @@ public class GtfsModule implements GraphBuilderModule {
   private final List<GtfsBundle> gtfsBundles;
   private final FareServiceFactory fareServiceFactory;
 
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
   public GtfsModule(
     List<GtfsBundle> bundles,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     Graph graph,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
     FareServiceFactory fareServiceFactory
   ) {
     this.gtfsBundles = bundles;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.graph = graph;
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
@@ -100,13 +100,13 @@ public class GtfsModule implements GraphBuilderModule {
 
   public GtfsModule(
     List<GtfsBundle> bundles,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     Graph graph,
     ServiceDateInterval transitPeriodLimit
   ) {
     this(
       bundles,
-      transitModel,
+      timetableRepository,
       graph,
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
@@ -132,7 +132,7 @@ public class GtfsModule implements GraphBuilderModule {
         feedIdsEncountered.put(feedId, gtfsBundle);
 
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
-          new OtpTransitServiceBuilder(transitModel.getStopModel(), issueStore),
+          new OtpTransitServiceBuilder(timetableRepository.getStopModel(), issueStore),
           feedId,
           issueStore,
           gtfsBundle.discardMinTransferTimes(),
@@ -170,7 +170,7 @@ public class GtfsModule implements GraphBuilderModule {
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(
           graph,
-          transitModel,
+          timetableRepository,
           builder,
           calendarServiceData.getServiceIds(),
           geometryProcessor,
@@ -182,11 +182,11 @@ public class GtfsModule implements GraphBuilderModule {
         // if this or previously processed gtfs bundle has transit that has not been filtered out
         hasTransit = hasTransit || otpTransitService.hasActiveTransit();
 
-        addTransitModelToGraph(graph, transitModel, gtfsBundle, otpTransitService);
+        addTimetableRepositoryToGraph(graph, timetableRepository, gtfsBundle, otpTransitService);
 
         if (gtfsBundle.blockBasedInterlining()) {
           new InterlineProcessor(
-            transitModel.getTransferService(),
+            timetableRepository.getTransferService(),
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.maxInterlineDistance(),
             issueStore,
@@ -206,9 +206,9 @@ public class GtfsModule implements GraphBuilderModule {
       gtfsBundles.forEach(GtfsBundle::close);
     }
 
-    transitModel.validateTimeZones();
+    timetableRepository.validateTimeZones();
 
-    transitModel.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
+    timetableRepository.updateCalendarServiceData(hasTransit, calendarServiceData, issueStore);
   }
 
   /**
@@ -268,7 +268,7 @@ public class GtfsModule implements GraphBuilderModule {
    */
   private void createTripPatterns(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds,
     GeometryProcessor geometryProcessor,
@@ -282,25 +282,25 @@ public class GtfsModule implements GraphBuilderModule {
       geometryProcessor
     );
     buildTPOp.run();
-    transitModel.setHasFrequencyService(
-      transitModel.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
+    timetableRepository.setHasFrequencyService(
+      timetableRepository.hasFrequencyService() || buildTPOp.hasFrequencyBasedTrips()
     );
-    transitModel.setHasScheduledService(
-      transitModel.hasScheduledService() || buildTPOp.hasScheduledTrips()
+    timetableRepository.setHasScheduledService(
+      timetableRepository.hasScheduledService() || buildTPOp.hasScheduledTrips()
     );
   }
 
-  private void addTransitModelToGraph(
+  private void addTimetableRepositoryToGraph(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     GtfsBundle gtfsBundle,
     OtpTransitService otpTransitService
   ) {
-    AddTransitModelEntitiesToGraph.addToGraph(
+    AddTransitEntitiesToGraph.addToGraph(
       otpTransitService,
       gtfsBundle.subwayAccessTime,
       graph,
-      transitModel
+      timetableRepository
     );
   }
 

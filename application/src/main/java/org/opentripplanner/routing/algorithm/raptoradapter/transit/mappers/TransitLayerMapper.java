@@ -25,13 +25,13 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the TransitLayer object from the TransitModel object. The ServiceDay hierarchy is reversed,
+ * Maps the TransitLayer object from the TimetableRepository object. The ServiceDay hierarchy is reversed,
  * with service days at the top level, which contains TripPatternForDate objects that contain only
  * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
  * when doing Range Raptor searches.
@@ -48,16 +48,16 @@ public class TransitLayerMapper {
   private final TransitService transitService;
   private final StopModel stopModel;
 
-  private TransitLayerMapper(TransitModel transitModel) {
-    this.transitService = new DefaultTransitService(transitModel);
-    this.stopModel = transitModel.getStopModel();
+  private TransitLayerMapper(TimetableRepository timetableRepository) {
+    this.transitService = new DefaultTransitService(timetableRepository);
+    this.stopModel = timetableRepository.getStopModel();
   }
 
   public static TransitLayer map(
     TransitTuningParameters tuningParameters,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
-    return new TransitLayerMapper(transitModel).map(tuningParameters);
+    return new TransitLayerMapper(timetableRepository).map(tuningParameters);
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
@@ -65,7 +65,7 @@ public class TransitLayerMapper {
     List<List<Transfer>> transferByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
-    LOG.info("Mapping transitLayer from TransitModel...");
+    LOG.info("Mapping transitLayer from TimetableRepository...");
 
     Collection<TripPattern> allTripPatterns = transitService.getAllTripPatterns();
 

@@ -23,7 +23,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,15 +37,19 @@ public class GraphBuilder implements Runnable {
 
   private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
 
   private boolean hasTransitData = false;
 
   @Inject
-  public GraphBuilder(Graph baseGraph, TransitModel transitModel, DataImportIssueStore issueStore) {
+  public GraphBuilder(
+    Graph baseGraph,
+    TimetableRepository timetableRepository,
+    DataImportIssueStore issueStore
+  ) {
     this.graph = baseGraph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
   }
 
@@ -57,7 +61,7 @@ public class GraphBuilder implements Runnable {
     BuildConfig config,
     GraphBuilderDataSources dataSources,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     @Nullable EmissionsDataModel emissionsDataModel,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -70,18 +74,18 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    transitModel.initTimeZone(config.transitModelTimeZone);
+    timetableRepository.initTimeZone(config.transitModelTimeZone);
 
     var builder = DaggerGraphBuilderFactory
       .builder()
       .config(config)
       .graph(graph)
-      .transitModel(transitModel)
+      .timetableRepository(timetableRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .dataSources(dataSources)
-      .timeZoneId(transitModel.getTimeZone());
+      .timeZoneId(timetableRepository.getTimeZone());
 
     if (OTPFeature.Co2Emissions.isOn()) {
       builder.emissionsDataModel(emissionsDataModel);
@@ -114,7 +118,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.tripPatternNamer());
     }
 
-    if (hasTransitData && transitModel.getAgencyTimeZones().size() > 1) {
+    if (hasTransitData && timetableRepository.getAgencyTimeZones().size() > 1) {
       graphBuilder.addModule(factory.timeZoneAdjusterModule());
     }
 
@@ -194,7 +198,7 @@ public class GraphBuilder implements Runnable {
     new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
     // Log before we validate, this way we have more information if the validation fails
-    logGraphBuilderCompleteStatus(startTime, graph, transitModel);
+    logGraphBuilderCompleteStatus(startTime, graph, timetableRepository);
 
     validate();
   }
@@ -223,7 +227,7 @@ public class GraphBuilder implements Runnable {
    * configuration, for example, then this function will throw a {@link OtpAppException}.
    */
   private void validate() {
-    if (hasTransitData() && !transitModel.hasTransit()) {
+    if (hasTransitData() && !timetableRepository.hasTransit()) {
       throw new OtpAppException(
         "The provided transit data have no trips within the configured transit service period. " +
         "There is something wrong with your data - see the log above. Another possibility is that the " +
@@ -235,14 +239,14 @@ public class GraphBuilder implements Runnable {
   private static void logGraphBuilderCompleteStatus(
     long startTime,
     Graph graph,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
-    var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
-    var nTransfers = f.formatNumber(transitModel.getTransferService().listAll().size());
+    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
+    var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

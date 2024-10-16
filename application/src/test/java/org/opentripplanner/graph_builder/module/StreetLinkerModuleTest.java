@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner._support.geometry.Coordinates.KONGSBERG_PLATFORM_1;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -21,11 +21,11 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class StreetLinkerModuleTest {
 
@@ -67,7 +67,7 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TransitModelForTest.of().unscheduledTrip("flex", model.stop());
+      var flexTrip = TimetableRepositoryForTest.of().unscheduledTrip("flex", model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -97,7 +97,7 @@ class StreetLinkerModuleTest {
     private final TransitStopVertex stopVertex;
     private final StreetLinkerModule module;
     private final RegularStop stop;
-    private final TransitModel transitModel;
+    private final TimetableRepository timetableRepository;
 
     public TestModel() {
       var from = StreetModelForTest.intersectionVertex(
@@ -123,13 +123,13 @@ class StreetLinkerModuleTest {
           .build();
       builder.withRegularStop(stop);
 
-      transitModel = new TransitModel(builder.build(), new Deduplicator());
+      timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
 
       stopVertex = TransitStopVertex.of().withStop(stop).build();
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 
-      module = new StreetLinkerModule(graph, transitModel, DataImportIssueStore.NOOP, false);
+      module = new StreetLinkerModule(graph, timetableRepository, DataImportIssueStore.NOOP, false);
 
       assertFalse(stopVertex.isConnectedToGraph());
       assertTrue(stopVertex.getIncoming().isEmpty());
@@ -153,7 +153,7 @@ class StreetLinkerModuleTest {
     }
 
     public void withFlexTrip(UnscheduledTrip flexTrip) {
-      transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
 }

@@ -26,7 +26,11 @@
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
         "com.azure:azure-messaging-servicebus",
-        "com.azure:azure-identity"
+        "com.azure:azure-identity",
+        // there is a breaking change in this package which is breaking our workflow, that cannot
+        // be reverted: https://github.com/dotansimha/graphql-code-generator/issues/10167
+        // once that is resolved, we can remove this line
+        "@graphql-codegen/client-preset"
       ],
       "enabled": false
     },

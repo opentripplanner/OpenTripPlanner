@@ -24,7 +24,7 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 public class TestServerContext {
@@ -34,17 +34,17 @@ public class TestServerContext {
   /** Create a context for unit testing, using the default RouteRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
-    transitModel.index();
+    timetableRepository.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(timetableRepository);
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
       new RaptorConfig<>(routerConfig.transitTuningConfig()),
       graph,
-      new DefaultTransitService(transitModel),
+      new DefaultTransitService(timetableRepository),
       Metrics.globalRegistry,
       routerConfig.vectorTileConfig(),
       createWorldEnvelopeService(),
@@ -58,7 +58,7 @@ public class TestServerContext {
       null,
       null
     );
-    creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
+    creatTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
     return context;
   }
 

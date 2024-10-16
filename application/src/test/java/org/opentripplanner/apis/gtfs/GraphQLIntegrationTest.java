@@ -11,7 +11,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus.IN_TRANSIT_TO;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
@@ -79,7 +79,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
@@ -94,13 +94,13 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 
 class GraphQLIntegrationTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
@@ -115,7 +115,7 @@ class GraphQLIntegrationTest {
     .of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
     .toList();
-  private static final Route ROUTE = TransitModelForTest.route("a-route").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("a-route").build();
 
   private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
     .withVehicles(10)
@@ -160,9 +160,12 @@ class GraphQLIntegrationTest {
     var stopModel = TEST_MODEL.stopModelBuilder();
     STOP_LOCATIONS.forEach(stopModel::withRegularStop);
     var model = stopModel.build();
-    var transitModel = new TransitModel(model, DEDUPLICATOR);
+    var timetableRepository = new TimetableRepository(model, DEDUPLICATOR);
 
-    var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
+    var trip = TimetableRepositoryForTest
+      .trip("123")
+      .withHeadsign(I18NString.of("Trip Headsign"))
+      .build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
     final TripPattern pattern = TEST_MODEL
@@ -170,11 +173,11 @@ class GraphQLIntegrationTest {
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
 
-    transitModel.addTripPattern(id("pattern-1"), pattern);
+    timetableRepository.addTripPattern(id("pattern-1"), pattern);
 
     var feedId = "testfeed";
     var feedInfo = FeedInfo.dummyForTest(feedId);
-    transitModel.addFeedInfo(feedInfo);
+    timetableRepository.addFeedInfo(feedInfo);
 
     var agency = Agency
       .of(new FeedScopedId(feedId, "agency-xx"))
@@ -182,15 +185,15 @@ class GraphQLIntegrationTest {
       .withUrl("www.otp-foo.bar")
       .withTimezone("Europe/Berlin")
       .build();
-    transitModel.addAgency(agency);
+    timetableRepository.addAgency(agency);
 
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    transitModel.index();
+    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    timetableRepository.index();
     var routes = Arrays
       .stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
       .map(m ->
-        TransitModelForTest
+        TimetableRepositoryForTest
           .route(m.name())
           .withMode(m)
           .withLongName(I18NString.of("Long name for %s".formatted(m)))
@@ -201,8 +204,10 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
-    TransitEditorService transitService = new DefaultTransitService(transitModel) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
+    TransitEditorService transitService = new DefaultTransitService(timetableRepository) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(
+        timetableRepository
+      );
 
       @Override
       public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
@@ -466,7 +471,7 @@ class GraphQLIntegrationTest {
       List<String> filterByNetwork,
       TransitService transitService
     ) {
-      var stop = TransitModelForTest.of().stop("A").build();
+      var stop = TimetableRepositoryForTest.of().stop("A").build();
       return List.of(
         new PlaceAtDistance(stop, 0),
         new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),

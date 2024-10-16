@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -39,9 +39,9 @@ class RouteTest {
   private static final String FLEXIBLE_LINE_TYPE = "flexible line type";
   private static final Integer GTFS_SORT_ORDER = 0;
   private static final String URL = "url";
-  public static final Agency AGENCY = TransitModelForTest.AGENCY;
+  public static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
   private static final Route subject = Route
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withLongName(LONG_NAME)
     .withDescription(DESCRIPTION)
@@ -96,7 +96,7 @@ class RouteTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withLongName(new NonLocalizedString("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
@@ -116,7 +116,9 @@ class RouteTest {
           .build()
       )
     );
-    assertFalse(subject.sameAs(subject.copy().withAgency(TransitModelForTest.agency("X")).build()));
+    assertFalse(
+      subject.sameAs(subject.copy().withAgency(TimetableRepositoryForTest.agency("X")).build())
+    );
     assertFalse(
       subject.sameAs(
         subject
