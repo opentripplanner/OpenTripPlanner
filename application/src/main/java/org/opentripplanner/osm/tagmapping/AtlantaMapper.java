@@ -13,10 +13,9 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author demory
  * @see OsmTagMapper
- * @see DefaultMapper
  */
 
-class AtlantaMapper implements OsmTagMapper {
+class AtlantaMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -27,7 +26,6 @@ class AtlantaMapper implements OsmTagMapper {
     // Max speed limit in Georgia is 70 mph ~= 113kmh ~= 31.3m/s
     props.maxPossibleCarSpeed = 31.4f;
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }

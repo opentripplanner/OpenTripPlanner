@@ -23,9 +23,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  *
  * @author juusokor
  * @see OsmTagMapper
- * @see DefaultMapper
  */
-class FinlandMapper implements OsmTagMapper {
+class FinlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -91,6 +90,8 @@ class FinlandMapper implements OsmTagMapper {
 
     // No biking on designated footways/sidewalks
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
+    props.setProperties("highway=footway;area=yes", withModes(PEDESTRIAN));
+    //props.setProperties("public_transport=platform;area=yes", withModes(PEDESTRIAN));
     props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN));
 
     // Walking on segregated ways is safer than when cycling and walking happens on the same lane
@@ -203,8 +204,7 @@ class FinlandMapper implements OsmTagMapper {
     // ~= 16 kph
     props.setCarSpeed("highway=track", 4.5f);
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 
   @Override
