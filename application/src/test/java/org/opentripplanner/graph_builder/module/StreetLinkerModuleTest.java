@@ -105,7 +105,7 @@ class StreetLinkerModuleTest {
   @Test
   void linkCarsAllowedStop() {
     var model = new TestModel();
-    var carsAllowedTrip = TransitModelForTest
+    var carsAllowedTrip = TimetableRepositoryForTest
       .of()
       .trip("carsAllowedTrip")
       .withCarsAllowed(CarAccess.ALLOWED)
@@ -198,7 +198,7 @@ class StreetLinkerModuleTest {
     }
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
-      Route route = TransitModelForTest.route("carsAllowedRoute").build();
+      Route route = TimetableRepositoryForTest.route("carsAllowedRoute").build();
       var stopTimes = Arrays
         .stream(stops)
         .map(s -> {
@@ -214,15 +214,15 @@ class StreetLinkerModuleTest {
       RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
         trip,
         stopTimes,
-        transitModel.getDeduplicator()
+        timetableRepository.getDeduplicator()
       );
-      TripPattern tripPattern = TransitModelForTest
+      TripPattern tripPattern = TimetableRepositoryForTest
         .tripPattern("carsAllowedTripPattern", route)
         .withStopPattern(stopPattern)
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
 
-      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
 }

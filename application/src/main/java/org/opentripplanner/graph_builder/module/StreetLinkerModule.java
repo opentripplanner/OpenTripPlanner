@@ -89,10 +89,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(transitModel);
+      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(timetableRepository);
     }
 
-    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = transitModel.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
@@ -357,8 +357,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private Set<StopLocation> getStopLocationsUsedForFlexTrips(TransitModel transitModel) {
-    Set<StopLocation> stopLocations = transitModel
+  private Set<StopLocation> getStopLocationsUsedForFlexTrips(
+    TimetableRepository timetableRepository
+  ) {
+    Set<StopLocation> stopLocations = timetableRepository
       .getAllFlexTrips()
       .stream()
       .flatMap(t -> t.getStops().stream())
