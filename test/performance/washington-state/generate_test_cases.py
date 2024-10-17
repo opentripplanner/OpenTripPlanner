@@ -18,14 +18,6 @@ locations= [
         "name": "Des Moines"
     },
     {
-        "coordinates":  "47.340218616,-122.2246170043",
-        "name": "North Auburn"
-    },
-    {
-        "coordinates":  "47.31322426310727,-122.336540222167",
-        "name": "Federal Way"
-    },
-    {
         "coordinates":  "47.571024,-122.3877811",
         "name": "West Seattle"
     },

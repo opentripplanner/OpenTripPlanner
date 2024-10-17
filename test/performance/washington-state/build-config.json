@@ -50,11 +50,6 @@
     },
     {
       "type": "gtfs",
-      "source": "https://otp-performance.leonard.io/data/washington-state-new/snoqualmie-wa-us--flex-v2.zip",
-      "feedId": "snoqualmie"
-    },
-    {
-      "type": "gtfs",
       "source": "https://otp-performance.leonard.io/data/washington-state-new/soundgenerations-wa-us-hyde--flex-v2.zip",
       "feedId": "hyde"
     },
