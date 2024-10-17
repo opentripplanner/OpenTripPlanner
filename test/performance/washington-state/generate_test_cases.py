@@ -47,19 +47,19 @@ locations= [
     },
 ]
 
-failing_cases = [16, 64, 70, 82, 88, 120, 128, 130, 132, 134, 136, 138, 146, 152, 154, 158, 164, 172]
+failing_cases = []
 
 rows = []
 
 modes = [
     {
-        "mode": "TRANSIT|WALK",
-        "category": "transit",
+        "mode": "FLEX_DIRECT|WALK",
+        "category": "flex-direct",
         "window": ""
     },
     {
         "mode": "FLEX_ACCESS|FLEX_EGRESS|TRANSIT",
-        "category": "flex",
+        "category": "flex-and-transit",
         "window": "6h"
     }
 ]
