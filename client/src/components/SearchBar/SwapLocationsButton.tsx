@@ -1,7 +1,5 @@
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import swapImg from '../../static/img/swap.svg';
-
-const HINT = 'Swap from/to';
+import icon from '../../static/img/swap.svg';
 
 export function SwapLocationsButton({
   tripQueryVariables,
@@ -19,8 +17,8 @@ export function SwapLocationsButton({
   };
 
   return (
-    <button className="swap-from-to" onClick={swapFromTo} title={HINT}>
-      <img alt={HINT} src={swapImg} />
+    <button className="swap-from-to" onClick={swapFromTo} title="Swap from/to">
+      <img alt="Swap from/to" src={icon} />
     </button>
   );
 }
