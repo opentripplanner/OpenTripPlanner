@@ -123,6 +123,14 @@ public class DefaultMapperTest {
   }
 
   @Test
+  void indoor() {
+    var corridor = wps.getDataForWay(WayTestData.indoor("corridor"));
+    assertEquals(PEDESTRIAN, corridor.getPermission());
+    var area = wps.getDataForWay(WayTestData.indoor("area"));
+    assertEquals(PEDESTRIAN, area.getPermission());
+  }
+
+  @Test
   void footDiscouraged() {
     var regular = WayTestData.pedestrianTunnel();
     var props = wps.getDataForWay(regular);
