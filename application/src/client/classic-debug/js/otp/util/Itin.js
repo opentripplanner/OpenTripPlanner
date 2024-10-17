@@ -221,8 +221,9 @@ otp.util.Itin = {
         //TRANSLATORS: Tram, Streetcar, Light rail. Any light rail or street
         //level system within a metropolitan area.
         'TRAM' : _tr('Light Rail'),
-        //TRANSLATORS: Used for street-level rail cars where the cable runs beneath the vehicle.
-        'CABLE_CAR': _tr('Cable Tram'),
+        //TRANSLATORS: Used for street-level cable cars where the cable runs
+        //beneath the car.
+        'CABLE_CAR': _tr('Cable Car'),
         //TRANSLATORS: Any rail system designed for steep inclines.
         'FUNICULAR': _tr('Funicular'),
         //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial

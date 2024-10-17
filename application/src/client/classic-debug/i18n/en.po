@@ -930,8 +930,8 @@ msgstr "Light Rail"
 #. Used for street-level cable cars where the cable runs
 #. beneath the car.
 #: src/client/js/otp/util/Itin.js:226
-msgid "Cable Tram"
-msgstr "Cable Tram"
+msgid "Cable Car"
+msgstr "Cable Car"
 
 #. Any rail system designed for steep inclines.
 #: src/client/js/otp/util/Itin.js:228

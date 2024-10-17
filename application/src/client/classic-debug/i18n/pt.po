@@ -925,7 +925,7 @@ msgstr "Ferroviário leve"
 #. Used for street-level cable cars where the cable runs
 #. beneath the car.
 #: src/client/js/otp/util/Itin.js:226
-msgid "Cable Tram"
+msgid "Cable Car"
 msgstr "Eléctrico"
 
 #. Any rail system designed for steep inclines.
