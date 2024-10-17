@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 public class FareModelForTest {
 
@@ -25,7 +25,7 @@ public class FareModelForTest {
     .of(FeedScopedId.ofNullable("F2", "other-feed-zone"))
     .build();
 
-  private static final StopModelBuilder STOP_MODEL_BUILDER = StopModel.of();
+  private static final SiteRepositoryBuilder STOP_MODEL_BUILDER = SiteRepository.of();
 
   static final RegularStop AIRPORT_STOP = STOP_MODEL_BUILDER
     .regularStop(id("airport"))

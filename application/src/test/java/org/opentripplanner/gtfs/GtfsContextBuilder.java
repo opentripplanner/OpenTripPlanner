@@ -17,7 +17,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * This class helps building GtfsContext and post process the GtfsDao by repairing
@@ -44,7 +44,10 @@ public class GtfsContextBuilder {
 
   public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, File path)
     throws IOException {
-    var transitBuilder = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+    var transitBuilder = new OtpTransitServiceBuilder(
+      new SiteRepository(),
+      DataImportIssueStore.NOOP
+    );
     GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
     GtfsFeedId feedId = gtfsImport.getFeedId();
     var mapper = new GTFSToOtpTransitServiceMapper(

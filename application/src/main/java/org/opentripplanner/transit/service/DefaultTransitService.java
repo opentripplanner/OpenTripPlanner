@@ -146,18 +146,18 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Station getStationById(FeedScopedId id) {
-    return this.timetableRepository.getStopModel().getStationById(id);
+    return this.timetableRepository.getSiteRepository().getStationById(id);
   }
 
   @Override
   public MultiModalStation getMultiModalStation(FeedScopedId id) {
-    return this.timetableRepository.getStopModel().getMultiModalStation(id);
+    return this.timetableRepository.getSiteRepository().getMultiModalStation(id);
   }
 
   @Override
   public Collection<Station> getStations() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepository.getStopModel().listStations();
+    return this.timetableRepository.getSiteRepository().listStations();
   }
 
   @Override
@@ -174,7 +174,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public AreaStop getAreaStop(FeedScopedId id) {
-    return this.timetableRepository.getStopModel().getAreaStop(id);
+    return this.timetableRepository.getSiteRepository().getAreaStop(id);
   }
 
   @Override
@@ -184,7 +184,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public RegularStop getRegularStop(FeedScopedId id) {
-    return this.timetableRepository.getStopModel().getRegularStop(id);
+    return this.timetableRepository.getSiteRepository().getRegularStop(id);
   }
 
   @Override
@@ -240,40 +240,40 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<StopLocation> listStopLocations() {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().listStopLocations();
+    return timetableRepository.getSiteRepository().listStopLocations();
   }
 
   @Override
   public Collection<RegularStop> listRegularStops() {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().listRegularStops();
+    return timetableRepository.getSiteRepository().listRegularStops();
   }
 
   @Override
   public Collection<GroupStop> listGroupStops() {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().listGroupStops();
+    return timetableRepository.getSiteRepository().listGroupStops();
   }
 
   @Override
   public StopLocation getStopLocation(FeedScopedId id) {
-    return timetableRepository.getStopModel().getStopLocation(id);
+    return timetableRepository.getSiteRepository().getStopLocation(id);
   }
 
   @Override
   public Collection<StopLocation> getStopOrChildStops(FeedScopedId id) {
-    return timetableRepository.getStopModel().findStopOrChildStops(id);
+    return timetableRepository.getSiteRepository().findStopOrChildStops(id);
   }
 
   @Override
   public Collection<StopLocationsGroup> listStopLocationGroups() {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().listStopLocationGroups();
+    return timetableRepository.getSiteRepository().listStopLocationGroups();
   }
 
   @Override
   public StopLocationsGroup getStopLocationsGroup(FeedScopedId id) {
-    return timetableRepository.getStopModel().getStopLocationsGroup(id);
+    return timetableRepository.getSiteRepository().getStopLocationsGroup(id);
   }
 
   @Override
@@ -359,7 +359,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public MultiModalStation getMultiModalStationForStation(Station station) {
-    return this.timetableRepository.getStopModel().getMultiModalStationForStation(station);
+    return this.timetableRepository.getSiteRepository().getMultiModalStationForStation(station);
   }
 
   /**
@@ -683,13 +683,13 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<RegularStop> findRegularStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().findRegularStops(envelope);
+    return timetableRepository.getSiteRepository().findRegularStops(envelope);
   }
 
   @Override
   public Collection<AreaStop> findAreaStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getStopModel().findAreaStops(envelope);
+    return timetableRepository.getSiteRepository().findAreaStops(envelope);
   }
 
   @Override

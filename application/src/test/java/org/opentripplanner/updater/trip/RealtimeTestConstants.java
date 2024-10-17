@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 public interface RealtimeTestConstants {
   LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
@@ -35,8 +35,8 @@ public interface RealtimeTestConstants {
   RegularStop STOP_B2 = TEST_MODEL.stop("B2").withParentStation(STATION_B).build();
   RegularStop STOP_C1 = TEST_MODEL.stop(STOP_C1_ID).withParentStation(STATION_C).build();
   RegularStop STOP_D1 = TEST_MODEL.stop("D1").withParentStation(STATION_D).build();
-  StopModel STOP_MODEL = TEST_MODEL
-    .stopModelBuilder()
+  SiteRepository STOP_MODEL = TEST_MODEL
+    .siteRepositoryBuilder()
     .withRegularStop(STOP_A1)
     .withRegularStop(STOP_B1)
     .withRegularStop(STOP_B2)

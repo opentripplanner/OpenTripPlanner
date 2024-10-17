@@ -86,7 +86,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
       if (timetableRepository != null) {
-        var quay = timetableRepository.getStopModel().getRegularStop(stopId);
+        var quay = timetableRepository.getSiteRepository().getRegularStop(stopId);
         if (quay != null) {
           // TODO - SIRI: Add alerts from parent- and multimodal-stops
           /*

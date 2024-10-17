@@ -132,7 +132,7 @@ public class GtfsModule implements GraphBuilderModule {
         feedIdsEncountered.put(feedId, gtfsBundle);
 
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
-          new OtpTransitServiceBuilder(timetableRepository.getStopModel(), issueStore),
+          new OtpTransitServiceBuilder(timetableRepository.getSiteRepository(), issueStore),
           feedId,
           issueStore,
           gtfsBundle.discardMinTransferTimes(),

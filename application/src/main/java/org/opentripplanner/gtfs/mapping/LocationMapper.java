@@ -15,17 +15,20 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 /** Responsible for mapping GTFS Location into the OTP model. */
 public class LocationMapper {
 
   private final Map<Location, AreaStop> mappedLocations = new HashMap<>();
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final DataImportIssueStore issueStore;
 
-  public LocationMapper(StopModelBuilder stopModelBuilder, DataImportIssueStore issueStore) {
-    this.stopModelBuilder = stopModelBuilder;
+  public LocationMapper(
+    SiteRepositoryBuilder siteRepositoryBuilder,
+    DataImportIssueStore issueStore
+  ) {
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
     this.issueStore = issueStore;
   }
 
@@ -57,7 +60,7 @@ public class LocationMapper {
           )
         );
       }
-      return stopModelBuilder
+      return siteRepositoryBuilder
         .areaStop(id)
         .withName(name)
         .withUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()))

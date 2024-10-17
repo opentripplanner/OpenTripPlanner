@@ -15,7 +15,7 @@ import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class GroupStopTest {
 
@@ -27,7 +27,7 @@ class GroupStopTest {
   private static final StopLocation STOP_LOCATION = TEST_MODEL
     .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
     .build();
-  private static final GroupStop subject = StopModel
+  private static final GroupStop subject = SiteRepository
     .of()
     .groupStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
@@ -43,7 +43,7 @@ class GroupStopTest {
       .stop("2:stop", Coordinates.HAMBURG.getX(), Coordinates.HAMBURG.getY())
       .build();
 
-    GroupStop groupStop = StopModel
+    GroupStop groupStop = SiteRepository
       .of()
       .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
@@ -64,7 +64,7 @@ class GroupStopTest {
       .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
       .build();
 
-    GroupStop groupStop = StopModel
+    GroupStop groupStop = SiteRepository
       .of()
       .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)

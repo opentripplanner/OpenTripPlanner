@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 
-public class StopModelBuilder {
+public class SiteRepositoryBuilder {
 
   private final AtomicInteger stopIndexCounter;
 
@@ -28,7 +28,7 @@ public class StopModelBuilder {
   private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
   private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
-  StopModelBuilder(AtomicInteger stopIndexCounter) {
+  SiteRepositoryBuilder(AtomicInteger stopIndexCounter) {
     this.stopIndexCounter = stopIndexCounter;
   }
 
@@ -47,12 +47,12 @@ public class StopModelBuilder {
     return regularStopById.computeIfAbsent(id, factory);
   }
 
-  public StopModelBuilder withRegularStop(RegularStop stop) {
+  public SiteRepositoryBuilder withRegularStop(RegularStop stop) {
     regularStopById.add(stop);
     return this;
   }
 
-  public StopModelBuilder withRegularStops(Collection<RegularStop> stops) {
+  public SiteRepositoryBuilder withRegularStops(Collection<RegularStop> stops) {
     regularStopById.addAll(stops);
     return this;
   }
@@ -61,7 +61,7 @@ public class StopModelBuilder {
     return stationById;
   }
 
-  public StopModelBuilder withStation(Station station) {
+  public SiteRepositoryBuilder withStation(Station station) {
     stationById.add(station);
     return this;
   }
@@ -70,7 +70,7 @@ public class StopModelBuilder {
     return stationById.computeIfAbsent(id, body::apply);
   }
 
-  public StopModelBuilder withStations(Collection<Station> stations) {
+  public SiteRepositoryBuilder withStations(Collection<Station> stations) {
     stationById.addAll(stations);
     return this;
   }
@@ -79,7 +79,7 @@ public class StopModelBuilder {
     return multiModalStationById;
   }
 
-  public StopModelBuilder withMultiModalStation(MultiModalStation station) {
+  public SiteRepositoryBuilder withMultiModalStation(MultiModalStation station) {
     multiModalStationById.add(station);
     return this;
   }
@@ -88,7 +88,7 @@ public class StopModelBuilder {
     return groupOfStationById;
   }
 
-  public StopModelBuilder withGroupOfStation(GroupOfStations station) {
+  public SiteRepositoryBuilder withGroupOfStation(GroupOfStations station) {
     groupOfStationById.add(station);
     return this;
   }
@@ -101,12 +101,12 @@ public class StopModelBuilder {
     return areaStopById;
   }
 
-  public StopModelBuilder withAreaStop(AreaStop stop) {
+  public SiteRepositoryBuilder withAreaStop(AreaStop stop) {
     areaStopById.add(stop);
     return this;
   }
 
-  public StopModelBuilder withAreaStops(Collection<AreaStop> stops) {
+  public SiteRepositoryBuilder withAreaStops(Collection<AreaStop> stops) {
     areaStopById.addAll(stops);
     return this;
   }
@@ -119,21 +119,21 @@ public class StopModelBuilder {
     return groupStopById;
   }
 
-  public StopModelBuilder withGroupStop(GroupStop group) {
+  public SiteRepositoryBuilder withGroupStop(GroupStop group) {
     groupStopById.add(group);
     return this;
   }
 
-  public StopModelBuilder withGroupStops(Collection<GroupStop> groups) {
+  public SiteRepositoryBuilder withGroupStops(Collection<GroupStop> groups) {
     groupStopById.addAll(groups);
     return this;
   }
 
   /**
-   * Add the content of another stop model. There are no collision check, entities in the given
+   * Add the content of another site repository. There are no collision check, entities in the given
    * {@code other} model, will replace existing entities.
    */
-  public StopModelBuilder addAll(StopModel other) {
+  public SiteRepositoryBuilder addAll(SiteRepository other) {
     regularStopById.addAll(other.listRegularStops());
     stationById.addAll(other.listStations());
     multiModalStationById.addAll(other.listMultiModalStations());
@@ -143,8 +143,8 @@ public class StopModelBuilder {
     return this;
   }
 
-  public StopModel build() {
-    return new StopModel(this);
+  public SiteRepository build() {
+    return new SiteRepository(this);
   }
 
   AtomicInteger stopIndexCounter() {

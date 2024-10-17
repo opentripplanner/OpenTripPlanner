@@ -108,7 +108,7 @@ class LuceneIndexTest {
 
   @BeforeAll
   static void setup() {
-    var stopModel = TEST_MODEL.stopModelBuilder();
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder();
     List
       .of(
         ALEXANDERPLATZ_BUS,
@@ -122,11 +122,11 @@ class LuceneIndexTest {
         MERIDIAN_N2,
         MERIDIAN_AVE
       )
-      .forEach(stopModel::withRegularStop);
+      .forEach(siteRepository::withRegularStop);
     List
       .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
-      .forEach(stopModel::withStation);
-    var timetableRepository = new TimetableRepository(stopModel.build(), new Deduplicator());
+      .forEach(siteRepository::withStation);
+    var timetableRepository = new TimetableRepository(siteRepository.build(), new Deduplicator());
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap

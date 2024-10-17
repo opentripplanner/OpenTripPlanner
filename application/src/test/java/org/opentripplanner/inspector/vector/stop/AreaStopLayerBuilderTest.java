@@ -9,17 +9,17 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 class AreaStopLayerBuilderTest {
 
   private static final FeedScopedId ID = new FeedScopedId("FEED", "ID");
   private static final I18NString NAME = I18NString.of("Test stop");
 
-  private final StopModelBuilder stopModelBuilder = StopModel.of();
+  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
-  private final AreaStop areaStop = stopModelBuilder
+  private final AreaStop areaStop = siteRepositoryBuilder
     .areaStop(ID)
     .withName(NAME)
     .withGeometry(Polygons.BERLIN)

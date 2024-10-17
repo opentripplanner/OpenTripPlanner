@@ -37,7 +37,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .groups()
       .stream()
       .flatMap(group -> {
-        var primaryStop = timetableRepository.getStopModel().getRegularStop(group.primary());
+        var primaryStop = timetableRepository.getSiteRepository().getRegularStop(group.primary());
         if (primaryStop == null) {
           LOG.error(
             "Could not find primary stop with id {}. Ignoring stop group {}.",
@@ -98,7 +98,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .flatMap(g -> g.secondaries().stream())
       .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
       .findAny()
-      .map(id -> timetableRepository.getStopModel().getRegularStop(id));
+      .map(id -> timetableRepository.getSiteRepository().getRegularStop(id));
   }
 
   @Override
@@ -110,6 +110,6 @@ public class DefaultStopConsolidationService implements StopConsolidationService
       .map(ConsolidatedStopGroup::primary)
       .findAny()
       .orElse(id);
-    return Optional.ofNullable(timetableRepository.getStopModel().getRegularStop(primaryId));
+    return Optional.ofNullable(timetableRepository.getSiteRepository().getRegularStop(primaryId));
   }
 }

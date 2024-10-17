@@ -52,14 +52,14 @@ class DefaultTransitServiceTest {
 
   @BeforeAll
   static void setup() {
-    var stopModel = TEST_MODEL
-      .stopModelBuilder()
+    var siteRepository = TEST_MODEL
+      .siteRepositoryBuilder()
       .withRegularStop(STOP_A)
       .withRegularStop(STOP_B)
       .withStation(STATION)
       .build();
 
-    var timetableRepository = new TimetableRepository(stopModel, new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     timetableRepository.index();
 

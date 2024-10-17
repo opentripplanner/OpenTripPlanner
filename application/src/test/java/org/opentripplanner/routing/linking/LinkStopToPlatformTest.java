@@ -32,7 +32,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +45,9 @@ public class LinkStopToPlatformTest {
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
+    var siteRepository = new SiteRepository();
     Graph graph = new Graph(deduplicator);
-    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
@@ -107,7 +107,7 @@ public class LinkStopToPlatformTest {
     }
 
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
 
     for (RegularStop s : transitStops) {
       var v = TransitStopVertex.of().withStop(s).build();

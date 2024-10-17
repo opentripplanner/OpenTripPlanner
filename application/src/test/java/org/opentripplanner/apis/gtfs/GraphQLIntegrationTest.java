@@ -157,9 +157,9 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
-    var stopModel = TEST_MODEL.stopModelBuilder();
-    STOP_LOCATIONS.forEach(stopModel::withRegularStop);
-    var model = stopModel.build();
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder();
+    STOP_LOCATIONS.forEach(siteRepository::withRegularStop);
+    var model = siteRepository.build();
     var timetableRepository = new TimetableRepository(model, DEDUPLICATOR);
 
     var trip = TimetableRepositoryForTest

@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class StopsLayerTest {
@@ -47,7 +47,7 @@ public class StopsLayerTest {
     .withCoordinate(WgsCoordinate.GREENWICH)
     .withName(I18NString.of("A Station"))
     .build();
-  private static final RegularStop STOP = StopModel
+  private static final RegularStop STOP = SiteRepository
     .of()
     .regularStop(new FeedScopedId("F", "name"))
     .withName(NAME_TRANSLATIONS)
@@ -59,7 +59,7 @@ public class StopsLayerTest {
   @Test
   public void digitransitStopPropertyMapperTest() {
     var deduplicator = new Deduplicator();
-    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.index();
     var transitService = new TestTransitService(timetableRepository);
 
@@ -81,7 +81,7 @@ public class StopsLayerTest {
   @Test
   public void digitransitStopPropertyMapperTranslationTest() {
     var deduplicator = new Deduplicator();
-    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository);
 
