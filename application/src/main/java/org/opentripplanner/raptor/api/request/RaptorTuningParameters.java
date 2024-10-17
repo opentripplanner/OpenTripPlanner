@@ -20,11 +20,6 @@ public interface RaptorTuningParameters {
     return 60;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig} **/
-  default int searchThreadPoolSize() {
-    return 0;
-  }
-
   /**
    * Coefficients used to calculate raptor-search-window parameters dynamically  from heuristics.
    */

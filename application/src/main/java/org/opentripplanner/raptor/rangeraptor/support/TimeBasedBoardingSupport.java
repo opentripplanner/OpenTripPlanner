@@ -13,7 +13,6 @@ import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
 
 /**
  * This class contains code which is shared by all time-dependent {@link RoutingStrategy}s.
@@ -119,9 +118,6 @@ public final class TimeBasedBoardingSupport<T extends RaptorTripSchedule> {
     return calculator.plusDuration(prevArrivalTime, boardSlack);
   }
 
-  /**
-   * Create a trip search using {@link TripScheduleBoardSearch}.
-   */
   private RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
     if (!inFirstIteration && isFirstRound(round) && !hasTimeDependentAccess) {
       // For the first round of every iteration(except the first) we restrict the first

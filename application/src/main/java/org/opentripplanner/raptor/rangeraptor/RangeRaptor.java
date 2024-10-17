@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor;
 
 import static java.util.Objects.requireNonNull;
 
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -66,6 +65,8 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
 
   private final LifeCycleEventPublisher lifeCycle;
 
+  private final Runnable timeoutHook;
+
   private final int minNumberOfRounds;
 
   public RangeRaptor(
@@ -75,7 +76,8 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
     RoundTracker roundTracker,
     RaptorTransitCalculator<T> calculator,
     LifeCycleEventPublisher lifeCyclePublisher,
-    RaptorTimers timers
+    RaptorTimers timers,
+    Runnable timeoutHook
   ) {
     this.worker = requireNonNull(worker);
     this.transitData = requireNonNull(transitData);
@@ -85,6 +87,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
     this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
     this.roundTracker = requireNonNull(roundTracker);
     this.lifeCycle = requireNonNull(lifeCyclePublisher);
+    this.timeoutHook = requireNonNull(timeoutHook);
   }
 
   public RaptorRouterResult<T> route() {
@@ -165,7 +168,7 @@ public final class RangeRaptor<T extends RaptorTripSchedule> implements RaptorRo
    * Run the raptor search for this particular iteration departure time
    */
   private void setupIteration(int iterationDepartureTime) {
-    OTPRequestTimeoutException.checkForTimeout();
+    timeoutHook.run();
     roundTracker.setupIteration();
     lifeCycle.prepareForNextRound(round());
     lifeCycle.setupIteration(iterationDepartureTime);

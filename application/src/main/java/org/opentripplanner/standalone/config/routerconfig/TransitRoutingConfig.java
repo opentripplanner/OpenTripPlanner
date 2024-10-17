@@ -112,7 +112,7 @@ Multiple searches can run in parallel - this parameter have no effect with regar
 no extra threads are started and the search is done in one thread.
 """
         )
-        .asInt(dft.searchThreadPoolSize());
+        .asInt(0);
     // Dynamic Search Window
     this.stopBoardAlightDuringTransferCost =
       c
@@ -244,7 +244,6 @@ for more info."
     return iterationDepartureStepInSeconds;
   }
 
-  @Override
   public int searchThreadPoolSize() {
     return searchThreadPoolSize;
   }
