@@ -50,11 +50,6 @@
     },
     {
       "type": "gtfs",
-      "source": "https://otp-performance.leonard.io/data/washington-state-new/piercetransit-wa-us--flex-v2.zip",
-      "feedId": "pierce-flex"
-    },
-    {
-      "type": "gtfs",
       "source": "https://otp-performance.leonard.io/data/washington-state-new/snoqualmie-wa-us--flex-v2.zip",
       "feedId": "snoqualmie"
     },
