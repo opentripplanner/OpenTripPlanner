@@ -116,4 +116,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-flight-recorder
-          path: ${{ matrix.location}}-speed-test.jfr
+          path: application/${{ matrix.location }}-speed-test.jfr
