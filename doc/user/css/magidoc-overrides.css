@@ -1,0 +1,11 @@
+/*
+ * This file contains custom CSS overrides for the GraphQL documentation available at
+ * https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/
+ */
+
+/*
+ * Hide the deprecated queries from the left hand navigation panel.
+ */
+nav ul li .deprecated {
+  display: none;
+}
