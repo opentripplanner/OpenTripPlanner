@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { request } from 'graphql-request'; // eslint-disable-line import/no-unresolved
-import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
+import { Location, QueryType, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
 import { query } from '../static/query/tripQuery.tsx';
 
@@ -37,10 +37,14 @@ export const useTripQuery: TripQueryHook = (variables) => {
   );
 
   useEffect(() => {
-    if (variables?.from.coordinates && variables?.to.coordinates) {
+    if (validLocation(variables?.from) && validLocation(variables?.to)) {
       callback();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variables?.from, variables?.to]);
   return [data, loading, callback];
 };
+
+function validLocation(location: Location | undefined) {
+  return location && (location.coordinates || location.place);
+}
