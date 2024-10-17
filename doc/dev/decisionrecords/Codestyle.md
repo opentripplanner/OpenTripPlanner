@@ -157,6 +157,19 @@ context. Please avoid including trivial Javadoc or the empty Javadoc stubs added
     - Is it immutable or should anything be treated as immutable
     - Is it a utility class of static methods that should not be instantiated
 
+### Annotations
+
+- On methods:
+    - Method should be marked as `@Nullable` if they can return null values
+    - Method parameters should be marked as `@Nullable` if they can take null values.
+- On fields:
+    - Fields should be marked as `@Nullable` if they are nullable.
+
+Use of `@Nonnull` annotation is not allowed. It should be assumed methods/parameters/fields
+are non-null if they are not marked as `@Nullable`. However, there are places where the
+`@Nullable` annotation is missing even if it should have been used. Those can be updated
+to use the `@Nullable` annotation.
+
 ## JavaScript
 
 As of #206, we
