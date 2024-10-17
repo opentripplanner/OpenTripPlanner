@@ -102,14 +102,14 @@ jobs:
         run: |
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=../test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
 
-      - run: find . -name *travelSearch*
+      - run: find . -name *.jfr
 
       - name: Archive travel results file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
-          path: test/performance/${{ matrix.location }}/travelSearch-results.csv
+          path: test/performance/${{ matrix.location }}/travelSearch-results-md.csv
 
       - name: Archive Flight Recorder instrumentation file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
