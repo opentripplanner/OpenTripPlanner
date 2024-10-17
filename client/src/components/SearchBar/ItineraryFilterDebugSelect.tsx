@@ -11,11 +11,12 @@ export function ItineraryFilterDebugSelect({
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor="itineraryDebugFilterSelect">
-        Itinerary filter debug
+        Filter debug
       </Form.Label>
       <Form.Select
         id="itineraryDebugFilterSelect"
         size="sm"
+        className="input-medium"
         onChange={(e) => {
           setTripQueryVariables({
             ...tripQueryVariables,

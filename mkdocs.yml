@@ -56,12 +56,12 @@ nav:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
-    - Data Sources: 'Data-Sources.md'
+    - Netex and SIRI Tutorial: 'Netex-Tutorial.md'
     - Getting OTP: 'Getting-OTP.md'
+    - Data Sources: 'Data-Sources.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
-    - Netex and SIRI: 'Netex-Norway.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
     - Frontends: 'Frontends.md'
@@ -90,6 +90,7 @@ nav:
     - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Accessibility: 'Accessibility.md'
+    - NeTex and Siri compatibility: 'features-explained/Netex-Siri-Compatibility.md'
     - "Travel Time Analysis": 'Analysis.md'
     - "Logging": "Logging.md"
 - Development:

@@ -106,16 +106,6 @@ standards:
 2. Strip out any unneeded information by using the `osmium filter-tags` as describe
    in [Preparing OSM](Preparing-OSM.md)
 
-### Code Comments
-
-As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new
-methods, classes, and fields should include comments explaining what they are for and any other
-pertinent information. For Java code, the comments should use the
-[JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide
-comments that not only explain *what* you did but also *why you did it* while providing some
-context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
-`@param` annotations with no description.
-
 ### Itinerary and API Snapshot Tests
 
 To test the itinerary generation, and the API there are snapshot test which save the result of the
@@ -205,7 +195,8 @@ so they are a bit easier to maintain that way. The primary audience is also acti
 that have the code checked out locally.
 
  - [Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
- - [Code Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
+ - [Code Style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/Codestyle.md)
+ - [Naming Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/NamingConventions.md)
  - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DEVELOPMENT_DECISION_RECORDS.md)
 
 

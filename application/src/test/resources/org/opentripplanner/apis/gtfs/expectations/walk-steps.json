@@ -1,0 +1,39 @@
+{
+  "data" : {
+    "planConnection" : {
+      "edges" : [
+        {
+          "node" : {
+            "legs" : [
+              {
+                "steps" : [
+                  {
+                    "streetName" : "street",
+                    "area" : false,
+                    "relativeDirection" : "DEPART",
+                    "absoluteDirection" : "NORTHEAST"
+                  },
+                  {
+                    "streetName" : "elevator",
+                    "area" : false,
+                    "relativeDirection" : "ELEVATOR",
+                    "absoluteDirection" : null
+                  }
+                ]
+              },
+              {
+                "steps" : [ ]
+              },
+              {
+                "steps" : [ ]
+              },
+              {
+                "steps" : [ ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

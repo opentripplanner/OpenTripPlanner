@@ -3,7 +3,7 @@
 ## Contact Info
 
 - For HSL Park and Ride updater: Digitransit team, HSL, Helsinki, Finland
-- For Bikely, NOI and Bikeep updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
+- For Bikely, Bikeep and SIRI-FM updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
 
 ## Documentation
@@ -16,7 +16,7 @@ Currently contains the following updaters:
 - [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
 - [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - [Bikely](https://www.safebikely.com/)
-- [NOI Open Data Hub](https://opendatahub.com/)
+- SIRI-FM
 
 ### Configuration
 
@@ -61,7 +61,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[2]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -131,7 +131,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[3]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -216,7 +216,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[4]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -251,67 +251,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- bikely END -->
 
-## NOI Open Data Hub
-
-<!-- noi-open-data-hub BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-| Config Parameter                |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
-|---------------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
-| [feedId](#u__5__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
-| frequency                       |    `duration`   | How often to update the source.                                              | *Optional* | `"PT1M"`      |  2.6  |
-| [sourceType](#u__5__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
-| url                             |      `uri`      | URL of the locations endpoint.                                               | *Required* |               |  2.6  |
-| [headers](#u__5__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
-
-
-#### Details
-
-<h4 id="u__5__feedId">feedId</h4>
-
-**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[5] 
-
-The id of the data source, which will be the prefix of the parking lot's id.
-
-This will end up in the API responses as the feed id of the parking lot.
-
-<h4 id="u__5__sourceType">sourceType</h4>
-
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[5]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
-
-The source of the vehicle updates.
-
-<h4 id="u__5__headers">headers</h4>
-
-**Since version:** `2.6` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[5] 
-
-HTTP headers to add to the request. Any header key, value can be inserted.
-
-
-
-##### Example configuration
-
-```JSON
-// router-config.json
-{
-  "updaters" : [
-    {
-      "type" : "vehicle-parking",
-      "feedId" : "noi",
-      "sourceType" : "noi-open-data-hub",
-      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
-    }
-  ]
-}
-```
-
-<!-- noi-open-data-hub END -->
-
 ## Bikeep
 
 <!-- bikeep BEGIN -->
@@ -320,36 +259,36 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 | Config Parameter                 |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |----------------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-parking"         |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
-| [feedId](#u__14__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
+| [feedId](#u__13__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
 | frequency                        |    `duration`   | How often to update the source.                                              | *Optional* | `"PT1M"`      |  2.6  |
-| [sourceType](#u__14__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
+| [sourceType](#u__13__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
 | url                              |      `uri`      | URL of the locations endpoint.                                               | *Required* |               |  2.6  |
-| [headers](#u__14__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
+| [headers](#u__13__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
 
 
 #### Details
 
-<h4 id="u__14__feedId">feedId</h4>
+<h4 id="u__13__feedId">feedId</h4>
 
 **Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[14] 
+**Path:** /updaters/[13] 
 
 The id of the data source, which will be the prefix of the parking lot's id.
 
 This will end up in the API responses as the feed id of the parking lot.
 
-<h4 id="u__14__sourceType">sourceType</h4>
+<h4 id="u__13__sourceType">sourceType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[14]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
+**Path:** /updaters/[13]   
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
-<h4 id="u__14__headers">headers</h4>
+<h4 id="u__13__headers">headers</h4>
 
 **Since version:** `2.6` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[14] 
+**Path:** /updaters/[13] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
@@ -387,36 +326,36 @@ which requires SIRI 2.1.
 | Config Parameter                 |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |----------------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-parking"         |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
-| [feedId](#u__15__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
+| [feedId](#u__14__feedId)         |     `string`    | The id of the data source, which will be the prefix of the parking lot's id. | *Required* |               |  2.2  |
 | frequency                        |    `duration`   | How often to update the source.                                              | *Optional* | `"PT1M"`      |  2.6  |
-| [sourceType](#u__15__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
-| [url](#u__15__url)               |      `uri`      | URL of the SIRI-FM Light endpoint.                                           | *Required* |               |  2.6  |
-| [headers](#u__15__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
+| [sourceType](#u__14__sourceType) |      `enum`     | The source of the vehicle updates.                                           | *Required* |               |  2.2  |
+| [url](#u__14__url)               |      `uri`      | URL of the SIRI-FM Light endpoint.                                           | *Required* |               |  2.6  |
+| [headers](#u__14__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.6  |
 
 
 #### Details
 
-<h4 id="u__15__feedId">feedId</h4>
+<h4 id="u__14__feedId">feedId</h4>
 
 **Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[15] 
+**Path:** /updaters/[14] 
 
 The id of the data source, which will be the prefix of the parking lot's id.
 
 This will end up in the API responses as the feed id of the parking lot.
 
-<h4 id="u__15__sourceType">sourceType</h4>
+<h4 id="u__14__sourceType">sourceType</h4>
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[15]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `noi-open-data-hub` | `bikeep` | `siri-fm`
+**Path:** /updaters/[14]   
+**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
-<h4 id="u__15__url">url</h4>
+<h4 id="u__14__url">url</h4>
 
 **Since version:** `2.6` ∙ **Type:** `uri` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[15] 
+**Path:** /updaters/[14] 
 
 URL of the SIRI-FM Light endpoint.
 
@@ -427,10 +366,10 @@ The contents must also conform to the [Italian SIRI profile](https://github.com/
 which requires SIRI 2.1.
 
 
-<h4 id="u__15__headers">headers</h4>
+<h4 id="u__14__headers">headers</h4>
 
 **Since version:** `2.6` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[15] 
+**Path:** /updaters/[14] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
