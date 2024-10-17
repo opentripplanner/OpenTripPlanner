@@ -170,3 +170,20 @@
 .maplibregl-ctrl-group.layer-select label {
   margin-left: 6px;
 }
+
+.maplibregl-ctrl-group.layer-select h4 {
+  font-size: 17px;
+}
+
+.maplibregl-ctrl-group.layer-select .group-label {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.maplibregl-ctrl-group.layer-select div.group {
+  margin-top: 10px;
+}
+
+.maplibregl-ctrl-group.layer-select div.layer {
+  margin-left: 17px;
+}
