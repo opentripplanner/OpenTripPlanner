@@ -27,6 +27,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
@@ -144,9 +145,36 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     );
   }
 
+  static Stream<Arguments> transportModesCasesWithCoach() {
+    return Stream.of(
+      of(
+        List.of(mode("BUS")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS]}]}]"
+      ),
+      of(
+        List.of(mode("BUS"), mode("COACH")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
+      ),
+      of(
+        List.of(mode("BUS"), mode("MONORAIL")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, MONORAIL]}]}]"
+      )
+    );
+  }
+
   @ParameterizedTest
   @MethodSource("transportModesCases")
   void modes(List<Map<String, Object>> modes, String expectedFilters) {
+    OTPFeature.GtfsCoach.testOff(() -> testModes(modes, expectedFilters));
+  }
+
+  @ParameterizedTest
+  @MethodSource("transportModesCasesWithCoach")
+  void modesWithCoach(List<Map<String, Object>> modes, String expectedFilters) {
+    OTPFeature.GtfsCoach.testOn(() -> testModes(modes, expectedFilters));
+  }
+
+  private void testModes(List<Map<String, Object>> modes, String expectedFilters) {
     Map<String, Object> arguments = Map.of("transportModes", modes);
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
