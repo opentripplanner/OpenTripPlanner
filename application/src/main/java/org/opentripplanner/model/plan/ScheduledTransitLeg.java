@@ -164,7 +164,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public LegTime start() {
-    if (getRealTime()) {
+    if (isRealTimeUpdated()) {
       return LegTime.of(startTime, getDepartureDelay());
     } else {
       return LegTime.ofStatic(startTime);
@@ -173,7 +173,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public LegTime end() {
-    if (getRealTime()) {
+    if (isRealTimeUpdated()) {
       return LegTime.of(endTime, getArrivalDelay());
     } else {
       return LegTime.ofStatic(endTime);
@@ -216,13 +216,10 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public boolean getRealTime() {
+  public boolean isRealTimeUpdated() {
     return (
-      !tripTimes.isScheduled() &&
-      (
-        !tripTimes.isNoDataStop(boardStopPosInPattern) ||
-        !tripTimes.isNoDataStop(alightStopPosInPattern)
-      )
+      tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
+      tripTimes.isRealTimeUpdated(alightStopPosInPattern)
     );
   }
 
@@ -283,7 +280,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
       StopLocation stop = tripPattern.getStop(i);
-      final StopArrival visit = mapper.map(i, stop, getRealTime());
+      final StopArrival visit = mapper.map(i, stop, isRealTimeUpdated());
       visits.add(visit);
     }
     return visits;
@@ -417,7 +414,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("to", getTo())
       .addTime("startTime", startTime)
       .addTime("endTime", endTime)
-      .addBool("realTime", getRealTime())
+      .addBool("realTime", isRealTimeUpdated())
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
       .addNum("routeType", getRouteType())

@@ -773,6 +773,25 @@ public class GraphQLTypes {
     VEHICLE_RENT,
   }
 
+  public static class GraphQLFixedDatedStopTimeHeadsignArgs {
+
+    private String language;
+
+    public GraphQLFixedDatedStopTimeHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public enum GraphQLFormFactor {
     BICYCLE,
     CAR,
@@ -2195,6 +2214,65 @@ public class GraphQLTypes {
 
     public void setGraphQLIds(List<String> ids) {
       this.ids = ids;
+    }
+  }
+
+  public static class GraphQLQueryTypeCanceledTripsArgs {
+
+    private String after;
+    private String before;
+    private List<String> feeds;
+    private Integer first;
+    private Integer last;
+
+    public GraphQLQueryTypeCanceledTripsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        this.feeds = (List<String>) args.get("feeds");
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+      }
+    }
+
+    public String getGraphQLAfter() {
+      return this.after;
+    }
+
+    public String getGraphQLBefore() {
+      return this.before;
+    }
+
+    public List<String> getGraphQLFeeds() {
+      return this.feeds;
+    }
+
+    public Integer getGraphQLFirst() {
+      return this.first;
+    }
+
+    public Integer getGraphQLLast() {
+      return this.last;
+    }
+
+    public void setGraphQLAfter(String after) {
+      this.after = after;
+    }
+
+    public void setGraphQLBefore(String before) {
+      this.before = before;
+    }
+
+    public void setGraphQLFeeds(List<String> feeds) {
+      this.feeds = feeds;
+    }
+
+    public void setGraphQLFirst(Integer first) {
+      this.first = first;
+    }
+
+    public void setGraphQLLast(Integer last) {
+      this.last = last;
     }
   }
 
@@ -4543,6 +4621,16 @@ public class GraphQLTypes {
     STOP_ON_ROUTES,
     STOP_ON_TRIPS,
     TRIPS,
+  }
+
+  /** Whether stop has been updated through a realtime update and if so, how. */
+  public enum GraphQLStopRealTimeState {
+    ADDED,
+    CANCELED,
+    NO_DATA,
+    RECORDED,
+    UNUPDATED,
+    UPDATED,
   }
 
   public static class GraphQLStoptimeHeadsignArgs {

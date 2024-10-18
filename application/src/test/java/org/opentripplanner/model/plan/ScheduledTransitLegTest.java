@@ -1,8 +1,10 @@
 package org.opentripplanner.model.plan;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.OffsetDateTime;
@@ -49,6 +51,7 @@ class ScheduledTransitLegTest {
 
     assertNull(leg.start().estimated());
     assertNull(leg.end().estimated());
+    assertFalse(leg.isRealTimeUpdated());
   }
 
   @Test
@@ -67,6 +70,7 @@ class ScheduledTransitLegTest {
 
     assertNotNull(leg.start().estimated());
     assertNotNull(leg.end().estimated());
+    assertTrue(leg.isRealTimeUpdated());
   }
 
   private static ScheduledTransitLegBuilder builder() {

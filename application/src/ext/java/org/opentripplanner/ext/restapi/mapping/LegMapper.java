@@ -87,7 +87,7 @@ public class LegMapper {
 
     api.departureDelay = domain.getDepartureDelay();
     api.arrivalDelay = domain.getArrivalDelay();
-    api.realTime = domain.getRealTime();
+    api.realTime = domain.isRealTimeUpdated();
     api.isNonExactFrequency = domain.getNonExactFrequency();
     api.headway = domain.getHeadway();
     api.distance = round3Decimals(domain.getDistanceMeters());

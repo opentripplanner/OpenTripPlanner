@@ -188,7 +188,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<Boolean> realTime() {
-    return environment -> getSource(environment).getRealTime();
+    return environment -> getSource(environment).isRealTimeUpdated();
   }
 
   @Override
