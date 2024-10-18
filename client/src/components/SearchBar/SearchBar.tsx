@@ -38,9 +38,21 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
           {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target} />}
         </div>
       </Navbar.Brand>
-      <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
+      <LocationInputField
+        label="From"
+        id="fromInputField"
+        locationFieldKey="from"
+        tripQueryVariables={tripQueryVariables}
+        setTripQueryVariables={setTripQueryVariables}
+      />
       <SwapLocationsButton tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-      <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />
+      <LocationInputField
+        label="To"
+        id="toInputField"
+        locationFieldKey="to"
+        tripQueryVariables={tripQueryVariables}
+        setTripQueryVariables={setTripQueryVariables}
+      />
       <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <DateTimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
