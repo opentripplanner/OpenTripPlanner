@@ -49,7 +49,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.update()).thenReturn(true);
 
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
 
     var parameters = new VehicleParkingUpdaterParameters() {
       @Override

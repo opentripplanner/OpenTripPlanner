@@ -262,11 +262,11 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
-    var stopModelBuilder = TEST_MODEL.stopModelBuilder();
+    var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = stopModelBuilder
+      var stop = siteRepositoryBuilder
         .regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
@@ -311,7 +311,7 @@ public class RaptorPathToItineraryMapperTest {
       null,
       null,
       TEST_MODEL
-        .stopModelBuilder()
+        .siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)

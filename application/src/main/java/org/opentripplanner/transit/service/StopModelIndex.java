@@ -24,9 +24,9 @@ import org.slf4j.event.Level;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-class StopModelIndex {
+class SiteRepositoryIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiteRepositoryIndex.class);
 
   private final HashGridSpatialIndex<RegularStop> regularStopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
@@ -36,7 +36,7 @@ class StopModelIndex {
   /**
    * @param stops All stops including regular transit and flex
    */
-  StopModelIndex(
+  SiteRepositoryIndex(
     Collection<RegularStop> stops,
     Collection<AreaStop> flexStops,
     Collection<GroupStop> groupStops,

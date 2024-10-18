@@ -19,7 +19,7 @@ import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 public class PlaceTest {
 
@@ -79,7 +79,7 @@ public class PlaceTest {
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
   @MethodSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
-    var stop = StopModel
+    var stop = SiteRepository
       .of()
       .areaStop(new FeedScopedId("1", "stop_id"))
       .withGeometry(GEOMETRY)

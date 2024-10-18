@@ -6,7 +6,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public record TestOtpModel(Graph graph, TimetableRepository timetableRepository) {
   public TestOtpModel index() {
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
     return this;
   }
 }

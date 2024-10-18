@@ -94,7 +94,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStations() {
-    Collection<Station> stations = subject.stopModel().listStations();
+    Collection<Station> stations = subject.siteRepository().listStations();
 
     assertEquals(1, stations.size());
     assertEquals("Station{F:station station}", first(stations).toString());
@@ -102,7 +102,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStops() {
-    Collection<RegularStop> stops = subject.stopModel().listRegularStops();
+    Collection<RegularStop> stops = subject.siteRepository().listRegularStops();
 
     assertEquals(25, stops.size());
     assertEquals("RegularStop{F:A A}", first(stops).toString());
@@ -132,14 +132,14 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    RegularStop stop = subject.stopModel().getRegularStop(TimetableRepositoryForTest.id("P"));
+    RegularStop stop = subject.siteRepository().getRegularStop(TimetableRepositoryForTest.id("P"));
     assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
   @Test
   public void testGetStopsForStation() {
     List<StopLocation> stops = new ArrayList<>(
-      subject.stopModel().getStationById(STATION_ID).getChildStops()
+      subject.siteRepository().getStationById(STATION_ID).getChildStops()
     );
     assertEquals("[RegularStop{F:A A}]", stops.toString());
   }

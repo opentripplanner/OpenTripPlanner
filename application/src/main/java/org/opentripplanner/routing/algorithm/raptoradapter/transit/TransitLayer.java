@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * This is a replica of public transportation data already present in TimetableRepository, but rearranged
@@ -48,7 +48,7 @@ public class TransitLayer {
    */
   private final TransferService transferService;
 
-  private final StopModel stopModel;
+  private final SiteRepository siteRepository;
 
   private final RaptorRequestTransferCache transferCache;
 
@@ -69,7 +69,7 @@ public class TransitLayer {
       transitLayer.tripPatternsRunningOnDate,
       transitLayer.transfersByStopIndex,
       transitLayer.transferService,
-      transitLayer.stopModel,
+      transitLayer.siteRepository,
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
@@ -81,7 +81,7 @@ public class TransitLayer {
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,
-    StopModel stopModel,
+    SiteRepository siteRepository,
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
@@ -90,7 +90,7 @@ public class TransitLayer {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
-    this.stopModel = stopModel;
+    this.siteRepository = siteRepository;
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
@@ -99,7 +99,7 @@ public class TransitLayer {
 
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop == -1 ? null : this.stopModel.stopByIndex(stop);
+    return stop == -1 ? null : this.siteRepository.stopByIndex(stop);
   }
 
   /**
@@ -112,7 +112,7 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopModel.stopIndexSize();
+    return siteRepository.stopIndexSize();
   }
 
   /**

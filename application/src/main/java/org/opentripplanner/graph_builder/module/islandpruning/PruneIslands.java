@@ -81,8 +81,8 @@ public class PruneIslands implements GraphBuilderModule {
       adaptivePruningDistance
     );
 
-    this.vertexLinker = graph.getLinkerSafe(timetableRepository.getStopModel());
-    this.streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
+    this.vertexLinker = graph.getLinkerSafe(timetableRepository.getSiteRepository());
+    this.streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
 
     pruneIslands(TraverseMode.BICYCLE);
     pruneIslands(TraverseMode.WALK);

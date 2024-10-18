@@ -61,7 +61,7 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public abstract class GraphRoutingTest {
@@ -85,7 +85,7 @@ public abstract class GraphRoutingTest {
     protected Builder() {
       var deduplicator = new Deduplicator();
       graph = new Graph(deduplicator);
-      timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+      timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -242,8 +242,8 @@ public abstract class GraphRoutingTest {
       double longitude,
       @Nullable Station parentStation
     ) {
-      var stopModelBuilder = timetableRepository.getStopModel().withContext();
-      var testModel = new TimetableRepositoryForTest(stopModelBuilder);
+      var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
+      var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
 
       var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (parentStation != null) {
@@ -251,19 +251,21 @@ public abstract class GraphRoutingTest {
       }
 
       var stop = stopBuilder.build();
-      timetableRepository.mergeStopModels(stopModelBuilder.withRegularStop(stop).build());
+      timetableRepository.mergeSiteRepositories(
+        siteRepositoryBuilder.withRegularStop(stop).build()
+      );
       return stop;
     }
 
     public Station stationEntity(String id, Consumer<StationBuilder> stationBuilder) {
-      var stopModelBuilder = timetableRepository.getStopModel().withContext();
-      var testModel = new TimetableRepositoryForTest(stopModelBuilder);
+      var siteRepositoryBuilder = timetableRepository.getSiteRepository().withContext();
+      var testModel = new TimetableRepositoryForTest(siteRepositoryBuilder);
 
       var builder = testModel.station(id);
       stationBuilder.accept(builder);
       var station = builder.build();
 
-      timetableRepository.mergeStopModels(stopModelBuilder.withStation(station).build());
+      timetableRepository.mergeSiteRepositories(siteRepositoryBuilder.withStation(station).build());
       return station;
     }
 

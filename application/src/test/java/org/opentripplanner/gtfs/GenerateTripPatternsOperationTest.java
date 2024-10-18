@@ -26,11 +26,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class GenerateTripPatternsOperationTest {
 
-  private static StopModel stopModel;
+  private static SiteRepository siteRepository;
   private static RegularStop stopA;
   private static RegularStop stopB;
   private static RegularStop stopC;
@@ -54,9 +54,9 @@ class GenerateTripPatternsOperationTest {
     stopA = timetableRepositoryForTest.stop("stopA").build();
     stopB = timetableRepositoryForTest.stop("stopB").build();
     stopC = timetableRepositoryForTest.stop("stopC").build();
-    stopModel =
+    siteRepository =
       timetableRepositoryForTest
-        .stopModelBuilder()
+        .siteRepositoryBuilder()
         .withRegularStop(stopA)
         .withRegularStop(stopB)
         .withRegularStop(stopC)
@@ -126,7 +126,7 @@ class GenerateTripPatternsOperationTest {
   void setup() {
     deduplicator = new Deduplicator();
     issueStore = new DefaultDataImportIssueStore();
-    transitServiceBuilder = new OtpTransitServiceBuilder(stopModel, issueStore);
+    transitServiceBuilder = new OtpTransitServiceBuilder(siteRepository, issueStore);
     double maxStopToShapeSnapDistance = 100;
     geometryProcessor =
       new GeometryProcessor(transitServiceBuilder, maxStopToShapeSnapDistance, issueStore);

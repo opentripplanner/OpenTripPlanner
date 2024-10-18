@@ -12,13 +12,13 @@ import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class FlexTripsMapperTest {
 
   @Test
   void defaultTimePenalty() {
-    var builder = new OtpTransitServiceBuilder(StopModel.of().build(), NOOP);
+    var builder = new OtpTransitServiceBuilder(SiteRepository.of().build(), NOOP);
     var stopTimes = List.of(stopTime(0), stopTime(1));
     builder.getStopTimesSortedByTrip().addAll(stopTimes);
     var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);

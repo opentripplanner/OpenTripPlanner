@@ -41,7 +41,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
-  private final StopModel stopModel;
+  private final SiteRepository siteRepository;
 
   private final VertexLinker vertexLinker;
 
@@ -74,11 +74,11 @@ public class StreetIndex {
   /**
    * Should only be called by the graph.
    */
-  public StreetIndex(Graph graph, StopModel stopModel) {
-    this.stopModel = stopModel;
+  public StreetIndex(Graph graph, SiteRepository siteRepository) {
+    this.siteRepository = siteRepository;
     this.edgeSpatialIndex = new EdgeSpatialIndex();
     this.verticesTree = new HashGridSpatialIndex<>();
-    this.vertexLinker = new VertexLinker(graph, stopModel, edgeSpatialIndex);
+    this.vertexLinker = new VertexLinker(graph, siteRepository, edgeSpatialIndex);
     this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
     this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
@@ -195,7 +195,7 @@ public class StreetIndex {
     if (nonTransitMode.isInCar()) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
-        var coordinate = stopModel.getCoordinateById(location.stopId);
+        var coordinate = siteRepository.getCoordinateById(location.stopId);
         if (coordinate != null) {
           location =
             new GenericLocation(
@@ -262,7 +262,7 @@ public class StreetIndex {
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
   public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
-    return stopModel
+    return siteRepository
       .findStopOrChildStops(id)
       .stream()
       .filter(RegularStop.class::isInstance)
