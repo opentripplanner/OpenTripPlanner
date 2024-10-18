@@ -182,7 +182,7 @@ public final class TripPattern
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
-    if (hopGeometries != null) {
+    if (hopGeometries != null && hopGeometries.length > stopPosInPattern) {
       return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
       return GeometryUtils
