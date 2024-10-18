@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { isTransitMode } from '../../util/isTransitMode.ts';
-import { getColorForMode } from '../../util/getColorForMode.ts';
+import { getColorForLeg } from '../../util/getColorForLeg.ts';
 import { generateTextColor } from '../../util/generateTextColor.ts';
 import { Leg } from '../../gql/graphql.ts';
 
@@ -27,7 +27,7 @@ export function useHeaderLegContentStyleCalculations(
   const showPublicCode =
     widthPx > 40 && isTransitMode(leg.mode) && leg.line?.publicCode && leg.line.publicCode.length <= 6;
 
-  const modeColor = getColorForMode(leg.mode);
+  const modeColor = getColorForLeg(leg);
   const legTextColor = useMemo(() => generateTextColor(modeColor), [modeColor]);
 
   return { widthPx, leftPx, legTextColor, modeColor, showPublicCode };
