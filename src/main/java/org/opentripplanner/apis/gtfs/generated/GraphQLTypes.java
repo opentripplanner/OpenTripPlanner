@@ -611,25 +611,6 @@ public class GraphQLTypes {
     SHORTEST_DURATION,
   }
 
-  public static class GraphQLDatedTripTripHeadsignArgs {
-
-    private String language;
-
-    public GraphQLDatedTripTripHeadsignArgs(Map<String, Object> args) {
-      if (args != null) {
-        this.language = (String) args.get("language");
-      }
-    }
-
-    public String getGraphQLLanguage() {
-      return this.language;
-    }
-
-    public void setGraphQLLanguage(String language) {
-      this.language = language;
-    }
-  }
-
   public static class GraphQLDepartureRowStoptimesArgs {
 
     private Integer numberOfDepartures;
@@ -747,25 +728,6 @@ public class GraphQLTypes {
     }
   }
 
-  public static class GraphQLExactDatedStopTimeHeadsignArgs {
-
-    private String language;
-
-    public GraphQLExactDatedStopTimeHeadsignArgs(Map<String, Object> args) {
-      if (args != null) {
-        this.language = (String) args.get("language");
-      }
-    }
-
-    public String getGraphQLLanguage() {
-      return this.language;
-    }
-
-    public void setGraphQLLanguage(String language) {
-      this.language = language;
-    }
-  }
-
   public static class GraphQLFeedAlertsArgs {
 
     private List<GraphQLFeedAlertType> types;
@@ -809,6 +771,25 @@ public class GraphQLTypes {
     STATION,
     STOP,
     VEHICLE_RENT,
+  }
+
+  public static class GraphQLFixedDatedStopTimeHeadsignArgs {
+
+    private String language;
+
+    public GraphQLFixedDatedStopTimeHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
   }
 
   public enum GraphQLFormFactor {

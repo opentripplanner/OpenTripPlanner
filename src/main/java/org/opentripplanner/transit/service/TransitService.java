@@ -41,7 +41,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -142,7 +141,7 @@ public interface TransitService {
    *
    * @param feeds If not null, used for filtering.
    */
-  Collection<DatedTrip> getCanceledTrips(List<String> feeds);
+  Collection<TripOnServiceDate> getCanceledTrips(List<String> feeds);
 
   Collection<Route> getAllRoutes();
 

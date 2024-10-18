@@ -26,8 +26,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -185,7 +185,7 @@ public class TimetableSnapshot {
    *
    * @param feeds if not null, only return trips from these feeds
    */
-  public ArrayList<DatedTrip> getCanceledTrips(List<String> feeds) {
+  public ArrayList<TripOnServiceDate> getCanceledTrips(List<String> feeds) {
     return timetables
       .values()
       .stream()
@@ -200,7 +200,13 @@ public class TimetableSnapshot {
                 tripTimes.isCanceled() &&
                 (feeds == null || feeds.contains(tripTimes.getTrip().getId().getFeedId()))
               )
-              .map(tripTimes -> new DatedTrip(tripTimes.getTrip(), timetable.getServiceDate()))
+              .map(tripTimes ->
+                TripOnServiceDate
+                  .of(tripTimes.getTrip().getId())
+                  .withServiceDate(timetable.getServiceDate())
+                  .withTrip(tripTimes.getTrip())
+                  .build()
+              )
           )
       )
       .collect(Collectors.toCollection(ArrayList::new));

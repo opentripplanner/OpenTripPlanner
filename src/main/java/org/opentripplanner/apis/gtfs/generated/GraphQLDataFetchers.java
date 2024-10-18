@@ -66,8 +66,8 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 
@@ -327,52 +327,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
-  /** Departure and/or arrival times to or from a stop on a specific date. */
-  public interface GraphQLDatedStopTime extends TypeResolver {}
-
-  /** Trip on a specific date */
-  public interface GraphQLDatedTrip {
-    public DataFetcher<java.time.LocalDate> date();
-
-    public DataFetcher<ArrivalDepartureTime> end();
-
-    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
-
-    public DataFetcher<TripPattern> pattern();
-
-    public DataFetcher<Route> route();
-
-    public DataFetcher<ArrivalDepartureTime> start();
-
-    public DataFetcher<Iterable<Object>> stops();
-
-    public DataFetcher<Iterable<Object>> stoptimes();
-
-    public DataFetcher<String> tripHeadsign();
-
-    public DataFetcher<String> tripShortName();
-  }
-
-  /**
-   * A connection to a list of dated trips that follows
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-   */
-  public interface GraphQLDatedTripConnection {
-    public DataFetcher<Iterable<Edge<DatedTrip>>> edges();
-
-    public DataFetcher<Object> pageInfo();
-  }
-
-  /**
-   * An edge for DatedTrip connection. Part of the
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-   */
-  public interface GraphQLDatedTripEdge {
-    public DataFetcher<String> cursor();
-
-    public DataFetcher<DatedTrip> node();
-  }
-
   /**
    * The standard case of a fare product: it only has a single price to be paid by the passenger
    * and no discounts are applied.
@@ -413,30 +367,6 @@ public class GraphQLDataFetchers {
 
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
-  }
-
-  /**
-   * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-   * This can include realtime estimates.
-   */
-  public interface GraphQLExactDatedStopTime {
-    public DataFetcher<ArrivalDepartureTime> arrival();
-
-    public DataFetcher<ArrivalDepartureTime> departure();
-
-    public DataFetcher<String> dropoffType();
-
-    public DataFetcher<String> headsign();
-
-    public DataFetcher<String> pickupType();
-
-    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
-
-    public DataFetcher<Object> stop();
-
-    public DataFetcher<Integer> stopPosition();
-
-    public DataFetcher<Boolean> timepoint();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
@@ -488,6 +418,43 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> name();
 
     public DataFetcher<String> url();
+  }
+
+  /**
+   * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+   * This can include realtime estimates.
+   */
+  public interface GraphQLFixedDatedStopTime {
+    public DataFetcher<ArrivalDepartureTime> arrival();
+
+    public DataFetcher<ArrivalDepartureTime> departure();
+
+    public DataFetcher<String> dropOffType();
+
+    public DataFetcher<String> headsign();
+
+    public DataFetcher<String> pickupType();
+
+    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
+
+    public DataFetcher<Object> stop();
+
+    public DataFetcher<Integer> stopPosition();
+
+    public DataFetcher<Boolean> timepoint();
+  }
+
+  /** A fixed (i.e. not flexible or frequency based) trip on a specific service date */
+  public interface GraphQLFixedTripOnServiceDate {
+    public DataFetcher<java.time.LocalDate> date();
+
+    public DataFetcher<TripTimeOnDate> end();
+
+    public DataFetcher<TripTimeOnDate> start();
+
+    public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+
+    public DataFetcher<Trip> trip();
   }
 
   public interface GraphQLGeometry {
@@ -846,7 +813,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
-    public DataFetcher<Connection<DatedTrip>> canceledTrips();
+    public DataFetcher<Connection<TripOnServiceDate>> canceledTrips();
 
     public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
@@ -1278,6 +1245,29 @@ public class GraphQLDataFetchers {
    */
   public interface GraphQLTripOccupancy {
     public DataFetcher<GraphQLOccupancyStatus> occupancyStatus();
+  }
+
+  /** An instance of a trip on a service date. */
+  public interface GraphQLTripOnServiceDate extends TypeResolver {}
+
+  /**
+   * A connection to a list of trips on service dates that follows
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLTripOnServiceDateConnection {
+    public DataFetcher<Iterable<Edge<TripOnServiceDate>>> edges();
+
+    public DataFetcher<Object> pageInfo();
+  }
+
+  /**
+   * An edge for TripOnServiceDate connection. Part of the
+   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   */
+  public interface GraphQLTripOnServiceDateEdge {
+    public DataFetcher<String> cursor();
+
+    public DataFetcher<Object> node();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */

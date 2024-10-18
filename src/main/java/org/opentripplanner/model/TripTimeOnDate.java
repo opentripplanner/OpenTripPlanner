@@ -89,6 +89,38 @@ public class TripTimeOnDate {
     return out;
   }
 
+  /**
+   * Get first stop TripTimeOnDate from Timetable.
+   */
+  public static TripTimeOnDate firstFromTripTimes(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    return new TripTimeOnDate(times, 0, table.getPattern(), serviceDate, midnight);
+  }
+
+  /**
+   * Get last stop TripTimeOnDate from Timetable.
+   */
+  public static TripTimeOnDate lastFromTripTimes(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    return new TripTimeOnDate(
+      times,
+      times.getNumStops() - 1,
+      table.getPattern(),
+      serviceDate,
+      midnight
+    );
+  }
+
   public static Comparator<TripTimeOnDate> compareByDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
   }

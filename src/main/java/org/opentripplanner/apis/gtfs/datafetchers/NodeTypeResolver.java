@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class NodeTypeResolver implements TypeResolver {
@@ -85,9 +84,6 @@ public class NodeTypeResolver implements TypeResolver {
     }
     if (o instanceof Trip) {
       return schema.getObjectType("Trip");
-    }
-    if (o instanceof DatedTrip) {
-      return schema.getObjectType("DatedTrip");
     }
     return null;
   }

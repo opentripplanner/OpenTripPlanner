@@ -12,41 +12,26 @@
           "node": {
             "date": "2024-08-09",
             "end": {
-              "estimated": {
-                "delay": "PT0S",
-                "time": "2024-08-09T11:40:00+02:00"
-              },
-              "scheduledTime": "2024-08-09T11:40:00+02:00"
+              "arrival": {
+                "estimated": {
+                  "delay": "PT0S",
+                  "time": "2024-08-09T11:40:00+02:00"
+                },
+                "scheduledTime": "2024-08-09T11:40:00+02:00"
+              }
             },
             "start": {
-              "estimated": {
-                "delay": "PT0S",
-                "time": "2024-08-09T11:30:00+02:00"
-              },
-              "scheduledTime": "2024-08-09T11:30:00+02:00"
-            },
-            "pattern": {
-              "code": "F:BUS"
-            },
-            "route": {
-              "gtfsId": "F:R321Canceled"
-            },
-            "stops": [
-              {
-                "gtfsId": "F:Stop_0"
-              },
-              {
-                "gtfsId": "F:Stop_1"
-              },
-              {
-                "gtfsId": "F:Stop_2"
+              "departure": {
+                "estimated": {
+                  "delay": "PT0S",
+                  "time": "2024-08-09T11:30:00+02:00"
+                },
+                "scheduledTime": "2024-08-09T11:30:00+02:00"
               }
-            ],
-            "tripHeadsign": "Trip Headsign",
-            "tripShortName": null,
+            },
             "stoptimes": [
               {
-                "dropoffType": null,
+                "dropOffType": null,
                 "headsign": "Stop headsign at stop 10",
                 "pickupType": null,
                 "realtimeState": "CANCELED",
@@ -71,7 +56,7 @@
                 }
               },
               {
-                "dropoffType": null,
+                "dropOffType": null,
                 "headsign": "Stop headsign at stop 20",
                 "pickupType": null,
                 "realtimeState": "CANCELED",
@@ -96,7 +81,7 @@
                 }
               },
               {
-                "dropoffType": null,
+                "dropOffType": null,
                 "headsign": "Stop headsign at stop 30",
                 "pickupType": null,
                 "realtimeState": "CANCELED",
@@ -120,7 +105,10 @@
                   }
                 }
               }
-            ]
+            ],
+            "trip": {
+              "gtfsId": "F:321Canceled"
+            }
           }
         }
       ]

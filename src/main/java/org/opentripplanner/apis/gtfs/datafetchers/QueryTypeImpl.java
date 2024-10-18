@@ -13,7 +13,6 @@ import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,8 +68,8 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
@@ -193,7 +192,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     };
   }
 
-  // TODO
+  /**
+   * @deprecated Replaced by {@link #canceledTrips()}.
+   */
+  @Deprecated
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes() {
     return environment -> null;
@@ -432,12 +434,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
               );
 
             return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
-          }
-        case "DatedTrip":
-          {
-            String[] parts = id.split(";");
-            var trip = transitService.getTripForId(FeedScopedId.parse(parts[0]));
-            return new DatedTrip(trip, LocalDate.parse(parts[1]));
           }
         case "Route":
           return transitService.getRouteForId(FeedScopedId.parse(id));
@@ -814,14 +810,13 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
-  public DataFetcher<Connection<DatedTrip>> canceledTrips() {
+  public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
     return environment -> {
       var args = new GraphQLTypes.GraphQLQueryTypeCanceledTripsArgs(environment.getArguments());
-      var datedTrips = getTransitService(environment)
-        .getCanceledTrips(args.getGraphQLFeeds())
-        .stream()
-        .collect(Collectors.toList());
-      return new SimpleListConnection<>(datedTrips).get(environment);
+      var trips = new ArrayList<>(
+        getTransitService(environment).getCanceledTrips(args.getGraphQLFeeds())
+      );
+      return new SimpleListConnection<>(trips).get(environment);
     };
   }
 

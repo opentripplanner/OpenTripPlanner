@@ -59,10 +59,10 @@ config:
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
-    ExactDatedStopTime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
-    DatedTrip: org.opentripplanner.transit.model.timetable.DatedTrip#DatedTrip
-    DatedTripConnection: graphql.relay.Connection#Connection<DatedTrip>
-    DatedTripEdge: graphql.relay.Edge#Edge<DatedTrip>
+    FixedDatedStopTime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
+    FixedTripOnServiceDate: org.opentripplanner.transit.model.timetable.TripOnServiceDate#TripOnServiceDate
+    TripOnServiceDateConnection: graphql.relay.Connection#Connection<TripOnServiceDate>
+    TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
     ArrivalDepartureTime: org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime#ArrivalDepartureTime
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop

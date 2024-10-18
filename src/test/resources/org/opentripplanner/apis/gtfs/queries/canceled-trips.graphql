@@ -8,35 +8,28 @@
     }
     edges {
       node {
-        date
-        end {
-          estimated {
-            delay
-            time
+        ... on FixedTripOnServiceDate {
+          date
+          end {
+            arrival {
+              estimated {
+                delay
+                time
+              }
+              scheduledTime
+            }
           }
-          scheduledTime
-        }
-        start {
-          estimated {
-            delay
-            time
+          start {
+            departure {
+              estimated {
+                delay
+                time
+              }
+              scheduledTime
+            }
           }
-          scheduledTime
-        }
-        pattern {
-          code
-        }
-        route {
-          gtfsId
-        }
-        stops {
-          gtfsId
-        }
-        tripHeadsign
-        tripShortName
-        stoptimes {
-          ... on ExactDatedStopTime {
-            dropoffType
+          stoptimes {
+            dropOffType
             headsign
             pickupType
             realtimeState
@@ -60,21 +53,10 @@
               }
             }
           }
-        }
-        date
-        start {
-          estimated {
-            time
-            delay
+          date
+          trip {
+            gtfsId
           }
-          scheduledTime
-        }
-        end {
-          estimated {
-            time
-            delay
-          }
-          scheduledTime
         }
       }
     }

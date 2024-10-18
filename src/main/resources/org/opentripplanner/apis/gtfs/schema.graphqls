@@ -73,10 +73,10 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
-"Departure and/or arrival times to or from a stop on a specific date."
-union DatedStopTime = ExactDatedStopTime
-
 union StopPosition = PositionAtStop | PositionBetweenStops
+
+"An instance of a trip on a service date."
+union TripOnServiceDate = FixedTripOnServiceDate
 
 "A public transport agency"
 type Agency implements Node {
@@ -398,75 +398,6 @@ type Currency {
   digits: Int!
 }
 
-"Trip on a specific date"
-type DatedTrip implements Node {
-  """
-  The service date when the trip occurs.
-    
-  **Note**: A service date is a technical term useful for transit planning purposes and might not
-    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
-    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
-  """
-  date: LocalDate!
-  "The time when the trip ends including real-time information, if available."
-  end: ArrivalDepartureTime
-  "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID!
-  "The pattern the trip is running on"
-  pattern: Pattern
-  "The route the trip is running on"
-  route: Route!
-  "The time when the trip starts including real-time information, if available."
-  start: ArrivalDepartureTime
-  "List of stops this trip passes through"
-  stops: [Stop!]!
-  "List of times when this trip arrives to or departs from a stop"
-  stoptimes: [DatedStopTime!]
-  "Headsign of the vehicle when running on this trip"
-  tripHeadsign(
-    """
-    If a translated headsign is found from GTFS translation.txt and wanted language is not same as
-    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
-    """
-    language: String
-  ): String
-  tripShortName: String
-}
-
-"""
-A connection to a list of dated trips that follows
-[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-"""
-type DatedTripConnection {
-  """
-  Edges which contain the trips. Part of the
-  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-  """
-  edges: [DatedTripEdge]
-  """
-  Contains cursors to fetch more pages of trips.
-  Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-  """
-  pageInfo: PageInfo!
-}
-
-"""
-An edge for DatedTrip connection. Part of the
-[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-"""
-type DatedTripEdge {
-  """
-  The cursor of the edge. Part of the
-  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-  """
-  cursor: String!
-  """
-  Dated trip as a node. Part of the
-  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
-  """
-  node: DatedTrip
-}
-
 """
 The standard case of a fare product: it only has a single price to be paid by the passenger
 and no discounts are applied.
@@ -525,58 +456,6 @@ type DepartureRow implements Node & PlaceInterface {
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
-}
-
-"""
-Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-This can include realtime estimates.
-"""
-type ExactDatedStopTime {
-  "Scheduled arrival time to the stop and a realtime estimate, if one exists."
-  arrival: ArrivalDepartureTime
-  "Scheduled departure time from the stop and a realtime estimate, if one exists."
-  departure: ArrivalDepartureTime
-  """
-  Whether the vehicle can be disembarked at this stop. This field can also be
-  used to indicate if disembarkation is possible only with special arrangements.
-  """
-  dropoffType: PickupDropoffType
-  """
-  Vehicle headsign of the trip on this stop. Trip headsigns can change during
-  the trip (e.g. on routes which run on loops), so this value should be used
-  instead of `tripHeadsign` to display the headsign relevant to the user.
-  """
-  headsign(
-    """
-    If translated headsign is found from gtfs translation.txt and wanted language is not same as
-    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
-    """
-    language: String
-  ): String
-  """
-  Whether the vehicle can be boarded at this stop. This field can also be used
-  to indicate if boarding is possible only with special arrangements.
-  """
-  pickupType: PickupDropoffType
-  "Whether stop has been updated through a realtime update and if so, how."
-  realtimeState: StopRealTimeState!
-  "The stop where this arrival/departure happens"
-  stop: Stop
-  """
-  The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
-  increasing integer sequence along the stops is valid.
-    
-  The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
-  between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
-  However, it should be noted that real-time updates can change the values, so don't store it for
-  longer amounts of time.
-    
-  Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
-  even generated.
-  """
-  stopPosition: Int
-  "true, if this stop is used as a time equalization stop. false otherwise."
-  timepoint: Boolean
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -669,6 +548,78 @@ type FeedPublisher {
   name: String!
   "Web address of feed publisher"
   url: String!
+}
+
+"""
+Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+This can include realtime estimates.
+"""
+type FixedDatedStopTime {
+  "Scheduled arrival time to the stop and a realtime estimate, if one exists."
+  arrival: ArrivalDepartureTime
+  "Scheduled departure time from the stop and a realtime estimate, if one exists."
+  departure: ArrivalDepartureTime
+  """
+  Whether the vehicle can be disembarked at this stop. This field can also be
+  used to indicate if disembarkation is possible only with special arrangements.
+  """
+  dropOffType: PickupDropoffType
+  """
+  Vehicle headsign of the trip on this stop. Trip headsigns can change during
+  the trip (e.g. on routes which run on loops), so this value should be used
+  instead of `tripHeadsign` to display the headsign relevant to the user.
+  """
+  headsign(
+    """
+    If translated headsign is found from gtfs translation.txt and wanted language is not same as
+    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+    """
+    language: String
+  ): String
+  """
+  Whether the vehicle can be boarded at this stop. This field can also be used
+  to indicate if boarding is possible only with special arrangements.
+  """
+  pickupType: PickupDropoffType
+  "Whether stop has been updated through a realtime update and if so, how."
+  realtimeState: StopRealTimeState!
+  "The stop where this arrival/departure happens"
+  stop: Stop
+  """
+  The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+  increasing integer sequence along the stops is valid.
+    
+  The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+  between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+  However, it should be noted that real-time updates can change the values, so don't store it for
+  longer amounts of time.
+    
+  Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+  even generated.
+  """
+  stopPosition: Int
+  "true, if this stop is used as a time equalization stop. false otherwise."
+  timepoint: Boolean
+}
+
+"A fixed (i.e. not flexible or frequency based) trip on a specific service date"
+type FixedTripOnServiceDate {
+  """
+  The service date when the trip occurs.
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  date: LocalDate!
+  "The time when the trip ends at a stop and information related to the stop."
+  end: FixedDatedStopTime
+  "The time when the trip starts from a stop and information related to the stop."
+  start: FixedDatedStopTime
+  "List of times when this trip arrives to or departs from a stop and information related to the stop"
+  stoptimes: [FixedDatedStopTime!]
+  "This trip on service date is an instance of this trip."
+  trip: Trip
 }
 
 type Geometry {
@@ -1239,7 +1190,7 @@ type QueryType {
     feeds: [String],
     first: Int,
     last: Int
-  ): DatedTripConnection
+  ): TripOnServiceDateConnection
   "Get canceled TripTimes."
   cancelledTripTimes(
     "Feed feedIds (e.g. [\"HSL\"])."
@@ -2480,6 +2431,40 @@ available for a trip. Historic data might not be available.
 type TripOccupancy {
   "Occupancy information mapped to a limited set of descriptive states."
   occupancyStatus: OccupancyStatus
+}
+
+"""
+A connection to a list of trips on service dates that follows
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type TripOnServiceDateConnection {
+  """
+  Edges which contain the trips. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  edges: [TripOnServiceDateEdge]
+  """
+  Contains cursors to fetch more pages of trips.
+  Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge for TripOnServiceDate connection. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type TripOnServiceDateEdge {
+  """
+  The cursor of the edge. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  cursor: String!
+  """
+  Trip on a service date as a node. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  node: TripOnServiceDate
 }
 
 "This is used for alert entities that we don't explicitly handle or they are missing."

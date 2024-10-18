@@ -25,7 +25,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -149,10 +148,7 @@ class DefaultTransitServiceTest {
 
   @Test
   void getCanceledTrips() {
-    Collection<DatedTrip> canceledTrips = service.getCanceledTrips(null);
-    assertEquals(
-      "[DatedTrip[trip=Trip{F:123 RR123}, serviceDate=2024-08-08], DatedTrip[trip=Trip{F:123 RR123}, serviceDate=2024-08-09]]",
-      canceledTrips.toString()
-    );
+    var canceledTrips = service.getCanceledTrips(null);
+    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
   }
 }

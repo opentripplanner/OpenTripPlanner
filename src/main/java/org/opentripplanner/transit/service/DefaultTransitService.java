@@ -51,7 +51,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -289,17 +288,17 @@ public class DefaultTransitService implements TransitEditorService {
    * TODO This only supports realtime cancelled trips for now.
    */
   @Override
-  public Collection<DatedTrip> getCanceledTrips(List<String> feeds) {
+  public Collection<TripOnServiceDate> getCanceledTrips(List<String> feeds) {
     OTPRequestTimeoutException.checkForTimeout();
     var timetableSnapshot = lazyGetTimeTableSnapShot();
     if (timetableSnapshot == null) {
       return List.of();
     }
-    List<DatedTrip> canceledTrips = timetableSnapshot.getCanceledTrips(feeds);
+    List<TripOnServiceDate> canceledTrips = timetableSnapshot.getCanceledTrips(feeds);
     canceledTrips.sort((t1, t2) -> {
-      if (t1.serviceDate().isBefore(t2.serviceDate())) {
+      if (t1.getServiceDate().isBefore(t2.getServiceDate())) {
         return -1;
-      } else if (t2.serviceDate().isBefore(t1.serviceDate())) {
+      } else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
         return 1;
       }
       var departure1 = getDepartureTime(t1);
@@ -310,7 +309,7 @@ public class DefaultTransitService implements TransitEditorService {
         return 1;
       } else {
         // identical departure day and time, so sort by unique feedscope id
-        return t1.trip().getId().compareTo(t2.trip().getId());
+        return t1.getTrip().getId().compareTo(t2.getTrip().getId());
       }
     });
     return canceledTrips;
@@ -756,9 +755,9 @@ public class DefaultTransitService implements TransitEditorService {
       .map(Map.Entry::getKey);
   }
 
-  private int getDepartureTime(DatedTrip datedTrip) {
-    var pattern = getPatternForTrip(datedTrip.trip());
-    var timetable = timetableSnapshot.resolve(pattern, datedTrip.serviceDate());
-    return timetable.getTripTimes(datedTrip.trip()).getDepartureTime(0);
+  private int getDepartureTime(TripOnServiceDate trip) {
+    var pattern = getPatternForTrip(trip.getTrip());
+    var timetable = timetableSnapshot.resolve(pattern, trip.getServiceDate());
+    return timetable.getTripTimes(trip.getTrip()).getDepartureTime(0);
   }
 }
