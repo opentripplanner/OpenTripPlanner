@@ -99,7 +99,6 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   }
 
   @Test
-  @Disabled("Currently disabled because of a bug in stop counting")
   void testMaxStopCount() {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 2;
@@ -150,7 +149,6 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   }
 
   @Test
-  @Disabled("Currently disabled because of a bug in stop counting")
   void testIgnoreStopsWithMaxStops() {
     var durationLimit = Duration.ofMinutes(10);
     var maxStopCount = 1;
@@ -165,14 +163,14 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     assertStopAtDistance(stopC, 200, sortedNearbyStops.get(0));
   }
 
-  private List<NearbyStop> sort(Collection<NearbyStop> stops) {
+  static List<NearbyStop> sort(Collection<NearbyStop> stops) {
     return stops.stream().sorted(Comparator.comparing(x -> x.distance)).toList();
   }
 
   /**
    * Verify that the nearby stop is zero distance and corresponds to the expected vertex
    */
-  private void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
+  static void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
     assertEquals(expected.getStop(), nearbyStop.stop);
     assertEquals(0, nearbyStop.distance);
     assertEquals(0, nearbyStop.edges.size());
@@ -183,7 +181,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   /**
    * Verify that the nearby stop is at a specific distance and corresponds to the expected vertex
    */
-  private void assertStopAtDistance(
+  static void assertStopAtDistance(
     TransitStopVertex expected,
     double expectedDistance,
     NearbyStop nearbyStop
