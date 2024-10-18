@@ -3,6 +3,7 @@ package org.opentripplanner.apis.vectortiles.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class StyleBuilder {
   private final Map<String, Object> layout = new LinkedHashMap<>();
   private final Map<String, Object> metadata = new LinkedHashMap<>();
   private final Map<String, Object> line = new LinkedHashMap<>();
-  private List<String> filter = List.of();
+  private List<? extends Object> filter = List.of();
 
   public static StyleBuilder ofId(String id) {
     return new StyleBuilder(id);
@@ -167,9 +168,39 @@ public class StyleBuilder {
   }
 
   // Line styling
+  public StyleBuilder lineCap(String lineCap) {
+    layout.put("line-cap", lineCap);
+    return this;
+  }
 
   public StyleBuilder lineColor(String color) {
     paint.put("line-color", validateColor(color));
+    return this;
+  }
+
+  public StyleBuilder lineColorMatch(
+    String propertyName,
+    Collection<String> values,
+    String defaultValue
+  ) {
+    paint.put(
+      "line-color",
+      ListUtils.combine(
+        List.of("match", List.of("get", propertyName)),
+        (Collection) values,
+        List.of(defaultValue)
+      )
+    );
+    return this;
+  }
+
+  public StyleBuilder lineOpacity(float lineOpacity) {
+    paint.put("line-opacity", lineOpacity);
+    return this;
+  }
+
+  public StyleBuilder lineDasharray(float... dashArray) {
+    paint.put("line-dasharray", dashArray);
     return this;
   }
 
@@ -233,6 +264,11 @@ public class StyleBuilder {
   @SafeVarargs
   public final StyleBuilder vertexFilter(Class<? extends Vertex>... classToFilter) {
     return filterClasses(classToFilter);
+  }
+
+  public StyleBuilder filterValueInProperty(String value, String propertyName) {
+    filter = List.of("in", value, List.of("string", List.of("get", propertyName)));
+    return this;
   }
 
   public JsonNode toJson() {
