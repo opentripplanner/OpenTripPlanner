@@ -295,6 +295,75 @@ public class BikeWalkingTest extends GraphRoutingTest {
     );
   }
 
+  @Test
+  public void testBicycleBicycleNoThruTrafficStart() {
+    CD.setBicycleNoThruTraffic(true);
+
+    assertPath(
+      C,
+      F,
+      StreetMode.BIKE,
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 5 / 10.0 - CD street",
+        "BICYCLE - 5 / 10.0 - DE street",
+        "BICYCLE - 5 / 10.0 - EF street"
+      ),
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 5 / 10.0 - CD street",
+        "BICYCLE - 5 / 10.0 - DE street",
+        "BICYCLE - 5 / 10.0 - EF street"
+      )
+    );
+  }
+
+  @Test
+  public void testBicycleBicycleNoThruTrafficMiddle() {
+    DE.setBicycleNoThruTraffic(true);
+
+    assertPath(
+      C,
+      F,
+      StreetMode.BIKE,
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 5 / 10.0 - CD street",
+        "🚲WALK - 120 / 1100.0 - DE street",
+        "BICYCLE - 105 / 1010.0 - EF street"
+      ),
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 105 / 1010.0 - CD street",
+        "🚲WALK - 120 / 1100.0 - DE street",
+        "BICYCLE - 5 / 10.0 - EF street"
+      )
+    );
+  }
+
+  @Test
+  public void testBicycleBicycleNoThruTrafficEnd() {
+    EF.setBicycleNoThruTraffic(true);
+
+    assertPath(
+      C,
+      F,
+      StreetMode.BIKE,
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 5 / 10.0 - CD street",
+        "BICYCLE - 5 / 10.0 - DE street",
+        "BICYCLE - 5 / 10.0 - EF street"
+      ),
+      List.of(
+        "null - 0 / 0.0 - null",
+        "BICYCLE - 5 / 10.0 - CD street",
+        "BICYCLE - 5 / 10.0 - DE street",
+        "BICYCLE - 5 / 10.0 - EF street"
+      )
+    );
+  }
+
   @BeforeEach
   protected void setUp() throws Exception {
     // Generate a very simple graph
