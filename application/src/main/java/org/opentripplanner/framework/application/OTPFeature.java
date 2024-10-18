@@ -38,6 +38,14 @@ public enum OTPFeature {
     "Should there be a transfer leg when transferring on the very same stop. Note that for in-seat/interlined transfers no transfer leg will be generated."
   ),
   FloatingBike(true, false, "Enable floating bike routing."),
+  GtfsCoach(
+    false,
+    false,
+    """
+    When parsing GTFS data, treat GTFS route type 200 to 299 as coach routes instead of bus routes.
+    When using the GTFS GraphQL API, do not return coach routes when only BUS is specified as a mode.
+    """
+  ),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
   GtfsGraphQlApiRentalStationFuzzyMatching(
     false,

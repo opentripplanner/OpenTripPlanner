@@ -2,6 +2,7 @@ package org.opentripplanner.api.parameter;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public enum ApiRequestMode {
@@ -12,7 +13,8 @@ public enum ApiRequestMode {
   TRAM(TransitMode.TRAM),
   SUBWAY(TransitMode.SUBWAY),
   RAIL(TransitMode.RAIL),
-  BUS(TransitMode.BUS, TransitMode.COACH),
+  BUS(TransitMode.BUS),
+  COACH(TransitMode.COACH),
   FERRY(TransitMode.FERRY),
   CABLE_CAR(TransitMode.CABLE_CAR),
   GONDOLA(TransitMode.GONDOLA),
@@ -40,6 +42,10 @@ public enum ApiRequestMode {
   }
 
   public Collection<TransitMode> getTransitModes() {
+    if (this == BUS && OTPFeature.GtfsCoach.isOff()) {
+      return List.of(TransitMode.BUS, TransitMode.COACH);
+    }
+
     return transitModes;
   }
 }
