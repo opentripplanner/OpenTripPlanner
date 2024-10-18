@@ -305,12 +305,12 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Nested
   class FlexSearchWindow {
 
-    private static final Itinerary FLEX = newItinerary(A, T11_00)
+    private final Itinerary FLEX = newItinerary(A, T11_00)
       .flex(T11_00, T11_30, B)
       .withIsSearchWindowAware(false)
       .build();
-    private static final Instant EARLIEST_DEPARTURE = FLEX.startTime().plusMinutes(10).toInstant();
-    private static final Duration SEARCH_WINDOW = Duration.ofHours(7);
+    private final Instant EARLIEST_DEPARTURE = FLEX.startTime().plusMinutes(10).toInstant();
+    private final Duration SEARCH_WINDOW = Duration.ofHours(7);
 
     /**
      * When the filtering of direct flex by the transit search window is deactivated, the direct
