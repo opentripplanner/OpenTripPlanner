@@ -19,9 +19,9 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author marcusyoung
  * @see OsmTagMapper
- * @see DefaultMapper
+ * @see OsmTagMapper
  */
-class UKMapper implements OsmTagMapper {
+class UKMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -73,7 +73,6 @@ class UKMapper implements OsmTagMapper {
     props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
     props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }

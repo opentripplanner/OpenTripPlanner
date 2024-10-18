@@ -49,6 +49,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `present(highway); ice_road=yes`                                                | `NONE`                   |                               |             |
 | `present(highway); winter_road=yes`                                             | `NONE`                   |                               |             |
 | `highway=footway`                                                               | `PEDESTRIAN`             |                               |             |
+| `highway=footway; area=yes`                                                     | `PEDESTRIAN`             |                               |             |
 | `footway=sidewalk; highway=footway`                                             | `PEDESTRIAN`             |                               |             |
 | `highway=cycleway; segregated=yes`                                              | `PEDESTRIAN_AND_BICYCLE` | 0.6                           | 1.1         |
 | `highway=footway; bridge=yes`                                                   | `PEDESTRIAN`             |                               |             |
@@ -77,6 +78,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=crossing`                                                              | `PEDESTRIAN`             |                               |             |
 | `highway=platform`                                                              | `PEDESTRIAN`             |                               |             |
 | `public_transport=platform`                                                     | `PEDESTRIAN`             |                               |             |
+| `public_transport=platform; area=yes`                                           | `PEDESTRIAN`             |                               |             |
 | `railway=platform`                                                              | `PEDESTRIAN`             |                               |             |
 | `footway=sidewalk; highway=footway`                                             | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=1`                                                                   | `PEDESTRIAN`             |                               |             |

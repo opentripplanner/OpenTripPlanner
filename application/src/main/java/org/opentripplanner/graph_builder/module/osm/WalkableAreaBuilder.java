@@ -499,9 +499,14 @@ class WalkableAreaBuilder {
       Area area = intersects.getFirst();
       OsmWithTags areaEntity = area.parent;
 
-      StreetTraversalPermission areaPermissions = areaEntity.overridePermissions(
-        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-      );
+      WayProperties wayData;
+      if (!wayPropertiesCache.containsKey(areaEntity)) {
+        wayData = areaEntity.getOsmProvider().getWayPropertySet().getDataForWay(areaEntity);
+        wayPropertiesCache.put(areaEntity, wayData);
+      } else {
+        wayData = wayPropertiesCache.get(areaEntity);
+      }
+      StreetTraversalPermission areaPermissions = wayData.getPermission();
 
       float carSpeed = areaEntity
         .getOsmProvider()
@@ -520,8 +525,8 @@ class WalkableAreaBuilder {
         startEndpoint.getLabel() +
         " to " +
         endEndpoint.getLabel();
-      I18NString name = namer.getNameForWay(areaEntity, label);
 
+      I18NString name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
         .withFromVertex(startEndpoint)
         .withToVertex(endEndpoint)
@@ -543,8 +548,8 @@ class WalkableAreaBuilder {
         endEndpoint.getLabel() +
         " to " +
         startEndpoint.getLabel();
-      name = namer.getNameForWay(areaEntity, label);
 
+      name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
         .withFromVertex(endEndpoint)
         .withToVertex(startEndpoint)
@@ -559,22 +564,10 @@ class WalkableAreaBuilder {
         .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
         .withLink(areaEntity.isLink());
 
-      if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = areaEntity
-          .getOsmProvider()
-          .getWayPropertySet()
-          .getDataForWay(areaEntity);
-        wayPropertiesCache.put(areaEntity, wayData);
-      }
-
       AreaEdge street = streetEdgeBuilder.buildAndConnect();
+
       AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
-      normalizer.applyWayProperties(
-        street,
-        backStreet,
-        wayPropertiesCache.get(areaEntity),
-        areaEntity
-      );
+      normalizer.applyWayProperties(street, backStreet, wayData, areaEntity);
       return Set.of(street, backStreet);
     } else {
       // take the part that intersects with the start vertex
@@ -640,12 +633,12 @@ class WalkableAreaBuilder {
       I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
+      WayProperties wayData;
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = areaEntity
-          .getOsmProvider()
-          .getWayPropertySet()
-          .getDataForWay(areaEntity);
+        wayData = areaEntity.getOsmProvider().getWayPropertySet().getDataForWay(areaEntity);
         wayPropertiesCache.put(areaEntity, wayData);
+      } else {
+        wayData = wayPropertiesCache.get(areaEntity);
       }
 
       double bicycleSafety = wayPropertiesCache.get(areaEntity).bicycleSafety().forward();
@@ -653,14 +646,8 @@ class WalkableAreaBuilder {
 
       double walkSafety = wayPropertiesCache.get(areaEntity).walkSafety().forward();
       namedArea.setWalkSafetyMultiplier(walkSafety);
-
       namedArea.setOriginalEdges(intersection);
-
-      StreetTraversalPermission permission = areaEntity.overridePermissions(
-        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-      );
-      namedArea.setPermission(permission);
-
+      namedArea.setPermission(wayData.getPermission());
       edgeList.addArea(namedArea);
     }
   }

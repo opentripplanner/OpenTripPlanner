@@ -15,9 +15,8 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  * networks.
  *
  * @see OsmTagMapper
- * @see DefaultMapper
  */
-class GermanyMapper implements OsmTagMapper {
+class GermanyMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -88,7 +87,6 @@ class GermanyMapper implements OsmTagMapper {
 
     props.setProperties("highway=unclassified;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }
