@@ -1,0 +1,20 @@
+{
+  "transitFeeds": [
+    {
+      "type": "netex",
+      "feedId": "NO",
+      "source": "https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip",
+      "sharedFilePattern": "_stops.xml",
+      "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
+      "groupFilePattern": "(\\w{3})_.*\\.xml"
+    }
+  ],
+  "osm": [
+    {
+      "source": "norway.osm.pbf",
+      "osmTagMapping": "norway",
+      "timeZone": "Europe/Oslo"
+    }
+  ],
+  "osmCacheDataInMem": true
+}

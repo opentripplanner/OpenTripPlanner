@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Configuring OpenTripPlanner
@@ -226,6 +226,7 @@ Here is a list of all features which can be toggled on/off and their default val
 | `APIUpdaterStatus`                         | Enable endpoint for graph updaters status.                                                                                                                                                                                                                                                                                               |         ✓️         |         |
 | `ConsiderPatternsForDirectTransfers`       | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                                                                                                                                                                       |         ✓️         |         |
 | `DebugUi`                                  | Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses. Be aware that the map tiles are not a stable API and can change without notice. Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.                         |         ✓️         |         |
+| `ExtraTransferLegOnSameStop`               | Should there be a transfer leg when transferring on the very same stop. Note that for in-seat/interlined transfers no transfer leg will be generated.                                                                                                                                                                                    |                    |         |
 | `FloatingBike`                             | Enable floating bike routing.                                                                                                                                                                                                                                                                                                            |         ✓️         |         |
 | `GtfsGraphQlApi`                           | Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md).                                                                                                                                                                                                                                                                                 |         ✓️         |         |
 | `GtfsGraphQlApiRentalStationFuzzyMatching` | Does vehicleRentalStation query also allow ids that are not feed scoped.                                                                                                                                                                                                                                                                 |                    |         |

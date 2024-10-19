@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # GraphQL tutorial
@@ -51,4 +51,4 @@ Most people want to get routing results out of OTP, so lets see the query for th
 Again, please use the autocomplete and documentation viewers to figure out what each input parameter
 and property means.
 
-More examples for a variety of queries can also be found [in the test code](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/test/resources/org/opentripplanner/apis/gtfs/queries).
+More examples for a variety of queries can also be found [in the test code](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/application/src/test/resources/org/opentripplanner/apis/gtfs/queries).

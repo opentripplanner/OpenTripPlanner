@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Router configuration
@@ -14,7 +14,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 Certain settings can be provided on the command line, when starting OpenTripPlanner. See
 the `CommandLineParameters` class
-for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
+for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
 .
 
 ## Routing defaults

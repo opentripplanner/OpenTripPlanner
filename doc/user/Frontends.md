@@ -19,7 +19,7 @@ On the other hand, **production frontends** are intended to be a component of la
 The main OpenTripPlanner repository currently contains two debug web frontends: 
 
 - new one currently under development at [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
-- the classic one in [`/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/client/classic-debug) 
+- the classic one in [`/application/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/application/src/client/classic-debug) 
 
 The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
 Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).
@@ -29,7 +29,7 @@ It connects to the OTP Java backend via a REST API using the GTFS vocabulary. Hi
 It is still available, but has been moved to `http://localhost:8080/classic-debug/` .
 
 There is a third piece of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
-located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
+located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
 While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric 
 UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the 
 street network, providing some insight into the internals of the routing algorithms that are not otherwise visible.
@@ -56,14 +56,16 @@ specified in terms of latitude and longitude coordinates. The debug frontend and
 Many different production OTP frontends exist. Any number of agencies and consultancies may have built new frontends, whether in Javascript or as native mobile apps, without the OpenTripPlanner development team even being aware of them.
 
 That said, there are two main Javascript-based web user interfaces that are generally recommended by members of the OTP development team who also work on professional, public-facing OpenTripPlanner deployments:
+
 - The [Digitransit UI](https://github.com/HSLdevcom/digitransit-ui), part of the Finnish Digitransit project.
 - The [OpenTripPlanner React UI](https://github.com/opentripplanner/otp-react-redux), developed and maintained by [Arcadis IBI](https://www.ibigroup.com)'s [transit routing team](https://www.ibigroup.com/ibi-products/transit-routing/).
 
 **Digitransit** is an open-source public transportation project, originally created in Finland to replace existing nationwide and regional journey planning solutions in 2014. Digitransit has since been used around the world in other projects, for example in Germany. It is a joint project of Helsinki Regional Transport Authority (HSL), Fintraffic, and Waltti Solutions.
 
 **Arcadis IBI** has for several years actively developed, deployed, and maintained instances of the React-based OTP UI, systematically contributing their improvements back to the original repositories under the OpenTripPlanner organization: 
-- https://github.com/opentripplanner/otp-ui
-- https://github.com/opentripplanner/otp-react-redux
+
+- [https://github.com/opentripplanner/otp-ui](https://github.com/opentripplanner/otp-ui)
+- [https://github.com/opentripplanner/otp-react-redux](https://github.com/opentripplanner/otp-react-redux)
 
 Both major frontend projects mentioned above support internationalization and have several translations already available.
 

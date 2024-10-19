@@ -26,7 +26,11 @@
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
         "com.azure:azure-messaging-servicebus",
-        "com.azure:azure-identity"
+        "com.azure:azure-identity",
+        // there is a breaking change in this package which is breaking our workflow, that cannot
+        // be reverted: https://github.com/dotansimha/graphql-code-generator/issues/10167
+        // once that is resolved, we can remove this line
+        "@graphql-codegen/client-preset"
       ],
       "enabled": false
     },
@@ -148,9 +152,17 @@
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackagePrefixes": [
         "com.google.dagger:",
-        "org.geotools:"
+        "com.fasterxml.jackson"
       ],
       "minimumReleaseAge": "1 week"
+    },
+    {
+      "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
+      "matchPackagePrefixes": [
+        "org.geotools:"
+      ],
+      "minimumReleaseAge": "1 week",
+      "labels": ["skip changelog", "bump serialization id"]
     }
   ],
   "timezone": "Europe/Berlin"

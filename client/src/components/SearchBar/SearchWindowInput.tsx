@@ -19,6 +19,7 @@ export function SearchWindowInput({
         size="sm"
         placeholder="(in minutes)"
         min={1}
+        className="input-small"
         value={tripQueryVariables.searchWindow || ''}
         onChange={(event) =>
           setTripQueryVariables({
