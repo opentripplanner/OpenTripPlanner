@@ -146,7 +146,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return new DefaultRangeRaptorWorker<>(
       workerState,
       routingStrategy,
-      ctx.transit(),
+      ctx.transitData(),
       ctx.slackProvider(),
       ctxLeg.accessPaths(),
       ctx.calculator(),
@@ -159,7 +159,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   private RangeRaptor<T> createRangeRaptor(SearchContext<T> ctx, RangeRaptorWorker<T> worker) {
     return new RangeRaptor<>(
       worker,
-      ctx.transit(),
+      ctx.transitData(),
       ctx.legs().getFirst().accessPaths(),
       ctx.roundTracker(),
       ctx.calculator(),
