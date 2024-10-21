@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -193,10 +192,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       Thread.currentThread().interrupt();
       // propagate interruption to the running task.
       asyncResult.cancel(true);
-      throw new OTPRequestTimeoutException();
+      throw config.mapInterruptedException(e);
     } catch (ExecutionException e) {
-      if (e.getCause() instanceof DestinationNotReachedException) {
-        throw new DestinationNotReachedException();
+      if (e.getCause() instanceof DestinationNotReachedException dnr) {
+        throw dnr;
       }
       LOG.error(e.getMessage() + ". Request: " + originalRequest, e);
       throw new IllegalStateException(

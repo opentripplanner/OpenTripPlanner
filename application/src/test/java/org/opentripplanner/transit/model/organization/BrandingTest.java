@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 public class BrandingTest {
 
@@ -19,7 +19,7 @@ public class BrandingTest {
   private static final String IMAGE = "test_image";
 
   Branding subject = Branding
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withName(NAME)
     .withUrl(URL)
@@ -53,7 +53,7 @@ public class BrandingTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));

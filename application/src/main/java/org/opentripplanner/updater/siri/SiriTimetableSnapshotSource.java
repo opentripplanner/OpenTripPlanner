@@ -24,8 +24,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -69,20 +69,20 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   public SiriTimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     this.snapshotManager =
       new TimetableSnapshotManager(
-        transitModel.getTransitLayerUpdater(),
+        timetableRepository.getTransitLayerUpdater(),
         parameters,
-        () -> LocalDate.now(transitModel.getTimeZone())
+        () -> LocalDate.now(timetableRepository.getTimeZone())
       );
     this.transitEditorService =
-      new DefaultTransitService(transitModel, getTimetableSnapshotBuffer());
+      new DefaultTransitService(timetableRepository, getTimetableSnapshotBuffer());
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::getPatternForTrip);
 
-    transitModel.initTimetableSnapshotProvider(this);
+    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**
@@ -293,7 +293,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Add a (new) trip to the transitModel and the buffer
+   * Add a (new) trip to the timetableRepository and the buffer
    */
   private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(TripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();

@@ -114,7 +114,9 @@ public class RouteRequestToFilterChainMapper {
       builder.withEmissions(new DecorateWithEmission(context.emissionsService()));
     }
 
-    if (context.stopConsolidationService() != null) {
+    if (
+      context.stopConsolidationService() != null && context.stopConsolidationService().isActive()
+    ) {
       builder.withConsolidatedStopNamesDecorator(
         new DecorateConsolidatedStopNames(context.stopConsolidationService())
       );

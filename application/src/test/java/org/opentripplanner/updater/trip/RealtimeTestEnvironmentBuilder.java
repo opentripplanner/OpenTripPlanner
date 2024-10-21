@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +9,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -17,12 +17,15 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   private RealtimeTestEnvironment.SourceType sourceType;
-  private final TransitModel transitModel = new TransitModel(STOP_MODEL, new Deduplicator());
+  private final TimetableRepository timetableRepository = new TimetableRepository(
+    STOP_MODEL,
+    new Deduplicator()
+  );
 
   RealtimeTestEnvironmentBuilder withSourceType(RealtimeTestEnvironment.SourceType sourceType) {
     this.sourceType = sourceType;
@@ -31,24 +34,28 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     createTrip(trip);
-    transitModel.index();
+    timetableRepository.index();
     return this;
   }
 
   public RealtimeTestEnvironment build() {
     Objects.requireNonNull(sourceType, "sourceType cannot be null");
-    transitModel.initTimeZone(TIME_ZONE);
-    transitModel.addAgency(TransitModelForTest.AGENCY);
+    timetableRepository.initTimeZone(TIME_ZONE);
+    timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    transitModel.getServiceCodes().put(SERVICE_ID, 0);
-    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+    timetableRepository.getServiceCodes().put(SERVICE_ID, 0);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
 
-    return new RealtimeTestEnvironment(sourceType, transitModel);
+    return new RealtimeTestEnvironment(sourceType, timetableRepository);
   }
 
   private Trip createTrip(TripInput tripInput) {
@@ -65,10 +72,10 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       .withServiceDate(SERVICE_DATE)
       .build();
 
-    transitModel.addTripOnServiceDate(tripOnServiceDate);
+    timetableRepository.addTripOnServiceDate(tripOnServiceDate);
 
     if (tripInput.route().getOperator() != null) {
-      transitModel.addOperators(List.of(tripInput.route().getOperator()));
+      timetableRepository.addOperators(List.of(tripInput.route().getOperator()));
     }
 
     var stopTimes = IntStream
@@ -81,17 +88,17 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
-    final TripPattern pattern = TransitModelForTest
+    final TripPattern pattern = TimetableRepositoryForTest
       .tripPattern(tripInput.id() + "Pattern", tripInput.route())
       .withStopPattern(
-        TransitModelForTest.stopPattern(
+        TimetableRepositoryForTest.stopPattern(
           tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
         )
       )
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
 
-    transitModel.addTripPattern(pattern.getId(), pattern);
+    timetableRepository.addTripPattern(pattern.getId(), pattern);
 
     return trip;
   }

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * the updated copy in an atomic operation. This ensures that any TransitLayer that is referenced
  * from the Graph is never changed.
  *
- * This is a way of keeping the TransitLayer up to date (in sync with the TransitModel plus its most
+ * This is a way of keeping the TransitLayer up to date (in sync with the TimetableRepository plus its most
  * recent TimetableSnapshot) without repeatedly deriving it from scratch every few seconds. The same
  * incremental changes are applied to both the TimetableSnapshot and the TransitLayer and they are
  * published together.
@@ -60,7 +60,7 @@ public class TransitLayerUpdater {
   }
 
   public void update(
-    Set<Timetable> updatedTimetables,
+    Collection<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
   ) {
     if (!transitService.hasRealtimeTransitLayer()) {

@@ -33,7 +33,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class LinkingTest {
 
@@ -114,16 +114,16 @@ public class LinkingTest {
     // build the graph without the added stops
     TestOtpModel model = buildGraphNoTransit();
     Graph g1 = model.graph();
-    TransitModel transitModel1 = model.transitModel();
+    TimetableRepository timetableRepository1 = model.timetableRepository();
     addRegularStopGrid(g1);
-    link(g1, transitModel1);
+    link(g1, timetableRepository1);
 
     TestOtpModel model2 = buildGraphNoTransit();
     Graph g2 = model2.graph();
-    TransitModel transitModel2 = model2.transitModel();
+    TimetableRepository timetableRepository2 = model2.timetableRepository();
     addExtraStops(g2);
     addRegularStopGrid(g2);
-    link(g2, transitModel2);
+    link(g2, timetableRepository2);
 
     var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
     assertEquals(1350, transitStopVertices.size());
@@ -152,7 +152,7 @@ public class LinkingTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var gg = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
 
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
@@ -160,7 +160,7 @@ public class LinkingTest {
     OsmModule osmModule = OsmModule.of(provider, gg).build();
 
     osmModule.buildGraph();
-    return new TestOtpModel(gg, transitModel);
+    return new TestOtpModel(gg, timetableRepository);
   }
 
   private static List<StreetTransitStopLink> outgoingStls(final TransitStopVertex tsv) {

@@ -13,7 +13,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.service.StopModel;
 
 class AreaStopTest {
@@ -24,7 +24,7 @@ class AreaStopTest {
 
   private static final I18NString URL = new NonLocalizedString("url");
 
-  private static final String ZONE_ID = TransitModelForTest.TIME_ZONE_ID;
+  private static final String ZONE_ID = TimetableRepositoryForTest.TIME_ZONE_ID;
 
   private static final Geometry GEOMETRY = Polygons.OSLO;
 
@@ -35,7 +35,7 @@ class AreaStopTest {
   private static AreaStopBuilder areaStopBuilder() {
     return StopModel
       .of()
-      .areaStop(TransitModelForTest.id(ID))
+      .areaStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .withDescription(DESCRIPTION)
       .withUrl(URL)
@@ -70,7 +70,7 @@ class AreaStopTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())

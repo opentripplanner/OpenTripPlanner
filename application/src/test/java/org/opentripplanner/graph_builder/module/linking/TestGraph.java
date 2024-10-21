@@ -8,9 +8,9 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in
@@ -18,7 +18,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class TestGraph {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   /** Add a regular grid of stops to the graph */
   public static void addRegularStopGrid(Graph graph) {
@@ -60,9 +60,9 @@ class TestGraph {
   }
 
   /** link the stops in the graph */
-  public static void link(Graph graph, TransitModel transitModel) {
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+  public static void link(Graph graph, TimetableRepository timetableRepository) {
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
 
     VertexLinker linker = graph.getLinker();
 

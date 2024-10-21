@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 public class GroupOfRoutesTest {
 
@@ -18,7 +18,7 @@ public class GroupOfRoutesTest {
   private static final String DESCRIPTION = "description";
 
   private static final GroupOfRoutes subject = GroupOfRoutes
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withPrivateCode(PRIVATE_CODE)
     .withShortName(SHORT_NAME)
     .withName(NAME)
@@ -52,7 +52,7 @@ public class GroupOfRoutesTest {
     // Make a copy, and set the same name (nothing is changed)
     var other = subject.copy().build();
     assertTrue(subject.sameAs(other));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
     assertFalse(subject.sameAs(subject.copy().withDescription("X").build()));
     assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));

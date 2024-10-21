@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TransitLayerTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final TripTimes TRIP_TIMES;
 
   private static final RoutingTripPattern TRIP_PATTERN;
@@ -30,17 +30,17 @@ class TransitLayerTest {
     var stopTime = new StopTime();
     stopTime.setStop(stop);
     var stopPattern = new StopPattern(List.of(stopTime));
-    var route = TransitModelForTest.route("1").build();
+    var route = TimetableRepositoryForTest.route("1").build();
     TRIP_PATTERN =
       TripPattern
-        .of(TransitModelForTest.id("P1"))
+        .of(TimetableRepositoryForTest.id("P1"))
         .withRoute(route)
         .withStopPattern(stopPattern)
         .build()
         .getRoutingTripPattern();
     TRIP_TIMES =
       TripTimesFactory.tripTimes(
-        TransitModelForTest.trip("1").withRoute(route).build(),
+        TimetableRepositoryForTest.trip("1").withRoute(route).build(),
         List.of(new StopTime()),
         new Deduplicator()
       );

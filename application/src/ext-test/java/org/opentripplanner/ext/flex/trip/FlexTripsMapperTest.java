@@ -11,7 +11,7 @@ import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.service.StopModel;
 
 class FlexTripsMapperTest {
@@ -30,7 +30,7 @@ class FlexTripsMapperTest {
 
   private static StopTime stopTime(int seq) {
     var st = FlexStopTimesForTest.area("08:00", "18:00");
-    st.setTrip(TransitModelForTest.trip("flex-1").build());
+    st.setTrip(TimetableRepositoryForTest.trip("flex-1").build());
     st.setStopSequence(seq);
     return st;
   }

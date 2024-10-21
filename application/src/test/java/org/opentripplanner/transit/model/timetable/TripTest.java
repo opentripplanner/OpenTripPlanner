@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -20,7 +20,7 @@ class TripTest {
   private static final String ID = "1";
   private static final String SHORT_NAME = "name";
   private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
-  public static final Route ROUTE = TransitModelForTest.route("routeId").build();
+  public static final Route ROUTE = TimetableRepositoryForTest.route("routeId").build();
   private static final Direction DIRECTION = Direction.INBOUND;
   public static final NonLocalizedString HEAD_SIGN = new NonLocalizedString("head sign");
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
@@ -37,7 +37,7 @@ class TripTest {
   private static final FeedScopedId SERVICE_ID = FeedScopedId.parse("x:serviceId");
   private static final FeedScopedId SHAPE_ID = FeedScopedId.parse("x:shapeId");
   private static final Trip subject = Trip
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withRoute(ROUTE)
     .withDirection(DIRECTION)
@@ -63,7 +63,7 @@ class TripTest {
       .withBikesAllowed(BIKE_ACCESS)
       .build();
 
-    var subject = Trip.of(TransitModelForTest.id(ID)).withRoute(routeWithModes).build();
+    var subject = Trip.of(TimetableRepositoryForTest.id(ID)).withRoute(routeWithModes).build();
 
     assertEquals(TRANSIT_MODE, subject.getMode());
     assertEquals(NETEX_SUBMODE, subject.getNetexSubMode());
@@ -97,14 +97,14 @@ class TripTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
     assertFalse(
       subject.sameAs(subject.copy().withWheelchairBoarding(Accessibility.NOT_POSSIBLE).build())
     );
     assertFalse(
       subject.sameAs(
-        subject.copy().withRoute(TransitModelForTest.route("otherRouteId").build()).build()
+        subject.copy().withRoute(TimetableRepositoryForTest.route("otherRouteId").build()).build()
       )
     );
     assertFalse(subject.sameAs(subject.copy().withDirection(Direction.OUTBOUND).build()));

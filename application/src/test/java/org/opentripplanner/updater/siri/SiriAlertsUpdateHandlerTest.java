@@ -34,7 +34,6 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.RealTimeUpdateContext;
-import org.opentripplanner.updater.siri.SiriAlertsUpdateHandler;
 import uk.org.ifopt.siri20.StopPlaceRef;
 import uk.org.siri.siri20.AffectedLineStructure;
 import uk.org.siri.siri20.AffectedRouteStructure;
@@ -81,15 +80,17 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
-    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, transitModel);
+    realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, timetableRepository);
     if (transitService == null) {
-      transitService = new DefaultTransitService(transitModel);
-      transitModel.setUpdaterManager(new GraphUpdaterManager(realTimeUpdateContext, List.of()));
+      transitService = new DefaultTransitService(timetableRepository);
+      timetableRepository.setUpdaterManager(
+        new GraphUpdaterManager(realTimeUpdateContext, List.of())
+      );
     } else {
       transitAlertService.getAllAlerts().clear();
     }
     if (alertsUpdateHandler == null) {
-      transitAlertService = new TransitAlertServiceImpl(transitModel);
+      transitAlertService = new TransitAlertServiceImpl(timetableRepository);
       alertsUpdateHandler =
         new SiriAlertsUpdateHandler(FEED_ID, transitAlertService, Duration.ZERO);
     }
@@ -458,7 +459,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
-    var modelZoneId = transitModel.getTimeZone();
+    var modelZoneId = timetableRepository.getTimeZone();
     var situationNumber = "TST:SituationNumber:1234";
     var startTime = LocalDateTime.parse("2014-01-01T00:00:00").atZone(modelZoneId);
     var endTime = LocalDateTime.parse("2014-01-01T23:59:59").atZone(modelZoneId);
@@ -497,7 +498,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertTrue(transitAlertService.getAllAlerts().isEmpty());
 
-    ZoneId zoneId = transitModel.getTimeZone();
+    ZoneId zoneId = timetableRepository.getTimeZone();
     final String situationNumber = "TST:SituationNumber:1234";
     final ZonedDateTime startTime = LocalDateTime.parse("2014-01-01T00:00:00").atZone(zoneId);
     final ZonedDateTime endTime = LocalDateTime.parse("2014-01-01T23:59:59").atZone(zoneId);

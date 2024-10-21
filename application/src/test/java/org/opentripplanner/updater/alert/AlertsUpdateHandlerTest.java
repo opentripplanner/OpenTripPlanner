@@ -25,13 +25,15 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class AlertsUpdateHandlerTest {
 
   private AlertsUpdateHandler handler;
 
-  private final TransitAlertService service = new TransitAlertServiceImpl(new TransitModel());
+  private final TransitAlertService service = new TransitAlertServiceImpl(
+    new TimetableRepository()
+  );
 
   @BeforeEach
   public void setUp() {

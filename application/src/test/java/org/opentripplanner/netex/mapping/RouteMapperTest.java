@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -102,7 +102,7 @@ class RouteMapperTest {
       transitBuilder.getGroupsOfRoutesByRouteId(),
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
-      TransitModelForTest.TIME_ZONE_ID,
+      TimetableRepositoryForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -210,7 +210,7 @@ class RouteMapperTest {
       ArrayListMultimap.create(),
       new DefaultEntityById<>(),
       netexIndex.readOnlyView(),
-      TransitModelForTest.TIME_ZONE_ID,
+      TimetableRepositoryForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -246,7 +246,7 @@ class RouteMapperTest {
       transitBuilder.getGroupsOfRoutesByRouteId(),
       transitBuilder.getGroupOfRouteById(),
       netexIndex.readOnlyView(),
-      TransitModelForTest.TIME_ZONE_ID,
+      TimetableRepositoryForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -278,7 +278,7 @@ class RouteMapperTest {
   }
 
   private Agency createAgency() {
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .agency("Ruter AS")
       .copy()
       .withId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))

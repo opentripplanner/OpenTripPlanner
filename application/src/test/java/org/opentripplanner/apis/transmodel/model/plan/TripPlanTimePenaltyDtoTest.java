@@ -11,7 +11,7 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class TripPlanTimePenaltyDtoTest {
 
@@ -20,7 +20,7 @@ class TripPlanTimePenaltyDtoTest {
     Cost.costOfSeconds(21)
   );
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final Place placeA = Place.forStop(testModel.stop("A").build());
   private final Place placeB = Place.forStop(testModel.stop("B").build());
 

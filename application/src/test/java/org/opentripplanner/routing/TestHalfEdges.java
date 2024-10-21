@@ -48,21 +48,21 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestHalfEdges {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
   private IntersectionVertex br, tr, bl, tl;
   private TransitStopVertex station1;
   private TransitStopVertex station2;
-  private TransitModel transitModel;
+  private TimetableRepository timetableRepository;
 
   @BeforeEach
   public void setUp() {
@@ -162,7 +162,7 @@ public class TestHalfEdges {
     var s2 = testModel.stop("morx station", 40.0099999, -74.002).build();
 
     stopModelBuilder.withRegularStop(s1).withRegularStop(s2);
-    transitModel = new TransitModel(stopModelBuilder.build(), deduplicator);
+    timetableRepository = new TimetableRepository(stopModelBuilder.build(), deduplicator);
 
     station1 = factory.transitStop(TransitStopVertex.of().withStop(s1));
     station2 = factory.transitStop(TransitStopVertex.of().withStop(s2));
@@ -172,8 +172,8 @@ public class TestHalfEdges {
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
 
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
   }
 
   @Test
@@ -595,7 +595,9 @@ public class TestHalfEdges {
   @Test
   public void testStreetLocationFinder() {
     StreetIndex finder = graph.getStreetIndex();
-    GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
+    GraphFinder graphFinder = new DirectGraphFinder(
+      timetableRepository.getStopModel()::findRegularStops
+    );
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
     assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
@@ -674,7 +676,7 @@ public class TestHalfEdges {
   @Test
   public void testNetworkLinker() {
     int numVerticesBefore = graph.getVertices().size();
-    TestStreetLinkerModule.link(graph, transitModel);
+    TestStreetLinkerModule.link(graph, timetableRepository);
     int numVerticesAfter = graph.getVertices().size();
     assertEquals(4, numVerticesAfter - numVerticesBefore);
     Collection<Edge> outgoing = station1.getOutgoing();

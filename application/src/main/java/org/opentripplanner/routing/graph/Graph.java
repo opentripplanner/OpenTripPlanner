@@ -43,10 +43,10 @@ import org.slf4j.LoggerFactory;
  * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
  * including edges representing both street segments and public transit lines connecting stops. In
  * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
- * other data structures suited to the Raptor algorithm (the TransitModel). Some transit-related
+ * other data structures suited to the Raptor algorithm (the TimetableRepository). Some transit-related
  * vertices are still present in the Graph, specifically those representing transit stops,
  * entrances, and elevators. Their presence in the street graph creates a connection between the two
- * routable data structures (identifying where stops in the TransitModel are located relative to
+ * routable data structures (identifying where stops in the TimetableRepository are located relative to
  * roads).
  * <p>
  * Other data structures related to street routing, such as elevation data and vehicle parking

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Package;
 
-public class TransitModelArchitectureTest {
+public class TimetableRepositoryArchitectureTest {
 
   private static final Package TRANSIT_FRAMEWORK = TRANSIT_MODEL.subPackage("framework");
   private static final Package BASIC = TRANSIT_MODEL.subPackage("basic");

@@ -26,7 +26,7 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -49,11 +49,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class RouteRequestTransitDataProviderFilterTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  private static final Route ROUTE = TransitModelForTest.route("1").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
+  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("T1");
 
   private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
@@ -100,8 +100,8 @@ class RouteRequestTransitDataProviderFilterTest {
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
     var tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
-      .withRoute(TransitModelForTest.route("1").build())
+      .of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
@@ -150,8 +150,8 @@ class RouteRequestTransitDataProviderFilterTest {
     var stopTime4 = getStopTime("TEST:4", PickDrop.SCHEDULED);
     var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3, stopTime4));
     var tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
-      .withRoute(TransitModelForTest.route("1").build())
+      .of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
@@ -294,7 +294,7 @@ class RouteRequestTransitDataProviderFilterTest {
             SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
           )
         ),
-        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+        List.of(TimetableRepositoryForTest.OTHER_AGENCY.getId())
       )
     );
 
@@ -329,7 +329,7 @@ class RouteRequestTransitDataProviderFilterTest {
             SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
           )
         ),
-        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+        List.of(TimetableRepositoryForTest.OTHER_AGENCY.getId())
       )
     );
 
@@ -357,7 +357,10 @@ class RouteRequestTransitDataProviderFilterTest {
         TransitFilterRequest
           .of()
           .addSelect(
-            SelectRequest.of().withAgencies(List.of(TransitModelForTest.AGENCY.getId())).build()
+            SelectRequest
+              .of()
+              .withAgencies(List.of(TimetableRepositoryForTest.AGENCY.getId()))
+              .build()
           )
           .addNot(
             SelectRequest
@@ -675,8 +678,8 @@ class RouteRequestTransitDataProviderFilterTest {
 
   @Test
   void testBikesAllowed() {
-    RouteBuilder routeBuilder = TransitModelForTest.route("1");
-    TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).withRoute(routeBuilder.build());
+    RouteBuilder routeBuilder = TimetableRepositoryForTest.route("1");
+    TripBuilder trip = Trip.of(TimetableRepositoryForTest.id("T1")).withRoute(routeBuilder.build());
 
     assertEquals(
       BikeAccess.UNKNOWN,
@@ -803,20 +806,20 @@ class RouteRequestTransitDataProviderFilterTest {
   }
 
   private TripPatternForDate createTestTripPatternForDate() {
-    Route route = TransitModelForTest.route("1").build();
+    Route route = TimetableRepositoryForTest.route("1").build();
 
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
     RoutingTripPattern tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
+      .of(TimetableRepositoryForTest.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(
-      TransitModelForTest.trip("1").withRoute(route).build(),
+      TimetableRepositoryForTest.trip("1").withRoute(route).build(),
       List.of(new StopTime()),
       new Deduplicator()
     );

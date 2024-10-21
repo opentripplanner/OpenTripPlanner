@@ -96,10 +96,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
     this.directDistanceMeters =
       getDistanceFromCoordinates(
-        List.of(
-          transitLegCoordinates.get(0),
-          transitLegCoordinates.get(transitLegCoordinates.size() - 1)
-        )
+        List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
   }
 
@@ -139,22 +136,23 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public Agency getAgency() {
-    return getTrip().getRoute().getAgency();
+    return trip().getRoute().getAgency();
   }
 
   @Override
+  @Nullable
   public Operator getOperator() {
-    return getTrip().getOperator();
+    return trip().getOperator();
   }
 
   @Override
   public Route getRoute() {
-    return getTrip().getRoute();
+    return trip().getRoute();
   }
 
   @Override
   public Trip getTrip() {
-    return tripTimes.getTrip();
+    return trip();
   }
 
   @Override
@@ -182,7 +180,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public TransitMode getMode() {
-    return getTrip().getMode();
+    return trip().getMode();
   }
 
   @Override
@@ -247,7 +245,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public Integer getRouteType() {
-    return getTrip().getRoute().getGtfsType();
+    return trip().getRoute().getGtfsType();
   }
 
   @Override
@@ -300,6 +298,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nullable
   public PickDrop getBoardRule() {
     if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {
       return null;
@@ -308,6 +307,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nullable
   public PickDrop getAlightRule() {
     if (transferToNextLeg != null && transferToNextLeg.getTransferConstraint().isStaySeated()) {
       return null;
@@ -432,6 +432,13 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .toString();
+  }
+
+  /**
+   * Non-null getter for trip
+   */
+  private Trip trip() {
+    return tripTimes.getTrip();
   }
 
   private List<Coordinate> extractTransitLegCoordinates(

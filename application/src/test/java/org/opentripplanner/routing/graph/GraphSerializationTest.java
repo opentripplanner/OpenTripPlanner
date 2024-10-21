@@ -29,7 +29,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -67,7 +67,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var weRepo = new DefaultWorldEnvelopeRepository();
     var emissionsDataModel = new EmissionsDataModel();
-    testRoundTrip(model.graph(), model.transitModel(), weRepo, emissionsDataModel);
+    testRoundTrip(model.graph(), model.timetableRepository(), weRepo, emissionsDataModel);
   }
 
   /**
@@ -78,7 +78,12 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
     var emissionsDataModel = new EmissionsDataModel();
-    testRoundTrip(model.graph(), model.transitModel(), worldEnvelopeRepository, emissionsDataModel);
+    testRoundTrip(
+      model.graph(),
+      model.timetableRepository(),
+      worldEnvelopeRepository,
+      emissionsDataModel
+    );
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -175,7 +180,7 @@ public class GraphSerializationTest {
    */
   private void testRoundTrip(
     Graph originalGraph,
-    TransitModel originalTransitModel,
+    TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     EmissionsDataModel emissionsDataModel
   ) throws Exception {
@@ -185,7 +190,7 @@ public class GraphSerializationTest {
     streetLimitationParameters.initMaxCarSpeed(40);
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
-      originalTransitModel,
+      originalTimetableRepository,
       worldEnvelopeRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
@@ -197,23 +202,23 @@ public class GraphSerializationTest {
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
     Graph copiedGraph1 = deserializedGraph.graph;
-    TransitModel copiedTransitModel1 = deserializedGraph.transitModel;
+    TimetableRepository copiedTimetableRepository1 = deserializedGraph.timetableRepository;
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
 
-    originalTransitModel.index();
-    originalGraph.index(originalTransitModel.getStopModel());
+    originalTimetableRepository.index();
+    originalGraph.index(originalTimetableRepository.getStopModel());
 
-    copiedTransitModel1.index();
-    copiedGraph1.index(copiedTransitModel1.getStopModel());
+    copiedTimetableRepository1.index();
+    copiedGraph1.index(copiedTimetableRepository1.getStopModel());
 
     assertNoDifferences(originalGraph, copiedGraph1);
 
     SerializedGraphObject deserializedGraph2 = SerializedGraphObject.load(tempFile);
     Graph copiedGraph2 = deserializedGraph2.graph;
-    TransitModel copiedTransitModel2 = deserializedGraph2.transitModel;
-    copiedTransitModel2.index();
-    copiedGraph2.index(copiedTransitModel2.getStopModel());
+    TimetableRepository copiedTimetableRepository2 = deserializedGraph2.timetableRepository;
+    copiedTimetableRepository2.index();
+    copiedGraph2.index(copiedTimetableRepository2.getStopModel());
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 }

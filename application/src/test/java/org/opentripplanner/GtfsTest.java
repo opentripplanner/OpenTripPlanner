@@ -1,5 +1,6 @@
 package org.opentripplanner;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -40,7 +41,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
@@ -50,7 +51,7 @@ import org.opentripplanner.updater.trip.UpdateIncrementality;
 public abstract class GtfsTest {
 
   public Graph graph;
-  public TransitModel transitModel;
+  public TimetableRepository timetableRepository;
 
   AlertsUpdateHandler alertsUpdateHandler;
   TimetableSnapshotSource timetableSnapshotSource;
@@ -178,7 +179,7 @@ public abstract class GtfsTest {
       assertEquals(1, leg.getStreetNotes().size());
       assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
     } else {
-      assertNull(leg.getStreetNotes());
+      assertThat(leg.getStreetNotes()).isEmpty();
     }
   }
 
@@ -194,27 +195,27 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(new StopModel(), deduplicator);
+    timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
 
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
-      transitModel,
+      timetableRepository,
       graph,
       ServiceDateInterval.unbounded()
     );
 
     gtfsGraphBuilderImpl.buildGraph();
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
-    serverContext = TestServerContext.createServerContext(graph, transitModel);
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
+    serverContext = TestServerContext.createServerContext(graph, timetableRepository);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
         TimetableSnapshotSourceParameters.DEFAULT
           .withPurgeExpiredData(true)
           .withMaxSnapshotFrequency(Duration.ZERO),
-        transitModel
+        timetableRepository
       );
-    alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
+    alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
 

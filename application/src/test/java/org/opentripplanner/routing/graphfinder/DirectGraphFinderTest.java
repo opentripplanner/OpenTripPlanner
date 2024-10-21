@@ -29,7 +29,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
         }
       }
     );
-    stopModel = model.transitModel().getStopModel();
+    stopModel = model.timetableRepository().getStopModel();
   }
 
   @Test

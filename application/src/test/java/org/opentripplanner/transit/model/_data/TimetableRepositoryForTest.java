@@ -50,7 +50,7 @@ import org.opentripplanner.transit.service.StopModelBuilder;
  *       state between tests. For now, it is just the stop index - but we want to
  *       use this to encapsulate the StopModel completely.
  */
-public class TransitModelForTest {
+public class TimetableRepositoryForTest {
 
   public static final String FEED_ID = "F";
   public static final String TIME_ZONE_ID = "Europe/Paris";
@@ -91,12 +91,12 @@ public class TransitModelForTest {
 
   private final StopModelBuilder stopModelBuilder;
 
-  public TransitModelForTest(StopModelBuilder stopModelBuilder) {
+  public TimetableRepositoryForTest(StopModelBuilder stopModelBuilder) {
     this.stopModelBuilder = stopModelBuilder;
   }
 
-  public static TransitModelForTest of() {
-    return new TransitModelForTest(StopModel.of());
+  public static TimetableRepositoryForTest of() {
+    return new TimetableRepositoryForTest(StopModel.of());
   }
 
   public static FeedScopedId id(String id) {

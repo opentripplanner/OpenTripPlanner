@@ -1,10 +1,9 @@
 package org.opentripplanner.raptor.configure;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.request.RaptorEnvironment;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.rangeraptor.ConcurrentCompositeRaptorRouter;
@@ -30,28 +29,26 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 /**
  * This class is responsible for creating a new search and holding application scoped Raptor state.
  * <p/>
- * This class should have APPLICATION scope. It keep a reference to the threadPool used by Raptor,
- * and holds a reference to the application tuning parameters.
+ * This class should have APPLICATION scope. It keeps a reference to the environment and the
+ * tuning parameters. The environment has a thread-pool, which should be APPLICATION scope.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorConfig<T extends RaptorTripSchedule> {
 
-  @Nullable
-  private final ExecutorService threadPool;
-
+  private final RaptorEnvironment environment;
   private final RaptorTuningParameters tuningParameters;
 
   /** The service is not final, because it depends on the request. */
   private PassThroughPointsService passThroughPointsService = null;
 
-  public RaptorConfig(RaptorTuningParameters tuningParameters) {
+  public RaptorConfig(RaptorTuningParameters tuningParameters, RaptorEnvironment environment) {
     this.tuningParameters = tuningParameters;
-    this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
+    this.environment = environment;
   }
 
   public static <T extends RaptorTripSchedule> RaptorConfig<T> defaultConfigForTest() {
-    return new RaptorConfig<>(new RaptorTuningParameters() {});
+    return new RaptorConfig<>(new RaptorTuningParameters() {}, new RaptorEnvironment() {});
   }
 
   public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
@@ -140,18 +137,22 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   }
 
   public boolean isMultiThreaded() {
-    return threadPool != null;
+    return threadPool() != null;
   }
 
   @Nullable
   public ExecutorService threadPool() {
-    return threadPool;
+    return environment.threadPool();
   }
 
   public void shutdown() {
-    if (threadPool != null) {
-      threadPool.shutdown();
+    if (threadPool() != null) {
+      threadPool().shutdown();
     }
+  }
+
+  public RuntimeException mapInterruptedException(InterruptedException e) {
+    return environment.mapInterruptedException(e);
   }
 
   public RaptorSearchWindowCalculator searchWindowCalculator() {
@@ -191,14 +192,8 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       ctx.roundTracker(),
       ctx.calculator(),
       ctx.createLifeCyclePublisher(),
-      ctx.performanceTimers()
+      ctx.performanceTimers(),
+      environment.timeoutHook()
     );
-  }
-
-  @Nullable
-  private ExecutorService createNewThreadPool(int size) {
-    return size > 0
-      ? Executors.newFixedThreadPool(size, OtpRequestThreadFactory.of("raptor-%d"))
-      : null;
   }
 }

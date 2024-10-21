@@ -6,26 +6,26 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RouteToCentroidStationIdsValidator implements GraphBuilderModule {
 
   private final DataImportIssueStore issueStore;
   private final Collection<FeedScopedId> transitRouteToStationCentroid;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
 
   public RouteToCentroidStationIdsValidator(
     DataImportIssueStore issueStore,
     Collection<FeedScopedId> transitRouteToStationCentroid,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     this.issueStore = issueStore;
     this.transitRouteToStationCentroid = transitRouteToStationCentroid;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
   }
 
   private void validate() {
-    var stationIds = transitModel
+    var stationIds = timetableRepository
       .getStopModel()
       .listStations()
       .stream()

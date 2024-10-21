@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -47,7 +47,7 @@ public class NoticeAssignmentMapperTest {
     noticeAssignment.setNoticedObjectRef(new VersionOfObjectRefStructure().withRef(ROUTE_ID));
     noticeAssignment.setNotice(NOTICE);
 
-    Route route = TransitModelForTest.route(ROUTE_ID).build();
+    Route route = TimetableRepositoryForTest.route(ROUTE_ID).build();
 
     EntityById<Route> routesById = new DefaultEntityById<>();
     routesById.add(route);
@@ -89,7 +89,7 @@ public class NoticeAssignmentMapperTest {
         )
     );
 
-    var trip = TransitModelForTest.trip("1").build();
+    var trip = TimetableRepositoryForTest.trip("1").build();
     StopTime stopTime1 = createStopTime(1, trip);
     StopTime stopTime2 = createStopTime(2, trip);
 
