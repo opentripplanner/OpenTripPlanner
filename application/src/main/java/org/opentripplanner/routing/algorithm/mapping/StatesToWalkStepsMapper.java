@@ -177,6 +177,9 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
+    } else if (backState.getVertex() instanceof StationEntranceVertex) {
+      addStep(createStationEntranceWalkStep(backState, forwardState, edge));
+      return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
       return;
@@ -258,8 +261,6 @@ public class StatesToWalkStepsMapper {
     }
 
     setMotorwayExit(backState);
-
-    setStationEntrance(backState);
 
     if (createdNewStep && !modeTransition) {
       // check last three steps for zag
@@ -379,23 +380,6 @@ public class StatesToWalkStepsMapper {
     }
     if (exitState.getVertex() instanceof ExitVertex) {
       current.withExit(((ExitVertex) exitState.getVertex()).getExitName());
-    }
-  }
-
-  /**
-   * Update the walk step with the name of the station entrance if set from OSM
-   */
-  private void setStationEntrance(State backState) {
-    State entranceState = backState;
-    Edge entranceEdge = entranceState.getBackEdge();
-    while (entranceEdge instanceof FreeEdge) {
-      entranceState = entranceState.getBackState();
-      entranceEdge = entranceState.getBackEdge();
-    }
-    if (entranceState.getVertex() instanceof StationEntranceVertex) {
-      current.withEntrance(
-        Entrance.withCode(((StationEntranceVertex) entranceState.getVertex()).getEntranceName())
-      );
     }
   }
 
@@ -533,6 +517,22 @@ public class StatesToWalkStepsMapper {
 
     step.withRelativeDirection(RelativeDirection.ELEVATOR);
 
+    return step;
+  }
+
+  private WalkStepBuilder createStationEntranceWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge
+  ) {
+    // don't care what came before or comes after
+    var step = createWalkStep(forwardState, backState);
+
+    step.withRelativeDirection(RelativeDirection.CONTINUE);
+
+    step.withEntrance(
+      Entrance.withCode(((StationEntranceVertex) backState.getVertex()).getEntranceName())
+    );
     return step;
   }
 
