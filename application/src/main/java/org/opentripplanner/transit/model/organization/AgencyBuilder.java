@@ -25,7 +25,6 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
     this.lang = original.getLang();
     this.phone = original.getPhone();
     this.fareUrl = original.getFareUrl();
-    this.brandingUrl = original.getBrandingUrl();
   }
 
   public String getName() {
@@ -79,15 +78,6 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
 
   public AgencyBuilder withFareUrl(String fareUrl) {
     this.fareUrl = fareUrl;
-    return this;
-  }
-
-  public String getBrandingUrl() {
-    return brandingUrl;
-  }
-
-  public AgencyBuilder withBrandingUrl(String brandingUrl) {
-    this.brandingUrl = brandingUrl;
     return this;
   }
 

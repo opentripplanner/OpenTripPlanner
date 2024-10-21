@@ -12,7 +12,6 @@ public class ApiAgency implements Serializable {
   public String lang;
   public String phone;
   public String fareUrl;
-  public String brandingUrl;
 
   @Override
   public int hashCode() {
