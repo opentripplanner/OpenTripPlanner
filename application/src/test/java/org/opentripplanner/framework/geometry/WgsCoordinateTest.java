@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.geometry.WgsCoordinate.GREENWICH;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -101,8 +102,8 @@ public class WgsCoordinateTest {
 
   @Test
   void testGreenwich() {
-    assertEquals(51.48d, WgsCoordinate.GREENWICH.latitude());
-    assertEquals(0d, WgsCoordinate.GREENWICH.longitude());
+    assertEquals(51.48d, GREENWICH.latitude());
+    assertEquals(0d, GREENWICH.longitude());
   }
 
   @Test
@@ -119,5 +120,10 @@ public class WgsCoordinateTest {
     var rounded = hamburg.roundToApproximate100m();
     assertEquals(10, rounded.longitude());
     assertEquals(53.557, rounded.latitude());
+  }
+
+  @Test
+  void testDistanceTo() {
+    assertEquals(131_394, (int) GREENWICH.distanceTo(GREENWICH.add(-1.0, 1.0)));
   }
 }
