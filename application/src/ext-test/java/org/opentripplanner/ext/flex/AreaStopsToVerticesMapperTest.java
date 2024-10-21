@@ -33,13 +33,13 @@ class AreaStopsToVerticesMapperTest {
     .areaStop("berlin")
     .withGeometry(Polygons.BERLIN)
     .build();
-  public static final SiteRepository STOP_MODEL = TEST_MODEL
+  public static final SiteRepository SITE_REPOSITORY = TEST_MODEL
     .siteRepositoryBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 
   public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
-    STOP_MODEL,
+    SITE_REPOSITORY,
     new Deduplicator()
   );
 

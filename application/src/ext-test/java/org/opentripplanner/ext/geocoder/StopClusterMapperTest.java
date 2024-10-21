@@ -22,12 +22,12 @@ class StopClusterMapperTest {
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
   private static final List<RegularStop> STOPS = List.of(STOP_A, STOP_B, STOP_C);
-  private static final SiteRepository STOP_MODEL = TEST_MODEL
+  private static final SiteRepository SITE_REPOSITORY = TEST_MODEL
     .siteRepositoryBuilder()
     .withRegularStops(STOPS)
     .build();
   private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
-    STOP_MODEL,
+    SITE_REPOSITORY,
     new Deduplicator()
   );
   private static final List<StopLocation> LOCATIONS = STOPS

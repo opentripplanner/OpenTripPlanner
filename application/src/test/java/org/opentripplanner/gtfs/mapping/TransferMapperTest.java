@@ -37,24 +37,24 @@ public class TransferMapperTest {
 
   private static StationMapper STATION_MAPPER;
 
-  private static final SiteRepositoryBuilder STOP_MODEL_BUILDER = SiteRepository.of();
+  private static final SiteRepositoryBuilder SITE_REPOSITORY_BUILDER = SiteRepository.of();
 
   private static final StopMapper STOP_MAPPER = new StopMapper(
     TRANSLATION_HELPER,
     stationId -> null,
-    STOP_MODEL_BUILDER
+    SITE_REPOSITORY_BUILDER
   );
   private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
 
   private static final LocationMapper LOCATION_MAPPER = new LocationMapper(
-    STOP_MODEL_BUILDER,
+    SITE_REPOSITORY_BUILDER,
     ISSUE_STORE
   );
 
   private static final LocationGroupMapper LOCATION_GROUP_MAPPER = new LocationGroupMapper(
     STOP_MAPPER,
     LOCATION_MAPPER,
-    STOP_MODEL_BUILDER
+    SITE_REPOSITORY_BUILDER
   );
   private static StopTimeMapper STOP_TIME_MAPPER;
 
