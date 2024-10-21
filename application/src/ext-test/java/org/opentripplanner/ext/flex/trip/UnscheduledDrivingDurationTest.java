@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V1;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;
 import java.util.List;

@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
@@ -28,7 +28,7 @@ class StopModelTest {
     .getGeometryFactory()
     .createPoint(COOR_A.asJtsCoordinate());
   public static final NonLocalizedString NAME = NonLocalizedString.ofNullable("Name");
-  private static final FeedScopedId ID = TransitModelForTest.id("A");
+  private static final FeedScopedId ID = TimetableRepositoryForTest.id("A");
   private static final Station STATION = Station
     .of(ID)
     .withName(NAME)

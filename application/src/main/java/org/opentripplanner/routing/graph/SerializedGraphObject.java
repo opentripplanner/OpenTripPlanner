@@ -35,7 +35,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class SerializedGraphObject implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(SerializedGraphObject.class);
 
   public final Graph graph;
-  public final TransitModel transitModel;
+  public final TimetableRepository timetableRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
 
@@ -82,7 +82,7 @@ public class SerializedGraphObject implements Serializable {
 
   public SerializedGraphObject(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig,
@@ -93,7 +93,7 @@ public class SerializedGraphObject implements Serializable {
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
@@ -184,9 +184,9 @@ public class SerializedGraphObject implements Serializable {
       );
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
-      serObj.transitModel.getStopModel().reindexAfterDeserialization();
-      serObj.transitModel.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.transitModel);
+      serObj.timetableRepository.getStopModel().reindexAfterDeserialization();
+      serObj.timetableRepository.index();
+      logSerializationCompleteStatus(serObj.graph, serObj.timetableRepository);
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -256,11 +256,14 @@ public class SerializedGraphObject implements Serializable {
     // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
   }
 
-  private static void logSerializationCompleteStatus(Graph graph, TransitModel transitModel) {
+  private static void logSerializationCompleteStatus(
+    Graph graph,
+    TimetableRepository timetableRepository
+  ) {
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
-    var nTransfers = f.formatNumber(transitModel.getTransferService().listAll().size());
-    var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
+    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
+    var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

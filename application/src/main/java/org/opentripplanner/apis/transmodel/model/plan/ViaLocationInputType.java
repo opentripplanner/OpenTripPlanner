@@ -5,6 +5,7 @@ import static graphql.Scalars.GraphQLString;
 
 import graphql.language.StringValue;
 import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import java.time.Duration;
@@ -84,7 +85,7 @@ public class ViaLocationInputType {
       b
         .name(FIELD_STOP_LOCATION_IDS)
         .description(DOC_STOP_LOCATION_IDS)
-        .type(gqlListOfNonNullStrings())
+        .type(requiredListOfNonNullStrings())
     )
     /*
       TODO: Add support for coordinates
@@ -101,7 +102,7 @@ public class ViaLocationInputType {
       b
         .name(FIELD_STOP_LOCATION_IDS)
         .description(DOC_STOP_LOCATION_IDS)
-        .type(gqlListOfNonNullStrings())
+        .type(requiredListOfNonNullStrings())
     )
     .build();
 
@@ -119,7 +120,7 @@ public class ViaLocationInputType {
     )
     .build();
 
-  private static GraphQLList gqlListOfNonNullStrings() {
-    return new GraphQLList(new GraphQLNonNull(GraphQLString));
+  private static GraphQLInputType requiredListOfNonNullStrings() {
+    return new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)));
   }
 }

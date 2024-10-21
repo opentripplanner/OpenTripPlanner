@@ -12,7 +12,7 @@ import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Responsible for dependency injection and creating main NeTEx module objects. This decouple the
@@ -35,7 +35,7 @@ public class NetexConfigure {
 
   public NetexModule createNetexModule(
     Iterable<ConfiguredDataSource<NetexFeedParameters>> netexSources,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     Graph graph,
     DataImportIssueStore issueStore
   ) {
@@ -43,7 +43,7 @@ public class NetexConfigure {
 
     for (ConfiguredDataSource<NetexFeedParameters> it : netexSources) {
       var transitServiceBuilder = new OtpTransitServiceBuilder(
-        transitModel.getStopModel(),
+        timetableRepository.getStopModel(),
         issueStore
       );
       netexBundles.add(netexBundle(transitServiceBuilder, it));
@@ -51,7 +51,7 @@ public class NetexConfigure {
 
     return new NetexModule(
       graph,
-      transitModel,
+      timetableRepository,
       issueStore,
       buildParams.getSubwayAccessTimeSeconds(),
       buildParams.getTransitServicePeriod(),

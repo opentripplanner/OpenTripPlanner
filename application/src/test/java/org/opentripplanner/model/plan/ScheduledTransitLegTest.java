@@ -3,14 +3,14 @@ package org.opentripplanner.model.plan;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -22,13 +22,13 @@ class ScheduledTransitLegTest {
   static final ZonedDateTime TIME = OffsetDateTime
     .parse("2023-04-17T17:49:06+02:00")
     .toZonedDateTime();
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
-  private static final Route ROUTE = TransitModelForTest.route(id("2")).build();
-  private static final TripPattern PATTERN = TransitModelForTest
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final Route ROUTE = TimetableRepositoryForTest.route(id("2")).build();
+  private static final TripPattern PATTERN = TimetableRepositoryForTest
     .tripPattern("1", ROUTE)
     .withStopPattern(TEST_MODEL.stopPattern(3))
     .build();
-  private static final Trip TRIP = TransitModelForTest.trip("trip1").build();
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("trip1").build();
   private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes
     .of()
     .withArrivalTimes("10:00 11:00 12:00")

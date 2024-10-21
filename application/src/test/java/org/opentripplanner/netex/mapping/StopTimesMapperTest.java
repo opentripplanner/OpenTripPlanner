@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
@@ -30,7 +30,7 @@ public class StopTimesMapperTest {
   private static final BigInteger TWO = BigInteger.valueOf(2);
 
   private static final LocalTime QUARTER_PAST_FIVE = LocalTime.of(5, 15);
-  public static final Trip TRIP = TransitModelForTest.trip("T1").build();
+  public static final Trip TRIP = TimetableRepositoryForTest.trip("T1").build();
 
   @Test
   public void testCalculateOtpTime() {

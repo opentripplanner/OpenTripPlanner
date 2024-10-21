@@ -5,20 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class ScheduledTripTimesTest {
 
-  private static final Trip TRIP = TransitModelForTest.trip("Trip-1").build();
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("Trip-1").build();
 
   private static final List<FeedScopedId> STOP_IDS = List.of(id("A"), id("B"), id("C"));
   private static final int SERVICE_CODE = 5;

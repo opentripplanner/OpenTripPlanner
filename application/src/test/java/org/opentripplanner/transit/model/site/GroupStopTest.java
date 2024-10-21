@@ -14,12 +14,12 @@ import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.service.StopModel;
 
 class GroupStopTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
@@ -29,7 +29,7 @@ class GroupStopTest {
     .build();
   private static final GroupStop subject = StopModel
     .of()
-    .groupStop(TransitModelForTest.id(ID))
+    .groupStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)
     .build();
@@ -45,7 +45,7 @@ class GroupStopTest {
 
     GroupStop groupStop = StopModel
       .of()
-      .groupStop(TransitModelForTest.id(ID))
+      .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation1)
       .addLocation(stopLocation2)
@@ -66,7 +66,7 @@ class GroupStopTest {
 
     GroupStop groupStop = StopModel
       .of()
-      .groupStop(TransitModelForTest.id(ID))
+      .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation)
       .withEncompassingAreaGeometries(List.of(Polygons.BERLIN))
@@ -105,11 +105,14 @@ class GroupStopTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addLocation(TransitModelForTest.of().stop("2:stop", 1d, 2d).build()).build()
+        subject
+          .copy()
+          .addLocation(TimetableRepositoryForTest.of().stop("2:stop", 1d, 2d).build())
+          .build()
       )
     );
   }

@@ -48,7 +48,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -62,7 +62,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public abstract class GraphRoutingTest {
 
@@ -71,21 +71,21 @@ public abstract class GraphRoutingTest {
   protected TestOtpModel modelOf(Builder builder) {
     builder.build();
     Graph graph = builder.graph();
-    TransitModel transitModel = builder.transitModel();
-    return new TestOtpModel(graph, transitModel).index();
+    TimetableRepository timetableRepository = builder.timetableRepository();
+    return new TestOtpModel(graph, timetableRepository).index();
   }
 
   public abstract static class Builder {
 
     private final Graph graph;
-    private final TransitModel transitModel;
+    private final TimetableRepository timetableRepository;
     private final VertexFactory vertexFactory;
     private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       var deduplicator = new Deduplicator();
       graph = new Graph(deduplicator);
-      transitModel = new TransitModel(new StopModel(), deduplicator);
+      timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -96,8 +96,8 @@ public abstract class GraphRoutingTest {
       return graph;
     }
 
-    public TransitModel transitModel() {
-      return transitModel;
+    public TimetableRepository timetableRepository() {
+      return timetableRepository;
     }
 
     public <T extends Vertex> T v(VertexLabel label) {
@@ -229,7 +229,7 @@ public abstract class GraphRoutingTest {
     // -- Transit network (pathways, linking)
     public Entrance entranceEntity(String id, double latitude, double longitude) {
       return Entrance
-        .of(TransitModelForTest.id(id))
+        .of(TimetableRepositoryForTest.id(id))
         .withName(new NonLocalizedString(id))
         .withCode(id)
         .withCoordinate(latitude, longitude)
@@ -242,8 +242,8 @@ public abstract class GraphRoutingTest {
       double longitude,
       @Nullable Station parentStation
     ) {
-      var stopModelBuilder = transitModel.getStopModel().withContext();
-      var testModel = new TransitModelForTest(stopModelBuilder);
+      var stopModelBuilder = timetableRepository.getStopModel().withContext();
+      var testModel = new TimetableRepositoryForTest(stopModelBuilder);
 
       var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (parentStation != null) {
@@ -251,19 +251,19 @@ public abstract class GraphRoutingTest {
       }
 
       var stop = stopBuilder.build();
-      transitModel.mergeStopModels(stopModelBuilder.withRegularStop(stop).build());
+      timetableRepository.mergeStopModels(stopModelBuilder.withRegularStop(stop).build());
       return stop;
     }
 
     public Station stationEntity(String id, Consumer<StationBuilder> stationBuilder) {
-      var stopModelBuilder = transitModel.getStopModel().withContext();
-      var testModel = new TransitModelForTest(stopModelBuilder);
+      var stopModelBuilder = timetableRepository.getStopModel().withContext();
+      var testModel = new TimetableRepositoryForTest(stopModelBuilder);
 
       var builder = testModel.station(id);
       stationBuilder.accept(builder);
       var station = builder.build();
 
-      transitModel.mergeStopModels(stopModelBuilder.withStation(station).build());
+      timetableRepository.mergeStopModels(stopModelBuilder.withStation(station).build());
       return station;
     }
 
@@ -454,7 +454,7 @@ public abstract class GraphRoutingTest {
     ) {
       var vehicleParking = VehicleParking
         .builder()
-        .id(TransitModelForTest.id(id))
+        .id(TimetableRepositoryForTest.id(id))
         .coordinate(new WgsCoordinate(y, x))
         .bicyclePlaces(bicyclePlaces)
         .carPlaces(carPlaces)
@@ -477,7 +477,7 @@ public abstract class GraphRoutingTest {
     ) {
       return builder ->
         builder
-          .entranceId(TransitModelForTest.id(id))
+          .entranceId(TimetableRepositoryForTest.id(id))
           .name(new NonLocalizedString(id))
           .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
           .vertex(streetVertex)
@@ -501,12 +501,12 @@ public abstract class GraphRoutingTest {
     }
 
     public Route route(String id, TransitMode mode, Agency agency) {
-      return TransitModelForTest.route(id).withAgency(agency).withMode(mode).build();
+      return TimetableRepositoryForTest.route(id).withAgency(agency).withMode(mode).build();
     }
 
     // Transit
     public void tripPattern(TripPattern tripPattern) {
-      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     public StopTime st(TransitStopVertex s1) {

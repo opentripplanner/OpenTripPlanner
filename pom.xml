@@ -58,13 +58,13 @@
 
 
     <properties>
-        <otp.serialization.version.id>164</otp.serialization.version.id>
+        <otp.serialization.version.id>165</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
         <jackson.version>2.18.0</jackson.version>
-        <jersey.version>3.1.8</jersey.version>
-        <junit.version>5.11.0</junit.version>
+        <jersey.version>3.1.9</jersey.version>
+        <junit.version>5.11.2</junit.version>
         <micrometer.version>1.13.5</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.8</logback.version>
@@ -181,7 +181,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -434,7 +434,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.2.1-jre</version>
+                <version>33.3.1-jre</version>
             </dependency>
 
             <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
@@ -490,7 +490,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.13.0</version>
+                <version>5.14.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>

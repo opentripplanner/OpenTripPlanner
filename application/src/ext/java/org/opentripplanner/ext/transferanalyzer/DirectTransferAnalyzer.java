@@ -18,7 +18,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +41,18 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(DirectTransferAnalyzer.class);
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final double radiusMeters;
 
   public DirectTransferAnalyzer(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     double radiusMeters
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.radiusMeters = radiusMeters;
   }
@@ -60,7 +60,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit index which is needed by the nearby stop finder. */
-    transitModel.index();
+    timetableRepository.index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 
@@ -68,7 +68,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
     DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
-      transitModel.getStopModel()::findRegularStops
+      timetableRepository.getStopModel()::findRegularStops
     );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 

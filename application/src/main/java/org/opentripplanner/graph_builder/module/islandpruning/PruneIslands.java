@@ -32,7 +32,7 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class PruneIslands implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(PruneIslands.class);
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
   private int pruningThresholdWithoutStops;
@@ -60,12 +60,12 @@ public class PruneIslands implements GraphBuilderModule {
 
   public PruneIslands(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     StreetLinkerModule streetLinkerModule
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.streetLinkerModule = streetLinkerModule;
   }
@@ -81,8 +81,8 @@ public class PruneIslands implements GraphBuilderModule {
       adaptivePruningDistance
     );
 
-    this.vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
-    this.streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    this.vertexLinker = graph.getLinkerSafe(timetableRepository.getStopModel());
+    this.streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
 
     pruneIslands(TraverseMode.BICYCLE);
     pruneIslands(TraverseMode.WALK);
@@ -91,7 +91,7 @@ public class PruneIslands implements GraphBuilderModule {
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
       LOG.info("Reconnecting stops");
-      streetLinkerModule.linkTransitStops(graph, transitModel);
+      streetLinkerModule.linkTransitStops(graph, timetableRepository);
       int isolated = 0;
       for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
         if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {

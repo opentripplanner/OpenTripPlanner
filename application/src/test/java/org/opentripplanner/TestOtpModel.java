@@ -1,12 +1,12 @@
 package org.opentripplanner;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
-public record TestOtpModel(Graph graph, TransitModel transitModel) {
+public record TestOtpModel(Graph graph, TimetableRepository timetableRepository) {
   public TestOtpModel index() {
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
     return this;
   }
 }

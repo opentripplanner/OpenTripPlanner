@@ -17,5 +17,5 @@ generates lists of both unusually long and unroutable transfers. These lists can
 to improve the quality of OSM data for transfer purposes.
 
 See javadoc in
-[DirectTransferAnalyzer](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/ext/java/org/opentripplanner/ext/transferanalyzer/DirectTransferAnalyzer.java)
+[DirectTransferAnalyzer](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/ext/java/org/opentripplanner/ext/transferanalyzer/DirectTransferAnalyzer.java)
 class

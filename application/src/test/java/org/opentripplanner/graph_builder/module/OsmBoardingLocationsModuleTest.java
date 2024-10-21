@@ -24,12 +24,12 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * We test that the platform area at Herrenberg station (https://www.openstreetmap.org/way/27558650)
@@ -37,7 +37,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class OsmBoardingLocationsModuleTest {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   File file = ResourceLoader
     .of(OsmBoardingLocationsModuleTest.class)
@@ -69,7 +69,7 @@ class OsmBoardingLocationsModuleTest {
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(new StopModel(), deduplicator);
+    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
     var factory = new VertexFactory(graph);
 
     var provider = new OsmProvider(file, false);
@@ -97,8 +97,8 @@ class OsmBoardingLocationsModuleTest {
       TransitStopVertex.of().withStop(busStop).withModes(Set.of(TransitMode.BUS))
     );
 
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -106,7 +106,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    new OsmBoardingLocationsModule(graph, transitModel).buildGraph();
+    new OsmBoardingLocationsModule(graph, timetableRepository).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module

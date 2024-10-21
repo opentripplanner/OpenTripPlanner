@@ -27,7 +27,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +55,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private final Graph graph;
 
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final VertexFactory vertexFactory;
 
   private VertexLinker linker;
 
   @Inject
-  public OsmBoardingLocationsModule(Graph graph, TransitModel transitModel) {
+  public OsmBoardingLocationsModule(Graph graph, TimetableRepository timetableRepository) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.vertexFactory = new VertexFactory(graph);
   }
 
@@ -71,7 +71,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
     this.linker = streetIndex.getVertexLinker();
     int successes = 0;
 

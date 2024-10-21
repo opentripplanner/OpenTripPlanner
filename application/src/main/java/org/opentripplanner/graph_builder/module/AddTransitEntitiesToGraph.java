@@ -42,13 +42,13 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AddTransitModelEntitiesToGraph {
+public class AddTransitEntitiesToGraph {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AddTransitEntitiesToGraph.class);
 
   private final OtpTransitService otpTransitService;
 
@@ -62,7 +62,7 @@ public class AddTransitModelEntitiesToGraph {
    * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
    *                         negative the default value of zero is used.
    */
-  private AddTransitModelEntitiesToGraph(
+  private AddTransitEntitiesToGraph(
     OtpTransitService otpTransitService,
     int subwayAccessTime,
     Graph graph
@@ -76,16 +76,16 @@ public class AddTransitModelEntitiesToGraph {
     OtpTransitService otpTransitService,
     int subwayAccessTime,
     Graph graph,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
-    new AddTransitModelEntitiesToGraph(otpTransitService, subwayAccessTime, graph)
-      .applyToGraph(transitModel);
+    new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph)
+      .applyToGraph(timetableRepository);
   }
 
-  private void applyToGraph(TransitModel transitModel) {
-    transitModel.mergeStopModels(otpTransitService.stopModel());
+  private void applyToGraph(TimetableRepository timetableRepository) {
+    timetableRepository.mergeStopModels(otpTransitService.stopModel());
 
-    addStopsToGraphAndGenerateStopVertexes(transitModel);
+    addStopsToGraphAndGenerateStopVertexes(timetableRepository);
     addEntrancesToGraph();
     addStationCentroidsToGraph();
     addPathwayNodesToGraph();
@@ -94,26 +94,26 @@ public class AddTransitModelEntitiesToGraph {
     // Although pathways are loaded from GTFS they are street data, so we will put them in the
     // street graph.
     createPathwayEdgesAndAddThemToGraph();
-    addFeedInfoToGraph(transitModel);
-    addAgenciesToGraph(transitModel);
-    addServicesToTransitModel(transitModel);
-    addTripPatternsToTransitModel(transitModel);
+    addFeedInfoToGraph(timetableRepository);
+    addAgenciesToGraph(timetableRepository);
+    addServicesToTimetableRepository(timetableRepository);
+    addTripPatternsToTimetableRepository(timetableRepository);
 
     /* Interpret the transfers explicitly defined in transfers.txt. */
-    addTransfersToGraph(transitModel);
+    addTransfersToGraph(timetableRepository);
 
     if (OTPFeature.FlexRouting.isOn()) {
-      addFlexTripsToGraph(transitModel);
+      addFlexTripsToGraph(timetableRepository);
     }
   }
 
-  private void addStopsToGraphAndGenerateStopVertexes(TransitModel transitModel) {
+  private void addStopsToGraphAndGenerateStopVertexes(TimetableRepository timetableRepository) {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
     Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
 
     for (TripPattern pattern : otpTransitService.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
-      transitModel.addTransitMode(mode);
+      timetableRepository.addTransitMode(mode);
       for (var stop : pattern.getStops()) {
         Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
         set.add(mode);
@@ -335,45 +335,47 @@ public class AddTransitModelEntitiesToGraph {
       : new StopLevel(fromStation.getName(), null);
   }
 
-  private void addFeedInfoToGraph(TransitModel transitModel) {
+  private void addFeedInfoToGraph(TimetableRepository timetableRepository) {
     for (FeedInfo info : otpTransitService.getAllFeedInfos()) {
-      transitModel.addFeedInfo(info);
+      timetableRepository.addFeedInfo(info);
     }
   }
 
-  private void addAgenciesToGraph(TransitModel transitModel) {
+  private void addAgenciesToGraph(TimetableRepository timetableRepository) {
     for (Agency agency : otpTransitService.getAllAgencies()) {
-      transitModel.addAgency(agency);
+      timetableRepository.addAgency(agency);
     }
   }
 
-  private void addTransfersToGraph(TransitModel transitModel) {
-    transitModel.getTransferService().addAll(otpTransitService.getAllTransfers());
+  private void addTransfersToGraph(TimetableRepository timetableRepository) {
+    timetableRepository.getTransferService().addAll(otpTransitService.getAllTransfers());
   }
 
-  private void addServicesToTransitModel(TransitModel transitModel) {
+  private void addServicesToTimetableRepository(TimetableRepository timetableRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : otpTransitService.getAllServiceIds()) {
-      transitModel.getServiceCodes().put(serviceId, transitModel.getServiceCodes().size());
+      timetableRepository
+        .getServiceCodes()
+        .put(serviceId, timetableRepository.getServiceCodes().size());
     }
   }
 
-  private void addTripPatternsToTransitModel(TransitModel transitModel) {
+  private void addTripPatternsToTimetableRepository(TimetableRepository timetableRepository) {
     Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
 
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
       // TODO this could be more elegant
-      tripPattern.getScheduledTimetable().setServiceCodes(transitModel.getServiceCodes());
+      tripPattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-      transitModel.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
 
-  private void addFlexTripsToGraph(TransitModel transitModel) {
+  private void addFlexTripsToGraph(TimetableRepository timetableRepository) {
     for (FlexTrip<?, ?> flexTrip : otpTransitService.getAllFlexTrips()) {
-      transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
 

@@ -6,18 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class LegReferenceSerializerTest {
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("Trip");
+  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("Trip");
   private static final LocalDate SERVICE_DATE = LocalDate.of(2022, 1, 31);
   private static final int FROM_STOP_POS = 1;
 
-  private static final FeedScopedId FROM_STOP_ID = TransitModelForTest.id("Boarding Stop");
+  private static final FeedScopedId FROM_STOP_ID = TimetableRepositoryForTest.id("Boarding Stop");
   private static final int TO_STOP_POS = 3;
-  private static final FeedScopedId TO_STOP_ID = TransitModelForTest.id("Alighting Stop");
+  private static final FeedScopedId TO_STOP_ID = TimetableRepositoryForTest.id("Alighting Stop");
 
   /**
    * Token based on the initial format, without stop ids.

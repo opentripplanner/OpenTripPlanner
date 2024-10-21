@@ -20,7 +20,7 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class UnconnectedAreasTest {
 
@@ -159,7 +159,7 @@ public class UnconnectedAreasTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
     OsmProvider provider = new OsmProvider(RESOURCE_LOADER.file(osmFileName), false);
     OsmModule loader = OsmModule
       .of(provider, graph)
@@ -171,7 +171,7 @@ public class UnconnectedAreasTest {
 
     loader.buildGraph();
 
-    TestStreetLinkerModule.link(graph, transitModel);
+    TestStreetLinkerModule.link(graph, timetableRepository);
 
     return graph;
   }

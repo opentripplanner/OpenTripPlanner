@@ -21,14 +21,14 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RealtimeStopsLayerTest {
 
@@ -62,11 +62,11 @@ public class RealtimeStopsLayerTest {
   @Test
   void realtimeStopLayer() {
     var deduplicator = new Deduplicator();
-    var transitModel = new TransitModel(new StopModel(), deduplicator);
-    transitModel.initTimeZone(ZoneIds.HELSINKI);
-    transitModel.index();
-    var transitService = new DefaultTransitService(transitModel) {
-      final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
+    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    timetableRepository.initTimeZone(ZoneIds.HELSINKI);
+    timetableRepository.index();
+    var transitService = new DefaultTransitService(timetableRepository) {
+      final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
 
       @Override
       public TransitAlertService getTransitAlertService() {
@@ -74,7 +74,7 @@ public class RealtimeStopsLayerTest {
       }
     };
 
-    Route route = TransitModelForTest.route("route").build();
+    Route route = TimetableRepositoryForTest.route("route").build();
     var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
       .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
       .build();

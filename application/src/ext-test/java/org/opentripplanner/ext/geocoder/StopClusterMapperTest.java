@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class StopClusterMapperTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
@@ -26,7 +26,7 @@ class StopClusterMapperTest {
     .stopModelBuilder()
     .withRegularStops(STOPS)
     .build();
-  private static final TransitModel TRANSIT_MODEL = new TransitModel(
+  private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
     STOP_MODEL,
     new Deduplicator()
   );

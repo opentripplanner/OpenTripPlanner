@@ -31,7 +31,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,30 +48,30 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
   private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final Boolean addExtraEdgesToAreas;
 
   public StreetLinkerModule(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     boolean addExtraEdgesToAreas
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
 
   @Override
   public void buildGraph() {
-    transitModel.index();
-    graph.index(transitModel.getStopModel());
+    timetableRepository.index();
+    graph.index(timetableRepository.getStopModel());
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
     if (graph.hasStreets) {
-      linkTransitStops(graph, transitModel);
+      linkTransitStops(graph, timetableRepository);
       linkTransitEntrances(graph);
       linkStationCentroids(graph);
       linkVehicleParks(graph, issueStore);
@@ -81,7 +81,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-  public void linkTransitStops(Graph graph, TransitModel transitModel) {
+  public void linkTransitStops(Graph graph, TimetableRepository timetableRepository) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
@@ -90,7 +90,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     if (OTPFeature.FlexRouting.isOn()) {
       stopLocationsUsedForFlexTrips =
-        transitModel
+        timetableRepository
           .getAllFlexTrips()
           .stream()
           .flatMap(t -> t.getStops().stream())
