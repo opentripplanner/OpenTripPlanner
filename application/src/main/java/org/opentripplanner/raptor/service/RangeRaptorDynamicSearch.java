@@ -19,8 +19,8 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
@@ -129,18 +129,18 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
     LOG.debug("Main request: {}", request);
-    RangeRaptor<T> rangeRaptorRouter;
+    RaptorRouter<T> raptorRouter;
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      rangeRaptorRouter =
+      raptorRouter =
         config.createRangeRaptorWithMcWorker(transitData, request, getDestinationHeuristics());
     } else {
-      rangeRaptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
+      raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
 
     // Route
-    var result = rangeRaptorRouter.route();
+    var result = raptorRouter.route();
 
     // create and return response
     return new RaptorResponse<>(

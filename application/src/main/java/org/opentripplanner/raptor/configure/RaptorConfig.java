@@ -15,6 +15,7 @@ import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RangeRaptorWorker;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -27,14 +28,16 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 /**
  * This class is responsible for creating a new search and holding application scoped Raptor state.
  * <p/>
- * This class should have APPLICATION scope. It manage a threadPool, and hold a reference to the
- * application tuning parameters.
+ * This class should have APPLICATION scope. It keep a reference to the threadPool used by Raptor,
+ * and holds a reference to the application tuning parameters.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorConfig<T extends RaptorTripSchedule> {
 
+  @Nullable
   private final ExecutorService threadPool;
+
   private final RaptorTuningParameters tuningParameters;
 
   /** The service is not final, because it depends on the request. */
@@ -58,7 +61,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return SearchContext.of(request, tuningParameters, transit, acceptC2AtDestination).build();
   }
 
-  public RangeRaptor<T> createRangeRaptorWithStdWorker(
+  public RaptorRouter<T> createRangeRaptorWithStdWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
@@ -70,7 +73,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  public RangeRaptor<T> createRangeRaptorWithMcWorker(
+  public RaptorRouter<T> createRangeRaptorWithMcWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
@@ -93,11 +96,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       var c = new McRangeRaptorConfig<>(leg, passThroughPointsService).withHeuristics(heuristics);
       worker = createWorker(leg, c.state(), c.strategy());
     }
-
     return createRangeRaptor(context, worker);
   }
 
-  public RangeRaptor<T> createRangeRaptorWithHeuristicSearch(
+  public RaptorRouter<T> createRangeRaptorWithHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
@@ -117,6 +119,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     return threadPool != null;
   }
 
+  @Nullable
   public ExecutorService threadPool() {
     return threadPool;
   }
@@ -156,7 +159,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     );
   }
 
-  private RangeRaptor<T> createRangeRaptor(SearchContext<T> ctx, RangeRaptorWorker<T> worker) {
+  private RaptorRouter<T> createRangeRaptor(SearchContext<T> ctx, RangeRaptorWorker<T> worker) {
     return new RangeRaptor<>(
       worker,
       ctx.transitData(),
