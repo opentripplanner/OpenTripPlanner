@@ -8,16 +8,19 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -220,6 +223,38 @@ public class TimetableSnapshot {
   public TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return realTimeNewTripPatternsForModifiedTrips.get(tripIdAndServiceDate);
+  }
+
+  /**
+   * Get trips which have been canceled.
+   *
+   * @param feeds if not null, only return trips from these feeds
+   */
+  public ArrayList<TripOnServiceDate> getCanceledTrips(List<String> feeds) {
+    return timetables
+      .values()
+      .stream()
+      .flatMap(timetables ->
+        timetables
+          .stream()
+          .flatMap(timetable ->
+            timetable
+              .getTripTimes()
+              .stream()
+              .filter(tripTimes ->
+                tripTimes.isCanceled() &&
+                (feeds == null || feeds.contains(tripTimes.getTrip().getId().getFeedId()))
+              )
+              .map(tripTimes ->
+                TripOnServiceDate
+                  .of(tripTimes.getTrip().getId())
+                  .withServiceDate(timetable.getServiceDate())
+                  .withTrip(tripTimes.getTrip())
+                  .build()
+              )
+          )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**

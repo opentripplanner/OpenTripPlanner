@@ -294,6 +294,37 @@ public class DefaultTransitService implements TransitEditorService {
     return this.timetableRepositoryIndex.getTripForId(id);
   }
 
+  /**
+   * TODO This only supports realtime cancelled trips for now.
+   */
+  @Override
+  public Collection<TripOnServiceDate> getCanceledTrips(List<String> feeds) {
+    OTPRequestTimeoutException.checkForTimeout();
+    var timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return List.of();
+    }
+    List<TripOnServiceDate> canceledTrips = timetableSnapshot.getCanceledTrips(feeds);
+    canceledTrips.sort((t1, t2) -> {
+      if (t1.getServiceDate().isBefore(t2.getServiceDate())) {
+        return -1;
+      } else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
+        return 1;
+      }
+      var departure1 = getDepartureTime(t1);
+      var departure2 = getDepartureTime(t2);
+      if (departure1 < departure2) {
+        return -1;
+      } else if (departure1 > departure2) {
+        return 1;
+      } else {
+        // identical departure day and time, so sort by unique feedscope id
+        return t1.getTrip().getId().compareTo(t2.getTrip().getId());
+      }
+    });
+    return canceledTrips;
+  }
+
   @Override
   public Collection<Trip> getAllTrips() {
     OTPRequestTimeoutException.checkForTimeout();
@@ -761,5 +792,11 @@ public class DefaultTransitService implements TransitEditorService {
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
       .map(Map.Entry::getKey);
+  }
+
+  private int getDepartureTime(TripOnServiceDate trip) {
+    var pattern = getPatternForTrip(trip.getTrip());
+    var timetable = timetableSnapshot.resolve(pattern, trip.getServiceDate());
+    return timetable.getTripTimes(trip.getTrip()).getDepartureTime(0);
   }
 }

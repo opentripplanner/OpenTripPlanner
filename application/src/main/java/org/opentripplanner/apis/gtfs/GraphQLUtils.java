@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import java.time.Instant;
 import java.util.Locale;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFilterPlaceType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
@@ -9,6 +10,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorC
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
@@ -108,5 +110,18 @@ public class GraphQLUtils {
 
   public static boolean startsWith(I18NString str, String name, Locale locale) {
     return str != null && str.toString(locale).toLowerCase(locale).startsWith(name);
+  }
+
+  /**
+   * Generally the missing values are removed during the graph build. However, for flex trips they
+   * are not and have to be converted to null here.
+   */
+  @Nullable
+  public static Integer stopTimeToInt(int value) {
+    if (value == StopTime.MISSING_VALUE) {
+      return null;
+    } else {
+      return value;
+    }
   }
 }
