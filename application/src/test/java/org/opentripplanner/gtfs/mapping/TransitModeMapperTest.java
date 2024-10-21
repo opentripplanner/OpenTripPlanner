@@ -1,7 +1,19 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model.basic.TransitMode.*;
+import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.CABLE_CAR;
+import static org.opentripplanner.transit.model.basic.TransitMode.CARPOOL;
+import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
+import static org.opentripplanner.transit.model.basic.TransitMode.FUNICULAR;
+import static org.opentripplanner.transit.model.basic.TransitMode.GONDOLA;
+import static org.opentripplanner.transit.model.basic.TransitMode.MONORAIL;
+import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
+import static org.opentripplanner.transit.model.basic.TransitMode.SUBWAY;
+import static org.opentripplanner.transit.model.basic.TransitMode.TAXI;
+import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
+import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
