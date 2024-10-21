@@ -1,5 +1,6 @@
 package org.opentripplanner;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -178,7 +179,7 @@ public abstract class GtfsTest {
       assertEquals(1, leg.getStreetNotes().size());
       assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
     } else {
-      assertNull(leg.getStreetNotes());
+      assertThat(leg.getStreetNotes()).isEmpty();
     }
   }
 
