@@ -141,6 +141,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
           new DefaultEmissionsService(new EmissionsDataModel()),
+          null,
           RouterConfig.DEFAULT.flexParameters(),
           List.of(),
           null,

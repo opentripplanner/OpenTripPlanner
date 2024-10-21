@@ -10,6 +10,7 @@ import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.EnturSorlandsbanenService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -41,6 +42,7 @@ public class ConstructApplicationModule {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
+    @Nullable EnturSorlandsbanenService enturSorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex
   ) {
@@ -58,6 +60,7 @@ public class ConstructApplicationModule {
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
+      enturSorlandsbanenService,
       routerConfig.flexParameters(),
       rideHailingServices,
       stopConsolidationService,

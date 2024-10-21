@@ -128,6 +128,23 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       );
   }
 
+  public RaptorRoutingRequestTransitData(
+    RaptorRoutingRequestTransitData original,
+    RaptorCostCalculator<TripSchedule> newCostCalculator
+  ) {
+    this.transitLayer = original.transitLayer;
+    this.transitSearchTimeZero = original.transitSearchTimeZero;
+    this.activeTripPatternsPerStop = original.activeTripPatternsPerStop;
+    this.patternIndex = original.patternIndex;
+    this.transferIndex = original.transferIndex;
+    this.transferService = original.transferService;
+    this.constrainedTransfers = original.constrainedTransfers;
+    this.validTransitDataStartTime = original.validTransitDataStartTime;
+    this.validTransitDataEndTime = original.validTransitDataEndTime;
+    this.generalizedCostCalculator = newCostCalculator;
+    this.slackProvider = original.slackProvider();
+  }
+
   @Override
   public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
     return transferIndex.getForwardTransfers(stopIndex).iterator();

@@ -51,6 +51,7 @@ public class TestServerContext {
       createRealtimeVehicleService(transitService),
       createVehicleRentalService(),
       createEmissionsService(),
+      null,
       routerConfig.flexParameters(),
       List.of(),
       null,

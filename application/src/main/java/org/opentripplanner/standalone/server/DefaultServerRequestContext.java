@@ -9,6 +9,7 @@ import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.EnturSorlandsbanenService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -48,6 +49,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
   private final EmissionsService emissionsService;
+
+  @Nullable
+  private final EnturSorlandsbanenService enturSorlandsbanenService;
+
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
@@ -67,12 +72,13 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
-    EmissionsService emissionsService,
+    @Nullable EmissionsService emissionsService,
+    @Nullable EnturSorlandsbanenService enturSorlandsbanenService,
     List<RideHailingService> rideHailingServices,
-    StopConsolidationService stopConsolidationService,
+    @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
-    TraverseVisitor traverseVisitor,
+    @Nullable TraverseVisitor traverseVisitor,
     @Nullable LuceneIndex luceneIndex
   ) {
     this.graph = graph;
@@ -90,6 +96,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
+    this.enturSorlandsbanenService = enturSorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
@@ -110,6 +117,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     @Nullable EmissionsService emissionsService,
+    @Nullable EnturSorlandsbanenService enturSorlandsbanenService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
@@ -130,6 +138,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
+      enturSorlandsbanenService,
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
@@ -250,5 +259,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public EmissionsService emissionsService() {
     return emissionsService;
+  }
+
+  @Nullable
+  public EnturSorlandsbanenService enturSorlandsbanenService() {
+    return enturSorlandsbanenService;
   }
 }

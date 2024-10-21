@@ -118,6 +118,11 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
+  Sorlandsbanen(
+    false,
+    true,
+    "Include train Sørlandsbanen in results when searchig in south of Norway. Only relevant in Norway."
+  ),
   TransferAnalyzer(false, true, "Analyze transfers during graph build.");
 
   private static final Object TEST_LOCK = new Object();

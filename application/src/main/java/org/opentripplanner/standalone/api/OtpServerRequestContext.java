@@ -10,6 +10,7 @@ import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.EnturSorlandsbanenService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -101,15 +102,9 @@ public interface OtpServerRequestContext {
 
   List<RideHailingService> rideHailingServices();
 
-  @Nullable
-  StopConsolidationService stopConsolidationService();
-
   StreetLimitationParametersService streetLimitationParametersService();
 
   MeterRegistry meterRegistry();
-
-  @Nullable
-  EmissionsService emissionsService();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();
@@ -129,6 +124,8 @@ public interface OtpServerRequestContext {
 
   VectorTileConfig vectorTileConfig();
 
+  /* Sandbox modules */
+
   @Nullable
   default DataOverlayContext dataOverlayContext(RouteRequest request) {
     return OTPFeature.DataOverlay.isOnElseNull(() ->
@@ -140,5 +137,14 @@ public interface OtpServerRequestContext {
   }
 
   @Nullable
+  EmissionsService emissionsService();
+
+  @Nullable
   LuceneIndex lucenceIndex();
+
+  @Nullable
+  StopConsolidationService stopConsolidationService();
+
+  @Nullable
+  EnturSorlandsbanenService enturSorlandsbanenService();
 }
