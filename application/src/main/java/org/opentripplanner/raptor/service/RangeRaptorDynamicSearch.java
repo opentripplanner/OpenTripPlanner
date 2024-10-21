@@ -22,6 +22,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
+import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +46,16 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private final RaptorRequest<T> originalRequest;
   private final RaptorSearchWindowCalculator dynamicSearchWindowCalculator;
 
+  @Nullable
+  private final ExtraMcRouterSearch<T> extraMcSearch;
+
   private final HeuristicSearchTask<T> fwdHeuristics;
   private final HeuristicSearchTask<T> revHeuristics;
 
   public RangeRaptorDynamicSearch(
     RaptorConfig<T> config,
     RaptorTransitDataProvider<T> transitData,
+    @Nullable ExtraMcRouterSearch<T> extraMcSearch,
     RaptorRequest<T> originalRequest
   ) {
     this.config = config;
@@ -58,6 +63,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.originalRequest = originalRequest;
     this.dynamicSearchWindowCalculator =
       config.searchWindowCalculator().withSearchParams(originalRequest.searchParams());
+    this.extraMcSearch = extraMcSearch;
 
     this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
     this.revHeuristics = new HeuristicSearchTask<>(REVERSE, "Reverse", config, transitData);
@@ -134,7 +140,12 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
       raptorRouter =
-        config.createRangeRaptorWithMcWorker(transitData, request, getDestinationHeuristics());
+        config.createRangeRaptorWithMcWorker(
+          transitData,
+          request,
+          getDestinationHeuristics(),
+          extraMcSearch
+        );
     } else {
       raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }

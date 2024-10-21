@@ -7,6 +7,7 @@ import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.raptor.rangeraptor.ConcurrentCompositeRaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.RangeRaptorWorkerComposite;
@@ -23,6 +24,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
+import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 /**
@@ -67,13 +69,35 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   ) {
     var context = context(transitData, request);
     var stdConfig = new StdRangeRaptorConfig<>(context);
-    return createRangeRaptor(
-      context,
-      createWorker(context.legs().getFirst(), stdConfig.state(), stdConfig.strategy())
-    );
+    var worker = createWorker(context.legs().getFirst(), stdConfig.state(), stdConfig.strategy());
+    return createRangeRaptor(context, worker);
   }
 
   public RaptorRouter<T> createRangeRaptorWithMcWorker(
+    RaptorTransitDataProvider<T> transitData,
+    RaptorRequest<T> request,
+    Heuristics heuristics,
+    @Nullable ExtraMcRouterSearch<T> extraMcSearch
+  ) {
+    var mainSearch = createRangeRaptorWithMcWorker(transitData, request, heuristics);
+
+    if (extraMcSearch == null) {
+      return mainSearch;
+    }
+    var alternativeSearch = createRangeRaptorWithMcWorker(
+      extraMcSearch.createTransitDataAlternativeSearch(transitData),
+      request,
+      heuristics
+    );
+    return new ConcurrentCompositeRaptorRouter<>(
+      mainSearch,
+      alternativeSearch,
+      extraMcSearch.merger(),
+      threadPool()
+    );
+  }
+
+  private RaptorRouter<T> createRangeRaptorWithMcWorker(
     RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
