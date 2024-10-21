@@ -12,6 +12,14 @@
     <name>OpenTripPlanner - Application</name>
 
     <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gtfs-realtime-protobuf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>

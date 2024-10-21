@@ -95,6 +95,7 @@
 
     <modules>
         <module>application</module>
+        <module>gtfs-realtime-protobuf</module>
     </modules>
 
     <build>
@@ -355,27 +356,6 @@
                             </permission>
                         </permissions>
                     </extraDirectories>
-                </configuration>
-            </plugin>
-
-            <!-- compile the gtfs-realtime.proto file to Java code
-               To update the proto file run the following command:
-                 curl https://raw.githubusercontent.com/google/transit/master/gtfs-realtime/proto/gtfs-realtime.proto -o src/main/proto/gtfs-realtime.proto
-              -->
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.6.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.22.0:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
             </plugin>
         </plugins>
