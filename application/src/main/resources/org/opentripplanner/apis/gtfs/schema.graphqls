@@ -3838,18 +3838,28 @@ input InputModeWeight {
   BUS: Float
   "The weight of CABLE_CAR traverse mode. Values over 1 add cost to cable car travel and values under 1 decrease cost"
   CABLE_CAR: Float
+  "The weight of CARPOOL traverse mode. Values over 1 add cost to carpool travel and values under 1 decrease cost"
+  CARPOOL: Float
+  "The weight of COACH traverse mode. Values over 1 add cost to coach travel and values under 1 decrease cost"
+  COACH: Float
   "The weight of FERRY traverse mode. Values over 1 add cost to ferry travel and values under 1 decrease cost"
   FERRY: Float
   "The weight of FUNICULAR traverse mode. Values over 1 add cost to funicular travel and values under 1 decrease cost"
   FUNICULAR: Float
   "The weight of GONDOLA traverse mode. Values over 1 add cost to gondola travel and values under 1 decrease cost"
   GONDOLA: Float
+  "The weight of MONORAIL traverse mode. Values over 1 add cost to monorail travel and values under 1 decrease cost"
+  MONORAIL: Float
   "The weight of RAIL traverse mode. Values over 1 add cost to rail travel and values under 1 decrease cost"
   RAIL: Float
   "The weight of SUBWAY traverse mode. Values over 1 add cost to subway travel and values under 1 decrease cost"
   SUBWAY: Float
+  "The weight of TAXI traverse mode. Values over 1 add cost to taxi travel and values under 1 decrease cost"
+  TAXI: Float
   "The weight of TRAM traverse mode. Values over 1 add cost to tram travel and values under 1 decrease cost"
   TRAM: Float
+  "The weight of TROLLEYBUS traverse mode. Values over 1 add cost to trolleybus travel and values under 1 decrease cost"
+  TROLLEYBUS: Float
 }
 
 input InputPreferred {
