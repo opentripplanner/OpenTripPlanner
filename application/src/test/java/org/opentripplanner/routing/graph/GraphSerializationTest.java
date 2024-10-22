@@ -207,10 +207,10 @@ public class GraphSerializationTest {
     // might be indexed by other tests.
 
     originalTimetableRepository.index();
-    originalGraph.index(originalTimetableRepository.getStopModel());
+    originalGraph.index(originalTimetableRepository.getSiteRepository());
 
     copiedTimetableRepository1.index();
-    copiedGraph1.index(copiedTimetableRepository1.getStopModel());
+    copiedGraph1.index(copiedTimetableRepository1.getSiteRepository());
 
     assertNoDifferences(originalGraph, copiedGraph1);
 
@@ -218,7 +218,7 @@ public class GraphSerializationTest {
     Graph copiedGraph2 = deserializedGraph2.graph;
     TimetableRepository copiedTimetableRepository2 = deserializedGraph2.timetableRepository;
     copiedTimetableRepository2.index();
-    copiedGraph2.index(copiedTimetableRepository2.getStopModel());
+    copiedGraph2.index(copiedTimetableRepository2.getSiteRepository());
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 }

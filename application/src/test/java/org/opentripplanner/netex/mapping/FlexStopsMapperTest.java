@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -127,14 +127,14 @@ class FlexStopsMapperTest {
     );
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
-  private final StopModelBuilder stopModelBuilder = testModel.stopModelBuilder();
+  private final SiteRepositoryBuilder siteRepositoryBuilder = testModel.siteRepositoryBuilder();
 
   @Test
   void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -195,7 +195,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -216,7 +216,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -248,7 +248,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2, stop3),
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -292,7 +292,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DataImportIssueStore.NOOP
     );
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);

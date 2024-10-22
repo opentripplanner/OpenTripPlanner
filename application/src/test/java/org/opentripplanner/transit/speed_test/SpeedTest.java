@@ -278,7 +278,7 @@ public class SpeedTest {
 
     TimetableRepository timetableRepository = serializedGraphObject.timetableRepository;
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
     return new LoadModel(graph, timetableRepository, serializedGraphObject.buildConfig);
   }
 

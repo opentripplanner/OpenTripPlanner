@@ -244,7 +244,7 @@ public class GraphBuilder implements Runnable {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
     var nVertices = f.formatNumber(graph.countVertices());

@@ -40,7 +40,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
@@ -195,7 +195,7 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
-    timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
 
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
@@ -206,7 +206,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
     serverContext = TestServerContext.createServerContext(graph, timetableRepository);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
