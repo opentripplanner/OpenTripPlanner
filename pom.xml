@@ -96,6 +96,7 @@
     <modules>
         <module>application</module>
         <module>gtfs-realtime-protobuf</module>
+        <module>framework</module>
     </modules>
 
     <build>

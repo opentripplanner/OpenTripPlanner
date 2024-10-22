@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.framework.time.ZoneIds;
 
 public class ToStringBuilderTest {
 

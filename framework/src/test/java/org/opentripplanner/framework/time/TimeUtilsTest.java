@@ -11,7 +11,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
 
 public class TimeUtilsTest {
 

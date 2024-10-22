@@ -9,7 +9,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.framework.collection.ToveUtils;
 
 /** Basic union-find data structure with path compression */
 class DisjointSet<T> {
@@ -62,7 +62,7 @@ class DisjointSet<T> {
   public List<Set<T>> sets() {
     TLongObjectMap<Set<T>> out = new TLongObjectHashMap<>();
     setMapping.forEachEntry((k, v) -> {
-      MapUtils.addToMapSet(out, compact(v), k);
+      ToveUtils.addToMapSet(out, compact(v), k);
       return true;
     });
     return new ArrayList<>(out.valueCollection());

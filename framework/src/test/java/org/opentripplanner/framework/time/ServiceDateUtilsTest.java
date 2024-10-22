@@ -17,7 +17,6 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
 
 public class ServiceDateUtilsTest {
 
