@@ -3976,6 +3976,55 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeVehicleRentalStationsByBboxArgs {
+
+    private Double maxLat;
+    private Double maxLon;
+    private Double minLat;
+    private Double minLon;
+
+    public GraphQLQueryTypeVehicleRentalStationsByBboxArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.maxLat = (Double) args.get("maxLat");
+        this.maxLon = (Double) args.get("maxLon");
+        this.minLat = (Double) args.get("minLat");
+        this.minLon = (Double) args.get("minLon");
+      }
+    }
+
+    public Double getGraphQLMaxLat() {
+      return this.maxLat;
+    }
+
+    public Double getGraphQLMaxLon() {
+      return this.maxLon;
+    }
+
+    public Double getGraphQLMinLat() {
+      return this.minLat;
+    }
+
+    public Double getGraphQLMinLon() {
+      return this.minLon;
+    }
+
+    public void setGraphQLMaxLat(Double maxLat) {
+      this.maxLat = maxLat;
+    }
+
+    public void setGraphQLMaxLon(Double maxLon) {
+      this.maxLon = maxLon;
+    }
+
+    public void setGraphQLMinLat(Double minLat) {
+      this.minLat = minLat;
+    }
+
+    public void setGraphQLMinLon(Double minLon) {
+      this.minLon = minLon;
+    }
+  }
+
   public enum GraphQLRealtimeState {
     ADDED,
     CANCELED,

@@ -832,6 +832,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
+    public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStationsByBbox();
+
     public DataFetcher<Object> viewer();
   }
 

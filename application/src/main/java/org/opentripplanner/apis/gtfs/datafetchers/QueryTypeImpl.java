@@ -929,6 +929,33 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStationsByBbox() {
+    return environment -> {
+      VehicleRentalService vehicleRentalStationService = environment
+        .<GraphQLRequestContext>getContext()
+        .vehicleRentalService();
+
+      var args = new GraphQLTypes.GraphQLQueryTypeVehicleRentalStationsByBboxArgs(
+        environment.getArguments()
+      );
+
+      Envelope envelope = new Envelope(
+        new Coordinate(args.getGraphQLMinLon(), args.getGraphQLMinLat()),
+        new Coordinate(args.getGraphQLMaxLon(), args.getGraphQLMaxLat())
+      );
+
+      Stream<VehicleRentalStation> stationStream = vehicleRentalStationService
+        .getVehicleRentalStations()
+        .stream()
+        .filter(station ->
+          envelope.contains(new Coordinate(station.getLongitude(), station.getLatitude()))
+        );
+
+      return stationStream.toList();
+    };
+  }
+
+  @Override
   public DataFetcher<Object> viewer() {
     return environment -> new Object();
   }
