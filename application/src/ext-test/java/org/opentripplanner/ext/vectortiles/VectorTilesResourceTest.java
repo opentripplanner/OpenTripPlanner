@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class VectorTilesResourceTest {
 
@@ -17,7 +17,7 @@ class VectorTilesResourceTest {
     // the Grizzly request is awful to instantiate, using Mockito
     var grizzlyRequest = Mockito.mock(Request.class);
     var resource = new VectorTilesResource(
-      TestServerContext.createServerContext(new Graph(), new TransitModel()),
+      TestServerContext.createServerContext(new Graph(), new TimetableRepository()),
       grizzlyRequest,
       "default"
     );

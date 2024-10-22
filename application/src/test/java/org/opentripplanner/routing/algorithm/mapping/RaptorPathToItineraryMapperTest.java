@@ -58,7 +58,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -66,11 +66,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RaptorPathToItineraryMapperTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final int BOARD_COST_SEC = 60;
   private static final int TRANSFER_COST_SEC = 120;
   private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
@@ -79,7 +79,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
-  private static final Route ROUTE = TransitModelForTest.route("route").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("route").build();
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
@@ -262,11 +262,11 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
-    var stopModelBuilder = TEST_MODEL.stopModelBuilder();
+    var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = stopModelBuilder
+      var stop = siteRepositoryBuilder
         .regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
@@ -294,11 +294,11 @@ public class RaptorPathToItineraryMapperTest {
       .of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
-    TransitModel transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.CET);
+    TimetableRepository timetableRepository = new TimetableRepository();
+    timetableRepository.initTimeZone(ZoneIds.CET);
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
-      new DefaultTransitService(transitModel),
+      new DefaultTransitService(timetableRepository),
       getTransitLayer(),
       dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
@@ -311,7 +311,7 @@ public class RaptorPathToItineraryMapperTest {
       null,
       null,
       TEST_MODEL
-        .stopModelBuilder()
+        .siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)

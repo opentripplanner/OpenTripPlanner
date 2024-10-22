@@ -31,6 +31,15 @@ class StopPlaceTypeMapperTest {
   }
 
   @Test
+  void mapCableway() {
+    var transitMode = stopPlaceTypeMapper.map(
+      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.CABLEWAY)
+    );
+    assertEquals(TransitMode.GONDOLA, transitMode.mainMode());
+    assertNull(transitMode.subMode());
+  }
+
+  @Test
   void mapWithSubMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()

@@ -108,7 +108,7 @@ jobs:
         if: github.event_name == 'pull_request'
 
       - name: Install Python dependencies
-        run: pip install --break-system-packages -r doc/user/requirements.txt
+        run: pip install -r doc/user/requirements.txt
         
 
       - name: Build main documentation
@@ -179,7 +179,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
       - name: Run code generator
         working-directory: application/src/main/java/org/opentripplanner/apis/gtfs/generated
         run: |

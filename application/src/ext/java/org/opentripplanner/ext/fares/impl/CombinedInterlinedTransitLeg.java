@@ -5,6 +5,7 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -94,6 +95,7 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nullable
   public LineString getLegGeometry() {
     return null;
   }

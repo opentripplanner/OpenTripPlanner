@@ -161,7 +161,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.13.0</version>
+            <version>5.14.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -510,6 +510,29 @@
                                 </transformer>
                             </transformers>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.bohnman</groupId>
+                <artifactId>package-info-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <!-- Couldn't get this to work for main and ext code at the same time. -->
+                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                    <outputDirectory>${project.basedir}/target/generated-sources</outputDirectory>
+                    <packages>
+                        <package>
+                            <pattern>**</pattern>
+                            <template>${project.basedir}/src/build/templates/package-info-template.java</template>
+                        </package>
+                    </packages>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

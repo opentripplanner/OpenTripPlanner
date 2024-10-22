@@ -35,7 +35,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -44,7 +44,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 class ItineraryListFilterChainTest implements PlanTestConstants {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
   private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
   private static final Place C = Place.forStop(TEST_MODEL.stop("C").build());

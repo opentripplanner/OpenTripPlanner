@@ -6,12 +6,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class StopFinderTraverseVisitorTest {
 
-  static final RegularStop STOP = TransitModelForTest.of().stop("a-stop", 1, 1).build();
+  static final RegularStop STOP = TimetableRepositoryForTest.of().stop("a-stop", 1, 1).build();
 
   @Test
   void deduplicateStops() {

@@ -11,7 +11,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 
 /**
@@ -30,14 +30,14 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
   /**
-   * Constructor which scans over all existing GraphUpdaters associated with a TransitModel
+   * Constructor which scans over all existing GraphUpdaters associated with a TimetableRepository
    * instance and retains references to all their TransitAlertService instances.
    * This implies that these instances are expected to remain in use indefinitely (not be replaced
    * with new instances or taken out of service over time).
    */
-  public DelegatingTransitAlertServiceImpl(TransitModel transitModel) {
-    if (transitModel.getUpdaterManager() != null) {
-      transitModel
+  public DelegatingTransitAlertServiceImpl(TimetableRepository timetableRepository) {
+    if (timetableRepository.getUpdaterManager() != null) {
+      timetableRepository
         .getUpdaterManager()
         .getUpdaterList()
         .stream()

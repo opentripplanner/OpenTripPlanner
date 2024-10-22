@@ -106,11 +106,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
-          path: test/performance/${{ matrix.location }}/travelSearch-results.csv
+          path: test/performance/${{ matrix.location }}/travelSearch-results-md.csv
 
       - name: Archive Flight Recorder instrumentation file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-flight-recorder
-          path: ${{ matrix.location}}-speed-test.jfr
+          path: application/${{ matrix.location }}-speed-test.jfr

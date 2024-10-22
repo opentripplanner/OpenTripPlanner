@@ -27,8 +27,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 public class StopTimeMapperTest {
 
@@ -68,22 +68,22 @@ public class StopTimeMapperTest {
     .map(c -> new LngLatAlt(c.x, c.y))
     .toList();
 
-  private final StopModelBuilder stopModelBuilder = StopModel.of();
+  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
   private final StopMapper stopMapper = new StopMapper(
     new TranslationHelper(),
     stationId -> null,
-    stopModelBuilder
+    siteRepositoryBuilder
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper(
-    stopModelBuilder,
+    siteRepositoryBuilder,
     DataImportIssueStore.NOOP
   );
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
     stopMapper,
     locationMapper,
-    stopModelBuilder
+    siteRepositoryBuilder
   );
   private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(

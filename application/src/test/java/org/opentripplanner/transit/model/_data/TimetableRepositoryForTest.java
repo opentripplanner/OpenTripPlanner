@@ -38,19 +38,19 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 /**
  * Test utility class to help construct valid transit model objects.
  * <p>
  * TODO: This need cleanup - it has static factory methods. This is not safe, since
  *       all objects created will be created in the same context. All stops are created
- *       withing the context of a StopModel, mixing more than one model in a test is sharing
+ *       withing the context of a SiteRepository, mixing more than one model in a test is sharing
  *       state between tests. For now, it is just the stop index - but we want to
- *       use this to encapsulate the StopModel completely.
+ *       use this to encapsulate the SiteRepository completely.
  */
-public class TransitModelForTest {
+public class TimetableRepositoryForTest {
 
   public static final String FEED_ID = "F";
   public static final String TIME_ZONE_ID = "Europe/Paris";
@@ -89,14 +89,14 @@ public class TransitModelForTest {
     .withUrl("https:/www.otherfeedagency.com")
     .build();
 
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  public TransitModelForTest(StopModelBuilder stopModelBuilder) {
-    this.stopModelBuilder = stopModelBuilder;
+  public TimetableRepositoryForTest(SiteRepositoryBuilder siteRepositoryBuilder) {
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
-  public static TransitModelForTest of() {
-    return new TransitModelForTest(StopModel.of());
+  public static TimetableRepositoryForTest of() {
+    return new TimetableRepositoryForTest(SiteRepository.of());
   }
 
   public static FeedScopedId id(String id) {
@@ -137,15 +137,15 @@ public class TransitModelForTest {
     return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
-  public StopModelBuilder stopModelBuilder() {
-    return stopModelBuilder;
+  public SiteRepositoryBuilder siteRepositoryBuilder() {
+    return siteRepositoryBuilder;
   }
 
   /**
    * Create a stop with all required fields set.
    */
   public RegularStopBuilder stop(String idAndName) {
-    return stopModelBuilder
+    return siteRepositoryBuilder
       .regularStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
@@ -167,7 +167,7 @@ public class TransitModelForTest {
   }
 
   public GroupStop groupStop(String idAndName, RegularStop... stops) {
-    var builder = stopModelBuilder
+    var builder = siteRepositoryBuilder
       .groupStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName));
 
@@ -177,7 +177,7 @@ public class TransitModelForTest {
   }
 
   public AreaStopBuilder areaStop(String idAndName) {
-    return stopModelBuilder
+    return siteRepositoryBuilder
       .areaStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withGeometry(ANY_POLYGON);

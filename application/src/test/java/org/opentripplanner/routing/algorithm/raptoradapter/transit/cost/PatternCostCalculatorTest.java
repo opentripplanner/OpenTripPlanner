@@ -4,8 +4,8 @@ import static graphql.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.agency;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.Duration;
 import java.util.List;
@@ -25,7 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Gener
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.test.support.TestTableParser;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -212,7 +212,7 @@ public class PatternCostCalculatorTest {
   }
 
   private static TestTripPattern pattern(boolean unpreferredRoute, boolean unpreferredAgency) {
-    RouteBuilder builder = TransitModelForTest.route(
+    RouteBuilder builder = TimetableRepositoryForTest.route(
       unpreferredRoute ? UNPREFERRED_ROUTE_ID : DEFAULT_ROUTE_ID
     );
 

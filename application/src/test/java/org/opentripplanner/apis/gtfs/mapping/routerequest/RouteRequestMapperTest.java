@@ -34,7 +34,7 @@ import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehi
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class RouteRequestMapperTest {
 
@@ -62,9 +62,9 @@ class RouteRequestMapperTest {
 
   static {
     Graph graph = new Graph();
-    var transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(transitModel);
+    var timetableRepository = new TimetableRepository();
+    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     CONTEXT =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),

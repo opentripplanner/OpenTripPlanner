@@ -15,14 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class TripPatternForDateMapperTest {
 
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
   private static final int SERVICE_CODE = 555;
@@ -35,7 +35,7 @@ public class TripPatternForDateMapperTest {
   @BeforeAll
   public static void setUp() throws Exception {
     var pattern = TEST_MODEL.pattern(BUS).build();
-    var trip = TransitModelForTest.trip("1").build();
+    var trip = TimetableRepositoryForTest.trip("1").build();
     var tripTimes = TripTimesFactory.tripTimes(
       trip,
       TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),

@@ -14,7 +14,7 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Branding;
@@ -51,7 +51,7 @@ public class RouteMapperTest {
 
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
-    new AgencyMapper(TransitModelForTest.FEED_ID),
+    new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
