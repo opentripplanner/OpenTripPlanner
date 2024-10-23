@@ -308,7 +308,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -564,7 +564,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.6</version>
+                        <version>3.2.7</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
