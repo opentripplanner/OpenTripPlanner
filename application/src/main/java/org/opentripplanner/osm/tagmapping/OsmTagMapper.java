@@ -14,6 +14,8 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
+import org.opentripplanner.osm.wayproperty.specifier.Condition;
+import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
@@ -39,10 +41,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  * prevailing 'props.setProperties' statement) has a 'foot=yes' tag the permissions are overridden
  * and walking is allowed on that way.
  * <p>
- * TODO clarify why this needs a separate factory interface.
  *
  * @author bdferris, novalis
- * @see OsmTagMapper
  */
 
 public class OsmTagMapper {
@@ -67,7 +67,6 @@ public class OsmTagMapper {
     props.setProperties("highway=crossing", pedestrianWayProperties);
     props.setProperties("highway=platform", pedestrianWayProperties);
     props.setProperties("public_transport=platform", pedestrianWayProperties);
-    props.setProperties("public_transport=platform;area=yes", pedestrianWayProperties);
     props.setProperties("railway=platform", pedestrianWayProperties);
     props.setProperties("footway=sidewalk;highway=footway", pedestrianWayProperties);
     props.setProperties("mtb:scale=1", pedestrianWayProperties);
@@ -408,7 +407,11 @@ public class OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
     );
     props.setProperties(
-      "highway=footway;bicycle=yes;area=yes",
+      new ExactMatchSpecifier(
+        new Condition.Equals("highway", "footway"),
+        new Condition.Equals("bicycle", "yes"),
+        new Condition.Equals("area", " yes")
+      ),
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9)
     );
     props.setProperties(
