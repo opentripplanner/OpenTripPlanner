@@ -11,13 +11,26 @@
                     "streetName" : "street",
                     "area" : false,
                     "relativeDirection" : "DEPART",
-                    "absoluteDirection" : "NORTHEAST"
+                    "absoluteDirection" : "NORTHEAST",
+                    "entity" : null
                   },
                   {
                     "streetName" : "elevator",
                     "area" : false,
                     "relativeDirection" : "ELEVATOR",
-                    "absoluteDirection" : null
+                    "absoluteDirection" : null,
+                    "entity" : null
+
+                  },
+                  {
+                    "streetName" : "entrance",
+                    "area" : false,
+                    "relativeDirection" : "CONTINUE",
+                    "absoluteDirection" : null,
+                    "entity" : {
+                      "__typename" : "Entrance",
+                      "code": "A"
+                    }
                   }
                 ]
               },

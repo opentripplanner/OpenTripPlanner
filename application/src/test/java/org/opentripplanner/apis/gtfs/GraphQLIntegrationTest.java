@@ -49,6 +49,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Entrance;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -232,8 +233,13 @@ class GraphQLIntegrationTest {
       .build();
     var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
 
+    var step3 = walkStep("entrance")
+      .withRelativeDirection(RelativeDirection.CONTINUE)
+      .withEntrance(Entrance.withCode("A"))
+      .build();
+
     Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B, List.of(step1, step2))
+      .walk(20, B, List.of(step1, step2, step3))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)

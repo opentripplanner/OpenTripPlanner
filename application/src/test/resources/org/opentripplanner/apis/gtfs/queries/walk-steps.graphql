@@ -20,6 +20,12 @@
             area
             relativeDirection
             absoluteDirection
+            entity {
+              __typename
+              ... on Entrance {
+                code
+              }
+            }
           }
         }
       }
