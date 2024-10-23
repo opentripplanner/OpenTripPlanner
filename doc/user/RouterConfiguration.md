@@ -295,7 +295,7 @@ In addition there is an upper bound on the calculation of the search window:
 
 Upper limit for the search-window calculation.
 
-Long search windows consumes a lot of resources and may take a long time. Use this parameter to
+Long search windows consume a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
 This is the parameter that affects the response time most, the downside is that a search is only

@@ -101,7 +101,7 @@ public class TripQuery {
             waste resources server side, while using a search-window that is too long will be slow.
             
             OTP will dynamically calculate a reasonable value for the search-window, if not provided. The
-            calculation comes with a significant overhead (10-20% extra). Whether you should use the
+            calculation comes with a significant overhead (10-20%% extra). Whether you should use the
             dynamic calculated value or pass in a value depends on your use-case. For a travel planner
             in a small geographical area, with a dense network of public transportation, a fixed value
             between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
@@ -121,10 +121,10 @@ public class TripQuery {
             This is intended. Increasing the search-window beyond the max value is NOT going to be
             much faster. Instead the client can inform the user about the progress.
                         
-            Maximum value: {max-search-window}
-            """.replace(
-                "{max-search-window}",
-                durationInMinutesToString(transitTuningParameters.maxSearchWindow())
+            Maximum value: %d minutes (%dh)
+            """.formatted(
+                transitTuningParameters.maxSearchWindow().toMinutes(),
+                transitTuningParameters.maxSearchWindow().toHours()
               )
           )
           .type(Scalars.GraphQLInt)
