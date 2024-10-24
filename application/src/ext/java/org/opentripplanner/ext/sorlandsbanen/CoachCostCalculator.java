@@ -55,6 +55,9 @@ class CoachCostCalculator<T extends TripSchedule>  implements RaptorCostCalculat
       int toStop
     ) {
       int cost = delegate.transitArrivalCost(boardCost, alightSlack, transitTime, trip, toStop);
+
+      // This is a bit ugly, since it relays on the fact that the 'transitReluctanceFactorIndex'
+      // returns the 'route.getMode().ordinal()'
       if(trip.transitReluctanceFactorIndex() == TransitMode.COACH.ordinal()) {
         cost += transitTime * EXTRA_RELUCTANCE_ON_COACH;
       }

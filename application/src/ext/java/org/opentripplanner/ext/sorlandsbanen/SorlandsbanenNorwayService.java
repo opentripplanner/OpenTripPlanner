@@ -17,13 +17,14 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * This is basically a big hack to produce results containing "Sørlandsbanen" in Norway. This
- * railroad line is slow and goes inland fare from where people live. Despite this, people and the
- * operator want to show it in the results for log travel along the southern part of Norway where
- * ii is an option. Tuning the search has proven to be challenging. It is solved here by doing
- * two searches. One normal search and one where the rail is given a big cost advantage over coach.
- * If train results are found in the second search, then it is added to the results of the first
- * search. Everything found in the first search is always returned.
+ * This service is responsible for producing results with rail for the south of Norway. The rail
+ * line is called "Sørlandsbanen". This rail line is slow and goes inland fare from where people
+ * live. Despite this, people and the operator want to show it in the results for log travel along
+ * the southern part of Norway where ii is an option. Tuning the search has proven to be
+ * challenging. It is solved here by doing two searches. One normal search and one where the rail
+ * is given a big cost advantage over coach. If train results are found in the second search, then
+ * it is added to the results of the first search. Everything found in the first search is always
+ * returned.
  */
 public class SorlandsbanenNorwayService {
 
