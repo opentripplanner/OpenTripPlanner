@@ -11,7 +11,6 @@ public class AgencyBuilder extends AbstractEntityBuilder<Agency, AgencyBuilder> 
   private String lang;
   private String phone;
   private String fareUrl;
-  private String brandingUrl;
 
   AgencyBuilder(FeedScopedId id) {
     super(id);
