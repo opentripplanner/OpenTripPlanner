@@ -237,7 +237,7 @@ few percents.
 Split a travel search in smaller jobs and run them in parallel to improve performance.
 
 Use this parameter to set the total number of executable threads available across all searches.
-Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0,
+Multiple searches can run in parallel - this parameter has no effect with regard to that. If 0,
 no extra threads are started and the search is done in one thread.
 
 

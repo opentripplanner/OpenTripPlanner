@@ -12,7 +12,6 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
-import java.time.Duration;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
@@ -663,12 +662,5 @@ public class TripQuery {
       .findFirst()
       .get()
       .getName();
-  }
-
-  /**
-   * Format and return: "2440 minute (48h)"
-   */
-  private static String durationInMinutesToString(Duration value) {
-    return "%d minutes (%s)".formatted(value.toMinutes(), value.toHours() + "h");
   }
 }

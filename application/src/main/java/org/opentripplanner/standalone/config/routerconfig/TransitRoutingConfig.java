@@ -108,7 +108,7 @@ but you might get a slack of 60 seconds somewhere in the result.
         .description(
           """
 Use this parameter to set the total number of executable threads available across all searches.
-Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0,
+Multiple searches can run in parallel - this parameter has no effect with regard to that. If 0,
 no extra threads are started and the search is done in one thread.
 """
         )
