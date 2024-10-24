@@ -503,6 +503,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> pickupType();
 
+    public DataFetcher<Iterable<Leg>> previousLegs();
+
     public DataFetcher<Boolean> realTime();
 
     public DataFetcher<GraphQLRealtimeState> realtimeState();

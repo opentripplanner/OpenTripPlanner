@@ -722,6 +722,24 @@ type Leg {
   pickupBookingInfo: BookingInfo
   "This is used to indicate if boarding this leg is possible only with special arrangements."
   pickupType: PickupDropoffType
+  "Previous legs with same origin and destination stops or stations"
+  previousLegs(
+    """
+    Transportation modes for which all stops in the parent station are used as possible destination stops
+    for the previous legs. For modes not listed, only the exact destination stop of the leg is considered.
+    """
+    destinationModesWithParentStation: [TransitMode!],
+    """
+    The number of alternative legs searched. If fewer than the requested number are found,
+    then only the found legs are returned.
+    """
+    numberOfLegs: Int!,
+    """
+    Transportation modes for which all stops in the parent station are used as possible origin stops
+    for the previous legs. For modes not listed, only the exact origin stop of the leg is considered.
+    """
+    originModesWithParentStation: [TransitMode!]
+  ): [Leg!]
   "Whether there is real-time data about this Leg"
   realTime: Boolean
   "State of real-time data"

@@ -1318,6 +1318,69 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLLegPreviousLegsArgs {
+
+    private List<GraphQLTransitMode> destinationModesWithParentStation;
+    private Integer numberOfLegs;
+    private List<GraphQLTransitMode> originModesWithParentStation;
+
+    public GraphQLLegPreviousLegsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("destinationModesWithParentStation") != null) {
+          this.destinationModesWithParentStation =
+            ((List<Object>) args.get("destinationModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof GraphQLTransitMode
+                  ? item
+                  : GraphQLTransitMode.valueOf((String) item)
+              )
+              .map(GraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.numberOfLegs = (Integer) args.get("numberOfLegs");
+        if (args.get("originModesWithParentStation") != null) {
+          this.originModesWithParentStation =
+            ((List<Object>) args.get("originModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof GraphQLTransitMode
+                  ? item
+                  : GraphQLTransitMode.valueOf((String) item)
+              )
+              .map(GraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLTransitMode> getGraphQLDestinationModesWithParentStation() {
+      return this.destinationModesWithParentStation;
+    }
+
+    public Integer getGraphQLNumberOfLegs() {
+      return this.numberOfLegs;
+    }
+
+    public List<GraphQLTransitMode> getGraphQLOriginModesWithParentStation() {
+      return this.originModesWithParentStation;
+    }
+
+    public void setGraphQLDestinationModesWithParentStation(
+      List<GraphQLTransitMode> destinationModesWithParentStation
+    ) {
+      this.destinationModesWithParentStation = destinationModesWithParentStation;
+    }
+
+    public void setGraphQLNumberOfLegs(Integer numberOfLegs) {
+      this.numberOfLegs = numberOfLegs;
+    }
+
+    public void setGraphQLOriginModesWithParentStation(
+      List<GraphQLTransitMode> originModesWithParentStation
+    ) {
+      this.originModesWithParentStation = originModesWithParentStation;
+    }
+  }
+
   public static class GraphQLLocalDateRangeInput {
 
     private java.time.LocalDate end;
