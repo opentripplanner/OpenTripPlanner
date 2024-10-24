@@ -38,6 +38,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
 | `highway=trunk; bicycle=designated`                     | `ALL`                    | 7.25                          |             |
 | `highway=trunk_link; bicycle=designated`                | `ALL`                    | 2.0                           |             |
+| `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
+| `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=3`                                           | `NONE`                   |                               |             |
 | `mtb:scale=4`                                           | `NONE`                   |                               |             |
 | `mtb:scale=5`                                           | `NONE`                   |                               |             |
@@ -49,8 +51,6 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `public_transport=platform`                             | `PEDESTRIAN`             |                               |             |
 | `railway=platform`                                      | `PEDESTRIAN`             |                               |             |
 | `footway=sidewalk; highway=footway`                     | `PEDESTRIAN`             |                               |             |
-| `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
-| `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=1`                                           | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=2`                                           | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=0`                                           | `PEDESTRIAN_AND_BICYCLE` |                               |             |
