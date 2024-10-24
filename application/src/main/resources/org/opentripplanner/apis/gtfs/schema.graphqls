@@ -73,6 +73,9 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
+"Entity to a step"
+union StepEntity = Entrance
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -442,6 +445,16 @@ type DepartureRow implements Node & PlaceInterface {
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
+}
+
+"Station entrance/exit"
+type Entrance {
+  "Code of entrance/exit eg A or B"
+  code: String
+  "Gtfs id of entrance/exit"
+  gtfsId: String
+  "Name of entrance/exit"
+  name: String
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -2645,6 +2658,8 @@ type step {
   distance: Float
   "The elevation profile as a list of { distance, elevation } values."
   elevationProfile: [elevationProfileComponent]
+  "Step entity e.g. an entrance"
+  entity: StepEntity
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The latitude of the start of the step."

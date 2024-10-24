@@ -13,6 +13,7 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.Entrance;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.plan.WalkStepBuilder;
@@ -25,6 +26,7 @@ import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -174,6 +176,9 @@ public class StatesToWalkStepsMapper {
     // when alighting). We don't need to know what came before or will come after
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
+      return;
+    } else if (backState.getVertex() instanceof StationEntranceVertex) {
+      addStep(createStationEntranceWalkStep(backState, forwardState, edge));
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
@@ -512,6 +517,22 @@ public class StatesToWalkStepsMapper {
 
     step.withRelativeDirection(RelativeDirection.ELEVATOR);
 
+    return step;
+  }
+
+  private WalkStepBuilder createStationEntranceWalkStep(
+    State backState,
+    State forwardState,
+    Edge edge
+  ) {
+    // don't care what came before or comes after
+    var step = createWalkStep(forwardState, backState);
+
+    step.withRelativeDirection(RelativeDirection.CONTINUE);
+
+    step.withEntrance(
+      Entrance.withCode(((StationEntranceVertex) backState.getVertex()).getEntranceName())
+    );
     return step;
   }
 

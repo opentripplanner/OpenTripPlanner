@@ -58,6 +58,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.StepEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnRouteImpl;
@@ -124,6 +125,7 @@ class GtfsGraphQLIndex {
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
+        .type("StepEntity", type -> type.typeResolver(new StepEntityTypeResolver()))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))

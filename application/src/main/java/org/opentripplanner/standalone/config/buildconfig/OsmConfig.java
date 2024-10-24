@@ -84,6 +84,14 @@ public class OsmConfig {
           )
           .docDefaultValue(docDefaults.timeZone())
           .asZoneId(defaults.timeZone())
+      )
+      .withIncludeOsmSubwayEntrances(
+        node
+          .of("includeOsmSubwayEntrances")
+          .since(V2_2)
+          .summary("Whether to include subway entrances from the OSM data." + documentationAddition)
+          .docDefaultValue(docDefaults.includeOsmSubwayEntrances())
+          .asBoolean(defaults.includeOsmSubwayEntrances())
       );
   }
 }
