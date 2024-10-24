@@ -87,8 +87,6 @@ public class ApiLeg {
 
   public String agencyUrl;
 
-  public String agencyBrandingUrl;
-
   public int agencyTimeZoneOffset;
 
   /**
