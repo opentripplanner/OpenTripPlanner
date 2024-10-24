@@ -60,11 +60,10 @@ public interface DynamicSearchWindowCoefficients {
 
   /**
    * Set an upper limit to the calculation of the dynamic search window to prevent exceptionable
-   * cases to cause very long search windows. Long search windows consumes a lot of resources and
+   * cases to cause very long search windows. Long search windows consume a lot of resources and
    * may take a long time. Use this parameter to tune the desired maximum search time.
    * <p>
-   * This is the parameter that affect the response time most, the downside is that a search is only
-   * guaranteed to be pareto-optimal within a search-window.
+   * This is the parameter that affects the response time the most.
    * <p>
    * The default is 3 hours. The unit is minutes.
    */

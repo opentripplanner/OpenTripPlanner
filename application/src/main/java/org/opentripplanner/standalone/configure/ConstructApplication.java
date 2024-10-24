@@ -175,7 +175,8 @@ public class ConstructApplication {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
         timetableRepository(),
-        routerConfig().routingRequestDefaults()
+        routerConfig().routingRequestDefaults(),
+        routerConfig().transitTuningConfig()
       );
     }
 
