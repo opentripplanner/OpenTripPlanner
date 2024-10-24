@@ -2,8 +2,8 @@
 
 {DESCRIPTION}
 <!-- 
-  One or two sentences which go into the [DECISION_RECORDS](/DEVELOPMENT_DECISION_RECORDS.md) document
-  later. 
+  One or two sentences which go into the [DECISION_RECORDS](/DEVELOPMENT_DECISION_RECORDS.md) 
+  document later. 
 -->
 
 Original pull-request: {#NNNN}
@@ -12,13 +12,13 @@ Original pull-request: {#NNNN}
 ### Context and Problem Statement
 
 <!-- 
-   Describe the context and problem statement, e.g., in free form using two to three
-   sentences. You may want to articulate the issue in the form of a question.
+  Describe the context and problem statement, e.g., in free form using two to three sentences. You
+  may want to articulate the issue in the form of a question.
 -->
 
 ### Other options
 
- - 
+- 
 
 ### Decision & Consequences
 
@@ -26,8 +26,8 @@ Original pull-request: {#NNNN}
 
 #### Positive Consequences
 
- - 
+- 
 
 #### Negative Consequences
 
- - 
+- 
