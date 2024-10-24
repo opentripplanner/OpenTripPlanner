@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitModeMapper {
@@ -19,7 +20,7 @@ public class TransitModeMapper {
     if (routeType >= 100 && routeType < 200) { // Railway Service
       return TransitMode.RAIL;
     } else if (routeType >= 200 && routeType < 300) { //Coach Service
-      return TransitMode.BUS;
+      return OTPFeature.GtfsCoach.isOn() ? TransitMode.COACH : TransitMode.BUS;
     } else if (routeType >= 300 && routeType < 500) { //Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;
