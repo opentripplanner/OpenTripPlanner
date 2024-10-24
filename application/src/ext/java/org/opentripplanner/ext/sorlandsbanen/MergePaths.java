@@ -18,10 +18,10 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 class MergePaths<T extends RaptorTripSchedule> implements BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> {
 
   @Override
-  public Collection<RaptorPath<T>> apply(Collection<RaptorPath<T>> main, Collection<RaptorPath<T>> railAlternatives) {
+  public Collection<RaptorPath<T>> apply(Collection<RaptorPath<T>> main, Collection<RaptorPath<T>> alternatives) {
     Map<PathKey, RaptorPath<T>> result = new HashMap<>();
     addAllToMap(result, main);
-    addRailToMap(result, railAlternatives);
+    addRailToMap(result, alternatives);
     return result.values();
   }
 

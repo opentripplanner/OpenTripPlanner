@@ -40,7 +40,7 @@ public class SorlandsbanenNorwayService {
     );
     WgsCoordinate to = findStopCoordinate(request.to(), accessEgresses.getEgresses(), transitLayer);
 
-    if (from.latitude() > SOUTH_BOARDER_LIMIT && to.latitude() > SOUTH_BOARDER_LIMIT) {
+    if (from.isNorthOf(SOUTH_BOARDER_LIMIT) && to.isNorthOf(SOUTH_BOARDER_LIMIT)) {
       return null;
     }
 
