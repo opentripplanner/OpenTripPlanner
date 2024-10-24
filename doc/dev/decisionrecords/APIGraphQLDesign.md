@@ -7,9 +7,9 @@ of the OTP developers are the Production Ready GraphQL book by Marc-André Girou
 
 ## Pagination
 
-We use the [pagination](https://graphql.org/learn/pagination/) (a.k. Relay) specification for paging over entities like station, 
-stops, trips and routes. Very often OTP has a _final_ list of entities in memory. For non-entities
-(Itinerary and Legs), witch does not always have an ID and is none trivial to reconstruct, it is 
+We use the [pagination](https://graphql.org/learn/pagination/) (a.k. Relay) specification for paging over entities like stations, 
+stops, trips and routes. Very often OTP has a _finite_ list of entities in memory. For non-entities
+(Itinerary and Legs), witch do not always have an ID and is none trivial to reconstruct, it is 
 better to make a custom solution. 
 
 
