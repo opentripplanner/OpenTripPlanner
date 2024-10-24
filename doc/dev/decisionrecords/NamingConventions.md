@@ -57,7 +57,7 @@ them.
 | `setStop(Stop stop)`                        | Set a mutable Stop reference. Avoid if not part of natural lifecycle. Use `initStop(...)` if possible. |
 | `getStop() : Stop`                          | Old style accessor. Use the shorter form `stop() : Stop`.                                              |
 
-## Service, Model, and Repository
+## Service, Model and Repository
 
 ![MainModelOverview](../images/ServiceModelOverview.png)
 
