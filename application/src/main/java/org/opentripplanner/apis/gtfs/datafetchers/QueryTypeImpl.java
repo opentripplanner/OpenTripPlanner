@@ -940,8 +940,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       );
 
       Envelope envelope = new Envelope(
-        new Coordinate(args.getGraphQLMinLon(), args.getGraphQLMinLat()),
-        new Coordinate(args.getGraphQLMaxLon(), args.getGraphQLMaxLat())
+        new Coordinate(args.getGraphQLMinimumLongitude(), args.getGraphQLMinimumLatitude()),
+        new Coordinate(args.getGraphQLMaximumLongitude(), args.getGraphQLMaximumLatitude())
       );
 
       Stream<VehicleRentalStation> stationStream = vehicleRentalStationService
