@@ -70,7 +70,7 @@ Working Directory: $ProjectFileDir$
 > **Tip!**  Add an unused key shortcut to execute the external tool. Then you can use the old 
 > shortcut to format other file types.
 
-#### Install File Watchers Plugin in IntelliJ
+#### Install File Watchers plugin in IntelliJ
 
 You can also configure IntelliJ to run Prettier every time IntelliJ saves a Java file. But if you
 are editing the file at the same time, you will get a warning that the file in memory and the file
