@@ -177,6 +177,10 @@ public final class WgsCoordinate implements Serializable {
     );
   }
 
+  public boolean isNorthOf(double latitudeBorder) {
+    return latitude > latitudeBorder;
+  }
+
   /**
    * Return a new coordinate that is moved an approximate number of meters east.
    */

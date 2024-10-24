@@ -101,6 +101,13 @@ public class WgsCoordinateTest {
   }
 
   @Test
+  void testIsNorthOf() {
+    var c = new WgsCoordinate(10.0, 30.0);
+    assertTrue(c.isNorthOf(9.9));
+    assertFalse(c.isNorthOf(10.1));
+  }
+
+  @Test
   void testGreenwich() {
     assertEquals(51.48d, GREENWICH.latitude());
     assertEquals(0d, GREENWICH.longitude());
