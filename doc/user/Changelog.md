@@ -19,6 +19,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Rename TransitModel to TransitRepository [#6148](https://github.com/opentripplanner/OpenTripPlanner/pull/6148)
 - Clear added patterns in TimetableSnapshot [#6141](https://github.com/opentripplanner/OpenTripPlanner/pull/6141)
 - Rename StopModel to SiteRepository [#6165](https://github.com/opentripplanner/OpenTripPlanner/pull/6165)
+- Allow bike walking through bicycle no thru traffic areas [#6179](https://github.com/opentripplanner/OpenTripPlanner/pull/6179)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
