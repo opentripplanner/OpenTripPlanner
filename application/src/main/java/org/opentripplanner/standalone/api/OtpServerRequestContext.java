@@ -10,7 +10,7 @@ import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.sorlandsbanen.EnturSorlandsbanenService;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -146,5 +146,5 @@ public interface OtpServerRequestContext {
   StopConsolidationService stopConsolidationService();
 
   @Nullable
-  EnturSorlandsbanenService enturSorlandsbanenService();
+  SorlandsbanenNorwayService sorlandsbanenService();
 }

@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * If train results are found in the second search, then it is added to the results of the first
  * search. Everything found in the first search is always returned.
  */
-public class EnturSorlandsbanenService {
+public class SorlandsbanenNorwayService {
 
   private static final double SOUTH_BOARDER_LIMIT = 59.1;
   private static final int MIN_DISTANCE_LIMIT = 120_000;

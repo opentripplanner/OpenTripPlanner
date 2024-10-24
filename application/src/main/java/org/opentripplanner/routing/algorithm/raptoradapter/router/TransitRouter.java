@@ -403,7 +403,7 @@ public class TransitRouter {
     if (OTPFeature.Sorlandsbanen.isOff()) {
       return null;
     }
-    var service = serverContext.enturSorlandsbanenService();
+    var service = serverContext.sorlandsbanenService();
     return service == null
       ? null
       : service.createMcRouterFactory(request, accessEgresses, transitLayer);
