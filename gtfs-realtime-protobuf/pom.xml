@@ -18,6 +18,16 @@
         </dependency>
     </dependencies>
     <build>
+        <extensions>
+            <!-- makes build variables like os.detected.classifier available.
+                 use to select the correct protoc instance for the OS.
+                 see protobuf-maven-plugin below -->
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
         <plugins>
             <!-- compile the gtfs-realtime.proto file to Java code
                To update the proto file run the following command:

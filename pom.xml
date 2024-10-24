@@ -99,16 +99,6 @@
     </modules>
 
     <build>
-        <extensions>
-            <!-- makes build variables like os.detected.classifier available.
-                 use to select the correct protoc instance for the OS.
-                 see protobuf-maven-plugin below -->
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.7.1</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
