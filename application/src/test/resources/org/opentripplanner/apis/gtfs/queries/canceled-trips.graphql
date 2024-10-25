@@ -28,16 +28,10 @@
               scheduledTime
             }
           }
-          stoptimes {
-            dropOffType
-            headsign
-            pickupType
-            realtimeState
+          stopTimes {
             stop {
               gtfsId
             }
-            stopPosition
-            timepoint
             arrival {
               scheduledTime
               estimated {

@@ -773,25 +773,6 @@ public class GraphQLTypes {
     VEHICLE_RENT,
   }
 
-  public static class GraphQLFixedDatedStopTimeHeadsignArgs {
-
-    private String language;
-
-    public GraphQLFixedDatedStopTimeHeadsignArgs(Map<String, Object> args) {
-      if (args != null) {
-        this.language = (String) args.get("language");
-      }
-    }
-
-    public String getGraphQLLanguage() {
-      return this.language;
-    }
-
-    public void setGraphQLLanguage(String language) {
-      this.language = language;
-    }
-  }
-
   public enum GraphQLFormFactor {
     BICYCLE,
     CAR,
@@ -4621,16 +4602,6 @@ public class GraphQLTypes {
     STOP_ON_ROUTES,
     STOP_ON_TRIPS,
     TRIPS,
-  }
-
-  /** Whether stop has been updated through a realtime update and if so, how. */
-  public enum GraphQLStopRealTimeState {
-    ADDED,
-    CANCELED,
-    NO_DATA,
-    RECORDED,
-    UNUPDATED,
-    UPDATED,
   }
 
   public static class GraphQLStoptimeHeadsignArgs {

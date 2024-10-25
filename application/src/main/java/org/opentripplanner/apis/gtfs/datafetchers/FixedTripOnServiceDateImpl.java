@@ -61,7 +61,7 @@ public class FixedTripOnServiceDateImpl
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stopTimes() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getTrip(environment);

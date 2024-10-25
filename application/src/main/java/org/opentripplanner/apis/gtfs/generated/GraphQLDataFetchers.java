@@ -21,7 +21,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStat
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
@@ -430,19 +429,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<ArrivalDepartureTime> departure();
 
-    public DataFetcher<String> dropOffType();
-
-    public DataFetcher<String> headsign();
-
-    public DataFetcher<String> pickupType();
-
-    public DataFetcher<GraphQLStopRealTimeState> realtimeState();
-
     public DataFetcher<Object> stop();
-
-    public DataFetcher<Integer> stopPosition();
-
-    public DataFetcher<Boolean> timepoint();
   }
 
   /** A fixed (i.e. not flexible or frequency based) trip on a specific service date */
@@ -453,7 +440,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<TripTimeOnDate> start();
 
-    public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+    public DataFetcher<Iterable<TripTimeOnDate>> stopTimes();
 
     public DataFetcher<Trip> trip();
   }

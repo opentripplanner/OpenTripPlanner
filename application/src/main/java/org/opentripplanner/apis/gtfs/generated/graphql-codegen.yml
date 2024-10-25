@@ -102,7 +102,6 @@ config:
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
     StopOnRoute: org.opentripplanner.apis.gtfs.model.StopOnRouteModel#StopOnRouteModel
     StopOnTrip: org.opentripplanner.apis.gtfs.model.StopOnTripModel#StopOnTripModel
-    StopRealTimeState: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopRealTimeState#GraphQLStopRealTimeState
     Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet
