@@ -25,7 +25,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropoffType() {
     return environment -> PickDropMapper.map(getSource(environment).getDropoffType());
   }
 
@@ -36,7 +36,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<String> pickupType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> pickupType() {
     return environment -> PickDropMapper.map(getSource(environment).getPickupType());
   }
 

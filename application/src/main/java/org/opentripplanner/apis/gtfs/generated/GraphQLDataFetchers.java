@@ -18,6 +18,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverity
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoffType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
@@ -504,7 +505,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<BookingInfo> dropOffBookingInfo();
 
-    public DataFetcher<String> dropoffType();
+    public DataFetcher<GraphQLPickupDropoffType> dropoffType();
 
     public DataFetcher<Double> duration();
 
@@ -538,7 +539,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<BookingInfo> pickupBookingInfo();
 
-    public DataFetcher<String> pickupType();
+    public DataFetcher<GraphQLPickupDropoffType> pickupType();
 
     public DataFetcher<Boolean> realTime();
 
@@ -1110,11 +1111,11 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> departureDelay();
 
-    public DataFetcher<String> dropoffType();
+    public DataFetcher<GraphQLPickupDropoffType> dropoffType();
 
     public DataFetcher<String> headsign();
 
-    public DataFetcher<String> pickupType();
+    public DataFetcher<GraphQLPickupDropoffType> pickupType();
 
     public DataFetcher<Boolean> realtime();
 

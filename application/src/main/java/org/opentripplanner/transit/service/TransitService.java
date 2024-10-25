@@ -174,7 +174,7 @@ public interface TransitService {
    *
    * @param feeds If not null, used for filtering.
    */
-  Collection<TripOnServiceDate> getCanceledTrips(List<String> feeds);
+  Collection<TripOnServiceDate> getCanceledTrips(@Nullable List<String> feeds);
 
   /**
    * Return all routes, including those created by real-time updates.

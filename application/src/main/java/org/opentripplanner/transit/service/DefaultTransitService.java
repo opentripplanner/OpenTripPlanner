@@ -298,7 +298,7 @@ public class DefaultTransitService implements TransitEditorService {
    * TODO This only supports realtime cancelled trips for now.
    */
   @Override
-  public Collection<TripOnServiceDate> getCanceledTrips(List<String> feeds) {
+  public Collection<TripOnServiceDate> getCanceledTrips(@Nullable List<String> feeds) {
     OTPRequestTimeoutException.checkForTimeout();
     var timetableSnapshot = lazyGetTimeTableSnapShot();
     if (timetableSnapshot == null) {

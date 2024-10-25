@@ -172,14 +172,14 @@ public class TripTimeOnDate {
    * Returns the actual arrival time if available. Otherwise -1 is returned.
    */
   public int getActualArrival() {
-    return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
   }
 
   /**
    * Returns the actual departure time if available. Otherwise -1 is returned.
    */
   public int getActualDeparture() {
-    return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
   }
 
   public int getArrivalDelay() {
