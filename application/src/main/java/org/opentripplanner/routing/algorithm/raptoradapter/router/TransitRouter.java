@@ -146,7 +146,7 @@ public class TransitRouter {
     // Route transit
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
-      createMcRouterFactory(accessEgresses, transitLayer)
+      createExtraMcRouterSearch(accessEgresses, transitLayer)
     );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
@@ -396,7 +396,7 @@ public class TransitRouter {
    * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance.
    */
   @Nullable
-  private ExtraMcRouterSearch<TripSchedule> createMcRouterFactory(
+  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
     AccessEgresses accessEgresses,
     TransitLayer transitLayer
   ) {
@@ -406,6 +406,6 @@ public class TransitRouter {
     var service = serverContext.sorlandsbanenService();
     return service == null
       ? null
-      : service.createMcRouterFactory(request, accessEgresses, transitLayer);
+      : service.createExtraMcRouterSearch(request, accessEgresses, transitLayer);
   }
 }

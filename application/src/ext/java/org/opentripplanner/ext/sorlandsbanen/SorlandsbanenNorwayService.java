@@ -2,6 +2,7 @@ package org.opentripplanner.ext.sorlandsbanen;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -28,11 +29,12 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public class SorlandsbanenNorwayService {
 
-  private static final double SOUTH_BOARDER_LIMIT = 59.1;
+  private static final double SOUTH_BORDER_LIMIT = 59.1;
   private static final int MIN_DISTANCE_LIMIT = 120_000;
 
 
-  public ExtraMcRouterSearch<TripSchedule> createMcRouterFactory(RouteRequest request, AccessEgresses accessEgresses, TransitLayer transitLayer) {
+  @Nullable
+  public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(RouteRequest request, AccessEgresses accessEgresses, TransitLayer transitLayer) {
     WgsCoordinate from = findStopCoordinate(
       request.from(),
       accessEgresses.getAccesses(),
@@ -40,7 +42,7 @@ public class SorlandsbanenNorwayService {
     );
     WgsCoordinate to = findStopCoordinate(request.to(), accessEgresses.getEgresses(), transitLayer);
 
-    if (from.isNorthOf(SOUTH_BOARDER_LIMIT) && to.isNorthOf(SOUTH_BOARDER_LIMIT)) {
+    if (from.isNorthOf(SOUTH_BORDER_LIMIT) && to.isNorthOf(SOUTH_BORDER_LIMIT)) {
       return null;
     }
 
