@@ -96,7 +96,7 @@ public class TimetableRepository implements Serializable {
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-  private StopModel stopModel;
+  private SiteRepository siteRepository;
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
@@ -145,14 +145,14 @@ public class TimetableRepository implements Serializable {
   private transient TransitAlertService transitAlertService;
 
   @Inject
-  public TimetableRepository(StopModel stopModel, Deduplicator deduplicator) {
-    this.stopModel = Objects.requireNonNull(stopModel);
+  public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
+    this.siteRepository = Objects.requireNonNull(siteRepository);
     this.deduplicator = deduplicator;
   }
 
   /** No-argument constructor, required for deserialization. */
   public TimetableRepository() {
-    this(new StopModel(), new Deduplicator());
+    this(new SiteRepository(), new Deduplicator());
   }
 
   /**
@@ -163,7 +163,7 @@ public class TimetableRepository implements Serializable {
   public void index() {
     if (index == null) {
       LOG.info("Index transit model...");
-      // the transit model indexing updates the stop model index (flex stops added to the stop index)
+      // the transit model indexing updates the site repository index (flex stops added to the stop index)
       this.index = new TimetableRepositoryIndex(this);
       LOG.info("Index transit model complete.");
     }
@@ -430,8 +430,8 @@ public class TimetableRepository implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public StopModel getStopModel() {
-    return stopModel;
+  public SiteRepository getSiteRepository() {
+    return siteRepository;
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
@@ -499,11 +499,11 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * Updating the stop model is only allowed during graph build
+   * Updating the site repository is only allowed during graph build
    */
-  public void mergeStopModels(StopModel childStopModel) {
+  public void mergeSiteRepositories(SiteRepository childSiteRepository) {
     invalidateIndex();
-    this.stopModel = this.stopModel.merge(childStopModel);
+    this.siteRepository = this.siteRepository.merge(childSiteRepository);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {

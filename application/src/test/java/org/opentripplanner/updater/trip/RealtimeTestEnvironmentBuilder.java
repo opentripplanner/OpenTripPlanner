@@ -23,7 +23,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
   private RealtimeTestEnvironment.SourceType sourceType;
   private final TimetableRepository timetableRepository = new TimetableRepository(
-    STOP_MODEL,
+    SITE_REPOSITORY,
     new Deduplicator()
   );
 

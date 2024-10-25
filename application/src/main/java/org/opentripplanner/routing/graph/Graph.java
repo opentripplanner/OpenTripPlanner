@@ -30,7 +30,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -284,9 +284,9 @@ public class Graph implements Serializable {
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
    *           - something that should go into the index; Hence, inconsistent data.
    */
-  public void index(StopModel stopModel) {
+  public void index(SiteRepository siteRepository) {
     LOG.info("Index street model...");
-    streetIndex = new StreetIndex(this, stopModel);
+    streetIndex = new StreetIndex(this, siteRepository);
     LOG.info("Index street model complete.");
   }
 
@@ -297,7 +297,7 @@ public class Graph implements Serializable {
 
   /**
    * Get streetIndex, safe to use while routing, but do not use during graph build.
-   * @see #getStreetIndexSafe(StopModel)
+   * @see #getStreetIndexSafe(SiteRepository)
    */
   public StreetIndex getStreetIndex() {
     return this.streetIndex;
@@ -307,14 +307,14 @@ public class Graph implements Serializable {
    * Get streetIndex during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public StreetIndex getStreetIndexSafe(StopModel stopModel) {
-    indexIfNotIndexed(stopModel);
+  public StreetIndex getStreetIndexSafe(SiteRepository siteRepository) {
+    indexIfNotIndexed(siteRepository);
     return this.streetIndex;
   }
 
   /**
    * Get VertexLinker, safe to use while routing, but do not use during graph build.
-   * @see #getLinkerSafe(StopModel)
+   * @see #getLinkerSafe(SiteRepository)
    */
   public VertexLinker getLinker() {
     return streetIndex.getVertexLinker();
@@ -324,8 +324,8 @@ public class Graph implements Serializable {
    * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public VertexLinker getLinkerSafe(StopModel stopModel) {
-    indexIfNotIndexed(stopModel);
+  public VertexLinker getLinkerSafe(SiteRepository siteRepository) {
+    indexIfNotIndexed(siteRepository);
     return streetIndex.getVertexLinker();
   }
 
@@ -374,9 +374,9 @@ public class Graph implements Serializable {
     this.fareService = fareService;
   }
 
-  private void indexIfNotIndexed(StopModel stopModel) {
+  private void indexIfNotIndexed(SiteRepository siteRepository) {
     if (streetIndex == null) {
-      index(stopModel);
+      index(siteRepository);
     }
   }
 }

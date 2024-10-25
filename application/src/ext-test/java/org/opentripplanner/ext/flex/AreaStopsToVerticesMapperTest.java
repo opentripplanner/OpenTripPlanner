@@ -22,7 +22,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class AreaStopsToVerticesMapperTest {
@@ -33,13 +33,13 @@ class AreaStopsToVerticesMapperTest {
     .areaStop("berlin")
     .withGeometry(Polygons.BERLIN)
     .build();
-  public static final StopModel STOP_MODEL = TEST_MODEL
-    .stopModelBuilder()
+  public static final SiteRepository SITE_REPOSITORY = TEST_MODEL
+    .siteRepositoryBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 
   public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
-    STOP_MODEL,
+    SITE_REPOSITORY,
     new Deduplicator()
   );
 
