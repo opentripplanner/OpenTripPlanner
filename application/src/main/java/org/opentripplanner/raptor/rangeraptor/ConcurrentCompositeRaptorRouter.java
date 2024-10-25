@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiFunction;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -21,13 +22,15 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
   private final RaptorRouter<T> mainWorker;
   private final RaptorRouter<T> alternativeWorker;
   private final BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger;
+
+  @Nullable
   private final ExecutorService executorService;
 
   public ConcurrentCompositeRaptorRouter(
     RaptorRouter<T> mainWorker,
     RaptorRouter<T> alternativeWorker,
     BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger,
-    ExecutorService executorService
+    @Nullable ExecutorService executorService
   ) {
     this.mainWorker = mainWorker;
     this.alternativeWorker = alternativeWorker;
