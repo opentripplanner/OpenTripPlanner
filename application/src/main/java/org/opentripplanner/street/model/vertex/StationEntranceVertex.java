@@ -2,18 +2,18 @@ package org.opentripplanner.street.model.vertex;
 
 public class StationEntranceVertex extends OsmVertex {
 
-  private final String entranceName;
+  private final String code;
 
-  public StationEntranceVertex(double x, double y, long nodeId, String entranceName) {
+  public StationEntranceVertex(double x, double y, long nodeId, String code) {
     super(x, y, nodeId);
-    this.entranceName = entranceName;
+    this.code = code;
   }
 
-  public String getEntranceName() {
-    return entranceName;
+  public String getCode() {
+    return code;
   }
 
   public String toString() {
-    return "StationEntranceVertex(" + super.toString() + ")";
+    return "StationEntranceVertex(" + super.toString() + ", code=" + code + ")";
   }
 }
