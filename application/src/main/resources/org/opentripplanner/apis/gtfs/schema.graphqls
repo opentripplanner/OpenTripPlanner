@@ -578,7 +578,7 @@ type FixedTripOnServiceDate {
   "The time when the trip starts from a stop and information related to the stop."
   start: FixedDatedStopTime
   "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopTimes: [FixedDatedStopTime!]
+  stopTimes: [FixedDatedStopTime!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
 }
