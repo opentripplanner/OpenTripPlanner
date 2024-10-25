@@ -425,7 +425,7 @@ public class GraphQLDataFetchers {
    * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
    * This can include realtime estimates.
    */
-  public interface GraphQLFixedDatedStopTime {
+  public interface GraphQLFixedStopTimeOnServiceDate {
     public DataFetcher<ArrivalDepartureTime> arrival();
 
     public DataFetcher<ArrivalDepartureTime> departure();
