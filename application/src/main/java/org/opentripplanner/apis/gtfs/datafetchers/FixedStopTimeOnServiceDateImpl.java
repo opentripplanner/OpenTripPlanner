@@ -12,7 +12,8 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FixedDatedStopTimeImpl implements GraphQLDataFetchers.GraphQLFixedDatedStopTime {
+public class FixedStopTimeOnServiceDateImpl
+  implements GraphQLDataFetchers.GraphQLFixedDatedStopTime {
 
   @Override
   public DataFetcher<ArrivalDepartureTime> arrival() {

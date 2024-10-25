@@ -554,7 +554,7 @@ type FeedPublisher {
 Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
 This can include realtime estimates.
 """
-type FixedDatedStopTime {
+type FixedStopTimeOnServiceDate {
   "Scheduled arrival time to the stop and a realtime estimate, if one exists."
   arrival: ArrivalDepartureTime
   "Scheduled departure time from the stop and a realtime estimate, if one exists."
@@ -574,11 +574,11 @@ type FixedTripOnServiceDate {
   """
   date: LocalDate!
   "The time when the trip ends at a stop and information related to the stop."
-  end: FixedDatedStopTime
+  end: FixedStopTimeOnServiceDate
   "The time when the trip starts from a stop and information related to the stop."
-  start: FixedDatedStopTime
+  start: FixedStopTimeOnServiceDate
   "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopTimes: [FixedDatedStopTime!]!
+  stopTimes: [FixedStopTimeOnServiceDate!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
 }

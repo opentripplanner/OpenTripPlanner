@@ -40,7 +40,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.FixedDatedStopTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.FixedStopTimeOnServiceDateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FixedTripOnServiceDateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.GeometryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ItineraryImpl;
@@ -183,7 +183,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
         .type(typeWiring.build(FixedTripOnServiceDateImpl.class))
-        .type(typeWiring.build(FixedDatedStopTimeImpl.class))
+        .type(typeWiring.build(FixedStopTimeOnServiceDateImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
