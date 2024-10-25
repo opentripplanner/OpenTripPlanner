@@ -219,15 +219,12 @@ public final class TripPatternBuilder
     // being replaced having a different number of stops. In that case the geometry will be
     // preserved up until the first mismatching stop, and a straight line will be used for
     // all segments after that.
-    int sizeOfShortestPattern = Math.min(
-      stopPattern.getSize(),
-      originalTripPattern.numberOfStops()
-    );
-
     List<LineString> hopGeometries = new ArrayList<>();
 
-    for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-      LineString hopGeometry = originalTripPattern.getHopGeometry(i);
+    for (int i = 0; i < stopPattern.getSize() - 1; i++) {
+      LineString hopGeometry = i < originalTripPattern.numberOfStops() - 1
+        ? originalTripPattern.getHopGeometry(i)
+        : null;
 
       if (hopGeometry != null && stopPattern.sameStops(originalTripPattern.getStopPattern(), i)) {
         // Copy hop geometry from previous pattern
