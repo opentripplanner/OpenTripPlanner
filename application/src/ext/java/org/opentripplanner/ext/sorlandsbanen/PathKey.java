@@ -19,9 +19,6 @@ final class PathKey {
   }
 
   private static int hash(RaptorPath<?> path) {
-    if (path == null) {
-      return 0;
-    }
     int result = 1;
 
     PathLeg<?> leg = path.accessLeg();
