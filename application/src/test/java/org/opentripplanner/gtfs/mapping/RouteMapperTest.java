@@ -95,9 +95,9 @@ public class RouteMapperTest {
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
     assertEquals(SORT_ORDER, result.getGtfsSortOrder());
 
+    // We no longer read the non-standard brandingUrl from gtfs, but if it is supplied, it will not cause an error.
     Branding branding = result.getBranding();
-    assertNotNull(branding);
-    assertEquals(BRANDING_URL, branding.getUrl());
+    assertNull(branding);
   }
 
   @Test
