@@ -93,21 +93,20 @@ class DefaultTransitServiceTest {
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     timetableRepository.index();
 
-    timetableRepository.initTimetableSnapshotProvider(() -> {
-      TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-      RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
-        ScheduledTripTimes
-          .of()
-          .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
-          .withDepartureTimes(new int[] { 0, 1 })
-          .build()
-      );
-      timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
-      timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
-      timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
+      ScheduledTripTimes
+        .of()
+        .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
+        .withDepartureTimes(new int[] { 0, 1 })
+        .build()
+    );
+    timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
+    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
+    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
 
-      return timetableSnapshot.commit();
-    });
+    var snapshot = timetableSnapshot.commit();
+    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     service =
       new DefaultTransitService(timetableRepository) {

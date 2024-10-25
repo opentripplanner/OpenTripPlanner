@@ -253,13 +253,12 @@ class GraphQLIntegrationTest {
       calendarServiceData,
       DataImportIssueStore.NOOP
     );
-    timetableRepository.initTimetableSnapshotProvider(() -> {
-      TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-      tripTimes2.cancelTrip();
-      timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    tripTimes2.cancelTrip();
+    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
 
-      return timetableSnapshot.commit();
-    });
+    var snapshot = timetableSnapshot.commit();
+    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
