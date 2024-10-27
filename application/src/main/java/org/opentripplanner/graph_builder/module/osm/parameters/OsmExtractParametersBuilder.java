@@ -72,7 +72,7 @@ public class OsmExtractParametersBuilder {
     return timeZone;
   }
 
-  public boolean getIncludeOsmSubwayEntrances() {
+  public boolean includeOsmSubwayEntrances() {
     return includeOsmSubwayEntrances;
   }
 

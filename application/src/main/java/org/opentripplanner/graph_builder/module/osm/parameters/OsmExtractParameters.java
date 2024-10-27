@@ -31,7 +31,7 @@ public record OsmExtractParameters(
       builder.getSource(),
       builder.getOsmTagMapper(),
       builder.getTimeZone(),
-      builder.getIncludeOsmSubwayEntrances()
+      builder.includeOsmSubwayEntrances()
     );
   }
 
