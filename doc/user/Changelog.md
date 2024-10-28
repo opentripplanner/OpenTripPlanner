@@ -21,6 +21,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Rename StopModel to SiteRepository [#6165](https://github.com/opentripplanner/OpenTripPlanner/pull/6165)
 - Allow bike walking through bicycle no thru traffic areas [#6179](https://github.com/opentripplanner/OpenTripPlanner/pull/6179)
 - update the description of  mode to cable tram. [#6173](https://github.com/opentripplanner/OpenTripPlanner/pull/6173)
+- Change GraphQL tooltip for searchWindowUsed to say minutes, instead of seconds [#6185](https://github.com/opentripplanner/OpenTripPlanner/pull/6185)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
