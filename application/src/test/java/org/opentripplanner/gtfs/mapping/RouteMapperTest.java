@@ -47,8 +47,6 @@ public class RouteMapperTest {
 
   private static final Integer SORT_ORDER = 1;
 
-  private static final String BRANDING_URL = "www.url.me/brand";
-
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
     new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
@@ -68,7 +66,6 @@ public class RouteMapperTest {
     ROUTE.setTextColor(TEXT_COLOR);
     ROUTE.setBikesAllowed(BIKES_ALLOWED);
     ROUTE.setSortOrder(SORT_ORDER);
-    ROUTE.setBrandingUrl(BRANDING_URL);
   }
 
   @Test
