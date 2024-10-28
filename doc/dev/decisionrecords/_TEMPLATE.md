@@ -6,7 +6,7 @@
   document later. 
 -->
 
-Original pull-request: {#NNNN}
+Original pull request: {#NNNN}
 
 
 ### Context and Problem Statement
@@ -20,7 +20,7 @@ Original pull-request: {#NNNN}
 
 - 
 
-### Decision & Consequences
+### Decision and Consequences
 
 <!-- Describes the effects of the change. What becomes easier? What will be more difficult? -->
 
