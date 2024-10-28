@@ -447,13 +447,13 @@ type Emissions {
   co2: Grams
 }
 
-"Station entrance/exit"
+"Station entrance or exit."
 type Entrance {
-  "Code of entrance/exit eg A or B"
+  "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
   code: String
-  "Gtfs id of entrance/exit"
+  "ID of the entrance in the format of `FeedId:EntranceId`."
   gtfsId: String
-  "Name of entrance/exit"
+  "Name of the entrance or exit."
   name: String
 }
 
@@ -2658,7 +2658,7 @@ type step {
   distance: Float
   "The elevation profile as a list of { distance, elevation } values."
   elevationProfile: [elevationProfileComponent]
-  "Step entity e.g. an entrance"
+  "Step entity, e.g. an entrance."
   entity: StepEntity
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
