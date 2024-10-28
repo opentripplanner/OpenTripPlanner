@@ -1,0 +1,51 @@
+{
+  vehicleRentalStationsByBbox(
+    maximumLatitude: 48.00
+    maximumLongitude: 19.00
+    minimumLatitude: 47.50
+    minimumLongitude: 18.80
+  ) {
+    stationId
+    name
+    vehiclesAvailable
+    availableVehicles {
+      byType {
+        vehicleType {
+          formFactor
+          propulsionType
+        }
+        count
+      }
+      total
+    }
+    spacesAvailable
+    availableSpaces {
+      byType {
+        vehicleType {
+          formFactor
+          propulsionType
+        }
+        count
+      }
+      total
+    }
+    allowDropoff
+    allowPickup
+    allowDropoffNow
+    allowPickupNow
+    lon
+    lat
+    capacity
+    allowOverloading
+    rentalUris {
+      android
+      ios
+      web
+    }
+    operative
+    rentalNetwork {
+      networkId
+      url
+    }
+  }
+}
