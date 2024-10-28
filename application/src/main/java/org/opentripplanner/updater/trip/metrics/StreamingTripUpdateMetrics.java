@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -31,11 +33,16 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
   private final Map<UpdateError.UpdateErrorType, Counter> failuresByType = new HashMap<>();
   private final Map<UpdateSuccess.WarningType, Counter> warningsByType = new HashMap<>();
 
+  private final boolean detailedMetrics;
+  private final Map<String, Counter> successesByProvider = new HashMap<>();
+  private final Map<Pair<String, UpdateError.UpdateErrorType>, Counter> failuresByTypeAndProvider = new HashMap<>();
+
   public StreamingTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
     this.successfulCounter = getCounter("successful", "Total successfully applied trip updates");
     this.failureCounter = getCounter("failed", "Total failed trip updates");
     this.warningsCounter = getCounter("warnings", "Total warnings for successful trip updates");
+    this.detailedMetrics = parameters.detailedMetrics();
   }
 
   public void setCounters(UpdateResult result) {
@@ -45,6 +52,10 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
 
     setFailures(result);
     setWarnings(result);
+    if (detailedMetrics) {
+      setFailuresByTypeAndProvider(result);
+      setSuccessesByProvider(result);
+    }
   }
 
   private void setWarnings(UpdateResult result) {
@@ -76,6 +87,54 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
         failuresByType.put(errorType, counter);
       }
       counter.increment(result.failures().get(errorType).size());
+    }
+  }
+
+  private void setFailuresByTypeAndProvider(UpdateResult result) {
+    Map<Pair<String, UpdateError.UpdateErrorType>, Long> failureCountByTypeAndProvider = result
+      .errors()
+      .stream()
+      .collect(
+        Collectors.groupingBy(
+          error -> Pair.of(error.provider(), error.errorType()),
+          Collectors.counting()
+        )
+      );
+
+    for (var entry : failureCountByTypeAndProvider.entrySet()) {
+      Counter counter = failuresByTypeAndProvider.get(entry.getKey());
+      if (Objects.isNull(counter)) {
+        counter =
+          getCounter(
+            "failures_by_type_and_provider",
+            "Total failed trip updates by type and provider",
+            Tag.of("provider", entry.getKey().getLeft()),
+            Tag.of("errorType", entry.getKey().getRight().name())
+          );
+        failuresByTypeAndProvider.put(entry.getKey(), counter);
+      }
+      counter.increment(entry.getValue());
+    }
+  }
+
+  private void setSuccessesByProvider(UpdateResult result) {
+    Map<String, Long> successCountByProvider = result
+      .successes()
+      .stream()
+      .collect(Collectors.groupingBy(UpdateSuccess::provider, Collectors.counting()));
+
+    for (var entry : successCountByProvider.entrySet()) {
+      Counter counter = successesByProvider.get(entry.getKey());
+      if (Objects.isNull(counter)) {
+        counter =
+          getCounter(
+            "successes_by_provider",
+            "Total successful trip updates by provider",
+            Tag.of("provider", entry.getKey())
+          );
+        successesByProvider.put(entry.getKey(), counter);
+      }
+      counter.increment(entry.getValue());
     }
   }
 

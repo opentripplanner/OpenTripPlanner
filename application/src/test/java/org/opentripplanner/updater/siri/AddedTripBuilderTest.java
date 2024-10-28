@@ -135,7 +135,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -247,7 +248,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -275,7 +277,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -317,7 +320,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -351,7 +355,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -395,7 +400,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -450,7 +456,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -489,7 +496,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 
@@ -536,7 +544,8 @@ class AddedTripBuilderTest {
       false,
       SHORT_NAME,
       HEADSIGN,
-      List.of()
+      List.of(),
+      "TST"
     )
       .build();
 

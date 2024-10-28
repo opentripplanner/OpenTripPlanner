@@ -32,6 +32,7 @@ of the `router-config.json`.
 |------------------------------------------------------------|:----------:|----------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "siri-et-google-pubsub-updater"                     |   `enum`   | The type of the updater.                                                         | *Required* |               |  1.5  |
 | [dataInitializationUrl](#u__12__dataInitializationUrl)     |  `string`  | URL used to download over HTTP the recent history of SIRI-ET messages.           | *Optional* |               |  2.1  |
+| detailedMetrics                                            |  `boolean` | If detailed metrics should be collected.                                         | *Optional* | `false`       |  2.1  |
 | feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                                      | *Optional* |               |  2.1  |
 | fuzzyTripMatching                                          |  `boolean` | If the trips should be matched fuzzily.                                          | *Optional* | `false`       |  2.1  |
 | [initialGetDataTimeout](#u__12__initialGetDataTimeout)     | `duration` | Timeout for retrieving the recent history of SIRI-ET messages.                   | *Optional* | `"PT30S"`     |  2.1  |

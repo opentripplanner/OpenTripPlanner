@@ -79,6 +79,11 @@ public class SiriETGooglePubsubUpdaterConfig {
         .of("fuzzyTripMatching")
         .since(V2_1)
         .summary("If the trips should be matched fuzzily.")
+        .asBoolean(false),
+      c
+        .of("detailedMetrics")
+        .since(V2_1)
+        .summary("If detailed metrics should be collected.")
         .asBoolean(false)
     );
   }

@@ -174,7 +174,8 @@ class ModifiedTripBuilderTest {
       List.of(),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -203,7 +204,8 @@ class ModifiedTripBuilderTest {
       List.of(),
       true,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -247,7 +249,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -297,7 +300,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -345,7 +349,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -395,7 +400,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -451,7 +457,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
@@ -496,7 +503,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "TST"
     )
       .build();
 
