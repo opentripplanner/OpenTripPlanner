@@ -24,6 +24,7 @@
               __typename
               ... on Entrance {
                 code
+                accessible
               }
             }
           }

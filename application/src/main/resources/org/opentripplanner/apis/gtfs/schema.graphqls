@@ -449,6 +449,8 @@ type Emissions {
 
 "Station entrance or exit."
 type Entrance {
+  "True if the entrance is wheelchair accessible."
+  accessible: Boolean
   "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
   code: String
   "ID of the entrance in the format of `FeedId:EntranceId`."

@@ -104,11 +104,9 @@ class VertexGenerator {
 
       if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {
         String ref = node.getTag("ref");
-        if (ref != null) {
-          iv = vertexFactory.stationEntrance(nid, coordinate, ref);
-        } else {
-          iv = vertexFactory.stationEntrance(nid, coordinate, null);
-        }
+
+        boolean accessible = node.isTag("wheelchair", "yes");
+        iv = vertexFactory.stationEntrance(nid, coordinate, ref, accessible);
       }
 
       if (iv == null) {

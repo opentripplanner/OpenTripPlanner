@@ -235,7 +235,7 @@ class GraphQLIntegrationTest {
 
     var step3 = walkStep("entrance")
       .withRelativeDirection(RelativeDirection.CONTINUE)
-      .withEntrance(Entrance.withCode("A"))
+      .withEntrance(Entrance.withCodeAndAccessible("A", true))
       .build();
 
     Itinerary i1 = newItinerary(A, T11_00)

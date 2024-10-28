@@ -94,8 +94,13 @@ public class VertexFactory {
     return addToGraph(new ExitVertex(coordinate.x, coordinate.y, nid, exitName));
   }
 
-  public StationEntranceVertex stationEntrance(long nid, Coordinate coordinate, String code) {
-    return addToGraph(new StationEntranceVertex(coordinate.x, coordinate.y, nid, code));
+  public StationEntranceVertex stationEntrance(
+    long nid,
+    Coordinate coordinate,
+    String code,
+    boolean accessible
+  ) {
+    return addToGraph(new StationEntranceVertex(coordinate.x, coordinate.y, nid, code, accessible));
   }
 
   public OsmVertex osm(

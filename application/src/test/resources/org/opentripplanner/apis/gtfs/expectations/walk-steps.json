@@ -29,7 +29,8 @@
                     "absoluteDirection" : null,
                     "entity" : {
                       "__typename" : "Entrance",
-                      "code": "A"
+                      "code": "A",
+                      "accessible": true
                     }
                   }
                 ]

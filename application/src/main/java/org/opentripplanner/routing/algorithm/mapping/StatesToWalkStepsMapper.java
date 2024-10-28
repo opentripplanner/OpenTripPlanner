@@ -529,7 +529,9 @@ public class StatesToWalkStepsMapper {
     var step = createWalkStep(forwardState, backState);
 
     step.withRelativeDirection(RelativeDirection.CONTINUE);
-    step.withEntrance(Entrance.withCode(((StationEntranceVertex) backState.getVertex()).getCode()));
+
+    StationEntranceVertex vertex = (StationEntranceVertex) backState.getVertex();
+    step.withEntrance(Entrance.withCodeAndAccessible(vertex.getCode(), vertex.isAccessible()));
     return step;
   }
 
