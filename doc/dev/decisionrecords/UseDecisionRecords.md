@@ -15,7 +15,7 @@ a bit more discussion and explanation, then we will create a PR with a document 
 Use the [template](/doc/dev/decisionrecords/_TEMPLATE.md) as a starting point for documenting the
 decision.
 
-### How to discuss and document a Decision Record
+### How to Discuss and Document a Decision Record
 
 - Create a new pull request and describe the decision record by adding a document to the 
   `/doc/dev/decisionrecords` folder. Use the [template](/doc/dev/decisionrecords/_TEMPLATE.md).

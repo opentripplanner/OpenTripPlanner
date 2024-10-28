@@ -63,7 +63,7 @@ them.
 
 Naming convention for builders with and without a context.
 
-#### Graph builds and tests run without a context
+#### Graph Builds and Tests Run Without a Context
 
 ```java
 // Create a new Stop

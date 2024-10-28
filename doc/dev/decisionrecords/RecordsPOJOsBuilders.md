@@ -27,7 +27,7 @@ types of these fields.
 
 OTP used a simple builder pattern in many places, especially when creating immutable types.
 
-#### Builder conventions
+#### Builder Conventions
 
 - Use factory methods to create builder—either `of` or `copyOf`. The `copyOf` uses an existing
   instance as its base. The `of` creates a builder with all default values set. All constructors
@@ -47,7 +47,7 @@ OTP used a simple builder pattern in many places, especially when creating immut
 - For nested builders, see the field `nested` in the example.
 
 <details>
-  <summary><b>Builder example</b></summary>
+  <summary><b>Builder Example</b></summary>
 
 ```java
 /**

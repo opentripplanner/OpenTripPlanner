@@ -53,7 +53,7 @@ But, if you have set a custom code style in your settings (as we used until OTP 
 to  change to the _Project_ code style. Open the `Preferences` from the menu and select _Editor >
 Code Style_. Then select **Project** in the \_Scheme drop down.
 
-#### Run Prettier Maven Plugin as an external tool in IntelliJ
+#### Run Prettier Maven Plugin as an External Tool in IntelliJ
 
 You can run the Prettier Maven plugin as an external tool in IntelliJ. Set it up as an
 `External tool` and assign a keyboard shortcut to the tool execution.
@@ -70,7 +70,7 @@ Working Directory: $ProjectFileDir$
 > **Tip!**  Add an unused key shortcut to execute the external tool. Then you can use the old 
 > shortcut to format other file types.
 
-#### Install File Watchers plugin in IntelliJ
+#### Install File Watchers Plugin in IntelliJ
 
 You can also configure IntelliJ to run Prettier every time IntelliJ saves a Java file. But if you
 are editing the file at the same time, you will get a warning that the file in memory and the file
@@ -106,9 +106,8 @@ feel free to share it.
 
 Some of the classes in OTP have a lot of fields and methods. Keeping members sorted reduces merge
 conflicts. Adding fields and methods to the end of the list will cause merge conflicts more often
-than will inserting methods and fields in an ordered list. Fields and methods can be sorted in
-"feature" sections or alphabetically, but stick to it and respect it when adding new methods and
-fields.
+than inserting methods and fields in an ordered list. Fields and methods can be sorted in "feature"
+sections or alphabetically, but stick to it and respect it when adding new methods and fields.
 
 The provided formatter will group class members in this order:
 
@@ -166,7 +165,7 @@ context. Please avoid including trivial Javadoc or the empty Javadoc stubs added
 - On fields:
     - Fields should be marked as `@Nullable` if they are nullable.
 
-Use of `@NonNull` annotation is not allowed. It should be assumed methods/parameters/fields are
+Use of `@Nonnull` annotation is not allowed. It should be assumed methods/parameters/fields are
 non-null if they are not marked as `@Nullable`. However, there are places where the `@Nullable`
 annotation is missing even if it should have been used. Those can be updated to use the `@Nullable`
 annotation.
