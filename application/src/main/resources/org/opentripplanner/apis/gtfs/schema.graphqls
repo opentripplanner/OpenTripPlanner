@@ -1734,13 +1734,13 @@ type QueryType {
   "Get all vehicle rental stations within the specified bounding box"
   vehicleRentalStationsByBbox(
     "Northern bound of the bounding box"
-    maximumLatitude: Float!,
+    maximumLatitude: CoordinateValue!,
     "Eastern bound of the bounding box"
-    maximumLongitude: Float!,
+    maximumLongitude: CoordinateValue!,
     "Southern bound of the bounding box"
-    minimumLatitude: Float!,
+    minimumLatitude: CoordinateValue!,
     "Western bound of the bounding box"
-    minimumLongitude: Float!
+    minimumLongitude: CoordinateValue!
   ): [VehicleRentalStation]
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
