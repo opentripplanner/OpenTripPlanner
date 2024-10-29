@@ -11,15 +11,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g) October 20, 2009
  */
 public class DateUtils {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
   private static final int SANITY_CHECK_CUTOFF_YEAR = 1000;
 
@@ -53,9 +49,6 @@ public class DateUtils {
    */
   @Nullable
   public static ZonedDateTime toZonedDateTime(String date, String time, ZoneId tz) {
-    //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
-    LOG.debug("Parsing date {} and time {}", date, time);
-    LOG.debug("using timezone {}", tz);
     ZonedDateTime retVal = ZonedDateTime.ofInstant(Instant.now(), tz);
     if (date != null) {
       LocalDate localDate = parseDate(date);
@@ -80,7 +73,6 @@ public class DateUtils {
         retVal = LocalDateTime.of(retVal.toLocalDate(), localTime).atZone(tz);
       }
     }
-    LOG.debug("resulting date is {}", retVal);
     return retVal;
   }
 
@@ -136,30 +128,6 @@ public class DateUtils {
     } catch (Exception e) {
       return 0;
     }
-  }
-
-  /**
-   * Converts the given time in seconds to a <code>String</code> in the format h:mm.
-   *
-   * @param seconds the time in seconds.
-   * @return a <code>String</code> representing the time in the format h:mm
-   */
-  public static String secToHHMM(int seconds) {
-    int min;
-    String sign = "";
-
-    if (seconds >= 0) {
-      min = seconds / 60;
-      sign = "";
-    } else {
-      min = -seconds / 60;
-      sign = "-";
-    }
-
-    int mm = min % 60;
-    int hh = min / 60;
-
-    return String.format("%s%d:%02d", sign, hh, mm);
   }
 
   public static String trim(String str) {
@@ -227,11 +195,9 @@ public class DateUtils {
       if (hms.length > 2) {
         sec = Integer.parseInt(trim(hms[2]));
       }
-
       return LocalTime.of(hour, min, sec);
-    } catch (Exception ignore) {
-      LOG.info("Time '{}' didn't parse", time);
-      return null;
+    } catch (Exception e) {
+      throw new RuntimeException("Could not parse time: " + time, e);
     }
   }
 }
