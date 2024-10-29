@@ -39,7 +39,7 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class AlternativeLegs {
 
-  public enum SearchMode {
+  public enum SearchDirection {
     NEXT,
     PREVIOUS,
   }
@@ -50,10 +50,18 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchMode searchMode,
+    SearchDirection searchDirection,
     AlternativeLegsFilter filter
   ) {
-    return getAlternativeLegs(leg, numberLegs, transitService, searchMode, filter, false, false);
+    return getAlternativeLegs(
+      leg,
+      numberLegs,
+      transitService,
+      searchDirection,
+      filter,
+      false,
+      false
+    );
   }
 
   /**
@@ -63,7 +71,7 @@ public class AlternativeLegs {
    * @param numberLegs           The number of alternative legs requested. If fewer legs are found,
    *                             only the found legs are returned.
    * @param transitService       The transit service used for the search
-   * @param searchMode           Indicating whether the alternative legs should depart
+   * @param searchDirection           Indicating whether the alternative legs should depart
    *                             earlier (PREVIOUS) or later (NEXT) than the original.
    * @param filter               AlternativeLegsFilter indicating which properties of the original
    *                             leg should not change in the alternative legs
@@ -78,7 +86,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchMode searchMode,
+    SearchDirection searchDirection,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
     boolean exactDestinationStop
@@ -101,7 +109,7 @@ public class AlternativeLegs {
       ScheduledTransitLeg::getStartTime
     );
 
-    if (searchMode == SearchMode.PREVIOUS) {
+    if (searchDirection == SearchDirection.PREVIOUS) {
       legComparator = legComparator.reversed();
     }
 
@@ -115,7 +123,7 @@ public class AlternativeLegs {
       .distinct()
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
-        generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchMode)
+        generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchDirection)
       )
       .filter(Predicate.not(leg::isPartiallySameTransitLeg))
       .sorted(legComparator)
@@ -132,7 +140,7 @@ public class AlternativeLegs {
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
-    SearchMode searchMode
+    SearchDirection searchDirection
   ) {
     TripPattern pattern = tripPatternBetweenStops.tripPattern;
     int boardingPosition = tripPatternBetweenStops.positions.boardingPosition;
@@ -145,7 +153,7 @@ public class AlternativeLegs {
       tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
-    if (searchMode == SearchMode.PREVIOUS) {
+    if (searchDirection == SearchDirection.PREVIOUS) {
       comparator = comparator.reversed();
     }
 
@@ -175,7 +183,7 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange = searchMode == SearchMode.PREVIOUS
+        boolean departureTimeInRange = searchDirection == SearchDirection.PREVIOUS
           ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
           : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 
