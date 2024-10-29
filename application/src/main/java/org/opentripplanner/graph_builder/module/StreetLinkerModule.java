@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -87,24 +88,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.startMessage());
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
-
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips =
-        timetableRepository
-          .getAllFlexTrips()
-          .stream()
-          .flatMap(t -> t.getStops().stream())
-          .collect(Collectors.toSet());
-
-      stopLocationsUsedForFlexTrips.addAll(
-        stopLocationsUsedForFlexTrips
-          .stream()
-          .filter(GroupStop.class::isInstance)
-          .map(GroupStop.class::cast)
-          .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-          .toList()
-      );
+      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(timetableRepository);
     }
+
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
@@ -120,7 +108,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
       StopLinkType linkType = StopLinkType.WALK_ONLY;
 
       if (
-        OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(tStop.getStop())
+        (
+          OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(tStop.getStop())
+        ) ||
+        stopLocationsUsedForCarsAllowedTrips.contains(tStop.getStop())
       ) {
         linkType = StopLinkType.WALK_AND_CAR;
       }
@@ -364,6 +355,26 @@ public class StreetLinkerModule implements GraphBuilderModule {
       vehicleParking.getEntrances().remove(entrance);
       return null;
     }
+  }
+
+  private Set<StopLocation> getStopLocationsUsedForFlexTrips(
+    TimetableRepository timetableRepository
+  ) {
+    Set<StopLocation> stopLocations = timetableRepository
+      .getAllFlexTrips()
+      .stream()
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   private enum StopLinkType {
