@@ -205,14 +205,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
       var numberOfStops = pattern.numberOfStops();
       var result = new StopInPatternModel[numberOfStops];
       for (var i = 0; i < numberOfStops; i++) {
-        result[i] =
-          new StopInPatternModel(
-            pattern.getStop(i),
-            pattern,
-            i,
-            pattern.getBoardType(i),
-            pattern.getAlightType(i)
-          );
+        result[i] = StopInPatternModel.fromPatternAndIndex(pattern, i);
       }
       return List.of(result);
     };

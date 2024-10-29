@@ -10,4 +10,14 @@ public record StopInPatternModel(
   int indexInPattern,
   PickDrop pickupType,
   PickDrop dropoffType
-) {}
+) {
+  public static StopInPatternModel fromPatternAndIndex(TripPattern pattern, int indexInPattern) {
+    return new StopInPatternModel(
+      pattern.getStop(indexInPattern),
+      pattern,
+      indexInPattern,
+      pattern.getBoardType(indexInPattern),
+      pattern.getAlightType(indexInPattern)
+    );
+  }
+}
