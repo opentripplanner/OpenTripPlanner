@@ -122,8 +122,6 @@ public interface TransitService {
    */
   Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
 
-  Collection<Trip> getTripsForStop(StopLocation stop);
-
   Collection<Operator> getAllOperators();
 
   Operator getOperatorForId(FeedScopedId id);
@@ -131,8 +129,6 @@ public interface TransitService {
   RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
-
-  Collection<RegularStop> listRegularStops();
 
   Collection<GroupStop> listGroupStops();
 
@@ -149,8 +145,6 @@ public interface TransitService {
   Collection<StopLocationsGroup> listStopLocationGroups();
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
-
-  AreaStop getAreaStop(FeedScopedId id);
 
   /**
    * Return the trip for the given id, including trips created in real time.
