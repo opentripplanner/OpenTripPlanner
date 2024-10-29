@@ -615,6 +615,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Object>> stops();
 
+    public DataFetcher<Iterable<Object>> stopsInPattern();
+
     public DataFetcher<Iterable<Trip>> trips();
 
     public DataFetcher<Iterable<Trip>> tripsForDate();
@@ -1040,6 +1042,18 @@ public class GraphQLDataFetchers {
     public DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
 
     public DataFetcher<Iterable<Geometry>> googleEncoded();
+  }
+
+  public interface GraphQLStopInPattern {
+    public DataFetcher<String> dropoffType();
+
+    public DataFetcher<Integer> indexInPattern();
+
+    public DataFetcher<TripPattern> pattern();
+
+    public DataFetcher<String> pickupType();
+
+    public DataFetcher<Object> stop();
   }
 
   /** Stop that should (but not guaranteed) to exist on a route. */

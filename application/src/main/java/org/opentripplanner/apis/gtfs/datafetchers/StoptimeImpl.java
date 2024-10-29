@@ -2,10 +2,12 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -24,14 +26,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<String> dropoffType() {
-    return environment ->
-      switch (getSource(environment).getDropoffType()) {
-        case SCHEDULED -> "SCHEDULED";
-        case NONE -> "NONE";
-        case CALL_AGENCY -> "CALL_AGENCY";
-        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
-        case CANCELLED -> null;
-      };
+    return environment -> getGraphqlPickDrop(getSource(environment).getDropoffType());
   }
 
   @Override
@@ -42,14 +37,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<String> pickupType() {
-    return environment ->
-      switch (getSource(environment).getPickupType()) {
-        case SCHEDULED -> "SCHEDULED";
-        case NONE -> "NONE";
-        case CALL_AGENCY -> "CALL_AGENCY";
-        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
-        case CANCELLED -> null;
-      };
+    return environment -> getGraphqlPickDrop(getSource(environment).getPickupType());
   }
 
   @Override
@@ -108,6 +96,17 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).getTrip();
+  }
+
+  @Nullable
+  static String getGraphqlPickDrop(PickDrop pickDrop) {
+    return switch (pickDrop) {
+      case SCHEDULED -> "SCHEDULED";
+      case NONE -> "NONE";
+      case CALL_AGENCY -> "CALL_AGENCY";
+      case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
+      case CANCELLED -> null;
+    };
   }
 
   private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
