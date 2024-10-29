@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import java.time.LocalDate;
 import java.time.Period;

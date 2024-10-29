@@ -1,6 +1,6 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
-import static org.opentripplanner.framework.lang.OtpNumberFormat.formatTwoDecimals;
+import static org.opentripplanner.utils.lang.OtpNumberFormat.formatTwoDecimals;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

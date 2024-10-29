@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.logging;
+package org.opentripplanner.utils.logging;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,8 +7,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.text.FileSizeToTextConverter;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.text.FileSizeToTextConverter;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * The progress tracker notify the caller based a time interval.

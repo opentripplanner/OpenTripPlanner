@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.organization;
 
-import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
+import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.time.ZoneId;
 import java.util.Objects;

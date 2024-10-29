@@ -1,9 +1,9 @@
-package org.opentripplanner.framework.collection;
+package org.opentripplanner.utils.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.framework.collection.ListUtils.first;
-import static org.opentripplanner.framework.collection.ListUtils.last;
+import static org.opentripplanner.utils.collection.ListUtils.first;
+import static org.opentripplanner.utils.collection.ListUtils.last;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

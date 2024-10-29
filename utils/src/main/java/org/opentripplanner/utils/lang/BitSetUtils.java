@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 /**
  * A compact bit set utility class. It rely on the client to store the bit set himself (either as a

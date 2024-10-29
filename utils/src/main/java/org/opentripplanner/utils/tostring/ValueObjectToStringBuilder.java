@@ -1,11 +1,11 @@
-package org.opentripplanner.framework.tostring;
+package org.opentripplanner.utils.tostring;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Use this to-string-builder to build value objects. A [ValueObject](http://wiki.c2.com/?ValueObject)

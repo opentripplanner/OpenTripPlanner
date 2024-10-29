@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;

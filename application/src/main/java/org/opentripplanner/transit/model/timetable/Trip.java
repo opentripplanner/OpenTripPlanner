@@ -3,12 +3,11 @@ package org.opentripplanner.transit.model.timetable;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
-import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -18,6 +17,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a

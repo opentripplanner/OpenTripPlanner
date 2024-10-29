@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.

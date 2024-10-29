@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.text;
+package org.opentripplanner.utils.text;
 
 /**
  * Converts a byte array to its hexadecimal representation

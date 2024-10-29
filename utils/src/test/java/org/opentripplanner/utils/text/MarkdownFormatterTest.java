@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.text;
+package org.opentripplanner.utils.text;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

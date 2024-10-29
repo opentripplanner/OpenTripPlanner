@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>otp-framework</artifactId>
+            <artifactId>otp-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 

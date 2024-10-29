@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.text;
+package org.opentripplanner.utils.text;
 
 /**
  * This class is used to escape characters in a string, removing a special character from

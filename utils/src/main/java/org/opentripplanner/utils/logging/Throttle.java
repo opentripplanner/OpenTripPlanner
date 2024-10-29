@@ -1,7 +1,7 @@
-package org.opentripplanner.framework.logging;
+package org.opentripplanner.utils.logging;
 
 import java.time.Duration;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class can be used to throttle (logging) events.

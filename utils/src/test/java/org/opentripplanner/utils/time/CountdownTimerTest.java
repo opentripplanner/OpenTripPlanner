@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

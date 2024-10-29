@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 public class ParetoSetTest {
 

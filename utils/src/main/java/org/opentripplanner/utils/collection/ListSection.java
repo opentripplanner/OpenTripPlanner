@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.collection;
+package org.opentripplanner.utils.collection;
 
 /**
  * This enum is used to signal which part of a list an operation apply to. You may remove elements

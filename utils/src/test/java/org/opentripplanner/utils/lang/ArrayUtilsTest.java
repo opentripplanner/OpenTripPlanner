@@ -1,8 +1,8 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.lang.ArrayUtils.hasContent;
+import static org.opentripplanner.utils.lang.ArrayUtils.hasContent;
 
 import org.junit.jupiter.api.Test;
 

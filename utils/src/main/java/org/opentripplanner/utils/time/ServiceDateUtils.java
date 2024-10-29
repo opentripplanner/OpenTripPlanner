@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import java.text.ParseException;
 import java.time.Duration;

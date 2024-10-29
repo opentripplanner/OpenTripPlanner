@@ -1,18 +1,18 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.framework.lang.IntUtils.concat;
-import static org.opentripplanner.framework.lang.IntUtils.intArray;
-import static org.opentripplanner.framework.lang.IntUtils.intArrayToString;
-import static org.opentripplanner.framework.lang.IntUtils.intToString;
-import static org.opentripplanner.framework.lang.IntUtils.requireInRange;
-import static org.opentripplanner.framework.lang.IntUtils.requireNotNegative;
-import static org.opentripplanner.framework.lang.IntUtils.requireNullOrNotNegative;
-import static org.opentripplanner.framework.lang.IntUtils.shiftArray;
-import static org.opentripplanner.framework.lang.IntUtils.standardDeviation;
+import static org.opentripplanner.utils.lang.IntUtils.concat;
+import static org.opentripplanner.utils.lang.IntUtils.intArray;
+import static org.opentripplanner.utils.lang.IntUtils.intArrayToString;
+import static org.opentripplanner.utils.lang.IntUtils.intToString;
+import static org.opentripplanner.utils.lang.IntUtils.requireInRange;
+import static org.opentripplanner.utils.lang.IntUtils.requireNotNegative;
+import static org.opentripplanner.utils.lang.IntUtils.requireNullOrNotNegative;
+import static org.opentripplanner.utils.lang.IntUtils.shiftArray;
+import static org.opentripplanner.utils.lang.IntUtils.standardDeviation;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

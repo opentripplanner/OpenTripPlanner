@@ -1,15 +1,15 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.lang.DoubleUtils.requireInRange;
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo1Decimal;
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo3Decimals;
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo4Decimals;
-import static org.opentripplanner.framework.lang.DoubleUtils.roundToZeroDecimals;
+import static org.opentripplanner.utils.lang.DoubleUtils.requireInRange;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo1Decimal;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo3Decimals;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo4Decimals;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundToZeroDecimals;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.collection;
+package org.opentripplanner.utils.collection;
 
 import java.util.Comparator;
 

@@ -1,10 +1,10 @@
-package org.opentripplanner.framework.text;
+package org.opentripplanner.utils.text;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.framework.text.Table.Align.Center;
-import static org.opentripplanner.framework.text.Table.Align.Left;
-import static org.opentripplanner.framework.text.Table.Align.Right;
+import static org.opentripplanner.utils.text.Table.Align.Center;
+import static org.opentripplanner.utils.text.Table.Align.Left;
+import static org.opentripplanner.utils.text.Table.Align.Right;
 
 import org.junit.jupiter.api.Test;
 

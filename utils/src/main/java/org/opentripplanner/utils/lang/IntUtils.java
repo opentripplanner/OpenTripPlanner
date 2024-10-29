@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 import java.util.ArrayList;
 import java.util.Arrays;

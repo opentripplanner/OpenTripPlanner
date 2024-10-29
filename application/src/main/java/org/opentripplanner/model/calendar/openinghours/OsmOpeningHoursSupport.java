@@ -3,7 +3,7 @@ package org.opentripplanner.model.calendar.openinghours;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class OsmOpeningHoursSupport {
 

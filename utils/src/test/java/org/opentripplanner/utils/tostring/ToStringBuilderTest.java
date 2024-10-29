@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.tostring;
+package org.opentripplanner.utils.tostring;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.framework.time.ZoneIds;
+import org.opentripplanner.utils.time.TimeUtils;
+import org.opentripplanner.utils.time.ZoneIds;
 
 public class ToStringBuilderTest {
 

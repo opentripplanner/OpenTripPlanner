@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.logging;
+package org.opentripplanner.utils.logging;
 
 import java.time.Duration;
 import java.util.ArrayList;

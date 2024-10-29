@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.model;
 
 import java.time.Duration;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * Tuple of time(duration) and cost.

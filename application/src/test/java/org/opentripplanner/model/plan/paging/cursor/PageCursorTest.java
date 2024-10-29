@@ -2,12 +2,12 @@ package org.opentripplanner.model.plan.paging.cursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.framework.collection.ListSection.HEAD;
-import static org.opentripplanner.framework.collection.ListSection.TAIL;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
 import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
+import static org.opentripplanner.utils.collection.ListSection.HEAD;
+import static org.opentripplanner.utils.collection.ListSection.TAIL;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,13 +21,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.collection.ListSection;
 
 class PageCursorTest implements PlanTestConstants {
 

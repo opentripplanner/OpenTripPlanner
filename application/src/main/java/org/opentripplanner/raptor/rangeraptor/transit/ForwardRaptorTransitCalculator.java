@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -14,6 +13,7 @@ import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.util.IntIterators;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   extends ForwardTransitCalculator<T>

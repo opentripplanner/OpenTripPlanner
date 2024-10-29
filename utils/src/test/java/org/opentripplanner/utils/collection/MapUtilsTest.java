@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.collection;
+package org.opentripplanner.utils.collection;
 
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -6,7 +6,7 @@ import static java.util.function.Function.identity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.collection.MapUtils.mapToList;
+import static org.opentripplanner.utils.collection.MapUtils.mapToList;
 
 import java.util.Collections;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import java.security.SecureRandom;
 import java.time.Duration;

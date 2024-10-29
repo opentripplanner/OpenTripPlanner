@@ -1,13 +1,13 @@
-package org.opentripplanner.framework.time;
+package org.opentripplanner.utils.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2days;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax2hours;
-import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativeMax30minutes;
-import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
+import static org.opentripplanner.utils.time.DurationUtils.requireNonNegative;
+import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax2days;
+import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax2hours;
+import static org.opentripplanner.utils.time.DurationUtils.requireNonNegativeMax30minutes;
+import static org.opentripplanner.utils.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;

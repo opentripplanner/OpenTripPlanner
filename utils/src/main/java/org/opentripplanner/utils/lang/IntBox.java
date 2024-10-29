@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.utils.lang;
 
 /**
  * An IntBox is a writable container for an int. The most common use-case for this class is to

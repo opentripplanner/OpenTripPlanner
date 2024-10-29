@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.tostring;
+package org.opentripplanner.utils.tostring;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * When debug logging it is much more readable if the logging is nicely formatted with line-breaks.
