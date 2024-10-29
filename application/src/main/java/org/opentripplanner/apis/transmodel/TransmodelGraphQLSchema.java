@@ -114,6 +114,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.api.request.TripRequestBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -1300,40 +1302,19 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            List<FeedScopedId> lineIds = mapIDsToDomainNullSafe(
-              environment.getArgumentOrDefault("lines", List.of())
-            );
-            List<String> privateCodes = environment.getArgumentOrDefault("privateCodes", List.of());
-            List<LocalDate> activeServiceDates = environment.getArgumentOrDefault(
-              "activeDates",
-              List.of()
-            );
+            var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
+            var lineIds = mapIDsToDomainNullSafe(environment.getArgument("lines"));
+            var privateCodes = environment.<List<String>>getArgument("privateCodes");
+            var activeServiceDates = environment.<List<LocalDate>>getArgument("activeDates");
 
-            // TODO OTP2 - Use FeedScoped ID
-            List<String> authorities = environment.getArgumentOrDefault("authorities", List.of());
-            TransitService transitService = GqlUtil.getTransitService(environment);
-            return transitService
-              .getAllTrips()
-              .stream()
-              .filter(t -> lineIds.isEmpty() || lineIds.contains(t.getRoute().getId()))
-              .filter(t ->
-                privateCodes.isEmpty() || privateCodes.contains(t.getNetexInternalPlanningCode())
-              )
-              .filter(t ->
-                authorities.isEmpty() ||
-                authorities.contains(t.getRoute().getAgency().getId().getId())
-              )
-              .filter(t ->
-                (
-                  activeServiceDates.isEmpty() ||
-                  transitService
-                    .getCalendarService()
-                    .getServiceDatesForServiceId(t.getServiceId())
-                    .stream()
-                    .anyMatch(activeServiceDates::contains)
-                )
-              )
-              .collect(Collectors.toList());
+            TripRequestBuilder tripRequestBuilder = TripRequest
+              .of()
+              .withAuthorities(authorities)
+              .withLines(lineIds)
+              .withPrivateCodes(privateCodes)
+              .withActiveDates(activeServiceDates);
+
+            return GqlUtil.getTransitService(environment).getTrips(tripRequestBuilder.build());
           })
           .build()
       )
