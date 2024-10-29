@@ -39,24 +39,21 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class AlternativeLegs {
 
+  public enum SearchMode {
+    NEXT,
+    PREVIOUS,
+  }
+
   public static final int ZERO_COST = 0;
 
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    boolean searchBackward,
+    SearchMode searchMode,
     AlternativeLegsFilter filter
   ) {
-    return getAlternativeLegs(
-      leg,
-      numberLegs,
-      transitService,
-      searchBackward,
-      filter,
-      false,
-      false
-    );
+    return getAlternativeLegs(leg, numberLegs, transitService, searchMode, filter, false, false);
   }
 
   /**
@@ -66,9 +63,8 @@ public class AlternativeLegs {
    * @param numberLegs           The number of alternative legs requested. If fewer legs are found,
    *                             only the found legs are returned.
    * @param transitService       The transit service used for the search
-   * @param includeDepartBefore  Boolean indicating whether the alternative legs should depart
-   *                             earlier or later than the original leg True if earlier, false if
-   *                             later.
+   * @param searchMode           Indicating whether the alternative legs should depart
+   *                             earlier (PREVIOUS) or later (NEXT) than the original.
    * @param filter               AlternativeLegsFilter indicating which properties of the original
    *                             leg should not change in the alternative legs
    * @param exactOriginStop      Boolean indicating whether the exact departure stop of the original
@@ -82,7 +78,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    boolean includeDepartBefore,
+    SearchMode searchMode,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
     boolean exactDestinationStop
@@ -105,7 +101,7 @@ public class AlternativeLegs {
       ScheduledTransitLeg::getStartTime
     );
 
-    if (includeDepartBefore) {
+    if (searchMode == SearchMode.PREVIOUS) {
       legComparator = legComparator.reversed();
     }
 
@@ -119,13 +115,7 @@ public class AlternativeLegs {
       .distinct()
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
-        generateLegs(
-          transitService,
-          t,
-          leg.getStartTime(),
-          leg.getServiceDate(),
-          includeDepartBefore
-        )
+        generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchMode)
       )
       .filter(Predicate.not(leg::isPartiallySameTransitLeg))
       .sorted(legComparator)
@@ -142,7 +132,7 @@ public class AlternativeLegs {
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
-    boolean includeDepartBefore
+    SearchMode searchMode
   ) {
     TripPattern pattern = tripPatternBetweenStops.tripPattern;
     int boardingPosition = tripPatternBetweenStops.positions.boardingPosition;
@@ -155,7 +145,7 @@ public class AlternativeLegs {
       tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
-    if (includeDepartBefore) {
+    if (searchMode == SearchMode.PREVIOUS) {
       comparator = comparator.reversed();
     }
 
@@ -185,7 +175,7 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange = includeDepartBefore
+        boolean departureTimeInRange = searchMode == SearchMode.PREVIOUS
           ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
           : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 
