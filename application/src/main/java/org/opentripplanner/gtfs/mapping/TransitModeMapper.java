@@ -17,7 +17,8 @@ public class TransitModeMapper {
     }
 
     /* TPEG Extension  https://groups.google.com/d/msg/gtfs-changes/keT5rTPS7Y0/71uMz2l6ke0J */
-    if (routeType >= 100 && routeType < 200) { // Railway Service
+    if (routeType >= 100 && routeType < 200) {
+      // Railway Service
       return TransitMode.RAIL;
     } else if (routeType >= 200 && routeType < 300) { //Coach Service
       return OTPFeature.GtfsCoach.isOn() ? TransitMode.COACH : TransitMode.BUS;
@@ -29,24 +30,32 @@ public class TransitModeMapper {
         return TransitMode.MONORAIL;
       }
       return TransitMode.RAIL;
-    } else if (routeType >= 500 && routeType < 700) { //Metro Service and Underground Service
+    } else if (routeType >= 500 && routeType < 700) {
+      // Metro Service and Underground Service
       return TransitMode.SUBWAY;
-    } else if (routeType >= 700 && routeType < 900) { //Bus Service and Trolleybus service
-      if (routeType == 800) {
-        return TransitMode.TROLLEYBUS;
-      }
+    } else if (routeType >= 700 && routeType < 800) {
+      // Bus Service
       return TransitMode.BUS;
-    } else if (routeType >= 900 && routeType < 1000) { //Tram service
+    } else if (routeType >= 800 && routeType < 900) {
+      // Trolleybus Service
+      return TransitMode.TROLLEYBUS;
+    } else if (routeType >= 900 && routeType < 1000) {
+      // Tram service
       return TransitMode.TRAM;
-    } else if (routeType >= 1000 && routeType < 1100) { //Water Transport Service
+    } else if (routeType >= 1000 && routeType < 1100) {
+      // Water Transport Service
       return TransitMode.FERRY;
-    } else if (routeType >= 1100 && routeType < 1200) { //Air Service
+    } else if (routeType >= 1100 && routeType < 1200) {
+      // Air Service
       return TransitMode.AIRPLANE;
-    } else if (routeType >= 1200 && routeType < 1300) { //Ferry Service
+    } else if (routeType >= 1200 && routeType < 1300) {
+      // Ferry Service
       return TransitMode.FERRY;
-    } else if (routeType >= 1300 && routeType < 1400) { //Telecabin Service
+    } else if (routeType >= 1300 && routeType < 1400) {
+      // Telecabin Service
       return TransitMode.GONDOLA;
-    } else if (routeType >= 1400 && routeType < 1500) { //Funicular Service
+    } else if (routeType >= 1400 && routeType < 1500) {
+      // Funicular Service
       return TransitMode.FUNICULAR;
     } else if (routeType >= 1551 && routeType < 1561) {
       // Carpooling, not defined anywhere, so we've chosen this number space
@@ -54,11 +63,13 @@ public class TransitModeMapper {
       // standardise
       return TransitMode.CARPOOL;
     } else if (routeType >= 1500 && routeType < 1599) {
-      //Taxi Service
+      // Taxi Service
       return TransitMode.TAXI;
-    } else if (routeType >= 1600 && routeType < 1700) { //Self drive
+    } else if (routeType >= 1600 && routeType < 1700) {
+      // Self drive
       return TransitMode.BUS;
-    } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
+    } else if (routeType >= 1700 && routeType < 1800) {
+      // Miscellaneous Service
       return null;
     }
     /* Original GTFS route types. Should these be checked before TPEG types? */

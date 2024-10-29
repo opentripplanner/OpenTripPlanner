@@ -45,7 +45,7 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     var vertices = graph.getVertices();
-    var stops = timetableRepository.getStopModel().listStopLocations();
+    var stops = timetableRepository.getSiteRepository().listStopLocations();
     WorldEnvelope envelope = build(vertices, stops);
     worldEnvelopeRepository.saveEnvelope(envelope);
   }

@@ -89,14 +89,14 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var stopModel = TEST_MODEL
-      .stopModelBuilder()
+    var siteRepository = TEST_MODEL
+      .siteRepositoryBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)
       .build();
 
-    var timetableRepository = new TimetableRepository(stopModel, new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();

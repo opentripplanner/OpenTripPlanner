@@ -14,7 +14,7 @@
 
 To enable this turn on the feature `GoogleCloudStorage`. OTP can load or store artifacts from one or
 more Google Cloud Storge locations. Each artifact must be configured in the _build-config.json_:
-See [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
+See [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 on how to configure artifacts.
 
 Example (build-config.json):

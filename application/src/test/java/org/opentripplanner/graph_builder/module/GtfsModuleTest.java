@@ -18,7 +18,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 class GtfsModuleTest {
@@ -70,9 +70,9 @@ class GtfsModuleTest {
 
   private static TestModels buildTestModel() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
+    var siteRepository = new SiteRepository();
     var graph = new Graph(deduplicator);
-    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     return new TestModels(graph, timetableRepository);
   }
 

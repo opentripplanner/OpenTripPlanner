@@ -48,7 +48,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 public class OrcaFareServiceTest {
 
@@ -662,15 +662,15 @@ public class OrcaFareServiceTest {
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
 
-    var stopModelBuilder = StopModel.of();
+    var siteRepositoryBuilder = SiteRepository.of();
 
     // Set up stops
-    RegularStop firstStop = stopModelBuilder
+    RegularStop firstStop = siteRepositoryBuilder
       .regularStop(new FeedScopedId(agencyId, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString(firstStopName))
       .build();
-    RegularStop lastStop = stopModelBuilder
+    RegularStop lastStop = siteRepositoryBuilder
       .regularStop(new FeedScopedId(agencyId, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString(lastStopName))

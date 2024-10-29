@@ -199,7 +199,7 @@ class AddedTripBuilder {
         stopSequence == (calls.size() - 1)
       );
 
-      // Drop this update if the call refers to an unknown stop (not present in the stop model).
+      // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
         return UpdateError.result(tripId, NO_VALID_STOPS);
       }
@@ -335,7 +335,7 @@ class AddedTripBuilder {
   }
 
   /**
-   * Map the call to a StopTime or return null if the stop cannot be found in the stop model.
+   * Map the call to a StopTime or return null if the stop cannot be found in the site repository.
    */
   private StopTime createStopTime(
     Trip trip,
