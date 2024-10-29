@@ -2195,6 +2195,14 @@ type Stoptime {
   "The stop where this arrival/departure happens"
   stop: Stop
   """
+  The index of the stop in the pattern. This is required to start from 0 and be consecutive.
+  
+  The purpose of this field is to identify the position of the stop within the pattern so it can be
+  cross-referenced between different trips on the same pattern, as stopPosition can be different
+  between trips even within the same pattern.
+  """
+  stopIndex: Int!
+  """
   The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
   increasing integer sequence along the stops is valid.
     

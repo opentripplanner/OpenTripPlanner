@@ -1093,6 +1093,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Object> stop();
 
+    public DataFetcher<Integer> stopIndex();
+
     public DataFetcher<Integer> stopPosition();
 
     public DataFetcher<Boolean> timepoint();

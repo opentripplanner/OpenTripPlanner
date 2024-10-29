@@ -86,6 +86,11 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
+  public DataFetcher<Integer> stopIndex() {
+    return environment -> getSource(environment).getStopIndex();
+  }
+
+  @Override
   public DataFetcher<Integer> stopPosition() {
     return environment -> getSource(environment).getGtfsSequence();
   }
