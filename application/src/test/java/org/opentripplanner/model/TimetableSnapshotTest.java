@@ -33,6 +33,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -356,6 +357,59 @@ public class TimetableSnapshotTest {
       ConcurrentModificationException.class,
       () -> committedSnapshot.revertTripToScheduledTripPattern(null, null)
     );
+  }
+
+  @Test
+  void testClear() {
+    TimetableSnapshot snapshot = new TimetableSnapshot();
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
+
+    TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(
+      trip.getId(),
+      SERVICE_DATE
+    );
+    TripTimes updatedTriptimes = TripTimesFactory.tripTimes(
+      trip,
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
+    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
+      pattern,
+      updatedTriptimes,
+      SERVICE_DATE,
+      TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(SERVICE_DATE).build(),
+      true,
+      true
+    );
+
+    snapshot.update(realTimeTripUpdate);
+
+    assertNotNull(snapshot.getRealTimeAddedTrip(trip.getId()));
+    assertNotNull(snapshot.getRealTimeAddedPatternForTrip(trip));
+    assertFalse(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()).isEmpty());
+    assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
+    assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
+    assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
+
+    snapshot.clear(trip.getId().getFeedId());
+
+    assertNull(snapshot.getRealTimeAddedTrip(trip.getId()));
+    assertNull(snapshot.getRealTimeAddedPatternForTrip(trip));
+    assertNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
+    assertNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
+    assertNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
+    assertTrue(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()).isEmpty());
+
+    snapshot.update(realTimeTripUpdate);
+    snapshot.clear("another feed id");
+
+    assertNotNull(snapshot.getRealTimeAddedTrip(trip.getId()));
+    assertNotNull(snapshot.getRealTimeAddedPatternForTrip(trip));
+    assertFalse(snapshot.getRealTimeAddedPatternForRoute(pattern.getRoute()).isEmpty());
+    assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateById(trip.getId()));
+    assertNotNull(snapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate));
+    assertNotNull(snapshot.getRealtimeAddedRoute(pattern.getRoute().getId()));
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

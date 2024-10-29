@@ -972,24 +972,34 @@ public class GraphQLTypes {
     private Double AIRPLANE;
     private Double BUS;
     private Double CABLE_CAR;
+    private Double CARPOOL;
+    private Double COACH;
     private Double FERRY;
     private Double FUNICULAR;
     private Double GONDOLA;
+    private Double MONORAIL;
     private Double RAIL;
     private Double SUBWAY;
+    private Double TAXI;
     private Double TRAM;
+    private Double TROLLEYBUS;
 
     public GraphQLInputModeWeightInput(Map<String, Object> args) {
       if (args != null) {
         this.AIRPLANE = (Double) args.get("AIRPLANE");
         this.BUS = (Double) args.get("BUS");
         this.CABLE_CAR = (Double) args.get("CABLE_CAR");
+        this.CARPOOL = (Double) args.get("CARPOOL");
+        this.COACH = (Double) args.get("COACH");
         this.FERRY = (Double) args.get("FERRY");
         this.FUNICULAR = (Double) args.get("FUNICULAR");
         this.GONDOLA = (Double) args.get("GONDOLA");
+        this.MONORAIL = (Double) args.get("MONORAIL");
         this.RAIL = (Double) args.get("RAIL");
         this.SUBWAY = (Double) args.get("SUBWAY");
+        this.TAXI = (Double) args.get("TAXI");
         this.TRAM = (Double) args.get("TRAM");
+        this.TROLLEYBUS = (Double) args.get("TROLLEYBUS");
       }
     }
 
@@ -1005,6 +1015,14 @@ public class GraphQLTypes {
       return this.CABLE_CAR;
     }
 
+    public Double getGraphQLCarpool() {
+      return this.CARPOOL;
+    }
+
+    public Double getGraphQLCoach() {
+      return this.COACH;
+    }
+
     public Double getGraphQLFerry() {
       return this.FERRY;
     }
@@ -1017,6 +1035,10 @@ public class GraphQLTypes {
       return this.GONDOLA;
     }
 
+    public Double getGraphQLMonorail() {
+      return this.MONORAIL;
+    }
+
     public Double getGraphQLRail() {
       return this.RAIL;
     }
@@ -1025,8 +1047,16 @@ public class GraphQLTypes {
       return this.SUBWAY;
     }
 
+    public Double getGraphQLTaxi() {
+      return this.TAXI;
+    }
+
     public Double getGraphQLTram() {
       return this.TRAM;
+    }
+
+    public Double getGraphQLTrolleybus() {
+      return this.TROLLEYBUS;
     }
 
     public void setGraphQLAirplane(Double AIRPLANE) {
@@ -1041,6 +1071,14 @@ public class GraphQLTypes {
       this.CABLE_CAR = CABLE_CAR;
     }
 
+    public void setGraphQLCarpool(Double CARPOOL) {
+      this.CARPOOL = CARPOOL;
+    }
+
+    public void setGraphQLCoach(Double COACH) {
+      this.COACH = COACH;
+    }
+
     public void setGraphQLFerry(Double FERRY) {
       this.FERRY = FERRY;
     }
@@ -1053,6 +1091,10 @@ public class GraphQLTypes {
       this.GONDOLA = GONDOLA;
     }
 
+    public void setGraphQLMonorail(Double MONORAIL) {
+      this.MONORAIL = MONORAIL;
+    }
+
     public void setGraphQLRail(Double RAIL) {
       this.RAIL = RAIL;
     }
@@ -1061,8 +1103,16 @@ public class GraphQLTypes {
       this.SUBWAY = SUBWAY;
     }
 
+    public void setGraphQLTaxi(Double TAXI) {
+      this.TAXI = TAXI;
+    }
+
     public void setGraphQLTram(Double TRAM) {
       this.TRAM = TRAM;
+    }
+
+    public void setGraphQLTrolleybus(Double TROLLEYBUS) {
+      this.TROLLEYBUS = TROLLEYBUS;
     }
   }
 

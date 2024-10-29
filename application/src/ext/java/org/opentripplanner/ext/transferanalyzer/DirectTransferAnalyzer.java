@@ -68,7 +68,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
     DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
-      timetableRepository.getStopModel()::findRegularStops
+      timetableRepository.getSiteRepository()::findRegularStops
     );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 

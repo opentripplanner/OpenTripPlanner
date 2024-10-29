@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RealtimeStopsLayerTest {
@@ -40,7 +40,7 @@ public class RealtimeStopsLayerTest {
     var name = I18NString.of("name");
     var desc = I18NString.of("desc");
     stop =
-      StopModel
+      SiteRepository
         .of()
         .regularStop(new FeedScopedId("F", "name"))
         .withName(name)
@@ -49,7 +49,7 @@ public class RealtimeStopsLayerTest {
         .withTimeZone(ZoneIds.HELSINKI)
         .build();
     stop2 =
-      StopModel
+      SiteRepository
         .of()
         .regularStop(new FeedScopedId("F", "name"))
         .withName(name)
@@ -62,7 +62,7 @@ public class RealtimeStopsLayerTest {
   @Test
   void realtimeStopLayer() {
     var deduplicator = new Deduplicator();
-    var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+    var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository) {

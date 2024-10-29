@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 
-class StopModelTest {
+class SiteRepositoryTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
@@ -36,20 +36,20 @@ class StopModelTest {
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
-  private final StopModelBuilder stopModelBuilder = StopModel.of();
-  private final RegularStop stop = stopModelBuilder
+  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
+  private final RegularStop stop = siteRepositoryBuilder
     .regularStop(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)
     .withParentStation(STATION)
     .build();
   private final String expStops = List.of(stop).toString();
-  private final AreaStop STOP_AREA = stopModelBuilder
+  private final AreaStop STOP_AREA = siteRepositoryBuilder
     .areaStop(ID)
     .withName(NAME)
     .withGeometry(GEOMETRY)
     .build();
-  private final GroupStop stopGroup = stopModelBuilder.groupStop(ID).addLocation(stop).build();
+  private final GroupStop stopGroup = siteRepositoryBuilder.groupStop(ID).addLocation(stop).build();
   private final MultiModalStation mmStation = MultiModalStation
     .of(ID)
     .withName(NAME)
@@ -67,7 +67,7 @@ class StopModelTest {
 
   @Test
   void testStop() {
-    var m = stopModelBuilder.withRegularStop(stop).build();
+    var m = siteRepositoryBuilder.withRegularStop(stop).build();
     assertEquals(stop, m.getRegularStop(ID));
     assertEquals(stop, m.getStopLocation(ID));
     assertEquals(expStops, m.listRegularStops().toString());
@@ -79,7 +79,7 @@ class StopModelTest {
 
   @Test
   void testAreaStop() {
-    var m = stopModelBuilder.withAreaStop(STOP_AREA).build();
+    var m = siteRepositoryBuilder.withAreaStop(STOP_AREA).build();
     assertEquals(STOP_AREA, m.getAreaStop(ID));
     assertEquals(STOP_AREA, m.getStopLocation(ID));
     assertEquals("[AreaStop{F:A Name}]", m.listAreaStops().toString());
@@ -91,7 +91,7 @@ class StopModelTest {
 
   @Test
   void testStopGroup() {
-    var m = stopModelBuilder.withGroupStop(stopGroup).build();
+    var m = siteRepositoryBuilder.withGroupStop(stopGroup).build();
     assertEquals("[GroupStop{F:A}]", m.listGroupStops().toString());
     assertEquals("[GroupStop{F:A}]", m.listStopLocations().toString());
     assertEquals(stopGroup, m.stopByIndex(stopGroup.getIndex()));
@@ -101,7 +101,7 @@ class StopModelTest {
 
   @Test
   void testStations() {
-    var m = stopModelBuilder.withStation(STATION).build();
+    var m = siteRepositoryBuilder.withStation(STATION).build();
     assertEquals(STATION, m.getStationById(ID));
     assertEquals(EXP_STATIONS, m.listStations().toString());
     assertEquals(STATION, m.getStopLocationsGroup(ID));
@@ -113,7 +113,7 @@ class StopModelTest {
 
   @Test
   void testMultiModalStation() {
-    var m = stopModelBuilder.withMultiModalStation(mmStation).build();
+    var m = siteRepositoryBuilder.withMultiModalStation(mmStation).build();
     assertEquals(mmStation, m.getMultiModalStation(ID));
     assertEquals(mmStation, m.getMultiModalStationForStation(STATION));
     assertEquals(expMmStations, m.listMultiModalStations().toString());
@@ -126,7 +126,7 @@ class StopModelTest {
 
   @Test
   void testGroupOfStations() {
-    var m = stopModelBuilder.withGroupOfStation(groupOfStations).build();
+    var m = siteRepositoryBuilder.withGroupOfStation(groupOfStations).build();
     assertEquals(expGroupOfStation, m.listGroupOfStations().toString());
     assertEquals(groupOfStations, m.getStopLocationsGroup(ID));
     assertEquals(expStops, m.findStopOrChildStops(ID).toString());
@@ -137,7 +137,7 @@ class StopModelTest {
 
   @Test
   void testNullStopLocationId() {
-    var m = StopModel.of().build();
+    var m = SiteRepository.of().build();
     assertNull(m.getStopLocation(null));
   }
 }

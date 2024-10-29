@@ -35,24 +35,36 @@ import org.opentripplanner.transit.model.organization.Operator;
  */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
-  private final Operator operator;
   private final Route route;
-  private final FeedScopedId serviceId;
-  private final String shortName;
   private final TransitMode mode;
-  private final SubMode netexSubmode;
-  private final I18NString headsign;
-  private final FeedScopedId shapeId;
-
   private final Direction direction;
   private final BikeAccess bikesAllowed;
   private final CarAccess carsAllowed;
   private final Accessibility wheelchairBoarding;
 
+  private final SubMode netexSubmode;
+  private final TripAlteration netexAlteration;
+
+  @Nullable
+  private final Operator operator;
+
+  @Nullable
+  private final FeedScopedId serviceId;
+
+  @Nullable
+  private final String shortName;
+
+  @Nullable
+  private final I18NString headsign;
+
+  @Nullable
+  private final FeedScopedId shapeId;
+
+  @Nullable
   private final String gtfsBlockId;
 
+  @Nullable
   private final String netexInternalPlanningCode;
-  private final TripAlteration netexAlteration;
 
   Trip(TripBuilder builder) {
     super(builder.getId());

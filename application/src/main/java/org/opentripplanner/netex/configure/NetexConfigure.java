@@ -43,7 +43,7 @@ public class NetexConfigure {
 
     for (ConfiguredDataSource<NetexFeedParameters> it : netexSources) {
       var transitServiceBuilder = new OtpTransitServiceBuilder(
-        timetableRepository.getStopModel(),
+        timetableRepository.getSiteRepository(),
         issueStore
       );
       netexBundles.add(netexBundle(transitServiceBuilder, it));

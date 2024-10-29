@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -65,6 +66,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nullable
   public Operator getOperator() {
     return getTrip().getOperator();
   }

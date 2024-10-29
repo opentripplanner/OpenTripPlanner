@@ -232,7 +232,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public boolean isFlaggedForDeletion() {
-    return !getSystemNotices().isEmpty();
+    return !systemNotices.isEmpty();
   }
 
   /**

@@ -12,6 +12,14 @@
     <name>OpenTripPlanner - Application</name>
 
     <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gtfs-realtime-protobuf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
@@ -510,6 +518,29 @@
                                 </transformer>
                             </transformers>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.bohnman</groupId>
+                <artifactId>package-info-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <!-- Couldn't get this to work for main and ext code at the same time. -->
+                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                    <outputDirectory>${project.basedir}/target/generated-sources</outputDirectory>
+                    <packages>
+                        <package>
+                            <pattern>**</pattern>
+                            <template>${project.basedir}/src/build/templates/package-info-template.java</template>
+                        </package>
+                    </packages>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

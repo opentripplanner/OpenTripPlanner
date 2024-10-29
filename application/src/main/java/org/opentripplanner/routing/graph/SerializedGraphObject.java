@@ -184,7 +184,7 @@ public class SerializedGraphObject implements Serializable {
       );
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
-      serObj.timetableRepository.getStopModel().reindexAfterDeserialization();
+      serObj.timetableRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.timetableRepository.index();
       logSerializationCompleteStatus(serObj.graph, serObj.timetableRepository);
       return serObj;
@@ -261,7 +261,7 @@ public class SerializedGraphObject implements Serializable {
     TimetableRepository timetableRepository
   ) {
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
