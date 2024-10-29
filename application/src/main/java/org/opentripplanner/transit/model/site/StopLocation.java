@@ -62,7 +62,7 @@ public interface StopLocation extends LogInfo {
   }
 
   @Nullable
-  default TransitMode getGtfsVehicleType() {
+  default TransitMode getVehicleType() {
     return null;
   }
 

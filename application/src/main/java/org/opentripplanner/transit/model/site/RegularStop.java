@@ -29,7 +29,7 @@ public final class RegularStop
 
   private final ZoneId timeZone;
 
-  private final TransitMode gtfsVehicleType;
+  private final TransitMode vehicleType;
 
   private final SubMode netexVehicleSubmode;
 
@@ -43,7 +43,7 @@ public final class RegularStop
     this.platformCode = builder.platformCode();
     this.url = builder.url();
     this.timeZone = builder.timeZone();
-    this.gtfsVehicleType = builder.vehicleType();
+    this.vehicleType = builder.vehicleType();
     this.netexVehicleSubmode = SubMode.getOrBuildAndCacheForever(builder.netexVehicleSubmode());
     this.boardingAreas = setOfNullSafe(builder.boardingAreas());
     this.fareZones = setOfNullSafe(builder.fareZones());
@@ -102,8 +102,8 @@ public final class RegularStop
    */
   @Override
   @Nullable
-  public TransitMode getGtfsVehicleType() {
-    return gtfsVehicleType;
+  public TransitMode getVehicleType() {
+    return vehicleType;
   }
 
   public SubMode getNetexVehicleSubmode() {
@@ -148,7 +148,7 @@ public final class RegularStop
       Objects.equals(platformCode, other.platformCode) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timeZone, other.timeZone) &&
-      Objects.equals(gtfsVehicleType, other.gtfsVehicleType) &&
+      Objects.equals(vehicleType, other.vehicleType) &&
       Objects.equals(netexVehicleSubmode, other.netexVehicleSubmode) &&
       Objects.equals(boardingAreas, other.boardingAreas) &&
       Objects.equals(fareZones, other.fareZones)
