@@ -75,6 +75,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalNetworkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalStationImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.VehicleRentalTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.debugOutputImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.elevationProfileComponentImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.placeAtDistanceImpl;
@@ -123,6 +124,7 @@ class GtfsGraphQLIndex {
         )
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
+        .type("VehicleRental", type -> type.typeResolver(new VehicleRentalTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))

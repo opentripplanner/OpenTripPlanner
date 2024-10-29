@@ -70,6 +70,21 @@ interface PlaceInterface {
   lon: Float
 }
 
+interface VehicleRental {
+  "If true, a vehicle can be picked up."
+  allowPickupNow: Boolean
+  "Latitude of the vehicle rental object (WGS 84)"
+  lat: Float
+  "Longitude of the vehicle rental object (WGS 84)"
+  lon: Float
+  "Name of the vehicle"
+  name: String!
+  "If true, rental object is not disabled."
+  operative: Boolean
+  "The vehicle rental network information. This is referred as system in the GBFS terminology."
+  rentalNetwork: VehicleRentalNetwork!
+}
+
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
@@ -1758,7 +1773,7 @@ type RealTimeEstimate {
 }
 
 "Rental vehicle represents a vehicle that belongs to a rental network."
-type RentalVehicle implements Node & PlaceInterface {
+type RentalVehicle implements Node & PlaceInterface & VehicleRental {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
@@ -2480,7 +2495,7 @@ type VehicleRentalNetwork {
 }
 
 "Vehicle rental station represents a location where users can rent bicycles etc. for a fee."
-type VehicleRentalStation implements Node & PlaceInterface {
+type VehicleRentalStation implements Node & PlaceInterface & VehicleRental {
   """
   If true, vehicles can be returned to this station if the station has spaces available
   or allows overloading.

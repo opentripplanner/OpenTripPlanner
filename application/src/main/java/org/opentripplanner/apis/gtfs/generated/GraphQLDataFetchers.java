@@ -1276,6 +1276,32 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> vehicleId();
   }
 
+  public interface GraphQLVehicleRental extends TypeResolver {
+    public default DataFetcher<Boolean> allowPickupNow() {
+      return null;
+    }
+
+    public default DataFetcher<Double> lat() {
+      return null;
+    }
+
+    public default DataFetcher<Double> lon() {
+      return null;
+    }
+
+    public default DataFetcher<String> name() {
+      return null;
+    }
+
+    public default DataFetcher<Boolean> operative() {
+      return null;
+    }
+
+    public default DataFetcher<VehicleRentalSystem> rentalNetwork() {
+      return null;
+    }
+  }
+
   /**
    * Vehicle rental network, which is referred as system in the GBFS terminology. Note, the same operator can operate in multiple
    * regions either with the same network/system or with a different one. This can contain information about either the rental brand
