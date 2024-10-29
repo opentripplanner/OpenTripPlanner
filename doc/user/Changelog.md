@@ -24,6 +24,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Change GraphQL tooltip for searchWindowUsed to say minutes, instead of seconds [#6185](https://github.com/opentripplanner/OpenTripPlanner/pull/6185)
 - Interpret GTFS extended route types 801-899 also as trolleybus service [#6170](https://github.com/opentripplanner/OpenTripPlanner/pull/6170)
 - Disable protocol upgrades for the HTTP client by default. [#6194](https://github.com/opentripplanner/OpenTripPlanner/pull/6194)
+- Fix max search-window when paging [#6189](https://github.com/opentripplanner/OpenTripPlanner/pull/6189)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
