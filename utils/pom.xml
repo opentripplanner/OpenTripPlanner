@@ -9,8 +9,8 @@
         <version>2.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>otp-framework</artifactId>
-    <name>OpenTripPlanner - Framework</name>
+    <artifactId>otp-utils</artifactId>
+    <name>OpenTripPlanner - Utils</name>
 
     <dependencies>
         <!-- This is the ONLY allowed dependency -->
