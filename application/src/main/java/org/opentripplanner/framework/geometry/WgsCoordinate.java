@@ -164,7 +164,7 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Compute a farly accurate distance between two coordinates. Use the fast version in
+   * Compute a fairly accurate distance between two coordinates. Use the fast version in
    * {@link SphericalDistanceLibrary} if many computations are needed. Return the distance in
    * meters between the two coordinates.
    */

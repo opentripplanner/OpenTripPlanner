@@ -121,7 +121,7 @@ public enum OTPFeature {
   Sorlandsbanen(
     false,
     true,
-    "Include train Sørlandsbanen in results when searchig in south of Norway. Only relevant in Norway."
+    "Include train Sørlandsbanen in results when searching in south of Norway. Only relevant in Norway."
   ),
   TransferAnalyzer(false, true, "Analyze transfers during graph build.");
 

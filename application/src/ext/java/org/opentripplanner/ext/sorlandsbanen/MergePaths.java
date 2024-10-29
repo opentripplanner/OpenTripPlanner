@@ -35,7 +35,7 @@ class MergePaths<T extends RaptorTripSchedule> implements BiFunction<Collection<
     for (var it : paths) {
       if (hasRail(it)) {
         // Avoid replacing an existing value if it exists, there might be minor differences in the
-        // path, in witch case we want to keep the main result.
+        // path, in which case we want to keep the main result.
         map.computeIfAbsent(new PathKey(it), k -> it);
       }
     }

@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArri
  */
 class CompositeResult<T extends RaptorTripSchedule> implements RaptorRouterResult<T> {
 
-  public static final String UNSOPORTED_OPERATION =
+  private static final String UNSUPPORTED_OPERATION =
     "Merging all stop arrivals will be a complicated and memory intensive process, unless we need this this should not be done.";
   private final Collection<RaptorPath<T>> result;
 
@@ -39,17 +39,17 @@ class CompositeResult<T extends RaptorTripSchedule> implements RaptorRouterResul
 
   @Override
   public SingleCriteriaStopArrivals extractBestOverallArrivals() {
-    throw new UnsupportedOperationException(UNSOPORTED_OPERATION);
+    throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 
   @Override
   public SingleCriteriaStopArrivals extractBestTransitArrivals() {
-    throw new UnsupportedOperationException(UNSOPORTED_OPERATION);
+    throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 
   @Override
   public SingleCriteriaStopArrivals extractBestNumberOfTransfers() {
-    throw new UnsupportedOperationException(UNSOPORTED_OPERATION);
+    throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 
   /**

@@ -12,7 +12,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 
 /**
- * Run two Raptor routers and join the result. The two searches are run concurrent if an
+ * Run two Raptor routers and join the result. The two searches are run concurrently if an
  * {@link ExecutorService} is provided.
  * @see CompositeResult for joining results.
  */

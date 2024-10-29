@@ -6,7 +6,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 
 /**
- * This interface is used to run two mulit-criteria searches and merging the result. Raptor will
+ * This interface is used to run two multi-criteria searches and merging the result. Raptor will
  * run the heuristics as normal. Then create two multi-criteria searches, the main search and the
  * alternative search. The caller must provide a {@code merger} and
  * {@link RaptorTransitDataProvider}. The transit data is used for the alternative search. This
@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
  * For the heuristics to work, you may add extra cost or filter away data. But you cannot decrease
  * the cost, add transfer or add new trips.
  * <p>
- * This will alter the multi-criteria search, if only a sadard search is requested any extra
+ * This will alter the multi-criteria search, if only a standard search is requested any extra
  * multi-criteria search is ignored.
  * <p>
  * @param <T> The TripSchedule type defined by the user of the raptor API.

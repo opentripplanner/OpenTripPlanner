@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * This service is responsible for producing results with rail for the south of Norway. The rail
- * line is called "Sørlandsbanen". This rail line is slow and goes inland fare from where people
+ * line is called "Sørlandsbanen". This rail line is slow and goes inland far from where people
  * live. Despite this, people and the operator want to show it in the results for log travel along
- * the southern part of Norway where ii is an option. Tuning the search has proven to be
+ * the southern part of Norway where it is an option. Tuning the search has proven to be
  * challenging. It is solved here by doing two searches. One normal search and one where the rail
  * is given a big cost advantage over coach. If train results are found in the second search, then
  * it is added to the results of the first search. Everything found in the first search is always
@@ -72,7 +72,7 @@ public class SorlandsbanenNorwayService {
    *  - First return the coordinate of the location if it exists.
    *  - Then loop through the access/egress stops and try to find the
    *    stop or station given by the location id, return the stop/station coordinate.
-   *  - Return the fist stop in the access/egress list coordinate.
+   *  - Return the stop coordinate of the first access/egress in the list.
    */
   @SuppressWarnings("ConstantConditions")
   private static WgsCoordinate findStopCoordinate(
