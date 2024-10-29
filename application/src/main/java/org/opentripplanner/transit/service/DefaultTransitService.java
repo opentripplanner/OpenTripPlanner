@@ -173,11 +173,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public AreaStop getAreaStop(FeedScopedId id) {
-    return this.timetableRepository.getSiteRepository().getAreaStop(id);
-  }
-
-  @Override
   public Agency getAgencyForId(FeedScopedId id) {
     return this.timetableRepositoryIndex.getAgencyForId(id);
   }
@@ -221,12 +216,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Trip> getTripsForStop(StopLocation stop) {
-    OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepositoryIndex.getTripsForStop(stop);
-  }
-
-  @Override
   public Collection<Operator> getAllOperators() {
     OTPRequestTimeoutException.checkForTimeout();
     return this.timetableRepository.getOperators();
@@ -241,12 +230,6 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<StopLocation> listStopLocations() {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepository.getSiteRepository().listStopLocations();
-  }
-
-  @Override
-  public Collection<RegularStop> listRegularStops() {
-    OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getSiteRepository().listRegularStops();
   }
 
   @Override
