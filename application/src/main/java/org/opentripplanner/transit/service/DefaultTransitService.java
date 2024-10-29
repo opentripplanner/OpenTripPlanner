@@ -35,9 +35,11 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -542,8 +544,7 @@ public class DefaultTransitService implements TransitEditorService {
     return timetableRepository.getTripOnServiceDateById(tripOnServiceDateId);
   }
 
-  @Override
-  public Collection<TripOnServiceDate> getAllTripOnServiceDates() {
+  private Collection<TripOnServiceDate> getAllTripOnServiceDates() {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       return new CollectionsView<>(
@@ -580,6 +581,21 @@ public class DefaultTransitService implements TransitEditorService {
   public List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request) {
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
     return getAllTripOnServiceDates().stream().filter(matcher::match).toList();
+  }
+
+  /**
+   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
+   *
+   * @param request - A TripRequest object with filtering defined.
+   * @return - A list Trips
+   */
+  @Override
+  public List<Trip> getTrips(TripRequest request) {
+    Matcher<Trip> matcher = TripMatcherFactory.of(
+      request,
+      this.getCalendarService()::getServiceDatesForServiceId
+    );
+    return getAllTrips().stream().filter(matcher::match).toList();
   }
 
   /**

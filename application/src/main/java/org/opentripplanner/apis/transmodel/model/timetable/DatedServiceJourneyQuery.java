@@ -94,7 +94,7 @@ public class DatedServiceJourneyQuery {
       )
       .dataFetcher(environment -> {
         // The null safety checks are not needed here - they are taken care of by the request
-        // object, but reuse let's use the mapping method and leave this improvement until all APIs
+        // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
         var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
