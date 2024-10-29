@@ -277,15 +277,15 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<Iterable<Leg>> previousLegs() {
-    return nextOrPreviousLegs(AlternativeLegs.SearchMode.PREVIOUS);
+    return alternativeLegs(AlternativeLegs.SearchMode.PREVIOUS);
   }
 
   @Override
   public DataFetcher<Iterable<Leg>> nextLegs() {
-    return nextOrPreviousLegs(AlternativeLegs.SearchMode.NEXT);
+    return alternativeLegs(AlternativeLegs.SearchMode.NEXT);
   }
 
-  private DataFetcher<Iterable<Leg>> nextOrPreviousLegs(AlternativeLegs.SearchMode searchMode) {
+  private DataFetcher<Iterable<Leg>> alternativeLegs(AlternativeLegs.SearchMode searchMode) {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
