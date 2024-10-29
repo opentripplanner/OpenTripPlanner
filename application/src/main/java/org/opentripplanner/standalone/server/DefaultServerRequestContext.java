@@ -33,7 +33,6 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final List<RideHailingService> rideHailingServices;
-  private RouteRequest routeRequest = null;
   private final Graph graph;
   private final TransitService transitService;
   private final TransitRoutingConfig transitRoutingConfig;
@@ -51,6 +50,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
+
+  private RouteRequest defaultRouteRequestWithTimeSet = null;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -142,10 +143,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RouteRequest defaultRouteRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (routeRequest == null) {
-      routeRequest = routeRequestDefaults.copyWithDateTimeNow();
+    if (defaultRouteRequestWithTimeSet == null) {
+      defaultRouteRequestWithTimeSet = routeRequestDefaults.copyWithDateTimeNow();
     }
-    return routeRequest;
+    return defaultRouteRequestWithTimeSet;
   }
 
   /**
