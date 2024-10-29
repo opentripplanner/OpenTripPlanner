@@ -106,6 +106,14 @@ public final class RegularStop
     return vehicleType;
   }
 
+  /**
+   * Return {@code true} if the vehicle type is set in the import to be RAIL. Note! This does
+   * not check pattens visiting the stop.
+   */
+  public boolean isRailStop() {
+    return vehicleType == TransitMode.RAIL;
+  }
+
   public SubMode getNetexVehicleSubmode() {
     return netexVehicleSubmode;
   }
