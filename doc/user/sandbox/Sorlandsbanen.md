@@ -14,8 +14,11 @@ rail results(if they exist) from the second search and add it two to the results
 search. The new set of results will contain everything we found in the first search, plus the train 
 results in the second results.
 
-Note! This is a hack and the logic to enable this look at the origin and destination coordinates 
-in addition to the feature flag.
+Note! This looks at origin and destination coordinates in addition to the feature flag to enable
+the second search. It is automatically enabled if:
+ - the `OTPFeature.Sorlandsbanen` is on.
+ - the origin and/or destination is in the south of Norway.
+ - the search is a long-distance search, origin and destination are fare apart from each other. 
 
 
 ## Contact Info
