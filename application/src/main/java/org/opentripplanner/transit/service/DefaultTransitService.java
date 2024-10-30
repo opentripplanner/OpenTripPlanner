@@ -584,7 +584,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   /**
-   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
+   * Returns a list of Trips that match the filtering defined in the request.
    *
    * @param request - A TripRequest object with filtering defined.
    * @return - A list Trips
