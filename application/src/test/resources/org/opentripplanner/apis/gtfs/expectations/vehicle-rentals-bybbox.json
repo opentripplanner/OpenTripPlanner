@@ -1,0 +1,83 @@
+{
+  "data": {
+    "vehicleRentalsByBbox": [
+      {
+        "__typename": "VehicleRentalStation",
+        "allowPickupNow": false,
+        "lat": 47.51,
+        "lon": 18.99,
+        "name": "FooStation",
+        "operative": false,
+        "rentalNetwork": {
+          "networkId": "Network-1",
+          "url": "https://foo.bar"
+        },
+        "rentalUris": null,
+        "stationId": "Network-1:FooStation",
+        "vehiclesAvailable": 10,
+        "availableVehicles": {
+          "byType": [
+            {
+              "vehicleType": {
+                "formFactor": "BICYCLE",
+                "propulsionType": "ELECTRIC"
+              },
+              "count": 5
+            },
+            {
+              "vehicleType": {
+                "formFactor": "BICYCLE",
+                "propulsionType": "HUMAN"
+              },
+              "count": 5
+            }
+          ],
+          "total": 10
+        },
+        "spacesAvailable": 10,
+        "availableSpaces": {
+          "byType": [
+            {
+              "vehicleType": {
+                "formFactor": "BICYCLE",
+                "propulsionType": "ELECTRIC"
+              },
+              "count": 3
+            },
+            {
+              "vehicleType": {
+                "formFactor": "BICYCLE",
+                "propulsionType": "HUMAN"
+              },
+              "count": 7
+            }
+          ],
+          "total": 10
+        },
+        "allowDropoff": false,
+        "allowPickup": false,
+        "allowDropoffNow": false,
+        "capacity": null,
+        "allowOverloading": false
+      },
+      {
+        "__typename": "RentalVehicle",
+        "allowPickupNow": true,
+        "lat": 47.52,
+        "lon": 19.01,
+        "name": "free-floating-bicycle",
+        "operative": true,
+        "rentalNetwork": {
+          "networkId": "Network-1",
+          "url": "https://foo.bar"
+        },
+        "rentalUris": null,
+        "vehicleId": "Network-1:free-floating-bicycle",
+        "vehicleType": {
+          "formFactor": "BICYCLE",
+          "propulsionType": "HUMAN"
+        }
+      }
+    ]
+  }
+}
