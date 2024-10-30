@@ -5,11 +5,12 @@ import java.util.List;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
-/*
+/**
  * A request for trips on a specific service date.
  *
- * This request is used to retrieve TripsOnServiceDates that match the provided criteria.
+ * This request is used to retrieve {@link TripOnServiceDate}s that match the provided criteria.
  * At least one operatingDay must be provided.
  */
 public class TripOnServiceDateRequest {

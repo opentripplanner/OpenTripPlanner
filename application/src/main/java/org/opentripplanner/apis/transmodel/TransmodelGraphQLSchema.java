@@ -1289,7 +1289,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("activeDates")
-              .description("Set of ids of active dates to fetch serviceJourneys for.")
+              .description("Set of service dates to fetch serviceJourneys for.")
               .type(new GraphQLList(TransmodelScalars.DATE_SCALAR))
               .build()
           )

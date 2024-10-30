@@ -109,7 +109,7 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
-  void testMatchAuthorityId() {
+  void testMatchAgencyId() {
     TripRequest request = TripRequest
       .of()
       .withAuthorities(List.of(new FeedScopedId("RUT", "1")))
@@ -123,20 +123,20 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
-  void testMatchActiveDates() {
+  void testMatchServiceDates() {
     TripRequest request = TripRequest
       .of()
       .withActiveDates(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
       .build();
 
-    Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyActiveDateProvider);
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyServiceDateProvider);
 
     assertTrue(matcher.match(tripRut));
     assertTrue(matcher.match(tripRut2));
     assertFalse(matcher.match(tripAkt));
   }
 
-  private Set<LocalDate> dummyActiveDateProvider(FeedScopedId feedScopedId) {
+  private Set<LocalDate> dummyServiceDateProvider(FeedScopedId feedScopedId) {
     if (feedScopedId.equals(new FeedScopedId("RUT:route:trip", "1"))) {
       return Set.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23));
     } else if (feedScopedId.equals(new FeedScopedId("RUT:route:trip", "2"))) {
