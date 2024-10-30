@@ -1757,6 +1757,17 @@ type QueryType {
     "Western bound of the bounding box"
     minimumLongitude: CoordinateValue!
   ): [VehicleRentalStation]
+  "Get all rental vehicles within the specified bounding box"
+  vehicleRentalsByBbox(
+    "Northern bound of the bounding box"
+    maximumLatitude: CoordinateValue!,
+    "Eastern bound of the bounding box"
+    maximumLongitude: CoordinateValue!,
+    "Southern bound of the bounding box"
+    minimumLatitude: CoordinateValue!,
+    "Western bound of the bounding box"
+    minimumLongitude: CoordinateValue!
+  ): [VehicleRental!]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }

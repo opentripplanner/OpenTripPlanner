@@ -4025,6 +4025,55 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeVehicleRentalsByBboxArgs {
+
+    private Double maximumLatitude;
+    private Double maximumLongitude;
+    private Double minimumLatitude;
+    private Double minimumLongitude;
+
+    public GraphQLQueryTypeVehicleRentalsByBboxArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.maximumLatitude = (Double) args.get("maximumLatitude");
+        this.maximumLongitude = (Double) args.get("maximumLongitude");
+        this.minimumLatitude = (Double) args.get("minimumLatitude");
+        this.minimumLongitude = (Double) args.get("minimumLongitude");
+      }
+    }
+
+    public Double getGraphQLMaximumLatitude() {
+      return this.maximumLatitude;
+    }
+
+    public Double getGraphQLMaximumLongitude() {
+      return this.maximumLongitude;
+    }
+
+    public Double getGraphQLMinimumLatitude() {
+      return this.minimumLatitude;
+    }
+
+    public Double getGraphQLMinimumLongitude() {
+      return this.minimumLongitude;
+    }
+
+    public void setGraphQLMaximumLatitude(Double maximumLatitude) {
+      this.maximumLatitude = maximumLatitude;
+    }
+
+    public void setGraphQLMaximumLongitude(Double maximumLongitude) {
+      this.maximumLongitude = maximumLongitude;
+    }
+
+    public void setGraphQLMinimumLatitude(Double minimumLatitude) {
+      this.minimumLatitude = minimumLatitude;
+    }
+
+    public void setGraphQLMinimumLongitude(Double minimumLongitude) {
+      this.minimumLongitude = minimumLongitude;
+    }
+  }
+
   public enum GraphQLRealtimeState {
     ADDED,
     CANCELED,
