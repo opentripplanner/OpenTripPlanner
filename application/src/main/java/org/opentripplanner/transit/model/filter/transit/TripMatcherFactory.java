@@ -11,23 +11,35 @@ import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
+/**
+ * A factory for creating matchers for {@link Trip} objects.
+ * <p/>
+ * This factory is used to create matchers for {@link Trip} objects based on a request. The
+ * resulting matcher can be used to filter a list of {@link Trip} objects.
+ */
 public class TripMatcherFactory {
 
   public static Matcher<Trip> of(
     TripRequest request,
-    Function<FeedScopedId, Set<LocalDate>> activeDateProvider
+    Function<FeedScopedId, Set<LocalDate>> serviceDateProvider
   ) {
     ExpressionBuilder<Trip> expr = ExpressionBuilder.of();
 
-    expr.or(request.authorities(), TripMatcherFactory::authorityId);
-    expr.or(request.lines(), TripMatcherFactory::routeId);
-    expr.or(request.privateCodes(), TripMatcherFactory::privateCode);
+    expr.atLeastOneMatch(request.agencies(), TripMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.routes(), TripMatcherFactory::routeId);
+    expr.atLeastOneMatch(
+      request.netexInternalPlanningCodes(),
+      TripMatcherFactory::netexInternalPlanningCode
+    );
 
-    expr.or(request.activeDates(), TripMatcherFactory.activeDate(activeDateProvider));
+    expr.atLeastOneMatch(
+      request.serviceDates(),
+      TripMatcherFactory.serviceDate(serviceDateProvider)
+    );
     return expr.build();
   }
 
-  static Matcher<Trip> authorityId(FeedScopedId id) {
+  static Matcher<Trip> agencyId(FeedScopedId id) {
     return new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId());
   }
 
@@ -35,18 +47,18 @@ public class TripMatcherFactory {
     return new EqualityMatcher<>("route", id, t -> t.getRoute().getId());
   }
 
-  static Matcher<Trip> privateCode(String code) {
+  static Matcher<Trip> netexInternalPlanningCode(String code) {
     return new EqualityMatcher<>("privateCode", code, Trip::getNetexInternalPlanningCode);
   }
 
-  static Function<LocalDate, Matcher<Trip>> activeDate(
-    Function<FeedScopedId, Set<LocalDate>> activeDateProvider
+  static Function<LocalDate, Matcher<Trip>> serviceDate(
+    Function<FeedScopedId, Set<LocalDate>> serviceDateProvider
   ) {
     return date ->
       new ContainsMatcher<>(
-        "activeDatesAmong",
-        t -> activeDateProvider.apply(t.getServiceId()),
-        new EqualityMatcher<>("activeDateEquals", date, (dateToMatch -> dateToMatch))
+        "serviceDates",
+        t -> serviceDateProvider.apply(t.getServiceId()),
+        new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );
   }
 }

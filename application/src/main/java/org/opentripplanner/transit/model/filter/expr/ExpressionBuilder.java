@@ -22,7 +22,10 @@ public class ExpressionBuilder<T> {
     return new ExpressionBuilder<>();
   }
 
-  public <V> ExpressionBuilder<T> or(Collection<V> values, Function<V, Matcher<T>> valueProvider) {
+  public <V> ExpressionBuilder<T> atLeastOneMatch(
+    Collection<V> values,
+    Function<V, Matcher<T>> valueProvider
+  ) {
     if (values.isEmpty()) {
       return this;
     }

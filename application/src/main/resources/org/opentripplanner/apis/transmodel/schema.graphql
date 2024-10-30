@@ -736,7 +736,7 @@ type QueryType {
   serviceJourney(id: String!): ServiceJourney @timingData
   "Get all service journeys"
   serviceJourneys(
-    "Set of ids of active dates to fetch serviceJourneys for."
+    "Set of service dates to fetch serviceJourneys for."
     activeDates: [Date],
     "Set of ids of authorities to fetch serviceJourneys for."
     authorities: [String],
