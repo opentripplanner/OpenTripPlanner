@@ -1302,6 +1302,10 @@ public class GraphQLDataFetchers {
     public default DataFetcher<VehicleRentalSystem> rentalNetwork() {
       return null;
     }
+
+    public default DataFetcher<VehicleRentalStationUris> rentalUris() {
+      return null;
+    }
   }
 
   /**
