@@ -26,6 +26,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Disable protocol upgrades for the HTTP client by default. [#6194](https://github.com/opentripplanner/OpenTripPlanner/pull/6194)
 - Fix max search-window when paging [#6189](https://github.com/opentripplanner/OpenTripPlanner/pull/6189)
 - Add car ferry functionality [#5966](https://github.com/opentripplanner/OpenTripPlanner/pull/5966)
+- Make indoor=area and indoor=corridor routable for UK OSM tag mapper [#6119](https://github.com/opentripplanner/OpenTripPlanner/pull/6119)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
