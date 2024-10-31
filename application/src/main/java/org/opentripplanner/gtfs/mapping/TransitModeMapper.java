@@ -21,7 +21,7 @@ public class TransitModeMapper {
       // Railway Service
       return TransitMode.RAIL;
     } else if (routeType >= 200 && routeType < 300) { //Coach Service
-      return OTPFeature.GtfsCoach.isOn() ? TransitMode.COACH : TransitMode.BUS;
+      return TransitMode.COACH;
     } else if (routeType >= 300 && routeType < 500) { //Suburban Railway Service and Urban Railway service
       if (routeType >= 401 && routeType <= 402) {
         return TransitMode.SUBWAY;

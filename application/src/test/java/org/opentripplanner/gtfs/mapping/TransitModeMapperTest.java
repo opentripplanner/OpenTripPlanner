@@ -45,6 +45,8 @@ class TransitModeMapperTest {
       // https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J?pli=1
       Arguments.of(100, RAIL),
       Arguments.of(199, RAIL),
+      Arguments.of(200, COACH),
+      Arguments.of(299, COACH),
       Arguments.of(400, RAIL),
       Arguments.of(401, SUBWAY),
       Arguments.of(402, SUBWAY),
@@ -85,17 +87,5 @@ class TransitModeMapperTest {
   @MethodSource("testCases")
   void map(int mode, TransitMode expectedMode) {
     assertEquals(expectedMode, TransitModeMapper.mapMode(mode));
-  }
-
-  @Test
-  void testCoachFeatureFlag() {
-    OTPFeature.GtfsCoach.testOff(() -> {
-      assertEquals(BUS, TransitModeMapper.mapMode(200));
-      assertEquals(BUS, TransitModeMapper.mapMode(299));
-    });
-    OTPFeature.GtfsCoach.testOn(() -> {
-      assertEquals(COACH, TransitModeMapper.mapMode(200));
-      assertEquals(COACH, TransitModeMapper.mapMode(299));
-    });
   }
 }

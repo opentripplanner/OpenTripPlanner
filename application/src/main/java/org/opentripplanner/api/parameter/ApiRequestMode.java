@@ -42,10 +42,6 @@ public enum ApiRequestMode {
   }
 
   public Collection<TransitMode> getTransitModes() {
-    if (this == BUS && OTPFeature.GtfsCoach.isOff()) {
-      return List.of(TransitMode.BUS, TransitMode.COACH);
-    }
-
     return transitModes;
   }
 }
