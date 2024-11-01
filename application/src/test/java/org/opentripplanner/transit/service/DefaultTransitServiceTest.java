@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_30;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
@@ -152,8 +153,25 @@ class DefaultTransitServiceTest {
   }
 
   @Test
-  void getCanceledTrips() {
-    var canceledTrips = service.getCanceledTrips(null);
+  void listCanceledTrips() {
+    var canceledTrips = service.listCanceledTrips();
     assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
+  }
+
+  @Test
+  void findCanceledTrips() {
+    var canceledTripsForFeedWithCancellations = service.findCanceledTrips(List.of("F", "G"));
+    assertEquals(
+      "[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]",
+      canceledTripsForFeedWithCancellations.toString()
+    );
+
+    var canceledTripsForFeedWithoutCancellations = service.findCanceledTrips(List.of("G"));
+    assertEquals("[]", canceledTripsForFeedWithoutCancellations.toString());
+  }
+
+  @Test
+  void findCanceledTripsWithEmptyFeeds() {
+    assertThrows(IllegalArgumentException.class, () -> service.findCanceledTrips(List.of()));
   }
 }
