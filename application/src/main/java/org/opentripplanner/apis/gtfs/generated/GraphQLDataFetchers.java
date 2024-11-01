@@ -435,9 +435,9 @@ public class GraphQLDataFetchers {
 
   /** A fixed (i.e. not flexible or frequency based) trip on a specific service date */
   public interface GraphQLFixedTripOnServiceDate {
-    public DataFetcher<java.time.LocalDate> date();
-
     public DataFetcher<TripTimeOnDate> end();
+
+    public DataFetcher<java.time.LocalDate> serviceDate();
 
     public DataFetcher<TripTimeOnDate> start();
 

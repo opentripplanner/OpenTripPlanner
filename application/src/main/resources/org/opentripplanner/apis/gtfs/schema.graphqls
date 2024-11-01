@@ -572,7 +572,7 @@ type FixedTripOnServiceDate {
     correspond to a how a passenger thinks of a calendar date. For example, a night bus running
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
-  date: LocalDate!
+  serviceDate: LocalDate!
   "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
   end: FixedStopTimeOnServiceDate!
   "Information related to trip's scheduled departure from the first stop. Can contain realtime information."

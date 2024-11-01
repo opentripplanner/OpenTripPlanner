@@ -9,7 +9,7 @@
     edges {
       node {
         ... on FixedTripOnServiceDate {
-          date
+          serviceDate
           end {
             arrival {
               estimated {
@@ -47,7 +47,6 @@
               }
             }
           }
-          date
           trip {
             gtfsId
           }

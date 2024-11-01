@@ -20,7 +20,7 @@ public class FixedTripOnServiceDateImpl
   implements GraphQLDataFetchers.GraphQLFixedTripOnServiceDate {
 
   @Override
-  public DataFetcher<LocalDate> date() {
+  public DataFetcher<LocalDate> serviceDate() {
     return env -> getSource(env).getServiceDate();
   }
 
