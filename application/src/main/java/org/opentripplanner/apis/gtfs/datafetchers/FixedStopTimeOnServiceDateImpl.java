@@ -7,16 +7,16 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FixedStopTimeOnServiceDateImpl
   implements GraphQLDataFetchers.GraphQLFixedStopTimeOnServiceDate {
 
   @Override
-  public DataFetcher<ArrivalDepartureTime> arrival() {
+  public DataFetcher<FixedArrivalDepartureTime> arrival() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -24,13 +24,13 @@ public class FixedStopTimeOnServiceDateImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? ArrivalDepartureTime.of(scheduledTime, tripTime.getArrivalDelay())
-        : ArrivalDepartureTime.ofStatic(scheduledTime);
+        ? FixedArrivalDepartureTime.of(scheduledTime, tripTime.getArrivalDelay())
+        : FixedArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 
   @Override
-  public DataFetcher<ArrivalDepartureTime> departure() {
+  public DataFetcher<FixedArrivalDepartureTime> departure() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledDeparture());
@@ -38,8 +38,8 @@ public class FixedStopTimeOnServiceDateImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? ArrivalDepartureTime.of(scheduledTime, tripTime.getDepartureDelay())
-        : ArrivalDepartureTime.ofStatic(scheduledTime);
+        ? FixedArrivalDepartureTime.of(scheduledTime, tripTime.getDepartureDelay())
+        : FixedArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 

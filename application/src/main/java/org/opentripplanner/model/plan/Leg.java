@@ -209,12 +209,12 @@ public interface Leg {
   /**
    * The time (including realtime information) when the leg starts.
    */
-  LegTime start();
+  FixedArrivalDepartureTime start();
 
   /**
    * The time (including realtime information) when the leg ends.
    */
-  LegTime end();
+  FixedArrivalDepartureTime end();
 
   /**
    * The date and time this leg begins.

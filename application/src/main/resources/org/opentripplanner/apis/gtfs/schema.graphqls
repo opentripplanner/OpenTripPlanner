@@ -157,17 +157,6 @@ type Alert implements Node {
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
 }
 
-"""
-Timing of an arrival or a departure to or from a stop. May contain real-time information if
-available.
-"""
-type ArrivalDepartureTime {
-  "The estimated time of the event. If no real-time information is available, this is null."
-  estimated: RealTimeEstimate
-  "The scheduled time of the event."
-  scheduledTime: OffsetDateTime!
-}
-
 "Bike park represents a location where bicycles can be parked."
 type BikePark implements Node & PlaceInterface {
   "ID of the bike park"
@@ -551,20 +540,33 @@ type FeedPublisher {
 }
 
 """
+Timing of an arrival or a departure to or from a stop. May contain real-time information if
+available. This is used when there is a known scheduled time.
+"""
+type FixedArrivalDepartureTime {
+  "The estimated time of the event. If no real-time information is available, this is null."
+  estimated: RealTimeEstimate
+  "The scheduled time of the event."
+  scheduledTime: OffsetDateTime!
+}
+
+"""
 Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
 This can include realtime estimates.
 """
 type FixedStopTimeOnServiceDate {
   "Scheduled arrival time to the stop and a realtime estimate, if one exists."
-  arrival: ArrivalDepartureTime
+  arrival: FixedArrivalDepartureTime
   "Scheduled departure time from the stop and a realtime estimate, if one exists."
-  departure: ArrivalDepartureTime
+  departure: FixedArrivalDepartureTime
   "The stop where this arrival/departure happens"
   stop: Stop
 }
 
 "A fixed (i.e. not flexible or frequency based) trip on a specific service date"
 type FixedTripOnServiceDate {
+  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
+  end: FixedStopTimeOnServiceDate!
   """
   The service date when the trip occurs.
     
@@ -573,8 +575,6 @@ type FixedTripOnServiceDate {
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   serviceDate: LocalDate!
-  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
-  end: FixedStopTimeOnServiceDate!
   "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
   start: FixedStopTimeOnServiceDate!
   "List of times when this trip arrives to or departs from a stop and information related to the stop"

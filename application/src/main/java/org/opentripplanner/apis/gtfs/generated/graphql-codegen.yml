@@ -63,7 +63,7 @@ config:
     FixedTripOnServiceDate: org.opentripplanner.transit.model.timetable.TripOnServiceDate#TripOnServiceDate
     TripOnServiceDateConnection: graphql.relay.Connection#Connection<TripOnServiceDate>
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
-    ArrivalDepartureTime: org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime#ArrivalDepartureTime
+    FixedArrivalDepartureTime: org.opentripplanner.model.plan.FixedArrivalDepartureTime#FixedArrivalDepartureTime
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
@@ -74,7 +74,7 @@ config:
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
-    LegTime: org.opentripplanner.model.plan.LegTime#LegTime
+    LegTime: org.opentripplanner.model.plan.FixedArrivalDepartureTime#FixedArrivalDepartureTime
     Mode: String
     OccupancyStatus: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus#GraphQLOccupancyStatus
     TransitMode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode

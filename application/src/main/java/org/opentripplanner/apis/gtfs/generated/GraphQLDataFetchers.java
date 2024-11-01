@@ -23,7 +23,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
-import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -40,9 +39,9 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -142,16 +141,6 @@ public class GraphQLDataFetchers {
 
   /** Entity related to an alert */
   public interface GraphQLAlertEntity extends TypeResolver {}
-
-  /**
-   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
-   * available.
-   */
-  public interface GraphQLArrivalDepartureTime {
-    public DataFetcher<Object> estimated();
-
-    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
-  }
 
   /** Bike park represents a location where bicycles can be parked. */
   public interface GraphQLBikePark {
@@ -422,13 +411,23 @@ public class GraphQLDataFetchers {
   }
 
   /**
+   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
+   * available. This is used when there is a known scheduled time.
+   */
+  public interface GraphQLFixedArrivalDepartureTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  }
+
+  /**
    * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
    * This can include realtime estimates.
    */
   public interface GraphQLFixedStopTimeOnServiceDate {
-    public DataFetcher<ArrivalDepartureTime> arrival();
+    public DataFetcher<FixedArrivalDepartureTime> arrival();
 
-    public DataFetcher<ArrivalDepartureTime> departure();
+    public DataFetcher<FixedArrivalDepartureTime> departure();
 
     public DataFetcher<Object> stop();
   }
@@ -509,7 +508,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<LegTime> end();
+    public DataFetcher<FixedArrivalDepartureTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -553,7 +552,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<LegTime> start();
+    public DataFetcher<FixedArrivalDepartureTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -661,7 +660,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
-    public DataFetcher<LegTime> arrival();
+    public DataFetcher<FixedArrivalDepartureTime> arrival();
 
     public DataFetcher<Long> arrivalTime();
 
@@ -671,7 +670,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleParking> carPark();
 
-    public DataFetcher<LegTime> departure();
+    public DataFetcher<FixedArrivalDepartureTime> departure();
 
     public DataFetcher<Long> departureTime();
 

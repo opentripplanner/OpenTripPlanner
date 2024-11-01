@@ -6,20 +6,27 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * A scheduled time of a transit vehicle at a certain location with a optional realtime information.
+ * A scheduled time of a transit vehicle at a certain location with an optional realtime
+ * information.
  */
-public record LegTime(ZonedDateTime scheduledTime, @Nullable RealTimeEstimate estimated) {
-  public LegTime {
+public record FixedArrivalDepartureTime(
+  ZonedDateTime scheduledTime,
+  @Nullable RealTimeEstimate estimated
+) {
+  public FixedArrivalDepartureTime {
     Objects.requireNonNull(scheduledTime);
   }
 
-  public static LegTime of(ZonedDateTime realtime, int delaySecs) {
+  public static FixedArrivalDepartureTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new LegTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
+    return new FixedArrivalDepartureTime(
+      realtime.minus(delay),
+      new RealTimeEstimate(realtime, delay)
+    );
   }
 
-  public static LegTime ofStatic(ZonedDateTime staticTime) {
-    return new LegTime(staticTime, null);
+  public static FixedArrivalDepartureTime ofStatic(ZonedDateTime staticTime) {
+    return new FixedArrivalDepartureTime(staticTime, null);
   }
 
   /**
