@@ -1146,7 +1146,9 @@ type QueryType {
     ids: [String]
   ): [BikeRentalStation] @deprecated(reason : "Use rentalVehicles or vehicleRentalStations instead")
   """
-  Get pages of canceled Trips. Planned cancellations are not currently supported. Follows the
+  Get pages of canceled trips. Planned cancellations are not currently supported. Limiting the number of
+  returned trips with either `first` or `last` is highly recommended since the number of returned trips
+  can be really high when there is a strike affecting the transit services, for example. Follows the
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
   canceledTrips(
