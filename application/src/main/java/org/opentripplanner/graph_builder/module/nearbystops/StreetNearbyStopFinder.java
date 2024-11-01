@@ -30,8 +30,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -42,6 +40,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   private final int maxStopCount;
   private final DataOverlayContext dataOverlayContext;
   private final Set<Vertex> ignoreVertices;
+  private final Set<Vertex> findOnlyVertices;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
@@ -54,7 +53,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     int maxStopCount,
     DataOverlayContext dataOverlayContext
   ) {
-    this(durationLimit, maxStopCount, dataOverlayContext, Set.of());
+    this(durationLimit, maxStopCount, dataOverlayContext, Set.of(), Set.of());
   }
 
   /**
@@ -70,10 +69,30 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     DataOverlayContext dataOverlayContext,
     Set<Vertex> ignoreVertices
   ) {
+    this(durationLimit, maxStopCount, dataOverlayContext, ignoreVertices, Set.of());
+  }
+
+  /**
+   * Construct a NearbyStopFinder for the given graph and search radius.
+   *
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
+   *                     we will always return all the directly connected stops.
+   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
+   *
+   * @param findOnlyVertices   Only return NearbyStops that are in this set. If this is empty, no filtering is performed.
+   */
+  public StreetNearbyStopFinder(
+    Duration durationLimit,
+    int maxStopCount,
+    DataOverlayContext dataOverlayContext,
+    Set<Vertex> ignoreVertices,
+    Set<Vertex> findOnlyVertices
+  ) {
     this.dataOverlayContext = dataOverlayContext;
     this.durationLimit = durationLimit;
     this.maxStopCount = maxStopCount;
     this.ignoreVertices = ignoreVertices;
+    this.findOnlyVertices = findOnlyVertices;
   }
 
   /**
@@ -146,7 +165,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
           continue;
         }
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
+          // If a set of findOnlyVertices is provided, only add stops that are in the set.
+          if (findOnlyVertices.isEmpty() || findOnlyVertices.contains(targetVertex)) {
+            stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
+          }
         }
         if (
           OTPFeature.FlexRouting.isOn() &&

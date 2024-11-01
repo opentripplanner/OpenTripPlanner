@@ -49,6 +49,10 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
     return defaultValue;
   }
 
+  public boolean containsKey(E key) {
+    return valueForEnum.containsKey(key);
+  }
+
   /**
    * Utility method to get {@link #defaultValue} as an number in unit seconds. Equivalent to
    * {@code (int) defaultValue.toSeconds()}. The downcast is safe since we only allow days, hours,

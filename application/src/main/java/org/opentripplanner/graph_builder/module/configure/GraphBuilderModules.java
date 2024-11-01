@@ -237,7 +237,8 @@ public class GraphBuilderModules {
       timetableRepository,
       issueStore,
       config.maxTransferDuration,
-      config.transferRequests
+      config.transferRequests,
+      config.carsAllowedStopMaxTransferDurationsForMode
     );
   }
 
