@@ -166,7 +166,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         for (RouteRequest transferProfile : filteredTransferRequests) {
           findNearbyStops(nearbyStopFinder, ts0, transferProfile, stop, distinctTransfers);
-          if (OTPFeature.FlexRouting.isOn()) {
+        }
+        if (OTPFeature.FlexRouting.isOn()) {
+          for (RouteRequest transferProfile : filteredTransferRequests) {
             // This code is for finding transfers from AreaStops to Stops, transfers
             // from Stops to AreaStops and between Stops are already covered above.
             for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
@@ -189,6 +191,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
           }
         }
+
         // This calculates transfers between stops that can use trips with cars.
         for (RouteRequest transferProfile : carsAllowedStopTransferRequests) {
           StreetMode mode = transferProfile.journey().transfer().mode();
