@@ -165,6 +165,78 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     assertStopAtDistance(stopC, 200, sortedNearbyStops.get(0));
   }
 
+  @Test
+  void testFindOnlyVerticesStops() {
+    var durationLimit = Duration.ofMinutes(10);
+    var maxStopCount = 0;
+    Set<Vertex> findOnlyStops = Set.of(stopB, stopC);
+    var finder = new StreetNearbyStopFinder(
+      durationLimit,
+      maxStopCount,
+      null,
+      Set.of(),
+      findOnlyStops
+    );
+
+    var sortedNearbyStops = sort(
+      finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
+    );
+
+    assertThat(sortedNearbyStops).hasSize(3);
+    assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
+    assertStopAtDistance(stopB, 100, sortedNearbyStops.get(1));
+    assertStopAtDistance(stopC, 200, sortedNearbyStops.get(2));
+  }
+
+  @Test
+  void testFindOnlyVerticesStopsWithIgnore() {
+    var durationLimit = Duration.ofMinutes(10);
+    var maxStopCount = 0;
+    Set<Vertex> findOnlyStops = Set.of(stopB, stopC);
+    Set<Vertex> ignore = Set.of(stopB);
+    var finder = new StreetNearbyStopFinder(
+      durationLimit,
+      maxStopCount,
+      null,
+      ignore,
+      findOnlyStops
+    );
+
+    var sortedNearbyStops = sort(
+      finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
+    );
+
+    assertThat(sortedNearbyStops).hasSize(2);
+    assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
+    assertStopAtDistance(stopC, 200, sortedNearbyStops.get(1));
+  }
+
+  @Test
+  void testFindOnlyVerticesStopsWithDurationLimit() {
+    // If we only allow walk for 101 seconds and speed is 1 m/s we should only be able to reach
+    // one extra stop.
+    var durationLimit = Duration.ofSeconds(101);
+    var maxStopCount = 0;
+    Set<Vertex> findOnlyStops = Set.of(stopB, stopC);
+    var routeRequest = new RouteRequest()
+      .withPreferences(b -> b.withWalk(walkPreferences -> walkPreferences.withSpeed(1.0)));
+
+    var finder = new StreetNearbyStopFinder(
+      durationLimit,
+      maxStopCount,
+      null,
+      Set.of(),
+      findOnlyStops
+    );
+    var sortedNearbyStops = sort(
+      finder.findNearbyStops(stopA, routeRequest, new StreetRequest(), false)
+    );
+
+    assertThat(sortedNearbyStops).hasSize(2);
+    assertZeroDistanceStop(stopA, sortedNearbyStops.get(0));
+    assertStopAtDistance(stopB, 100, sortedNearbyStops.get(1));
+  }
+
   private List<NearbyStop> sort(Collection<NearbyStop> stops) {
     return stops.stream().sorted(Comparator.comparing(x -> x.distance)).toList();
   }
