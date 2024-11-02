@@ -48,16 +48,16 @@ public class FlexTripsMapper {
         result.add(
           ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
         );
-      } else if (hasContinuousStops(stopTimes) && FlexTrip.containsFlexStops(stopTimes)) {
+      } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlex)) {
         store.add(
-          "ContinuousFlexTrip",
-          "Trip %s contains both flex stops and continuous pick up/drop off. This is an invalid combination: https://github.com/MobilityData/gtfs-flex/issues/70",
+          "ContinuousFlexStopTime",
+          "Trip %s contains a stop time which combines flex with continuous pick up/drop off. This is an invalid combination: https://github.com/MobilityData/gtfs-flex/issues/70",
           trip.getId()
         );
         // result.add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
 
-      //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+      //Keep lambda! A method-ref would cause incorrect class and line number to be logged
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }

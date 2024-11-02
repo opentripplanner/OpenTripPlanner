@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.trip;
 
-import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
@@ -56,11 +55,9 @@ public class ScheduledDeviatedTrip
   }
 
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof RegularStop);
-    Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
+    Predicate<StopTime> notFixedStop = Predicate.not(st -> st.getStop() instanceof RegularStop);
     return (
-      stopTimes.stream().anyMatch(notStopType) && stopTimes.stream().allMatch(notContinuousStop)
+      stopTimes.stream().anyMatch(notFixedStop) && stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlex)
     );
   }
 

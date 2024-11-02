@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularStopTime;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V1;
 import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -11,6 +10,7 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.LineStrings;
+import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 
 class ScheduledFlexPathCalculatorTest {
@@ -19,9 +19,9 @@ class ScheduledFlexPathCalculatorTest {
     .of(id("123"))
     .withStopTimes(
       List.of(
-        regularStopTime("10:00", "10:01"),
+        FlexStopTimesForTest.regularStop("10:00", "10:01"),
         area("10:10", "10:20"),
-        regularStopTime("10:25", "10:26"),
+        FlexStopTimesForTest.regularStop("10:25", "10:26"),
         area("10:40", "10:50")
       )
     )
