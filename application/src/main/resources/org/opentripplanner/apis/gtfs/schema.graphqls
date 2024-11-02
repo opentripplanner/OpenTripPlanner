@@ -117,23 +117,32 @@ type Alert implements Node {
   "Alert cause"
   alertCause: AlertCauseType
   "Long description of the alert"
-  alertDescriptionText: String!
+  alertDescriptionText(
+    "Returns description with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String!
   "Long descriptions of the alert in all different available languages"
-  alertDescriptionTextTranslations: [TranslatedString!]!
+  alertDescriptionTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertDescriptionText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertDescriptionText` field.")
   "Alert effect"
   alertEffect: AlertEffectType
   "hashcode from the original GTFS-RT alert"
   alertHash: Int
   "Header of the alert, if available"
-  alertHeaderText: String
+  alertHeaderText(
+    "Returns header with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String
   "Header of the alert in all different available languages"
-  alertHeaderTextTranslations: [TranslatedString!]!
+  alertHeaderTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertHeaderText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertHeaderText` field.")
   "Alert severity level"
   alertSeverityLevel: AlertSeverityLevelType
   "Url with more information"
-  alertUrl: String
+  alertUrl(
+    "Returns URL with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String
   "Url with more information in all different available languages"
-  alertUrlTranslations: [TranslatedString!]!
+  alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
   effectiveEndDate: Long
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"

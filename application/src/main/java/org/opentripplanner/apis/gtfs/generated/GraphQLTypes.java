@@ -75,6 +75,63 @@ public class GraphQLTypes {
     ROUTE_TYPES,
   }
 
+  public static class GraphQLAlertAlertDescriptionTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertDescriptionTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertHeaderTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertHeaderTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertUrlArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertUrlArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   /** Cause of a alert */
   public enum GraphQLAlertCauseType {
     ACCIDENT,
