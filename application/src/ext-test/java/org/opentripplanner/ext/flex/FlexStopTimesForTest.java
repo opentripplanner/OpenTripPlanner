@@ -33,6 +33,34 @@ public class FlexStopTimesForTest {
     return stopTime;
   }
 
+  /**
+   * Returns an invalid combination of a flex area and continuous stopping.
+   */
+  public static StopTime areaWithContinuousStopping(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  /**
+   * Returns an invalid combination of a flex area and continuous pick up.
+   */
+  public static StopTime areaWithContinuousPickup(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  /**
+   * Returns an invalid combination of a flex area and continuous drop off.
+   */
+  public static StopTime areaWithContinuousDropOff(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
   public static StopTime regularStop(String arrivalTime, String departureTime) {
     return regularStop(TimeUtils.time(arrivalTime), TimeUtils.time(departureTime));
   }
@@ -48,6 +76,18 @@ public class FlexStopTimesForTest {
     return st;
   }
 
+  public static StopTime regularStopWithContinuousPickup(String time) {
+    var st = regularStop(TimeUtils.time(time), TimeUtils.time(time));
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  public static StopTime regularStopWithContinuousDropOff(String time) {
+    var st = regularStop(TimeUtils.time(time), TimeUtils.time(time));
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
   public static StopTime regularStop(int arrivalTime, int departureTime) {
     var stopTime = new StopTime();
     stopTime.setStop(REGULAR_STOP);
@@ -57,14 +97,6 @@ public class FlexStopTimesForTest {
     return stopTime;
   }
 
-  /**
-   * Returns an invalid combination of a flex area and continuous stopping.
-   */
-  public static StopTime areaWithContinuousStopping(String time) {
-    var st = area(time, time);
-    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
-    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
-    return st;
-  }
+
 
 }
