@@ -236,6 +236,7 @@
                         <printStderrOnError>true</printStderrOnError>
                         <printStderrOnFailure>true</printStderrOnFailure>
                         <printStderrOnSuccess>false</printStderrOnSuccess>
+                        <theme>UNICODE</theme>
                     </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>
