@@ -58,10 +58,8 @@
         "me.fabriciorby:maven-surefire-junit5-tree-reporter",
         "com.google.truth:truth",
         "org.jacoco:jacoco-maven-plugin", // coverage plugin
-        "org.apache.commons:commons-compress" // only used by tests
-      ],
-      "matchPackagePrefixes": [
-        "org.junit.jupiter:",
+        "org.apache.commons:commons-compress", // only used by tests
+        "org.junit.jupiter:{/,}**"
       ],
       "automerge": true,
       "schedule": "on the 17th day of the month"
@@ -95,8 +93,8 @@
     {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
       "description": "GraphQL Java (ignoring snapshot builds)",
-      "matchPackagePrefixes": [
-        "com.graphql-java:"
+      "matchPackageNames": [
+        "com.graphql-java:{/,}**"
       ],
       "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
     },
@@ -119,8 +117,8 @@
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
-      "matchPackagePrefixes": [
-        "org.apache.lucene:",
+      "matchPackageNames": [
+        "org.apache.lucene:{/,}**",
       ],
       "extends": [
         "schedule:quarterly"
@@ -141,16 +139,16 @@
     {
       "description": "Automerge logging dependencies in a single PR",
       "groupName": "logging dependencies",
-      "matchPackagePrefixes": [
-        "org.slf4j:",
-        "ch.qos.logback:"
+      "matchPackageNames": [
+        "org.slf4j:{/,}**",
+        "ch.qos.logback:{/,}**"
       ],
       "automerge": true,
       "schedule": "on the 4th day of the month"
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",
-      "matchPackagePrefixes": [
+      "matchPackageNames": [
         "com.google.dagger:",
         "com.fasterxml.jackson"
       ],
@@ -158,8 +156,8 @@
     },
     {
       "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
-      "matchPackagePrefixes": [
-        "org.geotools:"
+      "matchPackageNames": [
+        "org.geotools:{/,}**"
       ],
       "minimumReleaseAge": "1 week",
       "labels": ["skip changelog", "bump serialization id"]
