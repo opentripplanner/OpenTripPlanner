@@ -81,7 +81,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     if (stopTimes.isEmpty()) {
       return false;
-    } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlex)) {
+    } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
       return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
       return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);

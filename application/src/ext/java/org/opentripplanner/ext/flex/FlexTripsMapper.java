@@ -44,11 +44,11 @@ public class FlexTripsMapper {
             .withTimePenalty(timePenalty)
             .build()
         );
-      } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
+      } else if (ScheduledDeviatedTrip.isScheduledDeviatedFlexTrip(stopTimes)) {
         result.add(
           ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
         );
-      } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlex)) {
+      } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
         store.add(
           "ContinuousFlexStopTime",
           "Trip %s contains a stop time which combines flex with continuous pick up/drop off. This is an invalid combination: https://github.com/MobilityData/gtfs-flex/issues/70",

@@ -312,7 +312,7 @@ public final class StopTime implements Comparable<StopTime> {
    * Checks if this stop time combines flex windows with continuous stopping, which is against the
    * GTFS spec.
    */
-  public boolean combinesContinuousStoppingWithFlex() {
+  public boolean combinesContinuousStoppingWithFlexWindow() {
     return hasContinuousStopping() && hasFlexWindow();
   }
 

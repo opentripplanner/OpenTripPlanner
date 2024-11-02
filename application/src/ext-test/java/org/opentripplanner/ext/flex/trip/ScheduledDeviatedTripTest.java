@@ -34,16 +34,16 @@ class ScheduledDeviatedTripTest {
   @ParameterizedTest
   @MethodSource("isScheduledDeviatedTripCases")
   void isScheduledDeviatedTrip(List<StopTime> stopTimes) {
-    assertTrue(ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes));
+    assertTrue(ScheduledDeviatedTrip.isScheduledDeviatedFlexTrip(stopTimes));
   }
 
   private static List<List<StopTime>> isNotScheduledDeviatedTripCases() {
     return List.of(
       List.of(
         areaWithContinuousStopping("10:10"),
-        area("10:20", "10:30"),
+        regularStop("10:20", "10:30"),
         areaWithContinuousStopping("10:40"),
-        area("10:50", "11:00")
+        regularStop("10:50", "11:00")
       ),
       List.of(
         regularStop("10:10"),
@@ -55,7 +55,7 @@ class ScheduledDeviatedTripTest {
   @ParameterizedTest
   @MethodSource("isNotScheduledDeviatedTripCases")
   void isNotScheduledDeviatedTrip(List<StopTime> stopTimes) {
-    assertFalse(ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes));
+    assertFalse(ScheduledDeviatedTrip.isScheduledDeviatedFlexTrip(stopTimes));
   }
 
 
