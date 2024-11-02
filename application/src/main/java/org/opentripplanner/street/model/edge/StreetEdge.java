@@ -381,21 +381,6 @@ public class StreetEdge
 
     State state = editor != null ? editor.makeState() : null;
 
-    // Add an explicit bike-walking state for no-thru-traffic edges, so that dismounting and walking
-    // is an option to avoid the restriction
-    if (
-      s0.getBackMode() == TraverseMode.BICYCLE &&
-      canTraverse(TraverseMode.BICYCLE) &&
-      isBicycleNoThruTraffic() &&
-      !s0.hasEnteredNoThruTrafficArea()
-    ) {
-      var bikeWalk = doTraverse(s0, TraverseMode.WALK, true);
-      if (bikeWalk != null) {
-        State forkState = bikeWalk.makeState();
-        return State.ofNullable(forkState, state);
-      }
-    }
-
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking
     if (state != null && !fromv.rentalDropOffBanned(s0) && tov.rentalDropOffBanned(s0)) {

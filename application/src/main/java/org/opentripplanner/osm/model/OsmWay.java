@@ -14,6 +14,7 @@ public class OsmWay extends OsmWithTags {
     "backward",
     "reversible"
   );
+
   private final TLongList nodes = new TLongArrayList();
 
   public void addNodeRef(long nodeRef) {
@@ -137,8 +138,23 @@ public class OsmWay extends OsmWithTags {
     return isEscalator() && "backward".equals(this.getTag("conveying"));
   }
 
-  public boolean isArea() {
-    return isTag("area", "yes");
+  /**
+   * Returns true if the way is considered an area.
+   *
+   * An area can be specified as such, or be one by default as an amenity.
+   */
+  public boolean isRoutableArea() {
+    return (
+      !isTag("area", "no") &&
+      (
+        isTag("area", "yes") ||
+        isParking() ||
+        isBikeParking() ||
+        isBoardingArea() ||
+        isIndoorRoutable()
+      ) &&
+      getNodeRefs().size() > 2
+    );
   }
 
   /**
