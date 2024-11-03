@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptorlegacy._data.transit;
 
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.SearchDirection;

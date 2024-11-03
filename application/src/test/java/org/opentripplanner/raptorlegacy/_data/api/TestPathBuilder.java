@@ -1,13 +1,8 @@
-package org.opentripplanner.raptor._data.api;
+package org.opentripplanner.raptorlegacy._data.api;
 
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTransfer;
-import org.opentripplanner.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -15,6 +10,11 @@ import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code

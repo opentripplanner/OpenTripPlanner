@@ -1,11 +1,11 @@
-package org.opentripplanner.raptor._data.stoparrival;
+package org.opentripplanner.raptorlegacy._data.stoparrival;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
  *

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptorlegacy._data.transit;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;

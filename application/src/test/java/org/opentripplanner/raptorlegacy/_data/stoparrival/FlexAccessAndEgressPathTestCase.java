@@ -1,19 +1,12 @@
-package org.opentripplanner.raptor._data.stoparrival;
+package org.opentripplanner.raptorlegacy._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
-import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor.api.model.RaptorValueFormatter.formatC1;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTransfer;
-import org.opentripplanner.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -21,6 +14,11 @@ import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -296,19 +294,19 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     if (LINE_A.equals(line)) {
       // The latest time the access can arrive is the same as the TX1 arrival time in case B
       arrivalTime = accessPath.latestArrivalTime(TX1_END);
-      prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
+      prevArrival = TestArrivals.access(accessPath.stop(), arrivalTime, accessPath);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, 0, TRIP_A, prevArrival);
+      prevArrival = TestArrivals.bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, 0, TRIP_A, prevArrival);
     } else {
       arrivalTime = accessPath.latestArrivalTime(TX1_START);
-      prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
+      prevArrival = TestArrivals.access(accessPath.stop(), arrivalTime, accessPath);
       int timeShift = TX1_START - prevArrival.arrivalTime();
 
       prevArrival = new Transfer(1, TX1_END - timeShift, TX1_TRANSFER, prevArrival);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, 0, TRIP_B, prevArrival);
+      prevArrival = TestArrivals.bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, 0, TRIP_B, prevArrival);
 
       prevArrival = new Transfer(2, TX2_END, TX2_TRANSFER, prevArrival);
     }
@@ -342,18 +340,18 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     if (LINE_A.equals(line)) {
       arrivalTime = L1_END + ALIGHT_SLACK + TRANSFER_SLACK;
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
-      prevArrival = access(egressPath.stop(), arrivalTime, egressPath);
+      prevArrival = TestArrivals.access(egressPath.stop(), arrivalTime, egressPath);
 
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_A, prevArrival);
+      prevArrival = TestArrivals.bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_A, prevArrival);
     } else {
       arrivalTime = L1_END + ALIGHT_SLACK + TX2_DURATION + TRANSFER_SLACK;
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
-      prevArrival = access(egressPath.stop(), arrivalTime, egressPath);
+      prevArrival = TestArrivals.access(egressPath.stop(), arrivalTime, egressPath);
       arrivalTime = prevArrival.arrivalTime() - TX2_DURATION;
       prevArrival = new Transfer(1, arrivalTime, TX2_TRANSFER_REV, prevArrival);
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_B, prevArrival);
+      prevArrival = TestArrivals.bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_B, prevArrival);
       arrivalTime = prevArrival.arrivalTime() - TX1_DURATION;
       prevArrival = new Transfer(2, arrivalTime, TX1_TRANSFER_REV, prevArrival);
     }

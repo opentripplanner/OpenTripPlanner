@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptorlegacy._data.transit;
 
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

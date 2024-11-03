@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.stoparrival;
+package org.opentripplanner.raptorlegacy._data.stoparrival;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 

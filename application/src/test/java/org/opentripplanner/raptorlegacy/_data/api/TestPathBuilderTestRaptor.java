@@ -1,16 +1,16 @@
-package org.opentripplanner.raptor._data.api;
+package org.opentripplanner.raptorlegacy._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
-import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
+import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 
 /**
  * Test the PathBuilder to be sure that it works properly before using it in other tests.
@@ -50,7 +50,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       STOP_B
     );
 
-    int accessEgressCost = C1_CALCULATOR.costEgress(walk(STOP_B, D2m + D1m));
+    int accessEgressCost = C1_CALCULATOR.costEgress(TestAccessEgress.walk(STOP_B, D2m + D1m));
 
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(

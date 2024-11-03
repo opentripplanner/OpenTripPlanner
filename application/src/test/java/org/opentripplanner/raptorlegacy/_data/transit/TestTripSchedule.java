@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptorlegacy._data.transit;
 
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 

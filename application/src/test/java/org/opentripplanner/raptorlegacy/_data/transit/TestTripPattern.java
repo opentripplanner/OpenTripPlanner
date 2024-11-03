@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptorlegacy._data.transit;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.transit.model.network.Route;

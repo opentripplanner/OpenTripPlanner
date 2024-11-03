@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data;
+package org.opentripplanner.raptorlegacy._data;
 
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;

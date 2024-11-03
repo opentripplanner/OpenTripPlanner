@@ -1,12 +1,12 @@
-package org.opentripplanner.raptor._data.api;
+package org.opentripplanner.raptorlegacy._data.api;
 
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 
 /**
  * This utility help converting a Raptor path to a string which is used in several unit tests for
