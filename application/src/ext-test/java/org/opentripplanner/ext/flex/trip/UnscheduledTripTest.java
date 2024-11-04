@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
