@@ -18,7 +18,7 @@ env:
   # Since version 3.9.0 of Maven it will automatically understand this environment variable.
   # However, as of 2024-11 the latest versions of Ubuntu and Debian were on 3.8.8 so it will take some
   # time until we can remove the $MAVEN_ARGS below.
-  MAVEN_ARGS: "--batch-mode --no-transfer-progress"
+  MAVEN_ARGS: "--no-transfer-progress -Dstyle.color=always"
 
 jobs:
   build-linux:
