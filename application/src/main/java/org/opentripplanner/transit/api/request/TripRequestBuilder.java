@@ -23,7 +23,9 @@ public class TripRequestBuilder {
     return this;
   }
 
-  public TripRequestBuilder withNetexInternalPlanningCodes(List<String> netexInternalPlanningCodes) {
+  public TripRequestBuilder withNetexInternalPlanningCodes(
+    List<String> netexInternalPlanningCodes
+  ) {
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
