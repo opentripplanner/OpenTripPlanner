@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.utils.time.TimeUtils;
 
 record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTime)
   implements RaptorBoardOrAlightEvent<T> {
@@ -43,5 +44,10 @@ record EmptyBoardOrAlightEvent<T extends RaptorTripSchedule>(int earliestBoardTi
     Consumer<RaptorBoardOrAlightEvent<T>> alternativeBoardingFallback
   ) {
     alternativeBoardingFallback.accept(this);
+  }
+
+  @Override
+  public String toString() {
+    return "EmptyBoardOrAlightEvent(" + TimeUtils.timeToStrLong(earliestBoardTime) + ")";
   }
 }
