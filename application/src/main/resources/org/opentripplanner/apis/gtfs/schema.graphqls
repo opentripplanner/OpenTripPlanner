@@ -70,6 +70,7 @@ interface PlaceInterface {
   lon: Float
 }
 
+"Interface for rental vehicles, e.g. free floating vehicles and rental vehicle stations"
 interface VehicleRental {
   "If true, a vehicle can be picked up."
   allowPickupNow: Boolean
