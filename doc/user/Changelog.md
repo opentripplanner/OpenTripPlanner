@@ -29,6 +29,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make indoor=area and indoor=corridor routable for UK OSM tag mapper [#6119](https://github.com/opentripplanner/OpenTripPlanner/pull/6119)
 - Revert  [#6214](https://github.com/opentripplanner/OpenTripPlanner/pull/6214)
 - Remove reading agency and route brandingUrl from GTFS data [#6183](https://github.com/opentripplanner/OpenTripPlanner/pull/6183)
+- Fix NullPointerException when searching backwards with a frequency-based trip [#6211](https://github.com/opentripplanner/OpenTripPlanner/pull/6211)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
