@@ -11,26 +11,6 @@ import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
  */
 public class TestTransferConstraint implements Serializable, RaptorTransferConstraint {
 
-  /**
-   * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
-   * transfers with a priority and the {@link #GUARANTEED_TRANSFER_COST}.
-   */
-  private static final int STAY_SEATED_TRANSFER_COST = 10_00;
-
-  /**
-   * GUARANTEED is not a priority, but we assign a cost to it to be able to compare it with other
-   * transfers with a priority. The cost is better than a pure prioritized transfer, but the
-   * priority and GUARANTEED attribute is added together; Hence a (GUARANTEED, RECOMMENDED) transfer
-   * is better than (GUARANTEED, ALLOWED).
-   */
-  private static final int GUARANTEED_TRANSFER_COST = 20_00;
-
-  /**
-   * A cost penalty of 10 points is added to a Transfer which is NOT stay-seated or guaranteed. This
-   * makes sure that stay-seated and guaranteed transfers take precedence over the priority cost.
-   */
-  private static final int NONE_FACILITATED_COST = 30_00;
-
   private enum Type {
     NOT_ALLOWED,
     STAY_SEATED,
