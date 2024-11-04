@@ -22,8 +22,6 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.IntUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -41,6 +39,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily

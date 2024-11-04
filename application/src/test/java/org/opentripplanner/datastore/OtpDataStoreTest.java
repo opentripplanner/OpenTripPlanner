@@ -34,8 +34,8 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class OtpDataStoreTest {
 

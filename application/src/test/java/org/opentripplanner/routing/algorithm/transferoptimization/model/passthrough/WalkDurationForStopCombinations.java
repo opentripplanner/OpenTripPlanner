@@ -4,8 +4,8 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * This class is used to adjust the walk time - giving each path an unique generalized-cost. We want

@@ -2,9 +2,9 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public final class FareRule implements Serializable {
 

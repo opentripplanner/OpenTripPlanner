@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.model;
 
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * Encapsulate information about a transfer path.

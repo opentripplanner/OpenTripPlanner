@@ -7,11 +7,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.time.DurationUtils;
 
 class TripPlanTimePenaltyDtoTest {
 

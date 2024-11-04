@@ -3,8 +3,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
@@ -13,6 +11,8 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class StopArrivalFactoryC1Test {
 

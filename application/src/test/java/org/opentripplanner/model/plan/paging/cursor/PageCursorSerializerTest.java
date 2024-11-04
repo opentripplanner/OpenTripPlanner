@@ -8,8 +8,8 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.plan.ItinerarySortKey;
+import org.opentripplanner.utils.time.DurationUtils;
 
 class PageCursorSerializerTest {
 

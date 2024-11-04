@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.

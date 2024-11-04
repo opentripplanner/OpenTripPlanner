@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 class BookingTimeTest {
 

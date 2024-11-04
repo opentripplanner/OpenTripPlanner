@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A map of {@link TimeAndCost} indexed by enum type {@code T}.
