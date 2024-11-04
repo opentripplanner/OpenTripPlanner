@@ -88,7 +88,7 @@ class TestConstrainedTransfer
   }
 
   public boolean isFacilitated() {
-    return transferConstraint.isStaySeated();
+    return transferConstraint.isStaySeated() || transferConstraint.isGuaranteed();
   }
 
   @Nullable
