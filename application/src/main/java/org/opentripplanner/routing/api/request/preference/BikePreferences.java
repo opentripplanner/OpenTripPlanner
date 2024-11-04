@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
-import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.SAFE_STREETS;
 import static org.opentripplanner.routing.core.VehicleRoutingOptimizeType.TRIANGLE;
+import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The bike preferences contain all speed, reluctance, cost and factor preferences for biking

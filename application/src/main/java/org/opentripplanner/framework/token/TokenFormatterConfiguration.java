@@ -1,6 +1,6 @@
 package org.opentripplanner.framework.token;
 
-import org.opentripplanner.framework.text.CharacterEscapeFormatter;
+import org.opentripplanner.utils.text.CharacterEscapeFormatter;
 
 class TokenFormatterConfiguration {
 

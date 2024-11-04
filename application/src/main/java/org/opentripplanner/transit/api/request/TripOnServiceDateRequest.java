@@ -2,9 +2,9 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /*
  * A request for trips on a specific service date.

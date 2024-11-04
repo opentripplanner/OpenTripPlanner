@@ -42,7 +42,6 @@ import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -50,6 +49,7 @@ import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class LuceneIndex implements Serializable {
 

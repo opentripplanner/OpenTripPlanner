@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * A leg in a Raptor path. The legs are linked together from the first leg {@link AccessPathLeg}, to

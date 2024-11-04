@@ -9,7 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

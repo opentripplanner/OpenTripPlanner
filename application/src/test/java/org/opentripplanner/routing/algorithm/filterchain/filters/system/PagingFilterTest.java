@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.collection.ListUtils.first;
-import static org.opentripplanner.framework.collection.ListUtils.last;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.collection.ListUtils.first;
+import static org.opentripplanner.utils.collection.ListUtils.last;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.debug.TestDebug;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class PagingFilterTest implements PlanTestConstants {
 

@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This trip search will only match trips that is within the given slack of the timeLimit.

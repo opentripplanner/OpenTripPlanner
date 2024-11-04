@@ -14,10 +14,10 @@ import static org.opentripplanner.street.model.edge.StreetEdge.WHEELCHAIR_ACCESS
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.lang.BitSetUtils;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.utils.lang.BitSetUtils;
 
 public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
 

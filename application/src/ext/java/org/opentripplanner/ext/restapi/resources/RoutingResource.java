@@ -23,8 +23,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.ext.restapi.mapping.LegacyVehicleRoutingOptimizeType;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -35,6 +33,8 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

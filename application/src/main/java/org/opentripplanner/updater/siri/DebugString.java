@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.siri;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import uk.org.siri.siri20.DataFrameRefStructure;
 import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
