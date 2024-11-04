@@ -2,7 +2,7 @@
 
 In general, we use American English. We use the GTFS terminology inside OTP as the transit
 domain-specific language. In cases where GTFS does not provide an alternative, we use NeTEx. The
-naming  should follow the Java standard naming conventions. For example, a "real-time updater" class
+naming should follow the Java standard naming conventions. For example, a "real-time updater" class
 is named `RealTimeUpdater`. If in doubt, check the Oxford Dictionary (American).
 
 ## Packages

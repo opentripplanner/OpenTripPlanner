@@ -10,9 +10,9 @@ run `prettier-maven-plugin`. A check is run in the CI build, which fails the bui
 merging a PR if the code style is incorrect.
 
 There are two ways to format the code before checking it in. You may run a normal build with
-Maven—it takes a bit of time, but reformat the entire codebase. Only code you have changed should be
-formatted, since the existing code is already formatted. The second way is to set up Prettier and
-run it manually or hick it into your IDE, so it runs every time a file is changed.
+Maven; it takes a bit of time, but it reformats the entire codebase. Only code you have changed
+should be formatted, since the existing code is already formatted. The second way is to set up
+Prettier and run it manually or hick it into your IDE, so it runs every time a file is changed.
 
 ### How to Run Prettier with Maven
 
@@ -47,10 +47,10 @@ The check is run by the CI server and will fail the build if the code is incorre
 
 You should use the Prettier Maven plugin to reformat the code or run Prettier with Node (faster).
 
-Prettier does _not_ format the doc and Markdown files—only Java code. So, for other files, you
+Prettier does _not_ format the doc and Markdown files, only Java code. So, for other files you
 should use the _project_ code style. It is automatically imported when you first open the project.
 But, if you have set a custom code style in your settings (as we used until OTP v2.1), then you need
-to  change to the _Project_ code style. Open the `Preferences` from the menu and select _Editor >
+to change to the _Project_ code style. Open the `Preferences` from the menu and select _Editor >
 Code Style_. Then select **Project** in the \_Scheme drop down.
 
 #### Run Prettier Maven Plugin as an External Tool in IntelliJ
