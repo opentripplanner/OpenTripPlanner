@@ -59,7 +59,7 @@ jobs:
         if: github.repository_owner == 'opentripplanner'
         uses: codecov/codecov-action@v4
         with:
-          files: target/site/jacoco/jacoco.xml
+          files: target/site/jacoco-aggregate/jacoco.xml
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
