@@ -1,21 +1,23 @@
 package org.opentripplanner.raptor;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static org.opentripplanner.OtpArchitectureModules.FRAMEWORK_UTILS;
-import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
-import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
-import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.arch.ArchComponent;
-import org.opentripplanner._support.arch.Module;
-import org.opentripplanner._support.arch.Package;
+import org.opentripplanner.raptor._support.arch.ArchComponent;
+import org.opentripplanner.raptor._support.arch.Module;
+import org.opentripplanner.raptor._support.arch.Package;
 
 public class RaptorArchitectureTest {
 
+  private static final Package OTP_ROOT = Package.of("org.opentripplanner");
+  private static final Package GNU_TROVE = Package.of("gnu.trove..");
+  private static final Package OTP_UTILS = OTP_ROOT.subPackage("utils..");
+
+
   /* The Raptor module, all packages that other paths of OTP may use. */
   private static final Package RAPTOR = OTP_ROOT.subPackage("raptor");
+  private static final Package RAPTOR_API = RAPTOR.subPackage("api..");
   private static final Package API = RAPTOR.subPackage("api");
   private static final Package API_MODEL = API.subPackage("model");
   private static final Package API_PATH = API.subPackage("path");
@@ -49,7 +51,7 @@ public class RaptorArchitectureTest {
    * Packages used by standard-range-raptor and multi-criteria-range-raptor.
    */
   private static final Module RR_SHARED_PACKAGES = Module.of(
-    FRAMEWORK_UTILS,
+    OTP_UTILS,
     GNU_TROVE,
     RAPTOR_API,
     RAPTOR_SPI,
@@ -64,37 +66,37 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesRaptorAPI() {
-    API_MODEL.dependsOn(FRAMEWORK_UTILS).verify();
-    API_PATH.dependsOn(FRAMEWORK_UTILS, API_MODEL).verify();
-    var debug = API.subPackage("debug").dependsOn(FRAMEWORK_UTILS).verify();
-    var view = API.subPackage("view").dependsOn(FRAMEWORK_UTILS, API_MODEL).verify();
+    API_MODEL.dependsOn(OTP_UTILS).verify();
+    API_PATH.dependsOn(OTP_UTILS, API_MODEL).verify();
+    var debug = API.subPackage("debug").dependsOn(OTP_UTILS).verify();
+    var view = API.subPackage("view").dependsOn(OTP_UTILS, API_MODEL).verify();
     var request = API
       .subPackage("request")
-      .dependsOn(FRAMEWORK_UTILS, debug, API_MODEL, API_PATH, view)
+      .dependsOn(OTP_UTILS, debug, API_MODEL, API_PATH, view)
       .verify();
-    API.subPackage("response").dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH, request).verify();
+    API.subPackage("response").dependsOn(OTP_UTILS, API_MODEL, API_PATH, request).verify();
   }
 
   @Test
   void enforcePackageDependenciesRaptorSPI() {
-    RAPTOR.subPackage("spi").dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH).verify();
+    RAPTOR.subPackage("spi").dependsOn(OTP_UTILS, API_MODEL, API_PATH).verify();
   }
 
   @Test
   void enforcePackageDependenciesUtil() {
-    RAPTOR_UTIL.dependsOn(FRAMEWORK_UTILS, RAPTOR_SPI).verify();
+    RAPTOR_UTIL.dependsOn(OTP_UTILS, RAPTOR_SPI).verify();
     RAPTOR_UTIL_PARETO_SET.dependsOn(RAPTOR_UTIL_COMPOSITE).verify();
     RAPTOR_UTIL_COMPOSITE.verify();
   }
 
   @Test
   void enforcePackageDependenciesRaptorPath() {
-    RAPTOR_PATH.dependsOn(FRAMEWORK_UTILS, API_PATH, API_MODEL, RAPTOR_SPI, RR_TRANSIT).verify();
+    RAPTOR_PATH.dependsOn(OTP_UTILS, API_PATH, API_MODEL, RAPTOR_SPI, RR_TRANSIT).verify();
   }
 
   @Test
   void enforcePackageDependenciesInRangeRaptorSharedPackages() {
-    RR_INTERNAL_API.dependsOn(FRAMEWORK_UTILS, RAPTOR_API, RAPTOR_SPI).verify();
+    RR_INTERNAL_API.dependsOn(OTP_UTILS, RAPTOR_API, RAPTOR_SPI).verify();
     RR_DEBUG.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_LIFECYCLE.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_TRANSIT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE).verify();
@@ -200,7 +202,7 @@ public class RaptorArchitectureTest {
   void enforcePackageDependenciesInRaptorService() {
     SERVICE
       .dependsOn(
-        FRAMEWORK_UTILS,
+        OTP_UTILS,
         RAPTOR_API,
         RAPTOR_SPI,
         RAPTOR_UTIL,
@@ -216,6 +218,7 @@ public class RaptorArchitectureTest {
   void enforcePackageDependenciesInConfigure() {
     CONFIGURE
       .dependsOn(
+        OTP_UTILS,
         RAPTOR_API,
         RAPTOR_SPI,
         RANGE_RAPTOR,
@@ -223,8 +226,7 @@ public class RaptorArchitectureTest {
         RR_TRANSIT,
         RR_CONTEXT,
         RR_STD_CONFIGURE,
-        RR_MC_CONFIGURE,
-        FRAMEWORK_UTILS
+        RR_MC_CONFIGURE
       )
       .verify();
   }
