@@ -944,14 +944,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         new Coordinate(args.getGraphQLMaximumLongitude(), args.getGraphQLMaximumLatitude())
       );
 
-      Stream<VehicleRentalPlace> vehicleRental = Stream
-        .concat(
-          vehicleRentalService.getVehicleRentalStations().stream(),
-          vehicleRentalService.getVehicleRentalVehicles().stream()
-        )
-        .filter(vr -> envelope.contains(
-          new Coordinate(vr.getLongitude(), vr.getLatitude())
-        ));
+      Stream<VehicleRentalPlace> vehicleRental = vehicleRentalService
+        .getVehicleRentalPlaces()
+        .stream()
+        .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));
 
       return vehicleRental.toList();
     };
