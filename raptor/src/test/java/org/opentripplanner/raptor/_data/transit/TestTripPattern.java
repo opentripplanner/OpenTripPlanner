@@ -1,99 +1,45 @@
 package org.opentripplanner.raptor._data.transit;
 
+import java.util.Objects;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class TestTripPattern implements RaptorTripPattern {
 
-  public static final byte BOARDING_MASK = 0b0001;
-  public static final byte ALIGHTING_MASK = 0b0010;
-  public static final byte WHEELCHAIR_MASK = 0b0100;
-
   private final String name;
   private final int[] stopIndexes;
-  /**
-   * By caching the index, we avoid looking up the pattern during routing, this reduces memory lookups and
-   * improves the performance.
-   */
-  private int slackIndex = 0;
+  private final BoardAlightRestrictions restrictions;
+  private final int slackIndex;
+  private final int patternIndex;
+  private final int priorityGroupId;
 
-  private int patternIndex = 0;
+  private TestTripPattern(
+    String name,
+    int[] stopIndexes,
+    BoardAlightRestrictions restrictions,
+    int slackIndex,
+    int patternIndex,
+    int priorityGroupId
+  ) {
+    this.name = Objects.requireNonNull(name);
+    this.stopIndexes = Objects.requireNonNull(stopIndexes);
+    this.restrictions = Objects.requireNonNull(restrictions);
+    this.slackIndex = slackIndex;
+    this.patternIndex = patternIndex;
+    this.priorityGroupId = priorityGroupId;
+  }
 
-  private int priorityGroupId = 0;
-
-  /**
-   * <pre>
-   * 0 - 000 : No restriction
-   * 1 - 001 : No Boarding
-   * 2 - 010 : No Alighting
-   * 4 - 100 : No wheelchair
-   * </pre>
-   */
-  private final int[] restrictions;
-
-  private TestTripPattern(String name, int[] stopIndexes, int[] restrictions) {
-    this.name = name;
-    this.stopIndexes = stopIndexes;
-    this.restrictions = restrictions;
+  public static TestTripPattern.Builder of(String name, int... stopIndexes) {
+    return new TestTripPattern.Builder(name, stopIndexes);
   }
 
   public static TestTripPattern pattern(String name, int... stopIndexes) {
-    return new TestTripPattern(name, stopIndexes, new int[stopIndexes.length]);
+    return of(name, stopIndexes).build();
   }
 
   /** Create a pattern with name 'R1' and given stop indexes */
   public static TestTripPattern pattern(int... stopIndexes) {
-    return new TestTripPattern("R1", stopIndexes, new int[stopIndexes.length]);
-  }
-
-  public TestTripPattern withSlackIndex(int index) {
-    this.slackIndex = index;
-    return this;
-  }
-
-  TestTripPattern withPatternIndex(int index) {
-    this.patternIndex = index;
-    return this;
-  }
-
-  public TestTripPattern withPriorityGroup(int priorityGroupId) {
-    this.priorityGroupId = priorityGroupId;
-    return this;
-  }
-
-  /**
-   * <pre>
-   * Codes:
-   *   B : Board
-   *   A : Alight
-   *   W : Wheelchair
-   *   * : Board, Alight, Wheelchair
-   *
-   * Example:   B BA * AW
-   * </pre>
-   */
-  public void restrictions(String codes) {
-    String[] split = codes.split(" ");
-    for (int i = 0; i < split.length; i++) {
-      String restriction = split[i];
-      restrictions[i] = 0;
-      if (restriction.contains("*")) {
-        continue;
-      }
-      if (!restriction.contains("B")) {
-        restrictions[i] |= BOARDING_MASK;
-      }
-      if (!restriction.contains("A")) {
-        restrictions[i] |= ALIGHTING_MASK;
-      }
-      if (!restriction.contains("W")) {
-        restrictions[i] |= WHEELCHAIR_MASK;
-      }
-    }
-  }
-
-  public String getName() {
-    return name;
+    return pattern("R1", stopIndexes);
   }
 
   @Override
@@ -103,12 +49,12 @@ public class TestTripPattern implements RaptorTripPattern {
 
   @Override
   public boolean boardingPossibleAt(int stopPositionInPattern) {
-    return isNotRestricted(stopPositionInPattern, BOARDING_MASK);
+    return restrictions.isBoardingPossibleAt(stopPositionInPattern);
   }
 
   @Override
   public boolean alightingPossibleAt(int stopPositionInPattern) {
-    return isNotRestricted(stopPositionInPattern, ALIGHTING_MASK);
+    return restrictions.isAlightingPossibleAt(stopPositionInPattern);
   }
 
   @Override
@@ -142,11 +88,73 @@ public class TestTripPattern implements RaptorTripPattern {
       .of(TestTripPattern.class)
       .addStr("name", name)
       .addInts("stops", stopIndexes)
-      .addInts("restrictions", restrictions)
+      .addObj("restrictions", restrictions)
       .toString();
   }
 
-  private boolean isNotRestricted(int index, int mask) {
-    return restrictions == null || (restrictions[index] & mask) == 0;
+  public static class Builder {
+
+    private final String name;
+    private int[] stopIndexes;
+    private String restrictions;
+    private int slackIndex = 0;
+    private int patternIndex = 0;
+    private int priorityGroupId = 0;
+
+    public Builder(String name, int... stopIndexes) {
+      this.name = name;
+      this.stopIndexes = stopIndexes;
+    }
+
+    public Builder pattern(int... stopIndexes) {
+      this.stopIndexes = stopIndexes;
+      return this;
+    }
+
+    /**
+     * Set alight and board restriction using a "coded" string, use space as a separator
+     * between stops.
+     * <pre>
+     * Codes:
+     *   b : Board
+     *   a : Alight
+     *   * : Board & Alight
+     *   - : Boarding & Alighting is not allowed
+     *
+     * Example:   B BA * A
+     * </pre>
+     */
+    public Builder restrictions(String restrictions) {
+      this.restrictions = restrictions;
+      return this;
+    }
+
+    public Builder slackIndex(int index) {
+      this.slackIndex = index;
+      return this;
+    }
+
+    public Builder patternIndex(int index) {
+      this.patternIndex = index;
+      return this;
+    }
+
+    public Builder priorityGroup(int priorityGroupId) {
+      this.priorityGroupId = priorityGroupId;
+      return this;
+    }
+
+    public TestTripPattern build() {
+      return new TestTripPattern(
+        name,
+        stopIndexes,
+        restrictions == null
+          ? BoardAlightRestrictions.noRestriction(stopIndexes.length)
+          : BoardAlightRestrictions.restrictions(restrictions),
+        slackIndex,
+        patternIndex,
+        priorityGroupId
+      );
+    }
   }
 }

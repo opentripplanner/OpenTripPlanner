@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
@@ -57,8 +56,10 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
    */
   @BeforeEach
   void setup() {
-    TestTripPattern pattern = pattern("R1", STOP_B, STOP_C, STOP_D);
-    pattern.restrictions("BW BA AW");
+    TestTripPattern pattern = TestTripPattern
+      .of("R1", STOP_B, STOP_C, STOP_D)
+      .restrictions("B BA A")
+      .build();
     data.withRoute(route(pattern).withTimetable(schedule("00:01, 00:03, 00:05")));
     requestBuilder
       .searchParams()

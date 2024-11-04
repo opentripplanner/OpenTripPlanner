@@ -8,7 +8,6 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_A;
 import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_B;
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
+import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
@@ -54,13 +54,13 @@ public class K01_TransitPriorityTest {
   @BeforeEach
   private void prepareRequest() {
     data.withRoutes(
-      route(pattern("L1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
+      route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build())
         .withTimetable(schedule("00:02 00:12")),
-      route(pattern("U1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
+      route(TestTripPattern.of("U1", STOP_B, STOP_C).priorityGroup(GROUP_A).build())
         .withTimetable(schedule("00:02 00:12:01")),
-      route(pattern("L2", STOP_B, STOP_C).withPriorityGroup(GROUP_B))
+      route(TestTripPattern.of("L2", STOP_B, STOP_C).priorityGroup(GROUP_B).build())
         .withTimetable(schedule("00:02 00:13")),
-      route(pattern("L3", STOP_B, STOP_C).withPriorityGroup(GROUP_C))
+      route(TestTripPattern.of("L3", STOP_B, STOP_C).priorityGroup(GROUP_C).build())
         .withTimetable(schedule("00:02 00:14"))
     );
 
