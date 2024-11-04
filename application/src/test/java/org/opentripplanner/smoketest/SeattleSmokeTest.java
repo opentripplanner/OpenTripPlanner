@@ -198,6 +198,7 @@ public class SeattleSmokeTest {
       .includeArriveBy()
       .build();
   }
+
   @ParameterizedTest
   @MethodSource("bikeCombinations")
   public void bikeAndTransit(TripPlanParameters params) throws IOException {
