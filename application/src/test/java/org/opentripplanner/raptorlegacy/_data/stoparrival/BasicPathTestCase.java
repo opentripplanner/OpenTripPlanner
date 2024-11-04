@@ -2,7 +2,7 @@ package org.opentripplanner.raptorlegacy._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 

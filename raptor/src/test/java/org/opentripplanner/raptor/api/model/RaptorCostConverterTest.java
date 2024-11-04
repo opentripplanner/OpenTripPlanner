@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
+package org.opentripplanner.raptor.api.model;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 
 public class RaptorCostConverterTest {
 

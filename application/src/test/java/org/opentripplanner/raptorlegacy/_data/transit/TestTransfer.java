@@ -1,6 +1,6 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 

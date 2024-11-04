@@ -1,14 +1,14 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
+package org.opentripplanner.raptor.api.model;
 
 import java.time.Duration;
-import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 
 /**
- * Convert Raptor internal cost to OTP domain model cost, and back.
+ * Convert Raptor internal cost to OTP domain model cost, and back. This is provided by the Raptor
+ * module as a utility, but not used in Raptor except in unit-tests.
  * <p>
- * Inside Raptor the a cost unit is 1/100 of a "transit second" using {@code int} as type. In the
- * OTP internal domain the unit used for cost is one "transit second" with type {@code double}. Cost
- * in raptor is calculated using <b>int</b>s to spped up the calculations and to save memory.
+ * Inside Raptor the cost unit is 1/100 of a "transit second" using {@code int} as type. In the
+ * OTP internal domain the unit used for cost is one "transit second" with type {@code double}.
+ * Cost in raptor is calculated using <b>int</b>s to speed up the calculations and to save memory.
  * <p>
  * The reason for using 1/100 of a second resolution is that we want a cost factor of {@code 0.99}
  * to win over a cost factor of {@code 1.00}.
