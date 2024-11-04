@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.egress;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.transfer;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.raptor.api.model.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 import static org.opentripplanner.utils.time.TimeUtils.time;

@@ -2,9 +2,9 @@ package org.opentripplanner.raptor._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
+import static org.opentripplanner.raptor.api.model.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
