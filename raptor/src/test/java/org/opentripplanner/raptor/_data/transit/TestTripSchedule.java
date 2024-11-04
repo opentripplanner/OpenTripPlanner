@@ -18,12 +18,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
   private final int[] departureTimes;
   private final RaptorTripPattern pattern;
 
-  protected TestTripSchedule(
-    TestTripPattern pattern,
-    int[] arrivalTimes,
-    int[] departureTimes,
-    int transitReluctanceIndex
-  ) {
+  protected TestTripSchedule(TestTripPattern pattern, int[] arrivalTimes, int[] departureTimes) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
@@ -88,7 +83,6 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private int[] arrivalTimes;
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
-    private int transitReluctanceIndex = 0;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -101,7 +95,6 @@ public class TestTripSchedule implements RaptorTripSchedule {
       b.arrivalTimes = arrivalTimes;
       b.departureTimes = departureTimes;
       b.arrivalDepartureOffset = arrivalDepartureOffset;
-      b.transitReluctanceIndex = transitReluctanceIndex;
       return b;
     }
 
@@ -174,16 +167,6 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    /**
-     * Set the transit-reluctance-index.
-     * <p>
-     * The default is 0.
-     */
-    public TestTripSchedule.Builder transitReluctanceIndex(int transitReluctanceIndex) {
-      this.transitReluctanceIndex = transitReluctanceIndex;
-      return this;
-    }
-
     public TestTripSchedule.Builder[] repeat(int nTimes, int everySeconds) {
       return IntStream
         .range(0, nTimes)
@@ -219,7 +202,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
         );
       }
 
-      return new TestTripSchedule(pattern, arrivalTimes, departureTimes, transitReluctanceIndex);
+      return new TestTripSchedule(pattern, arrivalTimes, departureTimes);
     }
 
     private static int[] copyWithOffset(int[] source, int offset) {

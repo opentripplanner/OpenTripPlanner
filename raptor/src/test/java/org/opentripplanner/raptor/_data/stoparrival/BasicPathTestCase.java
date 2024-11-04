@@ -96,7 +96,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
   private static final int[] STOP_C1S = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
 
-  // Some times which should not have eny effect on tests
+  // These times should not have eny effect on tests
   private static final int VERY_EARLY = time("00:00");
   private static final int VERY_LATE = time("23:59");
 
@@ -195,13 +195,11 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final TestTripSchedule TRIP_1 = TestTripSchedule
     .schedule(pattern(LINE_11, STOP_A, STOP_B))
     .times(L11_START, L11_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
   public static final TestTripSchedule TRIP_2 = TestTripSchedule
     .schedule(pattern(LINE_21, STOP_C, STOP_D))
     .times(L21_START, L21_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
   public static final TestTripSchedule TRIP_3 = TestTripSchedule
@@ -209,7 +207,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     // The early arrival and late departure should not have any effect on tests
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
   public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR = new TestCostCalculator(

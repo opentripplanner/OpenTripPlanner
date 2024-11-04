@@ -142,13 +142,11 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
   public static final TestTripSchedule TRIP_A = TestTripSchedule
     .schedule(TestTripPattern.pattern(LINE_A, STOP_A, STOP_D))
     .times(L1_START, L1_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
   public static final TestTripSchedule TRIP_B = TestTripSchedule
     .schedule(TestTripPattern.pattern(LINE_B, STOP_B, STOP_C))
     .times(L1_START, L1_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
   public static final int L1_C1_EX_WAIT = C1_CALCULATOR.transitArrivalCost(
