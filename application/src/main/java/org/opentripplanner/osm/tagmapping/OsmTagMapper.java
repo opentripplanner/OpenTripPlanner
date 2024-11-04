@@ -407,11 +407,7 @@ public class OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
     );
     props.setProperties(
-      new ExactMatchSpecifier(
-        new Condition.Equals("highway", "footway"),
-        new Condition.Equals("bicycle", "yes"),
-        new Condition.Equals("area", " yes")
-      ),
+      new ExactMatchSpecifier("highway=footway;bicycle=yes;area=yes"),
       withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9)
     );
     props.setProperties(

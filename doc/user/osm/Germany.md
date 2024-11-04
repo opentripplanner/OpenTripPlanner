@@ -156,7 +156,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=primary_link; cycleway=opposite`               | `ALL`                    | forward: 2.06 <br> back: 2.99 |             |
 | `highway=path; bicycle=designated`                      | `PEDESTRIAN_AND_BICYCLE` | 0.6                           |             |
 | `highway=footway; bicycle=designated`                   | `PEDESTRIAN_AND_BICYCLE` | 0.75                          |             |
-| `highway=footway; bicycle=yes; area= yes`               | `PEDESTRIAN_AND_BICYCLE` | 0.9                           |             |
+| `highway=footway; bicycle=yes; area=yes`                | `PEDESTRIAN_AND_BICYCLE` | 0.9                           |             |
 | `highway=pedestrian; bicycle=designated`                | `PEDESTRIAN_AND_BICYCLE` | 0.75                          |             |
 | `footway=sidewalk; highway=footway; bicycle=yes`        | `PEDESTRIAN_AND_BICYCLE` | 2.5                           |             |
 | `footway=sidewalk; highway=footway; bicycle=designated` | `PEDESTRIAN_AND_BICYCLE` | 1.1                           |             |
