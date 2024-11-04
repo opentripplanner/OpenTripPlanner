@@ -156,6 +156,9 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return gtfsSortOrder;
   }
 
+  /**
+   * Returns the NeTEx submode for the route. Will return UNKNOWN by default.
+   */
   public SubMode getNetexSubmode() {
     return netexSubmode;
   }

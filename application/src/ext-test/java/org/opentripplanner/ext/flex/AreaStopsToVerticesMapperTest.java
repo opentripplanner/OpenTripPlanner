@@ -19,26 +19,29 @@ import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class AreaStopsToVerticesMapperTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL
     .areaStop("berlin")
     .withGeometry(Polygons.BERLIN)
     .build();
-  public static final StopModel STOP_MODEL = TEST_MODEL
-    .stopModelBuilder()
+  public static final SiteRepository SITE_REPOSITORY = TEST_MODEL
+    .siteRepositoryBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 
-  public static final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, new Deduplicator());
+  public static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
+    SITE_REPOSITORY,
+    new Deduplicator()
+  );
 
   static List<TestCase> testCases() {
     return List.of(

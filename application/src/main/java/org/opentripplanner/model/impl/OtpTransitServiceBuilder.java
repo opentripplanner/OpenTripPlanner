@@ -54,8 +54,8 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +78,7 @@ public class OtpTransitServiceBuilder {
 
   private final List<Frequency> frequencies = new ArrayList<>();
 
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
@@ -124,8 +124,8 @@ public class OtpTransitServiceBuilder {
 
   private final DataImportIssueStore issueStore;
 
-  public OtpTransitServiceBuilder(StopModel stopModel, DataImportIssueStore issueStore) {
-    this.stopModelBuilder = stopModel.withContext();
+  public OtpTransitServiceBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
+    this.siteRepositoryBuilder = siteRepository.withContext();
     this.issueStore = issueStore;
   }
 
@@ -151,16 +151,16 @@ public class OtpTransitServiceBuilder {
     return frequencies;
   }
 
-  public StopModelBuilder stopModel() {
-    return stopModelBuilder;
+  public SiteRepositoryBuilder siteRepository() {
+    return siteRepositoryBuilder;
   }
 
   public ImmutableEntityById<GroupOfStations> getGroupsOfStationsById() {
-    return stopModelBuilder.groupOfStationById();
+    return siteRepositoryBuilder.groupOfStationById();
   }
 
   public ImmutableEntityById<MultiModalStation> getMultiModalStationsById() {
-    return stopModelBuilder.multiModalStationById();
+    return siteRepositoryBuilder.multiModalStationById();
   }
 
   /**
@@ -188,11 +188,11 @@ public class OtpTransitServiceBuilder {
   }
 
   public ImmutableEntityById<Station> getStations() {
-    return stopModelBuilder.stationById();
+    return siteRepositoryBuilder.stationById();
   }
 
   public ImmutableEntityById<RegularStop> getStops() {
-    return stopModelBuilder.regularStopsById();
+    return siteRepositoryBuilder.regularStopsById();
   }
 
   public EntityById<Entrance> getEntrances() {
@@ -208,11 +208,11 @@ public class OtpTransitServiceBuilder {
   }
 
   public ImmutableEntityById<AreaStop> getAreaStops() {
-    return stopModelBuilder.areaStopById();
+    return siteRepositoryBuilder.areaStopById();
   }
 
   public ImmutableEntityById<GroupStop> getGroupStops() {
-    return stopModelBuilder.groupStopById();
+    return siteRepositoryBuilder.groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {

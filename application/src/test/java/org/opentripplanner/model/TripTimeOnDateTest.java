@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
@@ -14,9 +14,9 @@ class TripTimeOnDateTest implements PlanTestConstants {
 
   @Test
   void gtfsSequence() {
-    var testModel = TransitModelForTest.of();
+    var testModel = TimetableRepositoryForTest.of();
     var pattern = testModel.pattern(TransitMode.BUS).build();
-    var trip = TransitModelForTest.trip("123").build();
+    var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, T11_00);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());

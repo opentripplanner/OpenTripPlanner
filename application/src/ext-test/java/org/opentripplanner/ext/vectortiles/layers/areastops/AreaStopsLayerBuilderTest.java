@@ -15,9 +15,9 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class AreaStopsLayerBuilderTest {
 
@@ -46,25 +46,25 @@ class AreaStopsLayerBuilderTest {
     .layers()
     .getFirst();
 
-  private final StopModelBuilder stopModelBuilder = StopModel.of();
+  private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
-  private final AreaStop AREA_STOP = stopModelBuilder
+  private final AreaStop AREA_STOP = siteRepositoryBuilder
     .areaStop(ID)
     .withName(NAME)
     .withGeometry(Polygons.BERLIN)
     .build();
 
-  private final TransitModel transitModel = new TransitModel(
-    stopModelBuilder.withAreaStop(AREA_STOP).build(),
+  private final TimetableRepository timetableRepository = new TimetableRepository(
+    siteRepositoryBuilder.withAreaStop(AREA_STOP).build(),
     new Deduplicator()
   );
 
   @Test
   void getAreaStops() {
-    transitModel.index();
+    timetableRepository.index();
 
     var subject = new AreaStopsLayerBuilder(
-      new DefaultTransitService(transitModel),
+      new DefaultTransitService(timetableRepository),
       LAYER_CONFIG,
       Locale.ENGLISH
     );

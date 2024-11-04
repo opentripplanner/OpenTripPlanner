@@ -95,7 +95,6 @@ nav:
     - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Sandbox Development: 'SandboxExtension.md'
     - Release Checklist: 'ReleaseChecklist.md'

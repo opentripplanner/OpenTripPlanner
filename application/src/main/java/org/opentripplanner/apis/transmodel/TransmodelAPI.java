@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,15 +67,21 @@ public class TransmodelAPI {
    */
   public static void setUp(
     TransmodelAPIParameters config,
-    TransitModel transitModel,
-    RouteRequest defaultRouteRequest
+    TimetableRepository timetableRepository,
+    RouteRequest defaultRouteRequest,
+    TransitRoutingConfig transitRoutingConfig
   ) {
     if (config.hideFeedId()) {
-      TransitIdMapper.setupFixedFeedId(transitModel.getAgencies());
+      TransitIdMapper.setupFixedFeedId(timetableRepository.getAgencies());
     }
     tracingHeaderTags = config.tracingHeaderTags();
     maxNumberOfResultFields = config.maxNumberOfResultFields();
-    schema = TransmodelGraphQLSchema.create(defaultRouteRequest, transitModel.getTimeZone());
+    schema =
+      TransmodelGraphQLSchema.create(
+        defaultRouteRequest,
+        timetableRepository.getTimeZone(),
+        transitRoutingConfig
+      );
   }
 
   @POST

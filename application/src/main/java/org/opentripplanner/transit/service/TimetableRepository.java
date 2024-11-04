@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -44,9 +45,12 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -55,32 +59,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The TransitModel groups together all instances making up OTP's primary internal representation
+ * The TimetableRepository groups together all instances making up OTP's primary internal representation
  * of the public transportation network. Although the names of many entities are derived from
  * GTFS concepts, these are actually independent of the data source from which they are loaded.
  * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
  * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
  * only in NeTEx, the NeTEx name is used in the internal model.
  *
- * A TransitModel instance also includes references to some transient indexes of its contents, to
+ * A TimetableRepository instance also includes references to some transient indexes of its contents, to
  * the TransitLayer derived from it, and to some other services and utilities that operate upon
  * its contents.
  *
- * The TransitModel stands in opposition to two other aggregates: the Graph (representing the
- * street network) and the TransitLayer (representing many of the same things in the TransitModel
+ * The TimetableRepository stands in opposition to two other aggregates: the Graph (representing the
+ * street network) and the TransitLayer (representing many of the same things in the TimetableRepository
  * but rearranged to be more efficient for Raptor routing).
  *
- * At this point the TransitModel is not often read directly. Many requests will look at the
- * TransitLayer rather than the TransitModel it's derived from. Both are often accessed via the
- * TransitService rather than directly reading the fields of TransitModel or TransitLayer.
+ * At this point the TimetableRepository is not often read directly. Many requests will look at the
+ * TransitLayer rather than the TimetableRepository it's derived from. Both are often accessed via the
+ * TransitService rather than directly reading the fields of TimetableRepository or TransitLayer.
  *
  * TODO RT_AB: consider renaming. By some definitions this is not really the model, but a top-level
  *   object grouping together instances of model classes with things that operate on and map those
  *   instances.
  */
-public class TransitModel implements Serializable {
+public class TimetableRepository implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransitModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TimetableRepository.class);
 
   private final Collection<Agency> agencies = new ArrayList<>();
   private final Collection<Operator> operators = new ArrayList<>();
@@ -96,27 +100,27 @@ public class TransitModel implements Serializable {
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-  private StopModel stopModel;
+  private SiteRepository siteRepository;
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /**
-   * The TransitLayer representation (optimized and rearranged for Raptor) of this TransitModel's
+   * The TransitLayer representation (optimized and rearranged for Raptor) of this TimetableRepository's
    * scheduled (non-realtime) contents.
    */
   private transient TransitLayer transitLayer;
 
   /**
    * This updater applies realtime changes queued up for the next TimetableSnapshot such that
-   * this TransitModel.realtimeSnapshot remains aligned with the service represented in
-   * (this TransitModel instance + that next TimetableSnapshot). This is a way of keeping the
+   * this TimetableRepository.realtimeSnapshot remains aligned with the service represented in
+   * (this TimetableRepository instance + that next TimetableSnapshot). This is a way of keeping the
    * TransitLayer up to date without repeatedly deriving it from scratch every few seconds. The
    * same incremental changes are applied to both sets of data and they are published together.
    */
   private transient TransitLayerUpdater transitLayerUpdater;
 
   /**
-   * An optionally present second TransitLayer representing the contents of this TransitModel plus
+   * An optionally present second TransitLayer representing the contents of this TimetableRepository plus
    * the results of realtime updates in the latest TimetableSnapshot.
    */
   private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
@@ -125,7 +129,7 @@ public class TransitModel implements Serializable {
 
   private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
-  private transient TransitModelIndex index;
+  private transient TimetableRepositoryIndex index;
   private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
   private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
@@ -145,14 +149,14 @@ public class TransitModel implements Serializable {
   private transient TransitAlertService transitAlertService;
 
   @Inject
-  public TransitModel(StopModel stopModel, Deduplicator deduplicator) {
-    this.stopModel = Objects.requireNonNull(stopModel);
+  public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
+    this.siteRepository = Objects.requireNonNull(siteRepository);
     this.deduplicator = deduplicator;
   }
 
   /** No-argument constructor, required for deserialization. */
-  public TransitModel() {
-    this(new StopModel(), new Deduplicator());
+  public TimetableRepository() {
+    this(new SiteRepository(), new Deduplicator());
   }
 
   /**
@@ -163,8 +167,8 @@ public class TransitModel implements Serializable {
   public void index() {
     if (index == null) {
       LOG.info("Index transit model...");
-      // the transit model indexing updates the stop model index (flex stops added to the stop index)
-      this.index = new TransitModelIndex(this);
+      // the transit model indexing updates the site repository index (flex stops added to the stop index)
+      this.index = new TimetableRepositoryIndex(this);
       LOG.info("Index transit model complete.");
     }
   }
@@ -430,8 +434,8 @@ public class TransitModel implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public StopModel getStopModel() {
-    return stopModel;
+  public SiteRepository getSiteRepository() {
+    return siteRepository;
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
@@ -499,11 +503,11 @@ public class TransitModel implements Serializable {
   }
 
   /**
-   * Updating the stop model is only allowed during graph build
+   * Updating the site repository is only allowed during graph build
    */
-  public void mergeStopModels(StopModel childStopModel) {
+  public void mergeSiteRepositories(SiteRepository childSiteRepository) {
     invalidateIndex();
-    this.stopModel = this.stopModel.merge(childStopModel);
+    this.siteRepository = this.siteRepository.merge(childSiteRepository);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
@@ -548,7 +552,7 @@ public class TransitModel implements Serializable {
    * possibility that the index is not initialized (during graph build).
    */
   @Nullable
-  TransitModelIndex getTransitModelIndex() {
+  TimetableRepositoryIndex getTimetableRepositoryIndex() {
     return index;
   }
 
@@ -562,6 +566,36 @@ public class TransitModel implements Serializable {
 
   public FlexTrip getFlexTrip(FeedScopedId tripId) {
     return flexTripsById.get(tripId);
+  }
+
+  /**
+   * The stops that are used by transit capable of transporting cars need to be
+   * connected to the road network (e.g. car ferries). This method returns the
+   * stops that are used by trips that allow cars.
+   * @return set of stop locations that are used for trips that allow cars
+   */
+  public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
+    Set<StopLocation> stopLocations = getAllTripPatterns()
+      .stream()
+      .filter(t ->
+        t
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
+      )
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   private void invalidateIndex() {

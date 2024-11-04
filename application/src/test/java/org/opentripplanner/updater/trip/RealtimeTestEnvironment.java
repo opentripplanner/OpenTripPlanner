@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
@@ -12,13 +12,13 @@ import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -42,7 +42,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     false
   );
 
-  public final TransitModel transitModel;
+  public final TimetableRepository timetableRepository;
   private final SiriTimetableSnapshotSource siriSource;
   private final TimetableSnapshotSource gtfsSource;
   private final DateTimeHelper dateTimeHelper;
@@ -66,19 +66,19 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.GTFS_RT);
   }
 
-  RealtimeTestEnvironment(SourceType sourceType, TransitModel transitModel) {
+  RealtimeTestEnvironment(SourceType sourceType, TimetableRepository timetableRepository) {
     Objects.requireNonNull(sourceType);
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
 
-    this.transitModel.index();
+    this.timetableRepository.index();
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
     // we are actively refactoring to remove this restriction
     // for the time being you cannot run a SIRI and GTFS-RT test at the same time
     if (sourceType == SourceType.SIRI) {
-      siriSource = new SiriTimetableSnapshotSource(PARAMETERS, transitModel);
+      siriSource = new SiriTimetableSnapshotSource(PARAMETERS, timetableRepository);
       gtfsSource = null;
     } else {
-      gtfsSource = new TimetableSnapshotSource(PARAMETERS, transitModel);
+      gtfsSource = new TimetableSnapshotSource(PARAMETERS, timetableRepository);
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
@@ -88,7 +88,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
    * Returns a new fresh TransitService
    */
   public TransitService getTransitService() {
-    return new DefaultTransitService(transitModel);
+    return new DefaultTransitService(timetableRepository);
   }
 
   /**
@@ -103,7 +103,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   public String getFeedId() {
-    return TransitModelForTest.FEED_ID;
+    return TimetableRepositoryForTest.FEED_ID;
   }
 
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
@@ -219,7 +219,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
         DIFFERENTIAL,
         new DefaultRealTimeUpdateContext(
           new Graph(),
-          transitModel,
+          timetableRepository,
           siriSource.getTimetableSnapshotBuffer()
         )
       );
