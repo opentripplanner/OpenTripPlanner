@@ -24,7 +24,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.framework.collection.ToveUtils;
+import org.opentripplanner.framework.collection.TroveUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -267,7 +267,7 @@ public class OsmDatabase {
         way
           .getNodeRefs()
           .forEach(node -> {
-            ToveUtils.addToMapSet(areasForNode, node, way);
+            TroveUtils.addToMapSet(areasForNode, node, way);
             return true;
           });
       }
@@ -738,7 +738,7 @@ public class OsmDatabase {
         while (wayNodeIterator.hasNext()) {
           long nodeId = wayNodeIterator.next();
           if (nodesById.containsKey(nodeId)) {
-            ToveUtils.addToMapSet(areasForNode, nodeId, way);
+            TroveUtils.addToMapSet(areasForNode, nodeId, way);
           } else {
             // this area is missing some nodes, perhaps because it is on
             // the edge of the region, so we will simply not route on it.

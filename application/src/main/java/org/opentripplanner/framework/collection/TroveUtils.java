@@ -4,7 +4,7 @@ import gnu.trove.map.TLongObjectMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ToveUtils {
+public class TroveUtils {
 
   public static <U> void addToMapSet(TLongObjectMap<Set<U>> mapSet, long key, U value) {
     Set<U> set = mapSet.get(key);
