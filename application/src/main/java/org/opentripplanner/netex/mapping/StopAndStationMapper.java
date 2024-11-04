@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -68,7 +68,7 @@ class StopAndStationMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
     TariffZoneMapper tariffZoneMapper,
-    StopModelBuilder stopModelBuilder,
+    SiteRepositoryBuilder siteRepositoryBuilder,
     ZoneId defaultTimeZone,
     DataImportIssueStore issueStore,
     boolean noTransfersOnIsolatedStops,
@@ -81,9 +81,9 @@ class StopAndStationMapper {
         defaultTimeZone,
         noTransfersOnIsolatedStops,
         routeToCentroidStopPlaceIds,
-        stopModelBuilder
+        siteRepositoryBuilder
       );
-    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder);
+    this.quayMapper = new QuayMapper(idFactory, issueStore, siteRepositoryBuilder);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;

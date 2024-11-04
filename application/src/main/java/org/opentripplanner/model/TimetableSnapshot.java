@@ -13,11 +13,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
@@ -83,10 +81,14 @@ public class TimetableSnapshot {
 
   /**
    * During the construction phase of the TimetableSnapshot, before it is considered immutable and
-   * used in routing, this Set holds all timetables that have been modified and are waiting to be
-   * indexed. This field will be set to null when the TimetableSnapshot becomes read-only.
+   * used in routing, this Map holds all timetables that have been modified and are waiting to be
+   * indexed.
+   * A real-time timetable overrides the scheduled timetable of a TripPattern for only a single
+   * service date. There can be only one overriding timetable per TripPattern and per service date.
+   * This is enforced by indexing the map with a pair (TripPattern, service date).
+   * This map is cleared when the TimetableSnapshot becomes read-only.
    */
-  private final Set<Timetable> dirtyTimetables = new HashSet<>();
+  private final Map<TripPatternAndServiceDate, Timetable> dirtyTimetables = new HashMap<>();
 
   /**
    * For each TripPattern (sequence of stops on a particular Route) for which we have received a
@@ -130,7 +132,7 @@ public class TimetableSnapshot {
   /**
    * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
    * Route, TripPattern, TripOnServiceDate they refer to.
-   * They are meant to override the corresponding indexes in TransitModelIndex.
+   * They are meant to override the corresponding indexes in TimetableRepositoryIndex.
    */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
@@ -383,7 +385,7 @@ public class TimetableSnapshot {
     );
 
     if (transitLayerUpdater != null) {
-      transitLayerUpdater.update(dirtyTimetables, timetables);
+      transitLayerUpdater.update(dirtyTimetables.values(), timetables);
     }
 
     this.dirtyTimetables.clear();
@@ -404,8 +406,13 @@ public class TimetableSnapshot {
     boolean newTripPatternsForModifiedTripsWereCleared = clearNewTripPatternsForModifiedTrips(
       feedId
     );
+    boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
-    if (timetablesWereCleared || newTripPatternsForModifiedTripsWereCleared) {
+    if (
+      timetablesWereCleared ||
+      newTripPatternsForModifiedTripsWereCleared ||
+      addedTripPatternsWereCleared
+    ) {
       dirty = true;
     }
   }
@@ -550,7 +557,7 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Clear all realtime added trip patterns matching the provided feed id.
+   * Clear new trip patterns for modified trips matching the provided feed id.
    *
    * @param feedId feed id to clear out
    * @return true if the newTripPatternForModifiedTrip changed as a result of the call
@@ -559,6 +566,28 @@ public class TimetableSnapshot {
     return realTimeNewTripPatternsForModifiedTrips
       .keySet()
       .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
+  }
+
+  /**
+   * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
+   *
+   * */
+  private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
+    // it is sufficient to test for the removal of added trips, since other indexed entities are
+    // added only if a new trip is added.
+    boolean removedEntry = realTimeAddedTrips
+      .keySet()
+      .removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
+    realTimeAddedTripOnServiceDateForTripAndDay
+      .keySet()
+      .removeIf(tripOnServiceDate -> feedId.equals(tripOnServiceDate.tripId().getFeedId()));
+    realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternsForRoute
+      .keySet()
+      .removeIf(route -> feedId.equals(route.getId().getFeedId()));
+    realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    return removedEntry;
   }
 
   /**
@@ -600,7 +629,12 @@ public class TimetableSnapshot {
     }
     sortedTimetables.add(updated);
     timetables.put(pattern, ImmutableSortedSet.copyOfSorted(sortedTimetables));
-    dirtyTimetables.add(updated);
+
+    // if the timetable was already modified by a previous real-time update in the same snapshot
+    // and for the same service date,
+    // then the previously updated timetable is superseded by the new one
+    dirtyTimetables.put(new TripPatternAndServiceDate(pattern, updated.getServiceDate()), updated);
+
     dirty = true;
   }
 
@@ -617,4 +651,9 @@ public class TimetableSnapshot {
       return t1.getServiceDate().compareTo(t2.getServiceDate());
     }
   }
+
+  /**
+   * A pair made of a TripPattern and one of the service dates it is running on.
+   */
+  private record TripPatternAndServiceDate(TripPattern tripPattern, LocalDate serviceDate) {}
 }

@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
@@ -21,16 +21,16 @@ class QuayMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   QuayMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    StopModelBuilder stopModelBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
-    this.stopModelBuilder = stopModelBuilder;
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
   /**
@@ -45,7 +45,7 @@ class QuayMapper {
     Accessibility wheelchair
   ) {
     var id = idFactory.createId(quay.getId());
-    return stopModelBuilder.computeRegularStopIfAbsent(
+    return siteRepositoryBuilder.computeRegularStopIfAbsent(
       id,
       it -> map(it, quay, parentStation, fareZones, transitMode, wheelchair)
     );
@@ -70,7 +70,7 @@ class QuayMapper {
       return null;
     }
 
-    var builder = stopModelBuilder
+    var builder = siteRepositoryBuilder
       .regularStop(id)
       .withParentStation(parentStation)
       .withName(parentStation.getName())

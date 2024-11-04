@@ -831,7 +831,12 @@ type QueryType {
     modes: Modes,
     "The maximum number of trip patterns to return. Note! This reduce the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little/no performance gain in reducing the number of trip patterns returned. See also the trip meta-data on how to implement paging."
     numTripPatterns: Int = 50,
-    "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
+    """
+    Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+    response and keep the original request as is. This will enable you to search for
+    itineraries in the next or previous search-window. The paging will automatically scale
+    up/down the search-window to fit the `numTripPatterns`.
+    """
     pageCursor: String,
     "The list of points the journey is required to pass through."
     passThroughPoints: [PassThroughPoint!] @deprecated(reason : "Use via instead"),
@@ -868,13 +873,35 @@ type QueryType {
     """
     The length of the search-window in minutes. This parameter is optional.
     
-    The search-window is defined as the duration between the earliest-departure-time(EDT) and the latest-departure-time(LDT). OTP will search for all itineraries in this departure window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short search-window is faster than using a longer one, but the search duration is not linear. Using a "too" short search-window will waste resources server side, while using a search-window that is too long will be slow.
+    The search-window is defined as the duration between the earliest-departure-time(EDT) and
+    the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+    window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
+    will dynamically calculate the EDT. Using a short search-window is faster than using a
+    longer one, but the search duration is not linear. Using a "too" short search-window will
+    waste resources server side, while using a search-window that is too long will be slow.
     
-    OTP will dynamically calculate a reasonable value for the search-window, if not provided. The calculation comes with a significant overhead (10-20% extra). Whether you should use the dynamic calculated value or pass in a value depends on your use-case. For a travel planner in a small geographical area, with a dense network of public transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it so that the number of itineraries on average is around the wanted `numItineraries`. Make sure you set the `numItineraries` to a high number while testing. For a country wide area like Norway, using the dynamic search-window is the best.
+    OTP will dynamically calculate a reasonable value for the search-window, if not provided. The
+    calculation comes with a significant overhead (10-20% extra). Whether you should use the
+    dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+    in a small geographical area, with a dense network of public transportation, a fixed value
+    between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
+    so that the number of itineraries on average is around the wanted `numTripPatterns`. Make
+    sure you set the `numTripPatterns` to a high number while testing. For a country wide area like
+    Norway, using the dynamic search-window is the best.
     
-    When paginating, the search-window is calculated using the `numItineraries` in the original search together with statistics from the search for the last page. This behaviour is configured server side, and can not be overridden from the client.
+    When paginating, the search-window is calculated using the `numTripPatterns` in the original
+    search together with statistics from the search for the last page. This behaviour is
+    configured server side, and can not be overridden from the client. The paging may even
+    exceed the maximum value.
     
-    The search-window used is returned to the response metadata as `searchWindowUsed` for debugging purposes.
+    The search-window used is returned to the response metadata as `searchWindowUsed`.
+    This can be used by the client to calculate the when the next page start/end.
+    
+    Note! In some cases you may have to page many times to get all the results you want.
+    This is intended. Increasing the search-window beyond the max value is NOT going to be
+    much faster. Instead the client can inform the user about the progress.
+    
+    Maximum value: 1440 minutes (24h)
     """
     searchWindow: Int,
     """
@@ -1382,7 +1409,7 @@ type TripSearchData {
   nextDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
   "This is the suggested search time for the \"previous page\" or time-window. Insert it together with the 'searchWindowUsed' in the request to get a new set of trips preceding in the time-window BEFORE the current search."
   prevDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
-  "This is the time window used by the raptor search. The input searchWindow is an optional parameter and is dynamically assigned if not set. OTP might override the value if it is too small or too large. When paging OTP adjusts it to the appropriate size, depending on the number of itineraries found in the current search window. The scaling of the search window ensures faster paging and limits resource usage. The unit is seconds."
+  "This is the time window used by the raptor search. The input searchWindow is an optional parameter and is dynamically assigned if not set. OTP might override the value if it is too small or too large. When paging OTP adjusts it to the appropriate size, depending on the number of itineraries found in the current search window. The scaling of the search window ensures faster paging and limits resource usage. The unit is minutes."
   searchWindowUsed: Int!
 }
 
@@ -2204,7 +2231,7 @@ input TripPassThroughViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String!]
+  stopLocationIds: [String!]!
 }
 
 """
@@ -2239,7 +2266,7 @@ input TripVisitViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String!]
+  stopLocationIds: [String!]!
 }
 
 "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. The location also contain information about the minimum and maximum time the user is willing to stay at the via location."

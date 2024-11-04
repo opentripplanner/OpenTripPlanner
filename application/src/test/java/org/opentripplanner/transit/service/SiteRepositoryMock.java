@@ -3,11 +3,11 @@ package org.opentripplanner.transit.service;
 import java.util.List;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class StopModelMock extends StopModel {
+public class SiteRepositoryMock extends SiteRepository {
 
   private final List<StopLocation> stops;
 
-  public StopModelMock(List<StopLocation> stops) {
+  public SiteRepositoryMock(List<StopLocation> stops) {
     this.stops = stops;
   }
 

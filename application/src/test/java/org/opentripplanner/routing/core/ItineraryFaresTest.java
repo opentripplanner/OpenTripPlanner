@@ -12,7 +12,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_30;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

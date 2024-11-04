@@ -41,7 +41,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
@@ -53,9 +53,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var stopModelBuilder = testModel
       .stopModelBuilder()
       .withRegularStop(testModel.stop("stop1").build());
-    var transitModel = new TransitModel(stopModelBuilder.build(), new Deduplicator());
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(transitModel);
+    var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
+    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),

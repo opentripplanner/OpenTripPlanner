@@ -33,7 +33,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -48,7 +48,7 @@ public class TimetableSnapshotSourceTest {
     ZoneIds.NEW_YORK
   )
     .build();
-  private TransitModel transitModel;
+  private TimetableRepository timetableRepository;
   private TransitService transitService;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
@@ -58,8 +58,8 @@ public class TimetableSnapshotSourceTest {
   @BeforeEach
   public void setUp() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
-    transitModel = model.transitModel();
-    transitService = new DefaultTransitService(transitModel);
+    timetableRepository = model.timetableRepository();
+    transitService = new DefaultTransitService(timetableRepository);
 
     feedId = transitService.getFeedIds().stream().findFirst().get();
   }
@@ -284,7 +284,7 @@ public class TimetableSnapshotSourceTest {
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
       new TimetableSnapshotSourceParameters(Duration.ZERO, true),
-      transitModel,
+      timetableRepository,
       () -> SERVICE_DATE
     );
   }

@@ -15,7 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -77,7 +77,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     graph = otpModel.graph();
 
     graph.hasStreets = true;
-    TestStreetLinkerModule.link(graph, otpModel.transitModel());
+    TestStreetLinkerModule.link(graph, otpModel.timetableRepository());
   }
 
   @Test
@@ -110,8 +110,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TransitModelForTest.id("STOP"), null, null));
-        rr.setTo(new GenericLocation(null, TransitModelForTest.id("STOP"), null, null));
+        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
+        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
       },
       "E1E2 street",
       "D1D2 street",
@@ -180,8 +180,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TransitModelForTest.id(stopId), null, null));
-        rr.setTo(new GenericLocation(null, TransitModelForTest.id(stopId), null, null));
+        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
+        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
       },
       streetName,
       streetName,

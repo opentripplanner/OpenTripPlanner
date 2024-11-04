@@ -54,12 +54,12 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TransitModel.
- *   Is this intentional, because TransitLayer is meant to be read-only and TransitModel is not?
+ * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TimetableRepository.
+ *   Is this intentional, because TransitLayer is meant to be read-only and TimetableRepository is not?
  *   Should this be renamed TransitDataService since it seems to provide access to the data but
  *   not to transit routing functionality (which is provided by the RoutingService)?
- *   The DefaultTransitService implementation has a TransitModel instance and many of its methods
- *   read through to that TransitModel instance. But that field itself is not exposed, while the
+ *   The DefaultTransitService implementation has a TimetableRepository instance and many of its methods
+ *   read through to that TimetableRepository instance. But that field itself is not exposed, while the
  *   TransitLayer is here. It seems like exposing the raw TransitLayer is still a risk since it's
  *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
  */

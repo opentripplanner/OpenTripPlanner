@@ -25,7 +25,7 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME,
-      "src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
+      "application/src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")
@@ -36,8 +36,7 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
-      "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
-      "src/test/resources/standalone/config/**/" + BUILD_CONFIG_FILENAME,
+      "application/src/test/resources/standalone/config/**/" + BUILD_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")
@@ -61,7 +60,9 @@ public class ExampleConfigTest {
     testConfig(filename, nodeAdapter -> new OtpConfig(nodeAdapter, true));
   }
 
-  @FilePatternSource(pattern = { "src/test/resources/standalone/config/invalid-config.json" })
+  @FilePatternSource(
+    pattern = { "application/src/test/resources/standalone/config/invalid-config.json" }
+  )
   @ParameterizedTest(name = "Fail when parsing an invalid config from {0}")
   void failInvalidConfig(Path filename) {
     Assertions.assertThrows(

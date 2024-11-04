@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkSequenceProjection;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
@@ -107,7 +107,11 @@ class ServiceLinkMapperTest {
     EntityById<RegularStop> stopsById = new DefaultEntityById<>();
     issueStore = new DefaultDataImportIssueStore();
 
-    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore, new StopModel().withContext());
+    QuayMapper quayMapper = new QuayMapper(
+      ID_FACTORY,
+      issueStore,
+      new SiteRepository().withContext()
+    );
     stopPatternBuilder = StopPattern.create(3);
 
     Station parentStation = Station

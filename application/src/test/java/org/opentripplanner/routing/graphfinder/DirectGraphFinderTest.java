@@ -9,11 +9,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class DirectGraphFinderTest extends GraphRoutingTest {
 
-  private StopModel stopModel;
+  private SiteRepository siteRepository;
 
   private TransitStopVertex S1, S2, S3;
 
@@ -29,7 +29,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
         }
       }
     );
-    stopModel = model.transitModel().getStopModel();
+    siteRepository = model.timetableRepository().getSiteRepository();
   }
 
   @Test
@@ -37,7 +37,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
     var ns1 = new NearbyStop(S1.getStop(), 0, null, null);
     var ns2 = new NearbyStop(S2.getStop(), 1112, null, null);
 
-    var subject = new DirectGraphFinder(stopModel::findRegularStops);
+    var subject = new DirectGraphFinder(siteRepository::findRegularStops);
     var coordinate = new Coordinate(19.000, 47.500);
     assertEquals(List.of(ns1), subject.findClosestStops(coordinate, 100));
 

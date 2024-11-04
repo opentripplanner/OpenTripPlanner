@@ -3,17 +3,17 @@ package org.opentripplanner.transit.speed_test.support;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 
 public class AssertSpeedTestSetup {
 
   public static void assertTestDateHasData(
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     SpeedTestConfig config,
     BuildConfig buildConfig
   ) {
-    int numberOfPatternForTestDate = transitModel
+    int numberOfPatternForTestDate = timetableRepository
       .getTransitLayer()
       .getTripPatternsForRunningDate(config.testDate)
       .size();

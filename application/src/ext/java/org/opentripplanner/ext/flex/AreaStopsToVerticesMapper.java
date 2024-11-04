@@ -12,12 +12,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Iterates over all area stops in the stop model and adds them to vertices that are suitable for
+ * Iterates over all area stops in the stop  and adds them to vertices that are suitable for
  * boarding flex trips.
  */
 public class AreaStopsToVerticesMapper implements GraphBuilderModule {
@@ -25,32 +25,32 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(AreaStopsToVerticesMapper.class);
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
 
   @Inject
-  public AreaStopsToVerticesMapper(Graph graph, TransitModel transitModel) {
+  public AreaStopsToVerticesMapper(Graph graph, TimetableRepository timetableRepository) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
   }
 
   @Override
   @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
-    if (!transitModel.getStopModel().hasAreaStops()) {
+    if (!timetableRepository.getSiteRepository().hasAreaStops()) {
       return;
     }
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      transitModel.getStopModel().listAreaStops().size()
+      timetableRepository.getSiteRepository().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
-    var results = transitModel
-      .getStopModel()
+    var results = timetableRepository
+      .getSiteRepository()
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {

@@ -28,7 +28,6 @@ public class AgencyMapper {
     api.lang = domain.getLang();
     api.phone = domain.getPhone();
     api.fareUrl = domain.getFareUrl();
-    api.brandingUrl = domain.getBrandingUrl();
 
     return api;
   }

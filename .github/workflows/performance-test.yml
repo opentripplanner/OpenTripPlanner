@@ -83,12 +83,12 @@ jobs:
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           MAVEN_OPTS: "-Dmaven.repo.local=/home/lenni/.m2/repository/"
-        run: mvn -DskipTests --batch-mode package -P prettierSkip
+        run: mvn -DskipTests --batch-mode install -P prettierSkip
 
       - name: Build graph
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         run: |
-          cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
+          cp application/target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
       - name: Run speed test
@@ -98,18 +98,18 @@ jobs:
           SPEEDTEST_LOCATION: ${{ matrix.location }}
           MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr -Dmaven.repo.local=/home/lenni/.m2/repository/"
         run: |
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
+          mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0"
 
       - name: Archive travel results file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
-          path: test/performance/${{ matrix.location }}/travelSearch-results.csv
+          path: test/performance/${{ matrix.location }}/travelSearch-results-md.csv
 
       - name: Archive Flight Recorder instrumentation file
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.location }}-flight-recorder
-          path: ${{ matrix.location}}-speed-test.jfr
+          path: application/${{ matrix.location }}-speed-test.jfr

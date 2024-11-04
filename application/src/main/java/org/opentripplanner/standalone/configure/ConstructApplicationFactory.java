@@ -34,7 +34,7 @@ import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
@@ -65,7 +65,7 @@ public interface ConstructApplicationFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
-  TransitModel transitModel();
+  TimetableRepository timetableRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RealtimeVehicleRepository realtimeVehicleRepository();
@@ -102,7 +102,7 @@ public interface ConstructApplicationFactory {
     Builder graph(Graph graph);
 
     @BindsInstance
-    Builder transitModel(TransitModel transitModel);
+    Builder timetableRepository(TimetableRepository timetableRepository);
 
     @BindsInstance
     Builder graphVisualizer(@Nullable GraphVisualizer graphVisualizer);

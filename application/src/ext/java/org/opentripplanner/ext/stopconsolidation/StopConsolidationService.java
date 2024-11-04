@@ -2,6 +2,7 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -44,5 +45,5 @@ public interface StopConsolidationService {
    */
   Optional<StopLocation> primaryStop(FeedScopedId id);
 
-  boolean isPartOfConsolidatedStop(StopLocation sl);
+  boolean isPartOfConsolidatedStop(@Nullable StopLocation sl);
 }
