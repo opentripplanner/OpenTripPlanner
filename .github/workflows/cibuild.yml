@@ -62,6 +62,13 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
+      - name: Upload test results to Codecov
+        # always upload test results, even when failed
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Deploy to Github Package Registry
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
