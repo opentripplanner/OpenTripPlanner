@@ -1608,9 +1608,9 @@ type QueryType {
     is in combination of using paging can lead to better performance and to getting a more consistent
     number of itineraries in each search.
     """
-    searchWindow: Duration
+    searchWindow: Duration,
     "The list of points the journey is required to pass through."
-    via: [PlanViaLocationInput!],
+    via: [PlanViaLocationInput!]
   ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle
@@ -4105,7 +4105,7 @@ input PlanPassThroughViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String!]
+  stopLocationIds: [String!]!
 }
 
 "Wrapper type for different types of preferences related to plan query."

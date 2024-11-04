@@ -258,8 +258,8 @@ public class LegacyRouteRequestMapper {
   }
 
   static void mapViaLocations(RouteRequest request, DataFetchingEnvironment env) {
-    var args = new GraphQLTypes.GraphQLQueryTypePlanArgs(env.getArguments());
-    var locs = ViaLocationMapper.mapToViaLocations(args.getGraphQLVia());
+    var args = env.getArguments().get("via");
+    var locs = ViaLocationMapper.mapToViaLocations((List<Map<String, Map<String, Object>>>) args);
     request.setViaLocations(locs);
   }
 

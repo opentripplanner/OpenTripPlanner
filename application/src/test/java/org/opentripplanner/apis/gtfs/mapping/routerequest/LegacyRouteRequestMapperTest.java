@@ -38,7 +38,7 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -49,9 +49,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var testModel = TransitModelForTest.of();
+    var testModel = TimetableRepositoryForTest.of();
     var stopModelBuilder = testModel
-      .stopModelBuilder()
+      .siteRepositoryBuilder()
       .withRegularStop(testModel.stop("stop1").build());
     var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
@@ -267,7 +267,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     Map<String, Object> arguments = Map.of(
       "via",
       List.of(
-        new GraphQLPlanViaLocationInput(Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label")))
+        new GraphQLPlanViaLocationInput(
+          Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+        )
       )
     );
 
