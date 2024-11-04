@@ -52,7 +52,7 @@ jobs:
         # https://github.com/actions/runner-images/issues/1499
         # we set nodePath and npmPath to skip downloading the node binary, which frequently times out
         run: |
-          mvn $MAVEN_ARGS jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
+          mvn $MAVEN_ARGS jacoco:prepare-agent test jacoco:report-aggregate -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
           mvn $MAVEN_ARGS package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
