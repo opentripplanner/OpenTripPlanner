@@ -68,6 +68,7 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: "*TEST-*.xml"
 
       - name: Deploy to Github Package Registry
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
