@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.client.model.RequestMode.BICYCLE;
 import static org.opentripplanner.client.model.RequestMode.BUS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_ACCESS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_DIRECT;
@@ -27,6 +28,7 @@ import org.opentripplanner.client.model.Route;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.smoketest.util.RequestCombinationsBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
@@ -173,13 +175,21 @@ public class SeattleSmokeTest {
   }
 
   static List<TripPlanParameters> buildCombinations() {
-    return new RequestCombinationsBuilder()
+    var walk = new RequestCombinationsBuilder()
       .withLocations(SODO, ESPERANCE, CLYDE_HILL, RONALD_BOG_PARK, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
       .withModes(TRANSIT, WALK)
       .withTime(SmokeTest.weekdayAtNoon())
       .includeWheelchair()
       .includeArriveBy()
       .build();
+    var bike = new RequestCombinationsBuilder()
+      .withLocations(SODO, ESPERANCE, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
+      .withModes(TRANSIT, BICYCLE)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .includeArriveBy()
+      .build();
+
+    return ListUtils.combine(walk, bike);
   }
 
   @ParameterizedTest
