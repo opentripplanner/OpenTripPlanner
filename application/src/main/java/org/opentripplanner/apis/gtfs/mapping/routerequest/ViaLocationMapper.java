@@ -15,9 +15,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 class ViaLocationMapper {
 
-  private static final String STOP_LOCATION_IDS = "stopLocationIds";
-  private static final String LABEL = "label";
-  private static final String MINIMUM_WAIT_TIME = "minimumWaitTime";
+  static final String FIELD_STOP_LOCATION_IDS = "stopLocationIds";
+  static final String FIELD_LABEL = "label";
+  static final String FIELD_MINIMUM_WAIT_TIME = "minimumWaitTime";
+  static final String FIELD_VISIT = "visit";
+  static final String FIELD_PASS_THROUGH = "passThrough";
 
   static List<ViaLocation> mapToViaLocations(@Nullable List<Map<String, Map<String, Object>>> via) {
     return ListUtils
@@ -28,19 +30,19 @@ class ViaLocationMapper {
   }
 
   private static ViaLocation mapViaLocation(Map<String, Map<String, Object>> via) {
-    var passThrough = via.get("passThrough");
-    var visit = via.get("visit");
+    var passThrough = via.get(FIELD_PASS_THROUGH);
+    var visit = via.get(FIELD_VISIT);
 
-    if (passThrough != null && passThrough.get(STOP_LOCATION_IDS) != null) {
+    if (passThrough != null && passThrough.get(FIELD_STOP_LOCATION_IDS) != null) {
       return new PassThroughViaLocation(
-        (String) passThrough.get(LABEL),
-        mapStopLocationIds((List<String>) passThrough.get(STOP_LOCATION_IDS))
+        (String) passThrough.get(FIELD_LABEL),
+        mapStopLocationIds((List<String>) passThrough.get(FIELD_STOP_LOCATION_IDS))
       );
     } else if (visit != null) {
       return new VisitViaLocation(
-        (String) visit.get(LABEL),
-        (Duration) visit.get(MINIMUM_WAIT_TIME),
-        mapStopLocationIds((List<String>) visit.get(STOP_LOCATION_IDS)),
+        (String) visit.get(FIELD_LABEL),
+        (Duration) visit.get(FIELD_MINIMUM_WAIT_TIME),
+        mapStopLocationIds((List<String>) visit.get(FIELD_STOP_LOCATION_IDS)),
         List.of()
       );
     } else {

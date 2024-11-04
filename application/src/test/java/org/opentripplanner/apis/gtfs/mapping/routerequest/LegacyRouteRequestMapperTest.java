@@ -26,7 +26,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanViaLocationInput;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -267,9 +266,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     Map<String, Object> arguments = Map.of(
       "via",
       List.of(
-        new GraphQLPlanViaLocationInput(
-          Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
-        )
+        Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
       )
     );
 

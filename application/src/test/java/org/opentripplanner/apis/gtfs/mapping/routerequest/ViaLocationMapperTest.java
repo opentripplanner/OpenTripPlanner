@@ -1,5 +1,22 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
-/*
+
+import static java.util.Map.entry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_LABEL;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_MINIMUM_WAIT_TIME;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_PASS_THROUGH;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_STOP_LOCATION_IDS;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_VISIT;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.mapToViaLocations;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
 class ViaLocationMapperTest {
 
   public static final String LABEL = "TestLabel";
@@ -9,7 +26,7 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToVisitViaLocations() {
-    Map<String, Object> args = Map.of(
+    Map<String, Map<String, Object>> args = Map.of(
       FIELD_VISIT,
       Map.ofEntries(
         entry(FIELD_LABEL, LABEL),
@@ -35,8 +52,11 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToVisitViaLocationsWithBareMinimum() {
-    Map<String, Object> args = Map.of(FIELD_VISIT, Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1")));
-    var inputs = List.of(new GraphQLPlanViaLocationInput(args));
+    Map<String, Map<String, Object>> args = Map.of(
+      FIELD_VISIT,
+      Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
+    );
+    var inputs = List.of(args);
     var result = mapToViaLocations(inputs);
 
     var via = result.getFirst();
@@ -49,11 +69,11 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToPassThrough() {
-    final Map<String, Object> args = Map.of(
+    final Map<String, Map<String, Object>> args = Map.of(
       FIELD_PASS_THROUGH,
       Map.ofEntries(entry(FIELD_LABEL, LABEL), entry(FIELD_STOP_LOCATION_IDS, LIST_IDS_INPUT))
     );
-    var inputs = List.of(new GraphQLPlanViaLocationInput(args));
+    var inputs = List.of(args);
     var result = mapToViaLocations(inputs);
     var via = result.getFirst();
 
@@ -68,11 +88,11 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToPassThroughWithBareMinimum() {
-    Map<String, Object> args = Map.of(
+    Map<String, Map<String, Object>> args = Map.of(
       FIELD_PASS_THROUGH,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
-    var inputs = List.of(new GraphQLPlanViaLocationInput(args));
+    var inputs = List.of(args);
     var result = mapToViaLocations(inputs);
     var via = result.getFirst();
 
@@ -81,4 +101,3 @@ class ViaLocationMapperTest {
     assertTrue(via.isPassThroughLocation());
   }
 }
-*/
