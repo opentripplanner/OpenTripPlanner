@@ -61,7 +61,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_C);
     data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, 30));
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     // NOTE! No search-window is set.
     requestBuilder

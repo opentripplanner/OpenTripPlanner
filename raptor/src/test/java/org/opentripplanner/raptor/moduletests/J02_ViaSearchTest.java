@@ -258,7 +258,7 @@ class J02_ViaSearchTest {
         )
     );
 
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     var requestBuilder = prepareRequest();
 

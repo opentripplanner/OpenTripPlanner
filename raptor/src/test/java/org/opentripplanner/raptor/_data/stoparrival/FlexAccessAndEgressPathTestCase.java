@@ -11,6 +11,7 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -53,11 +54,10 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static final int BOARD_C1_SEC = 60;
   public static final int TRANSFER_C1_SEC = 120;
   // The C1_CALCULATOR is not under test, so we use it to calculate correct cost values.
-  public static final DefaultCostCalculator<TestTripSchedule> C1_CALCULATOR = new DefaultCostCalculator<>(
+  public static final TestCostCalculator C1_CALCULATOR = new TestCostCalculator(
     BOARD_C1_SEC,
     TRANSFER_C1_SEC,
     WAIT_RELUCTANCE,
-    null,
     null
   );
 

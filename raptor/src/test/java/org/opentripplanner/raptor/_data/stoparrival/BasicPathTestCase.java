@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -34,7 +35,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
  * This class is used to create a journeys with stop arrivals.
@@ -212,11 +212,10 @@ public class BasicPathTestCase implements RaptorTestConstants {
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR = new DefaultCostCalculator<>(
+  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR = new TestCostCalculator(
     BOARD_C1_SEC,
     TRANSFER_C1_SEC,
     WAIT_RELUCTANCE,
-    TRANSIT_RELUCTANCE,
     STOP_C1S
   );
 

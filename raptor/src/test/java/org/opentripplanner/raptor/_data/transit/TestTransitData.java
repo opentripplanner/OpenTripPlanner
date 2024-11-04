@@ -63,7 +63,9 @@ public class TestTransitData
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
-  private final GeneralizedCostParametersBuilder costParamsBuilder = GeneralizedCostParameters.of();
+  private int boardCostSec = 600;
+  private int transferCostSec = 0;
+  private double waitReluctance = 1.0;
 
   private final int[] stopBoardAlightTransferCosts = new int[NUM_STOPS];
 
@@ -103,8 +105,10 @@ public class TestTransitData
 
   @Override
   public RaptorCostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
-    return CostCalculatorFactory.createCostCalculator(
-      costParamsBuilder.build(),
+    return new TestCostCalculator(
+      boardCostSec,
+      transferCostSec,
+      waitReluctance,
       stopBoardAlightTransferCosts()
     );
   }
@@ -251,6 +255,11 @@ public class TestTransitData
     return this;
   }
 
+  public TestTransitData withTransferCost(int transferCostSec) {
+    this.transferCostSec = transferCostSec;
+    return this;
+  }
+
   public TestTransitData withGuaranteedTransfer(
     TestTripSchedule fromTrip,
     int fromStop,
@@ -305,10 +314,6 @@ public class TestTransitData
     return this;
   }
 
-  public GeneralizedCostParametersBuilder mcCostParamsBuilder() {
-    return costParamsBuilder;
-  }
-
   public ConstrainedTransfer findConstrainedTransfer(
     TestTripSchedule fromTrip,
     int fromStop,
@@ -351,6 +356,16 @@ public class TestTransitData
 
   public List<DefaultTripPattern> getPatterns() {
     return routes.stream().map(TestRoute::pattern).toList();
+  }
+
+  public TestTransitData withBoardCost(int boardCostSec) {
+    this.boardCostSec = boardCostSec;
+    return this;
+  }
+
+  public TestTransitData withWaitReluctance(double waitReluctance) {
+    this.waitReluctance = waitReluctance;
+    return this;
   }
 
   /* private methods */

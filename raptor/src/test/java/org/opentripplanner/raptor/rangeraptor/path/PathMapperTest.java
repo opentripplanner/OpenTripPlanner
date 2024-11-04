@@ -22,16 +22,16 @@ import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPa
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase;
+import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 public class PathMapperTest implements RaptorTestConstants {
 
   private static final RaptorSlackProvider FLEX_SLACK_PROVIDER =
     FlexAccessAndEgressPathTestCase.SLACK_PROVIDER;
-  private static final DefaultCostCalculator<TestTripSchedule> FLEX_COST_CALCULATOR =
+  private static final TestCostCalculator FLEX_COST_CALCULATOR =
     FlexAccessAndEgressPathTestCase.C1_CALCULATOR;
 
   /* BASIC CASES */

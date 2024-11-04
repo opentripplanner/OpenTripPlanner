@@ -70,7 +70,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   @Override
   public RaptorTripScheduleSearch<TestTripSchedule> tripSearch(SearchDirection direction) {
-    return TripScheduleSearchFactory.create(direction, new TestTripSearchTimetable(this));
+    return new TestTripScheduleSearch(direction, schedules);
   }
 
   public List<TestConstrainedTransfer> listTransferConstraintsForwardSearch() {

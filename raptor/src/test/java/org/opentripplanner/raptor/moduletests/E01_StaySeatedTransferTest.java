@@ -64,7 +64,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
       STOP_B,
       TransferConstraint.of().staySeated().build()
     );
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     // NOTE! No search-window is set.
     requestBuilder

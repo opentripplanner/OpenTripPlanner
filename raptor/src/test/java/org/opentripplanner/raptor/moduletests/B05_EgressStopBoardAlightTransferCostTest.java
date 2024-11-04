@@ -39,7 +39,7 @@ public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestCons
       .withRoute(route("R1", STOP_B, STOP_C).withTimetable(schedule("0:10, 0:14")))
       .withRoute(route("R2", STOP_C, STOP_D).withTimetable(schedule("0:18, 0:20")));
 
-    data.mcCostParamsBuilder().transferCost(0).boardCost(0);
+    data.withTransferCost(0).withBoardCost(0);
     data.withStopBoardAlightTransferCost(STOP_D, 60000);
 
     requestBuilder

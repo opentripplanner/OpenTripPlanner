@@ -54,7 +54,7 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
     data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     requestBuilder
       .searchParams()

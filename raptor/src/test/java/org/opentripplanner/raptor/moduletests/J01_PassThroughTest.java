@@ -163,7 +163,7 @@ class J01_PassThroughTest {
     var r2 = route("R2", STOP_A, STOP_C, STOP_D).withTimetable(schedule("0:02 0:10 0:50"));
 
     data.withRoutes(r1, r2);
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     var requestBuilder = prepareRequest();
 
@@ -195,7 +195,7 @@ class J01_PassThroughTest {
       .withTimetable(schedule("0:15 0:20 0:30 0:50"));
 
     data.withRoutes(r1, r2);
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     var requestBuilder = prepareRequest();
 

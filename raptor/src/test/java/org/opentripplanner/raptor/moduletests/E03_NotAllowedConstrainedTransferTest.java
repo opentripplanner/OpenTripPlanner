@@ -64,7 +64,7 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     // transit model, a not-allowed transfer should apply to ALL trips if constraint is passed
     // to raptor.
     data.withConstrainedTransfer(tripR1a, STOP_B, tripR2a, STOP_B, TestTransitData.TX_NOT_ALLOWED);
-    data.mcCostParamsBuilder().transferCost(100);
+    data.withTransferCost(100);
 
     // NOTE! No search-window set
     requestBuilder
