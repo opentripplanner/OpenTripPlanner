@@ -1,50 +1,32 @@
 package org.opentripplanner.raptor._data.transit;
 
-import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
-
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.IntStream;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
- * <p>
- * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
-// TODO : This class should implement RaptorTripSchedule not raptoradapter TripSchedule
-public class TestTripSchedule implements TripSchedule {
+public class TestTripSchedule implements RaptorTripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
-  private final DefaultTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
-  private final int transitReluctanceIndex;
-  private final Accessibility wheelchairBoarding;
-  private final TripPattern originalPattern;
+  private final RaptorTripPattern pattern;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
-    int transitReluctanceIndex,
-    Accessibility wheelchairBoarding,
-    TripPattern originalPattern
+    int transitReluctanceIndex
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
-    this.transitReluctanceIndex = transitReluctanceIndex;
-    this.wheelchairBoarding = wheelchairBoarding;
-    this.originalPattern = originalPattern;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -53,13 +35,6 @@ public class TestTripSchedule implements TripSchedule {
 
   public static TestTripSchedule.Builder schedule(TestTripPattern pattern) {
     return schedule().pattern(pattern);
-  }
-
-  public static TestTripSchedule.Builder schedule(
-    TestTripPattern pattern,
-    TripPattern originalPattern
-  ) {
-    return schedule().pattern(pattern).originalPattern(originalPattern);
   }
 
   public static TestTripSchedule.Builder schedule(String times) {
@@ -83,18 +58,8 @@ public class TestTripSchedule implements TripSchedule {
   }
 
   @Override
-  public DefaultTripPattern pattern() {
+  public RaptorTripPattern pattern() {
     return pattern;
-  }
-
-  @Override
-  public int transitReluctanceFactorIndex() {
-    return transitReluctanceIndex;
-  }
-
-  @Override
-  public Accessibility wheelchairBoarding() {
-    return wheelchairBoarding;
   }
 
   public int size() {
@@ -116,21 +81,6 @@ public class TestTripSchedule implements TripSchedule {
       .toString();
   }
 
-  @Override
-  public LocalDate getServiceDate() {
-    return null;
-  }
-
-  @Override
-  public TripTimes getOriginalTripTimes() {
-    return null;
-  }
-
-  @Override
-  public TripPattern getOriginalTripPattern() {
-    return this.originalPattern;
-  }
-
   @SuppressWarnings("UnusedReturnValue")
   public static class Builder {
 
@@ -139,16 +89,9 @@ public class TestTripSchedule implements TripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
-    private Accessibility wheelchairBoarding = NO_INFORMATION;
-    private TripPattern originalPattern;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
-      return this;
-    }
-
-    public TestTripSchedule.Builder originalPattern(TripPattern pattern) {
-      this.originalPattern = pattern;
       return this;
     }
 
@@ -159,8 +102,6 @@ public class TestTripSchedule implements TripSchedule {
       b.departureTimes = departureTimes;
       b.arrivalDepartureOffset = arrivalDepartureOffset;
       b.transitReluctanceIndex = transitReluctanceIndex;
-      b.wheelchairBoarding = wheelchairBoarding;
-      b.originalPattern = originalPattern;
       return b;
     }
 
@@ -243,11 +184,6 @@ public class TestTripSchedule implements TripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
-      this.wheelchairBoarding = wcb;
-      return this;
-    }
-
     public TestTripSchedule.Builder[] repeat(int nTimes, int everySeconds) {
       return IntStream
         .range(0, nTimes)
@@ -283,14 +219,7 @@ public class TestTripSchedule implements TripSchedule {
         );
       }
 
-      return new TestTripSchedule(
-        pattern,
-        arrivalTimes,
-        departureTimes,
-        transitReluctanceIndex,
-        wheelchairBoarding,
-        originalPattern
-      );
+      return new TestTripSchedule(pattern, arrivalTimes, departureTimes, transitReluctanceIndex);
     }
 
     private static int[] copyWithOffset(int[] source, int offset) {

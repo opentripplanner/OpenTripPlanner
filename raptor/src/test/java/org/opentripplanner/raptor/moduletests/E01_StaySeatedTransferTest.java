@@ -10,11 +10,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTransferConstraint;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
@@ -57,13 +57,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
     var tripB = r2.timetable().getTripSchedule(0);
 
     data.withRoutes(r1, r2);
-    data.withConstrainedTransfer(
-      tripA,
-      STOP_B,
-      tripB,
-      STOP_B,
-      TransferConstraint.of().staySeated().build()
-    );
+    data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, TestTransferConstraint.staySeated());
     data.withTransferCost(100);
 
     // NOTE! No search-window is set.

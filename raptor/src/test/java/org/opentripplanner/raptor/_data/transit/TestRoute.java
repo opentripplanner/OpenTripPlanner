@@ -3,14 +3,11 @@ package org.opentripplanner.raptor._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleSearchFactory;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
@@ -44,7 +41,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   }
 
   @Override
-  public DefaultTripPattern pattern() {
+  public TestTripPattern pattern() {
     return pattern;
   }
 
@@ -114,7 +111,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     int fromStopPos,
     TestTripSchedule toTrip,
     int toStopPos,
-    TransferConstraint constraint
+    TestTransferConstraint constraint
   ) {
     for (int i = 0; i < timetable().numberOfTripSchedules(); i++) {
       var trip = timetable().getTripSchedule(i);

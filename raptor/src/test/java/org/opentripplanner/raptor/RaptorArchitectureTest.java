@@ -14,7 +14,6 @@ public class RaptorArchitectureTest {
   private static final Package GNU_TROVE = Package.of("gnu.trove..");
   private static final Package OTP_UTILS = OTP_ROOT.subPackage("utils..");
 
-
   /* The Raptor module, all packages that other paths of OTP may use. */
   private static final Package RAPTOR = OTP_ROOT.subPackage("raptor");
   private static final Package RAPTOR_API = RAPTOR.subPackage("api..");

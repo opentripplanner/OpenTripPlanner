@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor._data.transit.TestTransferConstraint;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.path.Path;
@@ -176,7 +176,7 @@ public class PathTest implements RaptorTestConstants {
       .times(time("09:10"), time("09:20"))
       .build();
 
-    var tx = TransferConstraint.of().staySeated().build();
+    var tx = TestTransferConstraint.staySeated();
     TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
       trip2,
       trip2.departure(0),

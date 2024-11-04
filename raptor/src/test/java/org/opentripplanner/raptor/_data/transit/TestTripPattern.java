@@ -1,10 +1,9 @@
 package org.opentripplanner.raptor._data.transit;
 
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
-import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public class TestTripPattern implements DefaultTripPattern {
+public class TestTripPattern implements RaptorTripPattern {
 
   public static final byte BOARDING_MASK = 0b0001;
   public static final byte ALIGHTING_MASK = 0b0010;
@@ -31,8 +30,6 @@ public class TestTripPattern implements DefaultTripPattern {
    * </pre>
    */
   private final int[] restrictions;
-
-  private Route route;
 
   private TestTripPattern(String name, int[] stopIndexes, int[] restrictions) {
     this.name = name;
@@ -61,11 +58,6 @@ public class TestTripPattern implements DefaultTripPattern {
 
   public TestTripPattern withPriorityGroup(int priorityGroupId) {
     this.priorityGroupId = priorityGroupId;
-    return this;
-  }
-
-  public TestTripPattern withRoute(Route route) {
-    this.route = route;
     return this;
   }
 
@@ -137,11 +129,6 @@ public class TestTripPattern implements DefaultTripPattern {
   @Override
   public int numberOfStopsInPattern() {
     return stopIndexes.length;
-  }
-
-  @Override
-  public Route route() {
-    return route;
   }
 
   @Override
