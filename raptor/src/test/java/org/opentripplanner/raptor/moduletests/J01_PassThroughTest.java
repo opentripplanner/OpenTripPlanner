@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.PlanTestConstants.D2m;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.D2m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.D30s;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
