@@ -1,27 +1,27 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAForwardSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAReverseSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAText;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAWithOpeningHoursForwardSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAWithOpeningHoursReverseSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAWithOpeningHoursText;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBForwardSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBReverseSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBText;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBWithOpeningHoursForwardSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBWithOpeningHoursReverseSearch;
+import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseBWithOpeningHoursText;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByForwardSearch;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByReverseSearch;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.lifeCycle;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAForwardSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAReverseSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAText;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAWithOpeningHoursForwardSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAWithOpeningHoursReverseSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseAWithOpeningHoursText;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBForwardSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBReverseSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBText;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBWithOpeningHoursForwardSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBWithOpeningHoursReverseSearch;
-import static org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBWithOpeningHoursText;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase;
+import org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -30,9 +30,9 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 public class PathMapperTest implements RaptorTestConstants {
 
   private static final RaptorSlackProvider FLEX_SLACK_PROVIDER =
-    FlexAccessAndEgressPathTestCase.SLACK_PROVIDER;
+    AccessAndEgressWithOpeningHoursPathTestCase.SLACK_PROVIDER;
   private static final TestCostCalculator FLEX_COST_CALCULATOR =
-    FlexAccessAndEgressPathTestCase.C1_CALCULATOR;
+    AccessAndEgressWithOpeningHoursPathTestCase.C1_CALCULATOR;
 
   /* BASIC CASES */
 

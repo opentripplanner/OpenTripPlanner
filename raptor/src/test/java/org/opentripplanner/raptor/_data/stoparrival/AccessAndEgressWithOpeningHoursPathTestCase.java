@@ -33,7 +33,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <ol>
  *     <li>Flex access</li>
  *     <li>Transit, BUS A</li>
- *     <li>Flex </li>
+ *     <li>Flex egress</li>
  * </ol>
  * <p>
  * Case B with walking between transit and flex:
@@ -42,10 +42,10 @@ import org.opentripplanner.utils.time.TimeUtils;
  *     <li>Walk transfer</li>
  *     <li>Transit. BUS B</li>
  *     <li>Walk transfer</li>
- *     <li>Flex </li>
+ *     <li>Flex egress</li>
  * </ol>
  */
-public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
+public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestConstants {
 
   private static final int ZERO = 0;
   // The transit reluctance is ignored, any value should work
