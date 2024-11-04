@@ -288,6 +288,28 @@ class RouteRequestMapperTest {
     assertEquals(multiplier, itinFilter.groupedOtherThanSameLegsMaxCostMultiplier());
   }
 
+  @Test
+  void via() {
+    Map<String, Object> arguments = createArgsCopy(ARGS);
+    arguments.put(
+      "via",
+      List.of(
+        Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+      )
+    );
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(
+      executionContext(arguments, LOCALE, CONTEXT), CONTEXT
+    );
+    assertEquals(
+      "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
+      routeRequest.getViaLocations().toString()
+    );
+
+    var noParamsReq = RouteRequestMapper.toRouteRequest(executionContext(ARGS, LOCALE, CONTEXT), CONTEXT);
+    assertEquals(List.of(), noParamsReq.getViaLocations());
+  }
+
   static Map<String, Object> createArgsCopy(Map<String, Object> arguments) {
     Map<String, Object> newArgs = new HashMap<>();
     newArgs.putAll(arguments);
