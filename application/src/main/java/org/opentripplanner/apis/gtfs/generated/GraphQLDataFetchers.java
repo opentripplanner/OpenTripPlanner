@@ -832,7 +832,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
-    public DataFetcher<Iterable<Object>> vehicleRentalsByBbox();
+    public DataFetcher<Iterable<VehicleRentalPlace>> vehicleRentalsByBbox();
 
     public DataFetcher<Object> viewer();
   }
@@ -1276,6 +1276,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> vehicleId();
   }
 
+  /** Interface for rental vehicles, e.g. free floating vehicles and rental vehicle stations */
   public interface GraphQLVehicleRental extends TypeResolver {
     public default DataFetcher<Boolean> allowPickupNow() {
       return null;

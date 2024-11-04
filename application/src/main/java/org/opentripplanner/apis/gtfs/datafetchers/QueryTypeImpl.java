@@ -929,7 +929,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
-  public DataFetcher<Iterable<Object>> vehicleRentalsByBbox() {
+  public DataFetcher<Iterable<VehicleRentalPlace>> vehicleRentalsByBbox() {
     return environment -> {
       VehicleRentalService vehicleRentalService = environment
         .<GraphQLRequestContext>getContext()
@@ -944,13 +944,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         new Coordinate(args.getGraphQLMaximumLongitude(), args.getGraphQLMaximumLatitude())
       );
 
-      Stream<Object> vehicleRental = Stream
+      Stream<VehicleRentalPlace> vehicleRental = Stream
         .concat(
           vehicleRentalService.getVehicleRentalStations().stream(),
           vehicleRentalService.getVehicleRentalVehicles().stream()
         )
-        .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())))
-        .map(e -> (Object) e);
+        .filter(vr -> envelope.contains(
+          new Coordinate(vr.getLongitude(), vr.getLatitude())
+        ));
 
       return vehicleRental.toList();
     };
