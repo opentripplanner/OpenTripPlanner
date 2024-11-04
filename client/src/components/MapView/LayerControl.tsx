@@ -1,6 +1,6 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { IControl, Map } from 'maplibre-gl';
+import { IControl, Map, TypedStyleLayer } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
@@ -24,10 +24,11 @@ class LayerControl implements IControl {
         this.container.removeChild(this.container.firstChild);
       }
 
-      const title = document.createElement('h6');
+      const title = document.createElement('h4');
       title.textContent = 'Debug layers';
       this.container.appendChild(title);
 
+      const groups: Record<string, HTMLDivElement> = {};
       map
         .getLayersOrder()
         .map((l) => map.getLayer(l))
@@ -38,33 +39,79 @@ class LayerControl implements IControl {
         .reverse()
         .forEach((layer) => {
           if (layer) {
-            const div = document.createElement('div');
-            const input = document.createElement('input');
-            input.type = 'checkbox';
-            input.value = layer.id;
-            input.id = layer.id;
-            input.onchange = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            const meta: { group: string } = layer.metadata as { group: string };
 
-              if (this.layerVisible(map, layer)) {
-                map.setLayoutProperty(layer.id, 'visibility', 'none');
-              } else {
-                map.setLayoutProperty(layer.id, 'visibility', 'visible');
-              }
-            };
-            input.checked = this.layerVisible(map, layer);
-            const label = document.createElement('label');
-            label.textContent = layer.id;
-            label.htmlFor = layer.id;
-            div.appendChild(input);
-            div.appendChild(label);
-            this.container.appendChild(div);
+            let groupName: string = 'Misc';
+            if (meta.group) {
+              groupName = meta.group;
+            }
+
+            const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
+
+            if (groups[groupName]) {
+              groups[groupName]?.appendChild(layerDiv);
+            } else {
+              const groupDiv = this.buildGroupDiv(groupName, layerDiv);
+              groups[groupName] = groupDiv;
+              this.container.appendChild(groupDiv);
+            }
           }
         });
     });
 
     return this.container;
+  }
+
+  private buildLayerDiv(layer: TypedStyleLayer, map: Map) {
+    const layerDiv = document.createElement('div');
+    layerDiv.className = 'layer';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.value = layer.id;
+    input.id = layer.id;
+    input.onchange = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (input.checked) {
+        map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      } else {
+        map.setLayoutProperty(layer.id, 'visibility', 'none');
+      }
+    };
+    input.checked = this.layerVisible(map, layer);
+    input.className = 'layer';
+    const label = document.createElement('label');
+    label.textContent = layer.id;
+    label.htmlFor = layer.id;
+    layerDiv.appendChild(input);
+    layerDiv.appendChild(label);
+    return layerDiv;
+  }
+
+  private buildGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'group';
+
+    const groupInput = document.createElement('input');
+    groupInput.onchange = () => {
+      groupDiv.querySelectorAll<HTMLInputElement>('input.layer').forEach((input) => {
+        input.checked = groupInput.checked;
+        const event = new Event('change');
+        input.dispatchEvent(event);
+      });
+    };
+    groupInput.type = 'checkbox';
+    groupInput.id = groupName;
+
+    const groupLabel = document.createElement('label');
+    groupLabel.textContent = groupName;
+    groupLabel.htmlFor = groupName;
+    groupLabel.className = 'group-label';
+
+    groupDiv.appendChild(groupInput);
+    groupDiv.appendChild(groupLabel);
+    groupDiv.appendChild(layerDiv);
+    return groupDiv;
   }
 
   private layerVisible(map: Map, layer: { id: string }) {

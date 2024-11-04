@@ -22,13 +22,13 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 
 class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
 
-  static final Route route = TransitModelForTest.route("route-1").build();
+  static final Route route = TimetableRepositoryForTest.route("route-1").build();
   static final Itinerary interlinedWithDifferentRoute = newItinerary(
     Place.forStop(AIRPORT_STOP),
     T11_00

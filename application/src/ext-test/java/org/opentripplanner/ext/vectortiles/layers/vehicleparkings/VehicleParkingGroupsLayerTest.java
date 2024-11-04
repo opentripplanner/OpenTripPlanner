@@ -26,12 +26,12 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingGroupsLayerTest {
 
-  private static final FeedScopedId ID = TransitModelForTest.id("id");
+  private static final FeedScopedId ID = TimetableRepositoryForTest.id("id");
 
   private VehicleParkingGroup vehicleParkingGroup;
   private VehicleParking vehicleParking;

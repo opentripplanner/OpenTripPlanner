@@ -45,7 +45,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Configure all modules which is not simple enough to be injected.
@@ -95,7 +95,7 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
@@ -108,7 +108,7 @@ public class GraphBuilderModules {
     }
     return new GtfsModule(
       gtfsBundles,
-      transitModel,
+      timetableRepository,
       graph,
       issueStore,
       config.getTransitServicePeriod(),
@@ -138,13 +138,13 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     return new NetexConfigure(config)
       .createNetexModule(
         dataSources.getNetexConfiguredDatasource(),
-        transitModel,
+        timetableRepository,
         graph,
         issueStore
       );
@@ -155,10 +155,10 @@ public class GraphBuilderModules {
   static StreetLinkerModule provideStreetLinkerModule(
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
-    return new StreetLinkerModule(graph, transitModel, issueStore, config.areaVisibility);
+    return new StreetLinkerModule(graph, timetableRepository, issueStore, config.areaVisibility);
   }
 
   @Provides
@@ -166,14 +166,14 @@ public class GraphBuilderModules {
   static PruneIslands providePruneIslands(
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     PruneIslands pruneIslands = new PruneIslands(
       graph,
-      transitModel,
+      timetableRepository,
       issueStore,
-      new StreetLinkerModule(graph, transitModel, issueStore, config.areaVisibility)
+      new StreetLinkerModule(graph, timetableRepository, issueStore, config.areaVisibility)
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(
       config.islandPruning.pruningThresholdIslandWithoutStops
@@ -229,12 +229,12 @@ public class GraphBuilderModules {
   static DirectTransferGenerator provideDirectTransferGenerator(
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferGenerator(
       graph,
-      transitModel,
+      timetableRepository,
       issueStore,
       config.maxTransferDuration,
       config.transferRequests
@@ -246,12 +246,12 @@ public class GraphBuilderModules {
   static DirectTransferAnalyzer provideDirectTransferAnalyzer(
     BuildConfig config,
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferAnalyzer(
       graph,
-      transitModel,
+      timetableRepository,
       issueStore,
       config.maxTransferDuration.toSeconds() * WalkPreferences.DEFAULT.speed()
     );
@@ -293,13 +293,13 @@ public class GraphBuilderModules {
   @Singleton
   @Nullable
   static StopConsolidationModule providesStopConsolidationModule(
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
       .stopConsolidation()
-      .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
+      .map(ds -> StopConsolidationModule.of(timetableRepository, repo, ds))
       .orElse(null);
   }
 
@@ -309,12 +309,12 @@ public class GraphBuilderModules {
   static RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator(
     DataImportIssueStore issueStore,
     BuildConfig config,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     var ids = config.transitRouteToStationCentroid();
     return ids.isEmpty()
       ? null
-      : new RouteToCentroidStationIdsValidator(issueStore, ids, transitModel);
+      : new RouteToCentroidStationIdsValidator(issueStore, ids, timetableRepository);
   }
 
   /* private methods */

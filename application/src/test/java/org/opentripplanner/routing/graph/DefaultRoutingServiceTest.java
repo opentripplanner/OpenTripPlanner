@@ -36,7 +36,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    transitService = new DefaultTransitService(transitModel);
+    transitService = new DefaultTransitService(timetableRepository);
   }
 
   @Override

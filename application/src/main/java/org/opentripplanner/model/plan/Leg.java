@@ -161,6 +161,7 @@ public interface Leg {
   /**
    * For transit legs, the route agency. For non-transit legs {@code null}.
    */
+  @Nullable
   default Agency getAgency() {
     return null;
   }
@@ -171,6 +172,7 @@ public interface Leg {
    *
    * @see Trip#getOperator()
    */
+  @Nullable
   default Operator getOperator() {
     return null;
   }
@@ -178,6 +180,7 @@ public interface Leg {
   /**
    * For transit legs, the route. For non-transit legs, null.
    */
+  @Nullable
   default Route getRoute() {
     return null;
   }
@@ -198,6 +201,7 @@ public interface Leg {
     return null;
   }
 
+  @Nullable
   default Accessibility getTripWheelchairAccessibility() {
     return null;
   }
@@ -245,6 +249,7 @@ public interface Leg {
     return false;
   }
 
+  @Nullable
   default RealTimeState getRealTimeState() {
     return null;
   }
@@ -261,6 +266,7 @@ public interface Leg {
   /**
    * Is this a frequency-based trip with non-strict departure times?
    */
+  @Nullable
   default Boolean getNonExactFrequency() {
     return null;
   }
@@ -270,6 +276,7 @@ public interface Leg {
    * non-strict frequency trips, but could become important for real-time trips, strict frequency
    * trips, and scheduled trips with empirical headways.
    */
+  @Nullable
   default Integer getHeadway() {
     return null;
   }
@@ -289,10 +296,11 @@ public interface Leg {
 
   /**
    * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train, 3
-   * Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
+   * Bus, 4 Ferry, 5 Cable Tram, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
    * using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also see
    * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */
+  @Nullable
   default Integer getRouteType() {
     return null;
   }
@@ -300,6 +308,7 @@ public interface Leg {
   /**
    * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
    */
+  @Nullable
   default I18NString getHeadsign() {
     return null;
   }
@@ -312,6 +321,7 @@ public interface Leg {
    * for a given trip may happen at service date March 25th and service time 25:00, which in local
    * time would be Mach 26th 01:00.
    */
+  @Nullable
   default LocalDate getServiceDate() {
     return null;
   }
@@ -319,6 +329,7 @@ public interface Leg {
   /**
    * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
    */
+  @Nullable
   default String getRouteBrandingUrl() {
     return null;
   }
@@ -337,6 +348,7 @@ public interface Leg {
    * For transit legs, intermediate stops between the Place where the leg originates and the Place
    * where the leg ends. For non-transit legs, {@code null}.
    */
+  @Nullable
   default List<StopArrival> getIntermediateStops() {
     return null;
   }
@@ -344,6 +356,7 @@ public interface Leg {
   /**
    * The leg's geometry.
    */
+  @Nullable
   LineString getLegGeometry();
 
   /**
@@ -352,6 +365,7 @@ public interface Leg {
    * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
    * of the leg, y is the elevation at this distance.
    */
+  @Nullable
   default ElevationProfile getElevationProfile() {
     return null;
   }
@@ -364,49 +378,59 @@ public interface Leg {
   }
 
   default Set<StreetNote> getStreetNotes() {
-    return null;
+    return Set.of();
   }
 
   default Set<TransitAlert> getTransitAlerts() {
     return Set.of();
   }
 
+  @Nullable
   default PickDrop getBoardRule() {
     return null;
   }
 
+  @Nullable
   default PickDrop getAlightRule() {
     return null;
   }
 
+  @Nullable
   default BookingInfo getDropOffBookingInfo() {
     return null;
   }
 
+  @Nullable
   default BookingInfo getPickupBookingInfo() {
     return null;
   }
 
+  @Nullable
   default ConstrainedTransfer getTransferFromPrevLeg() {
     return null;
   }
 
+  @Nullable
   default ConstrainedTransfer getTransferToNextLeg() {
     return null;
   }
 
+  @Nullable
   default Integer getBoardStopPosInPattern() {
     return null;
   }
 
+  @Nullable
   default Integer getAlightStopPosInPattern() {
     return null;
   }
 
+  @Nullable
   default Integer getBoardingGtfsStopSequence() {
     return null;
   }
 
+  @Nullable
   default Integer getAlightGtfsStopSequence() {
     return null;
   }
@@ -414,6 +438,7 @@ public interface Leg {
   /**
    * Is this leg walking with a bike?
    */
+  @Nullable
   default Boolean getWalkingBike() {
     return null;
   }
@@ -435,10 +460,12 @@ public interface Leg {
     return null;
   }
 
+  @Nullable
   default Boolean getRentedVehicle() {
     return null;
   }
 
+  @Nullable
   default String getVehicleRentalNetwork() {
     return null;
   }
@@ -453,6 +480,7 @@ public interface Leg {
    */
   int getGeneralizedCost();
 
+  @Nullable
   default LegReference getLegReference() {
     return null;
   }

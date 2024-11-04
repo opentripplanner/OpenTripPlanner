@@ -14,12 +14,12 @@ import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class GroupStopTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
@@ -27,9 +27,9 @@ class GroupStopTest {
   private static final StopLocation STOP_LOCATION = TEST_MODEL
     .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
     .build();
-  private static final GroupStop subject = StopModel
+  private static final GroupStop subject = SiteRepository
     .of()
-    .groupStop(TransitModelForTest.id(ID))
+    .groupStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)
     .build();
@@ -43,9 +43,9 @@ class GroupStopTest {
       .stop("2:stop", Coordinates.HAMBURG.getX(), Coordinates.HAMBURG.getY())
       .build();
 
-    GroupStop groupStop = StopModel
+    GroupStop groupStop = SiteRepository
       .of()
-      .groupStop(TransitModelForTest.id(ID))
+      .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation1)
       .addLocation(stopLocation2)
@@ -64,9 +64,9 @@ class GroupStopTest {
       .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
       .build();
 
-    GroupStop groupStop = StopModel
+    GroupStop groupStop = SiteRepository
       .of()
-      .groupStop(TransitModelForTest.id(ID))
+      .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation)
       .withEncompassingAreaGeometries(List.of(Polygons.BERLIN))
@@ -105,11 +105,14 @@ class GroupStopTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addLocation(TransitModelForTest.of().stop("2:stop", 1d, 2d).build()).build()
+        subject
+          .copy()
+          .addLocation(TimetableRepositoryForTest.of().stop("2:stop", 1d, 2d).build())
+          .build()
       )
     );
   }

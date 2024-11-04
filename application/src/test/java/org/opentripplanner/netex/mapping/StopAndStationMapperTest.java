@@ -23,8 +23,8 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -78,7 +78,7 @@ class StopAndStationMapperTest {
     var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
     stopPlaceById.add(stopPlace);
 
-    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(StopModel.of());
+    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(SiteRepository.of());
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
@@ -159,7 +159,7 @@ class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
-      StopModel.of(),
+      SiteRepository.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false,
@@ -230,7 +230,7 @@ class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
-      StopModel.of(),
+      SiteRepository.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       isolated,
@@ -264,20 +264,20 @@ class StopAndStationMapperTest {
 
     stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1)));
 
-    StopModelBuilder stopModelBuilder = StopModel.of();
+    SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
-    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(stopModelBuilder);
+    StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(siteRepositoryBuilder);
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.withRegularStops(stopAndStationMapper.resultStops);
+    siteRepositoryBuilder.withRegularStops(stopAndStationMapper.resultStops);
 
-    StopAndStationMapper stopAndStationMapper2 = createStopAndStationMapper(stopModelBuilder);
+    StopAndStationMapper stopAndStationMapper2 = createStopAndStationMapper(siteRepositoryBuilder);
     stopAndStationMapper2.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.withRegularStops(stopAndStationMapper2.resultStops);
+    siteRepositoryBuilder.withRegularStops(stopAndStationMapper2.resultStops);
 
-    assertEquals(1, stopModelBuilder.regularStopsById().size());
+    assertEquals(1, siteRepositoryBuilder.regularStopsById().size());
     assertEquals(
       0,
-      stopModelBuilder
+      siteRepositoryBuilder
         .regularStopsById()
         .get(MappingSupport.ID_FACTORY.createId("ST:Quay:1"))
         .getIndex()
@@ -291,7 +291,7 @@ class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
-      StopModel.of(),
+      SiteRepository.of(),
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false,
@@ -312,13 +312,13 @@ class StopAndStationMapperTest {
   }
 
   private static StopAndStationMapper createStopAndStationMapper(
-    StopModelBuilder stopModelBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder
   ) {
     return new StopAndStationMapper(
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
-      stopModelBuilder,
+      siteRepositoryBuilder,
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.NOOP,
       false,

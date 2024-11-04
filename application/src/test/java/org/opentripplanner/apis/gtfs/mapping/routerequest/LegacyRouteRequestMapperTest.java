@@ -38,7 +38,7 @@ import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehi
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
@@ -46,9 +46,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(transitModel);
+    var timetableRepository = new TimetableRepository();
+    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),

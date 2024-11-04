@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_10;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.tripPattern;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -23,11 +23,11 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class PlaceFinderTraverseVisitorTest {
 
-  static TransitModelForTest model = TransitModelForTest.of();
+  static TimetableRepositoryForTest model = TimetableRepositoryForTest.of();
   static final Station STATION1 = Station
     .of(id("S1"))
     .withName(new NonLocalizedString("Station 1"))
@@ -55,7 +55,7 @@ public class PlaceFinderTraverseVisitorTest {
 
   static final Route r = route("r").build();
 
-  static TransitModel a = new TransitModel();
+  static TimetableRepository a = new TimetableRepository();
 
   static {
     a.addTransitMode(TransitMode.BUS);

@@ -17,7 +17,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -59,7 +59,7 @@ public class TestRouteData {
 
     tripPattern =
       TripPattern
-        .of(TransitModelForTest.id("TP:" + route))
+        .of(TimetableRepositoryForTest.id("TP:" + route))
         .withRoute(this.route)
         .withStopPattern(new StopPattern(stopTimesFistTrip))
         .withScheduledTimeTableBuilder(builder -> builder.addAllTripTimes(tripTimes))
@@ -167,7 +167,7 @@ public class TestRouteData {
     Deduplicator deduplicator
   ) {
     var trip = Trip
-      .of(TransitModelForTest.id(route + "-" + stopTimesByTrip.size() + 1))
+      .of(TimetableRepositoryForTest.id(route + "-" + stopTimesByTrip.size() + 1))
       .withRoute(this.route)
       .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
@@ -260,9 +260,12 @@ public class TestRouteData {
     }
 
     public TestRouteData build() {
-      var routeBuilder = TransitModelForTest.route(route).withMode(mode).withShortName(route);
+      var routeBuilder = TimetableRepositoryForTest
+        .route(route)
+        .withMode(mode)
+        .withShortName(route);
       if (agency != null) {
-        routeBuilder.withAgency(TransitModelForTest.agency(agency));
+        routeBuilder.withAgency(TimetableRepositoryForTest.agency(agency));
       }
       if (submode != null) {
         routeBuilder.withNetexSubmode(submode);

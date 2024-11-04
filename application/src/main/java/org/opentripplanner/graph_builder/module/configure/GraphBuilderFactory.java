@@ -33,7 +33,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
 @Component(modules = { GraphBuilderModules.class })
@@ -77,7 +77,7 @@ public interface GraphBuilderFactory {
     Builder graph(Graph graph);
 
     @BindsInstance
-    Builder transitModel(TransitModel transitModel);
+    Builder timetableRepository(TimetableRepository timetableRepository);
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

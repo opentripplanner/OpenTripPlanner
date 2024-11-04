@@ -18,16 +18,14 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,18 +45,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final List<RouteRequest> transferRequests;
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
 
   public DirectTransferGenerator(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
     List<RouteRequest> transferRequests
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
@@ -67,7 +65,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit model index which is needed by the nearby stop finder. */
-    transitModel.index();
+    timetableRepository.index();
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
@@ -166,7 +164,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         progress.step(m -> LOG.info(m));
       });
 
-    transitModel.addAllTransfersByStops(transfersByStop);
+    timetableRepository.addAllTransfersByStops(transfersByStop);
 
     LOG.info(progress.completeMessage());
     LOG.info(
@@ -182,7 +180,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * enabled.
    */
   private NearbyStopFinder createNearbyStopFinder() {
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(timetableRepository);
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(

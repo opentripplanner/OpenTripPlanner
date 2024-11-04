@@ -137,7 +137,7 @@ class TripMapper {
     );
 
     // TODO RTM - Instead of getting the first headsign from the StopTime this could be the
-    //          - default behaviour of the TransitModel - So, in the NeTEx mapper we would just
+    //          - default behaviour of the TimetableRepository - So, in the NeTEx mapper we would just
     //          - ignore setting the headsign on the Trip.
     builder.withHeadsign(new NonLocalizedString(headsign.get()));
 

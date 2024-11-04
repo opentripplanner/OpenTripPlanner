@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.ModuleTestDebugLogging;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -32,8 +32,8 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
 
   private static final String EXPECTED =
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s Tₓ0 C₁%d]";
-  private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
-  private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
+  private static final FeedScopedId ROUTE_ID_1 = TimetableRepositoryForTest.id("1");
+  private static final FeedScopedId ROUTE_ID_2 = TimetableRepositoryForTest.id("2");
   private static final CostLinearFunction UNPREFERRED_C1 = CostLinearFunction.of("5m + 1t");
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -45,11 +45,17 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
   public void setup() {
     // Given 2 identical routes R1 and R2
     data.withRoute(
-      route(pattern("R1", STOP_A, STOP_B).withRoute(TransitModelForTest.route(ROUTE_ID_1).build()))
+      route(
+        pattern("R1", STOP_A, STOP_B)
+          .withRoute(TimetableRepositoryForTest.route(ROUTE_ID_1).build())
+      )
         .withTimetable(schedule("00:01, 00:02:40"))
     );
     data.withRoute(
-      route(pattern("R2", STOP_A, STOP_B).withRoute(TransitModelForTest.route(ROUTE_ID_2).build()))
+      route(
+        pattern("R2", STOP_A, STOP_B)
+          .withRoute(TimetableRepositoryForTest.route(ROUTE_ID_2).build())
+      )
         .withTimetable(schedule("00:01, 00:02:40"))
     );
 

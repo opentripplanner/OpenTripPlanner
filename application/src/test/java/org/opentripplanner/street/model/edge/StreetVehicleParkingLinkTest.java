@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.Set;
 import java.util.stream.Stream;

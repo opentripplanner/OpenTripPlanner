@@ -26,7 +26,7 @@ public class TripMetadataType {
             "override the value if it is too small or too large. When paging OTP adjusts " +
             "it to the appropriate size, depending on the number of itineraries found in " +
             "the current search window. The scaling of the search window ensures faster " +
-            "paging and limits resource usage. The unit is seconds."
+            "paging and limits resource usage. The unit is minutes."
           )
           .type(new GraphQLNonNull(Scalars.GraphQLInt))
           .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).searchWindowUsed.toMinutes())

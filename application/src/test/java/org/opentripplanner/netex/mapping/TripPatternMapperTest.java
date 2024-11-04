@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -31,7 +31,7 @@ import org.rutebanken.netex.model.ServiceAlterationEnumeration;
  */
 class TripPatternMapperTest {
 
-  private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S01");
+  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("S01");
 
   @Test
   void testMapTripPattern() {

@@ -27,11 +27,11 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class PageCursorTest implements PlanTestConstants {
 
-  public static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  public static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   public static final Place A = Place.forStop(
     TEST_MODEL.stop("A").withCoordinate(5.0, 8.0).build()
   );

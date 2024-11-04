@@ -22,7 +22,7 @@ import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
@@ -32,7 +32,7 @@ public class MetricsLogging {
 
   @Inject
   public MetricsLogging(
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary
   ) {
@@ -48,9 +48,9 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
-    if (transitModel.getTransitLayer() != null) {
+    if (timetableRepository.getTransitLayer() != null) {
       new GuavaCacheMetrics(
-        transitModel.getTransitLayer().getTransferCache().getTransferCache(),
+        timetableRepository.getTransitLayer().getTransferCache().getTransferCache(),
         "raptorTransfersCache",
         List.of(Tag.of("cache", "raptorTransfers"))
       )
@@ -63,23 +63,23 @@ public class MetricsLogging {
     )
       .bindTo(Metrics.globalRegistry);
 
-    if (transitModel.getUpdaterManager() != null) {
+    if (timetableRepository.getUpdaterManager() != null) {
       new ExecutorServiceMetrics(
-        transitModel.getUpdaterManager().getPollingUpdaterPool(),
+        timetableRepository.getUpdaterManager().getPollingUpdaterPool(),
         "pollingGraphUpdaters",
         List.of(Tag.of("pool", "pollingGraphUpdaters"))
       )
         .bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
-        transitModel.getUpdaterManager().getNonPollingUpdaterPool(),
+        timetableRepository.getUpdaterManager().getNonPollingUpdaterPool(),
         "nonPollingGraphUpdaters",
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
       )
         .bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
-        transitModel.getUpdaterManager().getScheduler(),
+        timetableRepository.getUpdaterManager().getScheduler(),
         "graphUpdateScheduler",
         List.of(Tag.of("pool", "graphUpdateScheduler"))
       )

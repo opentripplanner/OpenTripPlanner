@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * A in-memory implementation of {@link OtpTransitService}. It's super fast for most methods, but
@@ -45,7 +45,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<FeedInfo> feedInfos;
 
-  private final StopModel stopModel;
+  private final SiteRepository siteRepository;
 
   private final ImmutableListMultimap<AbstractTransitEntity, Notice> noticeAssignments;
 
@@ -77,7 +77,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
     this.agencies = immutableList(builder.getAgenciesById().values());
     this.feedInfos = immutableList(builder.getFeedInfos());
-    this.stopModel = builder.stopModel().build();
+    this.siteRepository = builder.siteRepository().build();
     this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
@@ -109,8 +109,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public StopModel stopModel() {
-    return stopModel;
+  public SiteRepository siteRepository() {
+    return siteRepository;
   }
 
   /**

@@ -67,6 +67,16 @@
   margin-top: -2px;
 }
 
+.search-bar .swap-from-to {
+  border: none;
+  background: none;
+  margin: 30px 0 auto 0;
+}
+
+.search-bar .swap-from-to img {
+  width: 15px;
+}
+
 .itinerary-list-container {
   width: 36rem;
   overflow-y: auto;
@@ -169,4 +179,21 @@
 }
 .maplibregl-ctrl-group.layer-select label {
   margin-left: 6px;
+}
+
+.maplibregl-ctrl-group.layer-select h4 {
+  font-size: 17px;
+}
+
+.maplibregl-ctrl-group.layer-select .group-label {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.maplibregl-ctrl-group.layer-select div.group {
+  margin-top: 10px;
+}
+
+.maplibregl-ctrl-group.layer-select div.layer {
+  margin-left: 17px;
 }

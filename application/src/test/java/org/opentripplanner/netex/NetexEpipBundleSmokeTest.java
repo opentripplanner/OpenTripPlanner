@@ -62,8 +62,8 @@ class NetexEpipBundleSmokeTest {
 
     assertAgencies(otpModel.getAllAgencies());
     assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.stopModel().listRegularStops());
-    assertStations(otpModel.stopModel().listStations());
+    assertStops(otpModel.siteRepository().listRegularStops());
+    assertStations(otpModel.siteRepository().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
@@ -92,7 +92,6 @@ class NetexEpipBundleSmokeTest {
     assertNull(a.getLang());
     assertNull(a.getPhone());
     assertNull(a.getFareUrl());
-    assertNull(a.getBrandingUrl());
   }
 
   private void assertOperators(Collection<Operator> operators) {

@@ -6,6 +6,8 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
 import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
@@ -30,6 +32,7 @@ class TripViaLocationMapper {
     return passThroughPoints
       .stream()
       .map(TripViaLocationMapper::mapLegacyPassThroughViaLocation)
+      .filter(Objects::nonNull)
       .collect(toList());
   }
 
@@ -65,6 +68,13 @@ class TripViaLocationMapper {
 
   private static List<FeedScopedId> mapStopLocationIds(Map<String, Object> map) {
     var c = (Collection<String>) map.get(ViaLocationInputType.FIELD_STOP_LOCATION_IDS);
+
+    // When coordinates are added, we need to accept null here...
+    if (c == null) {
+      throw new IllegalArgumentException(
+        "'" + ViaLocationInputType.FIELD_STOP_LOCATION_IDS + "' is not set!"
+      );
+    }
     return c.stream().map(TransitIdMapper::mapIDToDomain).toList();
   }
 
@@ -72,12 +82,17 @@ class TripViaLocationMapper {
    * @deprecated Legacy passThrough, use via instead
    */
   @Deprecated
+  @Nullable
   private static ViaLocation mapLegacyPassThroughViaLocation(Map<String, Object> inputMap) {
     final String name = (String) inputMap.get("name");
-    final List<FeedScopedId> stopLocationIds =
-      ((List<String>) inputMap.get("placeIds")).stream()
-        .map(TransitIdMapper::mapIDToDomain)
-        .toList();
+    List<String> placeIds = (List<String>) inputMap.get("placeIds");
+    if (placeIds == null || placeIds.isEmpty()) {
+      return null;
+    }
+    final List<FeedScopedId> stopLocationIds = placeIds
+      .stream()
+      .map(TransitIdMapper::mapIDToDomain)
+      .toList();
     return new PassThroughViaLocation(name, stopLocationIds);
   }
 }

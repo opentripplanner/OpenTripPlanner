@@ -20,11 +20,11 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 public class PagingFilterTest implements PlanTestConstants {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);

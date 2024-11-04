@@ -148,7 +148,7 @@ props.setProperties("surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true
 ```
 
 The Javadoc
-of [`OSMSpecifier.java`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/graph_builder/module/osm/OSMSpecifier.java)
+of [`OSMSpecifier.java`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/osm/wayproperty/specifier/OsmSpecifier.java)
 contains the precise documentation about the syntax of the matchers.
 
 There are a lot of rules for which tags results in a specific safety score so it's not easy to get

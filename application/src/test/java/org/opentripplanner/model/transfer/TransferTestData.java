@@ -1,6 +1,6 @@
 package org.opentripplanner.model.transfer;
 
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
 
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   static final Station STATION = TEST_MODEL.station("Central Station").build();
 
@@ -32,14 +32,14 @@ public class TransferTestData {
     .build();
   static final RegularStop ANY_STOP = TEST_MODEL.stop("any", 60.0, 11.0).build();
 
-  static final Route ROUTE_1 = TransitModelForTest.route("1").build();
-  static final Route ROUTE_2 = TransitModelForTest.route("2").build();
-  static final Route ANY_ROUTE = TransitModelForTest.route("ANY").build();
+  static final Route ROUTE_1 = TimetableRepositoryForTest.route("1").build();
+  static final Route ROUTE_2 = TimetableRepositoryForTest.route("2").build();
+  static final Route ANY_ROUTE = TimetableRepositoryForTest.route("ANY").build();
 
-  static final Trip TRIP_11 = TransitModelForTest.trip("11").withRoute(ROUTE_1).build();
-  static final Trip TRIP_12 = TransitModelForTest.trip("12").withRoute(ROUTE_1).build();
-  static final Trip TRIP_21 = TransitModelForTest.trip("21").withRoute(ROUTE_2).build();
-  static final Trip ANY_TRIP = TransitModelForTest.trip("999").withRoute(ANY_ROUTE).build();
+  static final Trip TRIP_11 = TimetableRepositoryForTest.trip("11").withRoute(ROUTE_1).build();
+  static final Trip TRIP_12 = TimetableRepositoryForTest.trip("12").withRoute(ROUTE_1).build();
+  static final Trip TRIP_21 = TimetableRepositoryForTest.trip("21").withRoute(ROUTE_2).build();
+  static final Trip ANY_TRIP = TimetableRepositoryForTest.trip("999").withRoute(ANY_ROUTE).build();
 
   static final TransferPoint STATION_POINT = new StationTransferPoint(STATION);
 

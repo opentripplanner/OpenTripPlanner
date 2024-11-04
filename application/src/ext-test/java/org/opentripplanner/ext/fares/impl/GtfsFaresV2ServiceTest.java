@@ -2,8 +2,8 @@ package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
@@ -22,13 +22,13 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   FeedScopedId LEG_GROUP1 = id("leg-group1");
   FeedScopedId LEG_GROUP2 = id("leg-group2");

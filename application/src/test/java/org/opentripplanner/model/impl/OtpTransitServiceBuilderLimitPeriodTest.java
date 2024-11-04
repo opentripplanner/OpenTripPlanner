@@ -16,7 +16,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -45,12 +45,12 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private static final LocalDate D1 = LocalDate.of(2020, 1, 8);
   private static final LocalDate D2 = LocalDate.of(2020, 1, 15);
   private static final LocalDate D3 = LocalDate.of(2020, 1, 31);
-  private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
-  private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
-  private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
-  private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
+  private static final FeedScopedId SERVICE_C_IN = TimetableRepositoryForTest.id("CalSrvIn");
+  private static final FeedScopedId SERVICE_D_IN = TimetableRepositoryForTest.id("CalSrvDIn");
+  private static final FeedScopedId SERVICE_C_OUT = TimetableRepositoryForTest.id("CalSrvOut");
+  private static final FeedScopedId SERVICE_D_OUT = TimetableRepositoryForTest.id("CalSrvDOut");
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP_1 = TEST_MODEL.stop("Stop-1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("Stop-2").build();
   private static final List<StopTime> STOP_TIMES = List.of(
@@ -59,7 +59,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   );
   private static final StopPattern STOP_PATTERN = new StopPattern(STOP_TIMES);
   private static int SEQ_NR = 0;
-  private final Route route = TransitModelForTest.route(newId().getId()).build();
+  private final Route route = TimetableRepositoryForTest.route(newId().getId()).build();
   private final Trip tripCSIn = createTrip("TCalIn", SERVICE_C_IN);
   private final Trip tripCSOut = createTrip("TCalOut", SERVICE_C_OUT);
   private final Trip tripCSDIn = createTrip("TDateIn", SERVICE_D_IN);
@@ -70,7 +70,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   @BeforeEach
   public void setUp() {
-    subject = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+    subject = new OtpTransitServiceBuilder(new SiteRepository(), DataImportIssueStore.NOOP);
 
     // Add a service calendar that overlap with the period limit
     subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));
@@ -85,8 +85,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_OUT, D1, 1));
 
     // Add 2 stops
-    subject.stopModel().withRegularStop(STOP_1);
-    subject.stopModel().withRegularStop(STOP_2);
+    subject.siteRepository().withRegularStop(STOP_1);
+    subject.siteRepository().withRegularStop(STOP_2);
 
     // Add Route
     subject.getRoutes().add(route);
@@ -192,11 +192,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private static FeedScopedId newId() {
-    return TransitModelForTest.id(Integer.toString(++SEQ_NR));
+    return TimetableRepositoryForTest.id(Integer.toString(++SEQ_NR));
   }
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
-    FeedScopedId patternId = TransitModelForTest.id(
+    FeedScopedId patternId = TimetableRepositoryForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
     TripPatternBuilder tpb = TripPattern
@@ -213,7 +213,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .trip(id)
       .withServiceId(serviceId)
       .withDirection(Direction.INBOUND)

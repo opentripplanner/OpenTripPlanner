@@ -11,12 +11,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 class McMaxLimitFilterTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);

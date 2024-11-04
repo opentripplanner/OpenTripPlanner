@@ -8,13 +8,13 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 
 class GroupBySameRoutesAndStopsTest implements PlanTestConstants {
 
-  Route routeA = TransitModelForTest.route("A").build();
-  Route routeB = TransitModelForTest.route("B").build();
+  Route routeA = TimetableRepositoryForTest.route("A").build();
+  Route routeB = TimetableRepositoryForTest.route("B").build();
 
   Itinerary i1 = newItinerary(A)
     .bus(routeA, 21, T11_06, T11_28, E)

@@ -30,7 +30,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -38,7 +38,7 @@ import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 class FlexTemplateFactoryTest {
 
-  private static final TransitModelForTest MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
 
   /**
    * This is pass-through information
@@ -78,7 +78,7 @@ class FlexTemplateFactoryTest {
   private static final StopLocation GROUP_STOP_12 = MODEL.groupStop("G", STOP_G1, STOP_G2);
   private static final StopLocation GROUP_STOP_34 = MODEL.groupStop("G", STOP_G3, STOP_G4);
 
-  private static final Trip TRIP = TransitModelForTest.trip("Trip").build();
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("Trip").build();
   private static final int T_10_00 = time("10:00");
   private static final int T_10_10 = time("10:10");
   private static final int T_10_20 = time("10:20");

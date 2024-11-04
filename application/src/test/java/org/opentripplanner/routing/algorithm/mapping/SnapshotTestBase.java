@@ -85,7 +85,8 @@ public abstract class SnapshotTestBase {
   protected OtpServerRequestContext serverContext() {
     if (serverContext == null) {
       TestOtpModel model = getGraph();
-      serverContext = TestServerContext.createServerContext(model.graph(), model.transitModel());
+      serverContext =
+        TestServerContext.createServerContext(model.graph(), model.timetableRepository());
     }
 
     return serverContext;

@@ -32,7 +32,7 @@ class TransportModeMapper {
     return switch (mode) {
       case AIR -> TransitMode.AIRPLANE;
       case BUS -> TransitMode.BUS;
-      case CABLEWAY -> TransitMode.CABLE_CAR;
+      case CABLEWAY -> TransitMode.GONDOLA;
       case COACH -> TransitMode.COACH;
       case FUNICULAR -> TransitMode.FUNICULAR;
       case METRO -> TransitMode.SUBWAY;

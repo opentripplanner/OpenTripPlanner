@@ -14,7 +14,7 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Branding;
@@ -47,11 +47,9 @@ public class RouteMapperTest {
 
   private static final Integer SORT_ORDER = 1;
 
-  private static final String BRANDING_URL = "www.url.me/brand";
-
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
-    new AgencyMapper(TransitModelForTest.FEED_ID),
+    new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
@@ -68,7 +66,6 @@ public class RouteMapperTest {
     ROUTE.setTextColor(TEXT_COLOR);
     ROUTE.setBikesAllowed(BIKES_ALLOWED);
     ROUTE.setSortOrder(SORT_ORDER);
-    ROUTE.setBrandingUrl(BRANDING_URL);
   }
 
   @Test
@@ -95,9 +92,9 @@ public class RouteMapperTest {
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
     assertEquals(SORT_ORDER, result.getGtfsSortOrder());
 
+    // We no longer read the non-standard brandingUrl from gtfs, but if it is supplied, it will not cause an error.
     Branding branding = result.getBranding();
-    assertNotNull(branding);
-    assertEquals(BRANDING_URL, branding.getUrl());
+    assertNull(branding);
   }
 
   @Test

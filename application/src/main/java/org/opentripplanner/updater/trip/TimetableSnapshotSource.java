@@ -60,8 +60,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -108,9 +108,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   public TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
-    this(parameters, transitModel, () -> LocalDate.now(transitModel.getTimeZone()));
+    this(parameters, timetableRepository, () -> LocalDate.now(timetableRepository.getTimeZone()));
   }
 
   /**
@@ -119,20 +119,24 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     Supplier<LocalDate> localDateNow
   ) {
     this.snapshotManager =
-      new TimetableSnapshotManager(transitModel.getTransitLayerUpdater(), parameters, localDateNow);
-    this.timeZone = transitModel.getTimeZone();
+      new TimetableSnapshotManager(
+        timetableRepository.getTransitLayerUpdater(),
+        parameters,
+        localDateNow
+      );
+    this.timeZone = timetableRepository.getTimeZone();
     this.transitEditorService =
-      new DefaultTransitService(transitModel, snapshotManager.getTimetableSnapshotBuffer());
-    this.deduplicator = transitModel.getDeduplicator();
-    this.serviceCodes = transitModel.getServiceCodes();
+      new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
+    this.deduplicator = timetableRepository.getDeduplicator();
+    this.serviceCodes = timetableRepository.getServiceCodes();
     this.localDateNow = localDateNow;
 
     // Inject this into the transit model
-    transitModel.initTimetableSnapshotProvider(this);
+    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**

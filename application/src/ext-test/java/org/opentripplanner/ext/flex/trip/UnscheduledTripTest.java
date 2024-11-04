@@ -3,14 +3,11 @@ package org.opentripplanner.ext.flex.trip;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.area;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularArrival;
-import static org.opentripplanner.ext.flex.FlexStopTimesForTest.regularDeparture;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,9 +22,7 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -41,7 +36,7 @@ class UnscheduledTripTest {
   private static final int T14_00 = TimeUtils.hm2time(14, 0);
   private static final int T15_00 = TimeUtils.hm2time(15, 0);
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
 
@@ -56,7 +51,7 @@ class UnscheduledTripTest {
     private static final StopTime CONTINUOUS_DROP_OFF_STOP = new StopTime();
 
     static {
-      var trip = TransitModelForTest.trip("flex").build();
+      var trip = TimetableRepositoryForTest.trip("flex").build();
       SCHEDULED_STOP.setArrivalTime(30);
       SCHEDULED_STOP.setDepartureTime(60);
       SCHEDULED_STOP.setStop(AREA_STOP);

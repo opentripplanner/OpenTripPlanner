@@ -48,7 +48,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -73,8 +73,11 @@ public class LuceneIndex implements Serializable {
    * However, we do need some methods in the service and that's why we instantiate it manually in this
    * constructor.
    */
-  public LuceneIndex(TransitModel transitModel, StopConsolidationService stopConsolidationService) {
-    this(new DefaultTransitService(transitModel), stopConsolidationService);
+  public LuceneIndex(
+    TimetableRepository timetableRepository,
+    StopConsolidationService stopConsolidationService
+  ) {
+    this(new DefaultTransitService(timetableRepository), stopConsolidationService);
   }
 
   /**

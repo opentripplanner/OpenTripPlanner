@@ -69,7 +69,7 @@ public class RouterConfig implements Serializable {
     this.transmodelApi = new TransmodelAPIConfig("transmodelApi", root);
     this.routingRequestDefaults = mapDefaultRouteRequest("routingDefaults", root);
     this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
-    this.routingRequestDefaults.setMaxSearchWindow(transitConfig.maxSearchWindow());
+    this.routingRequestDefaults.initMaxSearchWindow(transitConfig.maxSearchWindow());
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileConfig = VectorTileConfig.mapVectorTilesParameters(root, "vectorTiles");

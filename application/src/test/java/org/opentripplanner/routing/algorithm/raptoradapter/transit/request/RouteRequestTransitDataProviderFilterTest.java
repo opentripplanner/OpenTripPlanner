@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,7 +27,7 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -34,6 +35,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -49,11 +51,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class RouteRequestTransitDataProviderFilterTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  private static final Route ROUTE = TransitModelForTest.route("1").build();
+  private static final Route ROUTE = TimetableRepositoryForTest.route("1").build();
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
+  private static final FeedScopedId TRIP_ID = TimetableRepositoryForTest.id("T1");
 
   private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
@@ -100,13 +102,14 @@ class RouteRequestTransitDataProviderFilterTest {
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
     var tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
-      .withRoute(TransitModelForTest.route("1").build())
+      .of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       true,
       accessibility,
@@ -150,13 +153,14 @@ class RouteRequestTransitDataProviderFilterTest {
     var stopTime4 = getStopTime("TEST:4", PickDrop.SCHEDULED);
     var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3, stopTime4));
     var tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
-      .withRoute(TransitModelForTest.route("1").build())
+      .of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -204,6 +208,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -221,6 +226,7 @@ class RouteRequestTransitDataProviderFilterTest {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -246,6 +252,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -253,6 +260,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -283,6 +291,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -294,7 +303,7 @@ class RouteRequestTransitDataProviderFilterTest {
             SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
           )
         ),
-        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+        List.of(TimetableRepositoryForTest.OTHER_AGENCY.getId())
       )
     );
 
@@ -318,6 +327,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -329,7 +339,7 @@ class RouteRequestTransitDataProviderFilterTest {
             SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
           )
         ),
-        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+        List.of(TimetableRepositoryForTest.OTHER_AGENCY.getId())
       )
     );
 
@@ -349,6 +359,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -357,7 +368,10 @@ class RouteRequestTransitDataProviderFilterTest {
         TransitFilterRequest
           .of()
           .addSelect(
-            SelectRequest.of().withAgencies(List.of(TransitModelForTest.AGENCY.getId())).build()
+            SelectRequest
+              .of()
+              .withAgencies(List.of(TimetableRepositoryForTest.AGENCY.getId()))
+              .build()
           )
           .addNot(
             SelectRequest
@@ -386,6 +400,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       TransmodelTransportSubmode.LOCAL_BUS.getValue(),
       Accessibility.NOT_POSSIBLE,
@@ -412,6 +427,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -419,6 +435,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -439,6 +456,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -446,6 +464,36 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      true,
+      false,
+      true,
+      WheelchairPreferences.DEFAULT,
+      false,
+      false,
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    boolean valid = filter.tripTimesPredicate(tripTimes, true);
+
+    assertFalse(valid);
+  }
+
+  @Test
+  void carsAllowedFilteringTest() {
+    TripTimes tripTimes = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       true,
       true,
       WheelchairPreferences.DEFAULT,
@@ -466,6 +514,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -473,6 +522,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -493,6 +543,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.POSSIBLE,
@@ -500,6 +551,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -520,6 +572,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -527,6 +580,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -549,6 +603,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -558,6 +613,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -566,6 +622,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     // Given
     var filter1 = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       WheelchairPreferences.DEFAULT,
@@ -587,6 +644,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     // Given
     var filter2 = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -613,6 +671,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -623,6 +682,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -632,6 +692,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     // Given
     var filter1 = new RouteRequestTransitDataProviderFilter(
+      false,
       false,
       false,
       WheelchairPreferences.DEFAULT,
@@ -655,6 +716,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter2 = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -675,8 +737,8 @@ class RouteRequestTransitDataProviderFilterTest {
 
   @Test
   void testBikesAllowed() {
-    RouteBuilder routeBuilder = TransitModelForTest.route("1");
-    TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).withRoute(routeBuilder.build());
+    RouteBuilder routeBuilder = TimetableRepositoryForTest.route("1");
+    TripBuilder trip = Trip.of(TimetableRepositoryForTest.id("T1")).withRoute(routeBuilder.build());
 
     assertEquals(
       BikeAccess.UNKNOWN,
@@ -710,11 +772,63 @@ class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
+  void testCarsAllowed() {
+    TripTimes tripTimesCarsAllowed = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
+      CarAccess.ALLOWED,
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
+    );
+
+    TripTimes tripTimesCarsNotAllowed = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
+      CarAccess.NOT_ALLOWED,
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
+    );
+
+    TripTimes tripTimesCarsUnknown = createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.UNKNOWN,
+      CarAccess.UNKNOWN,
+      TransitMode.FERRY,
+      null,
+      Accessibility.NO_INFORMATION,
+      TripAlteration.PLANNED
+    );
+
+    RouteRequestTransitDataProviderFilter filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      true,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      List.of(AllowAllTransitFilter.of())
+    );
+
+    assertThat(filter.tripTimesPredicate(tripTimesCarsAllowed, false)).isTrue();
+    assertThat(filter.tripTimesPredicate(tripTimesCarsNotAllowed, false)).isFalse();
+    assertThat(filter.tripTimesPredicate(tripTimesCarsUnknown, false)).isFalse();
+  }
+
+  @Test
   void multipleFilteringTest() {
     TripTimes matchingTripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
       BikeAccess.ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.POSSIBLE,
@@ -724,6 +838,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.RAIL,
       null,
       Accessibility.POSSIBLE,
@@ -733,6 +848,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.RAIL,
       null,
       Accessibility.POSSIBLE,
@@ -742,6 +858,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.RAIL,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -751,6 +868,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.NOT_POSSIBLE,
@@ -760,6 +878,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
       Accessibility.POSSIBLE,
@@ -768,6 +887,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
     var filter = new RouteRequestTransitDataProviderFilter(
       true,
+      false,
       true,
       DEFAULT_ACCESSIBILITY,
       false,
@@ -792,6 +912,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       false,
@@ -803,20 +924,20 @@ class RouteRequestTransitDataProviderFilterTest {
   }
 
   private TripPatternForDate createTestTripPatternForDate() {
-    Route route = TransitModelForTest.route("1").build();
+    Route route = TimetableRepositoryForTest.route("1").build();
 
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
     RoutingTripPattern tripPattern = TripPattern
-      .of(TransitModelForTest.id("P1"))
+      .of(TimetableRepositoryForTest.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build()
       .getRoutingTripPattern();
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(
-      TransitModelForTest.trip("1").withRoute(route).build(),
+      TimetableRepositoryForTest.trip("1").withRoute(route).build(),
       List.of(new StopTime()),
       new Deduplicator()
     );
@@ -867,6 +988,7 @@ class RouteRequestTransitDataProviderFilterTest {
     FeedScopedId tripId,
     Route route,
     BikeAccess bikeAccess,
+    CarAccess carAccess,
     TransitMode mode,
     String submode,
     Accessibility wheelchairBoarding,
@@ -878,6 +1000,7 @@ class RouteRequestTransitDataProviderFilterTest {
       .withMode(mode)
       .withNetexSubmode(submode)
       .withBikesAllowed(bikeAccess)
+      .withCarsAllowed(carAccess)
       .withWheelchairBoarding(wheelchairBoarding)
       .withNetexAlteration(tripAlteration)
       .build();
@@ -896,6 +1019,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
+      CarAccess.NOT_ALLOWED,
       TransitMode.BUS,
       submode,
       Accessibility.NOT_POSSIBLE,

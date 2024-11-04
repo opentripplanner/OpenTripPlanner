@@ -4,6 +4,7 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -84,6 +85,7 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
+  @Nullable
   public LineString getLegGeometry() {
     return null;
   }

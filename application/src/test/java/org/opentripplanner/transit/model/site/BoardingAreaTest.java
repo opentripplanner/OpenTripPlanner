@@ -10,17 +10,20 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class BoardingAreaTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final RegularStop PARENT_STOP = TransitModelForTest.of().stop("stopId").build();
+  private static final RegularStop PARENT_STOP = TimetableRepositoryForTest
+    .of()
+    .stop("stopId")
+    .build();
 
   private static final BoardingArea subject = BoardingArea
-    .of(TransitModelForTest.id(ID))
+    .of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withParentStop(PARENT_STOP)
@@ -52,7 +55,7 @@ class BoardingAreaTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TimetableRepositoryForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())

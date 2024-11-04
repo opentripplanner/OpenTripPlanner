@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -154,7 +154,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
       .build();
   }

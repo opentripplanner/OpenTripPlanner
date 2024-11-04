@@ -31,11 +31,10 @@ We run a speed test (included in the code) to measure the performance for every 
 
 ## Repository layout
 
-The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the
-Leaflet mapping library in `src/client/`. This client is now primarily used for testing, with most
-major deployments building custom clients from reusable components. The Maven build produces a
-unified ("shaded") JAR file at `target/otp-VERSION.jar` containing all necessary code and
-dependencies to run OpenTripPlanner.
+The main Java server code is in `application/src/main/`. OTP also includes a Javascript client based on the
+MapLibre mapping library in `client/src/`. This client is now used for testing, with most major
+deployments building custom clients from reusable components. The Maven build produces a unified ("shaded")
+JAR file at `application/target/otp-VERSION.jar` containing all necessary code and dependencies to run OpenTripPlanner.
 
 Additional information and instructions are available in
 the [main documentation](http://docs.opentripplanner.org/en/dev-2.x/), including a

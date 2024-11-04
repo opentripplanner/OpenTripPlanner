@@ -64,13 +64,13 @@ OTP. If all goes well you should see a success message like the following:
 [INFO] ------------------------------------------------------------------------
 ```
 
-This build process should produce a JAR file called `otp-x.y.z-shaded.jar` in the `target/`
-directory which contains all the compiled OTP classes and their dependencies (the external libraries
-they use). The shell script called 'otp' in the root of the cloned repository will start the main
-class of that JAR file under a Java virtual machine, so after the Maven build completes you should
-be able to run `./otp --help` and see an OTP help message including command line options. Due to the
-way Maven works, this script is not executable by default, so you will need to do `chmod u+x ./otp`
-before you run it to mark it as executable.
+This build process should produce a JAR file called `otp-x.y.z-shaded.jar` in the
+`application/target/` directory which contains all the compiled OTP classes and their dependencies
+(the external libraries they use). The shell script called 'otp' in the root of the cloned repository
+will start the main class of that JAR file under a Java virtual machine, so after the Maven build
+completes you should be able to run `./otp --help` and see an OTP help message including command line
+options. Due to the way Maven works, this script is not executable by default, so you will need to do
+`chmod u+x ./otp` before you run it to mark it as executable.
 
 The words "clean package" are the build steps you want to run. You're telling maven to clean up any
 extraneous junk in the directory, then perform all the build steps, including compilation, up to and

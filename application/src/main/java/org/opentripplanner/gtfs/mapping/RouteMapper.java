@@ -15,7 +15,6 @@ import org.opentripplanner.transit.model.network.Route;
 class RouteMapper {
 
   private final AgencyMapper agencyMapper;
-  private final BrandingMapper brandingMapper;
 
   private final DataImportIssueStore issueStore;
 
@@ -30,7 +29,6 @@ class RouteMapper {
   ) {
     this.agencyMapper = agencyMapper;
     this.issueStore = issueStore;
-    this.brandingMapper = new BrandingMapper();
     this.translationHelper = helper;
   }
 
@@ -82,7 +80,6 @@ class RouteMapper {
     lhs.withColor(rhs.getColor());
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    lhs.withBranding(brandingMapper.map(rhs));
     if (rhs.getNetworkId() != null) {
       var networkId = GroupOfRoutes
         .of(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId()))

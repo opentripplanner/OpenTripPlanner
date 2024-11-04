@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,12 +13,12 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 
 public class FaresFilterTest implements PlanTestConstants {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   @Test
   void shouldAddFare() {

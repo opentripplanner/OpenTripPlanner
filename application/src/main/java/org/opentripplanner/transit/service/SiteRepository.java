@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Repository for Stop entities.
  */
-public class StopModel implements Serializable {
+public class SiteRepository implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiteRepository.class);
 
   private final AtomicInteger stopIndexCounter;
   private final Map<FeedScopedId, RegularStop> regularStopById;
@@ -37,10 +37,10 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
   private final Map<FeedScopedId, AreaStop> areaStopById;
   private final Map<FeedScopedId, GroupStop> groupStopById;
-  private transient StopModelIndex index;
+  private transient SiteRepositoryIndex index;
 
   @Inject
-  public StopModel() {
+  public SiteRepository() {
     this.stopIndexCounter = new AtomicInteger(0);
     this.regularStopById = Map.of();
     this.stationById = Map.of();
@@ -51,7 +51,7 @@ public class StopModel implements Serializable {
     this.index = createIndex();
   }
 
-  StopModel(StopModelBuilder builder) {
+  SiteRepository(SiteRepositoryBuilder builder) {
     this.stopIndexCounter = builder.stopIndexCounter();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
@@ -67,7 +67,7 @@ public class StopModel implements Serializable {
    * method, if not this method will fail! If a duplicate key exist, then child value is kept -
    * this feature is normally not allowed, but not enforced here.
    */
-  private StopModel(StopModel main, StopModel child) {
+  private SiteRepository(SiteRepository main, SiteRepository child) {
     this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
@@ -83,28 +83,28 @@ public class StopModel implements Serializable {
   /**
    * Create a new builder based on an empty model. This is useful in unit-tests, but should
    * NOT be used in the main code. It is not possible to merge the result with another
-   * {@link StopModel}, because they do not share the same context(stopIndexCounter).
+   * {@link SiteRepository}, because they do not share the same context(stopIndexCounter).
    * <p>
    * In the application code the correct way is to retrieve a model instance and then use the
    * {@link #withContext()} method to create a builder.
    */
-  public static StopModelBuilder of() {
-    return new StopModelBuilder(new AtomicInteger(0));
+  public static SiteRepositoryBuilder of() {
+    return new SiteRepositoryBuilder(new AtomicInteger(0));
   }
 
   /**
    * Create a new builder attached to the existing model. The entities of the existing model are
    * NOT copied into the builder, but the builder has access to the model - allowing it to check
    * for duplicates and injecting information from the model(indexing). The changes in the
-   * StopModelBuilder can then be merged into the original model - this is for now left to the
+   * SiteRepositoryBuilder can then be merged into the original model - this is for now left to the
    * caller.
    * <p>
    * USE THIS TO CREATE A SAFE BUILDER IN PRODUCTION CODE. You MAY use this method in unit-tests,
    * the alternative is the {@link #of()} method. This method should be used if the test have a
-   * StopModel and the {@link #of()} method should be used if a stop-model in not needed.
+   * SiteRepository and the {@link #of()} method should be used if a stop-model in not needed.
    */
-  public StopModelBuilder withContext() {
-    return new StopModelBuilder(this.stopIndexCounter);
+  public SiteRepositoryBuilder withContext() {
+    return new SiteRepositoryBuilder(this.stopIndexCounter);
   }
 
   /**
@@ -282,24 +282,24 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Call this method after deserializing this class. This will reindex the StopModel.
+   * Call this method after deserializing this class. This will reindex the SiteRepository.
    */
   public void reindexAfterDeserialization() {
     reindex();
   }
 
-  public StopModel merge(StopModel child) {
-    return new StopModel(this, child);
+  public SiteRepository merge(SiteRepository child) {
+    return new SiteRepository(this, child);
   }
 
   private void reindex() {
-    LOG.info("Index stop model...");
+    LOG.info("Index site repository...");
     index = createIndex();
-    LOG.info("Index stop model complete.");
+    LOG.info("Index site repository complete.");
   }
 
-  private StopModelIndex createIndex() {
-    return new StopModelIndex(
+  private SiteRepositoryIndex createIndex() {
+    return new SiteRepositoryIndex(
       regularStopById.values(),
       areaStopById.values(),
       groupStopById.values(),
@@ -328,13 +328,13 @@ public class StopModel implements Serializable {
    */
   @SuppressWarnings("NumberEquality")
   private static AtomicInteger assertSameStopIndexCounterIsUsedToCreateBothModels(
-    StopModel main,
-    StopModel child
+    SiteRepository main,
+    SiteRepository child
   ) {
     if (main.stopIndexCounter != child.stopIndexCounter) {
       throw new IllegalArgumentException(
-        "Two Stop models can only be merged if they are created with the same stopIndexCounter. " +
-        "This is archived by using the 'StopModel.withContext()' method. We do this to avoid " +
+        "Two Stop repositories can only be merged if they are created with the same stopIndexCounter. " +
+        "This is archived by using the 'SiteRepository.withContext()' method. We do this to avoid " +
         "duplicates/gaps in the stopIndex."
       );
     }

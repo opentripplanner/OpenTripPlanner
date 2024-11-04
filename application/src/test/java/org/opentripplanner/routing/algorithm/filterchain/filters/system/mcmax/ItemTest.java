@@ -9,11 +9,11 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class ItemTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 11);
   private static final Itinerary ITINERARY = newItinerary(A).bus(1, 1, 2, B).build();

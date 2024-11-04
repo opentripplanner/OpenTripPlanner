@@ -1,21 +1,20 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.OTHER_FEED_AGENCY;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.OTHER_FEED_AGENCY;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
 public class FareModelForTest {
 
@@ -26,40 +25,40 @@ public class FareModelForTest {
     .of(FeedScopedId.ofNullable("F2", "other-feed-zone"))
     .build();
 
-  private static final StopModelBuilder STOP_MODEL_BUILDER = StopModel.of();
+  private static final SiteRepositoryBuilder SITE_REPOSITORY_BUILDER = SiteRepository.of();
 
-  static final RegularStop AIRPORT_STOP = STOP_MODEL_BUILDER
+  static final RegularStop AIRPORT_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(id("airport"))
     .withCoordinate(new WgsCoordinate(1, 1))
     .addFareZones(AIRPORT_ZONE)
     .withName(I18NString.of("Airport"))
     .build();
 
-  static final RegularStop CITY_CENTER_A_STOP = STOP_MODEL_BUILDER
+  static final RegularStop CITY_CENTER_A_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(id("city-center-a"))
     .withCoordinate(new WgsCoordinate(1, 2))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop A"))
     .build();
-  static final RegularStop CITY_CENTER_B_STOP = STOP_MODEL_BUILDER
+  static final RegularStop CITY_CENTER_B_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(id("city-center-b"))
     .withCoordinate(new WgsCoordinate(1, 3))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop B"))
     .build();
-  static final RegularStop CITY_CENTER_C_STOP = STOP_MODEL_BUILDER
+  static final RegularStop CITY_CENTER_C_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(id("city-center-c"))
     .withCoordinate(new WgsCoordinate(1, 4))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop C"))
     .build();
-  static final RegularStop SUBURB_STOP = STOP_MODEL_BUILDER
+  static final RegularStop SUBURB_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(id("suburb"))
     .withCoordinate(new WgsCoordinate(1, 4))
     .withName(I18NString.of("Suburb"))
     .build();
 
-  static final RegularStop OTHER_FEED_STOP = STOP_MODEL_BUILDER
+  static final RegularStop OTHER_FEED_STOP = SITE_REPOSITORY_BUILDER
     .regularStop(FeedScopedId.ofNullable("F2", "other-feed-stop"))
     .withCoordinate(new WgsCoordinate(1, 5))
     .withName(I18NString.of("Other feed stop"))

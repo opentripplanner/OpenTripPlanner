@@ -12,7 +12,7 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class TransitAlertFilterTest implements PlanTestConstants {
 
@@ -20,7 +20,7 @@ class TransitAlertFilterTest implements PlanTestConstants {
 
   @Test
   void testFilter() {
-    var transitAlertService = new TransitAlertServiceImpl(new TransitModel());
+    var transitAlertService = new TransitAlertServiceImpl(new TimetableRepository());
     transitAlertService.setAlerts(
       List.of(
         TransitAlert
