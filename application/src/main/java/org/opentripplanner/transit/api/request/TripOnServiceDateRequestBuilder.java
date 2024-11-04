@@ -7,28 +7,28 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class TripOnServiceDateRequestBuilder {
 
-  private List<FeedScopedId> authorities;
-  private List<FeedScopedId> lines;
+  private List<FeedScopedId> agencies;
+  private List<FeedScopedId> routes;
   private List<FeedScopedId> serviceJourneys;
   private List<FeedScopedId> replacementFor;
-  private List<String> privateCodes;
+  private List<String> netexInternalPlanningCodes;
   private List<TripAlteration> alterations;
-  private List<LocalDate> operatingDays;
+  private List<LocalDate> serviceDates;
 
   protected TripOnServiceDateRequestBuilder() {}
 
-  public TripOnServiceDateRequestBuilder withOperatingDays(List<LocalDate> operatingDays) {
-    this.operatingDays = operatingDays;
+  public TripOnServiceDateRequestBuilder withServiceDates(List<LocalDate> serviceDates) {
+    this.serviceDates = serviceDates;
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withAuthorities(List<FeedScopedId> authorities) {
-    this.authorities = authorities;
+  public TripOnServiceDateRequestBuilder withAgencies(List<FeedScopedId> agencies) {
+    this.agencies = agencies;
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withLines(List<FeedScopedId> lines) {
-    this.lines = lines;
+  public TripOnServiceDateRequestBuilder withRoutes(List<FeedScopedId> routes) {
+    this.routes = routes;
     return this;
   }
 
@@ -42,8 +42,8 @@ public class TripOnServiceDateRequestBuilder {
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withPrivateCodes(List<String> privateCodes) {
-    this.privateCodes = privateCodes;
+  public TripOnServiceDateRequestBuilder withNetexInternalPlanningCodes(List<String> netexInternalPlanningCodes) {
+    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
 
@@ -54,12 +54,12 @@ public class TripOnServiceDateRequestBuilder {
 
   public TripOnServiceDateRequest build() {
     return new TripOnServiceDateRequest(
-      operatingDays,
-      authorities,
-      lines,
+      serviceDates,
+      agencies,
+      routes,
       serviceJourneys,
       replacementFor,
-      privateCodes,
+      netexInternalPlanningCodes,
       alterations
     );
   }

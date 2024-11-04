@@ -106,14 +106,14 @@ public class DatedServiceJourneyQuery {
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
           .of()
-          .withOperatingDays(operatingDays)
-          .withAuthorities(authorities)
-          .withLines(lines)
+          .withServiceDates(operatingDays)
+          .withAgencies(authorities)
+          .withRoutes(lines)
           .withServiceJourneys(serviceJourneys)
           .withReplacementFor(replacementFor);
 
         tripOnServiceDateRequestBuilder =
-          tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
+          tripOnServiceDateRequestBuilder.withNetexInternalPlanningCodes(privateCodes);
 
         tripOnServiceDateRequestBuilder =
           tripOnServiceDateRequestBuilder.withAlterations(alterations);

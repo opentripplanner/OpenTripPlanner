@@ -19,6 +19,13 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class TripMatcherFactory {
 
+  /**
+   * Creates a matcher for {@link Trip} objects based on the given request.
+   *
+   * @param request - a {@link TripRequest} object that contains the criteria for the matcher.
+   * @param serviceDateProvider a function that provides the service dates for a given {@link FeedScopedId} of a {@link Trip}.
+   * @return a {@link Matcher<Trip>} to be used for filtering {@link Trip} objects.
+   */
   public static Matcher<Trip> of(
     TripRequest request,
     Function<FeedScopedId, Set<LocalDate>> serviceDateProvider
@@ -48,7 +55,7 @@ public class TripMatcherFactory {
   }
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {
-    return new EqualityMatcher<>("privateCode", code, Trip::getNetexInternalPlanningCode);
+    return new EqualityMatcher<>("netexInternalPlanningCode", code, Trip::getNetexInternalPlanningCode);
   }
 
   static Function<LocalDate, Matcher<Trip>> serviceDate(

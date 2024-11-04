@@ -15,7 +15,7 @@ public class TripRequest {
 
   private final List<FeedScopedId> agencies;
   private final List<FeedScopedId> routes;
-  private final List<String> netexInternalPlanningCode;
+  private final List<String> netexInternalPlanningCodes;
   private final List<LocalDate> serviceDates;
 
   protected TripRequest(
@@ -26,7 +26,7 @@ public class TripRequest {
   ) {
     this.agencies = ListUtils.nullSafeImmutableList(agencies);
     this.routes = ListUtils.nullSafeImmutableList(routes);
-    this.netexInternalPlanningCode = ListUtils.nullSafeImmutableList(netexInternalPlanningCodes);
+    this.netexInternalPlanningCodes = ListUtils.nullSafeImmutableList(netexInternalPlanningCodes);
     this.serviceDates = ListUtils.nullSafeImmutableList(serviceDates);
   }
 
@@ -43,7 +43,7 @@ public class TripRequest {
   }
 
   public List<String> netexInternalPlanningCodes() {
-    return netexInternalPlanningCode;
+    return netexInternalPlanningCodes;
   }
 
   public List<LocalDate> serviceDates() {

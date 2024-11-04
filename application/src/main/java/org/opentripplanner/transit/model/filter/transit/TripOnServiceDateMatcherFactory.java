@@ -22,20 +22,20 @@ public class TripOnServiceDateMatcherFactory {
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.operatingDays(), TripOnServiceDateMatcherFactory::operatingDay);
-    expr.atLeastOneMatch(request.authorities(), TripOnServiceDateMatcherFactory::authorityId);
-    expr.atLeastOneMatch(request.lines(), TripOnServiceDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(request.serviceDates(), TripOnServiceDateMatcherFactory::serviceDate);
+    expr.atLeastOneMatch(request.agencies(), TripOnServiceDateMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.routes(), TripOnServiceDateMatcherFactory::routeId);
     expr.atLeastOneMatch(
       request.serviceJourneys(),
       TripOnServiceDateMatcherFactory::serviceJourneyId
     );
     expr.atLeastOneMatch(request.replacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
-    expr.atLeastOneMatch(request.privateCodes(), TripOnServiceDateMatcherFactory::privateCode);
+    expr.atLeastOneMatch(request.netexInternalPlanningCodes(), TripOnServiceDateMatcherFactory::netexInternalPlanningCode);
     expr.atLeastOneMatch(request.alterations(), TripOnServiceDateMatcherFactory::alteration);
     return expr.build();
   }
 
-  static Matcher<TripOnServiceDate> authorityId(FeedScopedId id) {
+  static Matcher<TripOnServiceDate> agencyId(FeedScopedId id) {
     return new EqualityMatcher<>("agency", id, t -> t.getTrip().getRoute().getAgency().getId());
   }
 
@@ -55,16 +55,16 @@ public class TripOnServiceDateMatcherFactory {
     );
   }
 
-  static Matcher<TripOnServiceDate> privateCode(String code) {
+  static Matcher<TripOnServiceDate> netexInternalPlanningCode(String code) {
     return new EqualityMatcher<>(
-      "privateCode",
+      "netexInternalPlanningCode",
       code,
       t -> t.getTrip().getNetexInternalPlanningCode()
     );
   }
 
-  static Matcher<TripOnServiceDate> operatingDay(LocalDate date) {
-    return new EqualityMatcher<>("operatingDay", date, TripOnServiceDate::getServiceDate);
+  static Matcher<TripOnServiceDate> serviceDate(LocalDate date) {
+    return new EqualityMatcher<>("serviceDate", date, TripOnServiceDate::getServiceDate);
   }
 
   static Matcher<TripOnServiceDate> alteration(TripAlteration alteration) {

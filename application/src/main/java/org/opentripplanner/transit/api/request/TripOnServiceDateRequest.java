@@ -15,32 +15,32 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  */
 public class TripOnServiceDateRequest {
 
-  private final List<LocalDate> operatingDays;
-  private final List<FeedScopedId> authorities;
-  private final List<FeedScopedId> lines;
+  private final List<LocalDate> serviceDates;
+  private final List<FeedScopedId> agencies;
+  private final List<FeedScopedId> routes;
   private final List<FeedScopedId> serviceJourneys;
   private final List<FeedScopedId> replacementFor;
-  private final List<String> privateCodes;
+  private final List<String> netexInternalPlanningCodes;
   private final List<TripAlteration> alterations;
 
   protected TripOnServiceDateRequest(
-    List<LocalDate> operatingDays,
-    List<FeedScopedId> authorities,
-    List<FeedScopedId> lines,
+    List<LocalDate> serviceDates,
+    List<FeedScopedId> agencies,
+    List<FeedScopedId> routes,
     List<FeedScopedId> serviceJourneys,
     List<FeedScopedId> replacementFor,
-    List<String> privateCodes,
+    List<String> netexInternalPlanningCodes,
     List<TripAlteration> alterations
   ) {
-    if (operatingDays == null || operatingDays.isEmpty()) {
+    if (serviceDates == null || serviceDates.isEmpty()) {
       throw new IllegalArgumentException("operatingDays must have at least one date");
     }
-    this.operatingDays = ListUtils.nullSafeImmutableList(operatingDays);
-    this.authorities = ListUtils.nullSafeImmutableList(authorities);
-    this.lines = ListUtils.nullSafeImmutableList(lines);
+    this.serviceDates = ListUtils.nullSafeImmutableList(serviceDates);
+    this.agencies = ListUtils.nullSafeImmutableList(agencies);
+    this.routes = ListUtils.nullSafeImmutableList(routes);
     this.serviceJourneys = ListUtils.nullSafeImmutableList(serviceJourneys);
     this.replacementFor = ListUtils.nullSafeImmutableList(replacementFor);
-    this.privateCodes = ListUtils.nullSafeImmutableList(privateCodes);
+    this.netexInternalPlanningCodes = ListUtils.nullSafeImmutableList(netexInternalPlanningCodes);
     this.alterations = ListUtils.nullSafeImmutableList(alterations);
   }
 
@@ -48,12 +48,12 @@ public class TripOnServiceDateRequest {
     return new TripOnServiceDateRequestBuilder();
   }
 
-  public List<FeedScopedId> authorities() {
-    return authorities;
+  public List<FeedScopedId> agencies() {
+    return agencies;
   }
 
-  public List<FeedScopedId> lines() {
-    return lines;
+  public List<FeedScopedId> routes() {
+    return routes;
   }
 
   public List<FeedScopedId> serviceJourneys() {
@@ -64,15 +64,15 @@ public class TripOnServiceDateRequest {
     return replacementFor;
   }
 
-  public List<String> privateCodes() {
-    return privateCodes;
+  public List<String> netexInternalPlanningCodes() {
+    return netexInternalPlanningCodes;
   }
 
   public List<TripAlteration> alterations() {
     return alterations;
   }
 
-  public List<LocalDate> operatingDays() {
-    return operatingDays;
+  public List<LocalDate> serviceDates() {
+    return serviceDates;
   }
 }
