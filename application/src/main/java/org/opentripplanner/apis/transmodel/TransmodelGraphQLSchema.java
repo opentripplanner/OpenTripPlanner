@@ -1289,7 +1289,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("activeDates")
-              .description("Set of service dates to fetch serviceJourneys for.")
+              .description("Set of operating-days to fetch service-journeys for.")
               .type(new GraphQLList(TransmodelScalars.DATE_SCALAR))
               .build()
           )
@@ -1309,10 +1309,10 @@ public class TransmodelGraphQLSchema {
 
             TripRequestBuilder tripRequestBuilder = TripRequest
               .of()
-              .withAuthorities(authorities)
-              .withLines(lineIds)
-              .withPrivateCodes(privateCodes)
-              .withActiveDates(activeServiceDates);
+              .withAgencies(authorities)
+              .withRoutes(lineIds)
+              .withNetexInternalPlanningCodes(privateCodes)
+              .withServiceDates(activeServiceDates);
 
             return GqlUtil.getTransitService(environment).getTrips(tripRequestBuilder.build());
           })

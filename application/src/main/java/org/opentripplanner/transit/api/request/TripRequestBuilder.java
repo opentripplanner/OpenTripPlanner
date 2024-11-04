@@ -6,34 +6,34 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private List<FeedScopedId> authorities;
-  private List<FeedScopedId> lines;
-  private List<String> privateCodes;
-  private List<LocalDate> activeDates;
+  private List<FeedScopedId> agencies;
+  private List<FeedScopedId> routes;
+  private List<String> netexInternalPlanningCodes;
+  private List<LocalDate> serviceDates;
 
   protected TripRequestBuilder() {}
 
-  public TripRequestBuilder withAuthorities(List<FeedScopedId> authorities) {
-    this.authorities = authorities;
+  public TripRequestBuilder withAgencies(List<FeedScopedId> agencies) {
+    this.agencies = agencies;
     return this;
   }
 
-  public TripRequestBuilder withLines(List<FeedScopedId> lines) {
-    this.lines = lines;
+  public TripRequestBuilder withRoutes(List<FeedScopedId> routes) {
+    this.routes = routes;
     return this;
   }
 
-  public TripRequestBuilder withPrivateCodes(List<String> privateCodes) {
-    this.privateCodes = privateCodes;
+  public TripRequestBuilder withNetexInternalPlanningCodes(List<String> netexInternalPlanningCodes) {
+    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
 
-  public TripRequestBuilder withActiveDates(List<LocalDate> activeDates) {
-    this.activeDates = activeDates;
+  public TripRequestBuilder withServiceDates(List<LocalDate> serviceDates) {
+    this.serviceDates = serviceDates;
     return this;
   }
 
   public TripRequest build() {
-    return new TripRequest(authorities, lines, privateCodes, activeDates);
+    return new TripRequest(agencies, routes, netexInternalPlanningCodes, serviceDates);
   }
 }
