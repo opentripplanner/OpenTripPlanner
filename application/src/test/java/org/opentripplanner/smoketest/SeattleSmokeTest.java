@@ -28,7 +28,6 @@ import org.opentripplanner.client.model.Route;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.smoketest.util.RequestCombinationsBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
@@ -175,26 +174,33 @@ public class SeattleSmokeTest {
   }
 
   static List<TripPlanParameters> buildCombinations() {
-    var walk = new RequestCombinationsBuilder()
+    return new RequestCombinationsBuilder()
       .withLocations(SODO, ESPERANCE, CLYDE_HILL, RONALD_BOG_PARK, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
       .withModes(TRANSIT, WALK)
       .withTime(SmokeTest.weekdayAtNoon())
       .includeWheelchair()
       .includeArriveBy()
       .build();
-    var bike = new RequestCombinationsBuilder()
-      .withLocations(SODO, ESPERANCE, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
-      .withModes(TRANSIT, BICYCLE)
-      .withTime(SmokeTest.weekdayAtNoon())
-      .includeArriveBy()
-      .build();
-
-    return ListUtils.combine(walk, bike);
   }
 
   @ParameterizedTest
   @MethodSource("buildCombinations")
   public void accessibleRouting(TripPlanParameters params) throws IOException {
+    var tripPlan = SmokeTest.API_CLIENT.plan(params);
+    assertFalse(tripPlan.transitItineraries().isEmpty());
+  }
+
+  static List<TripPlanParameters> bikeCombinations() {
+    return new RequestCombinationsBuilder()
+      .withLocations(SODO, ESPERANCE, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
+      .withModes(TRANSIT, BICYCLE)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .includeArriveBy()
+      .build();
+  }
+  @ParameterizedTest
+  @MethodSource("bikeCombinations")
+  public void bikeAndTransit(TripPlanParameters params) throws IOException {
     var tripPlan = SmokeTest.API_CLIENT.plan(params);
     assertFalse(tripPlan.transitItineraries().isEmpty());
   }
