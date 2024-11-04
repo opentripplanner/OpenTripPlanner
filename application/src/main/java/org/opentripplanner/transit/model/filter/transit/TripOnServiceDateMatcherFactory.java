@@ -30,7 +30,10 @@ public class TripOnServiceDateMatcherFactory {
       TripOnServiceDateMatcherFactory::serviceJourneyId
     );
     expr.atLeastOneMatch(request.replacementFor(), TripOnServiceDateMatcherFactory::replacementFor);
-    expr.atLeastOneMatch(request.netexInternalPlanningCodes(), TripOnServiceDateMatcherFactory::netexInternalPlanningCode);
+    expr.atLeastOneMatch(
+      request.netexInternalPlanningCodes(),
+      TripOnServiceDateMatcherFactory::netexInternalPlanningCode
+    );
     expr.atLeastOneMatch(request.alterations(), TripOnServiceDateMatcherFactory::alteration);
     return expr.build();
   }

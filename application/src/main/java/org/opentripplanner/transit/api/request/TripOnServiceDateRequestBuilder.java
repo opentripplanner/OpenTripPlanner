@@ -42,7 +42,9 @@ public class TripOnServiceDateRequestBuilder {
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withNetexInternalPlanningCodes(List<String> netexInternalPlanningCodes) {
+  public TripOnServiceDateRequestBuilder withNetexInternalPlanningCodes(
+    List<String> netexInternalPlanningCodes
+  ) {
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }

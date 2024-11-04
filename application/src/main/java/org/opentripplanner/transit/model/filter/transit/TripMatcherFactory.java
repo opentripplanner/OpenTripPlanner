@@ -55,7 +55,11 @@ public class TripMatcherFactory {
   }
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {
-    return new EqualityMatcher<>("netexInternalPlanningCode", code, Trip::getNetexInternalPlanningCode);
+    return new EqualityMatcher<>(
+      "netexInternalPlanningCode",
+      code,
+      Trip::getNetexInternalPlanningCode
+    );
   }
 
   static Function<LocalDate, Matcher<Trip>> serviceDate(
