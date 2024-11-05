@@ -12,6 +12,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
+import org.opentripplanner.routing.alternativelegs.SearchTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
@@ -51,7 +52,7 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       3,
       transitService,
-      AlternativeLegs.SearchDirection.PREVIOUS,
+      SearchTime.BEFORE,
       AlternativeLegsFilter.NO_FILTER
     );
 
@@ -85,7 +86,7 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       3,
       transitService,
-      AlternativeLegs.SearchDirection.NEXT,
+      SearchTime.AFTER,
       AlternativeLegsFilter.NO_FILTER
     );
 
@@ -119,7 +120,7 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       2,
       transitService,
-      AlternativeLegs.SearchDirection.NEXT,
+      SearchTime.AFTER,
       AlternativeLegsFilter.NO_FILTER
     );
 
@@ -147,7 +148,7 @@ class AlternativeLegsTest extends GtfsTest {
       originalLeg,
       2,
       transitService,
-      AlternativeLegs.SearchDirection.NEXT,
+      SearchTime.AFTER,
       AlternativeLegsFilter.NO_FILTER
     );
     var legs = toString(alternativeLegs);

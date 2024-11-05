@@ -39,18 +39,13 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  */
 public class AlternativeLegs {
 
-  public enum SearchDirection {
-    NEXT,
-    PREVIOUS,
-  }
-
   public static final int ZERO_COST = 0;
 
   public static List<ScheduledTransitLeg> getAlternativeLegs(
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchDirection searchDirection,
+    SearchTime searchDirection,
     AlternativeLegsFilter filter
   ) {
     return getAlternativeLegs(
@@ -86,7 +81,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchDirection searchDirection,
+    SearchTime searchDirection,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
     boolean exactDestinationStop
@@ -109,7 +104,7 @@ public class AlternativeLegs {
       ScheduledTransitLeg::getStartTime
     );
 
-    if (searchDirection == SearchDirection.PREVIOUS) {
+    if (searchDirection == SearchTime.BEFORE) {
       legComparator = legComparator.reversed();
     }
 
@@ -140,7 +135,7 @@ public class AlternativeLegs {
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
-    SearchDirection searchDirection
+    SearchTime searchDirection
   ) {
     TripPattern pattern = tripPatternBetweenStops.tripPattern;
     int boardingPosition = tripPatternBetweenStops.positions.boardingPosition;
@@ -153,7 +148,7 @@ public class AlternativeLegs {
       tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
-    if (searchDirection == SearchDirection.PREVIOUS) {
+    if (searchDirection == SearchTime.BEFORE) {
       comparator = comparator.reversed();
     }
 
@@ -183,7 +178,7 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange = searchDirection == SearchDirection.PREVIOUS
+        boolean departureTimeInRange = searchDirection == SearchTime.BEFORE
           ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
           : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 

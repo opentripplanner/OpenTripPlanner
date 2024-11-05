@@ -33,7 +33,7 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
-import org.opentripplanner.routing.alternativelegs.AlternativeLegs.SearchDirection;
+import org.opentripplanner.routing.alternativelegs.SearchTime;
 
 public class LegType {
 
@@ -486,7 +486,7 @@ public class LegType {
               leg,
               env.getArgument("previous"),
               GqlUtil.getTransitService(env),
-              SearchDirection.PREVIOUS,
+              SearchTime.BEFORE,
               env.getArgument("filter")
             );
           })
@@ -526,7 +526,7 @@ public class LegType {
               leg,
               env.getArgument("next"),
               GqlUtil.getTransitService(env),
-              SearchDirection.NEXT,
+              SearchTime.AFTER,
               env.getArgument("filter")
             );
           })
