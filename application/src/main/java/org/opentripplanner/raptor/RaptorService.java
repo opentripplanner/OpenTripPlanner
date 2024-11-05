@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor;
 
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
@@ -8,6 +9,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.service.DefaultStopArrivals;
 import org.opentripplanner.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.raptor.service.RangeRaptorDynamicSearch;
+import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +25,16 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
   private final RaptorConfig<T> config;
 
-  public RaptorService(RaptorConfig<T> config) {
+  @Nullable
+  private final ExtraMcRouterSearch<T> extraMcSearch;
+
+  public RaptorService(RaptorConfig<T> config, @Nullable ExtraMcRouterSearch<T> extraMcSearch) {
     this.config = config;
+    this.extraMcSearch = extraMcSearch;
+  }
+
+  public RaptorService(RaptorConfig<T> config) {
+    this(config, null);
   }
 
   public RaptorResponse<T> route(
@@ -35,7 +45,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorResponse<T> response;
 
     if (request.isDynamicSearch()) {
-      response = new RangeRaptorDynamicSearch<>(config, transitData, request).route();
+      response =
+        new RangeRaptorDynamicSearch<>(config, transitData, extraMcSearch, request).route();
     } else {
       response = routeUsingStdWorker(transitData, request);
     }

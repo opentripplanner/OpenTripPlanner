@@ -10,6 +10,8 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
+import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -55,6 +57,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
+    SorlandsbanenNorwayModule.class,
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
@@ -89,6 +92,9 @@ public interface ConstructApplicationFactory {
   StopConsolidationRepository stopConsolidationRepository();
 
   StreetLimitationParameters streetLimitationParameters();
+
+  @Nullable
+  SorlandsbanenNorwayService enturSorlandsbanenService();
 
   @Nullable
   LuceneIndex luceneIndex();

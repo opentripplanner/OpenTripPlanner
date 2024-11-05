@@ -164,6 +164,24 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
+   * Compute a fairly accurate distance between two coordinates. Use the fast version in
+   * {@link SphericalDistanceLibrary} if many computations are needed. Return the distance in
+   * meters between the two coordinates.
+   */
+  public double distanceTo(WgsCoordinate other) {
+    return SphericalDistanceLibrary.distance(
+      this.latitude,
+      this.longitude,
+      other.latitude,
+      other.longitude
+    );
+  }
+
+  public boolean isNorthOf(double latitudeBorder) {
+    return latitude > latitudeBorder;
+  }
+
+  /**
    * Return a new coordinate that is moved an approximate number of meters east.
    */
   public WgsCoordinate moveEastMeters(double meters) {

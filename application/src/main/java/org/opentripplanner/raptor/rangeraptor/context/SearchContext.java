@@ -59,7 +59,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /**
    * the transit data role needed for routing
    */
-  protected final RaptorTransitDataProvider<T> transit;
+  protected final RaptorTransitDataProvider<T> transitData;
 
   private final RaptorTransitCalculator<T> calculator;
   private final RaptorTuningParameters tuningParameters;
@@ -75,10 +75,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
-  public SearchContext(
+  SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit,
+    RaptorTransitDataProvider<T> transitData,
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
     EgressPaths egressPaths,
@@ -86,7 +86,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
-    this.transit = transit;
+    this.transitData = transitData;
 
     this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker =
@@ -133,8 +133,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.multiCriteria();
   }
 
-  public RaptorTransitDataProvider<T> transit() {
-    return transit;
+  public RaptorTransitDataProvider<T> transitData() {
+    return transitData;
   }
 
   public RaptorTransitCalculator<T> calculator() {
@@ -150,7 +150,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   public RaptorSlackProvider raptorSlackProvider() {
-    return transit.slackProvider();
+    return transitData.slackProvider();
   }
 
   /**
@@ -167,7 +167,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   @Nullable
   public RaptorCostCalculator<T> costCalculator() {
     if (costCalculator == null) {
-      this.costCalculator = transit.multiCriteriaCostCalculator();
+      this.costCalculator = transitData.multiCriteriaCostCalculator();
     }
     return costCalculator;
   }
@@ -187,7 +187,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   /** Number of stops in transit graph. */
   public int nStops() {
-    return transit.numberOfStops();
+    return transitData.numberOfStops();
   }
 
   /** Calculate the maximum number of rounds to perform. */
@@ -224,7 +224,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /* private methods */
 
   public RaptorStopNameResolver stopNameResolver() {
-    return transit.stopNameResolver();
+    return transitData.stopNameResolver();
   }
 
   public TimeBasedBoardingSupport<T> createTimeBasedBoardingSupport() {

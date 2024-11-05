@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
+import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
@@ -142,7 +144,10 @@ public class TransitRouter {
     );
 
     // Route transit
-    var raptorService = new RaptorService<>(serverContext.raptorConfig());
+    var raptorService = new RaptorService<>(
+      serverContext.raptorConfig(),
+      createExtraMcRouterSearch(accessEgresses, transitLayer)
+    );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
     checkIfTransitConnectionExists(transitResponse);
@@ -385,5 +390,22 @@ public class TransitRouter {
       );
     }
     return stops.stream().mapToInt(StopLocation::getIndex);
+  }
+
+  /**
+   * An optional factory for creating a decorator around the multi-criteria RangeRaptor instance.
+   */
+  @Nullable
+  private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+    AccessEgresses accessEgresses,
+    TransitLayer transitLayer
+  ) {
+    if (OTPFeature.Sorlandsbanen.isOff()) {
+      return null;
+    }
+    var service = serverContext.sorlandsbanenService();
+    return service == null
+      ? null
+      : service.createExtraMcRouterSearch(request, accessEgresses, transitLayer);
   }
 }
