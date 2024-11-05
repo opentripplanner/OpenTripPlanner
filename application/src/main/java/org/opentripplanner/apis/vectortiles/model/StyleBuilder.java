@@ -228,6 +228,9 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Filter the entities by a boolean property.
+   */
   public final StyleBuilder booleanFilter(String propertyName, boolean value) {
     filter = List.of("==", propertyName, value);
     return this;

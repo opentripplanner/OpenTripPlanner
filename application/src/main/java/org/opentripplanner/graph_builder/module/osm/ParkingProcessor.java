@@ -312,7 +312,7 @@ class ParkingProcessor {
     );
   }
 
-  private VehicleParking createVehicleParkingObjectFromOsmEntity(
+  VehicleParking createVehicleParkingObjectFromOsmEntity(
     boolean isCarParkAndRide,
     Coordinate coordinate,
     OsmWithTags entity,
