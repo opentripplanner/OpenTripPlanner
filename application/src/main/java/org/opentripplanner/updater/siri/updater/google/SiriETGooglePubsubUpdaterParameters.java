@@ -3,8 +3,8 @@ package org.opentripplanner.updater.siri.updater.google;
 import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public record SiriETGooglePubsubUpdaterParameters(
   String configRef,

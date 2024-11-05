@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
+import org.opentripplanner.utils.time.DurationUtils;
 
 class EgressPathsTest {
 

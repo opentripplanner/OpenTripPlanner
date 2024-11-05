@@ -24,6 +24,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Change GraphQL tooltip for searchWindowUsed to say minutes, instead of seconds [#6185](https://github.com/opentripplanner/OpenTripPlanner/pull/6185)
 - Interpret GTFS extended route types 801-899 also as trolleybus service [#6170](https://github.com/opentripplanner/OpenTripPlanner/pull/6170)
 - Disable protocol upgrades for the HTTP client by default. [#6194](https://github.com/opentripplanner/OpenTripPlanner/pull/6194)
+- Fix max search-window when paging [#6189](https://github.com/opentripplanner/OpenTripPlanner/pull/6189)
+- Add car ferry functionality [#5966](https://github.com/opentripplanner/OpenTripPlanner/pull/5966)
+- Make indoor=area and indoor=corridor routable for UK OSM tag mapper [#6119](https://github.com/opentripplanner/OpenTripPlanner/pull/6119)
+- Revert  [#6214](https://github.com/opentripplanner/OpenTripPlanner/pull/6214)
+- Remove reading agency and route brandingUrl from GTFS data [#6183](https://github.com/opentripplanner/OpenTripPlanner/pull/6183)
+- Fix NullPointerException when searching backwards with a frequency-based trip [#6211](https://github.com/opentripplanner/OpenTripPlanner/pull/6211)
+- Combine two multi-criteria searches in Raptor [#6182](https://github.com/opentripplanner/OpenTripPlanner/pull/6182)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

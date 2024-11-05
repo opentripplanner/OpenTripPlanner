@@ -38,7 +38,6 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -75,6 +74,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 

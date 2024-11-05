@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * This class calculates an extra stop priority cost by using the stop-board-alight-transfer-cost

@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;

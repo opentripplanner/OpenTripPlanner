@@ -3,7 +3,6 @@ package org.opentripplanner.ext.emissions;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
@@ -13,6 +12,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * Calculates the emissions for the itineraries and adds them.

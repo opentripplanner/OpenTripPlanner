@@ -6,7 +6,7 @@ import static java.time.LocalDate.MIN;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * Value object which represent a service date interval from a starting date until an end date.
