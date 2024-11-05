@@ -17,8 +17,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.BitSetUtils;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -36,6 +34,8 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.street.search.state.VehicleRentalState;
+import org.opentripplanner.utils.lang.BitSetUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -380,21 +380,6 @@ public class StreetEdge
     }
 
     State state = editor != null ? editor.makeState() : null;
-
-    // Add an explicit bike-walking state for no-thru-traffic edges, so that dismounting and walking
-    // is an option to avoid the restriction
-    if (
-      s0.getBackMode() == TraverseMode.BICYCLE &&
-      canTraverse(TraverseMode.BICYCLE) &&
-      isBicycleNoThruTraffic() &&
-      !s0.hasEnteredNoThruTrafficArea()
-    ) {
-      var bikeWalk = doTraverse(s0, TraverseMode.WALK, true);
-      if (bikeWalk != null) {
-        State forkState = bikeWalk.makeState();
-        return State.ofNullable(forkState, state);
-      }
-    }
 
     // we are transitioning into a no-drop-off zone therefore we add a second state for dropping
     // off the vehicle and walking

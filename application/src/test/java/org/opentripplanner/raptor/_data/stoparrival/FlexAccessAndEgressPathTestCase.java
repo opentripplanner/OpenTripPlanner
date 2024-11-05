@@ -1,15 +1,14 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor.api.model.RaptorValueFormatter.formatC1;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
@@ -24,6 +23,7 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This test case construct two Raptor paths for forward and reverse search, with and without

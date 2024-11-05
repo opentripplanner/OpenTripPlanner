@@ -11,7 +11,7 @@ import graphql.schema.GraphQLScalarType;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class CostScalarFactory {
 

@@ -8,7 +8,6 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -35,6 +34,7 @@ import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,7 +175,8 @@ public class ConstructApplication {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
         timetableRepository(),
-        routerConfig().routingRequestDefaults()
+        routerConfig().routingRequestDefaults(),
+        routerConfig().transitTuningConfig()
       );
     }
 

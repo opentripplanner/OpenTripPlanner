@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Group by Similarity filter parameters. See the configuration for documentation of each field.

@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayBuilder;
 import org.opentripplanner.transit.model.site.StationElement;
+import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS Pathway into the OTP model. */
 class PathwayMapper {

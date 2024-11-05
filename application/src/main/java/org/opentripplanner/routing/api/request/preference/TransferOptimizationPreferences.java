@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * See {@link TransferOptimizationParameters} for documentation on this class.

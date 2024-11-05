@@ -18,6 +18,56 @@ public class OsmWayTest {
   }
 
   @Test
+  void testAreaMustContain3Nodes() {
+    OsmWay way = new OsmWay();
+    way.addTag("area", "yes");
+    assertFalse(way.isRoutableArea());
+    way.addNodeRef(1);
+    assertFalse(way.isRoutableArea());
+    way.addNodeRef(2);
+    assertFalse(way.isRoutableArea());
+    way.addNodeRef(3);
+    assertTrue(way.isRoutableArea());
+    way.addNodeRef(4);
+    assertTrue(way.isRoutableArea());
+  }
+
+  @Test
+  void testAreaTags() {
+    OsmWay platform = getClosedPolygon();
+    platform.addTag("public_transport", "platform");
+    assertTrue(platform.isRoutableArea());
+    platform.addTag("area", "no");
+    assertFalse(platform.isRoutableArea());
+
+    OsmWay roundabout = getClosedPolygon();
+    roundabout.addTag("highway", "roundabout");
+    assertFalse(roundabout.isRoutableArea());
+
+    OsmWay pedestrian = getClosedPolygon();
+    pedestrian.addTag("highway", "pedestrian");
+    assertFalse(pedestrian.isRoutableArea());
+    pedestrian.addTag("area", "yes");
+    assertTrue(pedestrian.isRoutableArea());
+
+    OsmWay indoorArea = getClosedPolygon();
+    indoorArea.addTag("indoor", "area");
+    assertTrue(indoorArea.isRoutableArea());
+
+    OsmWay bikeParking = getClosedPolygon();
+    bikeParking.addTag("amenity", "bicycle_parking");
+    assertTrue(bikeParking.isRoutableArea());
+
+    OsmWay corridor = getClosedPolygon();
+    corridor.addTag("indoor", "corridor");
+    assertTrue(corridor.isRoutableArea());
+
+    OsmWay door = getClosedPolygon();
+    door.addTag("indoor", "door");
+    assertFalse(door.isRoutableArea());
+  }
+
+  @Test
   void testIsSteps() {
     OsmWay way = new OsmWay();
     assertFalse(way.isSteps());
@@ -124,5 +174,14 @@ public class OsmWayTest {
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
+  }
+
+  private OsmWay getClosedPolygon() {
+    var way = new OsmWay();
+    way.addNodeRef(1);
+    way.addNodeRef(2);
+    way.addNodeRef(3);
+    way.addNodeRef(1);
+    return way;
   }
 }

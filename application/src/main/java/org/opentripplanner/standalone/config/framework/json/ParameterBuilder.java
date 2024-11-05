@@ -36,11 +36,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.LocalDateUtils;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.LocalDateUtils;
 
 /**
  * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the

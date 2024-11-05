@@ -4,10 +4,10 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.framework.collection.CompositeComparator;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.utils.collection.CompositeComparator;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class is responsible for holding information about a test result - a single itinerary. The

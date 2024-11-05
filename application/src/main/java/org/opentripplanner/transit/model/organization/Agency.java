@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.organization;
 
-import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
+import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.time.ZoneId;
 import java.util.Objects;
@@ -21,7 +21,6 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
   private final String lang;
   private final String phone;
   private final String fareUrl;
-  private final String brandingUrl;
 
   Agency(AgencyBuilder builder) {
     super(builder.getId());
@@ -43,7 +42,6 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
     this.lang = builder.getLang();
     this.phone = builder.getPhone();
     this.fareUrl = builder.getFareUrl();
-    this.brandingUrl = builder.getBrandingUrl();
   }
 
   public static AgencyBuilder of(FeedScopedId id) {
@@ -78,11 +76,6 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
     return fareUrl;
   }
 
-  @Nullable
-  public String getBrandingUrl() {
-    return brandingUrl;
-  }
-
   @Override
   public AgencyBuilder copy() {
     return new AgencyBuilder(this);
@@ -102,8 +95,7 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
       Objects.equals(url, other.url) &&
       Objects.equals(lang, other.lang) &&
       Objects.equals(phone, other.phone) &&
-      Objects.equals(fareUrl, other.fareUrl) &&
-      Objects.equals(brandingUrl, other.brandingUrl)
+      Objects.equals(fareUrl, other.fareUrl)
     );
   }
 }
