@@ -6,6 +6,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 
@@ -21,6 +22,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private FeedScopedId shapeId;
   private Direction direction;
   private BikeAccess bikesAllowed;
+  private CarAccess carsAllowed;
   private Accessibility wheelchairBoarding;
   private String gtfsBlockId;
   private String netexInternalPlanningCode;
@@ -44,6 +46,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     this.shapeId = original.getShapeId();
     this.direction = original.getDirection();
     this.bikesAllowed = original.getBikesAllowed();
+    this.carsAllowed = original.getCarsAllowed();
     this.wheelchairBoarding = original.getWheelchairBoarding();
     this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
   }
@@ -151,8 +154,17 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     return bikesAllowed;
   }
 
+  public CarAccess getCarsAllowed() {
+    return carsAllowed;
+  }
+
   public TripBuilder withBikesAllowed(BikeAccess bikesAllowed) {
     this.bikesAllowed = bikesAllowed;
+    return this;
+  }
+
+  public TripBuilder withCarsAllowed(CarAccess carsAllowed) {
+    this.carsAllowed = carsAllowed;
     return this;
   }
 

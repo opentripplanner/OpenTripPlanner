@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to

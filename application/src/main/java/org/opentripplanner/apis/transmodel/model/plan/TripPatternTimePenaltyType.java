@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class TripPatternTimePenaltyType {
 

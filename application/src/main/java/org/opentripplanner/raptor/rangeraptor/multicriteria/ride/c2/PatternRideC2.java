@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A {@link PatternRide} with support for c1 {@code generalized-cost} and c2 (custom-use-case-cost).

@@ -3,15 +3,15 @@ package org.opentripplanner.ext.flex;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class FlexStopTimesForTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final StopLocation AREA_STOP = TEST_MODEL
     .areaStop("area")
     .withGeometry(Polygons.BERLIN)

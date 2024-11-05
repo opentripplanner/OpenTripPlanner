@@ -11,7 +11,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -19,9 +18,10 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
+import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +45,16 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   private final RaptorRequest<T> originalRequest;
   private final RaptorSearchWindowCalculator dynamicSearchWindowCalculator;
 
+  @Nullable
+  private final ExtraMcRouterSearch<T> extraMcSearch;
+
   private final HeuristicSearchTask<T> fwdHeuristics;
   private final HeuristicSearchTask<T> revHeuristics;
 
   public RangeRaptorDynamicSearch(
     RaptorConfig<T> config,
     RaptorTransitDataProvider<T> transitData,
+    @Nullable ExtraMcRouterSearch<T> extraMcSearch,
     RaptorRequest<T> originalRequest
   ) {
     this.config = config;
@@ -58,6 +62,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.originalRequest = originalRequest;
     this.dynamicSearchWindowCalculator =
       config.searchWindowCalculator().withSearchParams(originalRequest.searchParams());
+    this.extraMcSearch = extraMcSearch;
 
     this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
     this.revHeuristics = new HeuristicSearchTask<>(REVERSE, "Reverse", config, transitData);
@@ -129,18 +134,23 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
     LOG.debug("Main request: {}", request);
-    RangeRaptor<T> rangeRaptorRouter;
+    RaptorRouter<T> raptorRouter;
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      rangeRaptorRouter =
-        config.createRangeRaptorWithMcWorker(transitData, request, getDestinationHeuristics());
+      raptorRouter =
+        config.createRangeRaptorWithMcWorker(
+          transitData,
+          request,
+          getDestinationHeuristics(),
+          extraMcSearch
+        );
     } else {
-      rangeRaptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
+      raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
 
     // Route
-    var result = rangeRaptorRouter.route();
+    var result = raptorRouter.route();
 
     // create and return response
     return new RaptorResponse<>(
@@ -182,10 +192,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
       Thread.currentThread().interrupt();
       // propagate interruption to the running task.
       asyncResult.cancel(true);
-      throw new OTPRequestTimeoutException();
+      throw config.mapInterruptedException(e);
     } catch (ExecutionException e) {
-      if (e.getCause() instanceof DestinationNotReachedException) {
-        throw new DestinationNotReachedException();
+      if (e.getCause() instanceof DestinationNotReachedException dnr) {
+        throw dnr;
       }
       LOG.error(e.getMessage() + ". Request: " + originalRequest, e);
       throw new IllegalStateException(

@@ -10,7 +10,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 
 class StreetSearchRequestMapperTest {
 
@@ -20,7 +20,7 @@ class StreetSearchRequestMapperTest {
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
     routeRequest.setDateTime(dateTime);
-    var from = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
+    var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
     routeRequest.setFrom(from);
     var to = new GenericLocation(60.0, 20.0);
     routeRequest.setTo(to);
@@ -44,7 +44,7 @@ class StreetSearchRequestMapperTest {
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
     routeRequest.setDateTime(dateTime);
-    var from = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
+    var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
     routeRequest.setFrom(from);
     var to = new GenericLocation(60.0, 20.0);
     routeRequest.setTo(to);

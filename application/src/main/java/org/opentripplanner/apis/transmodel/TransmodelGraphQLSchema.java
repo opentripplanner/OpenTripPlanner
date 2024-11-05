@@ -107,6 +107,7 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -133,17 +134,29 @@ public class TransmodelGraphQLSchema {
 
   private final DefaultRouteRequestType routing;
 
+  private final TransitTuningParameters transitTuningParameters;
+
   private final ZoneId timeZoneId;
 
   private final Relay relay = new Relay();
 
-  private TransmodelGraphQLSchema(RouteRequest defaultRequest, ZoneId timeZoneId) {
+  private TransmodelGraphQLSchema(
+    RouteRequest defaultRequest,
+    ZoneId timeZoneId,
+    TransitTuningParameters transitTuningParameters
+  ) {
     this.timeZoneId = timeZoneId;
     this.routing = new DefaultRouteRequestType(defaultRequest);
+    this.transitTuningParameters = transitTuningParameters;
   }
 
-  public static GraphQLSchema create(RouteRequest defaultRequest, ZoneId timeZoneId) {
-    return new TransmodelGraphQLSchema(defaultRequest, timeZoneId).create();
+  public static GraphQLSchema create(
+    RouteRequest defaultRequest,
+    ZoneId timeZoneId,
+    TransitTuningParameters transitTuningParameters
+  ) {
+    return new TransmodelGraphQLSchema(defaultRequest, timeZoneId, transitTuningParameters)
+      .create();
   }
 
   @SuppressWarnings("unchecked")
@@ -340,6 +353,7 @@ public class TransmodelGraphQLSchema {
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(
       routing,
+      transitTuningParameters,
       tripType,
       durationPerStreetModeInput,
       penaltyForStreetMode,

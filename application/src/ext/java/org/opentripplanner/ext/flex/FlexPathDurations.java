@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex;
 
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This value-object contains the durations for a Flex access or egress path. The path may also

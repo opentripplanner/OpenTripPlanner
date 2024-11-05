@@ -21,10 +21,15 @@ import org.junit.jupiter.api.Test;
 
 class TripViaLocationMapperTest {
 
-  public static final String LABEL = "TestLabel";
-  public static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
-  public static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
-  public static final String EXPECTED_IDS_AS_STRING = "[F:ID1, F:ID2]";
+  private static final String LABEL = "TestLabel";
+  private static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
+  private static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
+  private static final String EXPECTED_IDS_AS_STRING = "[F:ID1, F:ID2]";
+  private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH =
+    """
+    Unfortunately the 'placeIds' is not required. Making it required would be a breaking change,
+    so wee just ignore it."
+    """;
 
   @BeforeEach
   void setup() {
@@ -52,10 +57,7 @@ class TripViaLocationMapperTest {
 
   @Test
   void testMapToVisitViaLocationsWithBareMinimum() {
-    Map<String, Object> input = Map.of(
-      FIELD_VISIT,
-      Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
-    );
+    Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of("F:1")));
     var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
 
     var via = result.getFirst();
@@ -67,8 +69,31 @@ class TripViaLocationMapperTest {
   }
 
   @Test
+  void testMapToVisitViaLocationsWithoutIds() {
+    Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    );
+    assertEquals("'stopLocationIds' is not set!", ex.getMessage());
+  }
+
+  @Test
+  void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
+    Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    );
+    assertEquals(
+      "A via location must have at least one stop location or a coordinate.",
+      ex.getMessage()
+    );
+  }
+
+  @Test
   void tetMapToPassThrough() {
-    Map<String, Object> input = Map.of(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT));
+    Map<String, Object> input = mapOf(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT));
     var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
     var via = result.getFirst();
 
@@ -83,9 +108,9 @@ class TripViaLocationMapperTest {
 
   @Test
   void tetMapToPassThroughWithBareMinimum() {
-    Map<String, Object> input = Map.of(
+    Map<String, Object> input = mapOf(
       FIELD_PASS_THROUGH,
-      Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
+      mapOf(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
     var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
     var via = result.getFirst();
@@ -93,6 +118,32 @@ class TripViaLocationMapperTest {
     assertNull(via.label());
     assertEquals("[F:1]", via.stopLocationIds().toString());
     assertTrue(via.isPassThroughLocation());
+  }
+
+  @Test
+  void tetMapToPassThroughWithoutIds() {
+    Map<String, Object> input = mapOf(FIELD_PASS_THROUGH, mapOf(FIELD_STOP_LOCATION_IDS, null));
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    );
+    assertEquals("'stopLocationIds' is not set!", ex.getMessage());
+  }
+
+  @Test
+  void testMapToPassThroughWithAnEmptyListOfIds() {
+    Map<String, Object> input = mapOf(
+      FIELD_PASS_THROUGH,
+      mapOf(FIELD_STOP_LOCATION_IDS, List.of())
+    );
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    );
+    assertEquals(
+      "A pass through via location must have at least one stop location.",
+      ex.getMessage()
+    );
   }
 
   @Test
@@ -121,6 +172,48 @@ class TripViaLocationMapperTest {
     );
   }
 
+  @Test
+  void testToLegacyPassThroughLocations() {
+    Map<String, Object> input = Map.of("name", LABEL, "placeIds", LIST_IDS_INPUT);
+    var result = TripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    var via = result.getFirst();
+
+    assertEquals(LABEL, via.label());
+    assertEquals(EXPECTED_IDS_AS_STRING, via.stopLocationIds().toString());
+    assertTrue(via.isPassThroughLocation());
+    assertEquals(
+      "PassThroughViaLocation{label: TestLabel, stopLocationIds: [F:ID1, F:ID2]}",
+      via.toString()
+    );
+  }
+
+  @Test
+  void testToLegacyPassThroughLocationsWithBareMinimum() {
+    Map<String, Object> input = mapOf("placeIds", LIST_IDS_INPUT);
+    var result = TripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    var via = result.getFirst();
+
+    assertNull(via.label());
+    assertEquals(EXPECTED_IDS_AS_STRING, via.stopLocationIds().toString());
+    assertTrue(via.isPassThroughLocation());
+    assertEquals("PassThroughViaLocation{stopLocationIds: [F:ID1, F:ID2]}", via.toString());
+  }
+
+  @Test
+  void testToLegacyPassThroughLocationsWithoutIds() {
+    var result = TripViaLocationMapper.toLegacyPassThroughLocations(
+      List.of(mapOf("placeIds", null))
+    );
+    assertTrue(result.isEmpty(), REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH);
+  }
+
+  @Test
+  void testToLegacyPassThroughLocationsWithEmptyList() {
+    Map<String, Object> input = Map.ofEntries(entry("name", LABEL), entry("placeIds", List.of()));
+    var result = TripViaLocationMapper.toLegacyPassThroughLocations(List.of(input));
+    assertTrue(result.isEmpty(), REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH);
+  }
+
   private Map<String, Object> visitInput(String label, Duration minWaitTime, List<String> ids) {
     var map = new HashMap<String, Object>();
     if (label != null) {
@@ -137,5 +230,15 @@ class TripViaLocationMapperTest {
 
   private Map<String, Object> passThroughInput(String label, List<String> ids) {
     return visitInput(label, null, ids);
+  }
+
+  /**
+   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}.
+   * The {@link Map#of(Object, Object)} does not support {@code null} values.
+   */
+  private static Map<String, Object> mapOf(String key, Object value) {
+    var map = new HashMap<String, Object>();
+    map.put(key, value);
+    return map;
   }
 }

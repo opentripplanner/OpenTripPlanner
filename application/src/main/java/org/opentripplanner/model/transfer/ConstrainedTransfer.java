@@ -3,9 +3,9 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A constrained transfer is a transfer which is restricted in one ore more ways by the transit data

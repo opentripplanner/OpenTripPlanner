@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class FlexIndex {
 
@@ -24,11 +24,11 @@ public class FlexIndex {
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> tripById = new HashMap<>();
 
-  public FlexIndex(TransitModel transitModel) {
-    for (PathTransfer transfer : transitModel.getAllPathTransfers()) {
+  public FlexIndex(TimetableRepository timetableRepository) {
+    for (PathTransfer transfer : timetableRepository.getAllPathTransfers()) {
       transfersToStop.put(transfer.to, transfer);
     }
-    for (FlexTrip<?, ?> flexTrip : transitModel.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : timetableRepository.getAllFlexTrips()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {

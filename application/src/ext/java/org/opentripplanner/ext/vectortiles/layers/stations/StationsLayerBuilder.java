@@ -23,7 +23,7 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
     MapperType.Digitransit,
     DigitransitStationPropertyMapper::create
   );
-  private final TransitService transitModel;
+  private final TransitService transitService;
 
   public StationsLayerBuilder(
     TransitService transitService,
@@ -35,11 +35,11 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
-    this.transitModel = transitService;
+    this.transitService = transitService;
   }
 
   protected List<Geometry> getGeometries(Envelope query) {
-    return transitModel
+    return transitService
       .getStations()
       .stream()
       .map(station -> {

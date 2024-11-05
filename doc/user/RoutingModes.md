@@ -104,7 +104,7 @@ Used for short- and long-distance bus routes.
 
 <h4 id="CABLE_CAR">CABLE_CAR</h4>
 
-Used for street-level cable cars where the cable runs beneath the car.
+Used for street-level rail cars where the cable runs beneath the vehicle.
 
 <h4 id="CARPOOL">CARPOOL</h4>
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 public final class TripTransferPoint implements TransferPoint, Serializable {
 

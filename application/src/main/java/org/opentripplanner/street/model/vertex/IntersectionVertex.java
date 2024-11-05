@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.lang.BitSetUtils;
+import org.opentripplanner.utils.lang.BitSetUtils;
 
 /**
  * Represents an ordinary location in space, typically an intersection.

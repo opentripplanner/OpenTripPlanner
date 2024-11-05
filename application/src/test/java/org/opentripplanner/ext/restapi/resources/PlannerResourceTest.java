@@ -15,14 +15,14 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class PlannerResourceTest {
 
   static OtpServerRequestContext context() {
-    var transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    return TestServerContext.createServerContext(new Graph(), transitModel);
+    var timetableRepository = new TimetableRepository();
+    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    return TestServerContext.createServerContext(new Graph(), timetableRepository);
   }
 
   @Test

@@ -34,7 +34,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -71,7 +71,7 @@ public class VertexLinker {
 
   private final Graph graph;
 
-  private final StopModel stopModel;
+  private final SiteRepository siteRepository;
   private final VertexFactory vertexFactory;
 
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
@@ -81,11 +81,15 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph, StopModel stopModel, EdgeSpatialIndex edgeSpatialIndex) {
+  public VertexLinker(
+    Graph graph,
+    SiteRepository siteRepository,
+    EdgeSpatialIndex edgeSpatialIndex
+  ) {
     this.edgeSpatialIndex = edgeSpatialIndex;
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
-    this.stopModel = stopModel;
+    this.siteRepository = siteRepository;
   }
 
   public void linkVertexPermanently(
@@ -397,7 +401,7 @@ public class VertexLinker {
     }
     // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
-      FlexLocationAdder.addFlexLocations(edge, start, stopModel);
+      FlexLocationAdder.addFlexLocations(edge, start, siteRepository);
     }
 
     return start;

@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emissions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.Itinerary.createScheduledTransitItinerary;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -46,9 +46,13 @@ class EmissionsTest {
     .withEndTime(TIME.plusHours(1))
     .build();
 
-  private static final Route ROUTE_WITH_EMISSIONS = TransitModelForTest.route(id("1")).build();
-  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TransitModelForTest.route(id("2")).build();
-  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TransitModelForTest
+  private static final Route ROUTE_WITH_EMISSIONS = TimetableRepositoryForTest
+    .route(id("1"))
+    .build();
+  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TimetableRepositoryForTest
+    .route(id("2"))
+    .build();
+  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TimetableRepositoryForTest
     .route(id("3"))
     .build();
 
@@ -119,12 +123,15 @@ class EmissionsTest {
     var stoptime = new StopTime();
     var stopTimes = new ArrayList<StopTime>();
     stopTimes.add(stoptime);
-    var testModel = TransitModelForTest.of();
+    var testModel = TimetableRepositoryForTest.of();
     var stopOne = testModel.stop("1:stop1", 60, 25).build();
     var stopTwo = testModel.stop("1:stop1", 61, 25).build();
     var stopThree = testModel.stop("1:stop1", 62, 25).build();
-    var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
-    var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
+    var stopPattern = TimetableRepositoryForTest.stopPattern(stopOne, stopTwo, stopThree);
+    var pattern = TimetableRepositoryForTest
+      .tripPattern("1", route)
+      .withStopPattern(stopPattern)
+      .build();
     var trip = Trip
       .of(FeedScopedId.parse("FOO:BAR"))
       .withMode(TransitMode.BUS)

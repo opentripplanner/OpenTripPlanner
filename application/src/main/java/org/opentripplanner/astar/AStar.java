@@ -19,7 +19,7 @@ import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.time.DateUtils;
+import org.opentripplanner.utils.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

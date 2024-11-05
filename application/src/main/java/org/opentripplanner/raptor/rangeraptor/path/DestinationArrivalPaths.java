@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.IntPredicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
@@ -22,6 +20,8 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

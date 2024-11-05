@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.trip;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,18 +19,18 @@ import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class GenerateTripPatternsOperationTest {
 
-  private static StopModel stopModel;
+  private static SiteRepository siteRepository;
   private static RegularStop stopA;
   private static RegularStop stopB;
   private static RegularStop stopC;
@@ -50,13 +50,13 @@ class GenerateTripPatternsOperationTest {
 
   @BeforeAll
   static void setupClass() {
-    TransitModelForTest transitModelForTest = TransitModelForTest.of();
-    stopA = transitModelForTest.stop("stopA").build();
-    stopB = transitModelForTest.stop("stopB").build();
-    stopC = transitModelForTest.stop("stopC").build();
-    stopModel =
-      transitModelForTest
-        .stopModelBuilder()
+    TimetableRepositoryForTest timetableRepositoryForTest = TimetableRepositoryForTest.of();
+    stopA = timetableRepositoryForTest.stop("stopA").build();
+    stopB = timetableRepositoryForTest.stop("stopB").build();
+    stopC = timetableRepositoryForTest.stop("stopC").build();
+    siteRepository =
+      timetableRepositoryForTest
+        .siteRepositoryBuilder()
         .withRegularStop(stopA)
         .withRegularStop(stopB)
         .withRegularStop(stopC)
@@ -69,7 +69,7 @@ class GenerateTripPatternsOperationTest {
     stopTimeC = new StopTime();
     stopTimeC.setStop(stopC);
 
-    FeedScopedId serviceId1 = TransitModelForTest.id("SERVICE_ID_1");
+    FeedScopedId serviceId1 = TimetableRepositoryForTest.id("SERVICE_ID_1");
     trip1 =
       trip("TRIP_ID_1")
         .withServiceId(serviceId1)
@@ -79,7 +79,7 @@ class GenerateTripPatternsOperationTest {
         .build();
 
     // same route, mode, submode and direction as trip1
-    FeedScopedId serviceId2 = TransitModelForTest.id("SERVICE_ID_2");
+    FeedScopedId serviceId2 = TimetableRepositoryForTest.id("SERVICE_ID_2");
     trip2 =
       trip("TRIP_ID_2")
         .withServiceId(serviceId2)
@@ -90,7 +90,7 @@ class GenerateTripPatternsOperationTest {
         .build();
 
     // same route, direction as trip1, different mode
-    FeedScopedId serviceId3 = TransitModelForTest.id("SERVICE_ID_3");
+    FeedScopedId serviceId3 = TimetableRepositoryForTest.id("SERVICE_ID_3");
     trip3 =
       trip("TRIP_ID_3")
         .withServiceId(serviceId3)
@@ -100,7 +100,7 @@ class GenerateTripPatternsOperationTest {
         .build();
 
     // same route, mode, direction  as trip1, different submode
-    FeedScopedId serviceId4 = TransitModelForTest.id("SERVICE_ID_4");
+    FeedScopedId serviceId4 = TimetableRepositoryForTest.id("SERVICE_ID_4");
     trip4 =
       trip("TRIP_ID_4")
         .withServiceId(serviceId4)
@@ -111,7 +111,7 @@ class GenerateTripPatternsOperationTest {
         .build();
 
     // same route, mode  as trip1, different direction
-    FeedScopedId serviceId5 = TransitModelForTest.id("SERVICE_ID_5");
+    FeedScopedId serviceId5 = TimetableRepositoryForTest.id("SERVICE_ID_5");
     trip5 =
       trip("TRIP_ID_5")
         .withServiceId(serviceId5)
@@ -126,7 +126,7 @@ class GenerateTripPatternsOperationTest {
   void setup() {
     deduplicator = new Deduplicator();
     issueStore = new DefaultDataImportIssueStore();
-    transitServiceBuilder = new OtpTransitServiceBuilder(stopModel, issueStore);
+    transitServiceBuilder = new OtpTransitServiceBuilder(siteRepository, issueStore);
     double maxStopToShapeSnapDistance = 100;
     geometryProcessor =
       new GeometryProcessor(transitServiceBuilder, maxStopToShapeSnapDistance, issueStore);

@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.function.Supplier;
 import javax.annotation.concurrent.Immutable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * This class contains the results from a FlexPathCalculator.

@@ -12,10 +12,10 @@ public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
   @Test
   public void testMatch() {
-    String feedId = transitModel.getFeedIds().iterator().next();
+    String feedId = timetableRepository.getFeedIds().iterator().next();
 
     GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(
-      new DefaultTransitService(transitModel)
+      new DefaultTransitService(timetableRepository)
     );
     TripDescriptor trip1 = TripDescriptor
       .newBuilder()

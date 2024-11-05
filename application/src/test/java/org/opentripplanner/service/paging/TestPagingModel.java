@@ -1,20 +1,20 @@
 package org.opentripplanner.service.paging;
 
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.time.TimeUtils;
 
 class TestPagingModel {
 
@@ -54,7 +54,7 @@ class TestPagingModel {
 
   private static final Instant TRANSIT_START_TIME = TestItineraryBuilder.newTime(0).toInstant();
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
   private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
 

@@ -37,8 +37,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
@@ -60,8 +58,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -70,6 +68,8 @@ import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,9 +108,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   public TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
-    this(parameters, transitModel, () -> LocalDate.now(transitModel.getTimeZone()));
+    this(parameters, timetableRepository, () -> LocalDate.now(timetableRepository.getTimeZone()));
   }
 
   /**
@@ -119,20 +119,24 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     Supplier<LocalDate> localDateNow
   ) {
     this.snapshotManager =
-      new TimetableSnapshotManager(transitModel.getTransitLayerUpdater(), parameters, localDateNow);
-    this.timeZone = transitModel.getTimeZone();
+      new TimetableSnapshotManager(
+        timetableRepository.getTransitLayerUpdater(),
+        parameters,
+        localDateNow
+      );
+    this.timeZone = timetableRepository.getTimeZone();
     this.transitEditorService =
-      new DefaultTransitService(transitModel, snapshotManager.getTimetableSnapshotBuffer());
-    this.deduplicator = transitModel.getDeduplicator();
-    this.serviceCodes = transitModel.getServiceCodes();
+      new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
+    this.deduplicator = timetableRepository.getDeduplicator();
+    this.serviceCodes = timetableRepository.getServiceCodes();
     this.localDateNow = localDateNow;
 
     // Inject this into the transit model
-    transitModel.initTimetableSnapshotProvider(this);
+    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**

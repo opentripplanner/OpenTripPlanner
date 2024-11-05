@@ -1,16 +1,16 @@
 package org.opentripplanner.transit.speed_test.model.testcase;
 
-import static org.opentripplanner.framework.text.Table.Align.Center;
-import static org.opentripplanner.framework.text.Table.Align.Left;
-import static org.opentripplanner.framework.text.Table.Align.Right;
+import static org.opentripplanner.utils.text.Table.Align.Center;
+import static org.opentripplanner.utils.text.Table.Align.Left;
+import static org.opentripplanner.utils.text.Table.Align.Right;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.framework.text.TableBuilder;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.routing.util.DiffEntry;
+import org.opentripplanner.utils.text.Table;
+import org.opentripplanner.utils.text.TableBuilder;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class is responsible for creating a test report as a table. The Table is easy to read and

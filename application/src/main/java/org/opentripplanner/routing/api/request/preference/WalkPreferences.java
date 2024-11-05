@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The walk preferences contain all speed, reluctance, cost and factor preferences for walking

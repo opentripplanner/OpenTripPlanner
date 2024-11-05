@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
+import static org.opentripplanner.utils.time.DurationUtils.durationToStr;
 
 import java.util.List;
 import java.util.Optional;

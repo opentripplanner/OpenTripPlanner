@@ -1,6 +1,6 @@
 package org.opentripplanner.model.fare;
 
-import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  *

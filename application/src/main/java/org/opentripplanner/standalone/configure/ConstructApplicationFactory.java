@@ -10,6 +10,8 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
+import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -34,7 +36,7 @@ import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.service.StreetLimitationParametersServiceModule;
 import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
@@ -55,6 +57,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
+    SorlandsbanenNorwayModule.class,
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
@@ -65,7 +68,7 @@ public interface ConstructApplicationFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
-  TransitModel transitModel();
+  TimetableRepository timetableRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RealtimeVehicleRepository realtimeVehicleRepository();
@@ -91,6 +94,9 @@ public interface ConstructApplicationFactory {
   StreetLimitationParameters streetLimitationParameters();
 
   @Nullable
+  SorlandsbanenNorwayService enturSorlandsbanenService();
+
+  @Nullable
   LuceneIndex luceneIndex();
 
   @Component.Builder
@@ -102,7 +108,7 @@ public interface ConstructApplicationFactory {
     Builder graph(Graph graph);
 
     @BindsInstance
-    Builder transitModel(TransitModel transitModel);
+    Builder timetableRepository(TimetableRepository timetableRepository);
 
     @BindsInstance
     Builder graphVisualizer(@Nullable GraphVisualizer graphVisualizer);

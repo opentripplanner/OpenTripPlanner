@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import org.opentripplanner.framework.time.OffsetDateTimeParser;
+import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public final class DateTimeScalarFactory {
 

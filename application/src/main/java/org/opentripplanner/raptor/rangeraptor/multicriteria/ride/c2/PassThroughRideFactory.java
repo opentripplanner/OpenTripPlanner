@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
-import org.opentripplanner.framework.lang.IntBox;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
+import org.opentripplanner.utils.lang.IntBox;
 
 public class PassThroughRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {

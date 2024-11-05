@@ -2,7 +2,7 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The number of spaces by type. {@code null} if unknown.

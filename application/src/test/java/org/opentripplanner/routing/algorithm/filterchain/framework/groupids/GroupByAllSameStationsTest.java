@@ -7,13 +7,13 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 
 class GroupByAllSameStationsTest implements PlanTestConstants {
 
-  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   Station STATION_1 = testModel.station("1").build();
   Station STATION_2 = testModel.station("2").build();

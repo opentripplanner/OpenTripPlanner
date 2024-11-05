@@ -42,11 +42,11 @@ jobs:
 
       - name: Build jar file, compile tests
         run: |
-          mvn --no-transfer-progress clean package -Dmaven.test.skip -P prettierSkip
+          mvn --no-transfer-progress clean install -Dmaven.test.skip -P prettierSkip
           mvn org.apache.maven.plugins:maven-compiler-plugin:testCompile
 
       - name: Cache OSM files
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: smoke-tests/**/*.pbf
           key: osm-${{ matrix.locations.name }}-2023-10-31

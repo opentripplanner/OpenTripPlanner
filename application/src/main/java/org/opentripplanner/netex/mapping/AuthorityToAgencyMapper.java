@@ -2,10 +2,10 @@ package org.opentripplanner.netex.mapping;
 
 import static org.opentripplanner.netex.mapping.support.NetexObjectDecorator.withOptional;
 
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.AgencyBuilder;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.rutebanken.netex.model.Authority;
 
 /**

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.BitSet;
 import java.util.Objects;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  */

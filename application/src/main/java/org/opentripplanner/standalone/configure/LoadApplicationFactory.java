@@ -17,7 +17,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.LoadConfigModule;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * Dagger dependency injection Factory to create components for the OTP load application phase.
@@ -41,7 +41,7 @@ public interface LoadApplicationFactory {
   Graph emptyGraph();
 
   @Singleton
-  TransitModel emptyTransitModel();
+  TimetableRepository emptyTimetableRepository();
 
   @Singleton
   WorldEnvelopeRepository emptyWorldEnvelopeRepository();

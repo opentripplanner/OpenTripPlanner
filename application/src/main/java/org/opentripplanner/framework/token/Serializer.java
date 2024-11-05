@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.token;
 
 import java.util.Base64;
-import org.opentripplanner.framework.text.CharacterEscapeFormatter;
+import org.opentripplanner.utils.text.CharacterEscapeFormatter;
 
 class Serializer {
 

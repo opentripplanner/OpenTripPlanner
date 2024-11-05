@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public final class TimePenalty extends AbstractLinearFunction<Duration> {
 

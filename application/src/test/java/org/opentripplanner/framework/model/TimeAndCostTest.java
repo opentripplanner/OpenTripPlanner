@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 class TimeAndCostTest {
 

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.service;
 import java.time.ZoneId;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
-import org.opentripplanner.framework.tostring.MultiLineToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
@@ -13,6 +12,7 @@ import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.utils.tostring.MultiLineToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

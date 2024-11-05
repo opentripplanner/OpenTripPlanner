@@ -100,7 +100,7 @@ public class SiriTripPatternCache {
           .withCreatedByRealtimeUpdater(true)
           .withOriginalTripPattern(originalTripPattern)
           .build();
-      // TODO: Add pattern to transitModel index?
+      // TODO: Add pattern to timetableRepository index?
 
       // Add pattern to cache
       cache.put(key, tripPattern);

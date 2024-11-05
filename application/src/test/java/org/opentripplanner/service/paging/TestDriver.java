@@ -5,8 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner._support.debug.TestDebug;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.lang.Box;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -15,6 +13,8 @@ import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.lang.Box;
 
 /**
  * This class simulate/mock the context the paging is operating in.

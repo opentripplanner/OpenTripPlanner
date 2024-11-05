@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Parameters to configure the NETEX import. Se the generated build-config documentation or

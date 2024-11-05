@@ -3,7 +3,7 @@ package org.opentripplanner.updater.vehicle_parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -118,7 +118,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     class GraphUpdaterMock extends GraphUpdaterManager {
 
       private static final Graph GRAPH = new Graph();
-      private static final TransitModel TRANSIT_MODEL = new TransitModel();
+      private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository();
       public static final DefaultRealTimeUpdateContext REAL_TIME_UPDATE_CONTEXT = new DefaultRealTimeUpdateContext(
         GRAPH,
         TRANSIT_MODEL

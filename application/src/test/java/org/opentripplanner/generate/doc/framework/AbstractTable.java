@@ -1,18 +1,18 @@
 package org.opentripplanner.generate.doc.framework;
 
-import static org.opentripplanner.framework.text.MarkdownFormatter.code;
-import static org.opentripplanner.framework.text.MarkdownFormatter.escapeInTable;
 import static org.opentripplanner.generate.doc.framework.NodeAdapterHelper.anchor;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
+import static org.opentripplanner.utils.text.MarkdownFormatter.code;
+import static org.opentripplanner.utils.text.MarkdownFormatter.escapeInTable;
 
 import java.util.List;
-import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
+import org.opentripplanner.utils.text.MarkdownFormatter;
+import org.opentripplanner.utils.text.Table;
+import org.opentripplanner.utils.text.TableBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

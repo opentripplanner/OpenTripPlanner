@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.emissions;
 
 import java.util.Optional;
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * A service for getting emissions information for routes.

@@ -9,8 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingTag;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Configure system related features - a system feature is a non-functional feature. It

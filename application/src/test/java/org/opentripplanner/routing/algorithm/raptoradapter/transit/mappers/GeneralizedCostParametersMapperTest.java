@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.agency;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

@@ -7,13 +7,13 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.PatternTestModel;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class LayerFiltersTest {
 
-  private static final RegularStop STOP = TransitModelForTest.of().stop("1").build();
+  private static final RegularStop STOP = TimetableRepositoryForTest.of().stop("1").build();
   private static final LocalDate DATE = LocalDate.of(2024, 9, 5);
   private static final TripPattern PATTERN = PatternTestModel.pattern();
 

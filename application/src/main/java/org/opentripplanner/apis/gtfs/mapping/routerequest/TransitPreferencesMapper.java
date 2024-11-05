@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
-import org.opentripplanner.framework.collection.CollectionUtils;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.utils.collection.CollectionUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class TransitPreferencesMapper {
 

@@ -5,7 +5,6 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.BinHeap;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
@@ -13,6 +12,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

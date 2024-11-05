@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * This class represent a OTP coordinate.
@@ -161,6 +161,24 @@ public final class WgsCoordinate implements Serializable {
     var lat = DoubleUtils.roundTo3Decimals(latitude);
     var lng = DoubleUtils.roundTo3Decimals(longitude);
     return new WgsCoordinate(lat, lng);
+  }
+
+  /**
+   * Compute a fairly accurate distance between two coordinates. Use the fast version in
+   * {@link SphericalDistanceLibrary} if many computations are needed. Return the distance in
+   * meters between the two coordinates.
+   */
+  public double distanceTo(WgsCoordinate other) {
+    return SphericalDistanceLibrary.distance(
+      this.latitude,
+      this.longitude,
+      other.latitude,
+      other.longitude
+    );
+  }
+
+  public boolean isNorthOf(double latitudeBorder) {
+    return latitude > latitudeBorder;
   }
 
   /**

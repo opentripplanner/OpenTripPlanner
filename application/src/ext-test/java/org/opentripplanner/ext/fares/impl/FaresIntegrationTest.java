@@ -22,7 +22,7 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class FaresIntegrationTest {
 
@@ -30,11 +30,11 @@ public class FaresIntegrationTest {
   public void testBasic() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.CALTRAIN_GTFS);
     var graph = model.graph();
-    var transitModel = model.transitModel();
+    var timetableRepository = model.timetableRepository();
 
-    var feedId = transitModel.getFeedIds().iterator().next();
+    var feedId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
 
     var start = LocalDateTime
       .of(2009, Month.AUGUST, 7, 12, 0, 0)
@@ -53,10 +53,10 @@ public class FaresIntegrationTest {
   public void testPortland() {
     TestOtpModel model = ConstantsForTests.getInstance().getCachedPortlandGraph();
     Graph graph = model.graph();
-    TransitModel transitModel = model.transitModel();
-    var portlandId = transitModel.getFeedIds().iterator().next();
+    TimetableRepository timetableRepository = model.timetableRepository();
+    var portlandId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId(

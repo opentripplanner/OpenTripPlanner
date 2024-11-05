@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * A collection of stop indexes used to define a pass through-point.

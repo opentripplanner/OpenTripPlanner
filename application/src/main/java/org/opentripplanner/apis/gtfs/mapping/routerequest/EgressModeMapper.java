@@ -12,6 +12,7 @@ public class EgressModeMapper {
     return switch (mode) {
       case BICYCLE -> StreetMode.BIKE;
       case BICYCLE_RENTAL -> StreetMode.BIKE_RENTAL;
+      case CAR -> StreetMode.CAR;
       case CAR_RENTAL -> StreetMode.CAR_RENTAL;
       case CAR_PICKUP -> StreetMode.CAR_PICKUP;
       case FLEX -> StreetMode.FLEXIBLE;

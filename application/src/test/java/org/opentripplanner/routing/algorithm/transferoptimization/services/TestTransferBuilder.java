@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.Objects;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -11,8 +10,9 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a
@@ -154,7 +154,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TransitModelForTest
+    return TimetableRepositoryForTest
       .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
       .build();
   }

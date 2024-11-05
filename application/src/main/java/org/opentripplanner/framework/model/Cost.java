@@ -2,8 +2,8 @@ package org.opentripplanner.framework.model;
 
 import java.io.Serializable;
 import java.time.Duration;
-import org.opentripplanner.framework.lang.IntUtils;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
 
 /**
  * A type safe representation of a cost, like generalized-cost. A cost unit is equivalent of riding

@@ -4,13 +4,13 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +31,12 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   public GtfsRealtimeAlertsUpdater(
     GtfsRealtimeAlertsUpdaterParameters config,
-    TransitModel transitModel
+    TimetableRepository timetableRepository
   ) {
     super(config);
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
-    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl(timetableRepository);
 
     this.transitAlertService = transitAlertService;
 

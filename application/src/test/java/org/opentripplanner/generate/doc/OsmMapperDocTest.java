@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.osm.wayproperty.SafetyFeatures;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.utils.text.Table;
+import org.opentripplanner.utils.text.TableBuilder;
 
 @GeneratesDocumentation
 public class OsmMapperDocTest {

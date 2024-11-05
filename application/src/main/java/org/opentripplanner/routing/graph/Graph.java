@@ -30,7 +30,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +43,10 @@ import org.slf4j.LoggerFactory;
  * In OTP1, the Graph contained vertices and edges representing the entire transportation network,
  * including edges representing both street segments and public transit lines connecting stops. In
  * OTP2, the Graph edges now represent only the street network. Transit routing is performed on
- * other data structures suited to the Raptor algorithm (the TransitModel). Some transit-related
+ * other data structures suited to the Raptor algorithm (the TimetableRepository). Some transit-related
  * vertices are still present in the Graph, specifically those representing transit stops,
  * entrances, and elevators. Their presence in the street graph creates a connection between the two
- * routable data structures (identifying where stops in the TransitModel are located relative to
+ * routable data structures (identifying where stops in the TimetableRepository are located relative to
  * roads).
  * <p>
  * Other data structures related to street routing, such as elevation data and vehicle parking
@@ -284,9 +284,9 @@ public class Graph implements Serializable {
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
    *           - something that should go into the index; Hence, inconsistent data.
    */
-  public void index(StopModel stopModel) {
+  public void index(SiteRepository siteRepository) {
     LOG.info("Index street model...");
-    streetIndex = new StreetIndex(this, stopModel);
+    streetIndex = new StreetIndex(this, siteRepository);
     LOG.info("Index street model complete.");
   }
 
@@ -297,7 +297,7 @@ public class Graph implements Serializable {
 
   /**
    * Get streetIndex, safe to use while routing, but do not use during graph build.
-   * @see #getStreetIndexSafe(StopModel)
+   * @see #getStreetIndexSafe(SiteRepository)
    */
   public StreetIndex getStreetIndex() {
     return this.streetIndex;
@@ -307,14 +307,14 @@ public class Graph implements Serializable {
    * Get streetIndex during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public StreetIndex getStreetIndexSafe(StopModel stopModel) {
-    indexIfNotIndexed(stopModel);
+  public StreetIndex getStreetIndexSafe(SiteRepository siteRepository) {
+    indexIfNotIndexed(siteRepository);
     return this.streetIndex;
   }
 
   /**
    * Get VertexLinker, safe to use while routing, but do not use during graph build.
-   * @see #getLinkerSafe(StopModel)
+   * @see #getLinkerSafe(SiteRepository)
    */
   public VertexLinker getLinker() {
     return streetIndex.getVertexLinker();
@@ -324,8 +324,8 @@ public class Graph implements Serializable {
    * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public VertexLinker getLinkerSafe(StopModel stopModel) {
-    indexIfNotIndexed(stopModel);
+  public VertexLinker getLinkerSafe(SiteRepository siteRepository) {
+    indexIfNotIndexed(siteRepository);
     return streetIndex.getVertexLinker();
   }
 
@@ -374,9 +374,9 @@ public class Graph implements Serializable {
     this.fareService = fareService;
   }
 
-  private void indexIfNotIndexed(StopModel stopModel) {
+  private void indexIfNotIndexed(SiteRepository siteRepository) {
     if (streetIndex == null) {
-      index(stopModel);
+      index(siteRepository);
     }
   }
 }

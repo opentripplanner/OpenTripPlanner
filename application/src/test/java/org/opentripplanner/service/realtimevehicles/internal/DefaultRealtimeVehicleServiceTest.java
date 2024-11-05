@@ -2,25 +2,25 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.geometry.WgsCoordinate.GREENWICH;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.tripPattern;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
 
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class DefaultRealtimeVehicleServiceTest {
 
   private static final Route ROUTE = route("r1").build();
-  private static final TransitModelForTest MODEL = TransitModelForTest.of();
-  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
+  private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     MODEL.stop("1").build(),
     MODEL.stop("2").build()
   );
@@ -34,7 +34,9 @@ class DefaultRealtimeVehicleServiceTest {
 
   @Test
   void originalPattern() {
-    var service = new DefaultRealtimeVehicleService(new DefaultTransitService(new TransitModel()));
+    var service = new DefaultRealtimeVehicleService(
+      new DefaultTransitService(new TimetableRepository())
+    );
     service.setRealtimeVehicles(ORIGINAL, VEHICLES);
     var updates = service.getRealtimeVehicles(ORIGINAL);
     assertEquals(VEHICLES, updates);
@@ -42,7 +44,9 @@ class DefaultRealtimeVehicleServiceTest {
 
   @Test
   void realtimeAddedPattern() {
-    var service = new DefaultRealtimeVehicleService(new DefaultTransitService(new TransitModel()));
+    var service = new DefaultRealtimeVehicleService(
+      new DefaultTransitService(new TimetableRepository())
+    );
     var realtimePattern = tripPattern("realtime-added", ROUTE)
       .withStopPattern(STOP_PATTERN)
       .withOriginalTripPattern(ORIGINAL)

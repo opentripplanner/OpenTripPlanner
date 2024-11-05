@@ -6,30 +6,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
   private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
 
   StopMapper(
     TranslationHelper translationHelper,
     Function<FeedScopedId, Station> stationLookUp,
-    StopModelBuilder stopModelBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder
   ) {
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
-    this.stopModelBuilder = stopModelBuilder;
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
   Collection<RegularStop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
@@ -44,7 +44,7 @@ class StopMapper {
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     assertLocationTypeIsStop(gtfsStop);
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
-    RegularStopBuilder builder = stopModelBuilder
+    RegularStopBuilder builder = siteRepositoryBuilder
       .regularStop(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())

@@ -19,7 +19,7 @@ On the other hand, **production frontends** are intended to be a component of la
 The main OpenTripPlanner repository currently contains two debug web frontends: 
 
 - new one currently under development at [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
-- the classic one in [`/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/client/classic-debug) 
+- the classic one in [`/application/src/client/classic-debug/`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/application/src/client/classic-debug) 
 
 The **new debug client** is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
 Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).
@@ -29,7 +29,7 @@ It connects to the OTP Java backend via a REST API using the GTFS vocabulary. Hi
 It is still available, but has been moved to `http://localhost:8080/classic-debug/` .
 
 There is a third piece of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
-located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
+located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
 While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric 
 UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the 
 street network, providing some insight into the internals of the routing algorithms that are not otherwise visible.

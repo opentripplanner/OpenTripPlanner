@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This is a container for returning transfers from and to stop-positions indexed by

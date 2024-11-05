@@ -1,10 +1,10 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

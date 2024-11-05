@@ -5,9 +5,9 @@ import static java.lang.Boolean.TRUE;
 import java.time.ZonedDateTime;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.updater.siri.mapper.OccupancyMapper;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
 

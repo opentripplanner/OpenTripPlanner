@@ -22,7 +22,7 @@ import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Grams;
-import org.opentripplanner.framework.time.OffsetDateTimeParser;
+import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
 

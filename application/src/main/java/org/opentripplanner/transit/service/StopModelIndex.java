@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.framework.collection.CollectionsView;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -15,6 +14,7 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -24,9 +24,9 @@ import org.slf4j.event.Level;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-class StopModelIndex {
+class SiteRepositoryIndex {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiteRepositoryIndex.class);
 
   private final HashGridSpatialIndex<RegularStop> regularStopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
@@ -36,7 +36,7 @@ class StopModelIndex {
   /**
    * @param stops All stops including regular transit and flex
    */
-  StopModelIndex(
+  SiteRepositoryIndex(
     Collection<RegularStop> stops,
     Collection<AreaStop> flexStops,
     Collection<GroupStop> groupStops,

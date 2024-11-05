@@ -12,7 +12,7 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * This class is responsible for loading configuration and setting up the OTP data store.
@@ -54,7 +54,7 @@ public class LoadApplication {
   public ConstructApplication appConstruction(SerializedGraphObject obj) {
     return createAppConstruction(
       obj.graph,
-      obj.transitModel,
+      obj.timetableRepository,
       obj.worldEnvelopeRepository,
       obj.issueSummary,
       obj.emissionsDataModel,
@@ -67,7 +67,7 @@ public class LoadApplication {
   public ConstructApplication appConstruction() {
     return createAppConstruction(
       factory.emptyGraph(),
-      factory.emptyTransitModel(),
+      factory.emptyTimetableRepository(),
       factory.emptyWorldEnvelopeRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
@@ -89,7 +89,7 @@ public class LoadApplication {
 
   private ConstructApplication createAppConstruction(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionsDataModel emissionsDataModel,
@@ -99,7 +99,7 @@ public class LoadApplication {
     return new ConstructApplication(
       cli,
       graph,
-      transitModel,
+      timetableRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),

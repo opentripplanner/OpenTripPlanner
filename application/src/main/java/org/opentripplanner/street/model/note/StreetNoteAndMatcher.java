@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.note;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A container for a pair (note and note matcher).

@@ -3,8 +3,8 @@ package org.opentripplanner.framework.model;
 import static java.lang.Math.abs;
 
 import java.util.Locale;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * This utility can be used to perform sanity checks on common number types. It will also normalize

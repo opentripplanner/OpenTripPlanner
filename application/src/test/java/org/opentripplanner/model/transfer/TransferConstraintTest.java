@@ -10,7 +10,7 @@ import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
 
 import java.util.function.IntSupplier;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class TransferConstraintTest {
 

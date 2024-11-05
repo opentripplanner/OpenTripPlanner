@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.restapi.model;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * How to contact the agency to book a trip or requests information.

@@ -1,7 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_1;
+import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_1;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;

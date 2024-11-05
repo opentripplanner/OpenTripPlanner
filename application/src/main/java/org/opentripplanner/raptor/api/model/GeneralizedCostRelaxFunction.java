@@ -3,8 +3,8 @@ package org.opentripplanner.raptor.api.model;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Objects;
-import org.opentripplanner.framework.lang.IntUtils;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
+import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
 
 /**
  * This relax-function is used to relax increasing values by:

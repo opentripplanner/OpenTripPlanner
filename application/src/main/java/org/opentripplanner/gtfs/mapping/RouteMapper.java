@@ -3,19 +3,18 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS Route into the OTP model. */
 class RouteMapper {
 
   private final AgencyMapper agencyMapper;
-  private final BrandingMapper brandingMapper;
 
   private final DataImportIssueStore issueStore;
 
@@ -30,7 +29,6 @@ class RouteMapper {
   ) {
     this.agencyMapper = agencyMapper;
     this.issueStore = issueStore;
-    this.brandingMapper = new BrandingMapper();
     this.translationHelper = helper;
   }
 
@@ -82,7 +80,6 @@ class RouteMapper {
     lhs.withColor(rhs.getColor());
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
-    lhs.withBranding(brandingMapper.map(rhs));
     if (rhs.getNetworkId() != null) {
       var networkId = GroupOfRoutes
         .of(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId()))

@@ -8,7 +8,7 @@ import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class DurationScalarFactory {
 

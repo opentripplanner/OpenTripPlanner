@@ -9,13 +9,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.MemEfficientArrayBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
 
 /**
  * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at

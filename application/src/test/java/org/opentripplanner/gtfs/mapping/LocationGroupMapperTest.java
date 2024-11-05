@@ -11,7 +11,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class LocationGroupMapperTest {
 
@@ -19,7 +19,7 @@ class LocationGroupMapperTest {
 
   @Test
   void map() {
-    var builder = StopModel.of();
+    var builder = SiteRepository.of();
     var mapper = new LocationGroupMapper(
       new StopMapper(new TranslationHelper(), id -> null, builder),
       new LocationMapper(builder, DataImportIssueStore.NOOP),

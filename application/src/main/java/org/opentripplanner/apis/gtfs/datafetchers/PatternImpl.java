@@ -18,7 +18,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -31,6 +30,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 

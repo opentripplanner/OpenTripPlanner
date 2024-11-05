@@ -4,8 +4,8 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Group of vehicle parking locations.

@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.client.model.RequestMode.BICYCLE;
 import static org.opentripplanner.client.model.RequestMode.BUS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_ACCESS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_DIRECT;
@@ -185,6 +186,22 @@ public class SeattleSmokeTest {
   @ParameterizedTest
   @MethodSource("buildCombinations")
   public void accessibleRouting(TripPlanParameters params) throws IOException {
+    var tripPlan = SmokeTest.API_CLIENT.plan(params);
+    assertFalse(tripPlan.transitItineraries().isEmpty());
+  }
+
+  static List<TripPlanParameters> bikeCombinations() {
+    return new RequestCombinationsBuilder()
+      .withLocations(SODO, ESPERANCE, OLIVE_WAY, MOUNTAINLAKE_TERRACE)
+      .withModes(TRANSIT, BICYCLE)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .includeArriveBy()
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("bikeCombinations")
+  public void bikeAndTransit(TripPlanParameters params) throws IOException {
     var tripPlan = SmokeTest.API_CLIENT.plan(params);
     assertFalse(tripPlan.transitItineraries().isEmpty());
   }

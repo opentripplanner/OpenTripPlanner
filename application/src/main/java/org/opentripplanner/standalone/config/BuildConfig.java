@@ -23,7 +23,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.emissions.EmissionsConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
-import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
@@ -46,6 +45,7 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

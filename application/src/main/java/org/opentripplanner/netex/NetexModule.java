@@ -5,7 +5,7 @@ import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
+import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -15,7 +15,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * This module is used for importing the NeTEx CEN Technical Standard for exchanging Public
@@ -28,7 +28,7 @@ public class NetexModule implements GraphBuilderModule {
   private final int subwayAccessTime;
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
 
   /**
@@ -41,14 +41,14 @@ public class NetexModule implements GraphBuilderModule {
 
   public NetexModule(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
     ServiceDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
     this.transitPeriodLimit = transitPeriodLimit;
@@ -70,7 +70,7 @@ public class NetexModule implements GraphBuilderModule {
         );
         transitBuilder.limitServiceDays(transitPeriodLimit);
         for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
-          transitModel.addTripOnServiceDate(tripOnServiceDate);
+          timetableRepository.addTripOnServiceDate(tripOnServiceDate);
         }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
@@ -87,20 +87,20 @@ public class NetexModule implements GraphBuilderModule {
         // if this or previously processed netex bundle has transit that has not been filtered out
         hasActiveTransit = hasActiveTransit || otpService.hasActiveTransit();
 
-        // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
+        // TODO OTP2 - Move this into the AddTransitEntitiesToGraph
         //           - and make sure they also work with GTFS feeds - GTFS do no
         //           - have operators and notice assignments.
-        transitModel.addOperators(otpService.getAllOperators());
-        transitModel.addNoticeAssignments(otpService.getNoticeAssignments());
+        timetableRepository.addOperators(otpService.getAllOperators());
+        timetableRepository.addNoticeAssignments(otpService.getNoticeAssignments());
 
-        AddTransitModelEntitiesToGraph.addToGraph(
+        AddTransitEntitiesToGraph.addToGraph(
           otpService,
           subwayAccessTime,
           graph,
-          transitModel
+          timetableRepository
         );
 
-        transitModel.validateTimeZones();
+        timetableRepository.validateTimeZones();
 
         var lots = transitBuilder.vehicleParkings();
         graph.getVehicleParkingService().updateVehicleParking(lots, List.of());
@@ -108,7 +108,11 @@ public class NetexModule implements GraphBuilderModule {
         lots.forEach(linker::linkVehicleParkingToGraph);
       }
 
-      transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);
+      timetableRepository.updateCalendarServiceData(
+        hasActiveTransit,
+        calendarServiceData,
+        issueStore
+      );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

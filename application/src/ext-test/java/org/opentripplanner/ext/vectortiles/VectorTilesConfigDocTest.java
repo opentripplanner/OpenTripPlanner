@@ -3,11 +3,11 @@ package org.opentripplanner.ext.vectortiles;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromPath;
+import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;

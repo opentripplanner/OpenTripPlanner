@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.framework.lang.IntUtils;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This class can serialize and parse a linear function of time/duration/cost on the form

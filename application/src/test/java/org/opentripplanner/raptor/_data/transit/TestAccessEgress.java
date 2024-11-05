@@ -9,9 +9,9 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -19,6 +18,7 @@ import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEn
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.utils.time.DurationUtils;
 
 class AccessEgressPenaltyDecoratorTest {
 

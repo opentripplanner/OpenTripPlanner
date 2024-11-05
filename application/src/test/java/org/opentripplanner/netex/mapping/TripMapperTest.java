@@ -12,11 +12,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -33,7 +33,7 @@ public class TripMapperTest {
   private static final String ROUTE_ID = "RUT:Route:1";
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
-  private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S001");
+  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("S001");
   private static final DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
@@ -49,8 +49,8 @@ public class TripMapperTest {
     var limitations = new AccessibilityLimitations_RelStructure();
     var access = new AccessibilityAssessment();
 
-    var transitBuilder = new OtpTransitServiceBuilder(new StopModel(), issueStore);
-    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
+    var transitBuilder = new OtpTransitServiceBuilder(new SiteRepository(), issueStore);
+    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -79,10 +79,10 @@ public class TripMapperTest {
   @Test
   public void mapTrip() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
-      new StopModel(),
+      new SiteRepository(),
       issueStore
     );
-    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
+    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
       ID_FACTORY,
@@ -106,10 +106,10 @@ public class TripMapperTest {
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
-      new StopModel(),
+      new SiteRepository(),
       issueStore
     );
-    transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
+    transitBuilder.getRoutes().add(TimetableRepositoryForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
     journeyPattern.setRouteRef(new RouteRefStructure().withRef(ROUTE_ID));

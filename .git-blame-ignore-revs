@@ -9,3 +9,6 @@
 
 # reorder and reformat GTFS GraphQL API schema file with graphql-java
 14051fab312a67cae9a460aaf0bbc77223bec624
+
+# Make OTP a multi-module project
+ead33ffe280dd7caf72cae5ff7a41542e8427636

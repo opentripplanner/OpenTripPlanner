@@ -17,15 +17,15 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 
 public class OtpTransitServiceBuilderTest {
 
-  private static final String FEED_ID = TransitModelForTest.FEED_ID;
-  private static final FeedScopedId SERVICE_WEEKDAYS_ID = TransitModelForTest.id("weekdays");
+  private static final String FEED_ID = TimetableRepositoryForTest.FEED_ID;
+  private static final FeedScopedId SERVICE_WEEKDAYS_ID = TimetableRepositoryForTest.id("weekdays");
 
   private static OtpTransitServiceBuilder subject;
 

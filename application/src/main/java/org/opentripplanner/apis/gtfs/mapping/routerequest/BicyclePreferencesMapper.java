@@ -8,11 +8,11 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.p
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Set;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class BicyclePreferencesMapper {
 

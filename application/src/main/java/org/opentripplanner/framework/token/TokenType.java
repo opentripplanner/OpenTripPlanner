@@ -3,7 +3,7 @@ package org.opentripplanner.framework.token;
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * List of types we can store in a token.

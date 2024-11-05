@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -24,7 +24,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class RealTimeTripTimesTest {
 
-  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   private static final String TRIP_ID = "testTripId";
 
@@ -40,7 +40,7 @@ class RealTimeTripTimesTest {
   );
 
   static TripTimes createInitialTripTimes() {
-    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
+    Trip trip = TimetableRepositoryForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 
@@ -69,7 +69,7 @@ class RealTimeTripTimesTest {
 
     @Test
     void shouldHandleBothNullScenario() {
-      Trip trip = TransitModelForTest.trip("TRIP").build();
+      Trip trip = TimetableRepositoryForTest.trip("TRIP").build();
       List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
@@ -80,7 +80,7 @@ class RealTimeTripTimesTest {
 
     @Test
     void shouldHandleTripOnlyHeadSignScenario() {
-      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
@@ -91,7 +91,7 @@ class RealTimeTripTimesTest {
 
     @Test
     void shouldHandleStopsOnlyHeadSignScenario() {
-      Trip trip = TransitModelForTest.trip("TRIP").build();
+      Trip trip = TimetableRepositoryForTest.trip("TRIP").build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
       List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
@@ -104,7 +104,7 @@ class RealTimeTripTimesTest {
 
     @Test
     void shouldHandleStopsEqualToTripHeadSignScenario() {
-      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(DIRECTION);
       List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
@@ -117,7 +117,7 @@ class RealTimeTripTimesTest {
 
     @Test
     void shouldHandleDifferingTripAndStopHeadSignScenario() {
-      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      Trip trip = TimetableRepositoryForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
       List<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);

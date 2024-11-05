@@ -5,15 +5,15 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import org.opentripplanner.framework.lang.IntUtils;
-import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.utils.lang.IntUtils;
+import org.opentripplanner.utils.time.TimeUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.

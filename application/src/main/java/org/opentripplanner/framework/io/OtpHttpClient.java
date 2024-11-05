@@ -378,6 +378,7 @@ public class OtpHttpClient {
       .custom()
       .setResponseTimeout(Timeout.of(timeout))
       .setConnectionRequestTimeout(Timeout.of(timeout))
+      .setProtocolUpgradeEnabled(false)
       .build();
   }
 

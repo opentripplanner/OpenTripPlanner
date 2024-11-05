@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
 import java.util.Objects;

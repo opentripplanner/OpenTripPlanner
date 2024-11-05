@@ -10,8 +10,8 @@ import graphql.schema.GraphQLInputObjectType;
 import java.util.Map;
 import org.opentripplanner.framework.graphql.scalar.CostScalarFactory;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class RelaxCostType {
 

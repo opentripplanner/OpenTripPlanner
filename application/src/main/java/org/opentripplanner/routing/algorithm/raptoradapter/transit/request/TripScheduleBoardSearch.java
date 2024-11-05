@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The purpose of this class is to optimize the search for a trip schedule for a given pattern and
@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * trips are ordered after the FIRST stop boarding times. We also assume that trips do not pass each
  * other; Hence trips IN SERVICE on a given day will be in order for all other stops too.
  * <p/>
- * The search use a binary search if the number of trip schedules is above a given threshold. A
+ * The search uses a binary search if the number of trip schedules is above a given threshold. A
  * linear search is slow when the number of schedules is very large, let say more than 300 trip
  * schedules.
  *

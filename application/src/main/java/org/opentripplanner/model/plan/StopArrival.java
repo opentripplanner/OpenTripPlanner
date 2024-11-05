@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class is used to represent a stop arrival event mostly for intermediate visits to a stops

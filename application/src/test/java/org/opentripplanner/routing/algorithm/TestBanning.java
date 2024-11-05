@@ -2,14 +2,14 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -56,24 +56,32 @@ public class TestBanning {
   }
 
   private List<TripPattern> getTestPatterns() {
-    Agency agency1 = TransitModelForTest.agency("A").copy().withId(id("RUT:Agency:1")).build();
-    Agency agency2 = TransitModelForTest.agency("B").copy().withId(id("RUT:Agency:2")).build();
+    Agency agency1 = TimetableRepositoryForTest
+      .agency("A")
+      .copy()
+      .withId(id("RUT:Agency:1"))
+      .build();
+    Agency agency2 = TimetableRepositoryForTest
+      .agency("B")
+      .copy()
+      .withId(id("RUT:Agency:2"))
+      .build();
 
-    Route route1 = TransitModelForTest.route("RUT:Route:1").withAgency(agency1).build();
-    Route route2 = TransitModelForTest.route("RUT:Route:2").withAgency(agency1).build();
-    Route route3 = TransitModelForTest.route("RUT:Route:3").withAgency(agency2).build();
+    Route route1 = TimetableRepositoryForTest.route("RUT:Route:1").withAgency(agency1).build();
+    Route route2 = TimetableRepositoryForTest.route("RUT:Route:2").withAgency(agency1).build();
+    Route route3 = TimetableRepositoryForTest.route("RUT:Route:3").withAgency(agency2).build();
 
-    final StopPattern stopPattern = TransitModelForTest.of().stopPattern(2);
+    final StopPattern stopPattern = TimetableRepositoryForTest.of().stopPattern(2);
     return List.of(
-      TransitModelForTest
+      TimetableRepositoryForTest
         .tripPattern("RUT:JourneyPattern:1", route1)
         .withStopPattern(stopPattern)
         .build(),
-      TransitModelForTest
+      TimetableRepositoryForTest
         .tripPattern("RUT:JourneyPattern:2", route2)
         .withStopPattern(stopPattern)
         .build(),
-      TransitModelForTest
+      TimetableRepositoryForTest
         .tripPattern("RUT:JourneyPattern:3", route3)
         .withStopPattern(stopPattern)
         .build()

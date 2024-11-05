@@ -2,10 +2,10 @@ package org.opentripplanner.raptor.api.request;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * A via-connection is used to define one of the physical locations in a via location Raptor must

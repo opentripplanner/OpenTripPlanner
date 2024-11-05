@@ -10,9 +10,9 @@ import java.util.Objects;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class holds transfer constraint information.

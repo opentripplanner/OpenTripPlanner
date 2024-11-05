@@ -90,7 +90,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
   public void regular() {
     var request = requestBuilder.build();
 
-    var search = new RangeRaptorDynamicSearch<>(config, data, request);
+    var search = new RangeRaptorDynamicSearch<>(config, data, null, request);
 
     search.route();
 
@@ -105,7 +105,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
 
     var request = requestBuilder.build();
 
-    var search = new RangeRaptorDynamicSearch<>(config, data, request);
+    var search = new RangeRaptorDynamicSearch<>(config, data, null, request);
 
     search.route();
 

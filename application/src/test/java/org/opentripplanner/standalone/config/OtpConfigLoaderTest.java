@@ -15,8 +15,8 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class OtpConfigLoaderTest {
 

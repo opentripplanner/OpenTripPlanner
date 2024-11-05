@@ -3,12 +3,12 @@ package org.opentripplanner.raptor.api.request;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class configure the amount of debugging you want for your request. Debugging is supported by

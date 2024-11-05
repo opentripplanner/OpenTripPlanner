@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Preferences for transit routing.

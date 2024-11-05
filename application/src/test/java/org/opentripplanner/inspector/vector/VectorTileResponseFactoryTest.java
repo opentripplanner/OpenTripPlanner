@@ -11,13 +11,13 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 class VectorTileResponseFactoryTest {
 
   public static final OtpServerRequestContext SERVER_CONTEXT = TestServerContext.createServerContext(
     new Graph(),
-    new TransitModel()
+    new TimetableRepository()
   );
 
   enum LayerType {

@@ -125,19 +125,19 @@ public class NetexBundle implements Closeable {
   /** Load all files entries in the bundle */
   private void loadFileEntries() {
     // Load global shared files
-    loadFilesThenMapToOtpTransitModel("shared file", hierarchy.sharedEntries());
+    loadFilesThenMapToTimetableRepository("shared file", hierarchy.sharedEntries());
 
     for (GroupEntries group : hierarchy.groups()) {
       LOG.info("reading group {}", group.name());
 
       scopeInputData(() -> {
         // Load shared group files
-        loadFilesThenMapToOtpTransitModel("shared group file", group.sharedEntries());
+        loadFilesThenMapToTimetableRepository("shared group file", group.sharedEntries());
 
         for (DataSource entry : group.independentEntries()) {
           scopeInputData(() -> {
             // Load each independent file in group
-            loadFilesThenMapToOtpTransitModel("group file", List.of(entry));
+            loadFilesThenMapToTimetableRepository("group file", List.of(entry));
           });
         }
       });
@@ -164,7 +164,7 @@ public class NetexBundle implements Closeable {
    * when read, would lead to missing references, since the order entries are read is not enforced
    * in any way.
    */
-  private void loadFilesThenMapToOtpTransitModel(
+  private void loadFilesThenMapToTimetableRepository(
     String fileDescription,
     Iterable<DataSource> entries
   ) {

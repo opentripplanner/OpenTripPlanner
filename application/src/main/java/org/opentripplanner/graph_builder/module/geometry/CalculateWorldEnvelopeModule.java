@@ -2,14 +2,14 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import jakarta.inject.Inject;
 import java.util.Collection;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,24 +28,24 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
   private static final int LOG_EVERY_N_COORDINATE = 1_000_000;
 
   private final Graph graph;
-  private final TransitModel transitModel;
+  private final TimetableRepository timetableRepository;
   private final WorldEnvelopeRepository worldEnvelopeRepository;
 
   @Inject
   public CalculateWorldEnvelopeModule(
     Graph graph,
-    TransitModel transitModel,
+    TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.timetableRepository = timetableRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
   }
 
   @Override
   public void buildGraph() {
     var vertices = graph.getVertices();
-    var stops = transitModel.getStopModel().listStopLocations();
+    var stops = timetableRepository.getSiteRepository().listStopLocations();
     WorldEnvelope envelope = build(vertices, stops);
     worldEnvelopeRepository.saveEnvelope(envelope);
   }
