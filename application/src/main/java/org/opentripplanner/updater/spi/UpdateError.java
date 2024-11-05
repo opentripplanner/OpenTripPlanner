@@ -12,7 +12,7 @@ public record UpdateError(
   @Nullable FeedScopedId tripId,
   UpdateErrorType errorType,
   @Nullable Integer stopIndex,
-  @Nullable String provider
+  @Nullable String producer
 ) {
   public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
     this(tripId, errorType, null, null);
@@ -21,8 +21,8 @@ public record UpdateError(
   public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, Integer stopIndex) {
     this(tripId, errorType, stopIndex, null);
   }
-  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, String provider) {
-    this(tripId, errorType, null, provider);
+  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, String producer) {
+    this(tripId, errorType, null, producer);
   }
 
   public String debugId() {
@@ -67,9 +67,9 @@ public record UpdateError(
   public static <T> Result<T, UpdateError> result(
     FeedScopedId tripId,
     UpdateErrorType errorType,
-    String provider
+    String producer
   ) {
-    return Result.failure(new UpdateError(tripId, errorType, provider));
+    return Result.failure(new UpdateError(tripId, errorType, producer));
   }
 
   public static UpdateError noTripId(UpdateErrorType errorType) {

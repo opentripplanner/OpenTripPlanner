@@ -96,7 +96,7 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
       .stream()
       .collect(
         Collectors.groupingBy(
-          error -> Pair.of(error.provider(), error.errorType()),
+          error -> Pair.of(error.producer(), error.errorType()),
           Collectors.counting()
         )
       );
@@ -121,7 +121,7 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
     Map<String, Long> successCountByProvider = result
       .successes()
       .stream()
-      .collect(Collectors.groupingBy(UpdateSuccess::provider, Collectors.counting()));
+      .collect(Collectors.groupingBy(UpdateSuccess::producer, Collectors.counting()));
 
     for (var entry : successCountByProvider.entrySet()) {
       Counter counter = successesByProvider.get(entry.getKey());
@@ -129,8 +129,8 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
         counter =
           getCounter(
             "successes_by_provider",
-            "Total successful trip updates by provider",
-            Tag.of("provider", entry.getKey())
+            "Total successful trip updates by producer",
+            Tag.of("producer", entry.getKey())
           );
         successesByProvider.put(entry.getKey(), counter);
       }

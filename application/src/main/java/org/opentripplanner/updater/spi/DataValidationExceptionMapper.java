@@ -20,11 +20,11 @@ public class DataValidationExceptionMapper {
 
   public static <T> Result<T, UpdateError> toResult(
     DataValidationException error,
-    String provider
+    String producer
   ) {
     if (error.error() instanceof TimetableValidationError tt) {
       return Result.failure(
-        new UpdateError(tt.trip().getId(), mapTimeTableError(tt.code()), tt.stopIndex(), provider)
+        new UpdateError(tt.trip().getId(), mapTimeTableError(tt.code()), tt.stopIndex(), producer)
       );
     }
     // The mapper should handle all possible errors

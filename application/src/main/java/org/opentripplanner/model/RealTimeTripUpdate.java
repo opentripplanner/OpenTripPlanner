@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  *                               data.
  * @param routeCreation          true if an added trip cannot be registered under an existing route
  *                               and a new route must be created.
- * @param provider               the provider of the real-time update.
+ * @param producer               the producer of the real-time update.
  */
 public record RealTimeTripUpdate(
   TripPattern pattern,
@@ -30,7 +30,7 @@ public record RealTimeTripUpdate(
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   boolean tripCreation,
   boolean routeCreation,
-  String provider
+  @Nullable String producer
 ) {
   public RealTimeTripUpdate {
     Objects.requireNonNull(pattern);

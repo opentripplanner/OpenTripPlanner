@@ -136,7 +136,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -249,7 +249,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -278,7 +278,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -321,7 +321,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -356,7 +356,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -401,7 +401,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -457,7 +457,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -497,7 +497,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 
@@ -545,7 +545,7 @@ class AddedTripBuilderTest {
       SHORT_NAME,
       HEADSIGN,
       List.of(),
-      "TST"
+      "DATASOURCE"
     )
       .build();
 

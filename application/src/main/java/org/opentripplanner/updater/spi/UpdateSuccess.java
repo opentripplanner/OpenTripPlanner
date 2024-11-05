@@ -10,7 +10,7 @@ import org.opentripplanner.utils.collection.ListUtils;
  * ought to be looked at but didn't prevent the application of the update and the provider of the
  * update.
  */
-public record UpdateSuccess(List<WarningType> warnings, String provider) {
+public record UpdateSuccess(List<WarningType> warnings, String producer) {
   /**
    * Create an instance with no warnings and no provider.
    */
@@ -21,15 +21,15 @@ public record UpdateSuccess(List<WarningType> warnings, String provider) {
   /**
    * Create an instance with no warnings, but a provider.
    */
-  public static UpdateSuccess noWarnings(String provider) {
-    return new UpdateSuccess(List.of(), provider);
+  public static UpdateSuccess noWarnings(String producer) {
+    return new UpdateSuccess(List.of(), producer);
   }
 
   /**
    * Return a copy of the instance with the provided warnings added.
    */
   public UpdateSuccess addWarnings(Collection<WarningType> addedWarnings) {
-    return new UpdateSuccess(ListUtils.combine(this.warnings, addedWarnings), this.provider);
+    return new UpdateSuccess(ListUtils.combine(this.warnings, addedWarnings), this.producer);
   }
 
   public enum WarningType {
