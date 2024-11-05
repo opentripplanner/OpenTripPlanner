@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.spi;
 
+import com.beust.jcommander.internal.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.timetable.TimetableValidationError;
@@ -20,7 +21,7 @@ public class DataValidationExceptionMapper {
 
   public static <T> Result<T, UpdateError> toResult(
     DataValidationException error,
-    String producer
+    @Nullable String producer
   ) {
     if (error.error() instanceof TimetableValidationError tt) {
       return Result.failure(

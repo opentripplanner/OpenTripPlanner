@@ -51,7 +51,7 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
   private void incrementFailureCounts(UpdateResult result) {
     for (UpdateError error : result.errors()) {
       Tags tags = Tags.concat(baseTags, Tags.of("errorType", error.errorType().name()));
-      if (producerMetrics) {
+      if (producerMetrics && error.producer() != null) {
         tags = tags.and(Tag.of("producer", error.producer()));
       }
       Counter
@@ -66,7 +66,7 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
   private void incrementSuccessCounts(UpdateResult result) {
     for (UpdateSuccess success : result.successes()) {
       Tags tags = Tags.of(baseTags);
-      if (producerMetrics) {
+      if (producerMetrics && success.producer() != null) {
         tags = tags.and(Tag.of("producer", success.producer()));
       }
       Counter

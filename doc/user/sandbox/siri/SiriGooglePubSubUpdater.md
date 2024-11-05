@@ -32,10 +32,10 @@ of the `router-config.json`.
 |------------------------------------------------------------|:----------:|----------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "siri-et-google-pubsub-updater"                     |   `enum`   | The type of the updater.                                                         | *Required* |               |  1.5  |
 | [dataInitializationUrl](#u__12__dataInitializationUrl)     |  `string`  | URL used to download over HTTP the recent history of SIRI-ET messages.           | *Optional* |               |  2.1  |
-| detailedMetrics                                            |  `boolean` | If detailed metrics should be collected.                                         | *Optional* | `false`       |  2.1  |
 | feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                                      | *Optional* |               |  2.1  |
 | fuzzyTripMatching                                          |  `boolean` | If the trips should be matched fuzzily.                                          | *Optional* | `false`       |  2.1  |
 | [initialGetDataTimeout](#u__12__initialGetDataTimeout)     | `duration` | Timeout for retrieving the recent history of SIRI-ET messages.                   | *Optional* | `"PT30S"`     |  2.1  |
+| producerMetrics                                            |  `boolean` | If failure, success, and warning metrics should be collected per producer.       | *Optional* | `false`       |  2.7  |
 | [reconnectPeriod](#u__12__reconnectPeriod)                 | `duration` | Wait this amount of time before trying to reconnect to the PubSub subscription.  | *Optional* | `"PT30S"`     |  2.1  |
 | [subscriptionProjectName](#u__12__subscriptionProjectName) |  `string`  | The Google Cloud project that hosts the PubSub subscription.                     | *Required* |               |  2.1  |
 | topicName                                                  |  `string`  | The name of the PubSub topic that publishes the updates.                         | *Required* |               |  2.1  |
