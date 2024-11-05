@@ -22,15 +22,20 @@ public class ExpressionBuilder<T> {
     return new ExpressionBuilder<>();
   }
 
+  public ExpressionBuilder<T> matches(Matcher<T> matcher) {
+    matchers.add(matcher);
+    return this;
+  }
+
   public <V> ExpressionBuilder<T> atLeastOneMatch(
     Collection<V> values,
-    Function<V, Matcher<T>> valueProvider
+    Function<V, Matcher<T>> matcherProvider
   ) {
     if (values.isEmpty()) {
       return this;
     }
 
-    matchers.add(OrMatcher.of(values.stream().map(valueProvider).toList()));
+    matchers.add(OrMatcher.of(values.stream().map(matcherProvider).toList()));
     return this;
   }
 

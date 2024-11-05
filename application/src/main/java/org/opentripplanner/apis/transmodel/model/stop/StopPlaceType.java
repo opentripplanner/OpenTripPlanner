@@ -551,7 +551,6 @@ public class StopPlaceType {
     Stream<Station> stations = transitService
       .findRegularStops(envelope)
       .stream()
-      .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .map(StopLocation::getParentStation)
       .filter(Objects::nonNull)
       .distinct();

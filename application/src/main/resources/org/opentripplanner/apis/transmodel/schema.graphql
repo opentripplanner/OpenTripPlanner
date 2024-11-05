@@ -702,6 +702,7 @@ type QueryType {
   quays(ids: [String], name: String): [Quay]! @timingData
   "Get all quays within the specified bounding box"
   quaysByBbox(
+    "The ID of the authority to fetch stops for."
     authority: String,
     "If true only quays with at least one visiting line are included."
     filterByInUse: Boolean = false,

@@ -34,11 +34,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
+import org.opentripplanner.transit.api.request.RegularStopRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.RegularStopMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -683,6 +685,20 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<RegularStop> findRegularStops(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepository.getSiteRepository().findRegularStops(envelope);
+  }
+
+  @Override
+  public Collection<RegularStop> findRegularStops(RegularStopRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
+    Collection<RegularStop> stops = timetableRepository
+      .getSiteRepository()
+      .findRegularStops(request.envelope());
+
+    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
+      request,
+      stop -> !getPatternsForStop(stop, true).isEmpty()
+    );
+    return stops.stream().filter(matcher::match).toList();
   }
 
   @Override
