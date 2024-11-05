@@ -45,9 +45,9 @@ public class SiriETUpdaterConfig {
         .asBoolean(false),
       HttpHeadersConfig.headers(c, V2_3),
       c
-        .of("detailedMetrics")
+        .of("producerMetrics")
         .since(V2_0)
-        .summary("If detailed metrics should be collected.")
+        .summary("If failure, success, and warning metrics should be collected per producer.")
         .asBoolean(false)
     );
   }

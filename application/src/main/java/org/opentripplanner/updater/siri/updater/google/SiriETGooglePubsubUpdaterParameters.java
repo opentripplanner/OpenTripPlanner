@@ -16,7 +16,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   Duration reconnectPeriod,
   Duration initialGetDataTimeout,
   boolean fuzzyTripMatching,
-  boolean detailedMetrics
+  boolean producerMetrics
 )
   implements UrlUpdaterParameters {
   public static Duration RECONNECT_PERIOD = Duration.ofSeconds(30);

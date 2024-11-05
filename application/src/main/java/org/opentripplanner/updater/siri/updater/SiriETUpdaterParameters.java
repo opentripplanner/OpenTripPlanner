@@ -16,7 +16,7 @@ public record SiriETUpdaterParameters(
   Duration previewInterval,
   boolean fuzzyTripMatching,
   HttpHeaders httpRequestHeaders,
-  boolean detailedMetrics
+  boolean producerMetrics
 )
   implements
     PollingGraphUpdaterParameters, UrlUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {

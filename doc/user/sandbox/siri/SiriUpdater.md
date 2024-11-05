@@ -31,11 +31,11 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 |--------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "siri-et-updater"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
 | blockReadinessUntilInitialized |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
-| detailedMetrics                |    `boolean`    | If detailed metrics should be collected.                                                               | *Optional* | `false`       |  2.0  |
 | feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
 | frequency                      |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
 | fuzzyTripMatching              |    `boolean`    | If the fuzzy trip matcher should be used to match trips.                                               | *Optional* | `false`       |  2.0  |
 | previewInterval                |    `duration`   | TODO                                                                                                   | *Optional* |               |  2.0  |
+| producerMetrics                |    `boolean`    | If failure, success, and warning metrics should be collected per producer.                             | *Optional* | `false`       |  2.0  |
 | requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeout                        |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
 | [url](#u__8__url)              |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |

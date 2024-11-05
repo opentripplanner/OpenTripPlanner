@@ -5,7 +5,7 @@ public interface UrlUpdaterParameters {
   String configRef();
   String feedId();
 
-  default boolean detailedMetrics() {
+  default boolean producerMetrics() {
     return false;
   }
 }
