@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 class AgencyTest {
 
   private static final String ID = "1";
-  private static final String BRANDING_URL = "http://branding.aaa.com";
   private static final String NAME = "name";
   private static final String URL = "http://info.aaa.com";
   private static final String TIMEZONE = "Europe/Oslo";
@@ -26,7 +25,6 @@ class AgencyTest {
     .withUrl(URL)
     .withTimezone(TIMEZONE)
     .withPhone(PHONE)
-    .withBrandingUrl(BRANDING_URL)
     .withFareUrl(FARE_URL)
     .withLang(LANG)
     .build();
@@ -52,7 +50,6 @@ class AgencyTest {
     assertEquals(URL, copy.getUrl());
     assertEquals(TIMEZONE, copy.getTimezone().getId());
     assertEquals(PHONE, copy.getPhone());
-    assertEquals(BRANDING_URL, copy.getBrandingUrl());
     assertEquals(FARE_URL, copy.getFareUrl());
     assertEquals(LANG, copy.getLang());
   }
@@ -65,7 +62,6 @@ class AgencyTest {
     assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
     assertFalse(subject.sameAs(subject.copy().withTimezone("CET").build()));
     assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withBrandingUrl("X").build()));
     assertFalse(subject.sameAs(subject.copy().withFareUrl("X").build()));
     assertFalse(subject.sameAs(subject.copy().withLang("X").build()));
   }

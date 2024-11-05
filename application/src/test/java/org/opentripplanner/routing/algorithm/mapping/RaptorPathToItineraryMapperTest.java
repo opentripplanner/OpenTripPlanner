@@ -24,7 +24,6 @@ import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
@@ -67,6 +66,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
 

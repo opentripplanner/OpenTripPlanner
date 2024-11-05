@@ -15,11 +15,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -44,6 +44,8 @@ public class OsmWithTags {
     "bus_guideway",
     "escape"
   );
+
+  private static final Set<String> INDOOR_ROUTABLE_VALUES = Set.of("corridor", "area");
 
   private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
   private static final Set<String> DEFAULT_LEVEL = Set.of("0");
@@ -414,13 +416,20 @@ public class OsmWithTags {
   }
 
   /**
+   * @return True if this node / area is a parking.
+   */
+  public boolean isParking() {
+    return isTag("amenity", "parking");
+  }
+
+  /**
    * @return True if this node / area is a park and ride.
    */
   public boolean isParkAndRide() {
     String parkingType = getTag("parking");
     String parkAndRide = getTag("park_ride");
     return (
-      isTag("amenity", "parking") &&
+      isParking() &&
       (
         (parkingType != null && parkingType.contains("park_and_ride")) ||
         (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
@@ -532,7 +541,7 @@ public class OsmWithTags {
   public boolean isRoutable() {
     if (isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
       return false;
-    } else if (hasTag("highway") || isPlatform()) {
+    } else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
       if (isGeneralAccessDenied()) {
         // There are exceptions.
         return (
@@ -547,6 +556,10 @@ public class OsmWithTags {
     }
 
     return false;
+  }
+
+  public boolean isIndoorRoutable() {
+    return isOneOfTags("indoor", INDOOR_ROUTABLE_VALUES);
   }
 
   /**

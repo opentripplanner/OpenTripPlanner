@@ -18,6 +18,9 @@ public interface OtpArchitectureModules {
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
+
+  Package UTILS_PACKAGE = OTP_ROOT.subPackage("utils");
+
   Package DATASTORE = OTP_ROOT.subPackage("datastore");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
   Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
@@ -37,15 +40,20 @@ public interface OtpArchitectureModules {
    * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
    * (except true utilities like slf4j).
    */
+  Module OTP_UTILS = Module.of(
+    UTILS_PACKAGE.subPackage("collection"),
+    UTILS_PACKAGE.subPackage("lang"),
+    UTILS_PACKAGE.subPackage("logging"),
+    UTILS_PACKAGE.subPackage("text"),
+    UTILS_PACKAGE.subPackage("time"),
+    UTILS_PACKAGE.subPackage("tostring")
+  );
+
   Module FRAMEWORK_UTILS = Module.of(
+    OTP_UTILS,
     FRAMEWORK.subPackage("application"),
     FRAMEWORK.subPackage("error"),
     FRAMEWORK.subPackage("i18n"),
-    FRAMEWORK.subPackage("lang"),
-    FRAMEWORK.subPackage("logging"),
-    FRAMEWORK.subPackage("text"),
-    FRAMEWORK.subPackage("time"),
-    FRAMEWORK.subPackage("tostring"),
     FRAMEWORK.subPackage("concurrent"),
     FRAMEWORK.subPackage("doc")
   );

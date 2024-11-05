@@ -9,11 +9,11 @@ import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.opentripplanner.utils.collection.MapUtils;
 
 public class LocationGroupMapper {
 

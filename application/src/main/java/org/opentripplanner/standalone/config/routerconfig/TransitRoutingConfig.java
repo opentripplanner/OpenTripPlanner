@@ -62,8 +62,8 @@ request and the actual routing request.
         .summary("This parameter is used to allocate enough memory space for Raptor.")
         .description(
           """
-Set it to the maximum number of transfers for any given itinerary expected to be found within the 
-entire transit network. The memory overhead of setting this higher than the maximum number of 
+Set it to the maximum number of transfers for any given itinerary expected to be found within the
+entire transit network. The memory overhead of setting this higher than the maximum number of
 transfers is very little so it is better to set it too high than to low.
 """
         )
@@ -78,8 +78,8 @@ transfers is very little so it is better to set it too high than to low.
         .description(
           """
 This reduce the number of trips departure time lookups and comparisons. When testing with data from
-Entur and all of Norway as a Graph, the optimal value was about 50. If you calculate the departure 
-time every time or want to fine tune the performance, changing this may improve the performance a 
+Entur and all of Norway as a Graph, the optimal value was about 50. If you calculate the departure
+time every time or want to fine tune the performance, changing this may improve the performance a
 few percents.
 """
         )
@@ -108,7 +108,7 @@ but you might get a slack of 60 seconds somewhere in the result.
         .description(
           """
 Use this parameter to set the total number of executable threads available across all searches.
-Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, 
+Multiple searches can run in parallel - this parameter has no effect with regard to that. If 0,
 no extra threads are started and the search is done in one thread.
 """
         )
@@ -142,7 +142,7 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 | `recommended` | Use a small cost penalty like `60`.                                                           | int  |
 | `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
           
-Use values in a range from `0` to `100 000`. **All key/value pairs are required if the 
+Use values in a range from `0` to `100 000`. **All key/value pairs are required if the
 `stopBoardAlightDuringTransferCost` is listed.**
 """
         )
@@ -166,7 +166,7 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
         .summary("Routing requests to use for pre-filling the stop-to-stop transfer cache.")
         .description(
           """
-If not set, the default behavior is to cache stop-to-stop transfers using the default route request 
+If not set, the default behavior is to cache stop-to-stop transfers using the default route request
 (`routingDefaults`). Use this to change the default or specify more than one `RouteRequest`.
 
 **Example**
@@ -175,7 +175,7 @@ If not set, the default behavior is to cache stop-to-stop transfers using the de
 // router-config.json
 {
   "transit": {
-    "transferCacheRequests": [ 
+    "transferCacheRequests": [
       { "modes": "WALK"                                                     },
       { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
     ]
@@ -201,7 +201,7 @@ If not set, the default behavior is to cache stop-to-stop transfers using the de
           """
 The search window is expanded when the current page return few options. If ZERO result is returned
 the first duration in the list is used, if ONE result is returned then the second duration is used
-and so on. The duration is added to the existing search-window and inserted into the next and 
+and so on. The duration is added to the existing search-window and inserted into the next and
 previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
 for more info."
 """
@@ -366,7 +366,7 @@ In addition there is an upper bound on the calculation of the search window:
           .summary("Upper limit for the search-window calculation.")
           .description(
             """
-Long search windows consumes a lot of resources and may take a long time. Use this parameter to 
+Long search windows consume a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
 This is the parameter that affects the response time most, the downside is that a search is only
@@ -381,12 +381,12 @@ guaranteed to be pareto-optimal within a search-window.
           .summary("Used to set the steps the search-window is rounded to.")
           .description(
             """
-The search window is rounded off to the closest multiplication of `stepMinutes`. If `stepMinutes` = 
+The search window is rounded off to the closest multiplication of `stepMinutes`. If `stepMinutes` =
 10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
 minutes and 17 seconds it will be rounded up to 10 minutes.
 
 
-Use a value between `1` and `60`. This should be less than the `min-raptor-search-window` 
+Use a value between `1` and `60`. This should be less than the `min-raptor-search-window`
 coefficient.
 """
           )

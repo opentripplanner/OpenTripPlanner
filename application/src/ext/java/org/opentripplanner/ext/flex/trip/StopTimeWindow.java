@@ -3,10 +3,10 @@ package org.opentripplanner.ext.flex.trip;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.lang.IntRange;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.lang.IntRange;
 
 class StopTimeWindow implements Serializable {
 

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.flex.template.BoardAlight.ALIGHT_ONLY;
 import static org.opentripplanner.ext.flex.template.BoardAlight.BOARD_AND_ALIGHT;
 import static org.opentripplanner.ext.flex.template.BoardAlight.BOARD_ONLY;
-import static org.opentripplanner.framework.time.TimeUtils.time;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import gnu.trove.set.hash.TIntHashSet;
 import java.time.Duration;

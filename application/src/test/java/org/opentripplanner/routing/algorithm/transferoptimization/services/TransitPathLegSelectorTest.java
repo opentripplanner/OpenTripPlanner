@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -21,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
