@@ -25,6 +25,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public Double currentRangeMeters;
   public VehicleRentalStation station;
   public String pricingPlanId;
+  public Double currentFuelPercent;
 
   @Override
   public FeedScopedId getId() {
@@ -132,5 +133,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   @Override
   public VehicleRentalSystem getVehicleRentalSystem() {
     return system;
+  }
+
+  public Double getCurrentFuelPercent() {
+    return currentFuelPercent;
   }
 }

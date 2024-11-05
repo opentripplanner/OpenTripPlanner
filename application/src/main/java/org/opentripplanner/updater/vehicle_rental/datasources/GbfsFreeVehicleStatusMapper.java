@@ -61,6 +61,7 @@ public class GbfsFreeVehicleStatusMapper {
         String webUri = rentalUris.getWeb();
         rentalVehicle.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
       }
+      rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
 
       return rentalVehicle;
     } else {

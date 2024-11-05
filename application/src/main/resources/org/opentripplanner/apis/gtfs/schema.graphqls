@@ -1874,6 +1874,8 @@ type RealTimeEstimate {
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
+  "Current fuel percentage of the free floating vehicle. Value expressed from 0 to 1"
+  currentFuelPercent: Float
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "Latitude of the vehicle (WGS 84)"

@@ -15,7 +15,8 @@
       "rentalNetwork": {
         "networkId": "Network-1",
         "url": "https://foo.bar"
-      }
+      },
+      "currentFuelPercent": 0.5
     }
   }
 }

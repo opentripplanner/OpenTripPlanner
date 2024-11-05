@@ -17,6 +17,11 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   }
 
   @Override
+  public DataFetcher<Double> currentFuelPercent() {
+    return environment -> getSource(environment).getCurrentFuelPercent();
+  }
+
+  @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId("RentalVehicle", getSource(environment).getId().toString());
