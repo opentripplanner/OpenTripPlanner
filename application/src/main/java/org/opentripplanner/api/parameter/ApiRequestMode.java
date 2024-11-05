@@ -2,7 +2,6 @@ package org.opentripplanner.api.parameter;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public enum ApiRequestMode {
