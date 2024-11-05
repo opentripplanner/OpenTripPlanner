@@ -939,17 +939,12 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         environment.getArguments()
       );
 
-      Envelope envelope = new Envelope(
-        new Coordinate(args.getGraphQLMinimumLongitude(), args.getGraphQLMinimumLatitude()),
-        new Coordinate(args.getGraphQLMaximumLongitude(), args.getGraphQLMaximumLatitude())
+      return vehicleRentalService.getVehicleRentalPlacesForEnvelope(
+        args.getGraphQLMinimumLongitude(),
+        args.getGraphQLMinimumLatitude(),
+        args.getGraphQLMaximumLongitude(),
+        args.getGraphQLMaximumLatitude()
       );
-
-      Stream<VehicleRentalPlace> vehicleRental = vehicleRentalService
-        .getVehicleRentalPlaces()
-        .stream()
-        .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));
-
-      return vehicleRental.toList();
     };
   }
 
