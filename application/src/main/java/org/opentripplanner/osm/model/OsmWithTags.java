@@ -49,6 +49,7 @@ public class OsmWithTags {
 
   private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
   private static final Set<String> DEFAULT_LEVEL = Set.of("0");
+  private static final Consumer<String> NO_OP = i -> {};
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -230,7 +231,7 @@ public class OsmWithTags {
    * Everything else is returned as an emtpy optional.
    */
   public OptionalInt parseIntOrBoolean(String tag, Consumer<String> errorHandler) {
-    var maybeInt = getTagAsInt(tag, errorHandler);
+    var maybeInt = getTagAsInt(tag, NO_OP);
     if (maybeInt.isPresent()) {
       return maybeInt;
     } else {
