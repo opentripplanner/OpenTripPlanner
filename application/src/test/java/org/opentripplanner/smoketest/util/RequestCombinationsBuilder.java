@@ -12,7 +12,7 @@ import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.client.model.RequestMode;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
-import org.opentripplanner.framework.collection.ListUtils;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Generates all possible combinations of requests given input parameters.
