@@ -7,6 +7,16 @@ import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';
 import { ItineraryGraphiQLQuayLink } from './ItineraryGraphiQLQuayLink.tsx';
 import { ItineraryGraphiQLAuthorityLink } from './ItineraryGraphiQLAuthorityLink.tsx';
 
+/**
+ * Some GTFS trips don't have a short name (public code) so we use the long name in this case.
+ */
+function legName(leg: Leg): string {
+  if (leg.line?.publicCode) {
+    return leg.line.publicCode + ' ' + leg.toEstimatedCall?.destinationDisplay?.frontText;
+  } else {
+    return leg.line?.name || 'unknown';
+  }
+}
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
   return (
     <div className="itinerary-leg-details">
@@ -20,10 +30,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         <b>{leg.mode}</b>{' '}
         {leg.line && (
           <>
-            <ItineraryGraphiQLLineLink
-              legId={leg.line?.id}
-              legName={leg.line.publicCode + ' ' + leg.toEstimatedCall?.destinationDisplay?.frontText}
-            />
+            <ItineraryGraphiQLLineLink legId={leg.line?.id} legName={legName(leg)} />
             , <ItineraryGraphiQLAuthorityLink legId={leg.authority?.id} legName={leg.authority?.name} />
           </>
         )}{' '}
