@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -26,6 +25,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -296,7 +296,7 @@ public interface Leg {
 
   /**
    * For transit legs, the type of the route. Non transit -1 When 0-7: 0 Tram, 1 Subway, 2 Train, 3
-   * Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
+   * Bus, 4 Ferry, 5 Cable Tram, 6 Gondola, 7 Funicular When equal or highter than 100, it is coded
    * using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also see
    * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */

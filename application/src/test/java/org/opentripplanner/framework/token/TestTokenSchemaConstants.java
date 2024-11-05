@@ -3,7 +3,7 @@ package org.opentripplanner.framework.token;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.Month;
-import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public interface TestTokenSchemaConstants {
   // Token field names. These are used to reference a specific field value in theString BYTE_FIELD = "AByte";

@@ -12,6 +12,19 @@
     <name>OpenTripPlanner - Application</name>
 
     <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gtfs-realtime-protobuf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>otp-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
@@ -317,7 +330,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4</version>
+            <version>5.4.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

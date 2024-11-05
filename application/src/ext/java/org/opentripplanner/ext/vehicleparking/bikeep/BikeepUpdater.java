@@ -7,12 +7,12 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.json.ObjectMappers;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Vehicle parking updater for Bikeep's API.

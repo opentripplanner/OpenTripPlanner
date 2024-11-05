@@ -58,16 +58,16 @@
 
 
     <properties>
-        <otp.serialization.version.id>167</otp.serialization.version.id>
+        <otp.serialization.version.id>170</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
-        <jackson.version>2.18.0</jackson.version>
+        <jackson.version>2.18.1</jackson.version>
         <jersey.version>3.1.9</jersey.version>
         <junit.version>5.11.2</junit.version>
         <micrometer.version>1.13.5</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <logback.version>1.5.8</logback.version>
+        <logback.version>1.5.12</logback.version>
         <lucene.version>9.12.0</lucene.version>
         <slf4j.version>2.0.16</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
@@ -95,19 +95,11 @@
 
     <modules>
         <module>application</module>
+        <module>gtfs-realtime-protobuf</module>
+        <module>utils</module>
     </modules>
 
     <build>
-        <extensions>
-            <!-- makes build variables like os.detected.classifier available.
-                 use to select the correct protoc instance for the OS.
-                 see protobuf-maven-plugin below -->
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>1.7.1</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -308,7 +300,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -355,27 +347,6 @@
                             </permission>
                         </permissions>
                     </extraDirectories>
-                </configuration>
-            </plugin>
-
-            <!-- compile the gtfs-realtime.proto file to Java code
-               To update the proto file run the following command:
-                 curl https://raw.githubusercontent.com/google/transit/master/gtfs-realtime/proto/gtfs-realtime.proto -o src/main/proto/gtfs-realtime.proto
-              -->
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-                <version>0.6.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.22.0:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
             </plugin>
         </plugins>
@@ -564,7 +535,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.6</version>
+                        <version>3.2.7</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

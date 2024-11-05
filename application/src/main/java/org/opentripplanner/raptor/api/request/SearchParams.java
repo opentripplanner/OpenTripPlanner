@@ -5,10 +5,10 @@ import static org.opentripplanner.raptor.api.request.RaptorRequest.assertPropert
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The responsibility of this class is to encapsulate a Range Raptor travel request search

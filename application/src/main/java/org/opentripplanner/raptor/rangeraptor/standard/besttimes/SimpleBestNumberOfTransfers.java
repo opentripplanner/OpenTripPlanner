@@ -1,10 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.raptor.rangeraptor.support.IntArraySingleCriteriaArrivals;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * The responsibility for this class is to keep track of the best (minimun) number of transfers for

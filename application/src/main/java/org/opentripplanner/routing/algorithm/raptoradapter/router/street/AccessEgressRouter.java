@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

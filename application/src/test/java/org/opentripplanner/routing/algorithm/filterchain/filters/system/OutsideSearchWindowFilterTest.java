@@ -4,8 +4,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.Duration;
 import java.util.List;

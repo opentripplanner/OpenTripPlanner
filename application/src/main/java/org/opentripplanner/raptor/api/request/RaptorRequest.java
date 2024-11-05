@@ -4,10 +4,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

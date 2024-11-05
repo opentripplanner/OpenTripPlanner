@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * Represents the emissions of a journey. Each type of emissions has its own field and unit.
