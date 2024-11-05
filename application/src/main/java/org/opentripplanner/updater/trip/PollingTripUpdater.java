@@ -3,11 +3,11 @@ package org.opentripplanner.updater.trip;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

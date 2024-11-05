@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.path;
 
-import static org.opentripplanner.framework.text.Table.Align.Center;
-import static org.opentripplanner.framework.text.Table.Align.Left;
-import static org.opentripplanner.framework.text.Table.Align.Right;
+import static org.opentripplanner.utils.text.Table.Align.Center;
+import static org.opentripplanner.utils.text.Table.Align.Left;
+import static org.opentripplanner.utils.text.Table.Align.Right;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,16 +10,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.collection.CompositeComparator;
-import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.framework.text.TableBuilder;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
+import org.opentripplanner.utils.collection.CompositeComparator;
+import org.opentripplanner.utils.text.Table;
+import org.opentripplanner.utils.text.TableBuilder;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class is used to diff two set of paths. You may ask for the diff result or pass in a logger

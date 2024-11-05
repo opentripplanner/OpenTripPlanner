@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<RegularStop> {
 

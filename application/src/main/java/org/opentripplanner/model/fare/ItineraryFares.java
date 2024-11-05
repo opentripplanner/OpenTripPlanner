@@ -8,9 +8,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.framework.lang.Sandbox;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.utils.lang.Sandbox;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  *

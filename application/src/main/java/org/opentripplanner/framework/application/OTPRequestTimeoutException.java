@@ -18,10 +18,9 @@ public class OTPRequestTimeoutException extends RuntimeException {
 
   /**
    * The Grizzly web server is configured with a transaction timeout and will set the interrupt
-   * flag on the current thread. OTP does not have many blocking operations which check the
-   * interrupted flag, so instead we need to do the check manually. The check has a small
-   * performance overhead so try to place the check in the beginning of significantly big block of
-   * calculations.
+   * flag on the current thread. OTP has few blocking operations which check the interrupted flag,
+   * so instead we need to do the check manually. The check has a small performance overhead, so
+   * try to place the check at the beginning of a significant calculations.
    */
   public static void checkForTimeout() {
     // We call yield() to allow monitoring thread to interrupt current thread. If this work or not

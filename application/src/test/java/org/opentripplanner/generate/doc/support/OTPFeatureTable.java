@@ -1,12 +1,12 @@
 package org.opentripplanner.generate.doc.support;
 
-import static org.opentripplanner.framework.text.MarkdownFormatter.checkMark;
-import static org.opentripplanner.framework.text.Table.Align.Center;
-import static org.opentripplanner.framework.text.Table.Align.Left;
+import static org.opentripplanner.utils.text.MarkdownFormatter.checkMark;
+import static org.opentripplanner.utils.text.Table.Align.Center;
+import static org.opentripplanner.utils.text.Table.Align.Left;
 
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.Table;
+import org.opentripplanner.utils.text.MarkdownFormatter;
+import org.opentripplanner.utils.text.Table;
 
 @SuppressWarnings("NewClassNamingConvention")
 public class OTPFeatureTable {

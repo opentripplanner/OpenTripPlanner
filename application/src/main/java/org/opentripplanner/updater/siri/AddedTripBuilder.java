@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -37,6 +36,7 @@ import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.siri.mapper.PickDropMapper;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -199,7 +199,7 @@ class AddedTripBuilder {
         stopSequence == (calls.size() - 1)
       );
 
-      // Drop this update if the call refers to an unknown stop (not present in the stop model).
+      // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
         return UpdateError.result(tripId, NO_VALID_STOPS);
       }
@@ -335,7 +335,7 @@ class AddedTripBuilder {
   }
 
   /**
-   * Map the call to a StopTime or return null if the stop cannot be found in the stop model.
+   * Map the call to a StopTime or return null if the stop cannot be found in the site repository.
    */
   private StopTime createStopTime(
     Trip trip,

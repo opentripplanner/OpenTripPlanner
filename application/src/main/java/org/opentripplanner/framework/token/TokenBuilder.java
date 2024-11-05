@@ -2,7 +2,7 @@ package org.opentripplanner.framework.token;
 
 import java.time.Duration;
 import java.time.Instant;
-import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.utils.lang.ObjectUtils;
 
 /**
  * This class is used to create a {@link Token} before encoding it.
