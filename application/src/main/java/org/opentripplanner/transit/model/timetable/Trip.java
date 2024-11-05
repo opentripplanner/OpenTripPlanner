@@ -3,12 +3,11 @@ package org.opentripplanner.transit.model.timetable;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
-import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -16,8 +15,10 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
@@ -38,6 +39,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   private final TransitMode mode;
   private final Direction direction;
   private final BikeAccess bikesAllowed;
+  private final CarAccess carsAllowed;
   private final Accessibility wheelchairBoarding;
 
   private final SubMode netexSubmode;
@@ -76,6 +78,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
         : route.getNetexSubmode();
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
+    this.carsAllowed = requireNonNullElse(builder.getCarsAllowed(), CarAccess.UNKNOWN);
     this.wheelchairBoarding =
       requireNonNullElse(builder.getWheelchairBoarding(), Accessibility.NO_INFORMATION);
     this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
@@ -156,6 +159,10 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     return bikesAllowed;
   }
 
+  public CarAccess getCarsAllowed() {
+    return carsAllowed;
+  }
+
   public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
@@ -217,6 +224,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.shapeId, other.shapeId) &&
       Objects.equals(this.direction, other.direction) &&
       Objects.equals(this.bikesAllowed, other.bikesAllowed) &&
+      Objects.equals(this.carsAllowed, other.carsAllowed) &&
       Objects.equals(this.wheelchairBoarding, other.wheelchairBoarding) &&
       Objects.equals(this.netexAlteration, other.netexAlteration)
     );

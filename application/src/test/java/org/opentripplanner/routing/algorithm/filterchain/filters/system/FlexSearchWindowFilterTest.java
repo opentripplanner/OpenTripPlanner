@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.Duration;
 import java.time.Instant;

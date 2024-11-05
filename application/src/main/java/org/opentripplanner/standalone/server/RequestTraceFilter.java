@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.LogMDCSupport;
-import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * This filter manages OTP request trace parameters. A trace parameter can be read from the

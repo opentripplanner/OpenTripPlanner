@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
+import static org.opentripplanner.utils.time.TimeUtils.timeToStrLong;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;

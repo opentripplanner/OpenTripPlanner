@@ -10,8 +10,8 @@ import java.util.List;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -3,12 +3,12 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
+import org.opentripplanner.utils.collection.ListSection;
 
 /**
  * This class is used to enforce the cut/limit between two pages. It removes potential duplicates

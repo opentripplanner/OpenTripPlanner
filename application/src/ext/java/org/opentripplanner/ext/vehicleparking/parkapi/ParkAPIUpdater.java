@@ -12,7 +12,6 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.osm.OsmOpeningHoursParser;
@@ -21,6 +20,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.spi.GenericJsonDataSource;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
