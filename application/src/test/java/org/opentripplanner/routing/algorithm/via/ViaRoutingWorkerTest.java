@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Create search from point A to point B via point C. Search will start at 12:00 and will find two

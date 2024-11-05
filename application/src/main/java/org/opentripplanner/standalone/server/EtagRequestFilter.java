@@ -10,7 +10,7 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.apache.hc.core5.http.HttpStatus;
-import org.opentripplanner.framework.text.HexString;
+import org.opentripplanner.utils.text.HexString;
 
 public class EtagRequestFilter implements ContainerResponseFilter {
 

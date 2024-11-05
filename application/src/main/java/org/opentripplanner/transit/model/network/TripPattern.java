@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitialized;
+import static org.opentripplanner.utils.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
 import java.util.Collection;

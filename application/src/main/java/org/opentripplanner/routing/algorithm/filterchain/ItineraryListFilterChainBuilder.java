@@ -13,8 +13,6 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -58,6 +56,8 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * Create a filter chain based on the given config.

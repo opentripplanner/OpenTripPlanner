@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
+import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;

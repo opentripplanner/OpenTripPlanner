@@ -31,7 +31,6 @@ public class AgencyMapperTest {
 
   private static final String FARE_URL = "www.url.com/fare";
 
-  private static final String BRANDING_URL = "www.url.com/brand";
   private final AgencyMapper subject = new AgencyMapper(TimetableRepositoryForTest.FEED_ID);
 
   static {
@@ -42,7 +41,6 @@ public class AgencyMapperTest {
     AGENCY.setTimezone(TIMEZONE);
     AGENCY.setUrl(URL);
     AGENCY.setFareUrl(FARE_URL);
-    AGENCY.setBrandingUrl(BRANDING_URL);
   }
 
   @Test
@@ -66,7 +64,6 @@ public class AgencyMapperTest {
     assertEquals(TIMEZONE, result.getTimezone().getId());
     assertEquals(URL, result.getUrl());
     assertEquals(FARE_URL, result.getFareUrl());
-    assertEquals(BRANDING_URL, result.getBrandingUrl());
   }
 
   @Test
@@ -88,7 +85,6 @@ public class AgencyMapperTest {
     assertNull(result.getLang());
     assertNull(result.getPhone());
     assertNull(result.getFareUrl());
-    assertNull(result.getBrandingUrl());
   }
 
   /** Mapping the same object twice, should return the the same instance. */
