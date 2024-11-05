@@ -222,6 +222,12 @@ public class OsmWithTags {
 
   /**
    * Some tags are allowed to have values like 55, "true" or "false".
+   * <p>
+   * "true", "yes" is returned as 1.
+   * <p>
+   * "false", "no" is returned as 0
+   * <p>
+   * Everything else is returned as an emtpy optional.
    */
   public OptionalInt parseIntOrBoolean(String tag, Consumer<String> errorHandler) {
     var maybeInt = getTagAsInt(tag, errorHandler);
