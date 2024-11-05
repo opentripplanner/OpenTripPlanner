@@ -92,7 +92,6 @@ class NetexEpipBundleSmokeTest {
     assertNull(a.getLang());
     assertNull(a.getPhone());
     assertNull(a.getFareUrl());
-    assertNull(a.getBrandingUrl());
   }
 
   private void assertOperators(Collection<Operator> operators) {

@@ -3,10 +3,10 @@ package org.opentripplanner.model.plan.paging.cursor;
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class holds all the information needed to page to the next/previous page. It is serialized

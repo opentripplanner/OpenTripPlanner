@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Represents an elevation profile as a list of {@code x,y} coordinates. The {@code x} is the

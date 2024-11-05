@@ -100,7 +100,6 @@ public class LegMapper {
       api.agencyId = FeedScopedIdMapper.mapToApi(agency.getId());
       api.agencyName = agency.getName();
       api.agencyUrl = agency.getUrl();
-      api.agencyBrandingUrl = agency.getBrandingUrl();
       api.mode = ModeMapper.mapToApi(trLeg.getMode());
 
       var route = domain.getRoute();

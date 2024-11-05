@@ -2,8 +2,8 @@ package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Specifies a class of OSM tagged entities (e.g. ways) by a list of tags and their values (which

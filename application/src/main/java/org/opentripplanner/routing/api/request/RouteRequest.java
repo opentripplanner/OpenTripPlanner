@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -14,10 +14,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.lang.ObjectUtils;
-import org.opentripplanner.framework.time.DateUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
@@ -29,6 +25,10 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.lang.ObjectUtils;
+import org.opentripplanner.utils.time.DateUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

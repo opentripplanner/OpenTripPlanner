@@ -14,7 +14,6 @@ import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
@@ -38,6 +37,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

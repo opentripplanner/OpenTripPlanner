@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -9,9 +9,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Parameters for doing transfers between transit legs.

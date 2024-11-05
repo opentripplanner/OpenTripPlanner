@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -35,6 +34,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class RouteRequestConfig {
 

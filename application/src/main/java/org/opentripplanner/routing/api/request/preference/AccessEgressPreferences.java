@@ -7,12 +7,12 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Preferences for access/egress routing on street network
