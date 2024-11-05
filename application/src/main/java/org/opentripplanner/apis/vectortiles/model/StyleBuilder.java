@@ -2,6 +2,7 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class StyleBuilder {
   private final Map<String, Object> layout = new LinkedHashMap<>();
   private final Map<String, Object> metadata = new LinkedHashMap<>();
   private final Map<String, Object> line = new LinkedHashMap<>();
-  private List<String> filter = List.of();
+  private List<Object> filter = List.of();
 
   public static StyleBuilder ofId(String id) {
     return new StyleBuilder(id);
@@ -227,6 +228,11 @@ public class StyleBuilder {
     return this;
   }
 
+  public final StyleBuilder booleanFilter(String propertyName, boolean value) {
+    filter = List.of("==", propertyName, value);
+    return this;
+  }
+
   /**
    * Only apply the style to the given vertices.
    */
@@ -257,7 +263,7 @@ public class StyleBuilder {
 
   private StyleBuilder filterClasses(Class... classToFilter) {
     var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
-    filter = ListUtils.combine(List.of("in", "class"), clazzes);
+    filter = new ArrayList<>(ListUtils.combine(List.of("in", "class"), clazzes));
     return this;
   }
 

@@ -49,6 +49,7 @@ public class OsmWithTags {
 
   private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
   private static final Set<String> DEFAULT_LEVEL = Set.of("0");
+  private static final Consumer<String> NO_OP = x -> {};
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -218,6 +219,27 @@ public class OsmWithTags {
       }
     }
     return OptionalInt.empty();
+  }
+
+  /**
+   * Some tags are allowed to have values like 55, "true" or "false".
+   */
+  public OptionalInt parseIntOrBoolean(String tag, Consumer<String> errorHandler) {
+    var maybeInt = getTagAsInt(tag, NO_OP);
+    if (maybeInt.isPresent()) {
+      return maybeInt;
+    } else {
+      if (isTagTrue(tag)) {
+        return OptionalInt.of(1);
+      } else if (isTagFalse(tag)) {
+        return OptionalInt.of(0);
+      } else if (hasTag(tag)) {
+        errorHandler.accept(getTag(tag));
+        return OptionalInt.empty();
+      } else {
+        return OptionalInt.empty();
+      }
+    }
   }
 
   /**
