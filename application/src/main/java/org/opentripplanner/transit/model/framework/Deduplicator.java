@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Does the same thing as String.intern, but for several different types. Java's String.intern uses

@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler;
 import org.opentripplanner.apis.transmodel.ResponseTooLargeException;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.logging.ProgressTracker;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

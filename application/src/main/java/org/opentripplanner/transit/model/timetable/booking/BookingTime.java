@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.timetable.booking;
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.Objects;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Represents either the earliest or latest time a trip can be booked relative to the departure day

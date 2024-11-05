@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.transmodel.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.lang.StringUtils.quoteReplace;
+import static org.opentripplanner.utils.lang.StringUtils.quoteReplace;
 
 import graphql.ExecutionResult;
 import graphql.GraphQLError;

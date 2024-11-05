@@ -3,8 +3,6 @@ package org.opentripplanner.raptor.api.path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.framework.time.TimeUtils.time;
-import static org.opentripplanner.framework.time.TimeUtils.timeToStrCompact;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
@@ -13,6 +11,8 @@ import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.RAP
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.TOTAL_C1;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.utils.time.TimeUtils.time;
+import static org.opentripplanner.utils.time.TimeUtils.timeToStrCompact;
 
 import java.util.List;
 import java.util.stream.Collectors;

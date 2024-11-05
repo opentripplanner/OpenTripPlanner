@@ -3,7 +3,7 @@ package org.opentripplanner.service.worldenvelope.model;
 import java.io.Serializable;
 import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class calculates borders of envelopes that can be also on 180th meridian.

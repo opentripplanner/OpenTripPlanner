@@ -14,7 +14,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.ItemVisitor;
 import org.locationtech.jts.index.SpatialIndex;
-import org.opentripplanner.framework.lang.IntBox;
+import org.opentripplanner.utils.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

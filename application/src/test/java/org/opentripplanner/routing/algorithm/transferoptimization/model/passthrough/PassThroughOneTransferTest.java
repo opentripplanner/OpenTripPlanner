@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestCase.testCase;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.domainService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathBuilder;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathFocus;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.tx;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import java.util.stream.Collectors;

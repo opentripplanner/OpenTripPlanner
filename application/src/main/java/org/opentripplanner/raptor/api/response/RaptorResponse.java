@@ -1,11 +1,11 @@
 package org.opentripplanner.raptor.api.response;
 
 import java.util.Collection;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This is the result of a raptor search including the result paths, the original request

@@ -41,7 +41,6 @@ import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.ext.restapi.mapping.ItineraryMapper;
 import org.opentripplanner.ext.restapi.model.ApiLeg;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -54,6 +53,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * A base class for creating snapshots test of itinerary generation using the Portland graph.

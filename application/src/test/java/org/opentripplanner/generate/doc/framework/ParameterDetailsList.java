@@ -5,11 +5,11 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.EN
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
 import java.util.EnumSet;
-import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
+import org.opentripplanner.utils.text.MarkdownFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

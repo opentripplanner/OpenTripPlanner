@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;

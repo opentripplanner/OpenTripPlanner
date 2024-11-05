@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.tx;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import javax.annotation.Nullable;

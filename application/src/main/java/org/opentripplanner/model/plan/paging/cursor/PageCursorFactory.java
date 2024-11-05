@@ -6,9 +6,9 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PageCursorFactory {
 

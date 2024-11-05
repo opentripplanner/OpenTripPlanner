@@ -5,8 +5,8 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;

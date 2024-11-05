@@ -3,13 +3,13 @@ package org.opentripplanner.raptor.api.path;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }

@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.path;
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
@@ -22,6 +21,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It helps to cache and calculate

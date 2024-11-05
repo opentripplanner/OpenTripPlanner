@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Parameters to configure the multi-criteria search.

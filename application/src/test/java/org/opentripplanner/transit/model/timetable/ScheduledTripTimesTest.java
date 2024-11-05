@@ -10,11 +10,11 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.time.TimeUtils;
 
 class ScheduledTripTimesTest {
 

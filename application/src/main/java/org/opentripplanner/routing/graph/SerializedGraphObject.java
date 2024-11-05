@@ -21,8 +21,6 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
@@ -36,6 +34,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

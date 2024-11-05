@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor._data;
 
-import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.framework.time.TimeUtils.hm2time;
+import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;

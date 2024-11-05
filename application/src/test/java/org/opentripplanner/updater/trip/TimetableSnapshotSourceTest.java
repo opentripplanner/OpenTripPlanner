@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -37,6 +36,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TimetableSnapshotSourceTest {
 

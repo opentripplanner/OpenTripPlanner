@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.organization.ContactInfo;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class IncludeFileDirectiveTest {
 

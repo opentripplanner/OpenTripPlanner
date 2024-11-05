@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
@@ -11,13 +10,14 @@ import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.fin
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearchApproximateTime;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearchApproximateTime;
+import static org.opentripplanner.utils.time.TimeUtils.timeToStrLong;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class TripTimesSearchTest implements RaptorTestConstants {
 

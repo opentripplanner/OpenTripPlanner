@@ -3,7 +3,7 @@ package org.opentripplanner.ext.restapi.model;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Set;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through

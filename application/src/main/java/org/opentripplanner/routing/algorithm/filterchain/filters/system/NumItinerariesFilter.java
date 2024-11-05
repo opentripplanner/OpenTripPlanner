@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
+import org.opentripplanner.utils.collection.ListSection;
 
 /**
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list

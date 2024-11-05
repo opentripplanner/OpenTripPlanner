@@ -3,7 +3,6 @@ package org.opentripplanner.raptor.service;
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -12,6 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

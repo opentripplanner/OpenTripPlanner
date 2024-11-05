@@ -15,11 +15,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.

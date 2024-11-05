@@ -3,10 +3,7 @@ package org.opentripplanner.apis.vectortiles.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Stream;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
 
 /**

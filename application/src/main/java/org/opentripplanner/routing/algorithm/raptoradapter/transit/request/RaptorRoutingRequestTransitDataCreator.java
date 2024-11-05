@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.framework.time.ServiceDateUtils.secondsSinceStartOfTime;
+import static org.opentripplanner.utils.time.ServiceDateUtils.secondsSinceStartOfTime;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
@@ -14,13 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -10,7 +10,6 @@ import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -22,6 +21,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 

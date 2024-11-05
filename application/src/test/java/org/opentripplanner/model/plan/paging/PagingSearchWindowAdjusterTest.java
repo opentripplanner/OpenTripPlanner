@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan.paging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.DurationUtils.duration;
+import static org.opentripplanner.utils.time.DurationUtils.duration;
 
 import java.time.Duration;
 import java.time.Instant;

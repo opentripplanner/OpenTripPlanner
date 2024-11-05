@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.PagingSearchWindowAdjuster;
@@ -14,6 +13,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageCursorFactory;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PagingService {
 

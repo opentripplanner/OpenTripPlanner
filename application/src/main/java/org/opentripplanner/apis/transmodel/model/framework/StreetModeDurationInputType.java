@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.Objects;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class StreetModeDurationInputType {
 

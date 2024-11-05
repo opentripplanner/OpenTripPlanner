@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -17,6 +16,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

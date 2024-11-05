@@ -1,9 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import static org.opentripplanner.framework.time.TimeUtils.time;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public interface PlanTestConstants {
   int NOT_SET = -999_999;

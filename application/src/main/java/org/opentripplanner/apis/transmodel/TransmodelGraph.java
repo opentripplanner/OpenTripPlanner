@@ -23,9 +23,9 @@ import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
-import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
+import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

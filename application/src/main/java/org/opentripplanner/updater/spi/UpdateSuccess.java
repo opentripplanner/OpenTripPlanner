@@ -3,7 +3,7 @@ package org.opentripplanner.updater.spi;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.framework.collection.ListUtils;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * The result of a successful application of a realtime update, for example for trips or

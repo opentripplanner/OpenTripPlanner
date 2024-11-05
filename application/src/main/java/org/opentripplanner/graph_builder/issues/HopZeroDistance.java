@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public record HopZeroDistance(
   int sec,

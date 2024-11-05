@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Locale;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * Relax a value by the given ratio and slack. The relaxed value

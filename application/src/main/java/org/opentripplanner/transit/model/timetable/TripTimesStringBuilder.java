@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
 import java.util.ArrayList;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class TripTimesStringBuilder {
 

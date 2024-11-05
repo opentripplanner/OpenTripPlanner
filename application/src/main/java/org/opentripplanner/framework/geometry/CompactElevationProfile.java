@@ -4,7 +4,7 @@ import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * Compact elevation profile. To optimize storage, we use the following tricks:

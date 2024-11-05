@@ -3,7 +3,7 @@ package org.opentripplanner.ext.dataoverlay.configuration;
 import java.io.Serializable;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.routing.Parameter;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class describes the expected routing request parameter for the generic data

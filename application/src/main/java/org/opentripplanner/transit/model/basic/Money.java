@@ -8,7 +8,7 @@ import java.util.Currency;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * Represents an amount of money.

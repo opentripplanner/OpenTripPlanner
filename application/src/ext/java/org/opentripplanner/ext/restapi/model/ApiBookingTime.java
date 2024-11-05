@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.restapi.model;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Represents either an earliest or latest time a trip can be booked relative to the departure day

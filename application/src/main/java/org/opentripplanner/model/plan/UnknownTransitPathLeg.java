@@ -6,10 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A transit search may return an unknown transit path. A path consisting of a mix of

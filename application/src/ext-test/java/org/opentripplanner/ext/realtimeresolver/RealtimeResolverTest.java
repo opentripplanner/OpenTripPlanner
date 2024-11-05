@@ -3,8 +3,8 @@ package org.opentripplanner.ext.realtimeresolver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -2,12 +2,12 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.time.Instant;
 import java.util.List;
-import org.opentripplanner.framework.collection.ListSection;
-import org.opentripplanner.framework.collection.ListUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to

@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.fares;
 
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Takes fares and applies them to the legs of an itinerary.

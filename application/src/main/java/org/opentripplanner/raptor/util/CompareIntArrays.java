@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.util;
 
 import java.util.Comparator;
 import java.util.function.IntFunction;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * The responsibility of this class is to compare two int arrays and list all elements that differ.

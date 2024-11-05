@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The main purpose of this class is to hold data for a given arrival at a stop and raptor round. It

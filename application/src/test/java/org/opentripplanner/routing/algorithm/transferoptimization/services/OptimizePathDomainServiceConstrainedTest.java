@@ -2,12 +2,12 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
 import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

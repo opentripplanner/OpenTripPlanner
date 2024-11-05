@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Select a given set of transit routes base on the list of

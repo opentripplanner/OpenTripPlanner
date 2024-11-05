@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.organization;
 
-import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
+import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 
 import java.util.Objects;
 import javax.annotation.Nullable;

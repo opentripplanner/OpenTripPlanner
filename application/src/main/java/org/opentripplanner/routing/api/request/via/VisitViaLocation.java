@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A visit-via-location is a physical visit to one of the stops or coordinates listed. An on-board

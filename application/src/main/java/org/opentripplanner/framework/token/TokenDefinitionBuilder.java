@@ -2,8 +2,8 @@ package org.opentripplanner.framework.token;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.collection.ListUtils;
-import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 public class TokenDefinitionBuilder {
 

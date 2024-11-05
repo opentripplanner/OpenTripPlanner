@@ -1,14 +1,14 @@
 package org.opentripplanner.generate.doc.framework;
 
-import static org.opentripplanner.framework.text.Table.Align.Center;
-import static org.opentripplanner.framework.text.Table.Align.Left;
+import static org.opentripplanner.utils.text.Table.Align.Center;
+import static org.opentripplanner.utils.text.Table.Align.Left;
 
 import java.util.List;
-import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.Table;
-import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
+import org.opentripplanner.utils.text.MarkdownFormatter;
+import org.opentripplanner.utils.text.Table;
+import org.opentripplanner.utils.text.TableBuilder;
 
 public class ParameterSummaryTable extends AbstractTable {
 

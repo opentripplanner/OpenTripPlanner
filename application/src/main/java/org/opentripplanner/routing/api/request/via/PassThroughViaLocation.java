@@ -2,8 +2,8 @@ package org.opentripplanner.routing.api.request.via;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * One of the listed stop locations or one of its children must be visited. An on-board

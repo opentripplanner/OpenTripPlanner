@@ -1,10 +1,10 @@
 package org.opentripplanner.model.modes;
 
 import java.io.Serializable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This filter will exclude everything.

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static java.time.Duration.ofHours;
-import static java.time.Duration.ofMinutes;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
@@ -9,14 +8,13 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.Units;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class holds preferences for street routing in general, not mode specific.

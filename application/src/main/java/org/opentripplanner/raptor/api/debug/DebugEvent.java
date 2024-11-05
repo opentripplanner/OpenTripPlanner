@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.api.debug;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Debug events hold information about an internal event in the Raptor Algorithm. The element may be

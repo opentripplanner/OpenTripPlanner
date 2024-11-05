@@ -2,9 +2,9 @@ package org.opentripplanner.updater.trip;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * A simple data structure that is used by the {@link RealtimeTestEnvironment} to create

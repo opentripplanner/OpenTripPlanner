@@ -2,7 +2,7 @@ package org.opentripplanner.framework.time;
 
 import java.time.ZoneId;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.logging.Throttle;
+import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

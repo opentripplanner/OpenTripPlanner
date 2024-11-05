@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.framework.collection.CollectionUtils.getByNullableKey;
+import static org.opentripplanner.utils.collection.CollectionUtils.getByNullableKey;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSetMultimap;

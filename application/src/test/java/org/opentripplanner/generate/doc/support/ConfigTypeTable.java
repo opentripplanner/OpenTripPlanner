@@ -1,8 +1,8 @@
 package org.opentripplanner.generate.doc.support;
 
-import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
+import org.opentripplanner.utils.text.MarkdownFormatter;
+import org.opentripplanner.utils.text.Table;
 
 @SuppressWarnings("NewClassNamingConvention")
 public class ConfigTypeTable {

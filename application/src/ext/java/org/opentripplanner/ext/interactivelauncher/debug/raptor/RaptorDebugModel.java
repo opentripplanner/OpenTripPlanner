@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class RaptorDebugModel implements LauncherRequestDecorator {
 

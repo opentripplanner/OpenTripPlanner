@@ -3,7 +3,7 @@ package org.opentripplanner.updater.spi;
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
 import java.util.stream.Collectors;
-import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

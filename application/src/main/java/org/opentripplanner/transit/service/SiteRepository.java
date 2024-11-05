@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.framework.collection.CollectionsView;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -20,6 +18,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.utils.collection.CollectionsView;
+import org.opentripplanner.utils.collection.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

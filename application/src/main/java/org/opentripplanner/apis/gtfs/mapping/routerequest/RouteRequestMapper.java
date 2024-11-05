@@ -12,12 +12,12 @@ import java.time.Instant;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class RouteRequestMapper {
 

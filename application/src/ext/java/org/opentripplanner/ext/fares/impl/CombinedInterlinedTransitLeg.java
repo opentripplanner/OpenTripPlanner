@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegTime;
@@ -19,6 +18,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * This is a fake leg that combines two interlined legs for the purpose of fare calculation.

@@ -2,9 +2,9 @@ package org.opentripplanner.model;
 
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * Represents a location that is to be used in a routing request. It can be either a from, to, or
