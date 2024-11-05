@@ -29,6 +29,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -108,7 +109,10 @@ public class SpeedTest {
       DefaultServerRequestContext.create(
         config.transitRoutingParams,
         config.request,
-        new RaptorConfig<>(config.transitRoutingParams),
+        new RaptorConfig<>(
+          config.transitRoutingParams,
+          RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
+        ),
         graph,
         new DefaultTransitService(timetableRepository),
         timer.getRegistry(),
@@ -117,6 +121,7 @@ public class SpeedTest {
         TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
         TestServerContext.createEmissionsService(),
+        null,
         config.flexConfig,
         List.of(),
         null,
@@ -274,7 +279,7 @@ public class SpeedTest {
 
     TimetableRepository timetableRepository = serializedGraphObject.timetableRepository;
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
     return new LoadModel(graph, timetableRepository, serializedGraphObject.buildConfig);
   }
 

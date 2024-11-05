@@ -83,7 +83,7 @@ public class AddTransitEntitiesToGraph {
   }
 
   private void applyToGraph(TimetableRepository timetableRepository) {
-    timetableRepository.mergeStopModels(otpTransitService.stopModel());
+    timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
 
     addStopsToGraphAndGenerateStopVertexes(timetableRepository);
     addEntrancesToGraph();
@@ -122,7 +122,7 @@ public class AddTransitEntitiesToGraph {
 
     // Add a vertex representing the stop.
     // It is now possible for these vertices to not be connected to any edges.
-    for (RegularStop stop : otpTransitService.stopModel().listRegularStops()) {
+    for (RegularStop stop : otpTransitService.siteRepository().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = vertexFactory.transitStop(
         TransitStopVertex.of().withStop(stop).withModes(modes)
@@ -145,7 +145,7 @@ public class AddTransitEntitiesToGraph {
   }
 
   private void addStationCentroidsToGraph() {
-    for (Station station : otpTransitService.stopModel().listStations()) {
+    for (Station station : otpTransitService.siteRepository().listStations()) {
       if (station.shouldRouteToCentroid()) {
         vertexFactory.stationCentroid(station);
       }

@@ -24,7 +24,6 @@ import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
@@ -67,6 +66,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
 
@@ -262,11 +262,11 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
-    var stopModelBuilder = TEST_MODEL.stopModelBuilder();
+    var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = stopModelBuilder
+      var stop = siteRepositoryBuilder
         .regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
@@ -311,7 +311,7 @@ public class RaptorPathToItineraryMapperTest {
       null,
       null,
       TEST_MODEL
-        .stopModelBuilder()
+        .siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)

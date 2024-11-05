@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
  * Information about a configuration parameter.

@@ -1,8 +1,9 @@
 package org.opentripplanner.raptor.spi;
 
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Board and alight time tuple value object.
@@ -68,19 +69,18 @@ public class BoardAndAlightTime {
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addText("[")
-      .addObj(trip.pattern().stopIndex(boardStopPos))
-      .addText(" ~ ")
-      .addServiceTime(boardTime())
-      .addText(" ")
-      .addServiceTime(alightTime())
-      .addText("(")
-      .addDurationSec(alightTime() - boardTime())
-      .addText(") ~ ")
-      .addObj(trip.pattern().stopIndex(alightStopPos))
-      .addText("]")
-      .toString();
+    return (
+      "[" +
+      trip.pattern().stopIndex(boardStopPos) +
+      " ~ " +
+      TimeUtils.timeToStrCompact(boardTime()) +
+      " " +
+      TimeUtils.timeToStrCompact(alightTime()) +
+      "(" +
+      DurationUtils.durationToStr(alightTime() - boardTime()) +
+      ") ~ " +
+      trip.pattern().stopIndex(alightStopPos) +
+      "]"
+    );
   }
 }

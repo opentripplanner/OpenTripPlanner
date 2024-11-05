@@ -17,7 +17,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.MultilingualString;
@@ -38,7 +38,7 @@ class StationMapper {
 
   private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
 
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   StationMapper(
     DataImportIssueStore issueStore,
@@ -46,19 +46,22 @@ class StationMapper {
     ZoneId defaultTimeZone,
     boolean noTransfersOnIsolatedStops,
     Set<FeedScopedId> routeToCentroidStopPlaceIds,
-    StopModelBuilder stopModelBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.routeToCentroidStopPlaceIds = routeToCentroidStopPlaceIds;
-    this.stopModelBuilder = stopModelBuilder;
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
   Station map(StopPlace stopPlace) {
     var id = idFactory.createId(stopPlace.getId());
-    return stopModelBuilder.computeStationIfAbsent(id, it -> mapStopPlaceToStation(it, stopPlace));
+    return siteRepositoryBuilder.computeStationIfAbsent(
+      id,
+      it -> mapStopPlaceToStation(it, stopPlace)
+    );
   }
 
   Station mapStopPlaceToStation(FeedScopedId id, StopPlace stopPlace) {

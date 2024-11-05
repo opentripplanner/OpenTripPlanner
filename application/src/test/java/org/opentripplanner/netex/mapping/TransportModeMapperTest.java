@@ -68,6 +68,13 @@ class TransportModeMapperTest {
   }
 
   @Test
+  void mapCableway() throws UnsupportedModeException {
+    var transitMode = transportModeMapper.map(AllVehicleModesOfTransportEnumeration.CABLEWAY, null);
+    assertEquals(TransitMode.GONDOLA, transitMode.mainMode());
+    assertNull(transitMode.subMode());
+  }
+
+  @Test
   void mapWithSubMode() throws UnsupportedModeException {
     var transitMode = transportModeMapper.map(
       AllVehicleModesOfTransportEnumeration.RAIL,

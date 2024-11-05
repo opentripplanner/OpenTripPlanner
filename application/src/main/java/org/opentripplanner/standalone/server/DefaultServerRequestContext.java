@@ -9,6 +9,7 @@ import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -33,7 +34,6 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final List<RideHailingService> rideHailingServices;
-  private RouteRequest routeRequest = null;
   private final Graph graph;
   private final TransitService transitService;
   private final TransitRoutingConfig transitRoutingConfig;
@@ -48,9 +48,15 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
   private final EmissionsService emissionsService;
+
+  @Nullable
+  private final SorlandsbanenNorwayService sorlandsbanenService;
+
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
+
+  private RouteRequest defaultRouteRequestWithTimeSet = null;
 
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
@@ -67,12 +73,13 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
-    EmissionsService emissionsService,
+    @Nullable EmissionsService emissionsService,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     List<RideHailingService> rideHailingServices,
-    StopConsolidationService stopConsolidationService,
+    @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
-    TraverseVisitor traverseVisitor,
+    @Nullable TraverseVisitor traverseVisitor,
     @Nullable LuceneIndex luceneIndex
   ) {
     this.graph = graph;
@@ -90,6 +97,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
+    this.sorlandsbanenService = sorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
@@ -110,6 +118,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     @Nullable EmissionsService emissionsService,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
@@ -130,6 +139,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       realtimeVehicleService,
       vehicleRentalService,
       emissionsService,
+      sorlandsbanenService,
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
@@ -142,10 +152,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RouteRequest defaultRouteRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (routeRequest == null) {
-      routeRequest = routeRequestDefaults.copyWithDateTimeNow();
+    if (defaultRouteRequestWithTimeSet == null) {
+      defaultRouteRequestWithTimeSet = routeRequestDefaults.copyWithDateTimeNow();
     }
-    return routeRequest;
+    return defaultRouteRequestWithTimeSet;
   }
 
   /**
@@ -250,5 +260,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public EmissionsService emissionsService() {
     return emissionsService;
+  }
+
+  @Nullable
+  public SorlandsbanenNorwayService sorlandsbanenService() {
+    return sorlandsbanenService;
   }
 }

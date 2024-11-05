@@ -77,7 +77,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesRaptorSPI() {
-    RAPTOR.subPackage("spi").dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH).verify();
+    RAPTOR_SPI.dependsOn(FRAMEWORK_UTILS, API_MODEL, API_PATH).verify();
   }
 
   @Test

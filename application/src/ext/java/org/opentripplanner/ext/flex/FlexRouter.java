@@ -20,7 +20,6 @@ import org.opentripplanner.ext.flex.template.FlexEgressFactory;
 import org.opentripplanner.ext.flex.template.FlexServiceDate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -31,6 +30,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class FlexRouter {
 

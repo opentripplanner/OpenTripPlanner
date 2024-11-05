@@ -95,7 +95,6 @@ nav:
     - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Sandbox Development: 'SandboxExtension.md'
     - Release Checklist: 'ReleaseChecklist.md'
@@ -122,3 +121,4 @@ nav:
     - Ride Hailing: 'sandbox/RideHailing.md'
     - Emissions: 'sandbox/Emissions.md'
     - Stop Consolidation: 'sandbox/StopConsolidation.md'
+    - Sørlandsbanen: 'sandbox/Sorlandsbanen.md'

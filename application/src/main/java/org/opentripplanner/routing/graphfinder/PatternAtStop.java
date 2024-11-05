@@ -6,13 +6,13 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A reference to a pattern at a specific stop.

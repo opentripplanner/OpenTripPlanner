@@ -13,8 +13,6 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -24,6 +22,8 @@ import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,7 +244,7 @@ public class GraphBuilder implements Runnable {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
     var nVertices = f.formatNumber(graph.countVertices());

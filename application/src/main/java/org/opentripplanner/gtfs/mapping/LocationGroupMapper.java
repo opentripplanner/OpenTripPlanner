@@ -9,28 +9,28 @@ import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
-import org.opentripplanner.transit.service.StopModelBuilder;
+import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.opentripplanner.utils.collection.MapUtils;
 
 public class LocationGroupMapper {
 
   private final StopMapper stopMapper;
   private final LocationMapper locationMapper;
-  private final StopModelBuilder stopModelBuilder;
+  private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   private final Map<LocationGroup, GroupStop> mappedLocationGroups = new HashMap<>();
 
   public LocationGroupMapper(
     StopMapper stopMapper,
     LocationMapper locationMapper,
-    StopModelBuilder stopModelBuilder
+    SiteRepositoryBuilder siteRepositoryBuilder
   ) {
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
-    this.stopModelBuilder = stopModelBuilder;
+    this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
   Collection<GroupStop> map(Collection<LocationGroup> allLocationGroups) {
@@ -43,7 +43,7 @@ public class LocationGroupMapper {
   }
 
   private GroupStop doMap(LocationGroup element) {
-    GroupStopBuilder groupStopBuilder = stopModelBuilder
+    GroupStopBuilder groupStopBuilder = siteRepositoryBuilder
       .groupStop(mapAgencyAndId(element.getId()))
       .withName(new NonLocalizedString(element.getName()));
 

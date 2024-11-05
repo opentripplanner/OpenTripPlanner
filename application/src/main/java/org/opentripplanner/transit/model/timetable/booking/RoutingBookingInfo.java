@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.timetable.booking;
 import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This is the contract between booking info and the router. The router will enforce

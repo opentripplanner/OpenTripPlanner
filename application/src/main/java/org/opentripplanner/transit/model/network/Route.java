@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -18,6 +17,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.utils.lang.IntUtils;
 
 public final class Route extends AbstractTransitEntity<Route, RouteBuilder> implements LogInfo {
 
@@ -156,6 +156,9 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return gtfsSortOrder;
   }
 
+  /**
+   * Returns the NeTEx submode for the route. Will return UNKNOWN by default.
+   */
   public SubMode getNetexSubmode() {
     return netexSubmode;
   }

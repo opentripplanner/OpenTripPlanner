@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.issue.api;
 
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Generic issue type, which can be used to create issues.

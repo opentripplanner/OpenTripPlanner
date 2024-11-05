@@ -69,7 +69,7 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case TRAM -> "Tram, streetcar or light rail. Used for any light rail or street level system within a metropolitan area.";
       case FERRY -> "Used for short- and long-distance boat service.";
       case AIRPLANE -> "Taking an airplane";
-      case CABLE_CAR -> "Used for street-level cable cars where the cable runs beneath the car.";
+      case CABLE_CAR -> "Used for street-level rail cars where the cable runs beneath the vehicle.";
       case GONDOLA -> "Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.";
       case FUNICULAR -> "Used for any rail system that moves on steep inclines with a cable traction system.";
       case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";

@@ -71,7 +71,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
     this.linker = streetIndex.getVertexLinker();
     int successes = 0;
 

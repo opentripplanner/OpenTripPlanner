@@ -46,8 +46,8 @@ class TestStopConsolidationModel {
     .build();
 
   static TimetableRepository buildTimetableRepository() {
-    var stopModelBuilder = testModel.stopModelBuilder();
-    List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(stopModelBuilder::withRegularStop);
-    return new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
+    var siteRepositoryBuilder = testModel.siteRepositoryBuilder();
+    List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(siteRepositoryBuilder::withRegularStop);
+    return new TimetableRepository(siteRepositoryBuilder.build(), new Deduplicator());
   }
 }

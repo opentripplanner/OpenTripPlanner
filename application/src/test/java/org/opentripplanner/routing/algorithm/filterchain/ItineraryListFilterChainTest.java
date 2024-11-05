@@ -305,12 +305,12 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   @Nested
   class FlexSearchWindow {
 
-    private static final Itinerary FLEX = newItinerary(A, T11_00)
+    private final Itinerary flex = newItinerary(A, T11_00)
       .flex(T11_00, T11_30, B)
       .withIsSearchWindowAware(false)
       .build();
-    private static final Instant EARLIEST_DEPARTURE = FLEX.startTime().plusMinutes(10).toInstant();
-    private static final Duration SEARCH_WINDOW = Duration.ofHours(7);
+    private final Instant earliestDeparture = flex.startTime().plusMinutes(10).toInstant();
+    private final Duration searchWindow = Duration.ofHours(7);
 
     /**
      * When the filtering of direct flex by the transit search window is deactivated, the direct
@@ -320,18 +320,18 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     void keepDirectFlexWhenFilteringByEarliestDepartureIsDisabled() {
       ItineraryListFilterChain chain = createBuilder(true, false, 10)
         .withFilterDirectFlexBySearchWindow(false)
-        .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
+        .withSearchWindow(earliestDeparture, searchWindow)
         .build();
-      assertEquals(toStr(List.of(FLEX)), toStr(chain.filter(List.of(FLEX))));
+      assertEquals(toStr(List.of(flex)), toStr(chain.filter(List.of(flex))));
     }
 
     @Test
     void removeDirectFlexWhenFilteringByEarliestDepartureIsEnabled() {
       ItineraryListFilterChain chain = createBuilder(true, false, 10)
         .withFilterDirectFlexBySearchWindow(true)
-        .withSearchWindow(EARLIEST_DEPARTURE, SEARCH_WINDOW)
+        .withSearchWindow(earliestDeparture, searchWindow)
         .build();
-      assertEquals(toStr(List.of()), toStr(chain.filter(List.of(FLEX))));
+      assertEquals(toStr(List.of()), toStr(chain.filter(List.of(flex))));
     }
   }
 
