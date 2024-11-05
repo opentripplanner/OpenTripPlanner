@@ -224,7 +224,6 @@ public class IndexAPI {
       var stops = transitService().findRegularStops(envelope);
       return stops
         .stream()
-        .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
         .map(StopMapper::mapToApiShort)
         .toList();
     }

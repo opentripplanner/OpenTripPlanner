@@ -24,6 +24,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.api.request.RegularStopRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -304,16 +305,16 @@ public interface TransitService {
   /**
    * Returns a list of TripOnServiceDates that match the filtering defined in the request.
    *
-   * @param request - A TripOnServiceDateRequest object with filtering defined.
-   * @return - A list of TripOnServiceDates
+   * @param request - A {@link TripOnServiceDateRequest} object with filtering defined.
+   * @return - A list of {@link TripOnServiceDate}s
    */
   List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request);
 
   /**
    * Returns a list of Trips that match the filtering defined in the request.
    *
-   * @param request - A TripRequest object with filtering defined.
-   * @return - A list of Trips
+   * @param request - A {@link TripRequest} object with filtering defined.
+   * @return - A list of {@link Trip}s
    */
   List<Trip> getTrips(TripRequest request);
 
@@ -324,4 +325,12 @@ public interface TransitService {
    * @return true if the trip exists, false otherwise
    */
   boolean containsTrip(FeedScopedId id);
+
+  /**
+   * Returns a list of RegularStops that match the filtering defined in the request.
+   *
+   * @param request - A {@link RegularStopRequest} object with filtering defined.
+   * @return - A list of {@link RegularStop}s
+   */
+  Collection<RegularStop> findRegularStops(RegularStopRequest request);
 }
