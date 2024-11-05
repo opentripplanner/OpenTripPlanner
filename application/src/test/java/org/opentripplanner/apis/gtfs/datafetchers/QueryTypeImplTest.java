@@ -1,11 +1,17 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.alertpatch.AlertCause;
@@ -13,7 +19,9 @@ import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitService;
 
 public class QueryTypeImplTest {
 
@@ -170,5 +178,28 @@ public class QueryTypeImplTest {
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
     assertEquals(STOP_ID, filteredAlerts.get(0).getId());
+  }
+
+  @Test
+  public void nodeAlert() {
+    var subject = new QueryTypeImpl();
+    var id = new FeedScopedId("Feed", "Entity");
+    var alert = TransitAlert.of(id).build();
+
+    var transitAlertService = mock(TransitAlertService.class);
+    when(transitAlertService.getAlertById(id)).thenReturn(alert);
+
+    var transitService = mock(TransitService.class);
+    when(transitService.getTransitAlertService()).thenReturn(transitAlertService);
+
+    var environment = mock(DataFetchingEnvironment.class);
+    when(environment.<GraphQLRequestContext>getContext())
+      .thenReturn(
+        new GraphQLRequestContext(null, transitService, null, null, null, null, null, null)
+      );
+    when(environment.getArguments())
+      .thenReturn(Map.of("id", new graphql.relay.Relay.ResolvedGlobalId("Alert", id.toString())));
+
+    assertEquals(alert, assertDoesNotThrow(() -> subject.node().get(environment)));
   }
 }
