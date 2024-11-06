@@ -88,7 +88,6 @@ class AddedTripBuilder {
     operator = entityResolver.resolveOperator(operatorRef);
 
     // DataSource of added trip
-    Objects.requireNonNull(estimatedVehicleJourney.getDataSource(), "DataSource is required");
     dataSource = estimatedVehicleJourney.getDataSource();
 
     // LineRef of added trip

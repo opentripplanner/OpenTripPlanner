@@ -31,7 +31,7 @@ record TripUpdate(
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   @Nullable TripPattern addedTripPattern,
   boolean routeCreation,
-  String dataSource
+  @Nullable String dataSource
 ) {
   public TripUpdate {
     Objects.requireNonNull(stopPattern);
