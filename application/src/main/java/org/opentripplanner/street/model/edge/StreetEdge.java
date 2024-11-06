@@ -1007,8 +1007,11 @@ public class StreetEdge
     });
 
     StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
-    var forkState = walking.makeState();
-    return State.ofStream(Stream.concat(Stream.of(forkState), states));
+    if (walking != null) {
+      var forkState = walking.makeState();
+      states = Stream.concat(Stream.of(forkState), states);
+    }
+    return State.ofStream(states);
   }
 
   /**
