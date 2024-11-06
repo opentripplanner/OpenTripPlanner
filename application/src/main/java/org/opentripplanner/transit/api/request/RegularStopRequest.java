@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * A request for {@link RegularStop}s.
- *
+ * <p>
  * This request is used to retrieve {@link RegularStop}s that match the provided criteria.
  */
 public class RegularStopRequest {

@@ -9,7 +9,7 @@ import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * A request for trips on a specific service date.
- *
+ * <p>
  * This request is used to retrieve {@link TripOnServiceDate}s that match the provided criteria.
  * At least one operatingDay must be provided.
  */
