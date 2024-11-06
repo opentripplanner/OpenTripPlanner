@@ -55,4 +55,4 @@ jobs:
           date_time=`date +"%Y-%m-%dT%H-%M-%S"`
           docker_tag_long="$otp_version-$date_time-$commit_hash"
 
-          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=$docker_tag_long
+          mvn --batch-mode -P prettierSkip install com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=$docker_tag_long
