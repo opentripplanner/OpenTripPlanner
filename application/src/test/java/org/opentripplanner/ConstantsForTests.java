@@ -4,6 +4,7 @@ import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -15,6 +16,8 @@ import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -27,6 +30,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -167,7 +171,15 @@ public class ConstantsForTests {
 
       addPortlandVehicleRentals(graph);
 
-      timetableRepository.index();
+      new DirectTransferGenerator(
+        graph,
+        timetableRepository,
+        new DefaultDataImportIssueStore(),
+        Duration.ofMinutes(30),
+        List.of(new RouteRequest())
+      )
+        .buildGraph();
+
       graph.index(timetableRepository.getSiteRepository());
 
       return new TestOtpModel(graph, timetableRepository);
