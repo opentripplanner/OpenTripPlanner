@@ -31,6 +31,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove reading agency and route brandingUrl from GTFS data [#6183](https://github.com/opentripplanner/OpenTripPlanner/pull/6183)
 - Fix NullPointerException when searching backwards with a frequency-based trip [#6211](https://github.com/opentripplanner/OpenTripPlanner/pull/6211)
 - Combine two multi-criteria searches in Raptor [#6182](https://github.com/opentripplanner/OpenTripPlanner/pull/6182)
+- Implement alert node query in GTFS GraphQL API [#6225](https://github.com/opentripplanner/OpenTripPlanner/pull/6225)
+- Fix hop geometries when one pattern is replaced by another with different number of stops [#6136](https://github.com/opentripplanner/OpenTripPlanner/pull/6136)
+- Distinct coach from bus when reading in GTFS data and in GTFS GraphQL API [#6171](https://github.com/opentripplanner/OpenTripPlanner/pull/6171)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
