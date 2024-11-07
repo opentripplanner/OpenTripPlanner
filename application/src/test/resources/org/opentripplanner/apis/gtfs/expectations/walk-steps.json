@@ -12,25 +12,24 @@
                     "area" : false,
                     "relativeDirection" : "DEPART",
                     "absoluteDirection" : "NORTHEAST",
-                    "entity" : null
+                    "entrance" : null
                   },
                   {
                     "streetName" : "elevator",
                     "area" : false,
                     "relativeDirection" : "ELEVATOR",
                     "absoluteDirection" : null,
-                    "entity" : null
+                    "entrance" : null
 
                   },
                   {
                     "streetName" : "entrance",
                     "area" : false,
-                    "relativeDirection" : "CONTINUE",
+                    "relativeDirection" : "ENTER_OR_EXIT_STATION",
                     "absoluteDirection" : null,
-                    "entity" : {
-                      "__typename" : "Entrance",
+                    "entrance": {
                       "code": "A",
-                      "accessible": true
+                      "wheelchairAccessible": "POSSIBLE"
                     }
                   }
                 ]

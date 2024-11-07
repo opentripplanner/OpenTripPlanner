@@ -13,7 +13,6 @@ import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.ElevationProfile;
-import org.opentripplanner.model.plan.Entrance;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.plan.WalkStepBuilder;
@@ -30,6 +29,8 @@ import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
@@ -528,10 +529,20 @@ public class StatesToWalkStepsMapper {
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
 
-    step.withRelativeDirection(RelativeDirection.CONTINUE);
+    step.withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION);
 
     StationEntranceVertex vertex = (StationEntranceVertex) backState.getVertex();
-    step.withEntrance(Entrance.withCodeAndAccessible(vertex.getCode(), vertex.isAccessible()));
+
+    Entrance entrance = Entrance
+      .of(null)
+      .withCode(vertex.getCode())
+      .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
+      .withWheelchairAccessibility(
+        vertex.isAccessible() ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE
+      )
+      .build();
+
+    step.withEntrance(entrance);
     return step;
   }
 

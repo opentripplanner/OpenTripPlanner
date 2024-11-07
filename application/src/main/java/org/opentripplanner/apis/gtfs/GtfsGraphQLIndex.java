@@ -37,6 +37,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.EntranceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
@@ -58,7 +59,6 @@ import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.StepEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnRouteImpl;
@@ -125,7 +125,6 @@ class GtfsGraphQLIndex {
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
-        .type("StepEntity", type -> type.typeResolver(new StepEntityTypeResolver()))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
@@ -181,6 +180,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
+        .type(typeWiring.build(EntranceImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

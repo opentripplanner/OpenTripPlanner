@@ -8,9 +8,9 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.model.plan.StepEntity;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -45,7 +45,7 @@ public final class WalkStep {
   private final boolean walkingBike;
 
   private final String exit;
-  private final StepEntity entity;
+  private final Entrance entrance;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -58,7 +58,7 @@ public final class WalkStep {
     I18NString directionText,
     Set<StreetNote> streetNotes,
     String exit,
-    StepEntity entity,
+    Entrance entrance,
     ElevationProfile elevationProfile,
     boolean bogusName,
     boolean walkingBike,
@@ -79,7 +79,7 @@ public final class WalkStep {
     this.walkingBike = walkingBike;
     this.area = area;
     this.exit = exit;
-    this.entity = entity;
+    this.entrance = entrance;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -135,10 +135,10 @@ public final class WalkStep {
   }
 
   /**
-   * Entity related to a step e.g. building entrance/exit.
+   * Get information about building entrance or exit.
    */
-  public Object getEntity() {
-    return entity;
+  public Entrance getEntrance() {
+    return entrance;
   }
 
   /**

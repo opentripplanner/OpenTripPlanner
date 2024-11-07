@@ -38,6 +38,7 @@ public final class DirectionMapper {
       case UTURN_RIGHT -> GraphQLRelativeDirection.UTURN_RIGHT;
       case ENTER_STATION -> GraphQLRelativeDirection.ENTER_STATION;
       case EXIT_STATION -> GraphQLRelativeDirection.EXIT_STATION;
+      case ENTER_OR_EXIT_STATION -> GraphQLRelativeDirection.ENTER_OR_EXIT_STATION;
       case FOLLOW_SIGNS -> GraphQLRelativeDirection.FOLLOW_SIGNS;
     };
   }

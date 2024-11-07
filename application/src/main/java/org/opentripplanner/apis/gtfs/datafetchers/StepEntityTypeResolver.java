@@ -4,7 +4,7 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.plan.Entrance;
+import org.opentripplanner.transit.model.site.Entrance;
 
 public class StepEntityTypeResolver implements TypeResolver {
 

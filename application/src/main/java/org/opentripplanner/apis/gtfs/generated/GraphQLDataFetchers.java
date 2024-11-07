@@ -359,13 +359,13 @@ public class GraphQLDataFetchers {
 
   /** Station entrance or exit. */
   public interface GraphQLEntrance {
-    public DataFetcher<Boolean> accessible();
-
     public DataFetcher<String> code();
 
     public DataFetcher<String> gtfsId();
 
     public DataFetcher<String> name();
+
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
@@ -984,9 +984,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLInputField> inputField();
   }
 
-  /** Entity to a step */
-  public interface GraphQLStepEntity extends TypeResolver {}
-
   /**
    * Stop can represent either a single public transport stop, where passengers can
    * board and/or disembark vehicles, or a station, which contains multiple stops.
@@ -1438,7 +1435,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
-    public DataFetcher<Object> entity();
+    public DataFetcher<Object> entrance();
 
     public DataFetcher<String> exit();
 

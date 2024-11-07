@@ -49,7 +49,6 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
-import org.opentripplanner.model.plan.Entrance;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -81,6 +80,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
@@ -90,6 +90,7 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -232,10 +233,15 @@ class GraphQLIntegrationTest {
       .withAbsoluteDirection(20)
       .build();
     var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
-
+    Entrance entrance = Entrance
+      .of(null)
+      .withCoordinate(new WgsCoordinate(60, 80))
+      .withCode("A")
+      .withWheelchairAccessibility(Accessibility.POSSIBLE)
+      .build();
     var step3 = walkStep("entrance")
-      .withRelativeDirection(RelativeDirection.CONTINUE)
-      .withEntrance(Entrance.withCodeAndAccessible("A", true))
+      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+      .withEntrance(entrance)
       .build();
 
     Itinerary i1 = newItinerary(A, T11_00)

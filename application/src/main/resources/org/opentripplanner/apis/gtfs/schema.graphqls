@@ -73,9 +73,6 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
-"Entity to a step"
-union StepEntity = Entrance
-
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -449,14 +446,14 @@ type Emissions {
 
 "Station entrance or exit."
 type Entrance {
-  "True if the entrance is wheelchair accessible."
-  accessible: Boolean
   "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
   code: String
   "ID of the entrance in the format of `FeedId:EntranceId`."
   gtfsId: String
   "Name of the entrance or exit."
   name: String
+  "Whether the entrance or exit is accessible by wheelchair"
+  wheelchairAccessible: WheelchairBoarding
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -2660,8 +2657,8 @@ type step {
   distance: Float
   "The elevation profile as a list of { distance, elevation } values."
   elevationProfile: [elevationProfileComponent]
-  "Step entity, e.g. an entrance."
-  entity: StepEntity
+  "Information about an station entrance or exit"
+  entrance: Entrance
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The latitude of the start of the step."
@@ -3329,6 +3326,7 @@ enum RelativeDirection {
   CONTINUE
   DEPART
   ELEVATOR
+  ENTER_OR_EXIT_STATION
   ENTER_STATION
   EXIT_STATION
   FOLLOW_SIGNS

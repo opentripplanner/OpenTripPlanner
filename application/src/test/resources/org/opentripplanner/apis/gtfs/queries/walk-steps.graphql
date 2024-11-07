@@ -20,12 +20,9 @@
             area
             relativeDirection
             absoluteDirection
-            entity {
-              __typename
-              ... on Entrance {
-                code
-                accessible
-              }
+            entrance {
+              code
+              wheelchairAccessible
             }
           }
         }
