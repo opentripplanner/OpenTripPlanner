@@ -14,6 +14,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
@@ -32,7 +33,8 @@ class GbfsVehicleRentalDataSourceTest {
         HttpHeaders.empty(),
         null,
         false,
-        false
+        false,
+        AllowedRentalType.ALL
       ),
       new OtpHttpClientFactory()
     );
@@ -123,7 +125,8 @@ class GbfsVehicleRentalDataSourceTest {
         HttpHeaders.empty(),
         null,
         true,
-        false
+        false,
+        AllowedRentalType.ALL
       ),
       new OtpHttpClientFactory()
     );
@@ -165,7 +168,8 @@ class GbfsVehicleRentalDataSourceTest {
         HttpHeaders.empty(),
         network,
         false,
-        true
+        true,
+        AllowedRentalType.ALL
       ),
       new OtpHttpClientFactory()
     );

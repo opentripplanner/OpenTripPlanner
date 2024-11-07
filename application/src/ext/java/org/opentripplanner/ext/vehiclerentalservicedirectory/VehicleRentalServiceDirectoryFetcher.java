@@ -110,7 +110,9 @@ public class VehicleRentalServiceDirectoryFetcher {
               networkName,
               networkParams.geofencingZones(),
               // overloadingAllowed - not part of GBFS, not supported here
-              false
+              false,
+              // allowedRentalType not supported
+              null
             )
           );
         } else {

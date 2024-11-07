@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
+import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
@@ -10,11 +11,17 @@ public record GbfsVehicleRentalDataSourceParameters(
   HttpHeaders httpHeaders,
   String network,
   boolean geofencingZones,
-  boolean overloadingAllowed
+  boolean overloadingAllowed,
+  AllowedRentalType allowedRentalType
 )
   implements VehicleRentalDataSourceParameters {
   @Override
   public VehicleRentalSourceType sourceType() {
     return VehicleRentalSourceType.GBFS;
+  }
+
+  @Override
+  public AllowedRentalType allowedRentalType() {
+    return allowedRentalType;
   }
 }

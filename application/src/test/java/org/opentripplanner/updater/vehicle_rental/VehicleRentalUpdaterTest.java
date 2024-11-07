@@ -15,6 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -102,6 +103,11 @@ class VehicleRentalUpdaterTest {
     @Override
     public HttpHeaders httpHeaders() {
       return HttpHeaders.empty();
+    }
+
+    @Override
+    public AllowedRentalType allowedRentalType() {
+      return AllowedRentalType.ALL;
     }
   }
 }

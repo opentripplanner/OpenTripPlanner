@@ -4,10 +4,12 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
+import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -43,13 +45,15 @@ public class VehicleRentalSourceFactory {
         headers(),
         network(),
         geofencingZones(),
-        overloadingAllowed()
+        overloadingAllowed(),
+        allowedRentalType()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),
         network(),
         overloadingAllowed(),
-        headers()
+        headers(),
+        allowedRentalType()
       );
     };
   }
@@ -120,5 +124,22 @@ public class VehicleRentalSourceFactory {
         """
       )
       .asBoolean(false);
+  }
+
+  private AllowedRentalType allowedRentalType() {
+    return c
+      .of("allowedRentalType")
+      .since(V2_7)
+      .summary("The type of rental data to include.")
+      .description(
+        """
+        The type of rental data to include. This can be one of the following:
+
+        - `ALL`: Include all data types.
+        - `STATIONS`: Include station data only.
+        - `VEHICLES`: Include floating vehicle data only.
+        """
+      )
+      .asEnum(AllowedRentalType.ALL);
   }
 }
