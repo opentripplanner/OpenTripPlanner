@@ -13,9 +13,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.api.PathUtils;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
  * <pre>

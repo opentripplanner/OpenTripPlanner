@@ -45,6 +45,7 @@ public class ModifiedTripBuilder {
   private final boolean cancellation;
   private final OccupancyEnumeration occupancy;
   private final boolean predictionInaccurate;
+  private final String dataSource;
 
   public ModifiedTripBuilder(
     TripTimes existingTripTimes,
@@ -64,6 +65,7 @@ public class ModifiedTripBuilder {
     cancellation = TRUE.equals(journey.isCancellation());
     predictionInaccurate = TRUE.equals(journey.isPredictionInaccurate());
     occupancy = journey.getOccupancy();
+    dataSource = journey.getDataSource();
   }
 
   /**
@@ -78,7 +80,8 @@ public class ModifiedTripBuilder {
     List<CallWrapper> calls,
     boolean cancellation,
     OccupancyEnumeration occupancy,
-    boolean predictionInaccurate
+    boolean predictionInaccurate,
+    String dataSource
   ) {
     this.existingTripTimes = existingTripTimes;
     this.pattern = pattern;
@@ -89,6 +92,7 @@ public class ModifiedTripBuilder {
     this.cancellation = cancellation;
     this.occupancy = occupancy;
     this.predictionInaccurate = predictionInaccurate;
+    this.dataSource = dataSource;
   }
 
   /**
@@ -103,7 +107,9 @@ public class ModifiedTripBuilder {
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
-      return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
+      return Result.success(
+        new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+      );
     }
 
     applyUpdates(newTimes);
@@ -116,7 +122,7 @@ public class ModifiedTripBuilder {
       newTimes.setRealTimeState(RealTimeState.MODIFIED);
     }
 
-    // TODO - Handle DataValidationException at the outemost level(pr trip)
+    // TODO - Handle DataValidationException at the outermost level (pr trip)
     try {
       newTimes.validateNonIncreasingTimes();
     } catch (DataValidationException e) {
@@ -125,7 +131,7 @@ public class ModifiedTripBuilder {
         newTimes.getTrip().getId(),
         e.getMessage()
       );
-      return DataValidationExceptionMapper.toResult(e);
+      return DataValidationExceptionMapper.toResult(e, dataSource);
     }
 
     int numStopsInUpdate = newTimes.getNumStops();
@@ -137,11 +143,11 @@ public class ModifiedTripBuilder {
         numStopsInUpdate,
         numStopsInPattern
       );
-      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate));
+    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
   }
 
   /**

@@ -2,9 +2,9 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.Arrays;
 import java.util.List;
-import org.opentripplanner.raptor._data.transit.TestTransitData;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 /**

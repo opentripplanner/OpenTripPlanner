@@ -24,7 +24,9 @@ class TripPatternTest {
 
   private static final Route ROUTE = TimetableRepositoryForTest.route("routeId").build();
   public static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
+  public static final RegularStop STOP_X = TEST_MODEL.stop("X").build();
   public static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
+  public static final RegularStop STOP_Y = TEST_MODEL.stop("Y").build();
   public static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
   private static final StopPattern STOP_PATTERN = TimetableRepositoryForTest.stopPattern(
     STOP_A,
@@ -33,8 +35,8 @@ class TripPatternTest {
   );
 
   private static final List<LineString> HOP_GEOMETRIES = List.of(
-    makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()),
-    makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate())
+    makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
+    makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
   );
 
   private static final TripPattern subject = TripPattern
@@ -68,6 +70,27 @@ class TripPatternTest {
     assertEquals(subject.getHopGeometry(0), copy.getHopGeometry(0));
     assertEquals(subject.getHopGeometry(1), copy.getHopGeometry(1));
     assertEquals(HOP_GEOMETRIES.get(1), copy.getHopGeometry(1));
+  }
+
+  @Test
+  void hopGeometryForReplacementPattern() {
+    var pattern = TripPattern
+      .of(id("replacement"))
+      .withName("replacement")
+      .withRoute(ROUTE)
+      .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_X, STOP_Y))
+      .withOriginalTripPattern(subject)
+      .build();
+
+    assertEquals(HOP_GEOMETRIES.get(0), pattern.getHopGeometry(0));
+    assertEquals(
+      makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate()),
+      pattern.getHopGeometry(1)
+    );
+    assertEquals(
+      makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate()),
+      pattern.getHopGeometry(2)
+    );
   }
 
   @Test

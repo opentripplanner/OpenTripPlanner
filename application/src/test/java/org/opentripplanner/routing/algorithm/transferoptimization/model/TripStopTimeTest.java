@@ -5,8 +5,8 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.model.S
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class TripStopTimeTest {
