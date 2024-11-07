@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>otp-root</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>otp</artifactId>
+    <name>OpenTripPlanner - Application</name>
+
+    <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gtfs-realtime-protobuf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>otp-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>otp-raptor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- 3rd party dependencies -->
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+        </dependency>
+        <!-- Logging API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <!-- Logging library, implements slf4j logging API -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <!-- JSON-formatted logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>8.0</version>
+        </dependency>
+
+        <!-- dependency injection -->
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${google.dagger.version}</version>
+        </dependency>
+
+        <!-- GEOTOOLS -->
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-coverage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geotiff</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson-core</artifactId>
+        </dependency>
+
+        <!-- Lucene is used by the Debug Client Geocode API -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- netcdf4 -->
+
+        <dependency>
+            <groupId>edu.ucar</groupId>
+            <artifactId>netcdf4</artifactId>
+            <version>${netcdf4.version}</version>
+        </dependency>
+        <!--
+            Netex XML document - JAXB generated Java model.
+            This is generated using the official Netex schema(v1.0) and support the entire model,
+            not just the Nordic/Norwegian profile which is currently supported by OTP.
+         -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-java-model</artifactId>
+            <version>${netex-java-model.version}</version>
+        </dependency>
+
+        <!-- SIRI -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-java-model</artifactId>
+            <version>${siri-java-model.version}</version>
+        </dependency>
+
+        <!-- XML <-> protobuf-mapper for SIRI-->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-protobuf-mapper</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mobilitydata</groupId>
+            <artifactId>gbfs-java-model</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+
+        <!-- TESTING -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>1.4.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>1.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.14.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.origin-energy</groupId>
+            <artifactId>java-snapshot-testing-junit5</artifactId>
+            <version>2.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Trove, and Kryo. -->
+        <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>kryo-tools</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <!-- kryo serializers for Guava types !-->
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.45</version>
+        </dependency>
+        <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- HK2 dependency injection framework for injecting context -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
+        </dependency>
+
+        <!-- Jackson modules. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!--
+            jersey pulls in older versions of this dependency which are binary-incompatible
+            with the latest jackson version, so we need to explicitly define them here
+         -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!--
+          Google library imports
+          The version is imported using google libraries-bom, see dep.management
+        -->
+
+        <!-- Google Cloud Storage - as OTP DataSource -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+
+        <!-- Google Cloud Pubsub for SIRI-updater-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
+
+        <!-- Google Protocol Buffers compact binary serialization format -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+
+        <!-- OBA GTFS loader -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs</artifactId>
+            <version>3.2.4</version>
+        </dependency>
+        <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>core</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
+        <dependency>
+            <groupId>net.java.dev.jets3t</groupId>
+            <artifactId>jets3t</artifactId>
+            <version>0.9.4</version>
+        </dependency>
+        <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
+        <dependency>
+            <groupId>org.openstreetmap.osmosis</groupId>
+            <artifactId>osmosis-osm-binary</artifactId>
+            <version>0.48.3</version>
+        </dependency>
+        <!-- Command line parameter parsing -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.82</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>22.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-scalars</artifactId>
+            <version>22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.ci-cmg</groupId>
+            <artifactId>mapbox-vector-tile</artifactId>
+            <version>4.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.objecthunter</groupId>
+            <artifactId>exp4j</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core</artifactId>
+            <version>1.46.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-messaging-servicebus</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.11.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.poole</groupId>
+            <artifactId>OpeningHoursParser</artifactId>
+            <version>0.28.2</version>
+        </dependency>
+
+        <!-- create zip test files-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.27.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--
+        Filtering will perform substitution on otp-project-info.properties,
+        see git commit id plugin below.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/ext/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/client</directory>
+                <targetPath>client</targetPath>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>src/ext-test/resources</directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>build-helper-generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java</source>
+                                <source>src/ext/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build-helper-generate-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                                <source>src/ext-test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+             There used to be a dependency-plugin:copy-dependencies plugin entry here, but the
+             shade-plugin will explode the dependencies even if they aren't manually copied in.
+            -->
+            <plugin>
+                <!-- We want to create a standalone jar that can be run on the command
+                  line. Java does not really allow this - you cannot place jars inside of jars.
+                  You must either provide all the dependency jars to the user (usually lib/
+                  under the directory containing the runnable jar) or explode all the jars
+                  and repackage them into a single jar. The problem is that while class files
+                  are nicely organized into the package namespace and should not collide, the
+                  META-INF directories of the jars will collide. Maven's standard assembly
+                  plugin does not account for this and will just clobber metadata. This then
+                  causes runtime errors, particularly with Spring. Instead, we use the shade
+                  plugin which has transformers that will for example append files of the same
+                  name rather than overwrite them in the combined JAR. NB: Don't use a version
+                  of the shade plugin older than 1.3.2, as it fixed MSHADE-76 (files not merged
+                  properly if some input files are missing a terminating newline) -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <!-- exclude signatures from merged JAR to avoid invalid signature messages -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <!-- The shaded JAR will not be the main artifact for the project, it will be attached
+                              for deployment in the way source and docs are. -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
+                              We have eliminated most Jersey auto-scanning, but there is still some need for include
+                              filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
+                            <!-- This roughly halves the size of the OTP JAR, bringing it down to around 20 MB.
+                              <minimizeJar>true</minimizeJar>
+                              <filters> <filter> <artifact>com.sun.jersey:*</artifact> <includes> <include>**</include>
+                              </includes> </filter> <filter> <artifact>org.opentripplanner:*</artifact>
+                              <includes> <include>**</include> </includes> </filter> </filters> -->
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>org.opentripplanner.standalone.OTPMain</Main-Class>
+                                        <!-- The ImageIO lines allow some image reader plugins to work
+                                             https://stackoverflow.com/questions/7051603/jai-vendorname-null#18495658 -->
+                                        <Specification-Title>Java Advanced Imaging Image I/O
+                                            Tools
+                                        </Specification-Title>
+                                        <Specification-Version>1.1</Specification-Version>
+                                        <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+                                        <Implementation-Title>com.sun.media.imageio</Implementation-Title>
+                                        <Implementation-Version>1.1</Implementation-Version>
+                                        <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
+                                        <Extension-Name>com.sun.media.imageio</Extension-Name>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.bohnman</groupId>
+                <artifactId>package-info-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <!-- Couldn't get this to work for main and ext code at the same time. -->
+                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                    <outputDirectory>${project.basedir}/target/generated-sources</outputDirectory>
+                    <packages>
+                        <package>
+                            <pattern>**</pattern>
+                            <template>${project.basedir}/src/build/templates/package-info-template.java</template>
+                        </package>
+                    </packages>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
