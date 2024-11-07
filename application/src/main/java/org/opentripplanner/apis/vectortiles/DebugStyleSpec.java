@@ -244,7 +244,11 @@ public class DebugStyleSpec {
           .vectorSourceLayer(edges)
           .group(PERMISSIONS_GROUP)
           .typeLine()
-          .filterValueInProperty(streetTraversalPermission.name(), "permission")
+          .filterValueInProperty(
+            "permission",
+            streetTraversalPermission.name(),
+            StreetTraversalPermission.ALL.name()
+          )
           .lineCap("butt")
           .lineColorMatch("permission", permissionColors(), BLACK)
           .lineWidth(LINE_WIDTH)
@@ -279,7 +283,11 @@ public class DebugStyleSpec {
           .vectorSourceLayer(edges)
           .group(NO_THRU_TRAFFIC_GROUP)
           .typeLine()
-          .filterValueInProperty(streetTraversalPermission.name(), "noThruTraffic")
+          .filterValueInProperty(
+            "noThruTraffic",
+            streetTraversalPermission.name(),
+            StreetTraversalPermission.ALL.name()
+          )
           .lineCap("butt")
           .lineColorMatch("noThruTraffic", permissionColors(), BLACK)
           .lineWidth(LINE_WIDTH)

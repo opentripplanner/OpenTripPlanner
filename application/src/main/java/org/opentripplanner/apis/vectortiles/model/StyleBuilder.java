@@ -2,6 +2,7 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -11,7 +12,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.framework.json.ObjectMappers;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.ListUtils;
@@ -251,14 +251,6 @@ public class StyleBuilder {
   }
 
   /**
-   * Filter the entities by their "permission" property.
-   */
-  public final StyleBuilder permissionsFilter(StreetTraversalPermission p) {
-    filter = List.of("==", "permission", p.name());
-    return this;
-  }
-
-  /**
    * Only apply the style to the given vertices.
    */
   @SafeVarargs
@@ -266,8 +258,13 @@ public class StyleBuilder {
     return filterClasses(classToFilter);
   }
 
-  public StyleBuilder filterValueInProperty(String value, String propertyName) {
-    filter = List.of("in", value, List.of("string", List.of("get", propertyName)));
+  public StyleBuilder filterValueInProperty(String propertyName, String... values) {
+    var newFilter = new ArrayList<>();
+    newFilter.add("any");
+    for (String value : values) {
+      newFilter.add(List.of("in", value, List.of("string", List.of("get", propertyName))));
+    }
+    filter = newFilter;
     return this;
   }
 

@@ -43,11 +43,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
   }
 
   public static String streetPermissionAsString(StreetTraversalPermission permission) {
-    return (
-      permission == StreetTraversalPermission.ALL
-        ? "PEDESTRIAN_AND_BICYCLE_AND_CAR"
-        : permission.toString()
-    ).replace("_AND_", " ");
+    return permission.name().replace("_AND_", " ");
   }
 
   private static String noThruTrafficAsString(StreetEdge se) {
