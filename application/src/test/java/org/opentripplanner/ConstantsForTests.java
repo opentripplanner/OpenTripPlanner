@@ -16,7 +16,6 @@ import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
@@ -174,7 +173,7 @@ public class ConstantsForTests {
       new DirectTransferGenerator(
         graph,
         timetableRepository,
-        new DefaultDataImportIssueStore(),
+        DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
         List.of(new RouteRequest())
       )
