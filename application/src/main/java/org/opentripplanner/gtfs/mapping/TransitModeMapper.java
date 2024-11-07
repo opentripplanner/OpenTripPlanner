@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitModeMapper {
