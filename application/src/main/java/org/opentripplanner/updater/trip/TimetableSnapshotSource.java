@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
@@ -72,6 +73,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -153,17 +155,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    @Nullable GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
     String feedId
   ) {
-    if (updates == null) {
-      LOG.warn("updates is null");
-      return UpdateResult.empty();
-    }
-
     Map<ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
@@ -172,7 +169,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       snapshotManager.clearBuffer(feedId);
     }
 
-    LOG.debug("message contains {} trip updates", updates.size());
+    debug(feedId, "message contains {} trip updates", updates.size());
     int uIndex = 0;
     for (TripUpdate tripUpdate : updates) {
       if (!tripUpdate.hasTrip()) {
@@ -223,8 +220,24 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       uIndex += 1;
-      LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
-      LOG.trace("{}", tripUpdate);
+      if (LOG.isTraceEnabled()) {
+        trace(
+          tripId,
+          serviceDate,
+          "trip update #{} ({} updates): {}",
+          uIndex,
+          tripUpdate.getStopTimeUpdateCount(),
+          tripUpdate
+        );
+      } else {
+        debug(
+          tripId,
+          serviceDate,
+          "trip update #{} ({} updates)",
+          uIndex,
+          tripUpdate.getStopTimeUpdateCount()
+        );
+      }
 
       Result<UpdateSuccess, UpdateError> result;
       try {
@@ -270,7 +283,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       results.add(result);
       if (result.isFailure()) {
         debug(tripId, serviceDate, "Failed to apply TripUpdate.");
-        LOG.trace(" Contents: {}", tripUpdate);
         if (failuresByRelationship.containsKey(scheduleRelationship)) {
           var c = failuresByRelationship.get(scheduleRelationship);
           failuresByRelationship.put(scheduleRelationship, ++c);
@@ -358,7 +370,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
 
     if (!failuresByRelationship.isEmpty()) {
-      LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);
+      info(feedId, "Failures by scheduleRelationship {}", failuresByRelationship);
     }
 
     var warnings = Multimaps.index(updateResult.warnings(), w -> w);
@@ -366,7 +378,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .keySet()
       .forEach(key -> {
         var count = warnings.get(key).size();
-        LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
+        info(feedId, "{} warnings of type {}", count, key);
       });
   }
 
@@ -909,7 +921,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           .ifPresent(newTripTimes::updateWheelchairAccessibility);
       }
     }
-    LOG.trace(
+    trace(
+      trip.getId(),
+      serviceDate,
       "Trip pattern added with mode {} on {} from {} to {}",
       trip.getRoute().getMode(),
       serviceDate,
@@ -1171,32 +1185,56 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static void debug(
     FeedScopedId id,
-    LocalDate serviceDate,
+    @Nullable LocalDate serviceDate,
     String message,
     Object... params
   ) {
-    debug(id.getFeedId(), id.getId(), serviceDate, message, params);
+    log(Level.DEBUG, id.getFeedId(), id.getId(), serviceDate, message, params);
   }
 
   private static void debug(String feedId, String message, Object... params) {
-    debug(feedId, null, null, message, params);
+    log(Level.DEBUG, feedId, null, null, message, params);
   }
 
-  private static void debug(
-    String feedId,
-    String tripId,
-    LocalDate serviceDate,
+  private static void trace(
+    FeedScopedId id,
+    @Nullable LocalDate serviceDate,
     String message,
     Object... params
   ) {
-    String m =
-      "[feedId: %s, tripId: %s, serviceDate: %s] %s".formatted(
-          feedId,
-          tripId,
-          serviceDate,
-          message
-        );
-    LOG.debug(m, params);
+    log(Level.TRACE, id.getFeedId(), id.getId(), serviceDate, message, params);
+  }
+
+  private static void info(String feedId, String message, Object... params) {
+    log(Level.INFO, feedId, null, null, message, params);
+  }
+
+  /**
+   * This adds detailed per-update logging to allow tracking what feeds and updates were applied to
+   * a given trip.
+   * <p>
+   * The INFO level is used for aggregated statistics, while DEBUG/TRACE is used to link specific
+   * messages to a trip.
+   */
+  private static void log(
+    Level logLevel,
+    String feedId,
+    @Nullable String tripId,
+    @Nullable LocalDate serviceDate,
+    String message,
+    Object... params
+  ) {
+    if (LOG.isEnabledForLevel(logLevel)) {
+      String m = tripId != null || serviceDate != null
+        ? "[feedId: %s, tripId: %s, serviceDate: %s] %s".formatted(
+            feedId,
+            tripId,
+            serviceDate,
+            message
+          )
+        : "[feedId: %s] %s".formatted(feedId, message);
+      LOG.makeLoggingEventBuilder(logLevel).log(m, params);
+    }
   }
 
   private enum CancelationType {
