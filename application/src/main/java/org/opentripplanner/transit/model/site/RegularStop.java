@@ -108,7 +108,7 @@ public final class RegularStop
 
   /**
    * Return {@code true} if the vehicle type is set in the import to be RAIL. Note! This does
-   * not check pattens visiting the stop.
+   * not check patterns visiting the stop.
    */
   public boolean isRailStop() {
     return vehicleType == TransitMode.RAIL;
