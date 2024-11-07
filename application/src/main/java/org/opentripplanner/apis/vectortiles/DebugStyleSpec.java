@@ -14,7 +14,6 @@ import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
-import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -50,7 +49,6 @@ public class DebugStyleSpec {
   private static final String DARK_GREEN = "#136b04";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
-  private static final String GRAY = "#DDDDDD";
 
   private static final int MAX_ZOOM = 23;
   private static final int LINE_DETAIL_ZOOM = 13;
@@ -197,7 +195,8 @@ public class DebugStyleSpec {
         .group(EDGES_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
-        .lineColor(GRAY)
+        .lineColor(MAGENTA)
+        .edgeFilter(EDGES_TO_DISPLAY)
         .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
@@ -209,6 +208,7 @@ public class DebugStyleSpec {
         .typeSymbol()
         .lineText("name")
         .vectorSourceLayer(edges)
+        .edgeFilter(EDGES_TO_DISPLAY)
         .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
@@ -217,8 +217,7 @@ public class DebugStyleSpec {
         .group(EDGES_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
-        .lineColor(GRAY)
-        .lineOpacity(0.2f)
+        .lineColor(BRIGHT_GREEN)
         .edgeFilter(
           StreetTransitStopLink.class,
           StreetTransitEntranceLink.class,
@@ -316,11 +315,11 @@ public class DebugStyleSpec {
   private static List<String> permissionColors() {
     return Arrays
       .stream(StreetTraversalPermission.values())
-      .flatMap(p -> Stream.of(streetPermissionAsString(p), permissionColors(p)))
+      .flatMap(p -> Stream.of(streetPermissionAsString(p), permissionColor(p)))
       .toList();
   }
 
-  private static String permissionColors(StreetTraversalPermission p) {
+  private static String permissionColor(StreetTraversalPermission p) {
     return switch (p) {
       case NONE -> BLACK;
       case PEDESTRIAN -> "#2ba812";

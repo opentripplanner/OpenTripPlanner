@@ -35,7 +35,7 @@
       "minzoom" : 6,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#DDDDDD",
+        "line-color" : "#f21d52",
         "line-width" : [
           "interpolate",
           [
@@ -63,6 +63,17 @@
           7.0
         ]
       },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
       "layout" : {
         "line-cap" : "round",
         "visibility" : "none"
@@ -84,6 +95,17 @@
         "text-halo-blur" : 4,
         "text-halo-width" : 3
       },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
       "layout" : {
         "symbol-placement" : "line-center",
         "symbol-spacing" : 1000,
@@ -122,8 +144,7 @@
       "minzoom" : 13,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#DDDDDD",
-        "line-opacity" : 0.2,
+        "line-color" : "#22DD9E",
         "line-width" : [
           "interpolate",
           [
@@ -197,7 +218,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -229,13 +250,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "PEDESTRIAN",
+        "any",
         [
-          "string",
+          "in",
+          "PEDESTRIAN",
           [
-            "get",
-            "permission"
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
           ]
         ]
       ],
@@ -275,7 +310,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -307,13 +342,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "BICYCLE",
+        "any",
         [
-          "string",
+          "in",
+          "BICYCLE",
           [
-            "get",
-            "permission"
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
           ]
         ]
       ],
@@ -353,7 +402,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -385,13 +434,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "CAR",
+        "any",
         [
-          "string",
+          "in",
+          "CAR",
           [
-            "get",
-            "permission"
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
           ]
         ]
       ],
@@ -489,7 +552,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -521,13 +584,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "PEDESTRIAN",
+        "any",
         [
-          "string",
+          "in",
+          "PEDESTRIAN",
           [
-            "get",
-            "noThruTraffic"
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
           ]
         ]
       ],
@@ -567,7 +644,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -599,13 +676,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "BICYCLE",
+        "any",
         [
-          "string",
+          "in",
+          "BICYCLE",
           [
-            "get",
-            "noThruTraffic"
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
           ]
         ]
       ],
@@ -645,7 +736,7 @@
           "#e25f8f",
           "BICYCLE CAR",
           "#e25f8f",
-          "PEDESTRIAN BICYCLE CAR",
+          "ALL",
           "#adb2b0",
           "#140d0e"
         ],
@@ -677,13 +768,27 @@
         ]
       },
       "filter" : [
-        "in",
-        "CAR",
+        "any",
         [
-          "string",
+          "in",
+          "CAR",
           [
-            "get",
-            "noThruTraffic"
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
           ]
         ]
       ],
