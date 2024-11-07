@@ -1,7 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
@@ -12,42 +11,37 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   @Override
   public DataFetcher<String> code() {
     return environment -> {
-      Entrance entrance = getEntrance(environment);
-      return entrance != null && entrance.getCode() != null ? entrance.getCode() : null;
+      Entrance entrance = environment.getSource();
+      return entrance.getCode();
     };
   }
 
   @Override
   public DataFetcher<String> gtfsId() {
     return environment -> {
-      Entrance entrance = getEntrance(environment);
-      return entrance != null && entrance.getId() != null ? entrance.getId().toString() : null;
+      Entrance entrance = environment.getSource();
+      return entrance.getId() != null ? entrance.getId().toString() : null;
     };
   }
 
   @Override
   public DataFetcher<String> name() {
     return environment -> {
-      Entrance entrance = getEntrance(environment);
-      return entrance != null && entrance.getName() != null ? entrance.getName().toString() : null;
+      Entrance entrance = environment.getSource();
+      return entrance.getName() != null
+        ? org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
+          entrance.getName(),
+          environment
+        )
+        : null;
     };
   }
 
   @Override
   public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible() {
     return environment -> {
-      Entrance entrance = getEntrance(environment);
-      return entrance != null
-        ? GraphQLUtils.toGraphQL(entrance.getWheelchairAccessibility())
-        : null;
+      Entrance entrance = environment.getSource();
+      return GraphQLUtils.toGraphQL(entrance.getWheelchairAccessibility());
     };
-  }
-
-  /**
-   * Helper method to retrieve the Entrance object from the DataFetchingEnvironment.
-   */
-  private Entrance getEntrance(DataFetchingEnvironment environment) {
-    Object source = environment.getSource();
-    return source instanceof Entrance ? (Entrance) source : null;
   }
 }
