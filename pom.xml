@@ -222,8 +222,6 @@
                         --add-opens java.base/sun.invoke.util=ALL-UNNAMED
                         --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
-                    <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
-                    <disableXmlReport>true</disableXmlReport>
                     <reportFormat>plain</reportFormat>
                     <consoleOutputReporter>
                         <disable>true</disable>
@@ -237,6 +235,7 @@
                         <printStderrOnError>true</printStderrOnError>
                         <printStderrOnFailure>true</printStderrOnFailure>
                         <printStderrOnSuccess>false</printStderrOnSuccess>
+                        <theme>UNICODE</theme>
                     </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>
