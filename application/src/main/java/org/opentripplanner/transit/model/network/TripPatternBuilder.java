@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.model.network;
 
-import static java.util.Objects.requireNonNullElseGet;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -219,15 +217,12 @@ public final class TripPatternBuilder
     // being replaced having a different number of stops. In that case the geometry will be
     // preserved up until the first mismatching stop, and a straight line will be used for
     // all segments after that.
-    int sizeOfShortestPattern = Math.min(
-      stopPattern.getSize(),
-      originalTripPattern.numberOfStops()
-    );
-
     List<LineString> hopGeometries = new ArrayList<>();
 
-    for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-      LineString hopGeometry = originalTripPattern.getHopGeometry(i);
+    for (int i = 0; i < stopPattern.getSize() - 1; i++) {
+      LineString hopGeometry = i < originalTripPattern.numberOfStops() - 1
+        ? originalTripPattern.getHopGeometry(i)
+        : null;
 
       if (hopGeometry != null && stopPattern.sameStops(originalTripPattern.getStopPattern(), i)) {
         // Copy hop geometry from previous pattern
@@ -236,15 +231,8 @@ public final class TripPatternBuilder
         hopGeometry != null && stopPattern.sameStations(originalTripPattern.getStopPattern(), i)
       ) {
         // Use old geometry but patch first and last point with new stops
-        var newStart = new Coordinate(
-          stopPattern.getStop(i).getCoordinate().longitude(),
-          stopPattern.getStop(i).getCoordinate().latitude()
-        );
-
-        var newEnd = new Coordinate(
-          stopPattern.getStop(i + 1).getCoordinate().longitude(),
-          stopPattern.getStop(i + 1).getCoordinate().latitude()
-        );
+        var newStart = stopPattern.getStop(i).getCoordinate().asJtsCoordinate();
+        var newEnd = stopPattern.getStop(i + 1).getCoordinate().asJtsCoordinate();
 
         Coordinate[] coordinates = originalTripPattern.getHopGeometry(i).getCoordinates().clone();
         coordinates[0].setCoordinate(newStart);

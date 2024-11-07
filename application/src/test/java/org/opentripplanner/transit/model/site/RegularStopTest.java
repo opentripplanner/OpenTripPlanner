@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class RegularStopTest {
 
@@ -35,7 +35,7 @@ class RegularStopTest {
   public static final ZoneId TIME_ZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
-  private static final RegularStop subject = StopModel
+  private static final RegularStop subject = SiteRepository
     .of()
     .regularStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)

@@ -67,6 +67,16 @@
   margin-top: -2px;
 }
 
+.search-bar .swap-from-to {
+  border: none;
+  background: none;
+  margin: 30px 0 auto 0;
+}
+
+.search-bar .swap-from-to img {
+  width: 15px;
+}
+
 .itinerary-list-container {
   width: 36rem;
   overflow-y: auto;

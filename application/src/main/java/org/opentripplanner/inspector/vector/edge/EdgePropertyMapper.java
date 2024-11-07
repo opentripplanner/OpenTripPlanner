@@ -1,18 +1,18 @@
 package org.opentripplanner.inspector.vector.edge;
 
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class EdgePropertyMapper extends PropertyMapper<Edge> {
 

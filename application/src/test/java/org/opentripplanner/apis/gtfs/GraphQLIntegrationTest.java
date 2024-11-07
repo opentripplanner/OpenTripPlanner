@@ -38,7 +38,6 @@ import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -97,6 +96,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
 
@@ -157,9 +157,9 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
-    var stopModel = TEST_MODEL.stopModelBuilder();
-    STOP_LOCATIONS.forEach(stopModel::withRegularStop);
-    var model = stopModel.build();
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder();
+    STOP_LOCATIONS.forEach(siteRepository::withRegularStop);
+    var model = siteRepository.build();
     var timetableRepository = new TimetableRepository(model, DEDUPLICATOR);
 
     var trip = TimetableRepositoryForTest

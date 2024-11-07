@@ -26,7 +26,7 @@ public class RouteToCentroidStationIdsValidator implements GraphBuilderModule {
 
   private void validate() {
     var stationIds = timetableRepository
-      .getStopModel()
+      .getSiteRepository()
       .listStations()
       .stream()
       .map(AbstractTransitEntity::getId)

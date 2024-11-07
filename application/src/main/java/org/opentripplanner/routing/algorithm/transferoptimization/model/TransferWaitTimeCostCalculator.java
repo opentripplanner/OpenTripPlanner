@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 
 /**
  * This calculator uses the {@code minSafeTransferTime}(t0) and an inverse log function to calculate

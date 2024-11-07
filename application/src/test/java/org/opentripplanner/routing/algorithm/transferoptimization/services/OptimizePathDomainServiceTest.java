@@ -1,20 +1,20 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.tx;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
-import org.opentripplanner.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.api.PathUtils;
+import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;

@@ -12,6 +12,7 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 
@@ -24,6 +25,7 @@ class TripTest {
   private static final Direction DIRECTION = Direction.INBOUND;
   public static final NonLocalizedString HEAD_SIGN = new NonLocalizedString("head sign");
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
+  private static final CarAccess CAR_ACCESS = CarAccess.ALLOWED;
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
   private static final String BLOCK_ID = "blockId";
   private static final TripAlteration TRIP_ALTERATION = TripAlteration.CANCELLATION;
@@ -43,6 +45,7 @@ class TripTest {
     .withDirection(DIRECTION)
     .withHeadsign(HEAD_SIGN)
     .withBikesAllowed(BIKE_ACCESS)
+    .withCarsAllowed(CAR_ACCESS)
     .withMode(TRANSIT_MODE)
     .withGtfsBlockId(BLOCK_ID)
     .withNetexAlteration(TRIP_ALTERATION)
@@ -84,6 +87,7 @@ class TripTest {
     assertEquals(DIRECTION, copy.getDirection());
     assertEquals(HEAD_SIGN, copy.getHeadsign());
     assertEquals(BIKE_ACCESS, copy.getBikesAllowed());
+    assertEquals(CAR_ACCESS, copy.getCarsAllowed());
     assertEquals(TRANSIT_MODE, copy.getMode());
     assertEquals(BLOCK_ID, copy.getGtfsBlockId());
     assertEquals(TRIP_ALTERATION, copy.getNetexAlteration());
@@ -110,6 +114,7 @@ class TripTest {
     assertFalse(subject.sameAs(subject.copy().withDirection(Direction.OUTBOUND).build()));
     assertFalse(subject.sameAs(subject.copy().withHeadsign(new NonLocalizedString("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withBikesAllowed(BikeAccess.NOT_ALLOWED).build()));
+    assertFalse(subject.sameAs(subject.copy().withCarsAllowed(CarAccess.NOT_ALLOWED).build()));
     assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
     assertFalse(subject.sameAs(subject.copy().withGtfsBlockId("X").build()));
     assertFalse(

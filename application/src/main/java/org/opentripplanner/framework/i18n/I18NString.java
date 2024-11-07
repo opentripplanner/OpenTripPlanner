@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.i18n;
 
 import java.util.Locale;
+import javax.annotation.Nullable;
 
 /**
  * This interface is used when providing translations on server side. Sources: OSM tags with
@@ -9,9 +10,20 @@ import java.util.Locale;
  * @author mabu
  */
 public interface I18NString {
-  /** true if the given value is not {@code null} or has at least one none white-space character. */
-  public static boolean hasValue(I18NString value) {
-    return value != null && !value.toString().isBlank();
+  /**
+   * Return {@code true} if the given value is not {@code null} or has at least one none
+   * white-space character.
+   */
+  static boolean hasValue(@Nullable I18NString value) {
+    return !hasNoValue(value);
+  }
+
+  /**
+   * Return {@code true} if the given value has at least one none white-space character.
+   * Return {@code false} if the value is {@code null} or blank.
+   */
+  static boolean hasNoValue(@Nullable I18NString value) {
+    return value == null || value.toString().isBlank();
   }
 
   /**
@@ -26,8 +38,8 @@ public interface I18NString {
    */
   String toString(Locale locale);
 
-  static I18NString assertHasValue(I18NString value) {
-    if (value == null || value.toString().isBlank()) {
+  static I18NString assertHasValue(@Nullable I18NString value) {
+    if (hasNoValue(value)) {
       throw new IllegalArgumentException(
         "Value can not be null, empty or just whitespace: " +
         (value == null ? "null" : "'" + value + "'")

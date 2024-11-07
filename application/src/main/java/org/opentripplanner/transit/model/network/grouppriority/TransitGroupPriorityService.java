@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-import org.opentripplanner.framework.lang.ArrayUtils;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.lang.ArrayUtils;
 
 /**
  * This class dynamically builds an index of transit-group-ids from the provided

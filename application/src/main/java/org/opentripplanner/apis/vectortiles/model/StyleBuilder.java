@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile

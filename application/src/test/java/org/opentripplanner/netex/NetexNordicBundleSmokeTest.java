@@ -67,10 +67,10 @@ public class NetexNordicBundleSmokeTest {
     OtpTransitService otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.stopModel().listMultiModalStations());
+    assertMultiModalStations(otpModel.siteRepository().listMultiModalStations());
     assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.stopModel().listRegularStops());
-    assertStations(otpModel.stopModel().listStations());
+    assertStops(otpModel.siteRepository().listRegularStops());
+    assertStations(otpModel.siteRepository().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
@@ -104,7 +104,6 @@ public class NetexNordicBundleSmokeTest {
     assertNull(a.getLang());
     assertNull(a.getPhone());
     assertNull(a.getFareUrl());
-    assertNull(a.getBrandingUrl());
   }
 
   private void assertMultiModalStations(Collection<MultiModalStation> multiModalStations) {

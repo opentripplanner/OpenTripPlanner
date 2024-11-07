@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
@@ -119,8 +119,8 @@ class ModifiedTripBuilderTest {
   );
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
-  private final StopModel stopModel = TEST_MODEL
-    .stopModelBuilder()
+  private final SiteRepository siteRepository = TEST_MODEL
+    .siteRepositoryBuilder()
     .withRegularStop(STOP_A_1)
     .withRegularStop(STOP_A_2)
     .withRegularStop(STOP_B_1)
@@ -128,7 +128,7 @@ class ModifiedTripBuilderTest {
     .withRegularStop(STOP_D)
     .build();
   private final TimetableRepository timetableRepository = new TimetableRepository(
-    stopModel,
+    siteRepository,
     DEDUPLICATOR
   );
   private EntityResolver entityResolver;
@@ -174,7 +174,8 @@ class ModifiedTripBuilderTest {
       List.of(),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -203,7 +204,8 @@ class ModifiedTripBuilderTest {
       List.of(),
       true,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -247,7 +249,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -297,7 +300,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -345,7 +349,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -395,7 +400,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -451,7 +457,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 
@@ -496,7 +503,8 @@ class ModifiedTripBuilderTest {
       ),
       false,
       null,
-      false
+      false,
+      "DATASOURCE"
     )
       .build();
 

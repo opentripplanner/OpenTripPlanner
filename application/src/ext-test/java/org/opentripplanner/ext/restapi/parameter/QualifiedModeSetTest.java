@@ -231,7 +231,7 @@ public class QualifiedModeSetTest {
   @Test
   void carHailWithTransit() {
     var modeSet = new QualifiedModeSet("CAR_HAIL,BUS,RAIL");
-    assertEquals(Set.of(COACH, BUS, RAIL), Set.copyOf(modeSet.getTransitModes()));
+    assertEquals(Set.of(BUS, RAIL), Set.copyOf(modeSet.getTransitModes()));
 
     assertEquals(WALK, modeSet.getRequestModes().directMode);
     assertEquals(CAR_HAILING, modeSet.getRequestModes().accessMode);

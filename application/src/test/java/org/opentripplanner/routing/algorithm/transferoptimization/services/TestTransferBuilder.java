@@ -1,18 +1,18 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.Objects;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This builder is used to create a {@link ConstrainedTransfer} for use in unit-tests. It build a

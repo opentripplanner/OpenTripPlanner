@@ -3,7 +3,6 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -14,6 +13,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.

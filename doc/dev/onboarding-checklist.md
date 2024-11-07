@@ -1,4 +1,5 @@
 # Onboarding Checklist
+
 * What is OTP?
   * [Website](https://www.opentripplanner.org/)
   * History

@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
+import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 

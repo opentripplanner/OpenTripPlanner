@@ -13,16 +13,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -232,7 +232,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public boolean isFlaggedForDeletion() {
-    return !getSystemNotices().isEmpty();
+    return !systemNotices.isEmpty();
   }
 
   /**

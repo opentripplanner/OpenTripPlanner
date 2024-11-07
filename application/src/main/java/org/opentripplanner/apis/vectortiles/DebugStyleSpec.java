@@ -13,7 +13,6 @@ import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
 import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -31,6 +30,7 @@ import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * A Mapbox/Mapblibre style specification for rendering debug information about transit and street

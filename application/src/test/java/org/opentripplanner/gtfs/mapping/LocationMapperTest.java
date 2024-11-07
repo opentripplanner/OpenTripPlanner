@@ -16,7 +16,7 @@ import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class LocationMapperTest {
 
@@ -29,7 +29,7 @@ class LocationMapperTest {
   void testMapping(String name, boolean isBogusName) {
     var gtfsLocation = getLocation(name, Polygons.OSLO);
 
-    var mapper = new LocationMapper(StopModel.of(), DataImportIssueStore.NOOP);
+    var mapper = new LocationMapper(SiteRepository.of(), DataImportIssueStore.NOOP);
     var flexLocation = mapper.map(gtfsLocation);
 
     assertEquals(isBogusName, flexLocation.hasFallbackName());
@@ -43,7 +43,7 @@ class LocationMapperTest {
     var gtfsLocation = getLocation("invalid", selfIntersecting);
 
     var issueStore = new DefaultDataImportIssueStore();
-    var mapper = new LocationMapper(StopModel.of(), issueStore);
+    var mapper = new LocationMapper(SiteRepository.of(), issueStore);
 
     mapper.map(gtfsLocation);
 

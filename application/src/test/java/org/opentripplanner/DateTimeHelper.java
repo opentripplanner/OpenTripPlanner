@@ -3,7 +3,7 @@ package org.opentripplanner;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import org.opentripplanner.framework.time.DateUtils;
+import org.opentripplanner.utils.time.DateUtils;
 
 public class DateTimeHelper {
 

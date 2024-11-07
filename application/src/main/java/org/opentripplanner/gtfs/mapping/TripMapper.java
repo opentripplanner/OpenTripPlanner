@@ -5,10 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.collection.MapUtils;
 
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
 class TripMapper {
@@ -71,6 +71,7 @@ class TripMapper {
     lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
     lhs.withWheelchairBoarding(WheelchairAccessibilityMapper.map(rhs.getWheelchairAccessible()));
     lhs.withBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
+    lhs.withCarsAllowed(CarAccessMapper.mapForTrip(rhs));
 
     var trip = lhs.build();
     mapSafeTimePenalty(rhs).ifPresent(f -> flexSafeTimePenalties.put(trip, f));

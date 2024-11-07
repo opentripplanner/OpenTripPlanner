@@ -21,8 +21,6 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
@@ -36,6 +34,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,7 +184,7 @@ public class SerializedGraphObject implements Serializable {
       );
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
-      serObj.timetableRepository.getStopModel().reindexAfterDeserialization();
+      serObj.timetableRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.timetableRepository.index();
       logSerializationCompleteStatus(serObj.graph, serObj.timetableRepository);
       return serObj;
@@ -261,7 +261,7 @@ public class SerializedGraphObject implements Serializable {
     TimetableRepository timetableRepository
   ) {
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(timetableRepository.getStopModel().stopIndexSize());
+    var nStops = f.formatNumber(timetableRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(timetableRepository.getTransferService().listAll().size());
     var nPatterns = f.formatNumber(timetableRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());

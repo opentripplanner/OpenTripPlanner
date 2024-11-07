@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 public class Distance {
 
