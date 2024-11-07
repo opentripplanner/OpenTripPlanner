@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import java.util.List;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 
 record TestCase(
   String description,

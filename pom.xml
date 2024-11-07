@@ -97,6 +97,7 @@
         <module>application</module>
         <module>gtfs-realtime-protobuf</module>
         <module>utils</module>
+        <module>raptor</module>
     </modules>
 
     <build>

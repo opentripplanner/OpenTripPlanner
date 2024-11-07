@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Arrays;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 
 /**
  * This class keep a facto for each index and the minimum factor for fast retrieval during Raptor
