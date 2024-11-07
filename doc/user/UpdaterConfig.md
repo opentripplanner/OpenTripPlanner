@@ -317,6 +317,7 @@ GBFS form factors:
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
 | [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
+| [allowedRentalType](#u_1_allowedRentalType)                                           |      `enum`     | The type of rental data to include.                                             | *Optional* | `"all"`       |  2.7  |
 | frequency                                                                             |    `duration`   | How often the data should be updated.                                           | *Optional* | `"PT1M"`      |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |  2.1  |
@@ -344,6 +345,21 @@ For this to be possible three things need to be configured:
  - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
  - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
  - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+
+
+<h4 id="u_1_allowedRentalType">allowedRentalType</h4>
+
+**Since version:** `2.7` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"all"`   
+**Path:** /updaters/[1]   
+**Enum values:** `stations` | `vehicles` | `all`
+
+The type of rental data to include.
+
+The type of rental data to include. This can be one of the following:
+
+- `ALL`: Include all data types.
+- `STATIONS`: Include station data only.
+- `VEHICLES`: Include floating vehicle data only.
 
 
 <h4 id="u_1_geofencingZones">geofencingZones</h4>
