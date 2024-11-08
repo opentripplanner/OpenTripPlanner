@@ -22,6 +22,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -96,6 +97,8 @@ public interface OtpServerRequestContext {
 
   VehicleRentalService vehicleRentalService();
 
+  VehicleParkingService getVehicleParkingService();
+
   TransitTuningParameters transitTuningParameters();
 
   RaptorTuningParameters raptorTuningParameters();
@@ -147,4 +150,5 @@ public interface OtpServerRequestContext {
 
   @Nullable
   SorlandsbanenNorwayService sorlandsbanenService();
+
 }

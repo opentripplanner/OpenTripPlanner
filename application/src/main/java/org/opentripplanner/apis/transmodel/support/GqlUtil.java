@@ -38,7 +38,6 @@ public class GqlUtil {
     DataFetchingEnvironment environment
   ) {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .graph()
       .getVehicleParkingService();
   }
 

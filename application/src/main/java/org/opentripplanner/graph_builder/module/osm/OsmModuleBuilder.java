@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingPara
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 
 /**
@@ -17,6 +18,7 @@ public class OsmModuleBuilder {
 
   private final Collection<OsmProvider> providers;
   private final Graph graph;
+  private final VehicleParkingService parkingService;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
@@ -27,9 +29,10 @@ public class OsmModuleBuilder {
   private int maxAreaNodes;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
-  OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
+  OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph, VehicleParkingService parkingService) {
     this.providers = providers;
     this.graph = graph;
+    this.parkingService = parkingService;
   }
 
   public OsmModuleBuilder withBoardingAreaRefTags(Set<String> boardingAreaRefTags) {

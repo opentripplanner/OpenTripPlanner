@@ -34,10 +34,9 @@ public class ApiRouterInfo {
     Graph graph,
     TransitService transitService,
     VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     WorldEnvelope envelope
   ) {
-    VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-
     this.routerId = routerId;
     this.polygon = graph.getConvexHull();
     this.buildTime = Date.from(graph.buildTime);
@@ -51,7 +50,7 @@ public class ApiRouterInfo {
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions =
-      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, transitService);
+      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, vehicleParkingService, transitService);
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {

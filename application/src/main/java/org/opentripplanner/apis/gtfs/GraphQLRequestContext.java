@@ -25,7 +25,7 @@ public record GraphQLRequestContext(
       context.routingService(),
       context.transitService(),
       context.graph().getFareService(),
-      context.graph().getVehicleParkingService(),
+      context.getVehicleParkingService(),
       context.vehicleRentalService(),
       context.realtimeVehicleService(),
       context.graphFinder(),
