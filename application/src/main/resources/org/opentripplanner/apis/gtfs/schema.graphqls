@@ -4227,7 +4227,7 @@ input PlanVisitViaLocationInput {
   label: String
   """
   The minimum wait time is used to force the trip to stay the given duration at the
-  via-location before the trip is continued.
+  via-location before the itinerary is continued.
   """
   minimumWaitTime: Duration = "PT0S"
   """
