@@ -29,7 +29,11 @@ public class OsmModuleBuilder {
   private int maxAreaNodes;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
-  OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph, VehicleParkingService parkingService) {
+  OsmModuleBuilder(
+    Collection<OsmProvider> providers,
+    Graph graph,
+    VehicleParkingService parkingService
+  ) {
     this.providers = providers;
     this.graph = graph;
     this.parkingService = parkingService;
@@ -84,6 +88,7 @@ public class OsmModuleBuilder {
     return new OsmModule(
       providers,
       graph,
+      parkingService,
       issueStore,
       streetLimitationParameters,
       new OsmProcessingParameters(

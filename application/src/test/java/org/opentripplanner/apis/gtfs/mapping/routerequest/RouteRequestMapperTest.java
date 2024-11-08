@@ -30,6 +30,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -70,7 +71,7 @@ class RouteRequestMapperTest {
         new TestRoutingService(List.of()),
         transitService,
         new DefaultFareService(),
-        graph.getVehicleParkingService(),
+        new VehicleParkingService(),
         new DefaultVehicleRentalService(),
         new DefaultRealtimeVehicleService(transitService),
         GraphFinder.getInstance(graph, transitService::findRegularStops),

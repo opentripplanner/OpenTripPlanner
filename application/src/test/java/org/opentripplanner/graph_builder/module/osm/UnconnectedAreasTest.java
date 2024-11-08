@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -162,7 +163,7 @@ public class UnconnectedAreasTest {
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     OsmProvider provider = new OsmProvider(RESOURCE_LOADER.file(osmFileName), false);
     OsmModule loader = OsmModule
-      .of(provider, graph)
+      .of(provider, graph, new VehicleParkingService())
       .withIssueStore(issueStore)
       .withAreaVisibility(true)
       .withStaticParkAndRide(true)

@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
@@ -74,6 +75,7 @@ public interface ConstructApplicationFactory {
   RealtimeVehicleRepository realtimeVehicleRepository();
   RealtimeVehicleService realtimeVehicleService();
   VehicleRentalRepository vehicleRentalRepository();
+  VehicleParkingService vehicleParkingService();
   VehicleRentalService vehicleRentalService();
   DataImportIssueSummary dataImportIssueSummary();
 
@@ -115,6 +117,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
+
+    @BindsInstance
+    Builder worldEnvelopeRepository(VehicleParkingService vehicleParkingService);
 
     @BindsInstance
     Builder stopConsolidationRepository(

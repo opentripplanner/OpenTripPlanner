@@ -150,5 +150,4 @@ public interface OtpServerRequestContext {
 
   @Nullable
   SorlandsbanenNorwayService sorlandsbanenService();
-
 }

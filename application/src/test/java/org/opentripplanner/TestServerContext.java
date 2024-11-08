@@ -9,6 +9,7 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -54,6 +55,7 @@ public class TestServerContext {
       createWorldEnvelopeService(),
       createRealtimeVehicleService(transitService),
       createVehicleRentalService(),
+      createVehicleParkingService(),
       createEmissionsService(),
       null,
       routerConfig.flexParameters(),
@@ -85,6 +87,10 @@ public class TestServerContext {
 
   public static VehicleRentalService createVehicleRentalService() {
     return new DefaultVehicleRentalService();
+  }
+
+  public static VehicleParkingService createVehicleParkingService() {
+    return new VehicleParkingService();
   }
 
   public static EmissionsService createEmissionsService() {

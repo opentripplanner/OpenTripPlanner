@@ -79,11 +79,19 @@ public class OsmModule implements GraphBuilderModule {
     this.parkingService = parkingService;
   }
 
-  public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph, VehicleParkingService service) {
+  public static OsmModuleBuilder of(
+    Collection<OsmProvider> providers,
+    Graph graph,
+    VehicleParkingService service
+  ) {
     return new OsmModuleBuilder(providers, graph, service);
   }
 
-  public static OsmModuleBuilder of(OsmProvider provider, Graph graph, VehicleParkingService service) {
+  public static OsmModuleBuilder of(
+    OsmProvider provider,
+    Graph graph,
+    VehicleParkingService service
+  ) {
     return of(List.of(provider), graph, service);
   }
 

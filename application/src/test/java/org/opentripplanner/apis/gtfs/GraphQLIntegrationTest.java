@@ -69,6 +69,7 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -140,22 +141,21 @@ class GraphQLIntegrationTest {
   private static GraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private static final VehicleParkingService parkingService = new VehicleParkingService();
 
   @BeforeAll
   static void setup() {
-    GRAPH
-      .getVehicleParkingService()
-      .updateVehicleParking(
-        List.of(
-          VehicleParking
-            .builder()
-            .id(id("parking-1"))
-            .coordinate(WgsCoordinate.GREENWICH)
-            .name(NonLocalizedString.ofNullable("parking"))
-            .build()
-        ),
-        List.of()
-      );
+    parkingService.updateVehicleParking(
+      List.of(
+        VehicleParking
+          .builder()
+          .id(id("parking-1"))
+          .coordinate(WgsCoordinate.GREENWICH)
+          .name(NonLocalizedString.ofNullable("parking"))
+          .build()
+      ),
+      List.of()
+    );
 
     var siteRepository = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepository::withRegularStop);
@@ -315,7 +315,7 @@ class GraphQLIntegrationTest {
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
-        GRAPH.getVehicleParkingService(),
+        parkingService,
         defaultVehicleRentalService,
         realtimeVehicleService,
         finder,
