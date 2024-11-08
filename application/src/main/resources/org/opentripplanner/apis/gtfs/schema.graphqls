@@ -672,7 +672,7 @@ type Leg {
   """
   An identifier for the leg, which can be used to re-fetch transit leg information, except leg's fare products.
   Re-fetching fails when the underlying transit data no longer exists.
-  **Note:** when both id and fare products are queried, id should be queried using a suitable graphQL alias
+  **Note:** when both id and fare products are queried, id should be queried using a suitable GraphQL alias
   such as `legId`. Relay does not accept different fare product ids in otherwise identical legs.
   """
   id: String
