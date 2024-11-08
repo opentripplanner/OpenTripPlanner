@@ -8,11 +8,19 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public class TestStreetLinkerModule {
 
   /** For test only */
-  public static void link(Graph graph, TimetableRepository model) {
+  public static void link(Graph graph, TimetableRepository timetableRepository) {
+    link(graph, new VehicleParkingService(), timetableRepository);
+  }
+
+  public static void link(
+    Graph graph,
+    VehicleParkingService vehicleParkingService,
+    TimetableRepository timetableRepository
+  ) {
     new StreetLinkerModule(
       graph,
-      new VehicleParkingService(),
-      model,
+      vehicleParkingService,
+      timetableRepository,
       DataImportIssueStore.NOOP,
       false
     )

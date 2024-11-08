@@ -176,7 +176,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, vehicleParkingService, timetableRepository);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 

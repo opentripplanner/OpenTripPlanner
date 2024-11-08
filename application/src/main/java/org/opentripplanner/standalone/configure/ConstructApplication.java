@@ -88,7 +88,7 @@ public class ConstructApplication {
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
-      org.opentripplanner.standalone.configure.DaggerConstructApplicationFactory
+      DaggerConstructApplicationFactory
         .builder()
         .configModel(config)
         .graph(graph)
