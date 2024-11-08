@@ -208,7 +208,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VehicleParkingService getVehicleParkingService() {
+  public VehicleParkingService vehicleParkingService() {
     return vehicleParkingService;
   }
 

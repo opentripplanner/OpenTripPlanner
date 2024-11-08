@@ -97,7 +97,7 @@ public interface OtpServerRequestContext {
 
   VehicleRentalService vehicleRentalService();
 
-  VehicleParkingService getVehicleParkingService();
+  VehicleParkingService vehicleParkingService();
 
   TransitTuningParameters transitTuningParameters();
 

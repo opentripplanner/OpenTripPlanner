@@ -140,12 +140,12 @@ public class VectorTilesResource {
         layerParameters
       );
       case VehicleParking -> new VehicleParkingsLayerBuilder(
-        context.getVehicleParkingService(),
+        context.vehicleParkingService(),
         layerParameters,
         locale
       );
       case VehicleParkingGroup -> new VehicleParkingGroupsLayerBuilder(
-        context.getVehicleParkingService(),
+        context.vehicleParkingService(),
         layerParameters,
         locale
       );

@@ -36,7 +36,7 @@ public class ParkAndRideResource {
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.vehicleParkingService = serverContext.getVehicleParkingService();
+    this.vehicleParkingService = serverContext.vehicleParkingService();
 
     // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
     //           - serverContext.graphFinder(). This needs at least a comment!

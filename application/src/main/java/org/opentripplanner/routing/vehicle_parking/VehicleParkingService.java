@@ -3,6 +3,7 @@ package org.opentripplanner.routing.vehicle_parking;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,6 +19,9 @@ import java.util.stream.Stream;
  * <P>THIS CLASS IS THREAD-SAFE<p>
  */
 public class VehicleParkingService implements Serializable {
+
+  @Inject
+  public VehicleParkingService() {}
 
   /**
    * To ensure that his is thread-safe, the set stored here should always be immutable.

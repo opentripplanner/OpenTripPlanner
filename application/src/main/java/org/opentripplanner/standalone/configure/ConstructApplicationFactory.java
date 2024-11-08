@@ -119,7 +119,7 @@ public interface ConstructApplicationFactory {
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
-    Builder worldEnvelopeRepository(VehicleParkingService vehicleParkingService);
+    Builder vehicleParkingService(VehicleParkingService vehicleParkingService);
 
     @BindsInstance
     Builder stopConsolidationRepository(

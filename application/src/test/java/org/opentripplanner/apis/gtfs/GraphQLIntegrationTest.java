@@ -315,8 +315,8 @@ class GraphQLIntegrationTest {
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
-        parkingService,
         defaultVehicleRentalService,
+        parkingService,
         realtimeVehicleService,
         finder,
         new RouteRequest()

@@ -14,8 +14,8 @@ public record GraphQLRequestContext(
   RoutingService routingService,
   TransitService transitService,
   FareService fareService,
-  VehicleParkingService vehicleParkingService,
   VehicleRentalService vehicleRentalService,
+  VehicleParkingService vehicleParkingService,
   RealtimeVehicleService realTimeVehicleService,
   GraphFinder graphFinder,
   RouteRequest defaultRouteRequest
@@ -25,8 +25,8 @@ public record GraphQLRequestContext(
       context.routingService(),
       context.transitService(),
       context.graph().getFareService(),
-      context.getVehicleParkingService(),
       context.vehicleRentalService(),
+      context.vehicleParkingService(),
       context.realtimeVehicleService(),
       context.graphFinder(),
       context.defaultRouteRequest()

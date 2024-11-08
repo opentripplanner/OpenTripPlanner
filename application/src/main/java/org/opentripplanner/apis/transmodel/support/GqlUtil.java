@@ -38,7 +38,7 @@ public class GqlUtil {
     DataFetchingEnvironment environment
   ) {
     return ((TransmodelRequestContext) environment.getContext()).getServerContext()
-      .getVehicleParkingService();
+      .vehicleParkingService();
   }
 
   public static GraphFinder getGraphFinder(DataFetchingEnvironment environment) {

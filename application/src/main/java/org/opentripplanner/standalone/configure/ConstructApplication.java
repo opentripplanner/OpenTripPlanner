@@ -76,6 +76,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
+    VehicleParkingService vehicleParkingService,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters
   ) {
@@ -87,13 +88,14 @@ public class ConstructApplication {
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
-      DaggerConstructApplicationFactory
+      org.opentripplanner.standalone.configure.DaggerConstructApplicationFactory
         .builder()
         .configModel(config)
         .graph(graph)
         .timetableRepository(timetableRepository)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .vehicleParkingService(vehicleParkingService)
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
