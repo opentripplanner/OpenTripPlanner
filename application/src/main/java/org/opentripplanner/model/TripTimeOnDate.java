@@ -63,9 +63,15 @@ public class TripTimeOnDate {
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
    * StopPatterns.
+   *
+   * @return null if the trip does not exist in the timetable
    */
+  @Nullable
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
     TripTimes times = table.getTripTimes(trip);
+    if (times == null) {
+      return null;
+    }
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
@@ -78,7 +84,10 @@ public class TripTimeOnDate {
    * StopPatterns.
    *
    * @param serviceDate service day to set, if null none is set
+   * @return null if the trip does not exist in the timetable
    */
+
+  @Nullable
   public static List<TripTimeOnDate> fromTripTimes(
     Timetable table,
     Trip trip,
@@ -86,6 +95,9 @@ public class TripTimeOnDate {
     Instant midnight
   ) {
     TripTimes times = table.getTripTimes(trip);
+    if (times == null) {
+      return null;
+    }
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));

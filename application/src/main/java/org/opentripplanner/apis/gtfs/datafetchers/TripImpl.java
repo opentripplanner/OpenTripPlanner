@@ -143,7 +143,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         }
       }
 
-      TripPattern tripPattern = getTripPattern(environment);
+      TripPattern tripPattern = getTripPattern(environment, serviceDate);
       if (tripPattern == null) {
         return null;
       }
@@ -176,7 +176,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         }
       }
 
-      TripPattern tripPattern = getTripPattern(environment);
+      TripPattern tripPattern = getTripPattern(environment, serviceDate);
       if (tripPattern == null) {
         return null;
       }
@@ -301,7 +301,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
-        TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
+        TripPattern tripPattern = getTripPattern(environment, serviceDate);
         // no matching pattern found
         if (tripPattern == null) {
           return List.of();
@@ -376,6 +376,15 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return getTransitService(environment).getPatternForTrip(environment.getSource());
   }
 
+  private TripPattern getTripPattern(
+    DataFetchingEnvironment environment,
+    @Nullable LocalDate date
+  ) {
+    return date == null
+      ? getTripPattern(environment)
+      : getTransitService(environment).getPatternForTrip(environment.getSource(), date);
+  }
+
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
   }
@@ -389,17 +398,28 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     @Nullable LocalDate serviceDate,
     int stopIndex
   ) {
-    var tripPattern = getTripPattern(environment);
+    var tripPattern = getTripPattern(environment, serviceDate);
+    var transitService = getTransitService(environment);
+    var timetable = serviceDate != null
+      ? transitService.getTimetableForTripPattern(tripPattern, serviceDate)
+      : tripPattern.getScheduledTimetable();
+    if (timetable == null) {
+      return null;
+    }
+
+    var tripTimes = timetable.getTripTimes(getSource(environment));
+    if (tripTimes == null) {
+      return null;
+    }
+
     return new TripTimeOnDate(
-      tripPattern.getScheduledTimetable().getTripTimes(getSource(environment)),
+      tripTimes,
       stopIndex,
       tripPattern,
       serviceDate,
       serviceDate == null
         ? null
-        : ServiceDateUtils
-          .asStartOfService(serviceDate, getTransitService(environment).getTimeZone())
-          .toInstant()
+        : ServiceDateUtils.asStartOfService(serviceDate, transitService.getTimeZone()).toInstant()
     );
   }
 
