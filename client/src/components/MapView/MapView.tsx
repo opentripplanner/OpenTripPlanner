@@ -77,8 +77,6 @@ export function MapView({
         onContextMenu={(e) => {
           setShowContextPopup(e.lngLat);
         }}
-        // it's unfortunate that you have to list these layers here.
-        // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
         interactiveLayerIds={interactiveLayerIds}
         cursor={cursor}
         onMouseEnter={onMouseEnter}
