@@ -19,6 +19,10 @@ public class StationEntranceVertex extends OsmVertex {
     return accessible;
   }
 
+  public String getId() {
+    return Long.toString(nodeId);
+  }
+
   public String toString() {
     return "StationEntranceVertex(" + super.toString() + ", code=" + code + ")";
   }

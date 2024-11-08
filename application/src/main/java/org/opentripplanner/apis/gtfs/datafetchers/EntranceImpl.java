@@ -17,7 +17,7 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   }
 
   @Override
-  public DataFetcher<String> gtfsId() {
+  public DataFetcher<String> entranceId() {
     return environment -> {
       Entrance entrance = environment.getSource();
       return entrance.getId() != null ? entrance.getId().toString() : null;

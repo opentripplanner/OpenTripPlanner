@@ -29,7 +29,8 @@
                     "absoluteDirection" : null,
                     "entrance": {
                       "code": "A",
-                      "wheelchairAccessible": "POSSIBLE"
+                      "wheelchairAccessible": "POSSIBLE",
+                      "entranceId": "osm:123"
                     }
                   }
                 ]

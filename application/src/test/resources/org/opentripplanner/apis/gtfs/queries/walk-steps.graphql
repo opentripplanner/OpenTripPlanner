@@ -23,6 +23,7 @@
             entrance {
               code
               wheelchairAccessible
+              entranceId
             }
           }
         }

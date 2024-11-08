@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**
@@ -533,8 +534,10 @@ public class StatesToWalkStepsMapper {
 
     StationEntranceVertex vertex = (StationEntranceVertex) backState.getVertex();
 
+    FeedScopedId entranceId = new FeedScopedId("osm", vertex.getId());
+
     Entrance entrance = Entrance
-      .of(null)
+      .of(entranceId)
       .withCode(vertex.getCode())
       .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
       .withWheelchairAccessibility(

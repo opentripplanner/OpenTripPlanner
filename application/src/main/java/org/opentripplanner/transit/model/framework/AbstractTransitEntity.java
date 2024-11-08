@@ -30,7 +30,7 @@ public abstract class AbstractTransitEntity<
   private final FeedScopedId id;
 
   public AbstractTransitEntity(FeedScopedId id) {
-    this.id = id; // TODO IS THIS WORNG
+    this.id = Objects.requireNonNull(id);
   }
 
   public final FeedScopedId getId() {

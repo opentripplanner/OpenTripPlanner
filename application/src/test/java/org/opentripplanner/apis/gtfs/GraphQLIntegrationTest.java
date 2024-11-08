@@ -233,8 +233,9 @@ class GraphQLIntegrationTest {
       .withAbsoluteDirection(20)
       .build();
     var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
+    FeedScopedId entranceId = new FeedScopedId("osm", "123");
     Entrance entrance = Entrance
-      .of(null)
+      .of(entranceId)
       .withCoordinate(new WgsCoordinate(60, 80))
       .withCode("A")
       .withWheelchairAccessibility(Accessibility.POSSIBLE)

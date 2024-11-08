@@ -361,7 +361,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLEntrance {
     public DataFetcher<String> code();
 
-    public DataFetcher<String> gtfsId();
+    public DataFetcher<String> entranceId();
 
     public DataFetcher<String> name();
 
