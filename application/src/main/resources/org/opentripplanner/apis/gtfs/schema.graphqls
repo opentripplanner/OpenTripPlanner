@@ -1482,7 +1482,10 @@ type QueryType {
     triangle: InputTriangle,
     "List of routes and agencies which are given lower preference when planning the itinerary"
     unpreferred: InputUnpreferred,
-    "The list of points the journey is required to pass through."
+    """
+    The list of points the itinerary required to pass through.
+    All locations are visited in the order they are listed.
+    """
     via: [PlanViaLocationInput!],
     """
     How much less bad is waiting at the beginning of the trip (replaces
@@ -1609,7 +1612,7 @@ type QueryType {
     number of itineraries in each search.
     """
     searchWindow: Duration,
-    "The list of points the journey is required to pass through."
+    "The list of points the itinerary is required to pass through."
     via: [PlanViaLocationInput!]
   ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
@@ -4101,9 +4104,8 @@ input PlanPassThroughViaLocationInput {
   "The label/name of the location. This is pass-through information and is not used in routing."
   label: String
   """
-  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
-  stop place or a group of stop places. It is enough to visit ONE of the locations
-  listed.
+  A list of stop locations. A stop location can be a stop or a station.
+  It is enough to visit ONE of the locations listed.
   """
   stopLocationIds: [String!]!
 }
@@ -4229,11 +4231,10 @@ input PlanVisitViaLocationInput {
   """
   minimumWaitTime: Duration = "PT0S"
   """
-  A list of stop locations. A stop location can be a quay, a stop place, a multimodal
-  stop place or a group of stop places. It is enough to visit ONE of the locations
-  listed.
+  A list of stop locations. A stop location can be a stop or a station.
+  It is enough to visit ONE of the locations listed.
   """
-  stopLocationIds: [String!]
+  stopLocationIds: [String!]!
 }
 
 "What criteria should be used when optimizing a scooter route."
