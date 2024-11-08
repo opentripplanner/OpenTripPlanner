@@ -2,6 +2,8 @@ package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmWay;
@@ -193,5 +195,29 @@ public class FinlandMapperTest {
     way.addTag("winter_road", "yes");
     wayData = wps.getDataForWay(way);
     assertEquals(wayData.getPermission(), NONE);
+  }
+
+  /**
+   * Test that biking is not allowed in footway areas and transit platforms
+   */
+  @Test
+  public void testArea() {
+    OsmWithTags way;
+    WayProperties wayData;
+
+    way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("area", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN);
+
+    way = new OsmWay();
+    way.addTag("public_transport", "platform");
+    way.addTag("area", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN);
+    way.addTag("bicycle", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN_AND_BICYCLE);
   }
 }
