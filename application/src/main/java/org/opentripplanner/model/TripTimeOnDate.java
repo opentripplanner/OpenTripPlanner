@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -31,7 +32,10 @@ public class TripTimeOnDate {
   private final int stopIndex;
   // This is only needed because TripTimes has no reference to TripPattern
   private final TripPattern tripPattern;
+
+  @Nullable
   private final LocalDate serviceDate;
+
   private final long midnight;
 
   public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern) {
@@ -46,8 +50,8 @@ public class TripTimeOnDate {
     TripTimes tripTimes,
     int stopIndex,
     TripPattern tripPattern,
-    LocalDate serviceDate,
-    Instant midnight
+    @Nullable LocalDate serviceDate,
+    @Nullable Instant midnight
   ) {
     this.tripTimes = tripTimes;
     this.stopIndex = stopIndex;
