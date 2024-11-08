@@ -33,7 +33,7 @@ public class VehicleRentalEdge extends Edge {
 
   @Override
   public State[] traverse(State s0) {
-    if (!s0.getRequest().mode().includesRenting()) {
+    if (!s0.getRequest().mode().includesRenting() || s0.getVehicleRentalState() == null) {
       return State.empty();
     }
 

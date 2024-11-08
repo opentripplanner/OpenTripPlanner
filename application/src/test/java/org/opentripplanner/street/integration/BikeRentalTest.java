@@ -168,10 +168,10 @@ public class BikeRentalTest extends GraphRoutingTest {
         "null - BEFORE_RENTING - E1 (1,656.14, 828)"
       ),
       List.of(
-        "WALK - HAVE_RENTED - AB street (76.19, 38)",
-        "WALK - HAVE_RENTED - BC street (1,579.95, 790)",
-        "WALK - HAVE_RENTED - CD street (1,655.14, 828)",
-        "null - HAVE_RENTED - E1 (1,656.14, 828)"
+        "WALK - null - AB street (76.19, 38)",
+        "WALK - null - BC street (1,579.95, 790)",
+        "WALK - null - CD street (1,655.14, 828)",
+        "null - null - E1 (1,656.14, 828)"
       )
     );
   }
@@ -450,7 +450,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     );
 
     assertEquals(
-      List.of("WALK - HAVE_RENTED - BC street (1,503.76, 752)"),
+      List.of("WALK - null - BC street (1,503.76, 752)"),
       runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true, setter),
       "arriveBy"
     );

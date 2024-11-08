@@ -48,15 +48,24 @@ class StateTest {
     NULL_RENTAL_STATES.add(null);
   }
 
+  static Set<VehicleRentalState> setOfWithNull(VehicleRentalState... states) {
+    var set = new HashSet<VehicleRentalState>();
+    set.add(null);
+    for (var state : states) {
+      set.add(state);
+    }
+    return set;
+  }
+
   static Stream<Arguments> testCases() {
     return Stream.of(
       of(SCOOTER_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
       //FIXME: it's strange that the arriveBy rental searches all start on a bicycle
-      of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(SCOOTER_RENTAL, true, setOfWithNull(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
       of(BIKE_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-      of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(BIKE_RENTAL, true, setOfWithNull(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
       of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-      of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(CAR_RENTAL, true, setOfWithNull(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
       of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(CAR)),
       of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
       of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),

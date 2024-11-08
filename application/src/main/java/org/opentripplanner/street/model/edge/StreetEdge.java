@@ -330,7 +330,9 @@ public class StreetEdge
     final StateEditor editor;
 
     final boolean arriveByRental =
-      s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
+      s0.getRequest().mode().includesRenting() &&
+      s0.getRequest().arriveBy() &&
+      s0.getVehicleRentalState() != null;
     if (arriveByRental && tov.rentalTraversalBanned(s0)) {
       return State.empty();
     } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
