@@ -130,6 +130,7 @@ public class ConstructApplication {
       graph(),
       timetableRepository(),
       factory.worldEnvelopeRepository(),
+      factory.vehicleParkingService(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
