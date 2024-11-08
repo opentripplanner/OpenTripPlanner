@@ -4234,7 +4234,7 @@ input PlanVisitViaLocationInput {
   A list of stop locations. A stop location can be a stop or a station.
   It is enough to visit ONE of the locations listed.
   """
-  stopLocationIds: [String!]!
+  stopLocationIds: [String!]
 }
 
 "What criteria should be used when optimizing a scooter route."
