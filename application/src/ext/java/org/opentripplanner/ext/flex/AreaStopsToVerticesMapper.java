@@ -6,18 +6,18 @@ import jakarta.inject.Inject;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Iterates over all area stops in the stop model and adds them to vertices that are suitable for
+ * Iterates over all area stops in the stop  and adds them to vertices that are suitable for
  * boarding flex trips.
  */
 public class AreaStopsToVerticesMapper implements GraphBuilderModule {
@@ -36,21 +36,21 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
   @Override
   @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
-    if (!timetableRepository.getStopModel().hasAreaStops()) {
+    if (!timetableRepository.getSiteRepository().hasAreaStops()) {
       return;
     }
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getStopModel());
+    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      timetableRepository.getStopModel().listAreaStops().size()
+      timetableRepository.getSiteRepository().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
     var results = timetableRepository
-      .getStopModel()
+      .getSiteRepository()
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {

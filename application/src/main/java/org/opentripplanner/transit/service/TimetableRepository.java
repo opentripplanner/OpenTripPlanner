@@ -20,10 +20,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.lang.ObjectUtils;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
@@ -44,13 +43,18 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.utils.lang.ObjectUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +100,7 @@ public class TimetableRepository implements Serializable {
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-  private StopModel stopModel;
+  private SiteRepository siteRepository;
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
@@ -145,14 +149,14 @@ public class TimetableRepository implements Serializable {
   private transient TransitAlertService transitAlertService;
 
   @Inject
-  public TimetableRepository(StopModel stopModel, Deduplicator deduplicator) {
-    this.stopModel = Objects.requireNonNull(stopModel);
+  public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
+    this.siteRepository = Objects.requireNonNull(siteRepository);
     this.deduplicator = deduplicator;
   }
 
   /** No-argument constructor, required for deserialization. */
   public TimetableRepository() {
-    this(new StopModel(), new Deduplicator());
+    this(new SiteRepository(), new Deduplicator());
   }
 
   /**
@@ -163,7 +167,7 @@ public class TimetableRepository implements Serializable {
   public void index() {
     if (index == null) {
       LOG.info("Index transit model...");
-      // the transit model indexing updates the stop model index (flex stops added to the stop index)
+      // the transit model indexing updates the site repository index (flex stops added to the stop index)
       this.index = new TimetableRepositoryIndex(this);
       LOG.info("Index transit model complete.");
     }
@@ -430,8 +434,8 @@ public class TimetableRepository implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public StopModel getStopModel() {
-    return stopModel;
+  public SiteRepository getSiteRepository() {
+    return siteRepository;
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
@@ -499,11 +503,11 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * Updating the stop model is only allowed during graph build
+   * Updating the site repository is only allowed during graph build
    */
-  public void mergeStopModels(StopModel childStopModel) {
+  public void mergeSiteRepositories(SiteRepository childSiteRepository) {
     invalidateIndex();
-    this.stopModel = this.stopModel.merge(childStopModel);
+    this.siteRepository = this.siteRepository.merge(childSiteRepository);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
@@ -562,6 +566,36 @@ public class TimetableRepository implements Serializable {
 
   public FlexTrip getFlexTrip(FeedScopedId tripId) {
     return flexTripsById.get(tripId);
+  }
+
+  /**
+   * The stops that are used by transit capable of transporting cars need to be
+   * connected to the road network (e.g. car ferries). This method returns the
+   * stops that are used by trips that allow cars.
+   * @return set of stop locations that are used for trips that allow cars
+   */
+  public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
+    Set<StopLocation> stopLocations = getAllTripPatterns()
+      .stream()
+      .filter(t ->
+        t
+          .getScheduledTimetable()
+          .getTripTimes()
+          .stream()
+          .anyMatch(tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED)
+      )
+      .flatMap(t -> t.getStops().stream())
+      .collect(Collectors.toSet());
+
+    stopLocations.addAll(
+      stopLocations
+        .stream()
+        .filter(GroupStop.class::isInstance)
+        .map(GroupStop.class::cast)
+        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
+        .toList()
+    );
+    return stopLocations;
   }
 
   private void invalidateIndex() {

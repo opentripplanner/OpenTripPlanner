@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.Objects;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class RoutingError {
 

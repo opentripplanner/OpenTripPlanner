@@ -8,19 +8,19 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 

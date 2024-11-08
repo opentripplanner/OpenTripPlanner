@@ -3,12 +3,12 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

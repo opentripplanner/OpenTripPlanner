@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
+import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * The combination of the closest stop, trip and trip active date.

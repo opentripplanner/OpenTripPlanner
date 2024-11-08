@@ -37,8 +37,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
@@ -70,6 +68,8 @@ import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.utils.lang.StringUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -32,7 +32,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class LinkingTest {
@@ -150,9 +150,9 @@ public class LinkingTest {
   /** Build a graph in Columbus, OH with no transit */
   public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
+    var siteRepository = new SiteRepository();
     var gg = new Graph(deduplicator);
-    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
 
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);

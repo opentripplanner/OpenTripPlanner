@@ -6,6 +6,7 @@ import static org.opentripplanner.OtpArchitectureModules.GEO_TOOLS;
 import static org.opentripplanner.OtpArchitectureModules.GNU_TROVE;
 import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
 import static org.opentripplanner.OtpArchitectureModules.OPEN_GIS;
+import static org.opentripplanner.OtpArchitectureModules.OTP_UTILS;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.arch.Module;
@@ -27,16 +28,13 @@ public class FrameworkArchitectureTest {
   private static final Package GEOMETRY = FRAMEWORK.subPackage("geometry");
   private static final Package I18N = FRAMEWORK.subPackage("i18n");
   private static final Package IO = FRAMEWORK.subPackage("io");
-  private static final Package LANG = FRAMEWORK.subPackage("lang");
   private static final Package LOGGING = FRAMEWORK.subPackage("logging");
   private static final Package RESOURCES = FRAMEWORK.subPackage("resources");
-  private static final Package TEXT = FRAMEWORK.subPackage("text");
   private static final Package TIME = FRAMEWORK.subPackage("time");
-  private static final Package TO_STRING = FRAMEWORK.subPackage("tostring");
 
   @Test
   void enforceApplicationPackageDependencies() {
-    APPLICATION.dependsOn(LANG).verify();
+    APPLICATION.dependsOn(OTP_UTILS).verify();
   }
 
   @Test
@@ -52,16 +50,7 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceGeometryPackageDependencies() {
     GEOMETRY
-      .dependsOn(
-        GEO_JSON,
-        GEO_TOOLS,
-        GNU_TROVE,
-        JTS_GEOM,
-        OPEN_GIS,
-        LANG,
-        TO_STRING,
-        GUAVA_COLLECTIONS
-      )
+      .dependsOn(GEO_JSON, GEO_TOOLS, GNU_TROVE, JTS_GEOM, OPEN_GIS, GUAVA_COLLECTIONS, OTP_UTILS)
       .verify();
   }
 
@@ -76,13 +65,8 @@ public class FrameworkArchitectureTest {
   }
 
   @Test
-  void enforceLangPackageDependencies() {
-    LANG.verify();
-  }
-
-  @Test
   void enforceLoggingPackageDependencies() {
-    LOGGING.dependsOn(TEXT, TIME).verify();
+    LOGGING.dependsOn(OTP_UTILS).verify();
   }
 
   @Test
@@ -91,17 +75,7 @@ public class FrameworkArchitectureTest {
   }
 
   @Test
-  void enforceTextPackageDependencies() {
-    TEXT.dependsOn(LANG).verify();
-  }
-
-  @Test
   void enforceTimePackageDependencies() {
-    TIME.dependsOn(LOGGING).verify();
-  }
-
-  @Test
-  void enforceToStingPackageDependencies() {
-    TO_STRING.dependsOn(LANG, TIME).verify();
+    TIME.dependsOn(OTP_UTILS).verify();
   }
 }

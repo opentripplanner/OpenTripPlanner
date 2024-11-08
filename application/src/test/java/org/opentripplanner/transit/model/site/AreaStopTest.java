@@ -14,7 +14,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class AreaStopTest {
 
@@ -33,7 +33,7 @@ class AreaStopTest {
   private static final AreaStop subject = areaStopBuilder().withGeometry(GEOMETRY).build();
 
   private static AreaStopBuilder areaStopBuilder() {
-    return StopModel
+    return SiteRepository
       .of()
       .areaStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)

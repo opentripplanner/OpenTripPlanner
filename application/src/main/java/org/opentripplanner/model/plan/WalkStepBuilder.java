@@ -7,11 +7,11 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 
 public class WalkStepBuilder {
 
