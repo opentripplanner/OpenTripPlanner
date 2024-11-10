@@ -39,7 +39,7 @@ public class WalkStepMapper {
     api.streetName = domain.getDirectionText().toString(locale);
     api.absoluteDirection =
       domain.getAbsoluteDirection().map(AbsoluteDirectionMapper::mapAbsoluteDirection).orElse(null);
-    api.exit = domain.getExit();
+    api.exit = domain.getHighwayExit();
     api.stayOn = domain.isStayOn();
     api.area = domain.getArea();
     api.bogusName = domain.getBogusName();

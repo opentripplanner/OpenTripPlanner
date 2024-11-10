@@ -130,14 +130,14 @@ public final class WalkStep {
   /**
    * When exiting a highway or traffic circle, the exit name/number.
    */
-  public String getExit() {
+  public String getHighwayExit() {
     return exit;
   }
 
   /**
-   * Get information about building entrance or exit.
+   * Get information about a subway station entrance or exit.
    */
-  public Entrance getEntrance() {
+  public Entrance getStationEntrance() {
     return entrance;
   }
 

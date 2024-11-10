@@ -65,7 +65,7 @@ public class PathGuidanceType {
           .name("exit")
           .description("When exiting a highway or traffic circle, the exit name/number.")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getExit())
+          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getHighwayExit())
           .build()
       )
       .field(
