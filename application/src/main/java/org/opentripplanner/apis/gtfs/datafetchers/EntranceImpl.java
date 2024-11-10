@@ -20,7 +20,7 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   public DataFetcher<String> entranceId() {
     return environment -> {
       Entrance entrance = environment.getSource();
-      return entrance.getId() != null ? entrance.getId().toString() : null;
+      return entrance.getId().toString();
     };
   }
 

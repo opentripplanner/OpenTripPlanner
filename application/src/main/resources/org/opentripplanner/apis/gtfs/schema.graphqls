@@ -449,7 +449,7 @@ type Entrance {
   "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
   code: String
   "ID of the entrance in the format of `FeedId:EntranceId`."
-  entranceId: String
+  entranceId: String!
   "Name of the entrance or exit."
   name: String
   "Whether the entrance or exit is accessible by wheelchair"
