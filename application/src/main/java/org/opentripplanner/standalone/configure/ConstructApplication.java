@@ -77,7 +77,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
-    VehicleParkingService vehicleParkingService,
+    VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters
   ) {
@@ -96,6 +96,7 @@ public class ConstructApplication {
         .timetableRepository(timetableRepository)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .vehicleParkingRepository(vehicleParkingRepository)
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)

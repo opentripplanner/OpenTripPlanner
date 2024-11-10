@@ -24,7 +24,7 @@ import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRep
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
-import org.opentripplanner.service.vehicleparking.configure.VehicleParkingModule;
+import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
@@ -57,7 +57,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RealtimeVehicleRepositoryModule.class,
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
-    VehicleParkingModule.class,
+    VehicleParkingServiceModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
@@ -125,6 +125,11 @@ public interface ConstructApplicationFactory {
     @BindsInstance
     Builder stopConsolidationRepository(
       @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
+
+    @BindsInstance
+    Builder vehicleParkingRepository(
+      VehicleParkingRepository parkingRepository
     );
 
     @BindsInstance

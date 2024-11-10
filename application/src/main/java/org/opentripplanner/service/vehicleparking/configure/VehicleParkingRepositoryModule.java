@@ -3,14 +3,11 @@ package org.opentripplanner.service.vehicleparking.configure;
 import dagger.Binds;
 import dagger.Module;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 
 @Module
-public interface VehicleParkingModule {
+public interface VehicleParkingRepositoryModule {
   @Binds
-  VehicleParkingService bindService(DefaultVehicleParkingService service);
+  VehicleParkingRepository bindService(DefaultVehicleParkingService service);
 
-  @Binds
-  VehicleParkingRepository bindRepository(DefaultVehicleParkingService service);
 }

@@ -23,7 +23,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
@@ -193,7 +193,7 @@ public class GraphSerializationTest {
     Graph originalGraph,
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    VehicleParkingService vehicleParkingService,
+    VehicleParkingRepository vehicleParkingRepository,
     EmissionsDataModel emissionsDataModel
   ) throws Exception {
     // Now round-trip the graph through serialization.
@@ -204,7 +204,7 @@ public class GraphSerializationTest {
       originalGraph,
       originalTimetableRepository,
       worldEnvelopeRepository,
-      vehicleParkingService,
+      vehicleParkingRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),

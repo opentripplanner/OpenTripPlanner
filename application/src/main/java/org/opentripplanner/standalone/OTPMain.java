@@ -152,7 +152,7 @@ public class OTPMain {
         app.graph(),
         app.timetableRepository(),
         app.worldEnvelopeRepository(),
-        app.vehicleParkingService(),
+        app.vehicleParkingRepository(),
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),

@@ -8,7 +8,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
@@ -57,7 +57,7 @@ public class LoadApplication {
       obj.graph,
       obj.timetableRepository,
       obj.worldEnvelopeRepository,
-      obj.vehicleParkingService,
+      obj.parkingRepository,
       obj.issueSummary,
       obj.emissionsDataModel,
       obj.stopConsolidationRepository,
@@ -71,7 +71,7 @@ public class LoadApplication {
       factory.emptyGraph(),
       factory.emptyTimetableRepository(),
       factory.emptyWorldEnvelopeRepository(),
-      factory.emptyVehicleParkingService(),
+      factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
       factory.emptyStopConsolidationRepository(),
@@ -94,7 +94,7 @@ public class LoadApplication {
     Graph graph,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    VehicleParkingService vehicleParkingService,
+    VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionsDataModel emissionsDataModel,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -109,7 +109,7 @@ public class LoadApplication {
       graphBuilderDataSources(),
       issueSummary,
       emissionsDataModel,
-      vehicleParkingService,
+      parkingRepository,
       stopConsolidationRepository,
       streetLimitationParameters
     );
