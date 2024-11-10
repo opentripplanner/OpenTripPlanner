@@ -30,7 +30,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;

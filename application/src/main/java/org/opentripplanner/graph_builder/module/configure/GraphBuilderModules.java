@@ -43,7 +43,7 @@ import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;

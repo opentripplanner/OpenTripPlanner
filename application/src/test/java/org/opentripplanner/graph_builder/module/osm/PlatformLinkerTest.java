@@ -6,7 +6,7 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;

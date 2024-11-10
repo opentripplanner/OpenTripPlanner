@@ -11,7 +11,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TimetableRepository;
 

@@ -16,8 +16,8 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 

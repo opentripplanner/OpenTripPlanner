@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestStreetLinkerModule {

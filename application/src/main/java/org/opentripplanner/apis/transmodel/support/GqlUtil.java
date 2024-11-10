@@ -12,7 +12,7 @@ import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitService;
 

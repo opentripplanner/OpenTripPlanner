@@ -5,7 +5,7 @@ import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.restapi.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;

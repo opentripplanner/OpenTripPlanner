@@ -23,7 +23,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitService;
