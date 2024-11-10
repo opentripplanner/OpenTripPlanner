@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
@@ -95,7 +96,7 @@ class VehicleParkingAvailabilityUpdaterTest {
   }
 
   private static VehicleParkingService buildParkingService(VehicleParkingSpaces capacity) {
-    var service = new VehicleParkingService();
+    var service = new DefaultVehicleParkingService();
 
     var parking = parkingBuilder()
       .carPlaces(capacity.getCarSpaces() != null)

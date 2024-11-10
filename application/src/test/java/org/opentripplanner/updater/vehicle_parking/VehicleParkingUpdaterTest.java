@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestUtil;
@@ -45,7 +46,7 @@ class VehicleParkingUpdaterTest {
     graphData.initGraph();
     graph = graphData.getGraph();
     timetableRepository = graphData.getTimetableRepository();
-    vehicleParkingService = new VehicleParkingService();
+    vehicleParkingService = new DefaultVehicleParkingService();
     realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, timetableRepository);
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);

@@ -47,7 +47,7 @@ import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
@@ -145,7 +145,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
           new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
-          new VehicleParkingService(),
+          new DefaultVehicleParkingService(),
           new DefaultEmissionsService(new EmissionsDataModel()),
           null,
           RouterConfig.DEFAULT.flexParameters(),

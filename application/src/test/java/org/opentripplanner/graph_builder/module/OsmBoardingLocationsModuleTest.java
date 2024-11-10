@@ -14,7 +14,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -84,7 +84,7 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network")
     );
     var osmModule = OsmModule
-      .of(provider, graph, new VehicleParkingService())
+      .of(provider, graph, new DefaultVehicleParkingService())
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();

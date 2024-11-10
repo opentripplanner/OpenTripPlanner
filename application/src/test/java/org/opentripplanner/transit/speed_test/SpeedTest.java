@@ -23,7 +23,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -99,7 +99,7 @@ public class SpeedTest {
       graph,
       new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
-      new VehicleParkingService(),
+      new DefaultVehicleParkingService(),
       timetableRepository,
       config.updatersConfig
     );

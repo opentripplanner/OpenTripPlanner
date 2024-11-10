@@ -32,6 +32,7 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -58,7 +59,7 @@ public class OsmModuleTest {
     OsmProvider provider = new OsmProvider(file, true);
 
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new VehicleParkingService())
+      .of(provider, gg, new DefaultVehicleParkingService())
       .withAreaVisibility(true)
       .build();
 
@@ -117,7 +118,7 @@ public class OsmModuleTest {
     File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new VehicleParkingService())
+      .of(provider, gg, new DefaultVehicleParkingService())
       .withAreaVisibility(true)
       .build();
 
@@ -313,7 +314,7 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     OsmProvider provider = new OsmProvider(file, false);
-    OsmModule loader = OsmModule.of(provider, graph, new VehicleParkingService()).build();
+    OsmModule loader = OsmModule.of(provider, graph, new DefaultVehicleParkingService()).build();
     loader.buildGraph();
 
     Vertex start = graph.getVertex(VertexLabel.osm(1));
@@ -330,7 +331,7 @@ public class OsmModuleTest {
 
   private BuildResult buildParkingLots() {
     var graph = new Graph();
-    var service = new VehicleParkingService();
+    var service = new DefaultVehicleParkingService();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(RESOURCE_LOADER::file)
@@ -364,7 +365,7 @@ public class OsmModuleTest {
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule
-      .of(provider, graph, new VehicleParkingService())
+      .of(provider, graph, new DefaultVehicleParkingService())
       .withAreaVisibility(!skipVisibility)
       .build();
 

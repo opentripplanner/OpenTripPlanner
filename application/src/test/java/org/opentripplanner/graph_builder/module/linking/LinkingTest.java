@@ -21,7 +21,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -158,7 +158,7 @@ public class LinkingTest {
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
-    OsmModule osmModule = OsmModule.of(provider, gg, new VehicleParkingService()).build();
+    OsmModule osmModule = OsmModule.of(provider, gg, new DefaultVehicleParkingService()).build();
 
     osmModule.buildGraph();
     return new TestOtpModel(gg, timetableRepository);

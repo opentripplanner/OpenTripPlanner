@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -170,7 +170,7 @@ public class VehicleParkingLinkingTest {
       )
       .build();
 
-    var vehicleParkingService = new VehicleParkingService();
+    var vehicleParkingService = new DefaultVehicleParkingService();
     vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
     helper.linkVehicleParkingToGraph(vehicleParking);
 

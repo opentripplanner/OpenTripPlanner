@@ -12,6 +12,7 @@ import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepo
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.configure.WorldEnvelopeRepositoryModule;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -31,6 +32,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
     GsDataSourceModule.class,
     WorldEnvelopeRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
+    VehicleParkingServiceModule.class,
   }
 )
 public interface LoadApplicationFactory {

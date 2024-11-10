@@ -6,7 +6,7 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -31,7 +31,7 @@ public class PlatformLinkerTest {
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new VehicleParkingService())
+      .of(provider, gg, new DefaultVehicleParkingService())
       .withPlatformEntriesLinking(true)
       .build();
 

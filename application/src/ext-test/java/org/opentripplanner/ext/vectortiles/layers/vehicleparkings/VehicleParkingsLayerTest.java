@@ -23,6 +23,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
@@ -85,7 +86,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void vehicleParkingGeometryTest() {
-    VehicleParkingService service = new VehicleParkingService();
+    VehicleParkingService service = new DefaultVehicleParkingService();
     service.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
