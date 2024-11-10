@@ -22,7 +22,9 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.configure.VehicleParkingModule;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
@@ -55,6 +57,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RealtimeVehicleRepositoryModule.class,
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
+    VehicleParkingModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
@@ -75,8 +78,9 @@ public interface ConstructApplicationFactory {
   RealtimeVehicleRepository realtimeVehicleRepository();
   RealtimeVehicleService realtimeVehicleService();
   VehicleRentalRepository vehicleRentalRepository();
-  VehicleParkingService vehicleParkingService();
   VehicleRentalService vehicleRentalService();
+  VehicleParkingRepository vehicleParkingRepository();
+  VehicleParkingService vehicleParkingService();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -117,9 +121,6 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
-
-    @BindsInstance
-    Builder vehicleParkingService(VehicleParkingService vehicleParkingService);
 
     @BindsInstance
     Builder stopConsolidationRepository(

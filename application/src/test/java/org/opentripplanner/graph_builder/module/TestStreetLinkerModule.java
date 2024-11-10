@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestStreetLinkerModule {
@@ -15,12 +15,12 @@ public class TestStreetLinkerModule {
 
   public static void link(
     Graph graph,
-    VehicleParkingService vehicleParkingService,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository
   ) {
     new StreetLinkerModule(
       graph,
-      vehicleParkingService,
+      parkingRepository,
       timetableRepository,
       DataImportIssueStore.NOOP,
       false

@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
@@ -49,20 +49,20 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
   private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
   private final Graph graph;
-  private final VehicleParkingService parkingService;
+  private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final Boolean addExtraEdgesToAreas;
 
   public StreetLinkerModule(
     Graph graph,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     boolean addExtraEdgesToAreas
   ) {
     this.graph = graph;
-    this.parkingService = parkingService;
+    this.parkingRepository = parkingRepository;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
@@ -314,7 +314,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       }
     }
     if (!vehicleParkingToRemove.isEmpty()) {
-      parkingService.updateVehicleParking(List.of(), vehicleParkingToRemove);
+      parkingRepository.updateVehicleParking(List.of(), vehicleParkingToRemove);
     }
   }
 

@@ -43,7 +43,7 @@ import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -60,7 +60,7 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingService,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters
   ) {
@@ -141,7 +141,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TimetableRepository timetableRepository,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingService,
     DataImportIssueStore issueStore
   ) {
     return new NetexConfigure(config)
@@ -159,13 +159,13 @@ public class GraphBuilderModules {
   static StreetLinkerModule provideStreetLinkerModule(
     BuildConfig config,
     Graph graph,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     return new StreetLinkerModule(
       graph,
-      parkingService,
+      parkingRepository,
       timetableRepository,
       issueStore,
       config.areaVisibility
@@ -177,7 +177,7 @@ public class GraphBuilderModules {
   static PruneIslands providePruneIslands(
     BuildConfig config,
     Graph graph,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
@@ -187,7 +187,7 @@ public class GraphBuilderModules {
       issueStore,
       new StreetLinkerModule(
         graph,
-        parkingService,
+        parkingRepository,
         timetableRepository,
         issueStore,
         config.areaVisibility

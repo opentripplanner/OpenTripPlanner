@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -95,7 +96,6 @@ public class ConstructApplication {
         .timetableRepository(timetableRepository)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
-        .vehicleParkingService(vehicleParkingService)
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
@@ -130,7 +130,7 @@ public class ConstructApplication {
       graph(),
       timetableRepository(),
       factory.worldEnvelopeRepository(),
-      factory.vehicleParkingService(),
+      factory.vehicleParkingRepository(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
@@ -167,6 +167,7 @@ public class ConstructApplication {
       graph(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
+      vehicleParkingRepository(),
       vehicleParkingService(),
       timetableRepository(),
       routerConfig().updaterConfig()
@@ -273,6 +274,10 @@ public class ConstructApplication {
 
   public VehicleParkingService vehicleParkingService() {
     return factory.vehicleParkingService();
+  }
+
+  public VehicleParkingRepository vehicleParkingRepository() {
+    return factory.vehicleParkingRepository();
   }
 
   public Graph graph() {

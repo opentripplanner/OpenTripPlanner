@@ -25,7 +25,7 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -52,7 +52,7 @@ public class OsmModule implements GraphBuilderModule {
    */
   private final List<OsmProvider> providers;
   private final Graph graph;
-  private final VehicleParkingService parkingService;
+  private final VehicleParkingRepository parkingRepository;
   private final DataImportIssueStore issueStore;
   private final OsmProcessingParameters params;
   private final SafetyValueNormalizer normalizer;
@@ -63,7 +63,7 @@ public class OsmModule implements GraphBuilderModule {
   OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
-    VehicleParkingService parkingService,
+    VehicleParkingRepository parkingService,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters,
     OsmProcessingParameters params
@@ -76,13 +76,13 @@ public class OsmModule implements GraphBuilderModule {
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
-    this.parkingService = parkingService;
+    this.parkingRepository = parkingService;
   }
 
   public static OsmModuleBuilder of(
     Collection<OsmProvider> providers,
     Graph graph,
-    VehicleParkingService service
+    VehicleParkingRepository service
   ) {
     return new OsmModuleBuilder(providers, graph, service);
   }
@@ -90,7 +90,7 @@ public class OsmModule implements GraphBuilderModule {
   public static OsmModuleBuilder of(
     OsmProvider provider,
     Graph graph,
-    VehicleParkingService service
+    VehicleParkingRepository service
   ) {
     return of(List.of(provider), graph, service);
   }
@@ -175,7 +175,7 @@ public class OsmModule implements GraphBuilderModule {
     }
 
     if (!parkingLots.isEmpty()) {
-      parkingService.updateVehicleParking(parkingLots, List.of());
+      parkingRepository.updateVehicleParking(parkingLots, List.of());
     }
 
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);

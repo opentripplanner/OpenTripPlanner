@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
@@ -23,7 +24,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
  * <P>THIS CLASS IS THREAD-SAFE<p>
  */
 @Singleton
-public class DefaultVehicleParkingService implements Serializable, VehicleParkingService {
+public class DefaultVehicleParkingService
+  implements Serializable, VehicleParkingService, VehicleParkingRepository {
 
   @Inject
   public DefaultVehicleParkingService() {}

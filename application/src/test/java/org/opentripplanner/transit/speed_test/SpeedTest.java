@@ -100,6 +100,7 @@ public class SpeedTest {
       new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingService(),
+      new DefaultVehicleParkingService(),
       timetableRepository,
       config.updatersConfig
     );
