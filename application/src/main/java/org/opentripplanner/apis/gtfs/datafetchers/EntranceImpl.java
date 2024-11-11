@@ -28,12 +28,10 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   public DataFetcher<String> name() {
     return environment -> {
       Entrance entrance = environment.getSource();
-      return entrance.getName() != null
-        ? org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
-          entrance.getName(),
-          environment
-        )
-        : null;
+      return org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
+        entrance.getName(),
+        environment
+      );
     };
   }
 
