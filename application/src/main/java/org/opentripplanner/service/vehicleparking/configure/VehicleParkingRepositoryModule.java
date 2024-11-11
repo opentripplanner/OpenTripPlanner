@@ -8,5 +8,5 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 @Module
 public interface VehicleParkingRepositoryModule {
   @Binds
-  VehicleParkingRepository bindService(DefaultVehicleParkingRepository repo);
+  VehicleParkingRepository bind(DefaultVehicleParkingRepository repo);
 }
