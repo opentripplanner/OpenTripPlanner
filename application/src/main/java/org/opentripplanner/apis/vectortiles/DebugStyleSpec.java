@@ -18,6 +18,7 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
+import org.opentripplanner.street.model.edge.LinearPlatformEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
@@ -61,6 +62,7 @@ public class DebugStyleSpec {
   private static final Class<Edge>[] EDGES_TO_DISPLAY = new Class[] {
     StreetEdge.class,
     AreaEdge.class,
+    LinearPlatformEdge.class,
     EscalatorEdge.class,
     PathwayEdge.class,
     ElevatorHopEdge.class,
