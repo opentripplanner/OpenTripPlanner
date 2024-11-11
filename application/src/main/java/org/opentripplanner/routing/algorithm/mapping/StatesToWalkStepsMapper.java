@@ -529,7 +529,7 @@ public class StatesToWalkStepsMapper {
   ) {
     // don't care what came before or comes after
     var step = createWalkStep(forwardState, backState);
-    // There is not a way to definitively determine if a user is entering or exiting the station, 
+    // There is not a way to definitively determine if a user is entering or exiting the station,
     // since the doors might be between or inside stations.
     step.withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION);
 
