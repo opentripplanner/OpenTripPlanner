@@ -45,7 +45,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchTime timeLine,
+    NavigationDirection timeLine,
     AlternativeLegsFilter filter
   ) {
     return getAlternativeLegs(leg, numberLegs, transitService, timeLine, filter, false, false);
@@ -73,7 +73,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
-    SearchTime timeLine,
+    NavigationDirection timeLine,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
     boolean exactDestinationStop
@@ -96,7 +96,7 @@ public class AlternativeLegs {
       ScheduledTransitLeg::getStartTime
     );
 
-    if (timeLine == SearchTime.BEFORE) {
+    if (timeLine == NavigationDirection.PREVIOUS) {
       legComparator = legComparator.reversed();
     }
 
@@ -127,7 +127,7 @@ public class AlternativeLegs {
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
-    SearchTime timeLine
+    NavigationDirection timeLine
   ) {
     TripPattern pattern = tripPatternBetweenStops.tripPattern;
     int boardingPosition = tripPatternBetweenStops.positions.boardingPosition;
@@ -140,7 +140,7 @@ public class AlternativeLegs {
       tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
-    if (timeLine == SearchTime.BEFORE) {
+    if (timeLine == NavigationDirection.PREVIOUS) {
       comparator = comparator.reversed();
     }
 
@@ -170,7 +170,7 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange = timeLine == SearchTime.BEFORE
+        boolean departureTimeInRange = timeLine == NavigationDirection.PREVIOUS
           ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
           : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 

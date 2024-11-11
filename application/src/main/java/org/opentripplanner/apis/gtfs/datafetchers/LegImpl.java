@@ -28,7 +28,7 @@ import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
-import org.opentripplanner.routing.alternativelegs.SearchTime;
+import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -278,15 +278,15 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<Iterable<Leg>> previousLegs() {
-    return alternativeLegs(SearchTime.BEFORE);
+    return alternativeLegs(NavigationDirection.PREVIOUS);
   }
 
   @Override
   public DataFetcher<Iterable<Leg>> nextLegs() {
-    return alternativeLegs(SearchTime.AFTER);
+    return alternativeLegs(NavigationDirection.NEXT);
   }
 
-  private DataFetcher<Iterable<Leg>> alternativeLegs(SearchTime timeLine) {
+  private DataFetcher<Iterable<Leg>> alternativeLegs(NavigationDirection timeLine) {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
