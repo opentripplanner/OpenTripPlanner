@@ -347,8 +347,7 @@ public class TimetableSnapshot {
     }
 
     // The time tables are finished during the commit
-
-    return Result.success(UpdateSuccess.noWarnings());
+    return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
   }
 
   /**

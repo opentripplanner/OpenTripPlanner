@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+
 /**
  * This {@link FactorStrategy} keep a single value and use it every time the factor is needed. The
  * {@link #minFactor()} return the same value.

@@ -135,11 +135,15 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
       of(
         List.of(mode("BUS")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS]}]}]"
+      ),
+      of(
+        List.of(mode("BUS"), mode("COACH")),
         "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
       ),
       of(
         List.of(mode("BUS"), mode("MONORAIL")),
-        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH, MONORAIL]}]}]"
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, MONORAIL]}]}]"
       )
     );
   }

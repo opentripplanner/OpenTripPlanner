@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters.INITIAL_GET_DATA_TIMEOUT;
 import static org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters.RECONNECT_PERIOD;
 
@@ -79,6 +80,11 @@ public class SiriETGooglePubsubUpdaterConfig {
         .of("fuzzyTripMatching")
         .since(V2_1)
         .summary("If the trips should be matched fuzzily.")
+        .asBoolean(false),
+      c
+        .of("producerMetrics")
+        .since(V2_7)
+        .summary("If failure, success, and warning metrics should be collected per producer.")
         .asBoolean(false)
     );
   }

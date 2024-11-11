@@ -10,10 +10,10 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.PathUtils;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.api.PathUtils;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
  *  This test focus on the PASS-THROUGH functionality with three transit legs and two transfer in

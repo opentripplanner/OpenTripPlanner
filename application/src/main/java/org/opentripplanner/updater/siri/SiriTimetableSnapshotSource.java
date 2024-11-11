@@ -174,7 +174,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       /* commit */
       return addTripToGraphAndBuffer(result.successValue());
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e);
+      return DataValidationExceptionMapper.toResult(e, journey.getDataSource());
     } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
@@ -217,6 +217,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     Trip trip = entityResolver.resolveTrip(estimatedVehicleJourney);
+    String dataSource = estimatedVehicleJourney.getDataSource();
 
     // Check if EstimatedVehicleJourney is reported as NOT monitored, ignore the notMonitored-flag
     // if the journey is NOT monitored because it has been cancelled
@@ -224,13 +225,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       !TRUE.equals(estimatedVehicleJourney.isMonitored()) &&
       !TRUE.equals(estimatedVehicleJourney.isCancellation())
     ) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED);
+      return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED, dataSource);
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
 
     if (serviceDate == null) {
-      return UpdateError.result(trip != null ? trip.getId() : null, NO_START_DATE);
+      return UpdateError.result(trip != null ? trip.getId() : null, NO_START_DATE, dataSource);
     }
 
     TripPattern pattern;
@@ -252,20 +253,20 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           "No trips found for EstimatedVehicleJourney. {}",
           DebugString.of(estimatedVehicleJourney)
         );
-        return UpdateError.result(null, NO_FUZZY_TRIP_MATCH);
+        return UpdateError.result(null, NO_FUZZY_TRIP_MATCH, dataSource);
       }
 
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, TRIP_NOT_FOUND);
+      return UpdateError.result(null, TRIP_NOT_FOUND, dataSource);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
-      return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
+      return UpdateError.result(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN, dataSource);
     }
     var updateResult = new ModifiedTripBuilder(
       existingTripTimes,
@@ -315,7 +316,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate,
       tripUpdate.addedTripOnServiceDate(),
       tripUpdate.tripCreation(),
-      tripUpdate.routeCreation()
+      tripUpdate.routeCreation(),
+      tripUpdate.dataSource()
     );
     var result = snapshotManager.updateBuffer(realTimeTripUpdate);
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
