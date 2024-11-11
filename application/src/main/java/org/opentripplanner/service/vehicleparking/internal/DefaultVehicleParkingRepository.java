@@ -68,11 +68,11 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
 
   @Override
   public Stream<VehicleParking> getVehicleParkings() {
-    return Stream.empty();
+    return vehicleParkings.stream();
   }
 
   @Override
   public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
-    return null;
+    return vehicleParkingGroups;
   }
 }
