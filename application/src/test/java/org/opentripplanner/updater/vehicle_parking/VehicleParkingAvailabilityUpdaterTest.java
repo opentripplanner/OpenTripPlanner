@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
@@ -50,7 +51,6 @@ class VehicleParkingAvailabilityUpdaterTest {
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
-      service,
       service
     );
 
@@ -68,7 +68,6 @@ class VehicleParkingAvailabilityUpdaterTest {
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
-      service,
       service
     );
 
@@ -86,7 +85,6 @@ class VehicleParkingAvailabilityUpdaterTest {
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(new AvailabiltyUpdate(id("not-found"), 100)),
-      service,
       service
     );
 
@@ -97,16 +95,16 @@ class VehicleParkingAvailabilityUpdaterTest {
     assertNull(updated.getAvailability());
   }
 
-  private static DefaultVehicleParkingService buildParkingService(VehicleParkingSpaces capacity) {
-    var service = new DefaultVehicleParkingService();
+  private static VehicleParkingRepository buildParkingService(VehicleParkingSpaces capacity) {
+    var repo = new DefaultVehicleParkingRepository();
 
     var parking = parkingBuilder()
       .carPlaces(capacity.getCarSpaces() != null)
       .bicyclePlaces(capacity.getBicycleSpaces() != null)
       .capacity(capacity)
       .build();
-    service.updateVehicleParking(List.of(parking), List.of());
-    return service;
+    repo.updateVehicleParking(List.of(parking), List.of());
+    return repo;
   }
 
   private static VehicleParking.VehicleParkingBuilder parkingBuilder() {

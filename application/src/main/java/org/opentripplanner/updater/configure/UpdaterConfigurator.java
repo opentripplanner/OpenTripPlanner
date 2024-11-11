@@ -213,12 +213,7 @@ public class UpdaterConfigurator {
         case AVAILABILITY_ONLY -> {
           var source = AvailabilityDatasourceFactory.create(configItem);
           updaters.add(
-            new VehicleParkingAvailabilityUpdater(
-              configItem,
-              source,
-              parkingRepository,
-              parkingService
-            )
+            new VehicleParkingAvailabilityUpdater(configItem, source, parkingRepository)
           );
         }
       }

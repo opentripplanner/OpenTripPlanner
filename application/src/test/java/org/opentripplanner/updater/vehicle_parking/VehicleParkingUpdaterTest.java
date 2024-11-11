@@ -11,9 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestUtil;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
@@ -36,7 +37,7 @@ class VehicleParkingUpdaterTest {
   private DefaultRealTimeUpdateContext realTimeUpdateContext;
 
   private VehicleParkingUpdater vehicleParkingUpdater;
-  private DefaultVehicleParkingService parkingService;
+  private VehicleParkingRepository parkingRepository;
 
   @BeforeEach
   @SuppressWarnings("unchecked")
@@ -45,7 +46,7 @@ class VehicleParkingUpdaterTest {
     graphData.initGraph();
     graph = graphData.getGraph();
     timetableRepository = graphData.getTimetableRepository();
-    parkingService = new DefaultVehicleParkingService();
+    parkingRepository = new DefaultVehicleParkingRepository();
     realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, timetableRepository);
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
@@ -76,7 +77,7 @@ class VehicleParkingUpdaterTest {
       }
     };
     vehicleParkingUpdater =
-      new VehicleParkingUpdater(parameters, dataSource, graph.getLinker(), parkingService);
+      new VehicleParkingUpdater(parameters, dataSource, graph.getLinker(), parkingRepository);
   }
 
   @Test
@@ -104,7 +105,7 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    var vehicleParkingInGraph = parkingService.getVehicleParkings().findFirst().orElseThrow();
+    var vehicleParkingInGraph = parkingRepository.getVehicleParkings().findFirst().orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
@@ -117,7 +118,7 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    vehicleParkingInGraph = parkingService.getVehicleParkings().findFirst().orElseThrow();
+    vehicleParkingInGraph = parkingRepository.getVehicleParkings().findFirst().orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
   }
@@ -152,7 +153,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingService.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.getVehicleParkings().count());
     assertVehicleParkingNotLinked();
   }
 
@@ -169,10 +170,10 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingService.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.getVehicleParkings().count());
     assertEquals(
       vehiclePlaces,
-      parkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+      parkingRepository.getVehicleParkings().findFirst().orElseThrow().getAvailability()
     );
     assertVehicleParkingNotLinked();
 
@@ -188,10 +189,10 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingService.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.getVehicleParkings().count());
     assertEquals(
       vehiclePlaces,
-      parkingService.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+      parkingRepository.getVehicleParkings().findFirst().orElseThrow().getAvailability()
     );
     assertVehicleParkingNotLinked();
   }
@@ -206,12 +207,12 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingService.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.getVehicleParkings().count());
 
     when(dataSource.getUpdates()).thenReturn(List.of());
     runUpdaterOnce();
 
-    assertEquals(0, parkingService.getVehicleParkings().count());
+    assertEquals(0, parkingRepository.getVehicleParkings().count());
   }
 
   private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
@@ -252,7 +253,7 @@ class VehicleParkingUpdaterTest {
       );
     }
 
-    assertEquals(vehicleParkingNumber, parkingService.getVehicleParkings().count());
+    assertEquals(vehicleParkingNumber, parkingRepository.getVehicleParkings().count());
   }
 
   private void runUpdaterOnce() {

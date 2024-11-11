@@ -128,9 +128,7 @@ public interface ConstructApplicationFactory {
     );
 
     @BindsInstance
-    Builder vehicleParkingRepository(
-      VehicleParkingRepository parkingRepository
-    );
+    Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
 
     @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);

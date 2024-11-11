@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -28,7 +27,6 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     VehicleParkingAvailabilityUpdater.class
   );
   private final DataSource<AvailabiltyUpdate> source;
-  private final VehicleParkingService service;
   private WriteToGraphCallback saveResultOnGraph;
 
   private final VehicleParkingRepository repository;
@@ -36,13 +34,11 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
   public VehicleParkingAvailabilityUpdater(
     VehicleParkingUpdaterParameters parameters,
     DataSource<AvailabiltyUpdate> source,
-    VehicleParkingRepository parkingRepository,
-    VehicleParkingService parkingService
+    VehicleParkingRepository parkingRepository
   ) {
     super(parameters);
     this.source = source;
     this.repository = parkingRepository;
-    this.service = parkingService;
 
     LOG.info("Creating vehicle-parking updater running every {}: {}", pollingPeriod(), source);
   }
@@ -70,7 +66,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     private AvailabilityUpdater(List<AvailabiltyUpdate> updates) {
       this.updates = List.copyOf(updates);
       this.parkingById =
-        service
+        repository
           .getVehicleParkings()
           .collect(Collectors.toUnmodifiableMap(VehicleParking::getId, Function.identity()));
     }
