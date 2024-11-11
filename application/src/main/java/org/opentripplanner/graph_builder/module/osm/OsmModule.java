@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -28,6 +29,8 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.LinearPlatform;
+import org.opentripplanner.street.model.edge.LinearPlatformEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
@@ -304,6 +307,8 @@ public class OsmModule implements GraphBuilderModule {
       // where the current edge should start
       OsmNode osmStartNode = null;
 
+      var platform = getPlatform(way);
+
       for (int i = 0; i < nodes.size() - 1; i++) {
         OsmNode segmentStartOsmNode = osmdb.getNode(nodes.get(i));
 
@@ -384,7 +389,8 @@ public class OsmModule implements GraphBuilderModule {
             way,
             i,
             permissions,
-            geometry
+            geometry,
+            platform
           );
 
           params.edgeNamer().recordEdges(way, streets);
@@ -405,6 +411,33 @@ public class OsmModule implements GraphBuilderModule {
     } // END loop over OSM ways
 
     LOG.info(progress.completeMessage());
+  }
+
+  private Optional<LinearPlatform> getPlatform(OsmWay way) {
+    if (way.isBoardingLocation()) {
+      var nodeRefs = way.getNodeRefs();
+      var size = nodeRefs.size();
+      var nodes = new Coordinate[size];
+      for (int i = 0; i < size; i++) {
+        nodes[i] = osmdb.getNode(nodeRefs.get(i)).getCoordinate();
+      }
+
+      var geometryFactory = GeometryUtils.getGeometryFactory();
+
+      var geometry = geometryFactory.createLineString(nodes);
+
+      var references = way.getMultiTagValues(params.boardingAreaRefTags());
+
+      return Optional.of(
+        new LinearPlatform(
+          params.edgeNamer().getNameForWay(way, "platform " + way.getId()),
+          geometry,
+          references
+        )
+      );
+    } else {
+      return Optional.empty();
+    }
   }
 
   private void validateBarriers() {
@@ -464,7 +497,8 @@ public class OsmModule implements GraphBuilderModule {
     OsmWay way,
     int index,
     StreetTraversalPermission permissions,
-    LineString geometry
+    LineString geometry,
+    Optional<LinearPlatform> platform
   ) {
     // No point in returning edges that can't be traversed by anyone.
     if (permissions.allowsNothing()) {
@@ -490,7 +524,8 @@ public class OsmModule implements GraphBuilderModule {
           length,
           permissionsFront,
           geometry,
-          false
+          false,
+          platform
         );
     }
     if (permissionsBack.allowsAnything()) {
@@ -503,7 +538,8 @@ public class OsmModule implements GraphBuilderModule {
           length,
           permissionsBack,
           backGeometry,
-          true
+          true,
+          platform
         );
     }
     if (street != null && backStreet != null) {
@@ -520,14 +556,19 @@ public class OsmModule implements GraphBuilderModule {
     double length,
     StreetTraversalPermission permissions,
     LineString geometry,
-    boolean back
+    boolean back,
+    Optional<LinearPlatform> platform
   ) {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-    StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
+    var seb = platform
+      .<StreetEdgeBuilder<?>>map(p -> new LinearPlatformEdgeBuilder().withPlatform(p))
+      .orElse(new StreetEdgeBuilder<>());
+
+    seb
       .withFromVertex(startEndpoint)
       .withToVertex(endEndpoint)
       .withGeometry(geometry)
