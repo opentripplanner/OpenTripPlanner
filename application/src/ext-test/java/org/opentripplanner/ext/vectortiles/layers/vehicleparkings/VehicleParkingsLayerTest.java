@@ -23,6 +23,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
@@ -85,8 +86,8 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void vehicleParkingGeometryTest() {
-    var service = new DefaultVehicleParkingService();
-    service.updateVehicleParking(List.of(vehicleParking), List.of());
+    var repo = new DefaultVehicleParkingRepository();
+    repo.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -109,7 +110,7 @@ public class VehicleParkingsLayerTest {
     var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
-    var builder = new VehicleParkingsLayerBuilder(service, tiles.layers().getFirst(), Locale.US);
+    var builder = new VehicleParkingsLayerBuilder(new DefaultVehicleParkingService(repo), tiles.layers().getFirst(), Locale.US);
 
     List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 

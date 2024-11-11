@@ -47,7 +47,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateCarAvailability() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().carSpaces(10).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().carSpaces(10).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
@@ -64,7 +64,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateBicycleAvailability() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
@@ -81,7 +81,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void notFound() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(new AvailabiltyUpdate(id("not-found"), 100)),
@@ -95,7 +95,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     assertNull(updated.getAvailability());
   }
 
-  private static VehicleParkingRepository buildParkingService(VehicleParkingSpaces capacity) {
+  private static VehicleParkingRepository buildParkingRepository(VehicleParkingSpaces capacity) {
     var repo = new DefaultVehicleParkingRepository();
 
     var parking = parkingBuilder()

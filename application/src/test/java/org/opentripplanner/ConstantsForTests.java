@@ -31,7 +31,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
@@ -136,7 +136,7 @@ public class ConstantsForTests {
       {
         OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
         OsmModule osmModule = OsmModule
-          .of(osmProvider, graph, new DefaultVehicleParkingService())
+          .of(osmProvider, graph, new DefaultVehicleParkingRepository())
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
           .build();
@@ -186,7 +186,7 @@ public class ConstantsForTests {
       // Add street data from OSM
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule
-        .of(osmProvider, graph, new DefaultVehicleParkingService())
+        .of(osmProvider, graph, new DefaultVehicleParkingRepository())
         .build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
@@ -229,7 +229,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var siteRepository = new SiteRepository();
-      var parkingService = new DefaultVehicleParkingService();
+      var parkingService = new DefaultVehicleParkingRepository();
       var graph = new Graph(deduplicator);
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM

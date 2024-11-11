@@ -70,6 +70,8 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -141,11 +143,11 @@ class GraphQLIntegrationTest {
   private static GraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
-  private static final DefaultVehicleParkingService parkingService = new DefaultVehicleParkingService();
+  private static final VehicleParkingRepository parkingRepository = new DefaultVehicleParkingRepository();
 
   @BeforeAll
   static void setup() {
-    parkingService.updateVehicleParking(
+    parkingRepository.updateVehicleParking(
       List.of(
         VehicleParking
           .builder()
@@ -316,7 +318,7 @@ class GraphQLIntegrationTest {
         transitService,
         new DefaultFareService(),
         defaultVehicleRentalService,
-        parkingService,
+        new DefaultVehicleParkingService(parkingRepository),
         realtimeVehicleService,
         finder,
         new RouteRequest()

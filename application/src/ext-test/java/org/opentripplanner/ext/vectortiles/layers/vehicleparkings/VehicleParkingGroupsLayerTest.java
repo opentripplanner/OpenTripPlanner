@@ -20,6 +20,7 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
@@ -90,8 +91,8 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void vehicleParkingGroupGeometryTest() {
-    var service = new DefaultVehicleParkingService();
-    service.updateVehicleParking(List.of(vehicleParking), List.of());
+    var repository = new DefaultVehicleParkingRepository();
+    repository.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -115,7 +116,7 @@ public class VehicleParkingGroupsLayerTest {
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
     var builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
-      service,
+      new DefaultVehicleParkingService(repository),
       tiles.layers().get(0),
       Locale.US
     );
