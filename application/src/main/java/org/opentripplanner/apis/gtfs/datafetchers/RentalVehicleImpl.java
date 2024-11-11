@@ -33,11 +33,6 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   }
 
   @Override
-  public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString(environment.getLocale());
-  }
-
-  @Override
   public DataFetcher<String> network() {
     return environment -> getSource(environment).getNetwork();
   }

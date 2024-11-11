@@ -854,8 +854,6 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> lon();
 
-    public DataFetcher<String> name();
-
     public DataFetcher<String> network();
 
     public DataFetcher<Boolean> operative();
