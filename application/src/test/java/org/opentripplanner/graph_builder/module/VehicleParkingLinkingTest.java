@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -170,7 +170,7 @@ public class VehicleParkingLinkingTest {
       )
       .build();
 
-    var vehicleParkingService = new DefaultVehicleParkingService();
+    var vehicleParkingService = new DefaultVehicleParkingRepository();
     vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
     helper.linkVehicleParkingToGraph(vehicleParking);
 

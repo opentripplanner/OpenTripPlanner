@@ -32,7 +32,8 @@ import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -59,7 +60,7 @@ public class OsmModuleTest {
     OsmProvider provider = new OsmProvider(file, true);
 
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new DefaultVehicleParkingService())
+      .of(provider, gg, new DefaultVehicleParkingRepository())
       .withAreaVisibility(true)
       .build();
 
@@ -118,7 +119,7 @@ public class OsmModuleTest {
     File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new DefaultVehicleParkingService())
+      .of(provider, gg, new DefaultVehicleParkingRepository())
       .withAreaVisibility(true)
       .build();
 
@@ -283,7 +284,7 @@ public class OsmModuleTest {
 
   @Test
   void addParkingLotsToService() {
-    var service = buildParkingLots().service;
+    var service = new DefaultVehicleParkingService(buildParkingLots().repository);
 
     assertEquals(11, service.getVehicleParkings().count());
     assertEquals(6, service.getBikeParks().count());
@@ -314,7 +315,7 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     OsmProvider provider = new OsmProvider(file, false);
-    OsmModule loader = OsmModule.of(provider, graph, new DefaultVehicleParkingService()).build();
+    OsmModule loader = OsmModule.of(provider, graph, new DefaultVehicleParkingRepository()).build();
     loader.buildGraph();
 
     Vertex start = graph.getVertex(VertexLabel.osm(1));
@@ -331,7 +332,7 @@ public class OsmModuleTest {
 
   private BuildResult buildParkingLots() {
     var graph = new Graph();
-    var service = new DefaultVehicleParkingService();
+    var service = new DefaultVehicleParkingRepository();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(RESOURCE_LOADER::file)
@@ -346,7 +347,7 @@ public class OsmModuleTest {
     return new BuildResult(graph, service);
   }
 
-  private record BuildResult(Graph graph, VehicleParkingService service) {}
+  private record BuildResult(Graph graph, VehicleParkingRepository repository) {}
 
   /**
    * This reads test file with area and tests if it can be routed if visibility is used and if it
@@ -365,7 +366,7 @@ public class OsmModuleTest {
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule
-      .of(provider, graph, new DefaultVehicleParkingService())
+      .of(provider, graph, new DefaultVehicleParkingRepository())
       .withAreaVisibility(!skipVisibility)
       .build();
 

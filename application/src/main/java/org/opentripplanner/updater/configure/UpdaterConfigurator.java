@@ -13,7 +13,6 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
@@ -52,7 +51,6 @@ public class UpdaterConfigurator {
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
-  private final VehicleParkingService parkingService;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
@@ -61,7 +59,6 @@ public class UpdaterConfigurator {
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
-    VehicleParkingService parkingService,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -71,7 +68,6 @@ public class UpdaterConfigurator {
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
-    this.parkingService = parkingService;
   }
 
   public static void configure(
@@ -79,7 +75,6 @@ public class UpdaterConfigurator {
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
-    VehicleParkingService parkingService,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -88,7 +83,6 @@ public class UpdaterConfigurator {
       realtimeVehicleRepository,
       vehicleRentalRepository,
       parkingRepository,
-      parkingService,
       timetableRepository,
       updatersParameters
     )

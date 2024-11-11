@@ -12,6 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -91,7 +92,7 @@ public class TestServerContext {
   }
 
   public static VehicleParkingService createVehicleParkingService() {
-    return new DefaultVehicleParkingService();
+    return new DefaultVehicleParkingService(new DefaultVehicleParkingRepository());
   }
 
   public static EmissionsService createEmissionsService() {

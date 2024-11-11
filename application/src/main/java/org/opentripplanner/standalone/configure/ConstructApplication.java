@@ -169,7 +169,6 @@ public class ConstructApplication {
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
       vehicleParkingRepository(),
-      vehicleParkingService(),
       timetableRepository(),
       routerConfig().updaterConfig()
     );
