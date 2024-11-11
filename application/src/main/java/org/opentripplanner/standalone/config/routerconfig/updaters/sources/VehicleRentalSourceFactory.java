@@ -9,9 +9,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
-import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
@@ -130,9 +130,11 @@ public class VehicleRentalSourceFactory {
     return c
       .of("allowedRentalType")
       .since(V2_7)
-      .summary("The type of rental data to include.")
+      .summary("Temporary parameter. The type of rental data to include.")
       .description(
         """
+        This parameter is temporary and will be removed in a future version of OTP.
+
         The type of rental data to include. This can be one of the following:
 
         - `ALL`: Include all data types.

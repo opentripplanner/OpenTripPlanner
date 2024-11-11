@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.smoovebikerental;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.updater.AllowedRentalType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -33,7 +33,7 @@ public record SmooveBikeRentalDataSourceParameters(
   }
 
   @Override
-  public AllowedRentalType allowedRentalType() {
-    return allowedRentalType;
+  public boolean allowRentalType(AllowedRentalType rentalType) {
+    return allowedRentalType == null || allowedRentalType == AllowedRentalType.ALL || rentalType == allowedRentalType;
   }
 }

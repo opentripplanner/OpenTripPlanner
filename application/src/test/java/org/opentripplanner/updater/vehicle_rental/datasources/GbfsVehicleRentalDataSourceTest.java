@@ -14,8 +14,8 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**

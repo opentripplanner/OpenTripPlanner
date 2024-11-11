@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
-import org.opentripplanner.updater.AllowedRentalType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
@@ -21,7 +20,11 @@ public record GbfsVehicleRentalDataSourceParameters(
   }
 
   @Override
-  public AllowedRentalType allowedRentalType() {
-    return allowedRentalType;
+  public boolean allowRentalType(AllowedRentalType rentalType) {
+    return (
+      allowedRentalType == null ||
+      allowedRentalType == AllowedRentalType.ALL ||
+      allowedRentalType == rentalType
+    );
   }
 }
