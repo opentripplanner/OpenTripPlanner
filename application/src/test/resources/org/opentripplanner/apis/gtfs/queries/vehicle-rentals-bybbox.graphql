@@ -9,7 +9,6 @@
     allowPickupNow
     lat
     lon
-    name
     operative
     rentalNetwork {
       networkId
@@ -28,6 +27,7 @@
       }
     }
     ... on VehicleRentalStation {
+      name
       stationId
       vehiclesAvailable
       availableVehicles {

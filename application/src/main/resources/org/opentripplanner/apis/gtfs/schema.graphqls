@@ -78,8 +78,6 @@ interface VehicleRental {
   lat: Float
   "Longitude of the vehicle rental object (WGS 84)"
   lon: Float
-  "Name of the vehicle"
-  name: String!
   "If true, rental object is not disabled."
   operative: Boolean
   "The vehicle rental network information. This is referred as system in the GBFS terminology."
@@ -1785,8 +1783,6 @@ type RentalVehicle implements Node & PlaceInterface & VehicleRental {
   lat: Float
   "Longitude of the vehicle (WGS 84)"
   lon: Float
-  "Name of the vehicle"
-  name: String!
   "ID of the rental network."
   network: String @deprecated(reason : "Use `networkId` from `rentalNetwork` instead.")
   "If true, vehicle is not disabled."

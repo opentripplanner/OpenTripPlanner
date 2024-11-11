@@ -6,13 +6,13 @@
         "allowPickupNow": false,
         "lat": 47.51,
         "lon": 18.99,
-        "name": "FooStation",
         "operative": false,
         "rentalNetwork": {
           "networkId": "Network-1",
           "url": "https://foo.bar"
         },
         "rentalUris": null,
+        "name": "FooStation",
         "stationId": "Network-1:FooStation",
         "vehiclesAvailable": 10,
         "availableVehicles": {
@@ -65,7 +65,6 @@
         "allowPickupNow": true,
         "lat": 47.52,
         "lon": 19.01,
-        "name": "free-floating-bicycle",
         "operative": true,
         "rentalNetwork": {
           "networkId": "Network-1",

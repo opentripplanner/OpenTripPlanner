@@ -1290,10 +1290,6 @@ public class GraphQLDataFetchers {
       return null;
     }
 
-    public default DataFetcher<String> name() {
-      return null;
-    }
-
     public default DataFetcher<Boolean> operative() {
       return null;
     }
