@@ -251,14 +251,6 @@ public class StyleBuilder {
   }
 
   /**
-   * Filter the entities by their "permission" property.
-   */
-  public final StyleBuilder permissionsFilter(StreetTraversalPermission p) {
-    filter = List.of("==", "permission", p.name());
-    return this;
-  }
-
-  /**
    * Filter the entities by a boolean property.
    */
   public final StyleBuilder booleanFilter(String propertyName, boolean value) {
