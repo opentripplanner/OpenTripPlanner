@@ -1,21 +1,23 @@
-package org.opentripplanner.osm.tagmapping;
+package org.opentripplanner.osm.wayproperty;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
+import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmWithTags;
-import org.opentripplanner.osm.wayproperty.SpeedPicker;
-import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
-public class DefaultMapperTest {
+public class MapperTest {
 
   private WayPropertySet wps;
   private OsmTagMapper mapper;
@@ -24,7 +26,7 @@ public class DefaultMapperTest {
   @BeforeEach
   public void setup() {
     var wps = new WayPropertySet();
-    DefaultMapper source = new DefaultMapper();
+    var source = new OsmTagMapper();
     source.populateProperties(wps);
     this.wps = wps;
     this.mapper = source;
@@ -197,6 +199,22 @@ public class DefaultMapperTest {
 
     var indoor = WayTestData.southeastLaBonitaWay().addTag("indoor", "yes");
     assertTrue(wps.getSlopeOverride(indoor));
+  }
+
+  @Test
+  public void mixin() {
+    wps.setProperties("tag=imaginary", withModes(CAR).bicycleSafety(2));
+    wps.setMixinProperties("foo=bar", ofBicycleSafety(0.5));
+
+    var withoutFoo = new OsmWithTags();
+    withoutFoo.addTag("tag", "imaginary");
+    assertEquals(2, wps.getDataForWay(withoutFoo).bicycleSafety().back());
+
+    // the mixin for foo=bar reduces the bike safety factor
+    var withFoo = new OsmWithTags();
+    withFoo.addTag("tag", "imaginary");
+    withFoo.addTag("foo", "bar");
+    assertEquals(1, wps.getDataForWay(withFoo).bicycleSafety().back());
   }
 
   /**

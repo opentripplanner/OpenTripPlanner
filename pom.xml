@@ -58,14 +58,14 @@
 
 
     <properties>
-        <otp.serialization.version.id>170</otp.serialization.version.id>
+        <otp.serialization.version.id>171</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
         <jackson.version>2.18.1</jackson.version>
         <jersey.version>3.1.9</jersey.version>
         <junit.version>5.11.2</junit.version>
-        <micrometer.version>1.13.5</micrometer.version>
+        <micrometer.version>1.13.7</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.12</logback.version>
         <lucene.version>9.12.0</lucene.version>
@@ -222,8 +222,6 @@
                         --add-opens java.base/sun.invoke.util=ALL-UNNAMED
                         --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
-                    <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
-                    <disableXmlReport>true</disableXmlReport>
                     <reportFormat>plain</reportFormat>
                     <consoleOutputReporter>
                         <disable>true</disable>
@@ -237,6 +235,7 @@
                         <printStderrOnError>true</printStderrOnError>
                         <printStderrOnFailure>true</printStderrOnFailure>
                         <printStderrOnSuccess>false</printStderrOnSuccess>
+                        <theme>UNICODE</theme>
                     </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>

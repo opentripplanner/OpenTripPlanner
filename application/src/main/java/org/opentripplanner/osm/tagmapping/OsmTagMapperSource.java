@@ -18,7 +18,7 @@ public enum OsmTagMapperSource {
 
   public OsmTagMapper getInstance() {
     return switch (this) {
-      case DEFAULT -> new DefaultMapper();
+      case DEFAULT -> new OsmTagMapper();
       case NORWAY -> new NorwayMapper();
       case UK -> new UKMapper();
       case FINLAND -> new FinlandMapper();

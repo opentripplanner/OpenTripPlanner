@@ -75,6 +75,63 @@ public class GraphQLTypes {
     ROUTE_TYPES,
   }
 
+  public static class GraphQLAlertAlertDescriptionTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertDescriptionTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertHeaderTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertHeaderTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertUrlArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertUrlArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   /** Cause of a alert */
   public enum GraphQLAlertCauseType {
     ACCIDENT,
@@ -1815,6 +1872,35 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLPlanPassThroughViaLocationInput {
+
+    private String label;
+    private List<String> stopLocationIds;
+
+    public GraphQLPlanPassThroughViaLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.label = (String) args.get("label");
+        this.stopLocationIds = (List<String>) args.get("stopLocationIds");
+      }
+    }
+
+    public String getGraphQLLabel() {
+      return this.label;
+    }
+
+    public List<String> getGraphQLStopLocationIds() {
+      return this.stopLocationIds;
+    }
+
+    public void setGraphQLLabel(String label) {
+      this.label = label;
+    }
+
+    public void setGraphQLStopLocationIds(List<String> stopLocationIds) {
+      this.stopLocationIds = stopLocationIds;
+    }
+  }
+
   public static class GraphQLPlanPreferencesInput {
 
     private GraphQLAccessibilityPreferencesInput accessibility;
@@ -2045,6 +2131,75 @@ public class GraphQLTypes {
 
     public void setGraphQLTransit(List<GraphQLPlanTransitModePreferenceInput> transit) {
       this.transit = transit;
+    }
+  }
+
+  public static class GraphQLPlanViaLocationInput {
+
+    private GraphQLPlanPassThroughViaLocationInput passThrough;
+    private GraphQLPlanVisitViaLocationInput visit;
+
+    public GraphQLPlanViaLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.passThrough =
+          new GraphQLPlanPassThroughViaLocationInput((Map<String, Object>) args.get("passThrough"));
+        this.visit = new GraphQLPlanVisitViaLocationInput((Map<String, Object>) args.get("visit"));
+      }
+    }
+
+    public GraphQLPlanPassThroughViaLocationInput getGraphQLPassThrough() {
+      return this.passThrough;
+    }
+
+    public GraphQLPlanVisitViaLocationInput getGraphQLVisit() {
+      return this.visit;
+    }
+
+    public void setGraphQLPassThrough(GraphQLPlanPassThroughViaLocationInput passThrough) {
+      this.passThrough = passThrough;
+    }
+
+    public void setGraphQLVisit(GraphQLPlanVisitViaLocationInput visit) {
+      this.visit = visit;
+    }
+  }
+
+  public static class GraphQLPlanVisitViaLocationInput {
+
+    private String label;
+    private java.time.Duration minimumWaitTime;
+    private List<String> stopLocationIds;
+
+    public GraphQLPlanVisitViaLocationInput(Map<String, Object> args) {
+      if (args != null) {
+        this.label = (String) args.get("label");
+        this.minimumWaitTime = (java.time.Duration) args.get("minimumWaitTime");
+        this.stopLocationIds = (List<String>) args.get("stopLocationIds");
+      }
+    }
+
+    public String getGraphQLLabel() {
+      return this.label;
+    }
+
+    public java.time.Duration getGraphQLMinimumWaitTime() {
+      return this.minimumWaitTime;
+    }
+
+    public List<String> getGraphQLStopLocationIds() {
+      return this.stopLocationIds;
+    }
+
+    public void setGraphQLLabel(String label) {
+      this.label = label;
+    }
+
+    public void setGraphQLMinimumWaitTime(java.time.Duration minimumWaitTime) {
+      this.minimumWaitTime = minimumWaitTime;
+    }
+
+    public void setGraphQLStopLocationIds(List<String> stopLocationIds) {
+      this.stopLocationIds = stopLocationIds;
     }
   }
 
@@ -2745,6 +2900,7 @@ public class GraphQLTypes {
     private List<GraphQLTransportModeInput> transportModes;
     private GraphQLInputTriangleInput triangle;
     private GraphQLInputUnpreferredInput unpreferred;
+    private List<GraphQLPlanViaLocationInput> via;
     private Double waitAtBeginningFactor;
     private Double waitReluctance;
     private Integer walkBoardCost;
@@ -2826,6 +2982,9 @@ public class GraphQLTypes {
         this.triangle = new GraphQLInputTriangleInput((Map<String, Object>) args.get("triangle"));
         this.unpreferred =
           new GraphQLInputUnpreferredInput((Map<String, Object>) args.get("unpreferred"));
+        if (args.get("via") != null) {
+          this.via = (List<GraphQLPlanViaLocationInput>) args.get("via");
+        }
         this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
         this.waitReluctance = (Double) args.get("waitReluctance");
         this.walkBoardCost = (Integer) args.get("walkBoardCost");
@@ -3055,6 +3214,10 @@ public class GraphQLTypes {
 
     public GraphQLInputUnpreferredInput getGraphQLUnpreferred() {
       return this.unpreferred;
+    }
+
+    public List<GraphQLPlanViaLocationInput> getGraphQLVia() {
+      return this.via;
     }
 
     public Double getGraphQLWaitAtBeginningFactor() {
@@ -3315,6 +3478,10 @@ public class GraphQLTypes {
       this.unpreferred = unpreferred;
     }
 
+    public void setGraphQLVia(List<GraphQLPlanViaLocationInput> via) {
+      this.via = via;
+    }
+
     public void setGraphQLWaitAtBeginningFactor(Double waitAtBeginningFactor) {
       this.waitAtBeginningFactor = waitAtBeginningFactor;
     }
@@ -3362,6 +3529,7 @@ public class GraphQLTypes {
     private GraphQLPlanLabeledLocationInput origin;
     private GraphQLPlanPreferencesInput preferences;
     private java.time.Duration searchWindow;
+    private List<GraphQLPlanViaLocationInput> via;
 
     public GraphQLQueryTypePlanConnectionArgs(Map<String, Object> args) {
       if (args != null) {
@@ -3380,6 +3548,9 @@ public class GraphQLTypes {
         this.preferences =
           new GraphQLPlanPreferencesInput((Map<String, Object>) args.get("preferences"));
         this.searchWindow = (java.time.Duration) args.get("searchWindow");
+        if (args.get("via") != null) {
+          this.via = (List<GraphQLPlanViaLocationInput>) args.get("via");
+        }
       }
     }
 
@@ -3431,6 +3602,10 @@ public class GraphQLTypes {
       return this.searchWindow;
     }
 
+    public List<GraphQLPlanViaLocationInput> getGraphQLVia() {
+      return this.via;
+    }
+
     public void setGraphQLAfter(String after) {
       this.after = after;
     }
@@ -3477,6 +3652,10 @@ public class GraphQLTypes {
 
     public void setGraphQLSearchWindow(java.time.Duration searchWindow) {
       this.searchWindow = searchWindow;
+    }
+
+    public void setGraphQLVia(List<GraphQLPlanViaLocationInput> via) {
+      this.via = via;
     }
   }
 

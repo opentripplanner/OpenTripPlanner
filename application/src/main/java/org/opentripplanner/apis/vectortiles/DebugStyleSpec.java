@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.vectortiles;
 
+import static org.opentripplanner.inspector.vector.edge.EdgePropertyMapper.streetPermissionAsString;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +32,8 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
- *  A Mapbox/Mapblibre style specification for rendering debug information about transit and
- *  street data.
+ * A Mapbox/Mapblibre style specification for rendering debug information about transit and street
+ * data.
  */
 public class DebugStyleSpec {
 
@@ -50,11 +52,15 @@ public class DebugStyleSpec {
   private static final String BLACK = "#140d0e";
 
   private static final int MAX_ZOOM = 23;
+  private static final int LINE_DETAIL_ZOOM = 13;
   private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
-    List.of(new ZoomStop(13, 0.3f), new ZoomStop(MAX_ZOOM, 6))
+    List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.4f), new ZoomStop(MAX_ZOOM, 7))
   );
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
-    List.of(new ZoomStop(13, 0.2f), new ZoomStop(MAX_ZOOM, 8))
+    List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.2f), new ZoomStop(MAX_ZOOM, 8))
+  );
+  private static final ZoomDependentNumber LINE_HALF_WIDTH = new ZoomDependentNumber(
+    List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.1f), new ZoomStop(MAX_ZOOM, 6))
   );
   private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
     List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
@@ -71,7 +77,14 @@ public class DebugStyleSpec {
   private static final String EDGES_GROUP = "Edges";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
-  private static final String TRAVERSAL_PERMISSIONS_GROUP = "Traversal permissions";
+  private static final String PERMISSIONS_GROUP = "Permissions";
+  private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
+
+  private static final StreetTraversalPermission[] streetModes = new StreetTraversalPermission[] {
+    StreetTraversalPermission.PEDESTRIAN,
+    StreetTraversalPermission.BICYCLE,
+    StreetTraversalPermission.CAR,
+  };
   private static final String WHEELCHAIR_GROUP = "Wheelchair accessibility";
 
   static StyleSpec build(
@@ -95,6 +108,8 @@ public class DebugStyleSpec {
         wheelchair(edges),
         traversalPermissions(edges),
         edges(edges),
+        traversalPermissions(edges),
+        noThruTraffic(edges),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -186,7 +201,7 @@ public class DebugStyleSpec {
         .vectorSourceLayer(edges)
         .lineColor(MAGENTA)
         .edgeFilter(EDGES_TO_DISPLAY)
-        .lineWidth(LINE_WIDTH)
+        .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
@@ -225,26 +240,32 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> traversalPermissions(VectorSourceLayer edges) {
     var permissionStyles = Arrays
-      .stream(StreetTraversalPermission.values())
-      .map(p ->
+      .stream(streetModes)
+      .map(streetTraversalPermission ->
         StyleBuilder
-          .ofId(p.name())
+          .ofId("permission " + streetTraversalPermission)
           .vectorSourceLayer(edges)
-          .group(TRAVERSAL_PERMISSIONS_GROUP)
+          .group(PERMISSIONS_GROUP)
           .typeLine()
-          .lineColor(permissionColor(p))
-          .permissionsFilter(p)
+          .filterValueInProperty(
+            "permission",
+            streetTraversalPermission.name(),
+            StreetTraversalPermission.ALL.name()
+          )
+          .lineCap("butt")
+          .lineColorMatch("permission", permissionColors(), BLACK)
           .lineWidth(LINE_WIDTH)
           .lineOffset(LINE_OFFSET)
-          .minZoom(6)
+          .minZoom(LINE_DETAIL_ZOOM)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden()
       )
       .toList();
+
     var textStyle = StyleBuilder
       .ofId("permission-text")
       .vectorSourceLayer(edges)
-      .group(TRAVERSAL_PERMISSIONS_GROUP)
+      .group(PERMISSIONS_GROUP)
       .typeSymbol()
       .lineText("permission")
       .textOffset(1)
@@ -252,7 +273,54 @@ public class DebugStyleSpec {
       .minZoom(17)
       .maxZoom(MAX_ZOOM)
       .intiallyHidden();
+
     return ListUtils.combine(permissionStyles, List.of(textStyle));
+  }
+
+  private static List<StyleBuilder> noThruTraffic(VectorSourceLayer edges) {
+    var noThruTrafficStyles = Arrays
+      .stream(streetModes)
+      .map(streetTraversalPermission ->
+        StyleBuilder
+          .ofId("no-thru-traffic " + streetTraversalPermission)
+          .vectorSourceLayer(edges)
+          .group(NO_THRU_TRAFFIC_GROUP)
+          .typeLine()
+          .filterValueInProperty(
+            "noThruTraffic",
+            streetTraversalPermission.name(),
+            StreetTraversalPermission.ALL.name()
+          )
+          .lineCap("butt")
+          .lineColorMatch("noThruTraffic", permissionColors(), BLACK)
+          .lineWidth(LINE_WIDTH)
+          .lineOffset(LINE_OFFSET)
+          .minZoom(LINE_DETAIL_ZOOM)
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden()
+      )
+      .toList();
+
+    var textStyle = StyleBuilder
+      .ofId("no-thru-traffic-text")
+      .vectorSourceLayer(edges)
+      .group(NO_THRU_TRAFFIC_GROUP)
+      .typeSymbol()
+      .lineText("noThruTraffic")
+      .textOffset(1)
+      .edgeFilter(EDGES_TO_DISPLAY)
+      .minZoom(17)
+      .maxZoom(MAX_ZOOM)
+      .intiallyHidden();
+
+    return ListUtils.combine(noThruTrafficStyles, List.of(textStyle));
+  }
+
+  private static List<String> permissionColors() {
+    return Arrays
+      .stream(StreetTraversalPermission.values())
+      .flatMap(p -> Stream.of(streetPermissionAsString(p), permissionColor(p)))
+      .toList();
   }
 
   private static List<StyleBuilder> wheelchair(VectorSourceLayer edges) {
@@ -286,7 +354,7 @@ public class DebugStyleSpec {
 
   private static String permissionColor(StreetTraversalPermission p) {
     return switch (p) {
-      case NONE -> "#000";
+      case NONE -> BLACK;
       case PEDESTRIAN -> "#2ba812";
       case BICYCLE, PEDESTRIAN_AND_BICYCLE -> "#10d3b6";
       case CAR -> "#f92e13";
