@@ -11,7 +11,6 @@ public class BikeAccessMapperTest {
 
   private static final int BIKES_ALLOWED = 1;
   private static final int BIKES_NOT_ALLOWED = 2;
-  private static final int TRIP_BIKES_NOT_ALLOWED = 1;
 
   @Test
   public void testTripProvidedValues() {
