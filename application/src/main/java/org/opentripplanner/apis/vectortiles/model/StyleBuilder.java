@@ -251,6 +251,14 @@ public class StyleBuilder {
   }
 
   /**
+   * Filter the entities by a boolean property.
+   */
+  public final StyleBuilder booleanFilter(String propertyName, boolean value) {
+    filter = List.of("==", propertyName, value);
+    return this;
+  }
+
+  /**
    * Only apply the style to the given vertices.
    */
   @SafeVarargs
@@ -290,7 +298,7 @@ public class StyleBuilder {
 
   private StyleBuilder filterClasses(Class... classToFilter) {
     var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
-    filter = ListUtils.combine(List.of("in", "class"), clazzes);
+    filter = new ArrayList<>(ListUtils.combine(List.of("in", "class"), clazzes));
     return this;
   }
 

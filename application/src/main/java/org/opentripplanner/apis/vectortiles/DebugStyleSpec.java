@@ -47,6 +47,7 @@ public class DebugStyleSpec {
   private static final String MAGENTA = "#f21d52";
   private static final String BRIGHT_GREEN = "#22DD9E";
   private static final String DARK_GREEN = "#136b04";
+  private static final String RED = "#fc0f2a";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
 
@@ -84,6 +85,7 @@ public class DebugStyleSpec {
     StreetTraversalPermission.BICYCLE,
     StreetTraversalPermission.CAR,
   };
+  private static final String WHEELCHAIR_GROUP = "Wheelchair accessibility";
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -103,6 +105,7 @@ public class DebugStyleSpec {
       allSources,
       ListUtils.combine(
         List.of(StyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0)),
+        wheelchair(edges),
         edges(edges),
         traversalPermissions(edges),
         noThruTraffic(edges),
@@ -317,6 +320,35 @@ public class DebugStyleSpec {
       .stream(StreetTraversalPermission.values())
       .flatMap(p -> Stream.of(streetPermissionAsString(p), permissionColor(p)))
       .toList();
+  }
+
+  private static List<StyleBuilder> wheelchair(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("wheelchair-accessible")
+        .vectorSourceLayer(edges)
+        .group(WHEELCHAIR_GROUP)
+        .typeLine()
+        .lineColor(DARK_GREEN)
+        .booleanFilter("wheelchairAccessible", true)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("wheelchair-inaccessible")
+        .vectorSourceLayer(edges)
+        .group(WHEELCHAIR_GROUP)
+        .typeLine()
+        .lineColor(RED)
+        .booleanFilter("wheelchairAccessible", false)
+        .lineWidth(LINE_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
   }
 
   private static String permissionColor(StreetTraversalPermission p) {

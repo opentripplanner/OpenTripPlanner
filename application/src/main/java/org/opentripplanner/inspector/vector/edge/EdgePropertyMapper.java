@@ -32,7 +32,8 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     var props = Lists.newArrayList(
       kv("permission", streetPermissionAsString(se.getPermission())),
       kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
-      kv("noThruTraffic", noThruTrafficAsString(se))
+      kv("noThruTraffic", noThruTrafficAsString(se)),
+      kv("wheelchairAccessible", se.isWheelchairAccessible())
     );
     if (se.hasBogusName()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
