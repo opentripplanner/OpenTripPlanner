@@ -2214,10 +2214,10 @@ type Stoptime {
   "The stop where this arrival/departure happens"
   stop: Stop
   """
-  The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+  The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
   increasing integer sequence along the stops is valid.
     
-  The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+  The purpose of this field is to identify the stop within the trip so it can be cross-referenced
   between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
   However, it should be noted that real-time updates can change the values, so don't store it for
   longer amounts of time.
@@ -2226,6 +2226,15 @@ type Stoptime {
   even generated.
   """
   stopPosition: Int
+  """
+  The position of the stop in the pattern. This is required to start from 0 and be consecutive along
+  the pattern, up to n-1 for a pattern with n stops.
+    
+  The purpose of this field is to identify the position of the stop within the pattern so it can be
+  cross-referenced between different trips on the same pattern, as stopPosition can be different
+  between trips even within the same pattern.
+  """
+  stopPositionInPattern: Int!
   "true, if this stop is used as a time equalization stop. false otherwise."
   timepoint: Boolean
   "Trip which this stoptime is for"

@@ -1095,6 +1095,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> stopPosition();
 
+    public DataFetcher<Integer> stopPositionInPattern();
+
     public DataFetcher<Boolean> timepoint();
 
     public DataFetcher<Trip> trip();
