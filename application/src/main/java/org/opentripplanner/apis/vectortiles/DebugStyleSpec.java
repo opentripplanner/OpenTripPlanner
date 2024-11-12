@@ -106,7 +106,6 @@ public class DebugStyleSpec {
       ListUtils.combine(
         List.of(StyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0)),
         wheelchair(edges),
-        traversalPermissions(edges),
         edges(edges),
         traversalPermissions(edges),
         noThruTraffic(edges),
