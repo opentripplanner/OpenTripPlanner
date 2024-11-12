@@ -20,6 +20,7 @@
       web
     }
     ... on RentalVehicle {
+      name
       vehicleId
       vehicleType {
         formFactor

@@ -71,6 +71,7 @@
           "url": "https://foo.bar"
         },
         "rentalUris": null,
+        "name": "free-floating-bicycle",
         "vehicleId": "Network-1:free-floating-bicycle",
         "vehicleType": {
           "formFactor": "BICYCLE",
