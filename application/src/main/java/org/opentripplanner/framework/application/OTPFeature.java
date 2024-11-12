@@ -22,10 +22,10 @@ public enum OTPFeature {
     false,
     false,
     """
-      Turning this on make sure that Rail stops without scheduled patterns still get included
+      Turning this on guarantees that Rail stops without scheduled departures still get included
       when generating transfers using `ConsiderPatternsForDirectTransfers`. It is common for stops
-      to be assign at realtime for Rail, if so turning this on will help to avoid dropping transfers
-      which are needed, when the stop become in use later. Turning this on, if
+      to be assign at real-time for Rail. Turning this on will help to avoid dropping transfers which
+      are needed, when the stop is in use later. Turning this on, if
       ConsiderPatternsForDirectTransfers is off has no effect.
       """
   ),
