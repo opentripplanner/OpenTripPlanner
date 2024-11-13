@@ -14,6 +14,7 @@ import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.transit.api.model.CriteriaCollection;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -96,13 +97,25 @@ public class DatedServiceJourneyQuery {
         // The null safety checks are not needed here - they are taken care of by the request
         // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
-        var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
-        var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
-        var serviceJourneys = mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"));
-        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
-        var privateCodes = environment.<List<String>>getArgument("privateCodes");
-        var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
-        var alterations = environment.<List<TripAlteration>>getArgument("alterations");
+        var authorities = CriteriaCollection.of(
+          mapIDsToDomainNullSafe(environment.getArgument("authorities"))
+        );
+        var lines = CriteriaCollection.of(mapIDsToDomainNullSafe(environment.getArgument("lines")));
+        var serviceJourneys = CriteriaCollection.of(
+          mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
+        );
+        var replacementFor = CriteriaCollection.of(
+          mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
+        );
+        var privateCodes = CriteriaCollection.of(
+          environment.<List<String>>getArgument("privateCodes")
+        );
+        var operatingDays = CriteriaCollection.of(
+          environment.<List<LocalDate>>getArgument("operatingDays")
+        );
+        var alterations = CriteriaCollection.of(
+          environment.<List<TripAlteration>>getArgument("alterations")
+        );
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
           .of()

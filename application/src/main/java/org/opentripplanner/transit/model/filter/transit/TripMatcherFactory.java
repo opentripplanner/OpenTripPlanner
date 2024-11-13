@@ -38,11 +38,11 @@ public class TripMatcherFactory {
       request.netexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
     );
-
     expr.atLeastOneMatch(
       request.serviceDates(),
       TripMatcherFactory.serviceDate(serviceDateProvider)
     );
+
     return expr.build();
   }
 

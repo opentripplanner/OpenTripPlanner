@@ -1,36 +1,36 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
-import java.util.List;
+import org.opentripplanner.transit.api.model.CriteriaCollection;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private List<FeedScopedId> agencies;
-  private List<FeedScopedId> routes;
-  private List<String> netexInternalPlanningCodes;
-  private List<LocalDate> serviceDates;
+  private CriteriaCollection<FeedScopedId> agencies;
+  private CriteriaCollection<FeedScopedId> routes;
+  private CriteriaCollection<String> netexInternalPlanningCodes;
+  private CriteriaCollection<LocalDate> serviceDates;
 
   protected TripRequestBuilder() {}
 
-  public TripRequestBuilder withAgencies(List<FeedScopedId> agencies) {
+  public TripRequestBuilder withAgencies(CriteriaCollection<FeedScopedId> agencies) {
     this.agencies = agencies;
     return this;
   }
 
-  public TripRequestBuilder withRoutes(List<FeedScopedId> routes) {
+  public TripRequestBuilder withRoutes(CriteriaCollection<FeedScopedId> routes) {
     this.routes = routes;
     return this;
   }
 
   public TripRequestBuilder withNetexInternalPlanningCodes(
-    List<String> netexInternalPlanningCodes
+    CriteriaCollection<String> netexInternalPlanningCodes
   ) {
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
 
-  public TripRequestBuilder withServiceDates(List<LocalDate> serviceDates) {
+  public TripRequestBuilder withServiceDates(CriteriaCollection<LocalDate> serviceDates) {
     this.serviceDates = serviceDates;
     return this;
   }

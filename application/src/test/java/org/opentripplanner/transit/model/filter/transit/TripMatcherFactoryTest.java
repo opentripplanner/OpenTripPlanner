@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.api.model.CriteriaCollection;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -26,13 +27,13 @@ public class TripMatcherFactoryTest {
   void setup() {
     tripRut =
       Trip
-        .of(new FeedScopedId("RUT:route:trip", "1"))
+        .of(new FeedScopedId("F", "RUT:route:trip:1"))
         .withRoute(
           Route
-            .of(new FeedScopedId("RUT:route", "1"))
+            .of(new FeedScopedId("F", "RUT:route:1"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("RUT", "1"))
+                .of(new FeedScopedId("F", "RUT:1"))
                 .withName("RUT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -41,17 +42,17 @@ public class TripMatcherFactoryTest {
             .withShortName("BUS")
             .build()
         )
-        .withServiceId(new FeedScopedId("RUT:route:trip", "1"))
+        .withServiceId(new FeedScopedId("F", "RUT:route:trip:1"))
         .build();
     tripRut2 =
       Trip
-        .of(new FeedScopedId("RUT:route:trip", "2"))
+        .of(new FeedScopedId("F", "RUT:route:trip:2"))
         .withRoute(
           Route
-            .of(new FeedScopedId("RUT:route", "2"))
+            .of(new FeedScopedId("F", "RUT:route:2"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("RUT", "2"))
+                .of(new FeedScopedId("F", "RUT:2"))
                 .withName("RUT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -60,17 +61,17 @@ public class TripMatcherFactoryTest {
             .withShortName("BUS")
             .build()
         )
-        .withServiceId(new FeedScopedId("RUT:route:trip", "2"))
+        .withServiceId(new FeedScopedId("F", "RUT:route:trip:2"))
         .build();
     tripAkt =
       Trip
-        .of(new FeedScopedId("AKT:route:trip", "1"))
+        .of(new FeedScopedId("F", "AKT:route:trip:1"))
         .withRoute(
           Route
-            .of(new FeedScopedId("AKT:route", "1"))
+            .of(new FeedScopedId("F", "AKT:route:1"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("AKT", "1"))
+                .of(new FeedScopedId("F", "AKT"))
                 .withName("AKT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -79,7 +80,7 @@ public class TripMatcherFactoryTest {
             .withShortName("BUS")
             .build()
         )
-        .withServiceId(new FeedScopedId("AKT:route:trip", "1"))
+        .withServiceId(new FeedScopedId("F", "AKT:route:trip:1"))
         .build();
   }
 
@@ -87,7 +88,7 @@ public class TripMatcherFactoryTest {
   void testMatchRouteId() {
     TripRequest request = TripRequest
       .of()
-      .withRoutes(List.of(new FeedScopedId("RUT:route", "1")))
+      .withRoutes(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:route:1"))))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -112,7 +113,7 @@ public class TripMatcherFactoryTest {
   void testMatchAgencyId() {
     TripRequest request = TripRequest
       .of()
-      .withAgencies(List.of(new FeedScopedId("RUT", "1")))
+      .withAgencies(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:1"))))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -126,7 +127,9 @@ public class TripMatcherFactoryTest {
   void testMatchServiceDates() {
     TripRequest request = TripRequest
       .of()
-      .withServiceDates(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
+      .withServiceDates(
+        CriteriaCollection.of(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
+      )
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyServiceDateProvider);
@@ -137,9 +140,9 @@ public class TripMatcherFactoryTest {
   }
 
   private Set<LocalDate> dummyServiceDateProvider(FeedScopedId feedScopedId) {
-    if (feedScopedId.equals(new FeedScopedId("RUT:route:trip", "1"))) {
+    if (feedScopedId.equals(new FeedScopedId("F", "RUT:route:trip:1"))) {
       return Set.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23));
-    } else if (feedScopedId.equals(new FeedScopedId("RUT:route:trip", "2"))) {
+    } else if (feedScopedId.equals(new FeedScopedId("F", "RUT:route:trip:2"))) {
       return Set.of(LocalDate.of(2024, 2, 23));
     }
     return Set.of();

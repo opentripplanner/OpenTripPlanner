@@ -114,8 +114,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.transit.api.model.CriteriaCollection;
 import org.opentripplanner.transit.api.request.TripRequest;
-import org.opentripplanner.transit.api.request.TripRequestBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -1302,19 +1302,28 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
-            var lineIds = mapIDsToDomainNullSafe(environment.getArgument("lines"));
-            var privateCodes = environment.<List<String>>getArgument("privateCodes");
-            var activeServiceDates = environment.<List<LocalDate>>getArgument("activeDates");
+            var authorities = CriteriaCollection.of(
+              mapIDsToDomainNullSafe(environment.getArgument("authorities"))
+            );
+            var lineIds = CriteriaCollection.of(
+              mapIDsToDomainNullSafe(environment.getArgument("lines"))
+            );
+            var privateCodes = CriteriaCollection.of(
+              environment.<List<String>>getArgument("privateCodes")
+            );
+            var activeServiceDates = CriteriaCollection.of(
+              environment.<List<LocalDate>>getArgument("activeDates")
+            );
 
-            TripRequestBuilder tripRequestBuilder = TripRequest
+            TripRequest tripRequest = TripRequest
               .of()
               .withAgencies(authorities)
               .withRoutes(lineIds)
               .withNetexInternalPlanningCodes(privateCodes)
-              .withServiceDates(activeServiceDates);
+              .withServiceDates(activeServiceDates)
+              .build();
 
-            return GqlUtil.getTransitService(environment).getTrips(tripRequestBuilder.build());
+            return GqlUtil.getTransitService(environment).getTrips(tripRequest);
           })
           .build()
       )
