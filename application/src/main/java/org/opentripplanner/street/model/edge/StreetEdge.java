@@ -1006,6 +1006,10 @@ public class StreetEdge
       return null;
     });
 
+    // Also include a state which continues walking, because the vehicle rental states are
+    // speculation. It is possible that the rental states don't end up at the target at all
+    // due to mode limitations or not finding a place to pick up the rental vehicle, or that
+    // the rental possibility is simply more expensive than walking.
     StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
     if (walking != null) {
       var forkState = walking.makeState();

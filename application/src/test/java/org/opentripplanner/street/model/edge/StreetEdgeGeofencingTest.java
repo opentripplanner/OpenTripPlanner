@@ -259,8 +259,8 @@ class StreetEdgeGeofencingTest {
 
       var states = edge.traverse(haveRentedState);
 
-      // we return 3 states: one for the speculative renting of a vehicle, but with the information
-      // of which networks' no-drop-off zones it started in
+      // we return 4 states: one for continuing walking, one for the speculative renting of
+      // a vehicle, but with the information of which networks' no-drop-off zones it started in
       assertEquals(4, states.length);
 
       // first the fallback walk state
@@ -268,7 +268,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      // then the speculative renting case
+      // then the speculative renting case for unknown rental network
       final State speculativeRenting = states[1];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
       assertEquals(BICYCLE, speculativeRenting.currentMode());
@@ -280,6 +280,7 @@ class StreetEdgeGeofencingTest {
         speculativeRenting.stateData.noRentalDropOffZonesAtStartOfReverseSearch
       );
 
+      // then the speculative renting cases for specific rental networks
       final State tierState = states[2];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
