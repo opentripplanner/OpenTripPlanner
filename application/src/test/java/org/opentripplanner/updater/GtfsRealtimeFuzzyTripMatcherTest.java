@@ -72,13 +72,14 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   @Test
   public void simpleMatch() {
     var matcher = matcher();
-    TripDescriptor trip1 = TripDescriptor
-      .newBuilder()
-      .setRouteId(ROUTE_ID)
-      .setDirectionId(2)
-      .setStartTime(START_TIME)
-      .setStartDate(GTFS_SERVICE_DATE)
-      .build();
+    TripDescriptor trip1 = matchingTripUpdate().build();
+    assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
+  }
+
+  @Test
+  public void nonExistingTripId() {
+    var matcher = matcher();
+    TripDescriptor trip1 = matchingTripUpdate().setTripId("does-not-exist-in-timetable").build();
     assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
   }
 
@@ -107,5 +108,14 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
 
   private static GtfsRealtimeFuzzyTripMatcher matcher() {
     return new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(TT_REPO));
+  }
+
+  private static TripDescriptor.Builder matchingTripUpdate() {
+    return TripDescriptor
+      .newBuilder()
+      .setRouteId(ROUTE_ID)
+      .setDirectionId(2)
+      .setStartTime(START_TIME)
+      .setStartDate(GTFS_SERVICE_DATE);
   }
 }
