@@ -23,7 +23,7 @@ export function GeometryPropertyPopup({
           {Object.entries(properties).map(([key, value]) => (
             <tr key={key}>
               <th scope="row">{key}</th>
-              <td>{value}</td>
+              <td>{String(value)}</td>
             </tr>
           ))}
         </tbody>

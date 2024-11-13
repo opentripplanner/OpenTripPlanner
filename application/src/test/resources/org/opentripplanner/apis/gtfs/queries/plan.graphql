@@ -10,6 +10,16 @@
       filters: [{ select: [{ tags: ["e"] }] }]
     }
     transportModes: [{ mode: CAR, qualifier: HAIL }]
+    via: [
+      { passThrough: { label: "via1", stopLocationIds: ["F:BUS"] } }
+      {
+        visit: {
+          label: "via2"
+          stopLocationIds: ["F:RAIL"]
+          minimumWaitTime: "1h"
+        }
+      }
+    ]
   ) {
     itineraries {
       start

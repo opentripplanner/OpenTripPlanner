@@ -23,6 +23,7 @@ import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
 import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
 import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
 import org.opentripplanner.apis.gtfs.model.UnknownModel;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -65,11 +66,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   public DataFetcher<String> alertDescriptionText() {
     return environment -> {
       var alert = getSource(environment);
-      return alert
-        .descriptionText()
-        .or(alert::headerText)
-        .map(t -> t.toString(environment.getLocale()))
-        .orElse(FALLBACK_EMPTY_STRING);
+      var descriptionText = GraphQLUtils.getTranslation(
+        alert.descriptionText().or(alert::headerText).orElse(null),
+        environment
+      );
+      return descriptionText != null ? descriptionText : FALLBACK_EMPTY_STRING;
     };
   }
 
@@ -103,11 +104,11 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   public DataFetcher<String> alertHeaderText() {
     return environment -> {
       var alert = getSource(environment);
-      return alert
-        .headerText()
-        .or(alert::descriptionText)
-        .map(h -> h.toString(environment.getLocale()))
-        .orElse(FALLBACK_EMPTY_STRING);
+      var headerText = GraphQLUtils.getTranslation(
+        alert.headerText().or(alert::descriptionText).orElse(null),
+        environment
+      );
+      return headerText != null ? headerText : FALLBACK_EMPTY_STRING;
     };
   }
 
@@ -125,7 +126,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   @Override
   public DataFetcher<String> alertUrl() {
     return environment ->
-      getSource(environment).url().map(u -> u.toString(environment.getLocale())).orElse(null);
+      GraphQLUtils.getTranslation(getSource(environment).url().orElse(null), environment);
   }
 
   @Override
