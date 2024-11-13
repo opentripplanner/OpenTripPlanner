@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters.sources;
 
+import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -130,18 +131,8 @@ public class VehicleRentalSourceFactory {
     return c
       .of("allowedRentalType")
       .since(V2_7)
-      .summary("Temporary parameter. The type of rental data to include.")
-      .description(
-        """
-        This parameter is temporary and will be removed in a future version of OTP.
-
-        The type of rental data to include. This can be one of the following:
-
-        - `ALL`: Include all data types.
-        - `STATIONS`: Include station data only.
-        - `VEHICLES`: Include floating vehicle data only.
-        """
-      )
+      .summary(AllowedRentalType.ALL.typeDescription())
+      .description(docEnumValueList(AllowedRentalType.values()))
       .asEnum(AllowedRentalType.ALL);
   }
 }

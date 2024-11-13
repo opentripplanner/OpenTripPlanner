@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
+import java.util.Objects;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
@@ -14,6 +15,9 @@ public record GbfsVehicleRentalDataSourceParameters(
   AllowedRentalType allowedRentalType
 )
   implements VehicleRentalDataSourceParameters {
+  public GbfsVehicleRentalDataSourceParameters {
+    Objects.requireNonNull(allowedRentalType);
+  }
   @Override
   public VehicleRentalSourceType sourceType() {
     return VehicleRentalSourceType.GBFS;

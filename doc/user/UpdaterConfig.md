@@ -313,19 +313,19 @@ GBFS form factors:
 <!-- vehicle-rental BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
-|---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
-| [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
-| [allowedRentalType](#u_1_allowedRentalType)                                           |      `enum`     | Temporary parameter. The type of rental data to include.                        | *Optional* | `"all"`       |  2.7  |
-| frequency                                                                             |    `duration`   | How often the data should be updated.                                           | *Optional* | `"PT1M"`      |  1.5  |
-| [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
-| language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |  2.1  |
-| [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |  1.5  |
-| overloadingAllowed                                                                    |    `boolean`    | Allow leaving vehicles at a station even though there are no free slots.        | *Optional* | `false`       |  2.2  |
-| [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |  1.5  |
-| url                                                                                   |     `string`    | The URL to download the data from.                                              | *Required* |               |  1.5  |
-| [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  1.5  |
+| Config Parameter                                                                      |       Type      | Summary                                                                                                           |  Req./Opt. | Default Value | Since |
+|---------------------------------------------------------------------------------------|:---------------:|-------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                                                          | *Required* |               |  1.5  |
+| [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental.                                   | *Optional* | `false`       |  2.1  |
+| [allowedRentalType](#u_1_allowedRentalType)                                           |      `enum`     | Temporary parameter. Use this to specify the type of rental data that is allowed to be read from the data source. | *Optional* | `"all"`       |  2.7  |
+| frequency                                                                             |    `duration`   | How often the data should be updated.                                                                             | *Optional* | `"PT1M"`      |  1.5  |
+| [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                   | *Optional* | `false`       |  2.3  |
+| language                                                                              |     `string`    | TODO                                                                                                              | *Optional* |               |  2.1  |
+| [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.                                         | *Optional* |               |  1.5  |
+| overloadingAllowed                                                                    |    `boolean`    | Allow leaving vehicles at a station even though there are no free slots.                                          | *Optional* | `false`       |  2.2  |
+| [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                                                     | *Required* |               |  1.5  |
+| url                                                                                   |     `string`    | The URL to download the data from.                                                                                | *Required* |               |  1.5  |
+| [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                                        | *Optional* |               |  1.5  |
 
 
 ##### Parameter details
@@ -353,15 +353,11 @@ For this to be possible three things need to be configured:
 **Path:** /updaters/[1]   
 **Enum values:** `stations` | `vehicles` | `all`
 
-Temporary parameter. The type of rental data to include.
+Temporary parameter. Use this to specify the type of rental data that is allowed to be read from the data source.
 
-This parameter is temporary and will be removed in a future version of OTP.
-
-The type of rental data to include. This can be one of the following:
-
-- `ALL`: Include all data types.
-- `STATIONS`: Include station data only.
-- `VEHICLES`: Include floating vehicle data only.
+ - `stations` Only station data is allowed.
+ - `vehicles` Only vehicle data is allowed.
+ - `all` All types of rental data are allowed.
 
 
 <h4 id="u_1_geofencingZones">geofencingZones</h4>
