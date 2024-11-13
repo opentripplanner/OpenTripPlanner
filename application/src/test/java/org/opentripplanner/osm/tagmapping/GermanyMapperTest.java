@@ -1,6 +1,8 @@
 package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -278,5 +280,20 @@ public class GermanyMapperTest {
     autobahn.addTag("highway", "motorway");
     autobahn.addTag("maxspeed", "none");
     assertEquals(33.33000183105469, wps.getCarSpeedForWay(autobahn, false), epsilon);
+  }
+
+  /**
+   * Test that biking is not allowed in transit platforms
+   */
+  @Test
+  public void testArea() {
+    OsmWithTags way;
+
+    way = new OsmWithTags();
+    way.addTag("public_transport", "platform");
+    way.addTag("area", "yes");
+    assertEquals(wps.getDataForWay(way).getPermission(), PEDESTRIAN);
+    way.addTag("bicycle", "yes");
+    assertEquals(wps.getDataForWay(way).getPermission(), PEDESTRIAN_AND_BICYCLE);
   }
 }

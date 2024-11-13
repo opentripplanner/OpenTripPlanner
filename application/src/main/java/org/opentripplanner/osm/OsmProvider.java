@@ -10,13 +10,13 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
-import org.opentripplanner.framework.logging.ProgressTracker;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.utils.logging.ProgressTracker;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

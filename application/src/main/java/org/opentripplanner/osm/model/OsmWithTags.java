@@ -15,11 +15,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -49,6 +49,7 @@ public class OsmWithTags {
 
   private static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
   private static final Set<String> DEFAULT_LEVEL = Set.of("0");
+  private static final Consumer<String> NO_OP = i -> {};
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -218,6 +219,33 @@ public class OsmWithTags {
       }
     }
     return OptionalInt.empty();
+  }
+
+  /**
+   * Some tags are allowed to have values like 55, "true" or "false".
+   * <p>
+   * "true", "yes" is returned as 1.
+   * <p>
+   * "false", "no" is returned as 0
+   * <p>
+   * Everything else is returned as an emtpy optional.
+   */
+  public OptionalInt parseIntOrBoolean(String tag, Consumer<String> errorHandler) {
+    var maybeInt = getTagAsInt(tag, NO_OP);
+    if (maybeInt.isPresent()) {
+      return maybeInt;
+    } else {
+      if (isTagTrue(tag)) {
+        return OptionalInt.of(1);
+      } else if (isTagFalse(tag)) {
+        return OptionalInt.of(0);
+      } else if (hasTag(tag)) {
+        errorHandler.accept(getTag(tag));
+        return OptionalInt.empty();
+      } else {
+        return OptionalInt.empty();
+      }
+    }
   }
 
   /**

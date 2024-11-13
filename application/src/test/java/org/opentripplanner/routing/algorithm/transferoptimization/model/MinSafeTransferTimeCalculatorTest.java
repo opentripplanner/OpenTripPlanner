@@ -1,18 +1,18 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
+import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator.bound;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
+import org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 

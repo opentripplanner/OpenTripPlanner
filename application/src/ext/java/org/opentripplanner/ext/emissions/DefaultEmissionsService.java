@@ -2,10 +2,10 @@ package org.opentripplanner.ext.emissions;
 
 import jakarta.inject.Inject;
 import java.util.Optional;
-import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.Sandbox;
 
 @Sandbox
 public class DefaultEmissionsService implements EmissionsService {

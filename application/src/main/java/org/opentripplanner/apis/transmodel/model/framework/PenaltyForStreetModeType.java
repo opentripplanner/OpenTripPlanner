@@ -19,10 +19,10 @@ import java.util.Objects;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.scalars.DoubleFunction;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
+import org.opentripplanner.utils.lang.ObjectUtils;
 
 /**
  * Access and egress penalty:

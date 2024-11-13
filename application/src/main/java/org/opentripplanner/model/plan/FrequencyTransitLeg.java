@@ -2,8 +2,8 @@ package org.opentripplanner.model.plan;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

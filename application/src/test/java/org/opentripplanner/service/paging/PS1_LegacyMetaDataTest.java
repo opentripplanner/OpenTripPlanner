@@ -5,7 +5,7 @@ import static org.opentripplanner.service.paging.TestPagingModel.D30m;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This tests the entire paging service module.

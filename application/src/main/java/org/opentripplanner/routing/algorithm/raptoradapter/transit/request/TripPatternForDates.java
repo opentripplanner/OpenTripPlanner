@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -18,6 +17,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.Tri
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of

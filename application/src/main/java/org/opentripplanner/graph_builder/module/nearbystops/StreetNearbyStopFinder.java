@@ -11,10 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.astar.strategy.MaxCountSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -30,8 +28,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -46,8 +42,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
-   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
-   *                     we will always return all the directly connected stops.
+   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the
+   *                     maxStopCount we will always return all the directly connected stops.
    */
   public StreetNearbyStopFinder(
     Duration durationLimit,
@@ -117,23 +113,30 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     // Return only the origin vertices if there are no valid street modes
     if (
       streetRequest.mode() == StreetMode.NOT_SET ||
-      (maxStopCount != 0 && stopsFound.size() >= maxStopCount)
+      (maxStopCount > 0 && stopsFound.size() >= maxStopCount)
     ) {
       return stopsFound;
     }
     stopsFound = new ArrayList<>(stopsFound);
 
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
+    var streetSearch = StreetSearchBuilder
       .of()
-      .setSkipEdgeStrategy(getSkipEdgeStrategy())
+      .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
       .setArriveBy(reverseDirection)
       .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
       .setTo(reverseDirection ? originVertices : null)
-      .setDataOverlayContext(dataOverlayContext)
-      .getShortestPathTree();
+      .setDataOverlayContext(dataOverlayContext);
+
+    if (maxStopCount > 0) {
+      streetSearch.setTerminationStrategy(
+        new MaxCountTerminationStrategy<>(maxStopCount, this::hasReachedStop)
+      );
+    }
+
+    ShortestPathTree<State, Edge, Vertex> spt = streetSearch.getShortestPathTree();
 
     // Only used if OTPFeature.FlexRouting.isOn()
     Multimap<AreaStop, State> locationsMap = ArrayListMultimap.create();
@@ -186,16 +189,6 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     return stopsFound;
   }
 
-  private SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
-    var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
-
-    if (maxStopCount > 0) {
-      var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, this::hasReachedStop);
-      return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
-    }
-    return durationSkipEdgeStrategy;
-  }
-
   private boolean canBoardFlex(State state, boolean reverse) {
     Collection<Edge> edges = reverse
       ? state.getVertex().getIncoming()
@@ -212,13 +205,13 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * <p>
    * This is important because there can be cases where states that cannot actually board the vehicle
    * can dominate those that can thereby leading to zero found stops when this predicate is used with
-   * the {@link MaxCountSkipEdgeStrategy}.
+   * the {@link MaxCountTerminationStrategy}.
    * <p>
    * An example of this would be an egress/reverse search with a very high walk reluctance where the
    * states that speculatively rent a vehicle move the walk states down the A* priority queue until
    * the required number of stops are reached to abort the search, leading to zero egress results.
    */
-  public boolean hasReachedStop(State state) {
+  private boolean hasReachedStop(State state) {
     var vertex = state.getVertex();
     return (
       vertex instanceof TransitStopVertex && state.isFinal() && !ignoreVertices.contains(vertex)

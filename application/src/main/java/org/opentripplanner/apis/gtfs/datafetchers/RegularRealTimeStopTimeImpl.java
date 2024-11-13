@@ -7,10 +7,10 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class RegularRealTimeStopTimeImpl
   implements GraphQLDataFetchers.GraphQLRegularRealTimeStopTime {

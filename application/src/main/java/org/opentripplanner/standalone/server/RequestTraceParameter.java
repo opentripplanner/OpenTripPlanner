@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.server;
 
-import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * OTP supports tracing user requests across log events and "outside" services. It does so by

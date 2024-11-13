@@ -74,7 +74,7 @@ nav:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
     - OSM Tag Mapping:
-        - Default: 'osm/Default.md'
+        - Default: 'osm/OsmTag.md'
         - Finland: 'osm/Finland.md'
         - Germany: 'osm/Germany.md'
         - Norway: 'osm/Norway.md'
@@ -121,3 +121,4 @@ nav:
     - Ride Hailing: 'sandbox/RideHailing.md'
     - Emissions: 'sandbox/Emissions.md'
     - Stop Consolidation: 'sandbox/StopConsolidation.md'
+    - Sørlandsbanen: 'sandbox/Sorlandsbanen.md'
