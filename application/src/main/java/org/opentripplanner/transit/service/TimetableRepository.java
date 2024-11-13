@@ -166,10 +166,10 @@ public class TimetableRepository implements Serializable {
    */
   public void index() {
     if (index == null) {
-      LOG.info("Index transit model...");
+      LOG.info("Index timetable repository...");
       // the transit model indexing updates the site repository index (flex stops added to the stop index)
       this.index = new TimetableRepositoryIndex(this);
-      LOG.info("Index transit model complete.");
+      LOG.info("Index timetable repository complete.");
     }
   }
 
