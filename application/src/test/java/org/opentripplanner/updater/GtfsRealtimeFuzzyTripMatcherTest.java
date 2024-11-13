@@ -7,8 +7,11 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -70,17 +73,33 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   }
 
   @Test
-  public void simpleMatch() {
+  void simpleMatch() {
     var matcher = matcher();
     TripDescriptor trip1 = matchingTripUpdate().build();
     assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
   }
 
   @Test
-  public void nonExistingTripId() {
+  void nonExistingTripId() {
     var matcher = matcher();
     TripDescriptor trip1 = matchingTripUpdate().setTripId("does-not-exist-in-timetable").build();
     assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
+  }
+
+  public static List<Function<TripDescriptor.Builder, TripDescriptor.Builder>> incompleteDataCases() {
+    return List.of(
+      TripDescriptor.Builder::clearDirectionId,
+      TripDescriptor.Builder::clearRouteId,
+      TripDescriptor.Builder::clearStartTime
+    );
+  }
+
+  @MethodSource("incompleteDataCases")
+  @ParameterizedTest
+  void incompleteMatchingData(Function<TripDescriptor.Builder, TripDescriptor.Builder> modifier) {
+    var matcher = matcher();
+    TripDescriptor trip1 = modifier.apply(matchingTripUpdate()).build();
+    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
   }
 
   @Test
