@@ -301,56 +301,6 @@ class StreetEdgeGeofencingTest {
         .withArriveBy(true)
         .build();
     }
-
-    @Test
-    public void hslFailTst() {
-      StreetVertex V5 = intersectionVertex("V5", 1, 1);
-      StreetVertex V6 = intersectionVertex("V6", 2, 2);
-      V6.addRentalRestriction(NO_DROP_OFF_TIER);
-      Edge edge = streetEdge(V5, V6);
-      var req = hslArriveByRequest();
-      var haveRentedState = State
-        .getInitialStates(Set.of(V6), req)
-        .stream()
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
-      var states = edge.traverse(haveRentedState);
-      assertEquals(3, states.length);
-      State stateUnknownNetwork = Arrays
-        .stream(states)
-        .filter(s -> s.getVehicleRentalState() == RENTING_FLOATING && s.unknownRentalNetwork())
-        .findAny()
-        .get();
-      State stateTierNetwork = Arrays
-        .stream(states)
-        .filter(s ->
-          s.getVehicleRentalState() == RENTING_FLOATING &&
-          s.getVehicleRentalNetwork() == NETWORK_TIER
-        )
-        .findAny()
-        .get();
-      State stateWalk = Arrays
-        .stream(states)
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
-      assertNotNull(stateUnknownNetwork);
-      assertNotNull(stateTierNetwork);
-      assertNotNull(stateWalk);
-      assertEquals(stateWalk.currentMode(), WALK);
-    }
-
-    private static StreetSearchRequest hslArriveByRequest() {
-      return StreetSearchRequest
-        .of()
-        .withPreferences(p ->
-          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
-        )
-        .withMode(StreetMode.BIKE_RENTAL)
-        .withArriveBy(true)
-        .build();
-    }
   }
 
   private static GeofencingZoneExtension noDropOffRestriction(String networkTier) {
