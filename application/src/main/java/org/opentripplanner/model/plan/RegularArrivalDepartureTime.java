@@ -9,24 +9,24 @@ import javax.annotation.Nullable;
  * A scheduled time of a transit vehicle at a certain location with an optional realtime
  * information.
  */
-public record FixedArrivalDepartureTime(
+public record RegularArrivalDepartureTime(
   ZonedDateTime scheduledTime,
   @Nullable RealTimeEstimate estimated
 ) {
-  public FixedArrivalDepartureTime {
+  public RegularArrivalDepartureTime {
     Objects.requireNonNull(scheduledTime);
   }
 
-  public static FixedArrivalDepartureTime of(ZonedDateTime realtime, int delaySecs) {
+  public static RegularArrivalDepartureTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new FixedArrivalDepartureTime(
+    return new RegularArrivalDepartureTime(
       realtime.minus(delay),
       new RealTimeEstimate(realtime, delay)
     );
   }
 
-  public static FixedArrivalDepartureTime ofStatic(ZonedDateTime staticTime) {
-    return new FixedArrivalDepartureTime(staticTime, null);
+  public static RegularArrivalDepartureTime ofStatic(ZonedDateTime staticTime) {
+    return new RegularArrivalDepartureTime(staticTime, null);
   }
 
   /**

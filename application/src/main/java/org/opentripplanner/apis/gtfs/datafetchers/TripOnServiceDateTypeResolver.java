@@ -14,7 +14,7 @@ public class TripOnServiceDateTypeResolver implements TypeResolver {
     GraphQLSchema schema = environment.getSchema();
 
     if (o instanceof TripOnServiceDate) {
-      return schema.getObjectType("FixedTripOnServiceDate");
+      return schema.getObjectType("RegularTripOnServiceDate");
     }
     return null;
   }

@@ -16,8 +16,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FixedTripOnServiceDateImpl
-  implements GraphQLDataFetchers.GraphQLFixedTripOnServiceDate {
+public class RegularTripOnServiceDateImpl
+  implements GraphQLDataFetchers.GraphQLRegularTripOnServiceDate {
 
   @Override
   public DataFetcher<LocalDate> serviceDate() {

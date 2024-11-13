@@ -70,13 +70,22 @@ interface PlaceInterface {
   lon: Float
 }
 
+"An instance of a trip on a service date."
+interface TripOnServiceDate {
+  """
+  The service date when the trip occurs.
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  serviceDate: LocalDate!
+}
+
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
 union StopPosition = PositionAtStop | PositionBetweenStops
-
-"An instance of a trip on a service date."
-union TripOnServiceDate = FixedTripOnServiceDate
 
 "A public transport agency"
 type Agency implements Node {
@@ -537,50 +546,6 @@ type FeedPublisher {
   name: String!
   "Web address of feed publisher"
   url: String!
-}
-
-"""
-Timing of an arrival or a departure to or from a stop. May contain real-time information if
-available. This is used when there is a known scheduled time.
-"""
-type FixedArrivalDepartureTime {
-  "The estimated time of the event. If no real-time information is available, this is null."
-  estimated: RealTimeEstimate
-  "The scheduled time of the event."
-  scheduledTime: OffsetDateTime!
-}
-
-"""
-Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-This can include realtime estimates.
-"""
-type FixedStopTimeOnServiceDate {
-  "Scheduled arrival time to the stop and a realtime estimate, if one exists."
-  arrival: FixedArrivalDepartureTime
-  "Scheduled departure time from the stop and a realtime estimate, if one exists."
-  departure: FixedArrivalDepartureTime
-  "The stop where this arrival/departure happens"
-  stop: Stop
-}
-
-"A fixed (i.e. not flexible or frequency based) trip on a specific service date"
-type FixedTripOnServiceDate {
-  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
-  end: FixedStopTimeOnServiceDate!
-  """
-  The service date when the trip occurs.
-    
-  **Note**: A service date is a technical term useful for transit planning purposes and might not
-    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
-    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
-  """
-  serviceDate: LocalDate!
-  "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
-  start: FixedStopTimeOnServiceDate!
-  "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopTimes: [FixedStopTimeOnServiceDate!]!
-  "This trip on service date is an instance of this trip."
-  trip: Trip
 }
 
 type Geometry {
@@ -1822,6 +1787,50 @@ type RealTimeEstimate {
   """
   delay: Duration!
   time: OffsetDateTime!
+}
+
+"""
+Timing of an arrival or a departure to or from a stop. May contain real-time information if
+available. This is used when there is a known scheduled time.
+"""
+type RegularRealTimeArrivalDepartureTime {
+  "The estimated time of the event. If no real-time information is available, this is null."
+  estimated: RealTimeEstimate
+  "The scheduled time of the event."
+  scheduledTime: OffsetDateTime!
+}
+
+"""
+Regular real-time stop time represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+This can include real-time estimates.
+"""
+type RegularRealTimeStopTime {
+  "Scheduled arrival time to the stop and a real-time estimate, if one exists."
+  arrival: RegularRealTimeArrivalDepartureTime
+  "Scheduled departure time from the stop and a real-time estimate, if one exists."
+  departure: RegularRealTimeArrivalDepartureTime
+  "The stop where this arrival/departure happens"
+  stop: Stop
+}
+
+"A regular (i.e. not flexible) trip on a specific service date"
+type RegularTripOnServiceDate implements TripOnServiceDate {
+  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
+  end: RegularRealTimeStopTime!
+  """
+  The service date when the trip occurs.
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  serviceDate: LocalDate!
+  "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
+  start: RegularRealTimeStopTime!
+  "List of times when this trip arrives to or departs from a stop and information related to the stop"
+  stopTimes: [RegularRealTimeStopTime!]!
+  "This trip on service date is an instance of this trip."
+  trip: Trip
 }
 
 "Rental vehicle represents a vehicle that belongs to a rental network."

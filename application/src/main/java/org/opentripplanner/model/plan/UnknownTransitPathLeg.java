@@ -70,13 +70,13 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
-  public FixedArrivalDepartureTime start() {
-    return FixedArrivalDepartureTime.ofStatic(startTime);
+  public RegularArrivalDepartureTime start() {
+    return RegularArrivalDepartureTime.ofStatic(startTime);
   }
 
   @Override
-  public FixedArrivalDepartureTime end() {
-    return FixedArrivalDepartureTime.ofStatic(endTime);
+  public RegularArrivalDepartureTime end() {
+    return RegularArrivalDepartureTime.ofStatic(endTime);
   }
 
   @Override

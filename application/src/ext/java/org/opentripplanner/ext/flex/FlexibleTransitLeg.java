@@ -15,7 +15,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
+import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -87,13 +87,13 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public FixedArrivalDepartureTime start() {
-    return FixedArrivalDepartureTime.ofStatic(startTime);
+  public RegularArrivalDepartureTime start() {
+    return RegularArrivalDepartureTime.ofStatic(startTime);
   }
 
   @Override
-  public FixedArrivalDepartureTime end() {
-    return FixedArrivalDepartureTime.ofStatic(endTime);
+  public RegularArrivalDepartureTime end() {
+    return RegularArrivalDepartureTime.ofStatic(endTime);
   }
 
   @Override

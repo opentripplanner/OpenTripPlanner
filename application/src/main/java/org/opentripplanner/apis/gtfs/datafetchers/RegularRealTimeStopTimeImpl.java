@@ -9,14 +9,14 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
+import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
 import org.opentripplanner.transit.service.TransitService;
 
-public class FixedStopTimeOnServiceDateImpl
-  implements GraphQLDataFetchers.GraphQLFixedStopTimeOnServiceDate {
+public class RegularRealTimeStopTimeImpl
+  implements GraphQLDataFetchers.GraphQLRegularRealTimeStopTime {
 
   @Override
-  public DataFetcher<FixedArrivalDepartureTime> arrival() {
+  public DataFetcher<RegularArrivalDepartureTime> arrival() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -24,13 +24,13 @@ public class FixedStopTimeOnServiceDateImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? FixedArrivalDepartureTime.of(scheduledTime, tripTime.getArrivalDelay())
-        : FixedArrivalDepartureTime.ofStatic(scheduledTime);
+        ? RegularArrivalDepartureTime.of(scheduledTime, tripTime.getArrivalDelay())
+        : RegularArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 
   @Override
-  public DataFetcher<FixedArrivalDepartureTime> departure() {
+  public DataFetcher<RegularArrivalDepartureTime> departure() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledDeparture());
@@ -38,8 +38,8 @@ public class FixedStopTimeOnServiceDateImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? FixedArrivalDepartureTime.of(scheduledTime, tripTime.getDepartureDelay())
-        : FixedArrivalDepartureTime.ofStatic(scheduledTime);
+        ? RegularArrivalDepartureTime.of(scheduledTime, tripTime.getDepartureDelay())
+        : RegularArrivalDepartureTime.ofStatic(scheduledTime);
     };
   }
 

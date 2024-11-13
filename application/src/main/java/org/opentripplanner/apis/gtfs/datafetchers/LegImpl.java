@@ -17,8 +17,8 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -81,7 +81,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<FixedArrivalDepartureTime> end() {
+  public DataFetcher<RegularArrivalDepartureTime> end() {
     return environment -> getSource(environment).end();
   }
 
@@ -227,7 +227,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<FixedArrivalDepartureTime> start() {
+  public DataFetcher<RegularArrivalDepartureTime> start() {
     return environment -> getSource(environment).start();
   }
 

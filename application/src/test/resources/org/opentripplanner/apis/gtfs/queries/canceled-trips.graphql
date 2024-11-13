@@ -8,7 +8,7 @@
     }
     edges {
       node {
-        ... on FixedTripOnServiceDate {
+        ... on RegularTripOnServiceDate {
           serviceDate
           end {
             arrival {

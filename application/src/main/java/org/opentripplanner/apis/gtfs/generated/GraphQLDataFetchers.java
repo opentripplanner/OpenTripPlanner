@@ -39,9 +39,9 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
-import org.opentripplanner.model.plan.FixedArrivalDepartureTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -410,41 +410,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> url();
   }
 
-  /**
-   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
-   * available. This is used when there is a known scheduled time.
-   */
-  public interface GraphQLFixedArrivalDepartureTime {
-    public DataFetcher<Object> estimated();
-
-    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
-  }
-
-  /**
-   * Exact dated stoptime represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-   * This can include realtime estimates.
-   */
-  public interface GraphQLFixedStopTimeOnServiceDate {
-    public DataFetcher<FixedArrivalDepartureTime> arrival();
-
-    public DataFetcher<FixedArrivalDepartureTime> departure();
-
-    public DataFetcher<Object> stop();
-  }
-
-  /** A fixed (i.e. not flexible or frequency based) trip on a specific service date */
-  public interface GraphQLFixedTripOnServiceDate {
-    public DataFetcher<TripTimeOnDate> end();
-
-    public DataFetcher<java.time.LocalDate> serviceDate();
-
-    public DataFetcher<TripTimeOnDate> start();
-
-    public DataFetcher<Iterable<TripTimeOnDate>> stopTimes();
-
-    public DataFetcher<Trip> trip();
-  }
-
   public interface GraphQLGeometry {
     public DataFetcher<Integer> length();
 
@@ -508,7 +473,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<FixedArrivalDepartureTime> end();
+    public DataFetcher<RegularArrivalDepartureTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -552,7 +517,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<FixedArrivalDepartureTime> start();
+    public DataFetcher<RegularArrivalDepartureTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -660,7 +625,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
-    public DataFetcher<FixedArrivalDepartureTime> arrival();
+    public DataFetcher<RegularArrivalDepartureTime> arrival();
 
     public DataFetcher<Long> arrivalTime();
 
@@ -670,7 +635,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleParking> carPark();
 
-    public DataFetcher<FixedArrivalDepartureTime> departure();
+    public DataFetcher<RegularArrivalDepartureTime> departure();
 
     public DataFetcher<Long> departureTime();
 
@@ -879,6 +844,41 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.Duration> delay();
 
     public DataFetcher<java.time.OffsetDateTime> time();
+  }
+
+  /**
+   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
+   * available. This is used when there is a known scheduled time.
+   */
+  public interface GraphQLRegularRealTimeArrivalDepartureTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  }
+
+  /**
+   * Regular real-time stop time represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+   * This can include real-time estimates.
+   */
+  public interface GraphQLRegularRealTimeStopTime {
+    public DataFetcher<RegularArrivalDepartureTime> arrival();
+
+    public DataFetcher<RegularArrivalDepartureTime> departure();
+
+    public DataFetcher<Object> stop();
+  }
+
+  /** A regular (i.e. not flexible) trip on a specific service date */
+  public interface GraphQLRegularTripOnServiceDate {
+    public DataFetcher<TripTimeOnDate> end();
+
+    public DataFetcher<java.time.LocalDate> serviceDate();
+
+    public DataFetcher<TripTimeOnDate> start();
+
+    public DataFetcher<Iterable<TripTimeOnDate>> stopTimes();
+
+    public DataFetcher<Trip> trip();
   }
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
@@ -1240,7 +1240,11 @@ public class GraphQLDataFetchers {
   }
 
   /** An instance of a trip on a service date. */
-  public interface GraphQLTripOnServiceDate extends TypeResolver {}
+  public interface GraphQLTripOnServiceDate extends TypeResolver {
+    public default DataFetcher<java.time.LocalDate> serviceDate() {
+      return null;
+    }
+  }
 
   /**
    * A connection to a list of trips on service dates that follows
