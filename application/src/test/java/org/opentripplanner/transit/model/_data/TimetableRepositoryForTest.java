@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * Test utility class to help construct valid transit model objects.
@@ -232,6 +233,13 @@ public class TimetableRepositoryForTest {
       .range(0, count)
       .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
       .toList();
+  }
+
+  /**
+   * @see TimetableRepositoryForTest#stopTimesEvery5Minutes(int, Trip, int)
+   */
+  public List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, String startTime) {
+    return stopTimesEvery5Minutes(count, trip, TimeUtils.time(startTime));
   }
 
   public StopPattern stopPattern(int numberOfStops) {

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
@@ -153,7 +154,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    @Nullable GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
