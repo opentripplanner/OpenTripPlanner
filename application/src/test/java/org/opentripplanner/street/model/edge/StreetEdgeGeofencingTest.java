@@ -261,7 +261,7 @@ class StreetEdgeGeofencingTest {
 
       // we return 3 states: one for the speculative renting of a vehicle, but with the information
       // of which networks' no-drop-off zones it started in
-      assertEquals(4, states.length);
+      assertEquals(3, states.length);
 
       // first the fallback walk state
       final State walkState = states[0];
@@ -286,16 +286,22 @@ class StreetEdgeGeofencingTest {
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
       assertEquals(Set.of(), tierState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
 
+      /*
+      * These rental networks are not allowed in the request so they are no longer returned
       final State birdState = states[3];
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
       assertEquals(BICYCLE, birdState.currentMode());
       assertEquals(NETWORK_BIRD, birdState.getVehicleRentalNetwork());
       assertEquals(Set.of(), birdState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
+       */
     }
 
     private static StreetSearchRequest defaultArriveByRequest() {
       return StreetSearchRequest
         .of()
+        .withPreferences(p ->
+          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
+        )
         .withMode(StreetMode.SCOOTER_RENTAL)
         .withArriveBy(true)
         .build();

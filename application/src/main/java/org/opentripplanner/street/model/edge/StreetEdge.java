@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -976,6 +977,26 @@ public class StreetEdge
     return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
   }
 
+  private State makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0, String network) {
+    var preferences = s0.getRequest().preferences();
+    var edit = doTraverse(s0, TraverseMode.WALK, false);
+    if (edit != null) {
+      edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
+      if (network != null) {
+        edit.resetStartedInNoDropOffZone();
+      }
+      State state = edit.makeState();
+      if (state != null && network != null) {
+        var allowedNetworks = preferences.rental(state.currentMode()).allowedNetworks();
+        if (!allowedNetworks.contains(network)) {
+          return null;
+        }
+      }
+      return state;
+    }
+    return null;
+  }
+
   /**
    * A very special case: an arriveBy rental search has started in a no-drop-off zone
    * we don't know yet which rental network we will end up using.
@@ -987,31 +1008,21 @@ public class StreetEdge
    * zone applies to where we pick up a vehicle with a specific network.
    */
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
-    var networks = Stream.concat(
+    var states = tov.rentalRestrictions().noDropOffNetworks().stream().map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network)).filter(Objects::nonNull).toList();
+    var statesStream = states.stream();
+
+    if (!states.isEmpty()) {
       // null is a special rental network that speculatively assumes that you can take any vehicle
       // you have to check in the rental edge if this has search has been started in a no-drop off zone
-      Stream.of((String) null),
-      tov.rentalRestrictions().noDropOffNetworks().stream()
-    );
-
-    var states = networks.map(network -> {
-      var edit = doTraverse(s0, TraverseMode.WALK, false);
-      if (edit != null) {
-        edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
-        if (network != null) {
-          edit.resetStartedInNoDropOffZone();
-        }
-        return edit.makeState();
-      }
-      return null;
-    });
+      statesStream = Stream.concat(Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null)),
+        statesStream);
+    }
 
     StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
     if (walking != null) {
-      var forkState = walking.makeState();
-      states = Stream.concat(Stream.of(forkState), states);
+      statesStream = Stream.concat(Stream.of(walking.makeState()), statesStream);
     }
-    return State.ofStream(states);
+    return State.ofStream(statesStream);
   }
 
   /**
