@@ -94,6 +94,27 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     assertEquals(TRIP_ID, matcher.match(FEED_ID, trip1).getTripId());
   }
 
+  @Test
+  void incorrectRoute() {
+    var matcher = matcher();
+    TripDescriptor trip1 = matchingTripUpdate().setRouteId("does-not-exists").build();
+    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+  }
+
+  @Test
+  void incorrectDateFormat() {
+    var matcher = matcher();
+    TripDescriptor trip1 = matchingTripUpdate().setStartDate("ZZZ").build();
+    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+  }
+
+  @Test
+  void incorrectDirection() {
+    var matcher = matcher();
+    TripDescriptor trip1 = matchingTripUpdate().setDirectionId(1).build();
+    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+  }
+
   public static List<Function<TripDescriptor.Builder, TripDescriptor.Builder>> incompleteDataCases() {
     return List.of(
       TripDescriptor.Builder::clearDirectionId,
