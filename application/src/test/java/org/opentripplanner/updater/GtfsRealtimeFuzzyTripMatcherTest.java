@@ -46,7 +46,8 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     new Deduplicator()
   );
   private static final Route ROUTE = TimetableRepositoryForTest.route(id(ROUTE_ID)).build();
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("t1").build();
+  private static final String TRIP_ID = "t1";
+  private static final Trip TRIP = TimetableRepositoryForTest.trip(TRIP_ID).build();
 
   private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("sid1");
   private static final String START_TIME = "07:30:00";
@@ -73,24 +74,32 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   }
 
   @Test
-  void simpleMatch() {
+  void noTripId() {
     var matcher = matcher();
     TripDescriptor trip1 = matchingTripUpdate().build();
     assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
   }
 
   @Test
-  void nonExistingTripId() {
+  void tripIdSetButNotInSchedule() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setTripId("does-not-exist-in-timetable").build();
-    assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
+    TripDescriptor trip1 = matchingTripUpdate().setTripId("does-not-exist-in-schedule").build();
+    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip1).getTripId());
+  }
+
+  @Test
+  void tripIdExistsInSchedule() {
+    var matcher = matcher();
+    TripDescriptor trip1 = matchingTripUpdate().setTripId(TRIP_ID).build();
+    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip1).getTripId());
   }
 
   public static List<Function<TripDescriptor.Builder, TripDescriptor.Builder>> incompleteDataCases() {
     return List.of(
       TripDescriptor.Builder::clearDirectionId,
       TripDescriptor.Builder::clearRouteId,
-      TripDescriptor.Builder::clearStartTime
+      TripDescriptor.Builder::clearStartTime,
+      TripDescriptor.Builder::clearStartDate
     );
   }
 
