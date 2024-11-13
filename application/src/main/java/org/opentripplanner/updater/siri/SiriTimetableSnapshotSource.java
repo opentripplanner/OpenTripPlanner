@@ -80,7 +80,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitEditorService =
       new DefaultTransitService(timetableRepository, getTimetableSnapshotBuffer());
     this.tripPatternCache =
-      new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::getPatternForTrip);
+      new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::findPattern);
 
     timetableRepository.initTimetableSnapshotProvider(this);
   }
@@ -238,7 +238,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitEditorService.getPatternForTrip(trip);
+      pattern = transitEditorService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       TripAndPattern tripAndPattern = fuzzyTripMatcher.match(
@@ -332,7 +332,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean markScheduledTripAsDeleted(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = transitEditorService.getPatternForTrip(trip);
+    final TripPattern pattern = transitEditorService.findPattern(trip);
 
     if (pattern != null) {
       // Mark scheduled trip times for this trip in this pattern as deleted

@@ -387,7 +387,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return UpdateError.result(tripId, NO_UPDATES);
     }
 
-    final FeedScopedId serviceId = transitEditorService.getTripForId(tripId).getServiceId();
+    final FeedScopedId serviceId = transitEditorService.getTrip(tripId).getServiceId();
     final Set<LocalDate> serviceDates = transitEditorService
       .getCalendarService()
       .getServiceDatesForServiceId(serviceId);
@@ -431,7 +431,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .cancelStops(skippedStopIndices)
         .build();
 
-      final Trip trip = transitEditorService.getTripForId(tripId);
+      final Trip trip = transitEditorService.getTrip(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
@@ -473,7 +473,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    final Trip trip = transitEditorService.getScheduledTripForId(tripId);
+    final Trip trip = transitEditorService.getScheduledTrip(tripId);
 
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
@@ -653,7 +653,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     boolean routeExists = routeExists(tripId.getFeedId(), tripDescriptor);
     if (routeExists) {
       route =
-        transitEditorService.getRouteForId(
+        transitEditorService.getRoute(
           new FeedScopedId(tripId.getFeedId(), tripDescriptor.getRouteId())
         );
     } else {
@@ -706,7 +706,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       var addedRouteExtension = AddedRoute.ofTripDescriptor(tripDescriptor);
 
       var agency = transitEditorService
-        .findAgencyById(new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId()))
+        .findAgency(new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId()))
         .orElseGet(() -> fallbackAgency(tripId.getFeedId()));
 
       builder.withAgency(agency);
@@ -751,7 +751,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean routeExists(String feedId, TripDescriptor tripDescriptor) {
     if (tripDescriptor.hasRouteId() && StringUtils.hasValue(tripDescriptor.getRouteId())) {
       var routeId = new FeedScopedId(feedId, tripDescriptor.getRouteId());
-      return Objects.nonNull(transitEditorService.getRouteForId(routeId));
+      return Objects.nonNull(transitEditorService.getRoute(routeId));
     } else {
       return false;
     }
@@ -841,7 +841,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
-    final TripPattern originalTripPattern = transitEditorService.getPatternForTrip(trip);
+    final TripPattern originalTripPattern = transitEditorService.findPattern(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
@@ -1000,7 +1000,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     //
 
     // Check whether trip id already exists in graph
-    Trip trip = transitEditorService.getTripForId(tripId);
+    Trip trip = transitEditorService.getTrip(tripId);
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
@@ -1117,8 +1117,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return trip pattern or null if no trip pattern was found
    */
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitEditorService.getTripForId(tripId);
-    return transitEditorService.getPatternForTrip(trip);
+    Trip trip = transitEditorService.getTrip(tripId);
+    return transitEditorService.findPattern(trip);
   }
 
   private static void debug(FeedScopedId id, String message, Object... params) {

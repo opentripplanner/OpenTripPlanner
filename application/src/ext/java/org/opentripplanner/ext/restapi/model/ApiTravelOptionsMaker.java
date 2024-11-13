@@ -33,7 +33,7 @@ public final class ApiTravelOptionsMaker {
   ) {
     var service = graph.getVehicleParkingService();
     return makeOptions(
-      transitService.getTransitModes(),
+      transitService.listTransitModes(),
       vehicleRentalService.hasRentalBikes(),
       service.hasBikeParking(),
       service.hasCarParking()

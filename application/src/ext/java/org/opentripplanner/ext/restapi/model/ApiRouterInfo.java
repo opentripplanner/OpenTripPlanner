@@ -43,7 +43,7 @@ public class ApiRouterInfo {
     this.buildTime = Date.from(graph.buildTime);
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
-    this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
+    this.transitModes = ModeMapper.mapToApi(transitService.listTransitModes());
     this.envelope = envelope;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);

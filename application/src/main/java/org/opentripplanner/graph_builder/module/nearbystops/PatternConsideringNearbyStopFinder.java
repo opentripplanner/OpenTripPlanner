@@ -1,10 +1,8 @@
 package org.opentripplanner.graph_builder.module.nearbystops;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -60,7 +58,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
 
       if (ts1 instanceof RegularStop) {
         /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-        for (TripPattern pattern : transitService.getPatternsForStop(ts1)) {
+        for (TripPattern pattern : transitService.findPatterns(ts1)) {
           if (
             reverseDirection
               ? pattern.canAlight(nearbyStop.stop)

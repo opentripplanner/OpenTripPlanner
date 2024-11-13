@@ -270,7 +270,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           GraphQLTypes.GraphQLStopStopTimesForPatternArgs args = new GraphQLTypes.GraphQLStopStopTimesForPatternArgs(
             environment.getArguments()
           );
-          TripPattern pattern = transitService.getTripPatternForId(
+          TripPattern pattern = transitService.getTripPattern(
             FeedScopedId.parse(args.getGraphQLId())
           );
 
@@ -287,7 +287,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             );
           }
 
-          return transitService.stopTimesForPatternAtStop(
+          return transitService.findTripTimeOnDate(
             stop,
             pattern,
             GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
@@ -318,7 +318,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       var args = new GraphQLTypes.GraphQLStopStoptimesForPatternsArgs(environment.getArguments());
 
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        transitService.stopTimesForStop(
+        transitService.findStopTimesInPattern(
           stop,
           GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
           Duration.ofSeconds(args.getGraphQLTimeRange()),
@@ -356,7 +356,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       }
 
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
-        transitService.getStopTimesForStop(
+        transitService.findStopTimesInPattern(
           stop,
           date,
           args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
@@ -385,7 +385,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
         transitService
-          .stopTimesForStop(
+          .findStopTimesInPattern(
             stop,
             GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
             Duration.ofSeconds(args.getGraphQLTimeRange()),
@@ -431,7 +431,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             .getGraphQLMaxDistance();
 
           return getTransitService(environment)
-            .getTransfersByStop(stop)
+            .findPathTransfers(stop)
             .stream()
             .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
             .filter(transfer -> transfer.to instanceof RegularStop)
@@ -452,14 +452,14 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         environment,
         stop ->
           transitService
-            .getModesOfStopLocation(stop)
+            .findTransitModes(stop)
             .stream()
             .findFirst()
             .map(Enum::toString)
             .orElse(null),
         station ->
           transitService
-            .getModesOfStopLocationsGroup(station)
+            .findTransitModes(station)
             .stream()
             .findFirst()
             .map(Enum::toString)
@@ -495,7 +495,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
     return getValue(
       environment,
-      stop -> getTransitService(environment).getPatternsForStop(stop, true),
+      stop -> getTransitService(environment).findPatterns(stop, true),
       station -> null
     );
   }
@@ -503,7 +503,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
-      stop -> getTransitService(environment).getRoutesForStop(stop),
+      stop -> getTransitService(environment).findRoutes(stop),
       station -> null
     );
   }
@@ -531,7 +531,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       )
       .flatMap(tripPattern ->
         transitService
-          .stopTimesForPatternAtStop(
+          .findTripTimeOnDate(
             stop,
             tripPattern,
             startTime,
@@ -562,7 +562,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   ) {
     return originalPattern
       .scheduledTripsAsStream()
-      .map(trip -> transitService.getNewTripPatternForModifiedTrip(trip.getId(), date))
+      .map(trip -> transitService.findNewTripPatternForModifiedTrip(trip.getId(), date))
       .filter(tripPattern ->
         tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );

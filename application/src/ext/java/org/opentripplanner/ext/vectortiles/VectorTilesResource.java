@@ -109,7 +109,7 @@ public class VectorTilesResource {
   private List<FeedInfo> getFeedInfos() {
     return serverContext
       .transitService()
-      .getFeedIds()
+      .listFeedIds()
       .stream()
       .map(serverContext.transitService()::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))

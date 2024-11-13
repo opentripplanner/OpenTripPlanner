@@ -56,7 +56,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -89,7 +88,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   @Override
   public DataFetcher<Iterable<Agency>> agencies() {
-    return environment -> getTransitService(environment).getAgencies();
+    return environment -> getTransitService(environment).listAgencies();
   }
 
   @Override
@@ -99,7 +98,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         new GraphQLTypes.GraphQLQueryTypeAgencyArgs(environment.getArguments()).getGraphQLId()
       );
 
-      return getTransitService(environment).getAgencyForId(id);
+      return getTransitService(environment).getAgency(id);
     };
   }
 
@@ -264,7 +263,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   @Override
   public DataFetcher<Iterable<String>> feeds() {
-    return environment -> getTransitService(environment).getFeedIds();
+    return environment -> getTransitService(environment).listFeedIds();
   }
 
   @Override
@@ -276,7 +275,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       return new GtfsRealtimeFuzzyTripMatcher(transitService)
         .getTrip(
-          transitService.getRouteForId(FeedScopedId.parse(args.getGraphQLRoute())),
+          transitService.getRoute(FeedScopedId.parse(args.getGraphQLRoute())),
           DIRECTION_MAPPER.map(args.getGraphQLDirection()),
           args.getGraphQLTime(),
           ServiceDateUtils.parseString(args.getGraphQLDate())
@@ -393,7 +392,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       switch (type) {
         case "Agency":
-          return transitService.getAgencyForId(FeedScopedId.parse(id));
+          return transitService.getAgency(FeedScopedId.parse(id));
         case "Alert":
           return transitService.getTransitAlertService().getAlertById(FeedScopedId.parse(id));
         case "BikePark":
@@ -431,7 +430,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "DepartureRow":
           return PatternAtStop.fromId(transitService, id);
         case "Pattern":
-          return transitService.getTripPatternForId(FeedScopedId.parse(id));
+          return transitService.getTripPattern(FeedScopedId.parse(id));
         case "placeAtDistance":
           {
             String[] parts = id.split(";");
@@ -450,7 +449,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
           }
         case "Route":
-          return transitService.getRouteForId(FeedScopedId.parse(id));
+          return transitService.getRoute(FeedScopedId.parse(id));
         case "Stop":
           return transitService.getRegularStop(FeedScopedId.parse(id));
         case "Stoptime":
@@ -467,7 +466,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return null; //TODO
         case "Trip":
           var scopedId = FeedScopedId.parse(id);
-          return transitService.getTripForId(scopedId);
+          return transitService.getTrip(scopedId);
         case "VehicleParking":
           var vehicleParkingId = FeedScopedId.parse(id);
           return vehicleParkingService == null
@@ -487,7 +486,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<TripPattern> pattern() {
     return environment ->
       getTransitService(environment)
-        .getTripPatternForId(
+        .getTripPattern(
           FeedScopedId.parse(
             new GraphQLTypes.GraphQLQueryTypePatternArgs(environment.getArguments()).getGraphQLId()
           )
@@ -496,7 +495,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> getTransitService(environment).getAllTripPatterns();
+    return environment -> getTransitService(environment).listTripPatterns();
   }
 
   @Override
@@ -584,7 +583,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Route> route() {
     return environment ->
       getTransitService(environment)
-        .getRouteForId(
+        .getRoute(
           FeedScopedId.parse(
             new GraphQLTypes.GraphQLQueryTypeRouteArgs(environment.getArguments()).getGraphQLId()
           )
@@ -603,11 +602,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           .getGraphQLIds()
           .stream()
           .map(FeedScopedId::parse)
-          .map(transitService::getRouteForId)
+          .map(transitService::getRoute)
           .toList();
       }
 
-      Stream<Route> routeStream = transitService.getAllRoutes().stream();
+      Stream<Route> routeStream = transitService.listRoutes().stream();
 
       if (args.getGraphQLFeeds() != null) {
         List<String> feeds = args.getGraphQLFeeds();
@@ -652,7 +651,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Object> station() {
     return environment ->
       getTransitService(environment)
-        .getStationById(
+        .getStation(
           FeedScopedId.parse(
             new GraphQLTypes.GraphQLQueryTypeStationArgs(environment.getArguments()).getGraphQLId()
           )
@@ -671,11 +670,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           .getGraphQLIds()
           .stream()
           .map(FeedScopedId::parse)
-          .map(transitService::getStationById)
+          .map(transitService::getStation)
           .collect(Collectors.toList());
       }
 
-      Stream<Station> stationStream = transitService.getStations().stream();
+      Stream<Station> stationStream = transitService.listStations().stream();
 
       if (args.getGraphQLName() != null) {
         String name = args.getGraphQLName().toLowerCase(environment.getLocale());
@@ -803,7 +802,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Trip> trip() {
     return environment ->
       getTransitService(environment)
-        .getTripForId(
+        .getTrip(
           FeedScopedId.parse(
             new GraphQLTypes.GraphQLQueryTypeTripArgs(environment.getArguments()).getGraphQLId()
           )
@@ -815,7 +814,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     return environment -> {
       var args = new GraphQLTypes.GraphQLQueryTypeTripsArgs(environment.getArguments());
 
-      Stream<Trip> tripStream = getTransitService(environment).getAllTrips().stream();
+      Stream<Trip> tripStream = getTransitService(environment).listTrips().stream();
 
       if (args.getGraphQLFeeds() != null) {
         List<String> feeds = args.getGraphQLFeeds();

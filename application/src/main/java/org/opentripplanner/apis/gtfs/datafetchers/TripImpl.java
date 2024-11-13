@@ -325,14 +325,14 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
-        TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
+        TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         // no matching pattern found
         if (tripPattern == null) {
           return List.of();
         }
 
         Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
-        Timetable timetable = transitService.getTimetableForTripPattern(tripPattern, serviceDate);
+        Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
         return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
       } catch (ParseException e) {
         return null; // Invalid date format
@@ -397,7 +397,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   private TripPattern getTripPattern(DataFetchingEnvironment environment) {
-    return getTransitService(environment).getPatternForTrip(environment.getSource());
+    return getTransitService(environment).findPattern(environment.getSource());
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
