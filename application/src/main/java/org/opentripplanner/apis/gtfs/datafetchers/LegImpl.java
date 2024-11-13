@@ -286,7 +286,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return alternativeLegs(NavigationDirection.NEXT);
   }
 
-  private DataFetcher<Iterable<Leg>> alternativeLegs(NavigationDirection timeLine) {
+  private DataFetcher<Iterable<Leg>> alternativeLegs(NavigationDirection direction) {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
@@ -321,7 +321,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
             environment.getSource(),
             numberOfLegs,
             environment.<GraphQLRequestContext>getContext().transitService(),
-            timeLine,
+            direction,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
             limitToExactDestinationStop
