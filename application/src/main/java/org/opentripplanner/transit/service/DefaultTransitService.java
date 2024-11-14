@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -97,15 +96,17 @@ public class DefaultTransitService implements TransitEditorService {
     this.timetableSnapshot = timetableSnapshotBuffer;
   }
 
-  public List<TripTimeOnDate> getScheduledTripTimes(Trip trip) {
+  public Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip) {
     TripPattern tripPattern = getPatternForTrip(trip);
     if (tripPattern == null) {
-      return List.of();
+      return Optional.empty();
     }
-    return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip);
+    return Optional.ofNullable(
+      TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip)
+    );
   }
 
-  public List<TripTimeOnDate> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = getPatternForTrip(trip, serviceDate);
 
     Timetable timetable = getTimetableForTripPattern(pattern, serviceDate);
@@ -123,12 +124,14 @@ public class DefaultTransitService implements TransitEditorService {
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
     if (!this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())) {
-      return new ArrayList<>();
+      return Optional.empty();
     } else {
       Instant midnight = ServiceDateUtils
         .asStartOfService(serviceDate, this.getTimeZone())
         .toInstant();
-      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
+      return Optional.ofNullable(
+        TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight)
+      );
     }
   }
 

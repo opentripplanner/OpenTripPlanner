@@ -136,7 +136,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var stopTimes = serviceDate
         .map(date -> transitService.getTripTimeOnDates(trip, date))
         .orElseGet(() -> transitService.getScheduledTripTimes(trip));
-      return stopTimes.getLast();
+      return stopTimes.map(List::getLast).orElse(null);
     };
   }
 
@@ -159,7 +159,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var stopTimes = serviceDate
         .map(date -> transitService.getTripTimeOnDates(trip, date))
         .orElseGet(() -> transitService.getScheduledTripTimes(trip));
-      return stopTimes.getFirst();
+      return stopTimes.map(List::getFirst).orElse(null);
     };
   }
 
@@ -255,7 +255,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment ->
-      getTransitService(environment).getScheduledTripTimes(getSource(environment));
+      getTransitService(environment).getScheduledTripTimes(getSource(environment)).orElse(null);
   }
 
   @Override
@@ -270,7 +270,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
         : LocalDate.now(timeZone);
 
-      return transitService.getTripTimeOnDates(trip, serviceDate);
+      return transitService.getTripTimeOnDates(trip, serviceDate).orElse(null);
     };
   }
 

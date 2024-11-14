@@ -267,7 +267,8 @@ public class ServiceJourneyType {
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
             return GqlUtil
               .getTransitService(environment)
-              .getTripTimeOnDates(trip(environment), serviceDate);
+              .getTripTimeOnDates(trip(environment), serviceDate)
+              .orElse(null);
           })
           .build()
       )

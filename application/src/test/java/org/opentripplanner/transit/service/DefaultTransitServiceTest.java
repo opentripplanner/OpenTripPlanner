@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -46,8 +47,9 @@ class DefaultTransitServiceTest {
 
   private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");
   private static final int SERVICE_CODE = 0;
-  private static final Trip TRIP = TimetableRepositoryForTest
-    .trip("REAL_TIME_TRIP")
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build();
+  private static final Trip ADDED_TRIP = TimetableRepositoryForTest
+    .trip("REAL_TIME_ADDED_TRIP")
     .withServiceId(SERVICE_ID)
     .build();
   private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = ScheduledTripTimes
@@ -76,6 +78,15 @@ class DefaultTransitServiceTest {
     .build();
   private static final int DELAY = 120;
   private static final RealTimeTripTimes REALTIME_TRIP_TIMES = SCHEDULED_TRIP_TIMES.copyScheduledTimes();
+  private static final RealTimeTripTimes ADDED_TRIP_TIMES = RealTimeTripTimes.of(
+    ScheduledTripTimes
+      .of()
+      .withTrip(ADDED_TRIP)
+      .withArrivalTimes(new int[] { 10, 11 })
+      .withDepartureTimes(new int[] { 10, 11 })
+      .withServiceCode(SERVICE_CODE)
+      .build()
+  );
 
   static {
     for (var i = 0; i < REALTIME_TRIP_TIMES.getNumStops(); ++i) {
@@ -109,6 +120,9 @@ class DefaultTransitServiceTest {
       TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
       timetableSnapshot.update(
         new RealTimeTripUpdate(REAL_TIME_PATTERN, REALTIME_TRIP_TIMES, SERVICE_DATE)
+      );
+      timetableSnapshot.update(
+        new RealTimeTripUpdate(REAL_TIME_PATTERN, ADDED_TRIP_TIMES, SERVICE_DATE)
       );
 
       return timetableSnapshot.commit();
@@ -160,9 +174,11 @@ class DefaultTransitServiceTest {
   @Test
   void getScheduledTripTimes() {
     assertEquals(
-      List.of(
-        new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 0, RAIL_PATTERN),
-        new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 1, RAIL_PATTERN)
+      Optional.of(
+        List.of(
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 0, RAIL_PATTERN),
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 1, RAIL_PATTERN)
+        )
       ),
       service.getScheduledTripTimes(TRIP)
     );
@@ -175,9 +191,11 @@ class DefaultTransitServiceTest {
       .toInstant();
 
     assertEquals(
-      List.of(
-        new TripTimeOnDate(REALTIME_TRIP_TIMES, 0, REAL_TIME_PATTERN, SERVICE_DATE, midnight),
-        new TripTimeOnDate(REALTIME_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
+      Optional.of(
+        List.of(
+          new TripTimeOnDate(REALTIME_TRIP_TIMES, 0, REAL_TIME_PATTERN, SERVICE_DATE, midnight),
+          new TripTimeOnDate(REALTIME_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
+        )
       ),
       service.getTripTimeOnDates(TRIP, SERVICE_DATE)
     );
@@ -185,6 +203,28 @@ class DefaultTransitServiceTest {
 
   @Test
   void getTripTimesOnNoServiceDay() {
-    assertEquals(List.of(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
+    assertEquals(Optional.empty(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
+  }
+
+  @Test
+  void getScheduledTripTimesForAddedTrip() {
+    assertEquals(Optional.empty(), service.getScheduledTripTimes(ADDED_TRIP));
+  }
+
+  @Test
+  void getRealtimeTripTimesForAddedTrip() {
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(SERVICE_DATE, service.getTimeZone())
+      .toInstant();
+
+    assertEquals(
+      Optional.of(
+        List.of(
+          new TripTimeOnDate(ADDED_TRIP_TIMES, 0, REAL_TIME_PATTERN, SERVICE_DATE, midnight),
+          new TripTimeOnDate(ADDED_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
+        )
+      ),
+      service.getTripTimeOnDates(ADDED_TRIP, SERVICE_DATE)
+    );
   }
 }
