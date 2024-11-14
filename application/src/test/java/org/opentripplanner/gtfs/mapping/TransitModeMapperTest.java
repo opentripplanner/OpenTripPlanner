@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.CABLE_CAR;
 import static org.opentripplanner.transit.model.basic.TransitMode.CARPOOL;
+import static org.opentripplanner.transit.model.basic.TransitMode.COACH;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.FUNICULAR;
 import static org.opentripplanner.transit.model.basic.TransitMode.GONDOLA;
@@ -42,6 +43,8 @@ class TransitModeMapperTest {
       // https://groups.google.com/g/gtfs-changes/c/keT5rTPS7Y0/m/71uMz2l6ke0J?pli=1
       Arguments.of(100, RAIL),
       Arguments.of(199, RAIL),
+      Arguments.of(200, COACH),
+      Arguments.of(299, COACH),
       Arguments.of(400, RAIL),
       Arguments.of(401, SUBWAY),
       Arguments.of(402, SUBWAY),

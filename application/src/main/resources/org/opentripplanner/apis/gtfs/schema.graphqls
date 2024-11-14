@@ -670,8 +670,10 @@ type Leg {
   """
   headsign: String
   """
-  An identifier for the leg, which can be used to re-fetch transit leg information.
+  An identifier for the leg, which can be used to re-fetch transit leg information, except leg's fare products.
   Re-fetching fails when the underlying transit data no longer exists.
+  **Note:** when both id and fare products are queried with [Relay](https://relay.dev/), id should be queried using a suitable GraphQL alias
+  such as `legId: id`. Relay does not accept different fare product ids in otherwise identical legs.
   """
   id: String
   """
@@ -1173,6 +1175,7 @@ type QueryType {
   """
   Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.
+  Fare products cannot be refetched using this query.
   """
   leg(id: String!): Leg
   """
@@ -1483,6 +1486,11 @@ type QueryType {
     "List of routes and agencies which are given lower preference when planning the itinerary"
     unpreferred: InputUnpreferred,
     """
+    The list of points the itinerary required to pass through.
+    All locations are visited in the order they are listed.
+    """
+    via: [PlanViaLocationInput!],
+    """
     How much less bad is waiting at the beginning of the trip (replaces
     `waitReluctance` on the first boarding). Default value: 0.4
     """
@@ -1606,7 +1614,9 @@ type QueryType {
     is in combination of using paging can lead to better performance and to getting a more consistent
     number of itineraries in each search.
     """
-    searchWindow: Duration
+    searchWindow: Duration,
+    "The list of points the itinerary is required to pass through."
+    via: [PlanViaLocationInput!]
   ): PlanConnection @async
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle
@@ -4089,6 +4099,20 @@ input PlanModesInput {
   transitOnly: Boolean = false
 }
 
+"""
+One of the listed stop locations must be visited on-board a transit vehicle or the journey must
+alight or board at the location.
+"""
+input PlanPassThroughViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  A list of stop locations. A stop location can be a stop or a station.
+  It is enough to visit ONE of the locations listed.
+  """
+  stopLocationIds: [String!]!
+}
+
 "Wrapper type for different types of preferences related to plan query."
 input PlanPreferencesInput {
   "Accessibility preferences that affect both the street and transit routing."
@@ -4180,6 +4204,40 @@ input PlanTransitModesInput {
   itinerary without any transit legs. By default, all transit modes are usable.
   """
   transit: [PlanTransitModePreferenceInput!]
+}
+
+"""
+A via-location is used to specifying a location as an intermediate place the router must
+route through. The via-location is either a pass-through-location or a visit-via-location.
+"""
+input PlanViaLocationInput @oneOf {
+  "Board, alight or pass-through(on-board) at the stop location."
+  passThrough: PlanPassThroughViaLocationInput
+  "Board or alight at a stop location or visit a coordinate."
+  visit: PlanVisitViaLocationInput
+}
+
+"""
+A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
+on-board visit does not count, the traveler must alight or board at the given stop for it to to
+be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+in the street network from a stop and back to another stop to join the transit network.
+
+NOTE! Coordinates are NOT supported yet.
+"""
+input PlanVisitViaLocationInput {
+  "The label/name of the location. This is pass-through information and is not used in routing."
+  label: String
+  """
+  The minimum wait time is used to force the trip to stay the given duration at the
+  via-location before the itinerary is continued.
+  """
+  minimumWaitTime: Duration = "PT0S"
+  """
+  A list of stop locations. A stop location can be a stop or a station.
+  It is enough to visit ONE of the locations listed.
+  """
+  stopLocationIds: [String!]
 }
 
 "What criteria should be used when optimizing a scooter route."

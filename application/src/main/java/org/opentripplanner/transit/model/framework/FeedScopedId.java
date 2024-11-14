@@ -78,7 +78,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   /**
    * Concatenate feedId and id into a string.
    */
-  public static String concatenateId(String feedId, String id) {
+  private static String concatenateId(String feedId, String id) {
     return feedId + ID_SEPARATOR + id;
   }
 
