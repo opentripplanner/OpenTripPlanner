@@ -38,7 +38,7 @@ to have the same access properties.
 
 ![](images/nothruisland.png)  
 *Some regular (gray colored) streets are blocked behind access restricted (red colored) connections. Walk routing to them fails because it would be considered as pass through traffic.
-The image on the right shows that pruning added walk nothrough restricition to those streets, and routing works again.*
+The image on the right shows that pruning added walk nothrough restriction to those streets, and routing works again.*
 
 ## Pruning algorithm
 
