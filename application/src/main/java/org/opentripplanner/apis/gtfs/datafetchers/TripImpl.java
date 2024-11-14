@@ -3,7 +3,6 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -133,12 +132,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       LocalDate serviceDate = null;
       var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
       if (args.getGraphQLServiceDate() != null) {
-        try {
-          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
-        } catch (ParseException e) {
-          //Invalid date format
-          return null;
-        }
+        serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
       }
 
       var trip = getSource(environment);
@@ -166,12 +160,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       LocalDate serviceDate = null;
       var args = new GraphQLTypes.GraphQLTripDepartureStoptimeArgs(environment.getArguments());
       if (args.getGraphQLServiceDate() != null) {
-        try {
-          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
-        } catch (ParseException e) {
-          //Invalid date format
-          return null;
-        }
+        serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
       }
 
       var trip = getSource(environment);
@@ -286,15 +275,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var args = new GraphQLTypes.GraphQLTripStoptimesForDateArgs(environment.getArguments());
 
       ZoneId timeZone = transitService.getTimeZone();
-      LocalDate serviceDate;
-      try {
-        serviceDate =
-          args.getGraphQLServiceDate() != null
-            ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-            : LocalDate.now(timeZone);
-      } catch (ParseException e) {
-        return null; // Invalid date format
-      }
+      LocalDate serviceDate =
+        args.getGraphQLServiceDate() != null
+          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+          : LocalDate.now(timeZone);
 
       return transitService.getTripTimeOnDates(trip, serviceDate);
     };
