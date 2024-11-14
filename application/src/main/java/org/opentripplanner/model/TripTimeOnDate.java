@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -285,5 +286,23 @@ public class TripTimeOnDate {
 
   public BookingInfo getDropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(stopIndex);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    TripTimeOnDate that = (TripTimeOnDate) o;
+    return (
+      stopIndex == that.stopIndex &&
+      midnight == that.midnight &&
+      Objects.equals(tripTimes, that.tripTimes) &&
+      Objects.equals(tripPattern, that.tripPattern) &&
+      Objects.equals(serviceDate, that.serviceDate)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
   }
 }
