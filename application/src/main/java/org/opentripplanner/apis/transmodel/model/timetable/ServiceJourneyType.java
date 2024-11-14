@@ -238,9 +238,7 @@ public class ServiceJourneyType {
           .description(
             "Returns scheduled passing times only - without real-time-updates, for realtime-data use 'estimatedCalls'"
           )
-          .dataFetcher(env -> GqlUtil.getTransitService(env).getScheduledTripTimes(
-            trip(env)
-          ))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getScheduledTripTimes(trip(env)))
           .build()
       )
       .field(
@@ -267,10 +265,9 @@ public class ServiceJourneyType {
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
-            return GqlUtil.getTransitService(environment).getTripTimeOnDates(
-              trip(environment),
-              serviceDate
-            );
+            return GqlUtil
+              .getTransitService(environment)
+              .getTripTimeOnDates(trip(environment), serviceDate);
           })
           .build()
       )

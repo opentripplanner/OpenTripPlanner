@@ -102,12 +102,12 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
                       .anyMatch(entity ->
                         (
                           entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
-                            stopAndRoute.routeId().equals(getRoute(environment).getId())
+                          stopAndRoute.routeId().equals(getRoute(environment).getId())
                         ) ||
-                          (
-                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                              stopAndTrip.tripId().equals(getSource(environment).getId())
-                          )
+                        (
+                          entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                          stopAndTrip.tripId().equals(getSource(environment).getId())
+                        )
                       )
                   )
                   .toList()
@@ -274,7 +274,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
-    return environment -> getTransitService(environment).getScheduledTripTimes(getSource(environment));
+    return environment ->
+      getTransitService(environment).getScheduledTripTimes(getSource(environment));
   }
 
   @Override
@@ -287,13 +288,14 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       ZoneId timeZone = transitService.getTimeZone();
       LocalDate serviceDate;
       try {
-        serviceDate = args.getGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-          : LocalDate.now(timeZone);
+        serviceDate =
+          args.getGraphQLServiceDate() != null
+            ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+            : LocalDate.now(timeZone);
       } catch (ParseException e) {
         return null; // Invalid date format
       }
-      
+
       return transitService.getTripTimeOnDates(trip, serviceDate);
     };
   }
