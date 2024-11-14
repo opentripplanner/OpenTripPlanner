@@ -41,6 +41,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Deprecate old alert translations in the GTFS API and add language param to a few alert fields [#6216](https://github.com/opentripplanner/OpenTripPlanner/pull/6216)
 - add stopPositionInPattern in Stoptime in GTFS GraphQL API [#6204](https://github.com/opentripplanner/OpenTripPlanner/pull/6204)
 - Fix parsing of wheelchair accessible parking, add wheelchair debug layer [#6229](https://github.com/opentripplanner/OpenTripPlanner/pull/6229)
+- Add previousLegs into GTFS GraphQL API [#6142](https://github.com/opentripplanner/OpenTripPlanner/pull/6142)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
