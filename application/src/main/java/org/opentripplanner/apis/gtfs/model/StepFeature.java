@@ -8,13 +8,13 @@ import org.opentripplanner.transit.model.site.Entrance;
  **/
 public class StepFeature {
 
-  private final Object feature;
+  private final Entrance entranceFeature;
 
   public StepFeature(Entrance entrance) {
-    this.feature = entrance;
+    this.entranceFeature = entrance;
   }
 
-  public Object getFeature() {
-    return feature;
+  public Entrance getEntrance() {
+    return entranceFeature;
   }
 }
