@@ -13,12 +13,10 @@ import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
-import java.util.Arrays;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.street.BusinessAreaBorder;
 import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
@@ -259,8 +257,8 @@ class StreetEdgeGeofencingTest {
 
       var states = edge.traverse(haveRentedState);
 
-      // we return 3 states: one for the speculative renting of a vehicle, but with the information
-      // of which networks' no-drop-off zones it started in
+      // we return 3 states: one for continuing walking, one for the speculative renting of
+      // a vehicle, but with the information of which networks' no-drop-off zones it started in
       assertEquals(3, states.length);
 
       // first the fallback walk state
@@ -268,7 +266,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      // then the speculative renting case
+      // then the speculative renting case for unknown rental network
       final State speculativeRenting = states[1];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
       assertEquals(BICYCLE, speculativeRenting.currentMode());
@@ -280,6 +278,7 @@ class StreetEdgeGeofencingTest {
         speculativeRenting.stateData.noRentalDropOffZonesAtStartOfReverseSearch
       );
 
+      // then the speculative renting cases for specific rental networks
       final State tierState = states[2];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
@@ -303,56 +302,6 @@ class StreetEdgeGeofencingTest {
           p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
         )
         .withMode(StreetMode.SCOOTER_RENTAL)
-        .withArriveBy(true)
-        .build();
-    }
-
-    @Test
-    public void hslFailTst() {
-      StreetVertex V5 = intersectionVertex("V5", 1, 1);
-      StreetVertex V6 = intersectionVertex("V6", 2, 2);
-      V6.addRentalRestriction(NO_DROP_OFF_TIER);
-      Edge edge = streetEdge(V5, V6);
-      var req = hslArriveByRequest();
-      var haveRentedState = State
-        .getInitialStates(Set.of(V6), req)
-        .stream()
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
-      var states = edge.traverse(haveRentedState);
-      assertEquals(3, states.length);
-      State stateUnknownNetwork = Arrays
-        .stream(states)
-        .filter(s -> s.getVehicleRentalState() == RENTING_FLOATING && s.unknownRentalNetwork())
-        .findAny()
-        .get();
-      State stateTierNetwork = Arrays
-        .stream(states)
-        .filter(s ->
-          s.getVehicleRentalState() == RENTING_FLOATING &&
-          s.getVehicleRentalNetwork() == NETWORK_TIER
-        )
-        .findAny()
-        .get();
-      State stateWalk = Arrays
-        .stream(states)
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
-      assertNotNull(stateUnknownNetwork);
-      assertNotNull(stateTierNetwork);
-      assertNotNull(stateWalk);
-      assertEquals(stateWalk.currentMode(), WALK);
-    }
-
-    private static StreetSearchRequest hslArriveByRequest() {
-      return StreetSearchRequest
-        .of()
-        .withPreferences(p ->
-          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
-        )
-        .withMode(StreetMode.BIKE_RENTAL)
         .withArriveBy(true)
         .build();
     }
