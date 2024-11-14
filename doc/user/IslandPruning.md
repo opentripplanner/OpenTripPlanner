@@ -43,7 +43,7 @@ The image on the right shows that pruning added walk nothrough restricition to t
 ## Pruning algorithm
 
 Pruning analyses the three traverse modes - walk, bike and car - separately. For example, a resting area by a motorway may include some walking paths, but the only way to get there is
-to use car. Therefore, it represents a disconnected 'island' when considering the walk mode. Pruning does not erase disconnected graph geometry as long as it
+to use a car. Therefore, it represents a disconnected 'island' when considering the walk mode. Pruning does not erase disconnected graph geometry as long as it
 can be reached using any of the traverse modes. Instead, pruning removes traversal permission for each disconnected mode from the island.
 
 Pruning uses four parameters and some heuristics to decide if a disconnected sub graph is a real island to be retained, or a harmful data error:
