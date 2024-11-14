@@ -96,7 +96,7 @@ public class DefaultTransitService implements TransitEditorService {
     this(timetableRepository);
     this.timetableSnapshot = timetableSnapshotBuffer;
   }
-  
+
   public List<TripTimeOnDate> getScheduledTripTimes(Trip trip) {
     TripPattern tripPattern = getPatternForTrip(trip);
     if (tripPattern == null) {
@@ -104,7 +104,7 @@ public class DefaultTransitService implements TransitEditorService {
     }
     return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip);
   }
-  
+
   public List<TripTimeOnDate> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = getPatternForTrip(trip, serviceDate);
 
@@ -122,9 +122,7 @@ public class DefaultTransitService implements TransitEditorService {
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
-    if (
-      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
-    ) {
+    if (!this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())) {
       return new ArrayList<>();
     } else {
       Instant midnight = ServiceDateUtils

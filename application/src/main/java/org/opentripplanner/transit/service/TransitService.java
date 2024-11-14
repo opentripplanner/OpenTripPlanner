@@ -65,7 +65,7 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  */
 public interface TransitService {
   List<TripTimeOnDate> getScheduledTripTimes(Trip trip);
-  
+
   List<TripTimeOnDate> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
 
   Collection<String> getFeedIds();

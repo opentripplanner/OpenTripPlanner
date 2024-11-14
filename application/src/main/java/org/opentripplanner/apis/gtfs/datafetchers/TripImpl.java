@@ -133,7 +133,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var serviceDate = getOptionalServiceDateArgument(environment);
       var trip = getSource(environment);
       var transitService = getTransitService(environment);
-      var stopTimes = serviceDate.map(date -> transitService.getTripTimeOnDates(trip, date))
+      var stopTimes = serviceDate
+        .map(date -> transitService.getTripTimeOnDates(trip, date))
         .orElseGet(() -> transitService.getScheduledTripTimes(trip));
       return stopTimes.getLast();
     };
@@ -155,7 +156,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var serviceDate = getOptionalServiceDateArgument(environment);
       var trip = getSource(environment);
       var transitService = getTransitService(environment);
-      var stopTimes = serviceDate.map(date -> transitService.getTripTimeOnDates(trip, date))
+      var stopTimes = serviceDate
+        .map(date -> transitService.getTripTimeOnDates(trip, date))
         .orElseGet(() -> transitService.getScheduledTripTimes(trip));
       return stopTimes.getFirst();
     };
@@ -264,10 +266,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       var args = new GraphQLTypes.GraphQLTripStoptimesForDateArgs(environment.getArguments());
 
       ZoneId timeZone = transitService.getTimeZone();
-      LocalDate serviceDate =
-        args.getGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-          : LocalDate.now(timeZone);
+      LocalDate serviceDate = args.getGraphQLServiceDate() != null
+        ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+        : LocalDate.now(timeZone);
 
       return transitService.getTripTimeOnDates(trip, serviceDate);
     };
@@ -350,7 +351,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
-  private static Optional<LocalDate> getOptionalServiceDateArgument(DataFetchingEnvironment environment) throws ParseException {
+  private static Optional<LocalDate> getOptionalServiceDateArgument(
+    DataFetchingEnvironment environment
+  ) throws ParseException {
     var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
     if (args.getGraphQLServiceDate() != null) {
       return Optional.of(ServiceDateUtils.parseString(args.getGraphQLServiceDate()));
