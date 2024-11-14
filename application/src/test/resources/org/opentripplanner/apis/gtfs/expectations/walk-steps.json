@@ -12,14 +12,14 @@
                     "area" : false,
                     "relativeDirection" : "DEPART",
                     "absoluteDirection" : "NORTHEAST",
-                    "entrance" : null
+                    "feature" : null
                   },
                   {
                     "streetName" : "elevator",
                     "area" : false,
                     "relativeDirection" : "ELEVATOR",
                     "absoluteDirection" : null,
-                    "entrance" : null
+                    "feature" : null
 
                   },
                   {
@@ -27,10 +27,11 @@
                     "area" : false,
                     "relativeDirection" : "ENTER_OR_EXIT_STATION",
                     "absoluteDirection" : null,
-                    "entrance": {
+                    "feature": {
+                      "__typename": "Entrance",
                       "code": "A",
-                      "wheelchairAccessible": "POSSIBLE",
-                      "entranceId": "osm:123"
+                      "entranceId": "osm:123",
+                      "wheelchairAccessible": "POSSIBLE"
                     }
                   }
                 ]

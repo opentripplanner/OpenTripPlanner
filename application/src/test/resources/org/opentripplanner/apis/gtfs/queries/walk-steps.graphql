@@ -20,10 +20,13 @@
             area
             relativeDirection
             absoluteDirection
-            entrance {
-              code
-              wheelchairAccessible
-              entranceId
+            feature {
+              __typename
+              ... on Entrance {
+                code
+                entranceId
+                wheelchairAccessible
+              }
             }
           }
         }

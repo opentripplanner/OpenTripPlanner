@@ -357,7 +357,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
   }
 
-  /** Station entrance or exit. */
+  /** Station entrance or exit, originating from OSM or GTFS data. */
   public interface GraphQLEntrance {
     public DataFetcher<String> code();
 
@@ -984,6 +984,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLInputField> inputField();
   }
 
+  public interface GraphQLStepFeature extends TypeResolver {}
+
   /**
    * Stop can represent either a single public transport stop, where passengers can
    * board and/or disembark vehicles, or a station, which contains multiple stops.
@@ -1435,9 +1437,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>> elevationProfile();
 
-    public DataFetcher<Object> entrance();
-
     public DataFetcher<String> exit();
+
+    public DataFetcher<Object> feature();
 
     public DataFetcher<Double> lat();
 

@@ -73,6 +73,9 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
+"A feature for a step"
+union StepFeature = Entrance
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -2657,10 +2660,10 @@ type step {
   distance: Float
   "The elevation profile as a list of { distance, elevation } values."
   elevationProfile: [elevationProfileComponent]
-  "Information about an station entrance or exit"
-  entrance: Entrance
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
+  "Information about an feature associated with a step e.g. an station entrance or exit"
+  feature: StepFeature
   "The latitude of the start of the step."
   lat: Float
   "The longitude of the start of the step."

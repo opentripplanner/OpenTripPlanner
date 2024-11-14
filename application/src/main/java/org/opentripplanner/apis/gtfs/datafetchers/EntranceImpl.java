@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.model.StepFeature;
 import org.opentripplanner.transit.model.site.Entrance;
 
 public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
@@ -11,7 +12,8 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   @Override
   public DataFetcher<String> code() {
     return environment -> {
-      Entrance entrance = environment.getSource();
+      StepFeature feature = environment.getSource();
+      Entrance entrance = (Entrance) feature.getFeature();
       return entrance.getCode();
     };
   }
@@ -19,7 +21,8 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   @Override
   public DataFetcher<String> entranceId() {
     return environment -> {
-      Entrance entrance = environment.getSource();
+      StepFeature feature = environment.getSource();
+      Entrance entrance = (Entrance) feature.getFeature();
       return entrance.getId().toString();
     };
   }
@@ -27,7 +30,8 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   @Override
   public DataFetcher<String> name() {
     return environment -> {
-      Entrance entrance = environment.getSource();
+      StepFeature feature = environment.getSource();
+      Entrance entrance = (Entrance) feature.getFeature();
       return org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
         entrance.getName(),
         environment
@@ -38,7 +42,8 @@ public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
   @Override
   public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible() {
     return environment -> {
-      Entrance entrance = environment.getSource();
+      StepFeature feature = environment.getSource();
+      Entrance entrance = (Entrance) feature.getFeature();
       return GraphQLUtils.toGraphQL(entrance.getWheelchairAccessibility());
     };
   }
