@@ -64,6 +64,8 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
  */
 public interface TransitService {
+  List<TripTimeOnDate> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
+
   Collection<String> getFeedIds();
 
   Collection<Agency> getAgencies();

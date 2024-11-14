@@ -22,7 +22,6 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.TripTimeOnDateHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -274,8 +273,7 @@ public class ServiceJourneyType {
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
-            return TripTimeOnDateHelper.getTripTimeOnDates(
-              GqlUtil.getTransitService(environment),
+            return GqlUtil.getTransitService(environment).getTripTimeOnDates(
               trip(environment),
               serviceDate
             );
