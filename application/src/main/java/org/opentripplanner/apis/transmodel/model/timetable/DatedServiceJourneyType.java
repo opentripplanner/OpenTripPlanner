@@ -124,9 +124,7 @@ public class DatedServiceJourneyType {
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
-              throw new AssertException(
-                "Both first and last can't be defined simultaneously."
-              );
+              throw new AssertException("Both first and last can't be defined simultaneously.");
             }
 
             if ((first != null && first < 0) || (last != null && last < 0)) {
