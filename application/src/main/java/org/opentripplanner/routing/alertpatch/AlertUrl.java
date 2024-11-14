@@ -1,7 +1,10 @@
 package org.opentripplanner.routing.alertpatch;
 
-public class AlertUrl {
+import java.util.Objects;
+import javax.annotation.Nullable;
 
-  public String uri;
-  public String label;
+public record AlertUrl(String uri, @Nullable String label) {
+  public AlertUrl {
+    Objects.requireNonNull(uri);
+  }
 }

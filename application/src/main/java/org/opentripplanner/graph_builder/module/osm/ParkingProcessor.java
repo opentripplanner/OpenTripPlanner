@@ -312,7 +312,7 @@ class ParkingProcessor {
     );
   }
 
-  private VehicleParking createVehicleParkingObjectFromOsmEntity(
+  VehicleParking createVehicleParkingObjectFromOsmEntity(
     boolean isCarParkAndRide,
     Coordinate coordinate,
     OsmWithTags entity,
@@ -421,7 +421,7 @@ class ParkingProcessor {
   }
 
   private OptionalInt parseCapacity(OsmWithTags element, String capacityTag) {
-    return element.getTagAsInt(
+    return element.parseIntOrBoolean(
       capacityTag,
       v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
     );

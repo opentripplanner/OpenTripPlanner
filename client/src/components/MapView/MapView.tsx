@@ -37,6 +37,7 @@ export function MapView({
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
   const [showContextPopup, setShowContextPopup] = useState<LngLat | null>(null);
   const [showPropsPopup, setShowPropsPopup] = useState<PopupData | null>(null);
+  const [interactiveLayerIds, setInteractiveLayerIds] = useState<string[]>([]);
   const [cursor, setCursor] = useState<string>('auto');
   const onMouseEnter = useCallback(() => setCursor('pointer'), []);
   const onMouseLeave = useCallback(() => setCursor('auto'), []);
@@ -76,9 +77,7 @@ export function MapView({
         onContextMenu={(e) => {
           setShowContextPopup(e.lngLat);
         }}
-        // it's unfortunate that you have to list these layers here.
-        // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
-        interactiveLayerIds={['regular-stop', 'area-stop', 'group-stop', 'parking-vertex', 'vertex', 'edge', 'link']}
+        interactiveLayerIds={interactiveLayerIds}
         cursor={cursor}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -97,7 +96,7 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <DebugLayerControl position="top-right" />
+        <DebugLayerControl position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}

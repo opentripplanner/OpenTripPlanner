@@ -23,9 +23,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  *
  * @author juusokor
  * @see OsmTagMapper
- * @see DefaultMapper
  */
-class FinlandMapper implements OsmTagMapper {
+class FinlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -203,8 +202,7 @@ class FinlandMapper implements OsmTagMapper {
     // ~= 16 kph
     props.setCarSpeed("highway=track", 4.5f);
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 
   @Override

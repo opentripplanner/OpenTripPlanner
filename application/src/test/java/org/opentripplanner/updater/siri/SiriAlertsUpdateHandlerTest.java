@@ -198,8 +198,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final List<AlertUrl> alertUrlList = transitAlert.siriUrls();
     AlertUrl alertUrl = alertUrlList.get(0);
-    assertEquals(infoLinkUri, alertUrl.uri);
-    assertEquals(infoLinkLabel, alertUrl.label);
+    assertEquals(infoLinkUri, alertUrl.uri());
+    assertEquals(infoLinkLabel, alertUrl.label());
   }
 
   @Test

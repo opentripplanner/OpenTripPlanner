@@ -9,7 +9,7 @@ import org.opentripplanner.osm.wayproperty.specifier.Condition.Absent;
 import org.opentripplanner.osm.wayproperty.specifier.Condition.GreaterThan;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 
-class PortlandMapper implements OsmTagMapper {
+class PortlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -57,7 +57,6 @@ class PortlandMapper implements OsmTagMapper {
     // Max speed limit in Oregon is 70 mph ~= 113kmh ~= 31.3m/s
     props.maxPossibleCarSpeed = 31.4f;
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }

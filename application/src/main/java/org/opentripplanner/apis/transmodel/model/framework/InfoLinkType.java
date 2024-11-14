@@ -20,7 +20,7 @@ public class InfoLinkType {
           .description("URI")
           .dataFetcher(environment -> {
             AlertUrl source = environment.getSource();
-            return source.uri;
+            return source.uri();
           })
           .build()
       )
@@ -32,7 +32,7 @@ public class InfoLinkType {
           .description("Label")
           .dataFetcher(environment -> {
             AlertUrl source = environment.getSource();
-            return source.label;
+            return source.label();
           })
           .build()
       )

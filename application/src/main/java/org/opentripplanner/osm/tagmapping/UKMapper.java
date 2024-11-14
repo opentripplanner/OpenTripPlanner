@@ -21,9 +21,9 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author marcusyoung
  * @see OsmTagMapper
- * @see DefaultMapper
+ * @see OsmTagMapper
  */
-class UKMapper implements OsmTagMapper {
+class UKMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -79,7 +79,6 @@ class UKMapper implements OsmTagMapper {
     props.setProperties("indoor=area", pedestrianWayProperties);
     props.setProperties("indoor=corridor", pedestrianWayProperties);
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }

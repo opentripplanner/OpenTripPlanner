@@ -688,7 +688,7 @@ public class OsmDatabase {
         }
       }
       try {
-        newArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
+        addArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -751,7 +751,7 @@ public class OsmDatabase {
       }
       processedAreas.add(relation);
       try {
-        newArea(new Area(relation, outerWays, innerWays, nodesById));
+        addArea(new Area(relation, outerWays, innerWays, nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
         continue;
@@ -786,10 +786,12 @@ public class OsmDatabase {
   /**
    * Handler for a new Area (single way area or multipolygon relations)
    */
-  private void newArea(Area area) {
-    StreetTraversalPermission permissions = area.parent.overridePermissions(
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-    );
+  private void addArea(Area area) {
+    StreetTraversalPermission permissions = area.parent
+      .getOsmProvider()
+      .getWayPropertySet()
+      .getDataForWay(area.parent)
+      .getPermission();
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);
     }

@@ -135,9 +135,9 @@ public class SiriAlertsUpdateHandler {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 
     if (
-      (alert.headerText() == null || alert.headerText().toString().isEmpty()) &&
-      (alert.descriptionText() == null || alert.descriptionText().toString().isEmpty()) &&
-      (alert.detailText() == null || alert.detailText().toString().isEmpty())
+      I18NString.hasNoValue(alert.headerText()) &&
+      I18NString.hasNoValue(alert.descriptionText()) &&
+      I18NString.hasNoValue(alert.detailText())
     ) {
       LOG.debug(
         "Empty Alert - ignoring situationNumber: {}",
@@ -221,18 +221,18 @@ public class SiriAlertsUpdateHandler {
   private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
     return TransitAlert
       .of(new FeedScopedId(feedId, situation.getSituationNumber().getValue()))
-      .withDescriptionText(getTranslatedString(situation.getDescriptions()))
-      .withDetailText(getTranslatedString(situation.getDetails()))
-      .withAdviceText(getTranslatedString(situation.getAdvices()))
-      .withHeaderText(getTranslatedString(situation.getSummaries()))
-      .withUrl(getInfoLinkAsString(situation.getInfoLinks()))
-      .addSiriUrls(getInfoLinks(situation.getInfoLinks()));
+      .withDescriptionText(mapTranslatedString(situation.getDescriptions()))
+      .withDetailText(mapTranslatedString(situation.getDetails()))
+      .withAdviceText(mapTranslatedString(situation.getAdvices()))
+      .withHeaderText(mapTranslatedString(situation.getSummaries()))
+      .withUrl(mapInfoLinkToI18NString(situation.getInfoLinks()))
+      .addSiriUrls(mapInfoLinks(situation));
   }
 
   /*
    * Returns first InfoLink-uri as a String
    */
-  private I18NString getInfoLinkAsString(PtSituationElement.InfoLinks infoLinks) {
+  private I18NString mapInfoLinkToI18NString(PtSituationElement.InfoLinks infoLinks) {
     if (infoLinks != null) {
       if (isNotEmpty(infoLinks.getInfoLinks())) {
         InfoLinkStructure infoLinkStructure = infoLinks.getInfoLinks().get(0);
@@ -247,21 +247,32 @@ public class SiriAlertsUpdateHandler {
   /*
    * Returns all InfoLinks
    */
-  private List<AlertUrl> getInfoLinks(PtSituationElement.InfoLinks infoLinks) {
+  private List<AlertUrl> mapInfoLinks(PtSituationElement situation) {
+    PtSituationElement.InfoLinks infoLinks = situation.getInfoLinks();
     List<AlertUrl> alertUrls = new ArrayList<>();
     if (infoLinks != null) {
       if (isNotEmpty(infoLinks.getInfoLinks())) {
         for (InfoLinkStructure infoLink : infoLinks.getInfoLinks()) {
-          AlertUrl alertUrl = new AlertUrl();
-
+          String label = null;
           List<NaturalLanguageStringStructure> labels = infoLink.getLabels();
           if (labels != null && !labels.isEmpty()) {
-            NaturalLanguageStringStructure label = labels.get(0);
-            alertUrl.label = label.getValue();
+            NaturalLanguageStringStructure lbl = labels.get(0);
+            label = lbl.getValue();
           }
 
-          alertUrl.uri = infoLink.getUri();
-          alertUrls.add(alertUrl);
+          var uri = infoLink.getUri();
+          if (uri != null) {
+            alertUrls.add(new AlertUrl(uri, label));
+          } else {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(
+                "URI missing in info-link - ignoring info-link in situation: {}",
+                situation.getSituationNumber() != null
+                  ? situation.getSituationNumber().getValue()
+                  : null
+              );
+            }
+          }
         }
       }
     }
@@ -281,7 +292,7 @@ public class SiriAlertsUpdateHandler {
    *
    * @return A TranslatedString containing the same information as the input
    */
-  private I18NString getTranslatedString(List<DefaultedTextStructure> input) {
+  private I18NString mapTranslatedString(List<DefaultedTextStructure> input) {
     Map<String, String> translations = new HashMap<>();
     if (input != null && input.size() > 0) {
       for (DefaultedTextStructure textStructure : input) {

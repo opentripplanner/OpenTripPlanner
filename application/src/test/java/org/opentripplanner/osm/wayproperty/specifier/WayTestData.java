@@ -224,4 +224,12 @@ public class WayTestData {
     way.addTag("indoor", value);
     return way;
   }
+
+  public static OsmWithTags parkAndRide() {
+    var way = new OsmWithTags();
+    way.addTag("amenity", "parking");
+    way.addTag("park_ride", "yes");
+    way.addTag("capacity", "10");
+    return way;
+  }
 }
