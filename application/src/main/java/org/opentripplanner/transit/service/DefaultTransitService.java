@@ -96,12 +96,16 @@ public class DefaultTransitService implements TransitEditorService {
     this(timetableRepository);
     this.timetableSnapshot = timetableSnapshotBuffer;
   }
-
   
-  public List<TripTimeOnDate> getTripTimeOnDates(
-    Trip trip,
-    LocalDate serviceDate
-  ) {
+  public List<TripTimeOnDate> getScheduledTripTimes(Trip trip) {
+    TripPattern tripPattern = getPatternForTrip(trip);
+    if (tripPattern == null) {
+      return List.of();
+    }
+    return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip);
+  }
+  
+  public List<TripTimeOnDate> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = getPatternForTrip(trip, serviceDate);
 
     Timetable timetable = getTimetableForTripPattern(pattern, serviceDate);
