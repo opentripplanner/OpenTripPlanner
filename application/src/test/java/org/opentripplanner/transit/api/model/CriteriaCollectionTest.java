@@ -23,5 +23,4 @@ class CriteriaCollectionTest {
     CriteriaCollection<String> criteriaCollection2 = CriteriaCollection.of(nullList);
     assertTrue(criteriaCollection2.matchesAll());
   }
-
 }
