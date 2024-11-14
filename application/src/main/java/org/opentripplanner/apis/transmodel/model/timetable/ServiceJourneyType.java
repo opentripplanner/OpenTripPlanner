@@ -75,13 +75,6 @@ public class ServiceJourneyType {
           )
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("serviceAlteration")
-      //                        .type(serviceAlterationEnum)
-      //                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
-      //                        .dataFetcher(environment -> (((Trip) trip(environment)).getServiceAlteration()))
-      //                        .build())
-
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -331,17 +324,6 @@ public class ServiceJourneyType {
           )
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("keyValues")
-      //                        .description("List of keyValue pairs for the service journey.")
-      //                        .type(new GraphQLList(keyValueType))
-      //                        .dataFetcher(environment -> ((Trip) trip(environment)).getKeyValues())
-      //                        .build())
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("flexibleServiceType")
-      //                        .description("Type of flexible service, or null if service is not flexible.")
-      //                        .type(flexibleServiceTypeEnum)
-      //                        .build())
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
