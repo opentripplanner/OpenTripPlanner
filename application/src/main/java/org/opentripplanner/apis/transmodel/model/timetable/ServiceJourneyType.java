@@ -210,11 +210,13 @@ public class ServiceJourneyType {
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
-              throw new AssertException("Both first and last can't be defined simultaneously.");
+              throw new IllegalArgumentException(
+                "Both first and last can't be defined simultaneously."
+              );
             }
 
             if ((first != null && first < 0) || (last != null && last < 0)) {
-              throw new AssertException("first and last must be positive integers.");
+              throw new IllegalArgumentException("first and last must be positive integers.");
             }
 
             if (first != null && first < stops.size()) {
