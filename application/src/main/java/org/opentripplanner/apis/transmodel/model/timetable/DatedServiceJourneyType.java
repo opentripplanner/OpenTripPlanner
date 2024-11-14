@@ -124,15 +124,19 @@ public class DatedServiceJourneyType {
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
-              throw new AssertException("Both first and last can't be defined simultaneously.");
-            } else if (first != null) {
-              if (first > stops.size()) {
-                return stops.subList(0, first);
-              }
-            } else if (last != null) {
-              if (last > stops.size()) {
-                return stops.subList(stops.size() - last, stops.size());
-              }
+              throw new AssertException(
+                "Both first and last can't be defined simultaneously."
+              );
+            }
+
+            if ((first != null && first < 0) || (last != null && last < 0)) {
+              throw new AssertException("first and last must be positive integers.");
+            }
+
+            if (first != null && first < stops.size()) {
+              return stops.subList(0, first);
+            } else if (last != null && last < stops.size()) {
+              return stops.subList(stops.size() - last, stops.size());
             }
             return stops;
           })
