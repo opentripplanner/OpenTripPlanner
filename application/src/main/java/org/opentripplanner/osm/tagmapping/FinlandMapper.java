@@ -1,5 +1,7 @@
 package org.opentripplanner.osm.tagmapping;
 
+import java.util.Set;
+
 import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
@@ -25,6 +27,13 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * @see OsmTagMapper
  */
 class FinlandMapper extends OsmTagMapper {
+  private static final Set<String> NOTHROUGH_DRIVING_TAGS = Set.of(
+    "parking_aisle",
+    "driveway",
+    "alley",
+    "emergency_access",
+    "drive-through"
+  );
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -218,5 +227,13 @@ class FinlandMapper extends OsmTagMapper {
   public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+  }
+
+  @Override
+  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+    if (super.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
+      return true;
+    }
+    return way.isOneOfTags("service", NOTHROUGH_DRIVING_TAGS);
   }
 }
