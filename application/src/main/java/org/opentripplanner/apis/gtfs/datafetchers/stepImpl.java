@@ -59,7 +59,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
     return environment -> {
       WalkStep source = getSource(environment);
       if (source.getRelativeDirection() == RelativeDirection.ENTER_OR_EXIT_STATION) {
-        return source.getStepFeature().getEntrance();
+        return source.getEntrance();
       }
       return null;
     };
