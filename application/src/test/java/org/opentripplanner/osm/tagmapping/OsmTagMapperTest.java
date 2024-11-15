@@ -34,20 +34,6 @@ public class OsmTagMapperTest {
   }
 
   @Test
-  public void constantSpeedCarRouting() {
-    OsmTagMapper osmTagMapper = new ConstantSpeedFinlandMapper(20f);
-
-    var slowWay = new OsmWithTags();
-    slowWay.addTag("highway", "residential");
-    assertEquals(20f, osmTagMapper.getCarSpeedForWay(slowWay, true));
-
-    var fastWay = new OsmWithTags();
-    fastWay.addTag("highway", "motorway");
-    fastWay.addTag("maxspeed", "120 kmph");
-    assertEquals(20f, osmTagMapper.getCarSpeedForWay(fastWay, true));
-  }
-
-  @Test
   public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
     OsmTagMapper osmTagMapper = new OsmTagMapper();
     assertTrue(

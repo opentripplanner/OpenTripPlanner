@@ -1,7 +1,5 @@
 package org.opentripplanner.osm.tagmapping;
 
-import java.util.Set;
-
 import static org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
@@ -10,6 +8,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import java.util.Set;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -27,6 +26,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * @see OsmTagMapper
  */
 class FinlandMapper extends OsmTagMapper {
+
   private static final Set<String> NOTHROUGH_DRIVING_TAGS = Set.of(
     "parking_aisle",
     "driveway",
