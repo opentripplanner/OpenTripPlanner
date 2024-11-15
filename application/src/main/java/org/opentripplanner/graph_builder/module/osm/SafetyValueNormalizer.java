@@ -86,8 +86,8 @@ class SafetyValueNormalizer {
     boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
       way
     );
-    boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
-    boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
+    boolean bicycleNoThrough = tagMapperForWay.isBicycleThroughTrafficExplicitlyDisallowed(way);
+    boolean walkNoThrough = tagMapperForWay.isWalkThroughTrafficExplicitlyDisallowed(way);
 
     if (street != null) {
       double bicycleSafety = wayData.bicycleSafety().forward();

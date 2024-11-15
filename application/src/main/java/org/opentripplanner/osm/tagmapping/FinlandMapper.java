@@ -215,7 +215,7 @@ class FinlandMapper extends OsmTagMapper {
   }
 
   @Override
-  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String bicycle = way.getTag("bicycle");
     return (
       isVehicleThroughTrafficExplicitlyDisallowed(way) ||
@@ -224,7 +224,7 @@ class FinlandMapper extends OsmTagMapper {
   }
 
   @Override
-  public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
   }

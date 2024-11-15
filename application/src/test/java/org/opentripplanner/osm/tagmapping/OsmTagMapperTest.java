@@ -34,23 +34,21 @@ public class OsmTagMapperTest {
   }
 
   @Test
-  public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
+  public void isBicycleThroughTrafficExplicitlyDisallowed() {
     OsmTagMapper osmTagMapper = new OsmTagMapper();
     assertTrue(
-      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(way("bicycle", "destination"))
+      osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(way("bicycle", "destination"))
     );
     assertTrue(
-      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(way("access", "destination"))
+      osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(way("access", "destination"))
     );
   }
 
   @Test
-  public void isWalkNoThroughTrafficExplicitlyDisallowed() {
+  public void isWalkThroughTrafficExplicitlyDisallowed() {
     OsmTagMapper osmTagMapper = new OsmTagMapper();
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(way("foot", "destination")));
-    assertTrue(
-      osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(way("access", "destination"))
-    );
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(way("foot", "destination")));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(way("access", "destination")));
   }
 
   @Test
@@ -61,8 +59,8 @@ public class OsmTagMapperTest {
     tags.addTag("access", "no");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -73,8 +71,8 @@ public class OsmTagMapperTest {
     tags.addTag("access", "private");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -86,8 +84,8 @@ public class OsmTagMapperTest {
     tags.addTag("foot", "yes");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -98,8 +96,8 @@ public class OsmTagMapperTest {
     tags.addTag("vehicle", "destination");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -111,8 +109,8 @@ public class OsmTagMapperTest {
     tags.addTag("motor_vehicle", "designated");
 
     assertFalse(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -124,8 +122,8 @@ public class OsmTagMapperTest {
     tags.addTag("bicycle", "designated");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -137,8 +135,8 @@ public class OsmTagMapperTest {
     tags.addTag("motor_vehicle", "yes");
 
     assertFalse(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -150,8 +148,8 @@ public class OsmTagMapperTest {
     tags.addTag("bicycle", "yes");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   @Test
@@ -163,8 +161,8 @@ public class OsmTagMapperTest {
     tags.addTag("bicycle", "permissive");
 
     assertTrue(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(osmTagMapper.isBicycleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
   public OsmWithTags way(String key, String value) {
