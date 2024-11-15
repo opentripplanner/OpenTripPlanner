@@ -199,11 +199,17 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private boolean hasPassThroughOnly() {
-    return request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation);
+    return (
+      request.isViaSearch() &&
+      request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
+    );
   }
 
   private boolean hasViaLocationsOnly() {
-    return request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation);
+    return (
+      request.isViaSearch() &&
+      request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
+    );
   }
 
   private boolean hasViaLocationsAndPassThroughLocations() {
