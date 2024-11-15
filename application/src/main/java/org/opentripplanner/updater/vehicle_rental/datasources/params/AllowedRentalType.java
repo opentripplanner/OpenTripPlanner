@@ -21,7 +21,7 @@ public enum AllowedRentalType implements DocumentedEnum<AllowedRentalType> {
   @Override
   public String typeDescription() {
     return (
-      "Temporary parameter. Use this to specify the type of rental data that is allowed to be read from the data source."
+      "This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source."
     );
   }
 
