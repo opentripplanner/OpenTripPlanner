@@ -9,18 +9,33 @@ import javax.annotation.Nullable;
  * A scheduled time of a transit vehicle at a certain location with an optional realtime
  * information. This is meant to be used in transit legs.
  */
-public record LegCallTime(ZonedDateTime scheduledTime, @Nullable RealTimeEstimate estimated) {
-  public LegCallTime {
-    Objects.requireNonNull(scheduledTime);
+public class LegCallTime {
+
+  private final ZonedDateTime scheduledTime;
+
+  @Nullable
+  private final LegRealTimeEstimate estimated;
+
+  private LegCallTime(ZonedDateTime scheduledTime, @Nullable LegRealTimeEstimate estimated) {
+    this.scheduledTime = Objects.requireNonNull(scheduledTime);
+    this.estimated = estimated;
   }
 
   public static LegCallTime of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
-    return new LegCallTime(realtime.minus(delay), new RealTimeEstimate(realtime, delay));
+    return new LegCallTime(realtime.minus(delay), new LegRealTimeEstimate(realtime, delay));
   }
 
   public static LegCallTime ofStatic(ZonedDateTime staticTime) {
     return new LegCallTime(staticTime, null);
+  }
+
+  public ZonedDateTime scheduledTime() {
+    return scheduledTime;
+  }
+
+  public LegRealTimeEstimate estimated() {
+    return estimated;
   }
 
   /**
@@ -31,13 +46,7 @@ public record LegCallTime(ZonedDateTime scheduledTime, @Nullable RealTimeEstimat
     if (estimated == null) {
       return scheduledTime;
     } else {
-      return estimated.time;
+      return estimated.time();
     }
   }
-
-  /**
-   * Realtime information about a vehicle at a certain place.
-   * @param delay Delay or "earliness" of a vehicle. Earliness is expressed as a negative number.
-   */
-  record RealTimeEstimate(ZonedDateTime time, Duration delay) {}
 }
