@@ -41,7 +41,7 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
+import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -473,7 +473,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<RegularArrivalDepartureTime> end();
+    public DataFetcher<LegCallTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -517,7 +517,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<RegularArrivalDepartureTime> start();
+    public DataFetcher<LegCallTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -625,7 +625,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
-    public DataFetcher<RegularArrivalDepartureTime> arrival();
+    public DataFetcher<LegCallTime> arrival();
 
     public DataFetcher<Long> arrivalTime();
 
@@ -635,7 +635,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleParking> carPark();
 
-    public DataFetcher<RegularArrivalDepartureTime> departure();
+    public DataFetcher<LegCallTime> departure();
 
     public DataFetcher<Long> departureTime();
 
@@ -861,9 +861,9 @@ public class GraphQLDataFetchers {
    * This can include real-time estimates.
    */
   public interface GraphQLRegularRealTimeStopTime {
-    public DataFetcher<RegularArrivalDepartureTime> arrival();
+    public DataFetcher<LegCallTime> arrival();
 
-    public DataFetcher<RegularArrivalDepartureTime> departure();
+    public DataFetcher<LegCallTime> departure();
 
     public DataFetcher<Object> stop();
   }

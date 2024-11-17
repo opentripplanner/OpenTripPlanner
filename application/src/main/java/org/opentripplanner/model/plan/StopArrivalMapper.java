@@ -34,12 +34,12 @@ class StopArrivalMapper {
       tripTimes.getDepartureTime(i)
     );
 
-    var arrival = RegularArrivalDepartureTime.ofStatic(arrivalTime);
-    var departure = RegularArrivalDepartureTime.ofStatic(departureTime);
+    var arrival = LegCallTime.ofStatic(arrivalTime);
+    var departure = LegCallTime.ofStatic(departureTime);
 
     if (realTime) {
-      arrival = RegularArrivalDepartureTime.of(arrivalTime, tripTimes.getArrivalDelay(i));
-      departure = RegularArrivalDepartureTime.of(departureTime, tripTimes.getDepartureDelay(i));
+      arrival = LegCallTime.of(arrivalTime, tripTimes.getArrivalDelay(i));
+      departure = LegCallTime.of(departureTime, tripTimes.getDepartureDelay(i));
     }
 
     return new StopArrival(

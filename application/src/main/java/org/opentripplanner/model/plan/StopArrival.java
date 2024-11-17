@@ -9,8 +9,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class StopArrival {
 
   public final Place place;
-  public final RegularArrivalDepartureTime arrival;
-  public final RegularArrivalDepartureTime departure;
+  public final LegCallTime arrival;
+  public final LegCallTime departure;
   public final Integer stopPosInPattern;
   public final Integer gtfsStopSequence;
 
@@ -24,8 +24,8 @@ public final class StopArrival {
    */
   public StopArrival(
     Place place,
-    RegularArrivalDepartureTime arrival,
-    RegularArrivalDepartureTime departure,
+    LegCallTime arrival,
+    LegCallTime departure,
     Integer stopPosInPattern,
     Integer gtfsStopSequence
   ) {

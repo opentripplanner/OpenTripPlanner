@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.RegularArrivalDepartureTime;
+import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -16,7 +16,7 @@ public class RegularRealTimeStopTimeImpl
   implements GraphQLDataFetchers.GraphQLRegularRealTimeStopTime {
 
   @Override
-  public DataFetcher<RegularArrivalDepartureTime> arrival() {
+  public DataFetcher<LegCallTime> arrival() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledArrival());
@@ -24,13 +24,13 @@ public class RegularRealTimeStopTimeImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? RegularArrivalDepartureTime.of(scheduledTime, tripTime.getArrivalDelay())
-        : RegularArrivalDepartureTime.ofStatic(scheduledTime);
+        ? LegCallTime.of(scheduledTime, tripTime.getArrivalDelay())
+        : LegCallTime.ofStatic(scheduledTime);
     };
   }
 
   @Override
-  public DataFetcher<RegularArrivalDepartureTime> departure() {
+  public DataFetcher<LegCallTime> departure() {
     return environment -> {
       var tripTime = getSource(environment);
       var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledDeparture());
@@ -38,8 +38,8 @@ public class RegularRealTimeStopTimeImpl
         return null;
       }
       return tripTime.isRealtime()
-        ? RegularArrivalDepartureTime.of(scheduledTime, tripTime.getDepartureDelay())
-        : RegularArrivalDepartureTime.ofStatic(scheduledTime);
+        ? LegCallTime.of(scheduledTime, tripTime.getDepartureDelay())
+        : LegCallTime.ofStatic(scheduledTime);
     };
   }
 

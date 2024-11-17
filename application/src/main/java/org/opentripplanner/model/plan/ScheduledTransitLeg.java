@@ -161,20 +161,20 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public RegularArrivalDepartureTime start() {
+  public LegCallTime start() {
     if (isRealTimeUpdated()) {
-      return RegularArrivalDepartureTime.of(startTime, getDepartureDelay());
+      return LegCallTime.of(startTime, getDepartureDelay());
     } else {
-      return RegularArrivalDepartureTime.ofStatic(startTime);
+      return LegCallTime.ofStatic(startTime);
     }
   }
 
   @Override
-  public RegularArrivalDepartureTime end() {
+  public LegCallTime end() {
     if (isRealTimeUpdated()) {
-      return RegularArrivalDepartureTime.of(endTime, getArrivalDelay());
+      return LegCallTime.of(endTime, getArrivalDelay());
     } else {
-      return RegularArrivalDepartureTime.ofStatic(endTime);
+      return LegCallTime.ofStatic(endTime);
     }
   }
 
