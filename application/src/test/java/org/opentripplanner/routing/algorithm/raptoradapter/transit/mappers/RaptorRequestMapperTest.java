@@ -241,7 +241,9 @@ class RaptorRequestMapperTest {
 
   private static RouteRequest setFeaturesOnRequest(RouteRequest req, RequestFeature feature) {
     return switch (feature) {
-      case VIA_VISIT -> req.setViaLocations(List.of(VISIT_VIA_LOCATION));
+      case VIA_VISIT -> req.setViaLocations(
+        ListUtils.combine(req.getViaLocations(), List.of(VISIT_VIA_LOCATION))
+      );
       case VIA_PASS_THROUGH -> req.setViaLocations(
         ListUtils.combine(req.getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
       );
