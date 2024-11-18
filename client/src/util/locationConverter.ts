@@ -5,8 +5,6 @@ const DOUBLE_PATTERN = '-{0,1}\\d+(\\.\\d+){0,1}';
 
 const LAT_LON_PATTERN = '(' + DOUBLE_PATTERN + ')(\\s*,\\s*|\\s+)(' + DOUBLE_PATTERN + ')';
 
-const ID_SEPARATOR = ':';
-
 export function parseLocation(value: string): Location | null {
   const latLonMatch = value.match(LAT_LON_PATTERN);
 
@@ -19,17 +17,9 @@ export function parseLocation(value: string): Location | null {
     };
   }
 
-  if (validFeedScopeIdString(value)) {
-    return {
-      place: value,
-    };
-  }
-
-  return null;
-}
-
-function validFeedScopeIdString(value: string): boolean {
-  return value.indexOf(ID_SEPARATOR) > -1;
+  return {
+    place: value,
+  };
 }
 
 export function toString(location: Location): string | null {

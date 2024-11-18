@@ -20,7 +20,11 @@ export const useQuayCoordinateQuery = (location: Location) => {
     const fetchData = async () => {
       if (location.place) {
         const variables = { id: location.place };
-        setData((await request(getApiUrl(), query, variables)) as QueryType);
+        try {
+          setData((await request(getApiUrl(), query, variables)) as QueryType);
+        } catch (e) {
+          console.error('Error at useQuayCoordinateQuery', e);
+        }
       } else {
         setData(null);
       }

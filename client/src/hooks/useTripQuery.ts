@@ -22,10 +22,14 @@ export const useTripQuery: TripQueryHook = (variables) => {
       } else {
         if (variables) {
           setLoading(true);
-          if (pageCursor) {
-            setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
-          } else {
-            setData((await request(getApiUrl(), query, variables)) as QueryType);
+          try {
+            if (pageCursor) {
+              setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
+            } else {
+              setData((await request(getApiUrl(), query, variables)) as QueryType);
+            }
+          } catch (e) {
+            console.error('Error at useTripQuery', e);
           }
           setLoading(false);
         } else {
