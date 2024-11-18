@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.framework.collection.CollectionUtils.getByNullableKey;
+import static org.opentripplanner.utils.collection.CollectionUtils.getByNullableKey;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -347,8 +347,7 @@ public class TimetableSnapshot {
     }
 
     // The time tables are finished during the commit
-
-    return Result.success(UpdateSuccess.noWarnings());
+    return Result.success(UpdateSuccess.noWarnings(realTimeTripUpdate.producer()));
   }
 
   /**
@@ -406,8 +405,13 @@ public class TimetableSnapshot {
     boolean newTripPatternsForModifiedTripsWereCleared = clearNewTripPatternsForModifiedTrips(
       feedId
     );
+    boolean addedTripPatternsWereCleared = clearEntriesForRealtimeAddedTrips(feedId);
     // If this snapshot was modified, it will be dirty after the clear actions.
-    if (timetablesWereCleared || newTripPatternsForModifiedTripsWereCleared) {
+    if (
+      timetablesWereCleared ||
+      newTripPatternsForModifiedTripsWereCleared ||
+      addedTripPatternsWereCleared
+    ) {
       dirty = true;
     }
   }
@@ -552,7 +556,7 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Clear all realtime added trip patterns matching the provided feed id.
+   * Clear new trip patterns for modified trips matching the provided feed id.
    *
    * @param feedId feed id to clear out
    * @return true if the newTripPatternForModifiedTrip changed as a result of the call
@@ -561,6 +565,28 @@ public class TimetableSnapshot {
     return realTimeNewTripPatternsForModifiedTrips
       .keySet()
       .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
+  }
+
+  /**
+   * Clear all realtime added routes, trip patterns and trips matching the provided feed id.
+   *
+   * */
+  private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
+    // it is sufficient to test for the removal of added trips, since other indexed entities are
+    // added only if a new trip is added.
+    boolean removedEntry = realTimeAddedTrips
+      .keySet()
+      .removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
+    realTimeAddedTripOnServiceDateForTripAndDay
+      .keySet()
+      .removeIf(tripOnServiceDate -> feedId.equals(tripOnServiceDate.tripId().getFeedId()));
+    realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    realTimeAddedPatternsForRoute
+      .keySet()
+      .removeIf(route -> feedId.equals(route.getId().getFeedId()));
+    realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
+    return removedEntry;
   }
 
   /**

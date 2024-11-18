@@ -38,7 +38,6 @@ import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -97,6 +96,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.ListUtils;
 
 class GraphQLIntegrationTest {
 
@@ -117,7 +117,7 @@ class GraphQLIntegrationTest {
     .toList();
   private static final Route ROUTE = TimetableRepositoryForTest.route("a-route").build();
 
-  private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
+  private static final VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
     .withVehicles(10)
     .withSpaces(10)
     .withVehicleTypeBicycle(5, 7)
@@ -125,7 +125,7 @@ class GraphQLIntegrationTest {
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
-  private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+  private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
@@ -157,9 +157,9 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
-    var stopModel = TEST_MODEL.stopModelBuilder();
-    STOP_LOCATIONS.forEach(stopModel::withRegularStop);
-    var model = stopModel.build();
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder();
+    STOP_LOCATIONS.forEach(siteRepository::withRegularStop);
+    var model = siteRepository.build();
     var timetableRepository = new TimetableRepository(model, DEDUPLICATOR);
 
     var trip = TimetableRepositoryForTest

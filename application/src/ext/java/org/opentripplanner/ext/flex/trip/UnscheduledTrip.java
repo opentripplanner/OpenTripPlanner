@@ -12,9 +12,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntRange;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
@@ -23,6 +20,9 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntRange;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This type of FlexTrip is used when a taxi-type service is modeled, which operates in any number

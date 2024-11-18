@@ -8,8 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 public class OsmWithTagsTest {
@@ -212,6 +216,8 @@ public class OsmWithTagsTest {
   @Test
   void isRoutable() {
     assertFalse(WayTestData.zooPlatform().isRoutable());
+    assertTrue(WayTestData.indoor("area").isRoutable());
+    assertFalse(WayTestData.indoor("room").isRoutable());
   }
 
   @Test
@@ -269,5 +275,27 @@ public class OsmWithTagsTest {
 
     var namedTunnel = WayTestData.carTunnel();
     assertFalse(namedTunnel.hasNoName());
+  }
+
+  private static List<Arguments> parseIntOrBooleanCases() {
+    return List.of(
+      Arguments.of("true", OptionalInt.of(1)),
+      Arguments.of("yes", OptionalInt.of(1)),
+      Arguments.of("no", OptionalInt.of(0)),
+      Arguments.of("false", OptionalInt.of(0)),
+      Arguments.of("0", OptionalInt.of(0)),
+      Arguments.of("12", OptionalInt.of(12)),
+      Arguments.of("", OptionalInt.empty())
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parseIntOrBooleanCases")
+  void parseIntOrBoolean(String value, OptionalInt expected) {
+    var way = new OsmWithTags();
+    var key = "capacity:disabled";
+    way.addTag(key, value);
+    var maybeInt = way.parseIntOrBoolean(key, i -> {});
+    assertEquals(expected, maybeInt);
   }
 }

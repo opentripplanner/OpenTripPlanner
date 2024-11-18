@@ -2,7 +2,9 @@ package org.opentripplanner.osm.tagmapping;
 
 import static org.opentripplanner.osm.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
+import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 /**
@@ -19,9 +21,9 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
  *
  * @author marcusyoung
  * @see OsmTagMapper
- * @see DefaultMapper
+ * @see OsmTagMapper
  */
-class UKMapper implements OsmTagMapper {
+class UKMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -73,7 +75,10 @@ class UKMapper implements OsmTagMapper {
     props.setCarSpeed("highway=secondary_link", 13.4f); // ~= 30mph
     props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
+    props.setProperties("indoor=area", pedestrianWayProperties);
+    props.setProperties("indoor=corridor", pedestrianWayProperties);
+
+    super.populateProperties(props);
   }
 }

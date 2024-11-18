@@ -17,8 +17,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.BitSetUtils;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -36,6 +34,8 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.street.search.state.VehicleRentalState;
+import org.opentripplanner.utils.lang.BitSetUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1005,6 +1005,16 @@ public class StreetEdge
       }
       return null;
     });
+
+    // Also include a state which continues walking, because the vehicle rental states are
+    // speculation. It is possible that the rental states don't end up at the target at all
+    // due to mode limitations or not finding a place to pick up the rental vehicle, or that
+    // the rental possibility is simply more expensive than walking.
+    StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
+    if (walking != null) {
+      var forkState = walking.makeState();
+      states = Stream.concat(Stream.of(forkState), states);
+    }
     return State.ofStream(states);
   }
 

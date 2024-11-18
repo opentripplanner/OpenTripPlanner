@@ -14,7 +14,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 public class StopAndStationMapperTest {
 
@@ -51,7 +51,7 @@ public class StopAndStationMapperTest {
   private final StopMapper subject = new StopMapper(
     new TranslationHelper(),
     stationId -> null,
-    new StopModel().withContext()
+    new SiteRepository().withContext()
   );
 
   static {

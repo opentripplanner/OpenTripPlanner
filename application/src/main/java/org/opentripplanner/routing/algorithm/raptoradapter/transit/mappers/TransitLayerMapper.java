@@ -13,18 +13,18 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
@@ -46,11 +46,11 @@ public class TransitLayerMapper {
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerMapper.class);
 
   private final TransitService transitService;
-  private final StopModel stopModel;
+  private final SiteRepository siteRepository;
 
   private TransitLayerMapper(TimetableRepository timetableRepository) {
     this.transitService = new DefaultTransitService(timetableRepository);
-    this.stopModel = timetableRepository.getStopModel();
+    this.siteRepository = timetableRepository.getSiteRepository();
   }
 
   public static TransitLayer map(
@@ -71,7 +71,7 @@ public class TransitLayerMapper {
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(stopModel, transitService);
+    transferByStopIndex = mapTransfers(siteRepository, transitService);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -88,11 +88,11 @@ public class TransitLayerMapper {
       tripPatternsByStopByDate,
       transferByStopIndex,
       transitService.getTransferService(),
-      stopModel,
+      siteRepository,
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
-      createStopBoardAlightTransferCosts(stopModel, tuningParameters)
+      createStopBoardAlightTransferCosts(siteRepository, tuningParameters)
     );
   }
 
@@ -169,7 +169,7 @@ public class TransitLayerMapper {
    */
   @Nullable
   static int[] createStopBoardAlightTransferCosts(
-    StopModel stops,
+    SiteRepository stops,
     TransitTuningParameters tuningParams
   ) {
     if (!tuningParams.enableStopTransferPriority()) {

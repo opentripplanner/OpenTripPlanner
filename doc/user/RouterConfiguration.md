@@ -237,7 +237,7 @@ few percents.
 Split a travel search in smaller jobs and run them in parallel to improve performance.
 
 Use this parameter to set the total number of executable threads available across all searches.
-Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0,
+Multiple searches can run in parallel - this parameter has no effect with regard to that. If 0,
 no extra threads are started and the search is done in one thread.
 
 
@@ -295,7 +295,7 @@ In addition there is an upper bound on the calculation of the search window:
 
 Upper limit for the search-window calculation.
 
-Long search windows consumes a lot of resources and may take a long time. Use this parameter to
+Long search windows consume a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
 This is the parameter that affects the response time most, the downside is that a search is only

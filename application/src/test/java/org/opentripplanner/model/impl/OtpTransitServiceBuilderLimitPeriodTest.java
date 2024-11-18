@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -70,7 +70,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   @BeforeEach
   public void setUp() {
-    subject = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+    subject = new OtpTransitServiceBuilder(new SiteRepository(), DataImportIssueStore.NOOP);
 
     // Add a service calendar that overlap with the period limit
     subject.getCalendars().add(createServiceCalendar(SERVICE_C_IN, D1, D3));
@@ -85,8 +85,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_OUT, D1, 1));
 
     // Add 2 stops
-    subject.stopModel().withRegularStop(STOP_1);
-    subject.stopModel().withRegularStop(STOP_2);
+    subject.siteRepository().withRegularStop(STOP_1);
+    subject.siteRepository().withRegularStop(STOP_2);
 
     // Add Route
     subject.getRoutes().add(route);

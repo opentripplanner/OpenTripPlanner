@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class ServiceCalendarDateMapperTest {
 

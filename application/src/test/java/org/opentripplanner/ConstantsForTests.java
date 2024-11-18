@@ -4,6 +4,7 @@ import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -15,6 +16,7 @@ import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -27,6 +29,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -43,7 +46,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class ConstantsForTests {
@@ -100,7 +103,10 @@ public class ConstantsForTests {
 
     var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+    var transitService = new OtpTransitServiceBuilder(
+      new SiteRepository(),
+      DataImportIssueStore.NOOP
+    );
 
     return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
@@ -112,7 +118,10 @@ public class ConstantsForTests {
 
     var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+    var transitService = new OtpTransitServiceBuilder(
+      new SiteRepository(),
+      DataImportIssueStore.NOOP
+    );
 
     return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
@@ -124,7 +133,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
-      var timetableRepository = new TimetableRepository(new StopModel(), deduplicator);
+      var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       // Add street data from OSM
       {
         OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
@@ -161,8 +170,16 @@ public class ConstantsForTests {
 
       addPortlandVehicleRentals(graph);
 
-      timetableRepository.index();
-      graph.index(timetableRepository.getStopModel());
+      new DirectTransferGenerator(
+        graph,
+        timetableRepository,
+        DataImportIssueStore.NOOP,
+        Duration.ofMinutes(30),
+        List.of(new RouteRequest())
+      )
+        .buildGraph();
+
+      graph.index(timetableRepository.getSiteRepository());
 
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
@@ -173,9 +190,9 @@ public class ConstantsForTests {
   public static TestOtpModel buildOsmGraph(File osmFile) {
     try {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
+      var siteRepository = new SiteRepository();
       var graph = new Graph(deduplicator);
-      var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+      var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
@@ -209,9 +226,9 @@ public class ConstantsForTests {
 
   public static TestOtpModel buildGtfsGraph(File gtfsFile, FareServiceFactory fareServiceFactory) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
+    var siteRepository = new SiteRepository();
     var graph = new Graph(deduplicator);
-    var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+    var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     addGtfsToGraph(graph, timetableRepository, gtfsFile, fareServiceFactory, null);
     return new TestOtpModel(graph, timetableRepository);
   }
@@ -219,9 +236,9 @@ public class ConstantsForTests {
   public static TestOtpModel buildNewMinimalNetexGraph() {
     try {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
+      var siteRepository = new SiteRepository();
       var graph = new Graph(deduplicator);
-      var timetableRepository = new TimetableRepository(stopModel, deduplicator);
+      var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       {
         OsmProvider osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
@@ -292,7 +309,7 @@ public class ConstantsForTests {
     module.buildGraph();
 
     timetableRepository.index();
-    graph.index(timetableRepository.getStopModel());
+    graph.index(timetableRepository.getSiteRepository());
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

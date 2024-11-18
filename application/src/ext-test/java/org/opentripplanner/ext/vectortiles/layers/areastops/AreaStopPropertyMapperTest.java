@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class AreaStopPropertyMapperTest {
 
   private static final TimetableRepositoryForTest MODEL = new TimetableRepositoryForTest(
-    StopModel.of()
+    SiteRepository.of()
   );
   private static final AreaStop STOP = MODEL.areaStop("123").build();
   private static final Route ROUTE_WITH_COLOR = TimetableRepositoryForTest

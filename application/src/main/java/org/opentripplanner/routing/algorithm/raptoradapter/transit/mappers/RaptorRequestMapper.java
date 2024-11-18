@@ -12,6 +12,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
@@ -22,7 +23,6 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -199,11 +199,17 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   }
 
   private boolean hasPassThroughOnly() {
-    return request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation);
+    return (
+      request.isViaSearch() &&
+      request.getViaLocations().stream().allMatch(ViaLocation::isPassThroughLocation)
+    );
   }
 
   private boolean hasViaLocationsOnly() {
-    return request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation);
+    return (
+      request.isViaSearch() &&
+      request.getViaLocations().stream().noneMatch(ViaLocation::isPassThroughLocation)
+    );
   }
 
   private boolean hasViaLocationsAndPassThroughLocations() {

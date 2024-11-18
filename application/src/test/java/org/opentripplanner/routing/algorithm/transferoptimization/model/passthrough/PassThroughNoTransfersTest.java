@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestCase.testCase;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.domainService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.first;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathBuilder;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
  * This test focus on the PASS-THROUGH functionality with a very simple scenario - one transit leg

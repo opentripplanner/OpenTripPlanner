@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
+import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
+import org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase;
 
 class OptimizedPathTest implements RaptorTestConstants {
 

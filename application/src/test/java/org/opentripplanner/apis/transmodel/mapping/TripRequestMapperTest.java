@@ -5,8 +5,8 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -89,14 +89,14 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var stopModel = TEST_MODEL
-      .stopModelBuilder()
+    var siteRepository = TEST_MODEL
+      .siteRepositoryBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)
       .build();
 
-    var timetableRepository = new TimetableRepository(stopModel, new Deduplicator());
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
@@ -145,6 +145,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
           new DefaultEmissionsService(new EmissionsDataModel()),
+          null,
           RouterConfig.DEFAULT.flexParameters(),
           List.of(),
           null,

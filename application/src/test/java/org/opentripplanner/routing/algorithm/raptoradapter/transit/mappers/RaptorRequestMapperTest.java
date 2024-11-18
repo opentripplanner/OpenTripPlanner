@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -12,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
@@ -88,6 +89,37 @@ class RaptorRequestMapperTest {
       "[(Via A, stops: " + STOP_A.getIndex() + ")]",
       result.multiCriteria().passThroughPoints().toString()
     );
+  }
+
+  @Test
+  void testTransitGroupPriority() {
+    var req = new RouteRequest();
+
+    // Set relax transit-group-priority
+    req.withPreferences(p ->
+      p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
+    );
+
+    var result = map(req);
+
+    assertFalse(result.multiCriteria().transitPriorityCalculator().isEmpty());
+  }
+
+  @Test
+  void testVisitViaAllowsTransitGroupPriority() {
+    var req = new RouteRequest();
+
+    // Set visit-via and relax transit-group-priority
+    req.setViaLocations(
+      List.of(new VisitViaLocation("Via A", null, List.of(STOP_A.getId()), List.of()))
+    );
+    req.withPreferences(p ->
+      p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
+    );
+
+    var result = map(req);
+
+    assertFalse(result.multiCriteria().transitPriorityCalculator().isEmpty());
   }
 
   @Test

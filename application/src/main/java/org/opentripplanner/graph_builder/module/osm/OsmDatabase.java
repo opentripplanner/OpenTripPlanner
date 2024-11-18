@@ -24,10 +24,9 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.framework.collection.TroveUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
-import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
@@ -50,6 +49,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,11 +253,7 @@ public class OsmDatabase {
 
     applyLevelsForWay(way);
 
-    /* An area can be specified as such, or be one by default as an amenity */
-    if (
-      (way.isArea() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingArea()) &&
-      way.getNodeRefs().size() > 2
-    ) {
+    if (way.isRoutableArea()) {
       // this is an area that's a simple polygon. So we can just add it straight
       // to the areas, if it's not part of a relation.
       if (!areaWayIds.contains(wayId)) {
@@ -267,7 +263,7 @@ public class OsmDatabase {
         way
           .getNodeRefs()
           .forEach(node -> {
-            MapUtils.addToMapSet(areasForNode, node, way);
+            TroveUtils.addToMapSet(areasForNode, node, way);
             return true;
           });
       }
@@ -692,7 +688,7 @@ public class OsmDatabase {
         }
       }
       try {
-        newArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
+        addArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
@@ -738,7 +734,7 @@ public class OsmDatabase {
         while (wayNodeIterator.hasNext()) {
           long nodeId = wayNodeIterator.next();
           if (nodesById.containsKey(nodeId)) {
-            MapUtils.addToMapSet(areasForNode, nodeId, way);
+            TroveUtils.addToMapSet(areasForNode, nodeId, way);
           } else {
             // this area is missing some nodes, perhaps because it is on
             // the edge of the region, so we will simply not route on it.
@@ -755,7 +751,7 @@ public class OsmDatabase {
       }
       processedAreas.add(relation);
       try {
-        newArea(new Area(relation, outerWays, innerWays, nodesById));
+        addArea(new Area(relation, outerWays, innerWays, nodesById));
       } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
         continue;
@@ -790,10 +786,12 @@ public class OsmDatabase {
   /**
    * Handler for a new Area (single way area or multipolygon relations)
    */
-  private void newArea(Area area) {
-    StreetTraversalPermission permissions = area.parent.overridePermissions(
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
-    );
+  private void addArea(Area area) {
+    StreetTraversalPermission permissions = area.parent
+      .getOsmProvider()
+      .getWayPropertySet()
+      .getDataForWay(area.parent)
+      .getPermission();
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);
     }
