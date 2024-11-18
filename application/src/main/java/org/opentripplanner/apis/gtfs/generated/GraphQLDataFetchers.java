@@ -42,6 +42,7 @@ import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
+import org.opentripplanner.model.plan.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -66,6 +67,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.CallRealTimeEstimate;
 import org.opentripplanner.transit.model.timetable.CallTime;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -252,7 +254,7 @@ public class GraphQLDataFetchers {
    * available. This is used when there is a known scheduled time.
    */
   public interface GraphQLCallTime {
-    public DataFetcher<Object> estimated();
+    public DataFetcher<CallRealTimeEstimate> estimated();
 
     public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
@@ -558,7 +560,7 @@ public class GraphQLDataFetchers {
    * available.
    */
   public interface GraphQLLegTime {
-    public DataFetcher<Object> estimated();
+    public DataFetcher<LegRealTimeEstimate> estimated();
 
     public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }

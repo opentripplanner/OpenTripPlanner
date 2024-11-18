@@ -31,6 +31,8 @@ import org.opentripplanner.apis.gtfs.datafetchers.BikeParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.CallRealTimeEstimateImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.CallTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CancellableTripOnServiceDateTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ContactInfoImpl;
@@ -44,6 +46,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.GeometryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ItineraryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LegImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.LegTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.MoneyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.NodeTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
@@ -53,6 +56,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.PlaceInterfaceTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.PlanConnectionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlanImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.QueryTypeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.RealTimeEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
@@ -188,6 +192,10 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(TripOnServiceDateImpl.class))
         .type(typeWiring.build(StopCallImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
+        .type(typeWiring.build(LegTimeImpl.class))
+        .type(typeWiring.build(RealTimeEstimateImpl.class))
+        .type(typeWiring.build(CallTimeImpl.class))
+        .type(typeWiring.build(CallRealTimeEstimateImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

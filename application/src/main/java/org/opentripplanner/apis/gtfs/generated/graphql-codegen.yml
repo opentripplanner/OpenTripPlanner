@@ -130,4 +130,6 @@ config:
     FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition
+    RealTimeEstimate: org.opentripplanner.model.plan.LegRealTimeEstimate#LegRealTimeEstimate
+    CallRealTimeEstimate: org.opentripplanner.transit.model.timetable.CallRealTimeEstimate#CallRealTimeEstimate
 
