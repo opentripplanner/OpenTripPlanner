@@ -51,7 +51,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * contains both flex zones but also scheduled stops. Inside the zone, passengers can get on or off
  * anywhere, so there it works more like a taxi.
  * <p>
- * Read about the details at: https://www.cobbcounty.org/transportation/cobblinc/routes-and-schedules/flex
+ * This service is not being offered anymore, but we keep the test because others of the same
+ * type still exist.
  */
 class ScheduledDeviatedTripIntegrationTest {
 
