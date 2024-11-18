@@ -284,7 +284,6 @@ class StreetEdgeGeofencingTest {
       assertEquals(BICYCLE, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
       assertEquals(Set.of(), tierState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
-
       /*
       * These rental networks are not allowed in the request so they are no longer returned
       final State birdState = states[3];

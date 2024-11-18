@@ -977,7 +977,10 @@ public class StreetEdge
     return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
   }
 
-  private State makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0, String network) {
+  private State makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
+    State s0,
+    String network
+  ) {
     var preferences = s0.getRequest().preferences();
     var edit = doTraverse(s0, TraverseMode.WALK, false);
     if (edit != null) {
@@ -1008,14 +1011,23 @@ public class StreetEdge
    * zone applies to where we pick up a vehicle with a specific network.
    */
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
-    var states = tov.rentalRestrictions().noDropOffNetworks().stream().map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network)).filter(Objects::nonNull).toList();
+    var states = tov
+      .rentalRestrictions()
+      .noDropOffNetworks()
+      .stream()
+      .map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network))
+      .filter(Objects::nonNull)
+      .toList();
     var statesStream = states.stream();
 
     if (!states.isEmpty()) {
       // null is a special rental network that speculatively assumes that you can take any vehicle
       // you have to check in the rental edge if this has search has been started in a no-drop off zone
-      statesStream = Stream.concat(Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null)),
-        statesStream);
+      statesStream =
+        Stream.concat(
+          Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null)),
+          statesStream
+        );
     }
 
     // Also include a state which continues walking, because the vehicle rental states are
