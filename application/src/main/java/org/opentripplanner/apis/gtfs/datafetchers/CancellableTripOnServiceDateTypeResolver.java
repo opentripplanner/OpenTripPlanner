@@ -6,7 +6,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
-public class TripOnServiceDateTypeResolver implements TypeResolver {
+public class CancellableTripOnServiceDateTypeResolver implements TypeResolver {
 
   @Override
   public GraphQLObjectType getType(TypeResolutionEnvironment environment) {
@@ -14,7 +14,7 @@ public class TripOnServiceDateTypeResolver implements TypeResolver {
     GraphQLSchema schema = environment.getSchema();
 
     if (o instanceof TripOnServiceDate) {
-      return schema.getObjectType("RegularTripOnServiceDate");
+      return schema.getObjectType("TripOnServiceDate");
     }
     return null;
   }

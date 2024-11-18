@@ -16,8 +16,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
-public class RegularTripOnServiceDateImpl
-  implements GraphQLDataFetchers.GraphQLRegularTripOnServiceDate {
+public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnServiceDate {
 
   @Override
   public DataFetcher<LocalDate> serviceDate() {
@@ -61,7 +60,7 @@ public class RegularTripOnServiceDateImpl
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stopTimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getTrip(environment);

@@ -66,6 +66,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.CallTime;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -238,6 +239,26 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> time();
   }
+
+  /** Real-time estimates for an arrival or departure at a certain place. */
+  public interface GraphQLCallRealTimeEstimate {
+    public DataFetcher<java.time.Duration> delay();
+
+    public DataFetcher<java.time.OffsetDateTime> time();
+  }
+
+  /**
+   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
+   * available. This is used when there is a known scheduled time.
+   */
+  public interface GraphQLCallTime {
+    public DataFetcher<Object> estimated();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  }
+
+  /** An instance of a trip, which can be cancelled, on a service date. */
+  public interface GraphQLCancellableTripOnServiceDate extends TypeResolver {}
 
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
@@ -846,41 +867,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> time();
   }
 
-  /**
-   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
-   * available. This is used when there is a known scheduled time.
-   */
-  public interface GraphQLRegularRealTimeArrivalDepartureTime {
-    public DataFetcher<Object> estimated();
-
-    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
-  }
-
-  /**
-   * Regular real-time stop time represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-   * This can include real-time estimates.
-   */
-  public interface GraphQLRegularRealTimeStopTime {
-    public DataFetcher<LegCallTime> arrival();
-
-    public DataFetcher<LegCallTime> departure();
-
-    public DataFetcher<Object> stop();
-  }
-
-  /** A regular (i.e. not flexible) trip on a specific service date */
-  public interface GraphQLRegularTripOnServiceDate {
-    public DataFetcher<TripTimeOnDate> end();
-
-    public DataFetcher<java.time.LocalDate> serviceDate();
-
-    public DataFetcher<TripTimeOnDate> start();
-
-    public DataFetcher<Iterable<TripTimeOnDate>> stopTimes();
-
-    public DataFetcher<Trip> trip();
-  }
-
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
@@ -1075,6 +1061,18 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> zoneId();
   }
 
+  /**
+   * Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+   * This can include real-time estimates.
+   */
+  public interface GraphQLStopCall {
+    public DataFetcher<CallTime> arrival();
+
+    public DataFetcher<CallTime> departure();
+
+    public DataFetcher<Object> stop();
+  }
+
   public interface GraphQLStopGeometries {
     public DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
 
@@ -1241,11 +1239,17 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLOccupancyStatus> occupancyStatus();
   }
 
-  /** An instance of a trip on a service date. */
-  public interface GraphQLTripOnServiceDate extends TypeResolver {
-    public default DataFetcher<java.time.LocalDate> serviceDate() {
-      return null;
-    }
+  /** A regular (i.e. not flexible) trip on a specific service date */
+  public interface GraphQLTripOnServiceDate {
+    public DataFetcher<TripTimeOnDate> end();
+
+    public DataFetcher<java.time.LocalDate> serviceDate();
+
+    public DataFetcher<TripTimeOnDate> start();
+
+    public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
+
+    public DataFetcher<Trip> trip();
   }
 
   /**

@@ -29,7 +29,7 @@
                 "scheduledTime": "2024-08-09T11:30:00+02:00"
               }
             },
-            "stopTimes": [
+            "stopCalls": [
               {
                 "stop": {
                   "gtfsId": "F:Stop_0"

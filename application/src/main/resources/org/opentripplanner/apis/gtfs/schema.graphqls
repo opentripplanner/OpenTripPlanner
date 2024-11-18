@@ -70,20 +70,11 @@ interface PlaceInterface {
   lon: Float
 }
 
-"An instance of a trip on a service date."
-interface TripOnServiceDate {
-  """
-  The service date when the trip occurs.
-    
-  **Note**: A service date is a technical term useful for transit planning purposes and might not
-    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
-    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
-  """
-  serviceDate: LocalDate!
-}
-
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
+
+"An instance of a trip, which can be cancelled, on a service date."
+union CancellableTripOnServiceDate = TripOnServiceDate
 
 union StopPosition = PositionAtStop | PositionBetweenStops
 
@@ -304,6 +295,28 @@ type BookingTime {
   daysPrior: Int
   "Time of the booking"
   time: String
+}
+
+"Real-time estimates for an arrival or departure at a certain place."
+type CallRealTimeEstimate {
+  """
+  The delay or "earliness" of the vehicle at a certain place.
+    
+  If the vehicle is early then this is a negative duration.
+  """
+  delay: Duration!
+  time: OffsetDateTime!
+}
+
+"""
+Timing of an arrival or a departure to or from a stop. May contain real-time information if
+available. This is used when there is a known scheduled time.
+"""
+type CallTime {
+  "The estimated time of the event. If no real-time information is available, this is null."
+  estimated: CallRealTimeEstimate
+  "The scheduled time of the event."
+  scheduledTime: OffsetDateTime!
 }
 
 "Car park represents a location where cars can be parked."
@@ -1808,50 +1821,6 @@ type RealTimeEstimate {
   time: OffsetDateTime!
 }
 
-"""
-Timing of an arrival or a departure to or from a stop. May contain real-time information if
-available. This is used when there is a known scheduled time.
-"""
-type RegularRealTimeArrivalDepartureTime {
-  "The estimated time of the event. If no real-time information is available, this is null."
-  estimated: RealTimeEstimate
-  "The scheduled time of the event."
-  scheduledTime: OffsetDateTime!
-}
-
-"""
-Regular real-time stop time represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-This can include real-time estimates.
-"""
-type RegularRealTimeStopTime {
-  "Scheduled arrival time to the stop and a real-time estimate, if one exists."
-  arrival: RegularRealTimeArrivalDepartureTime
-  "Scheduled departure time from the stop and a real-time estimate, if one exists."
-  departure: RegularRealTimeArrivalDepartureTime
-  "The stop where this arrival/departure happens"
-  stop: Stop
-}
-
-"A regular (i.e. not flexible) trip on a specific service date"
-type RegularTripOnServiceDate implements TripOnServiceDate {
-  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
-  end: RegularRealTimeStopTime!
-  """
-  The service date when the trip occurs.
-    
-  **Note**: A service date is a technical term useful for transit planning purposes and might not
-    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
-    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
-  """
-  serviceDate: LocalDate!
-  "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
-  start: RegularRealTimeStopTime!
-  "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopTimes: [RegularRealTimeStopTime!]!
-  "This trip on service date is an instance of this trip."
-  trip: Trip
-}
-
 "Rental vehicle represents a vehicle that belongs to a rental network."
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
@@ -2214,6 +2183,19 @@ type Stop implements Node & PlaceInterface {
   zoneId: String
 }
 
+"""
+Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
+This can include real-time estimates.
+"""
+type StopCall {
+  "Scheduled arrival time to the stop and a real-time estimate, if one exists."
+  arrival: CallTime
+  "Scheduled departure time from the stop and a real-time estimate, if one exists."
+  departure: CallTime
+  "The stop where this arrival/departure happens"
+  stop: Stop
+}
+
 type StopGeometries {
   "Representation of the stop geometries as GeoJSON (https://geojson.org/)"
   geoJson: GeoJson
@@ -2469,6 +2451,26 @@ type TripOccupancy {
   occupancyStatus: OccupancyStatus
 }
 
+"A regular (i.e. not flexible) trip on a specific service date"
+type TripOnServiceDate {
+  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
+  end: StopCall!
+  """
+  The service date when the trip occurs.
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  serviceDate: LocalDate!
+  "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
+  start: StopCall!
+  "List of times when this trip arrives to or departs from a stop and information related to the stop"
+  stopCalls: [StopCall!]!
+  "This trip on service date is an instance of this trip."
+  trip: Trip
+}
+
 """
 A connection to a list of trips on service dates that follows
 [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
@@ -2500,7 +2502,7 @@ type TripOnServiceDateEdge {
   Trip on a service date as a node. Part of the
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
-  node: TripOnServiceDate
+  node: CancellableTripOnServiceDate
 }
 
 "This is used for alert entities that we don't explicitly handle or they are missing."
