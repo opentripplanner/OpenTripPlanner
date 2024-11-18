@@ -128,48 +128,85 @@ class RaptorRequestMapperTest {
 
   static List<Arguments> testViaAndTransitGroupPriorityCombinationsTestCases() {
     return List.of(
-      Arguments.of(List.of(VIA_VISIT), List.of(VIA_VISIT), null),
-      Arguments.of(List.of(VIA_PASS_THROUGH), List.of(VIA_PASS_THROUGH), null),
-      Arguments.of(List.of(TRANSIT_GROUP_PRIORITY), List.of(TRANSIT_GROUP_PRIORITY), null),
-      Arguments.of(List.of(RELAX_COST_DEST), List.of(RELAX_COST_DEST), null),
+      // If ONE feature is requested, the same feature is expected
       Arguments.of(
-        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
-        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
+        "VIA_PASS_THROUGH only",
+        List.of(VIA_PASS_THROUGH),
+        List.of(VIA_PASS_THROUGH),
+        null
+      ),
+      Arguments.of("VIA_VISIT only", List.of(VIA_VISIT), List.of(VIA_VISIT), null),
+      Arguments.of(
+        "TRANSIT_GROUP_PRIORITY only",
+        List.of(TRANSIT_GROUP_PRIORITY),
+        List.of(TRANSIT_GROUP_PRIORITY),
         null
       ),
       Arguments.of(
+        "RELAX_COST_DEST only",
+        List.of(RELAX_COST_DEST),
+        List.of(RELAX_COST_DEST),
+        null
+      ),
+      Arguments.of(
+        "VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.",
+        List.of(VIA_VISIT, VIA_PASS_THROUGH),
+        List.of(),
+        "A mix of via-locations and pass-through is not allowed in this version."
+      ),
+      Arguments.of(
+        """
+          VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.
+          Other features are ignored.
+          """,
+        List.of(VIA_VISIT, VIA_PASS_THROUGH, TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
+        List.of(),
+        "A mix of via-locations and pass-through is not allowed in this version."
+      ),
+      Arguments.of(
+        "VIA_PASS_THROUGH cannot be combined with other features, and other features are dropped",
         List.of(VIA_PASS_THROUGH, TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
         List.of(VIA_PASS_THROUGH),
         null
       ),
       Arguments.of(
+        "VIA_VISIT can be combined with TRANSIT_GROUP_PRIORITY",
+        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
+        List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
+        null
+      ),
+      Arguments.of(
+        """
+        VIA_VISIT can only be combined with TRANSIT_GROUP_PRIORITY, and other features are dropped
+        VIA_PASS_THROUGH override VIA_VISIT (see above)
+        """,
         List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
         List.of(VIA_VISIT, TRANSIT_GROUP_PRIORITY),
         null
       ),
       Arguments.of(
+        """
+          TRANSIT_GROUP_PRIORITY cannot be combined with other features, override RELAX_COST_DEST
+          VIA_PASS_THROUGH and VIA_VISIT override VIA_VISIT (see above)
+          """,
         List.of(TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
         List.of(TRANSIT_GROUP_PRIORITY),
         null
-      ),
-      Arguments.of(
-        List.of(VIA_VISIT, VIA_PASS_THROUGH),
-        List.of(),
-        "A mix of via-locations and pass-through is not allowed in this version."
       )
     );
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "{0}.  {1}  =>  {2}")
   @MethodSource("testViaAndTransitGroupPriorityCombinationsTestCases")
   void testViaAndTransitGroupPriorityCombinations(
-    List<RequestFeature> input,
-    List<RequestFeature> expectedEnabledFeatures,
+    String testDescription,
+    List<RequestFeature> requestedFeatures,
+    List<RequestFeature> expectedFeatures,
     @Nullable String errorMessage
   ) {
     var req = new RouteRequest();
 
-    for (RequestFeature it : input) {
+    for (RequestFeature it : requestedFeatures) {
       req = setFeaturesOnRequest(req, it);
     }
 
@@ -177,7 +214,7 @@ class RaptorRequestMapperTest {
       var result = map(req);
 
       for (var feature : RequestFeature.values()) {
-        assertFeatureSet(feature, result, expectedEnabledFeatures.contains(feature));
+        assertFeatureSet(feature, result, expectedFeatures.contains(feature));
       }
     } else {
       var r = req;
