@@ -1266,14 +1266,14 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("serviceJourneys")
-          .description("Get all service journeys")
+          .description("Get all _service journeys_")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .argument(
             GraphQLArgument
               .newArgument()
               .name("lines")
-              .description("Set of ids of lines to fetch serviceJourneys for.")
+              .description("Set of ids of _lines_ to fetch _service journeys_ for.")
               .type(new GraphQLList(Scalars.GraphQLID))
               .build()
           )
@@ -1281,7 +1281,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("privateCodes")
-              .description("Set of ids of private codes to fetch serviceJourneys for.")
+              .description("Set of ids of _private codes_ to fetch _service journeys_ for.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1289,7 +1289,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("activeDates")
-              .description("Set of operating-days to fetch service-journeys for.")
+              .description("Set of _operating days_ to fetch _service journeys_ for.")
               .type(new GraphQLList(TransmodelScalars.DATE_SCALAR))
               .build()
           )
@@ -1297,7 +1297,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("authorities")
-              .description("Set of ids of authorities to fetch serviceJourneys for.")
+              .description("Set of ids of _authorities_ to fetch _service journeys_ for.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )

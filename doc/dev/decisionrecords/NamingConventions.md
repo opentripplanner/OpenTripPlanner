@@ -72,3 +72,14 @@ trip = Trip.of(id).withName("The Express").build();
 // Modify and existing stop
 stop = stop.copyOf().withPrivateCode("TEX").build();
 ```
+
+## Referencing Established OTP Terminology in Documentation
+
+Use emphasis ("_dated service journey_") in markdown documentation, in API, and configuration
+documentation. In this kind of documentation we usually talk about the concept, not the implementing
+class. Use CamleCase (eg. TripOnServiceDate) if you need to reference the class.
+
+Use hyphen ("dated-service-journey") in plain text and JavaDoc. In JavaDoc we also use
+{@link TripOnServiceDate} the first time we mention a class. Note that sometimes we want to talk
+about the concept (dated-service-journey) and sometimes we reference a class 
+({@link DatedServiceJourney}).

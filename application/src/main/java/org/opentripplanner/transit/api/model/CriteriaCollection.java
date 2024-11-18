@@ -2,6 +2,7 @@ package org.opentripplanner.transit.api.model;
 
 import com.beust.jcommander.internal.Nullable;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -37,6 +38,11 @@ public class CriteriaCollection<E> {
   }
 
   public Collection<E> values() {
+    if (criteria == null) {
+      throw new NoSuchElementException(
+        "No values present, use matchesAll() before calling this method."
+      );
+    }
     return criteria;
   }
 }
