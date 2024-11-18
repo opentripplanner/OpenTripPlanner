@@ -7,11 +7,9 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Function;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -41,7 +39,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   );
   private static final RegularStop STOP_1 = TEST_MODEL.stop("s1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("s2").build();
-  private static final TimetableRepository TT_REPO = new TimetableRepository(
+  private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
     siteRepositoryBuilder.build(),
     new Deduplicator()
   );
@@ -67,10 +65,14 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     TRIP_TIMES.setServiceCode(SERVICE_CODE);
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(SERVICE_ID, List.of(SERVICE_DATE));
-    TT_REPO.addTripPattern(TRIP_PATTERN.getId(), TRIP_PATTERN);
-    TT_REPO.getServiceCodes().put(SERVICE_ID, SERVICE_CODE);
-    TT_REPO.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
-    TT_REPO.index();
+    TIMETABLE_REPOSITORY.addTripPattern(TRIP_PATTERN.getId(), TRIP_PATTERN);
+    TIMETABLE_REPOSITORY.getServiceCodes().put(SERVICE_ID, SERVICE_CODE);
+    TIMETABLE_REPOSITORY.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+    TIMETABLE_REPOSITORY.index();
   }
 
   @Test
@@ -115,23 +117,6 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
   }
 
-  public static List<Function<TripDescriptor.Builder, TripDescriptor.Builder>> incompleteDataCases() {
-    return List.of(
-      TripDescriptor.Builder::clearDirectionId,
-      TripDescriptor.Builder::clearRouteId,
-      TripDescriptor.Builder::clearStartTime,
-      TripDescriptor.Builder::clearStartDate
-    );
-  }
-
-  @MethodSource("incompleteDataCases")
-  @ParameterizedTest
-  void incompleteMatchingData(Function<TripDescriptor.Builder, TripDescriptor.Builder> modifier) {
-    var matcher = matcher();
-    TripDescriptor trip1 = modifier.apply(matchingTripUpdate()).build();
-    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
-  }
-
   @Test
   void noMatch() {
     // Test matching with "real time", when schedule uses time grater than 24:00
@@ -155,8 +140,36 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     assertFalse(trip1.hasTripId());
   }
 
+  @Nested
+  class IncompleteData {
+
+    @Test
+    void noRouteId() {
+      var td = matchingTripUpdate().clearRouteId().build();
+      assertFalse(matcher().match(FEED_ID, td).hasTripId());
+    }
+
+    @Test
+    void noDirectionId() {
+      var td = matchingTripUpdate().clearDirectionId().build();
+      assertFalse(matcher().match(FEED_ID, td).hasTripId());
+    }
+
+    @Test
+    void noStartDate() {
+      var td = matchingTripUpdate().clearStartDate().build();
+      assertFalse(matcher().match(FEED_ID, td).hasTripId());
+    }
+
+    @Test
+    void noStartTime() {
+      var td = matchingTripUpdate().clearStartTime().build();
+      assertFalse(matcher().match(FEED_ID, td).hasTripId());
+    }
+  }
+
   private static GtfsRealtimeFuzzyTripMatcher matcher() {
-    return new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(TT_REPO));
+    return new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(TIMETABLE_REPOSITORY));
   }
 
   private static TripDescriptor.Builder matchingTripUpdate() {
