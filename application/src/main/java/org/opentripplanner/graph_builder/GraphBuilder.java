@@ -207,7 +207,7 @@ public class GraphBuilder implements Runnable {
     graphBuilderModules.add(module);
   }
 
-  private void addModuleOptional(GraphBuilderModule module) {
+  private void addModuleOptional(@Nullable GraphBuilderModule module) {
     if (module != null) {
       graphBuilderModules.add(module);
     }

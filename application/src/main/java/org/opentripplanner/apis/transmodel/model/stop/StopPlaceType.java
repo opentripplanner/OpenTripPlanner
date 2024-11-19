@@ -183,7 +183,7 @@ public class StopPlaceType {
           .dataFetcher(environment ->
             ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
-              .map(StopLocation::getGtfsVehicleType)
+              .map(StopLocation::getVehicleType)
               .filter(Objects::nonNull)
               .collect(Collectors.toSet())
           )

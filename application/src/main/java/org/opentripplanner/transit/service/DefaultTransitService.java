@@ -714,8 +714,8 @@ public class DefaultTransitService implements TransitEditorService {
    * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
    */
   private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
-    if (stop.getGtfsVehicleType() != null) {
-      return Stream.of(stop.getGtfsVehicleType());
+    if (stop.getVehicleType() != null) {
+      return Stream.of(stop.getVehicleType());
     } else {
       return findPatterns(stop).stream().map(TripPattern::getMode);
     }
