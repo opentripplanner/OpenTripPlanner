@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -73,7 +74,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
    * applies those updates to the graph.
    */
   @Override
-  public void runPolling() {
+  public void runPolling() throws InterruptedException, ExecutionException {
     // Get update lists from update source
     List<TripUpdate> updates = updateSource.getUpdates();
     var incrementality = updateSource.incrementalityOfLastUpdates();
@@ -89,7 +90,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         feedId,
         recordMetrics
       );
-      saveResultOnGraph.execute(runnable);
+      saveResultOnGraph.execute(runnable).get();
     }
   }
 

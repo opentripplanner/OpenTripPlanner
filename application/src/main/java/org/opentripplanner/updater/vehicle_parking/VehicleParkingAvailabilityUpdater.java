@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_parking;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -49,12 +50,12 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException, ExecutionException {
     if (source.update()) {
       var updates = source.getUpdates();
 
       var graphWriterRunnable = new AvailabilityUpdater(updates);
-      saveResultOnGraph.execute(graphWriterRunnable);
+      saveResultOnGraph.execute(graphWriterRunnable).get();
     }
   }
 

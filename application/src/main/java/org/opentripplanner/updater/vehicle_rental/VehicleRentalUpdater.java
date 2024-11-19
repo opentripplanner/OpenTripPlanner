@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -124,7 +125,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle rental stations from {}", nameForLogging);
     if (!source.update()) {
       LOG.debug("No updates from {}", nameForLogging);
@@ -138,7 +139,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       stations,
       geofencingZones
     );
-    saveResultOnGraph.execute(graphWriterRunnable);
+    saveResultOnGraph.execute(graphWriterRunnable).get();
   }
 
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {

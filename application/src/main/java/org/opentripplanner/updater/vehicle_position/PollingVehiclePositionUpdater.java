@@ -3,6 +3,7 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
@@ -64,7 +65,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
    * applies those updates to the graph.
    */
   @Override
-  public void runPolling() {
+  public void runPolling() throws InterruptedException, ExecutionException {
     // Get update lists from update source
     List<VehiclePosition> updates = vehiclePositionSource.getPositions();
 
@@ -77,7 +78,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         fuzzyTripMatching,
         updates
       );
-      saveResultOnGraph.execute(runnable);
+      saveResultOnGraph.execute(runnable).get();
     }
   }
 

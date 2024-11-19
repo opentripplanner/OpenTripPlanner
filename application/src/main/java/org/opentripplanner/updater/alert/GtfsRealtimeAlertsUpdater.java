@@ -2,6 +2,7 @@ package org.opentripplanner.updater.alert;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
@@ -63,32 +64,28 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   }
 
   @Override
-  protected void runPolling() {
-    try {
-      final FeedMessage feed = otpHttpClient.getAndMap(
-        URI.create(url),
-        this.headers.asMap(),
-        FeedMessage.PARSER::parseFrom
-      );
+  protected void runPolling() throws InterruptedException, ExecutionException {
+    final FeedMessage feed = otpHttpClient.getAndMap(
+      URI.create(url),
+      this.headers.asMap(),
+      FeedMessage.PARSER::parseFrom
+    );
 
-      long feedTimestamp = feed.getHeader().getTimestamp();
-      if (feedTimestamp == lastTimestamp) {
-        LOG.debug("Ignoring feed with a timestamp that has not been updated from {}", url);
-        return;
-      }
-      if (feedTimestamp < lastTimestamp) {
-        LOG.info("Ignoring feed with older than previous timestamp from {}", url);
-        return;
-      }
-
-      // Handle update in graph writer runnable
-      saveResultOnGraph.execute(context ->
-        updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher())
-      );
-
-      lastTimestamp = feedTimestamp;
-    } catch (Exception e) {
-      LOG.error("Error reading gtfs-realtime feed from " + url, e);
+    long feedTimestamp = feed.getHeader().getTimestamp();
+    if (feedTimestamp == lastTimestamp) {
+      LOG.debug("Ignoring feed with a timestamp that has not been updated from {}", url);
+      return;
     }
+    if (feedTimestamp < lastTimestamp) {
+      LOG.info("Ignoring feed with older than previous timestamp from {}", url);
+      return;
+    }
+
+    // Handle update in graph writer runnable
+    saveResultOnGraph
+      .execute(context -> updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher()))
+      .get();
+
+    lastTimestamp = feedTimestamp;
   }
 }

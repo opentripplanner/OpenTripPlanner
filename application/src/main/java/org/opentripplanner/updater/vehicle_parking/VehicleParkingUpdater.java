@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
@@ -69,7 +70,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
@@ -81,7 +82,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     VehicleParkingGraphWriterRunnable graphWriterRunnable = new VehicleParkingGraphWriterRunnable(
       vehicleParkings
     );
-    saveResultOnGraph.execute(graphWriterRunnable);
+    saveResultOnGraph.execute(graphWriterRunnable).get();
   }
 
   private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {
