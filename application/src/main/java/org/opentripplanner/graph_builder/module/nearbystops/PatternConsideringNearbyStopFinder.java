@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.nearbystops;
 
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
