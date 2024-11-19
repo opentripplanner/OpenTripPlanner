@@ -27,30 +27,35 @@ class EscalatorProcessor {
       .boxed()
       .toList();
 
+    Long duration = escalatorWay.getDurationSeconds();
     for (int i = 0; i < nodes.size() - 1; i++) {
       if (escalatorWay.isForwardEscalator()) {
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
-          length
+          length,
+          duration
         );
       } else if (escalatorWay.isBackwardEscalator()) {
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
-          length
+          length,
+          duration
         );
       } else {
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
-          length
+          length,
+          duration
         );
 
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
-          length
+          length,
+          duration
         );
       }
     }

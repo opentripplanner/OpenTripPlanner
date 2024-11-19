@@ -17,10 +17,12 @@ public class EscalatorEdge extends Edge {
   private static final double HORIZONTAL_SPEED = 0.45;
   private static final LocalizedString NAME = new LocalizedString("name.escalator");
   private final double length;
+  private final Long duration;
 
-  private EscalatorEdge(Vertex v1, Vertex v2, double length) {
+  private EscalatorEdge(Vertex v1, Vertex v2, double length, Long duration) {
     super(v1, v2);
     this.length = length;
+    this.duration = duration;
   }
 
   @Override
@@ -28,7 +30,12 @@ public class EscalatorEdge extends Edge {
     // Only allow traversal by walking
     if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {
       var s1 = s0.edit(this);
-      var time = getDistanceMeters() / HORIZONTAL_SPEED;
+      double time;
+      if (duration == null) {
+        time = getDistanceMeters() / HORIZONTAL_SPEED;
+      } else {
+        time = duration;
+      }
       s1.incrementWeight(s0.getPreferences().walk().escalatorReluctance() * time);
       s1.incrementTimeInSeconds((int) Math.round(time));
       s1.incrementWalkDistance(getDistanceMeters());
@@ -51,7 +58,7 @@ public class EscalatorEdge extends Edge {
     return NAME;
   }
 
-  public static EscalatorEdge createEscalatorEdge(Vertex from, Vertex to, double length) {
-    return connectToGraph(new EscalatorEdge(from, to, length));
+  public static EscalatorEdge createEscalatorEdge(Vertex from, Vertex to, double length, Long duration) {
+    return connectToGraph(new EscalatorEdge(from, to, length, duration));
   }
 }
