@@ -1,5 +1,5 @@
 {
-  canceledTrips(feeds: "F") {
+  canceledTrips(first: 2) {
     pageInfo {
       hasNextPage
       hasPreviousPage

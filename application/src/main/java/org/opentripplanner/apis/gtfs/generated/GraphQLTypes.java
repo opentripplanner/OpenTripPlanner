@@ -2410,7 +2410,6 @@ public class GraphQLTypes {
 
     private String after;
     private String before;
-    private List<String> feeds;
     private Integer first;
     private Integer last;
 
@@ -2418,7 +2417,6 @@ public class GraphQLTypes {
       if (args != null) {
         this.after = (String) args.get("after");
         this.before = (String) args.get("before");
-        this.feeds = (List<String>) args.get("feeds");
         this.first = (Integer) args.get("first");
         this.last = (Integer) args.get("last");
       }
@@ -2430,10 +2428,6 @@ public class GraphQLTypes {
 
     public String getGraphQLBefore() {
       return this.before;
-    }
-
-    public List<String> getGraphQLFeeds() {
-      return this.feeds;
     }
 
     public Integer getGraphQLFirst() {
@@ -2450,10 +2444,6 @@ public class GraphQLTypes {
 
     public void setGraphQLBefore(String before) {
       this.before = before;
-    }
-
-    public void setGraphQLFeeds(List<String> feeds) {
-      this.feeds = feeds;
     }
 
     public void setGraphQLFirst(Integer first) {

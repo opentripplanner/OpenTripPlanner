@@ -227,20 +227,6 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Find trips which have been canceled.
-   *
-   * @param feeds only return trips from these feeds. Empty list is not allowed.
-   */
-  public List<TripOnServiceDate> findCanceledTrips(List<String> feeds) {
-    if (feeds == null || feeds.isEmpty()) {
-      throw new IllegalArgumentException("Feeds list cannot be null or empty");
-    }
-    return findTripsOnServiceDates(tripTimes ->
-      tripTimes.isCanceled() && feeds.contains(tripTimes.getTrip().getId().getFeedId())
-    );
-  }
-
-  /**
    * List trips which have been canceled.
    */
   public List<TripOnServiceDate> listCanceledTrips() {

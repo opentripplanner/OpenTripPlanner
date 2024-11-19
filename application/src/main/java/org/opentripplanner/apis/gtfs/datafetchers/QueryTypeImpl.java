@@ -833,16 +833,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   @Override
   public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
     return environment -> {
-      var args = new GraphQLTypes.GraphQLQueryTypeCanceledTripsArgs(environment.getArguments());
-      if (args.getGraphQLFeeds() != null && args.getGraphQLFeeds().isEmpty()) {
-        throw new IllegalArgumentException(
-          "Feeds need to be either not specified or contain elements."
-        );
-      }
-
-      var trips = args.getGraphQLFeeds() != null
-        ? getTransitService(environment).findCanceledTrips(args.getGraphQLFeeds())
-        : getTransitService(environment).listCanceledTrips();
+      var trips = getTransitService(environment).listCanceledTrips();
       return new SimpleListConnection<>(trips).get(environment);
     };
   }

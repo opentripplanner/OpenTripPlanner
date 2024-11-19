@@ -1151,8 +1151,6 @@ type QueryType {
     and should be used together with the `last` parameter.
     """
     before: String,
-    "Feed feedIds (e.g. [\"HSL\"])."
-    feeds: [String],
     """
     Limits how many trips are returned. This parameter is part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with

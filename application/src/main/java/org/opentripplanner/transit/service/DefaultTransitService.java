@@ -299,26 +299,6 @@ public class DefaultTransitService implements TransitEditorService {
    * TODO This only supports realtime cancelled trips for now.
    */
   @Override
-  public List<TripOnServiceDate> findCanceledTrips(List<String> feeds) {
-    if (feeds == null || feeds.isEmpty()) {
-      throw new IllegalArgumentException(
-        "Feeds list cannot be empty or null. It needs to have elements."
-      );
-    }
-    OTPRequestTimeoutException.checkForTimeout();
-    var timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot == null) {
-      return List.of();
-    }
-    List<TripOnServiceDate> canceledTrips = timetableSnapshot.findCanceledTrips(feeds);
-    canceledTrips.sort(new TripOnServiceDateComparator());
-    return canceledTrips;
-  }
-
-  /**
-   * TODO This only supports realtime cancelled trips for now.
-   */
-  @Override
   public List<TripOnServiceDate> listCanceledTrips() {
     OTPRequestTimeoutException.checkForTimeout();
     var timetableSnapshot = lazyGetTimeTableSnapShot();

@@ -170,13 +170,6 @@ public interface TransitService {
   Collection<Trip> getAllTrips();
 
   /**
-   * Find canceled trips.
-   *
-   * @param feeds used for filtering. Empty list is not allowed.
-   */
-  List<TripOnServiceDate> findCanceledTrips(List<String> feeds);
-
-  /**
    * List all canceled trips.
    */
   List<TripOnServiceDate> listCanceledTrips();
