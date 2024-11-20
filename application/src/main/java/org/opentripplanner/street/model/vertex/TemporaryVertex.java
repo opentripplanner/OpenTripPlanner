@@ -21,6 +21,4 @@ public interface TemporaryVertex {
   static void dispose(Vertex vertex) {
     TemporaryVertexDispose.dispose(vertex);
   }
-
-  boolean isEndVertex();
 }

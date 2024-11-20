@@ -13,5 +13,22 @@ public enum LinkingDirection {
    * From the main graph towards the new vertex
    */
   OUTGOING,
-  BOTH_WAYS,
+  /**
+   * Link both ways
+   */
+  BOTH_WAYS;
+
+  /**
+   * Return {@code true} if either outgoing or both-ways.
+   */
+  public boolean allowOutgoing() {
+    return this == OUTGOING || this == BOTH_WAYS;
+  }
+
+  /**
+   * Return {@code true} if either incoming or both-ways.
+   */
+  public boolean allowIncoming() {
+    return this == INCOMING || this == BOTH_WAYS;
+  }
 }

@@ -359,7 +359,7 @@ public abstract class GraphRoutingTest {
       double longitude,
       boolean endVertex
     ) {
-      return new TemporaryStreetLocation(
+      return TemporaryStreetLocation.originOrDestination(
         name,
         new Coordinate(longitude, latitude),
         new NonLocalizedString(name),

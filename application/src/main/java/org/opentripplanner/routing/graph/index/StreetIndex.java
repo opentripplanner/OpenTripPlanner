@@ -102,7 +102,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    TemporaryStreetLocation location = new TemporaryStreetLocation(
+    TemporaryStreetLocation location = TemporaryStreetLocation.originOrDestination(
       label,
       nearestPoint,
       name,
@@ -377,7 +377,7 @@ public class StreetIndex {
       name = new NonLocalizedString(label);
     }
 
-    TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
+    TemporaryStreetLocation temporaryStreetLocation = TemporaryStreetLocation.originOrDestination(
       UUID.randomUUID().toString(),
       coordinate,
       name,

@@ -70,7 +70,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionFromEdgeSplitWithTemporary() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge1.splitNonDestructively(
@@ -91,7 +91,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionToEdgeSplitTemporary() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge2.splitNonDestructively(
@@ -110,7 +110,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionFromEdgeSplitWithToVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge1.splitNonDestructively(
@@ -129,7 +129,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionToEdgeSplitWithToVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, true);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge2.splitNonDestructively(
@@ -150,7 +150,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionFromEdgeSplitWithFromVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, false);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge1.splitNonDestructively(
@@ -171,7 +171,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionToEdgeSplitWithFromVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
+    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2);
     var disposableEdgeCollection = new DisposableEdgeCollection(graph);
 
     var splitResult = streetEdge2.splitNonDestructively(
