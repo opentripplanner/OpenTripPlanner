@@ -8,12 +8,12 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
+import org.opentripplanner.utils.lang.ObjectUtils;
 
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
@@ -62,7 +62,7 @@ public interface StopLocation extends LogInfo {
   }
 
   @Nullable
-  default TransitMode getGtfsVehicleType() {
+  default TransitMode getVehicleType() {
     return null;
   }
 

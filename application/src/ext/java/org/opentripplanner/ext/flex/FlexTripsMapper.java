@@ -7,13 +7,13 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,20 +44,20 @@ public class FlexTripsMapper {
             .withTimePenalty(timePenalty)
             .build()
         );
-      } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
+      } else if (ScheduledDeviatedTrip.isScheduledDeviatedFlexTrip(stopTimes)) {
         result.add(
           ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
         );
-      } else if (hasContinuousStops(stopTimes) && FlexTrip.containsFlexStops(stopTimes)) {
+      } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
         store.add(
-          "ContinuousFlexTrip",
-          "Trip %s contains both flex stops and continuous pick up/drop off. This is an invalid combination: https://github.com/MobilityData/gtfs-flex/issues/70",
+          "ContinuousFlexStopTime",
+          "Trip %s contains a stop time which combines flex with continuous pick up/drop off. This is an invalid combination: https://github.com/MobilityData/gtfs-flex/issues/70",
           trip.getId()
         );
         // result.add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
 
-      //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+      //Keep lambda! A method-ref would cause incorrect class and line number to be logged
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }

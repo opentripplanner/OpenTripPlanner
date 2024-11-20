@@ -1,17 +1,18 @@
 package org.opentripplanner.inspector.vector.edge;
 
-import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.inspector.vector.KeyValue;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
@@ -29,8 +30,10 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
 
   private static List<KeyValue> mapStreetEdge(StreetEdge se) {
     var props = Lists.newArrayList(
-      kv("permission", se.getPermission().toString()),
-      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor()))
+      kv("permission", streetPermissionAsString(se.getPermission())),
+      kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
+      kv("noThruTraffic", noThruTrafficAsString(se)),
+      kv("wheelchairAccessible", se.isWheelchairAccessible())
     );
     if (se.hasBogusName()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
@@ -38,5 +41,23 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       props.addFirst(kv("name", se.getName().toString()));
     }
     return props;
+  }
+
+  public static String streetPermissionAsString(StreetTraversalPermission permission) {
+    return permission.name().replace("_AND_", " ");
+  }
+
+  private static String noThruTrafficAsString(StreetEdge se) {
+    var noThruPermission = StreetTraversalPermission.NONE;
+    if (se.isWalkNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+    if (se.isBicycleNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.BICYCLE);
+    }
+    if (se.isMotorVehicleNoThruTraffic()) {
+      noThruPermission = noThruPermission.add(StreetTraversalPermission.CAR);
+    }
+    return streetPermissionAsString(noThruPermission);
   }
 }

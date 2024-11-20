@@ -18,6 +18,17 @@ public enum OTPFeature {
   APIBikeRental(true, false, "Enable the bike rental endpoint."),
   APIServerInfo(true, false, "Enable the server info endpoint."),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
+  IncludeEmptyRailStopsInTransfers(
+    false,
+    false,
+    """
+      Turning this on guarantees that Rail stops without scheduled departures still get included
+      when generating transfers using `ConsiderPatternsForDirectTransfers`. It is common for stops
+      to be assign at real-time for Rail. Turning this on will help to avoid dropping transfers which
+      are needed, when the stop is in use later. Turning this on, if
+      ConsiderPatternsForDirectTransfers is off has no effect.
+      """
+  ),
   ConsiderPatternsForDirectTransfers(
     true,
     false,
@@ -118,6 +129,11 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
+  Sorlandsbanen(
+    false,
+    true,
+    "Include train Sørlandsbanen in results when searching in south of Norway. Only relevant in Norway."
+  ),
   TransferAnalyzer(false, true, "Analyze transfers during graph build.");
 
   private static final Object TEST_LOCK = new Object();

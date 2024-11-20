@@ -1,13 +1,15 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import static org.opentripplanner.model.PickDrop.NONE;
+
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model, it is not
@@ -304,5 +306,17 @@ public final class StopTime implements Comparable<StopTime> {
    */
   public boolean hasFlexWindow() {
     return flexWindowStart != MISSING_VALUE || flexWindowEnd != MISSING_VALUE;
+  }
+
+  /**
+   * Checks if this stop time combines flex windows with continuous stopping, which is against the
+   * GTFS spec.
+   */
+  public boolean combinesContinuousStoppingWithFlexWindow() {
+    return hasContinuousStopping() && hasFlexWindow();
+  }
+
+  public boolean hasContinuousStopping() {
+    return this.flexContinuousPickup != NONE || flexContinuousDropOff != NONE;
   }
 }

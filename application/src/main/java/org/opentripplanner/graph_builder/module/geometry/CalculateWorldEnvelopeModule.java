@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import jakarta.inject.Inject;
 import java.util.Collection;
-import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -10,6 +9,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

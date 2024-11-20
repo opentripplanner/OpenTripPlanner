@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.trip;
 
-import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.util.Arrays;
@@ -8,13 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.TimePenaltyCalculator;
-import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntRange;
-import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
@@ -23,6 +18,9 @@ import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntRange;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This type of FlexTrip is used when a taxi-type service is modeled, which operates in any number
@@ -81,11 +79,9 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    *  - One or more stop times with a flexible time window but no fixed stop in between them
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> hasContinuousStops = stopTime ->
-      stopTime.getFlexContinuousDropOff() != NONE || stopTime.getFlexContinuousPickup() != NONE;
     if (stopTimes.isEmpty()) {
       return false;
-    } else if (stopTimes.stream().anyMatch(hasContinuousStops)) {
+    } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
       return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
       return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);

@@ -3,7 +3,7 @@ package org.opentripplanner.framework.token;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A token schema contains a set of token definitions, one for each version. This is

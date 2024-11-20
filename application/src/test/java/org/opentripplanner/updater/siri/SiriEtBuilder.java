@@ -39,6 +39,7 @@ public class SiriEtBuilder {
 
     // Set default values
     evj.setMonitored(true);
+    evj.setDataSource("DATASOURCE");
   }
 
   public List<EstimatedTimetableDeliveryStructure> buildEstimatedTimetableDeliveries() {

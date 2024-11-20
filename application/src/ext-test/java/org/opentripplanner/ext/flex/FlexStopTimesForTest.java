@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.flex;
 
-import static org.opentripplanner.model.StopTime.MISSING_VALUE;
-
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class FlexStopTimesForTest {
 
@@ -18,6 +18,8 @@ public class FlexStopTimesForTest {
     .build();
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
 
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("flex").build();
+
   public static StopTime area(String startTime, String endTime) {
     return area(AREA_STOP, endTime, startTime);
   }
@@ -27,26 +29,74 @@ public class FlexStopTimesForTest {
     stopTime.setStop(areaStop);
     stopTime.setFlexWindowStart(TimeUtils.time(startTime));
     stopTime.setFlexWindowEnd(TimeUtils.time(endTime));
+    stopTime.setTrip(TRIP);
     return stopTime;
   }
 
-  public static StopTime regularArrival(String arrivalTime) {
-    return regularStopTime(TimeUtils.time(arrivalTime), MISSING_VALUE);
+  /**
+   * Returns an invalid combination of a flex area and continuous stopping.
+   */
+  public static StopTime areaWithContinuousStopping(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
   }
 
-  public static StopTime regularStopTime(String arrivalTime, String departureTime) {
-    return regularStopTime(TimeUtils.time(arrivalTime), TimeUtils.time(departureTime));
+  /**
+   * Returns an invalid combination of a flex area and continuous pick up.
+   */
+  public static StopTime areaWithContinuousPickup(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
   }
 
-  public static StopTime regularStopTime(int arrivalTime, int departureTime) {
+  /**
+   * Returns an invalid combination of a flex area and continuous drop off.
+   */
+  public static StopTime areaWithContinuousDropOff(String time) {
+    var st = area(time, time);
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  public static StopTime regularStop(String arrivalTime, String departureTime) {
+    return regularStop(TimeUtils.time(arrivalTime), TimeUtils.time(departureTime));
+  }
+
+  public static StopTime regularStop(String time) {
+    return regularStop(TimeUtils.time(time), TimeUtils.time(time));
+  }
+
+  public static StopTime regularStopWithContinuousStopping(String time) {
+    var st = regularStop(TimeUtils.time(time), TimeUtils.time(time));
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  public static StopTime regularStopWithContinuousPickup(String time) {
+    var st = regularStop(TimeUtils.time(time), TimeUtils.time(time));
+    st.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  public static StopTime regularStopWithContinuousDropOff(String time) {
+    var st = regularStop(TimeUtils.time(time), TimeUtils.time(time));
+    st.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+    return st;
+  }
+
+  public static StopTime regularStop(int arrivalTime, int departureTime) {
     var stopTime = new StopTime();
     stopTime.setStop(REGULAR_STOP);
     stopTime.setArrivalTime(arrivalTime);
     stopTime.setDepartureTime(departureTime);
+    stopTime.setTrip(TRIP);
     return stopTime;
   }
 
-  public static StopTime regularDeparture(String departureTime) {
-    return regularStopTime(MISSING_VALUE, TimeUtils.time(departureTime));
-  }
+
+
 }

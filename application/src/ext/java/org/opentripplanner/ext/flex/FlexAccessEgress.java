@@ -4,10 +4,10 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public final class FlexAccessEgress {
 

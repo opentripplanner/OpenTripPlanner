@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.BOARD_SLACK;
+import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.BOARD_SLACK;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -24,19 +24,13 @@ import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.raptor._data.transit.TestRoute;
-import org.opentripplanner.raptor._data.transit.TestTransitData;
-import org.opentripplanner.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -46,6 +40,12 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
+import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
+import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
@@ -53,7 +53,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
@@ -67,6 +66,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
 

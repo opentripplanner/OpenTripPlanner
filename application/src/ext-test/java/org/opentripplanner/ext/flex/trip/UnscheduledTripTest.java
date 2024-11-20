@@ -17,14 +17,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.ext.flex.FlexStopTimesForTest;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.opentripplanner.utils.time.TimeUtils;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 class UnscheduledTripTest {
 
@@ -45,35 +46,14 @@ class UnscheduledTripTest {
   @Nested
   class IsUnscheduledTrip {
 
-    private static final StopTime SCHEDULED_STOP = new StopTime();
-    private static final StopTime UNSCHEDULED_STOP = new StopTime();
-    private static final StopTime CONTINUOUS_PICKUP_STOP = new StopTime();
-    private static final StopTime CONTINUOUS_DROP_OFF_STOP = new StopTime();
+    private static final StopTime SCHEDULED_STOP = FlexStopTimesForTest.regularStop("10:00");
+    private static final StopTime UNSCHEDULED_STOP = FlexStopTimesForTest.area("10:10", "10:20");
+    private static final StopTime CONTINUOUS_PICKUP_STOP = FlexStopTimesForTest.regularStopWithContinuousPickup("10:30");
+    private static final StopTime CONTINUOUS_DROP_OFF_STOP = FlexStopTimesForTest.regularStopWithContinuousDropOff("10:40");
 
-    static {
-      var trip = TimetableRepositoryForTest.trip("flex").build();
-      SCHEDULED_STOP.setArrivalTime(30);
-      SCHEDULED_STOP.setDepartureTime(60);
-      SCHEDULED_STOP.setStop(AREA_STOP);
-      SCHEDULED_STOP.setTrip(trip);
-
-      UNSCHEDULED_STOP.setFlexWindowStart(30);
-      UNSCHEDULED_STOP.setFlexWindowEnd(300);
-      UNSCHEDULED_STOP.setStop(AREA_STOP);
-      UNSCHEDULED_STOP.setTrip(trip);
-
-      CONTINUOUS_PICKUP_STOP.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
-      CONTINUOUS_PICKUP_STOP.setFlexWindowStart(30);
-      CONTINUOUS_PICKUP_STOP.setFlexWindowEnd(300);
-      CONTINUOUS_PICKUP_STOP.setStop(AREA_STOP);
-      CONTINUOUS_PICKUP_STOP.setTrip(trip);
-
-      CONTINUOUS_DROP_OFF_STOP.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
-      CONTINUOUS_DROP_OFF_STOP.setFlexWindowStart(100);
-      CONTINUOUS_DROP_OFF_STOP.setFlexWindowEnd(200);
-      CONTINUOUS_DROP_OFF_STOP.setStop(AREA_STOP);
-      CONTINUOUS_DROP_OFF_STOP.setTrip(trip);
-    }
+    // disallowed by the GTFS spec
+    private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP = FlexStopTimesForTest.areaWithContinuousPickup("10:50");
+    private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP = FlexStopTimesForTest.areaWithContinuousDropOff("11:00");
 
     static List<List<StopTime>> notUnscheduled() {
       return List.of(
@@ -82,9 +62,9 @@ class UnscheduledTripTest {
         List.of(SCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, SCHEDULED_STOP, UNSCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, CONTINUOUS_PICKUP_STOP),
-        List.of(UNSCHEDULED_STOP, CONTINUOUS_DROP_OFF_STOP),
-        List.of(CONTINUOUS_PICKUP_STOP, CONTINUOUS_DROP_OFF_STOP)
+        List.of(UNSCHEDULED_STOP, FLEX_AND_CONTINUOUS_PICKUP_STOP),
+        List.of(UNSCHEDULED_STOP, FLEX_AND_CONTINUOUS_DROP_OFF_STOP),
+        List.of(FLEX_AND_CONTINUOUS_PICKUP_STOP, FLEX_AND_CONTINUOUS_DROP_OFF_STOP)
       );
     }
 
@@ -101,7 +81,11 @@ class UnscheduledTripTest {
         List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-        Collections.nCopies(10, UNSCHEDULED_STOP)
+        Collections.nCopies(10, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, CONTINUOUS_PICKUP_STOP),
+        List.of(CONTINUOUS_PICKUP_STOP, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, CONTINUOUS_DROP_OFF_STOP),
+        List.of(CONTINUOUS_DROP_OFF_STOP, UNSCHEDULED_STOP)
       );
     }
 
