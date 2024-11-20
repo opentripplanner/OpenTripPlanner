@@ -70,11 +70,11 @@ interface PlaceInterface {
   lon: Float
 }
 
-"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
-union RentalPlace = VehicleRentalStation | RentalVehicle
-
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
+
+"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
+union RentalPlace = RentalVehicle | VehicleRentalStation
 
 union StopPosition = PositionAtStop | PositionBetweenStops
 

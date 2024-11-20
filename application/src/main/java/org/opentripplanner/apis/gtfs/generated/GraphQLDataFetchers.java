@@ -844,7 +844,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> time();
   }
 
-  /** Rental place union that represents either a VehicleRentalStation or RentalVehicle */
+  /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
   public interface GraphQLRentalPlace extends TypeResolver {}
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
