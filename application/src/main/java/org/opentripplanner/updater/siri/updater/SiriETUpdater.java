@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,14 +40,15 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> recordMetrics;
 
   public SiriETUpdater(
-    SiriETUpdaterParameters config,
-    SiriTimetableSnapshotSource timetableSnapshotSource
+    SiriUpdaterParameters config,
+    SiriTimetableSnapshotSource timetableSnapshotSource,
+    EstimatedTimetableSource source
   ) {
     super(config);
     // Create update streamer from preferences
     this.feedId = config.feedId();
 
-    this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
+    this.updateSource = source;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
@@ -100,5 +103,10 @@ public class SiriETUpdater extends PollingGraphUpdater {
   public String toString() {
     String s = (updateSource == null) ? "NONE" : updateSource.toString();
     return "Polling SIRI ET updater with update source = " + s;
+  }
+
+  interface SiriUpdaterParameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+    boolean blockReadinessUntilInitialized();
+    boolean fuzzyTripMatching();
   }
 }

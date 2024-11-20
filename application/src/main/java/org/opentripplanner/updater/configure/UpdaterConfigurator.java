@@ -20,6 +20,8 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.updater.SiriETHttpTripUpdateSource;
+import org.opentripplanner.updater.siri.updater.SiriETLightHttpTripUpdateSource;
 import org.opentripplanner.updater.siri.updater.SiriETUpdater;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
@@ -182,7 +184,22 @@ public class UpdaterConfigurator {
       updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(
+        new SiriETUpdater(
+          configItem,
+          provideSiriTimetableSnapshot(),
+          new SiriETHttpTripUpdateSource(configItem.sourceParameters())
+        )
+      );
+    }
+    for (var configItem : updatersParameters.getSiriETLightUpdaterParameters()) {
+      updaters.add(
+        new SiriETUpdater(
+          configItem,
+          provideSiriTimetableSnapshot(),
+          new SiriETLightHttpTripUpdateSource(configItem.sourceParameters())
+        )
+      );
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
