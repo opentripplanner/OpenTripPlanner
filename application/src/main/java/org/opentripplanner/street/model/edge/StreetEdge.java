@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -979,9 +981,9 @@ public class StreetEdge
 
   private State makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
     State s0,
-    String network
+    String network,
+    RoutingPreferences preferences
   ) {
-    var preferences = s0.getRequest().preferences();
     var edit = doTraverse(s0, TraverseMode.WALK, false);
     if (edit != null) {
       edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
@@ -990,9 +992,17 @@ public class StreetEdge
       }
       State state = edit.makeState();
       if (state != null && network != null) {
-        var allowedNetworks = preferences.rental(state.currentMode()).allowedNetworks();
-        if (!allowedNetworks.contains(network)) {
-          return null;
+        var rentalPreferences = preferences.rental(state.currentMode());
+        var allowedNetworks = rentalPreferences.allowedNetworks();
+        var bannedNetworks = rentalPreferences.bannedNetworks();
+        if (allowedNetworks.isEmpty()) {
+          if (bannedNetworks.contains(network)) {
+            return null;
+          }
+        } else {
+          if (!allowedNetworks.contains(network)) {
+            return null;
+          }
         }
       }
       return state;
@@ -1011,11 +1021,12 @@ public class StreetEdge
    * zone applies to where we pick up a vehicle with a specific network.
    */
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
+    var preferences = s0.getRequest().preferences();
     var states = tov
       .rentalRestrictions()
       .noDropOffNetworks()
       .stream()
-      .map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network))
+      .map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network, preferences))
       .filter(Objects::nonNull)
       .toList();
     var statesStream = states.stream();
@@ -1025,7 +1036,7 @@ public class StreetEdge
       // you have to check in the rental edge if this has search has been started in a no-drop off zone
       statesStream =
         Stream.concat(
-          Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null)),
+          Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, preferences)),
           statesStream
         );
     }
