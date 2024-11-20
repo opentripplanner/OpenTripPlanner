@@ -7,7 +7,7 @@ import graphql.schema.TypeResolver;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
-public class VehicleRentalTypeResolver implements TypeResolver {
+public class RentalPlaceTypeResolver implements TypeResolver {
 
   @Override
   public GraphQLObjectType getType(TypeResolutionEnvironment env) {

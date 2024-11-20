@@ -70,21 +70,8 @@ interface PlaceInterface {
   lon: Float
 }
 
-"Interface for rental vehicles, e.g. free floating vehicles and rental vehicle stations"
-interface VehicleRental {
-  "If true, a vehicle can be picked up."
-  allowPickupNow: Boolean
-  "Latitude of the vehicle rental object (WGS 84)"
-  lat: Float
-  "Longitude of the vehicle rental object (WGS 84)"
-  lon: Float
-  "If true, rental object is not disabled."
-  operative: Boolean
-  "The vehicle rental network information. This is referred as system in the GBFS terminology."
-  rentalNetwork: VehicleRentalNetwork!
-  "Platform-specific URLs to begin the vehicle."
-  rentalUris: VehicleRentalUris
-}
+"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
+union RentalPlace = VehicleRentalStation | RentalVehicle
 
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
@@ -1757,7 +1744,7 @@ type QueryType {
     minimumLatitude: CoordinateValue!,
     "Western bound of the bounding box"
     minimumLongitude: CoordinateValue!
-  ): [VehicleRental!]!
+  ): [RentalPlace]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }
@@ -1774,7 +1761,7 @@ type RealTimeEstimate {
 }
 
 "Rental vehicle represents a vehicle that belongs to a rental network."
-type RentalVehicle implements Node & PlaceInterface & VehicleRental {
+type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
@@ -2496,7 +2483,7 @@ type VehicleRentalNetwork {
 }
 
 "Vehicle rental station represents a location where users can rent bicycles etc. for a fee."
-type VehicleRentalStation implements Node & PlaceInterface & VehicleRental {
+type VehicleRentalStation implements Node & PlaceInterface {
   """
   If true, vehicles can be returned to this station if the station has spaces available
   or allows overloading.

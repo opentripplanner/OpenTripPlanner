@@ -844,6 +844,9 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> time();
   }
 
+  /** Rental place union that represents either a VehicleRentalStation or RentalVehicle */
+  public interface GraphQLRentalPlace extends TypeResolver {}
+
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
@@ -1274,33 +1277,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<Trip> trip();
 
     public DataFetcher<String> vehicleId();
-  }
-
-  /** Interface for rental vehicles, e.g. free floating vehicles and rental vehicle stations */
-  public interface GraphQLVehicleRental extends TypeResolver {
-    public default DataFetcher<Boolean> allowPickupNow() {
-      return null;
-    }
-
-    public default DataFetcher<Double> lat() {
-      return null;
-    }
-
-    public default DataFetcher<Double> lon() {
-      return null;
-    }
-
-    public default DataFetcher<Boolean> operative() {
-      return null;
-    }
-
-    public default DataFetcher<VehicleRentalSystem> rentalNetwork() {
-      return null;
-    }
-
-    public default DataFetcher<VehicleRentalStationUris> rentalUris() {
-      return null;
-    }
   }
 
   /**
