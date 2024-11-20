@@ -46,6 +46,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix rental searches when destination is in a no-drop-off zone [#6233](https://github.com/opentripplanner/OpenTripPlanner/pull/6233)
 - Include empty rail stops in transfers [#6208](https://github.com/opentripplanner/OpenTripPlanner/pull/6208)
 - Relax rejection of GTFS flex trips that also contain continuous stopping [#6231](https://github.com/opentripplanner/OpenTripPlanner/pull/6231)
+- Remove legacy bike access mapping [#6248](https://github.com/opentripplanner/OpenTripPlanner/pull/6248)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
