@@ -317,7 +317,6 @@ GBFS form factors:
 |---------------------------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                                                                                                       | *Required* |               |  1.5  |
 | [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                                | *Optional* | `false`       |  2.1  |
-| [allowedRentalType](#u_1_allowedRentalType)                                           |      `enum`     | This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source. | *Optional* | `"all"`       |  2.7  |
 | frequency                                                                             |    `duration`   | How often the data should be updated.                                                                                                                          | *Optional* | `"PT1M"`      |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                                                                | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                                                                                                           | *Optional* |               |  2.1  |
@@ -326,6 +325,7 @@ GBFS form factors:
 | [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                                                                                                  | *Required* |               |  1.5  |
 | url                                                                                   |     `string`    | The URL to download the data from.                                                                                                                             | *Required* |               |  1.5  |
 | [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                                                                                     | *Optional* |               |  1.5  |
+| [rentalPickupTypes](#u_1_rentalPickupTypes)                                           |    `enum set`   | This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source. | *Optional* |               |  2.7  |
 
 
 ##### Parameter details
@@ -345,19 +345,6 @@ For this to be possible three things need to be configured:
  - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
  - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
  - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
-
-
-<h4 id="u_1_allowedRentalType">allowedRentalType</h4>
-
-**Since version:** `2.7` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"all"`   
-**Path:** /updaters/[1]   
-**Enum values:** `stations` | `vehicles` | `all`
-
-This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source.
-
- - `stations` Only station data is allowed.
- - `vehicles` Only vehicle data is allowed.
- - `all` All types of rental data are allowed.
 
 
 <h4 id="u_1_geofencingZones">geofencingZones</h4>
@@ -396,6 +383,18 @@ What source of vehicle rental updater to use.
 **Path:** /updaters/[1] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
+
+<h4 id="u_1_rentalPickupTypes">rentalPickupTypes</h4>
+
+**Since version:** `2.7` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[1]   
+**Enum values:** `station` | `free-floating`
+
+This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source.
+
+ - `station` Only station data is allowed.
+ - `free-floating` Only vehicle data is allowed.
+
 
 
 

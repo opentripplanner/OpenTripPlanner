@@ -15,8 +15,8 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.HttpHeaders;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 
 /**
  * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
@@ -34,7 +34,7 @@ class GbfsVehicleRentalDataSourceTest {
         null,
         false,
         false,
-        AllowedRentalType.ALL
+        RentalPickupType.ALL
       ),
       new OtpHttpClientFactory()
     );
@@ -126,7 +126,7 @@ class GbfsVehicleRentalDataSourceTest {
         null,
         true,
         false,
-        AllowedRentalType.ALL
+        RentalPickupType.ALL
       ),
       new OtpHttpClientFactory()
     );
@@ -169,7 +169,7 @@ class GbfsVehicleRentalDataSourceTest {
         network,
         false,
         true,
-        AllowedRentalType.ALL
+        RentalPickupType.ALL
       ),
       new OtpHttpClientFactory()
     );

@@ -7,13 +7,14 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
+import java.util.Set;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 /**
@@ -47,14 +48,14 @@ public class VehicleRentalSourceFactory {
         network(),
         geofencingZones(),
         overloadingAllowed(),
-        allowedRentalType()
+        rentalPickupTypes()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),
         network(),
         overloadingAllowed(),
         headers(),
-        allowedRentalType()
+        rentalPickupTypes()
       );
     };
   }
@@ -127,12 +128,12 @@ public class VehicleRentalSourceFactory {
       .asBoolean(false);
   }
 
-  private AllowedRentalType allowedRentalType() {
+  private Set<RentalPickupType> rentalPickupTypes() {
     return c
-      .of("allowedRentalType")
+      .of("rentalPickupTypes")
       .since(V2_7)
-      .summary(AllowedRentalType.ALL.typeDescription())
-      .description(docEnumValueList(AllowedRentalType.values()))
-      .asEnum(AllowedRentalType.ALL);
+      .summary(RentalPickupType.STATION.typeDescription())
+      .description(docEnumValueList(RentalPickupType.values()))
+      .asEnumSet(RentalPickupType.class, RentalPickupType.ALL);
   }
 }

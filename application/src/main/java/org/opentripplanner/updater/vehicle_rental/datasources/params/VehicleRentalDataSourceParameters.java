@@ -14,5 +14,5 @@ public interface VehicleRentalDataSourceParameters {
 
   HttpHeaders httpHeaders();
 
-  boolean allowRentalType(AllowedRentalType rentalType);
+  boolean allowRentalType(RentalPickupType rentalPickupType);
 }

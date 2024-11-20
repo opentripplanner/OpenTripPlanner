@@ -20,7 +20,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 class VehicleRentalUpdaterTest {
@@ -106,7 +106,7 @@ class VehicleRentalUpdaterTest {
     }
 
     @Override
-    public boolean allowRentalType(AllowedRentalType rentalType) {
+    public boolean allowRentalType(RentalPickupType rentalPickupType) {
       return true;
     }
   }

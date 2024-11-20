@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 import org.opentripplanner.framework.doc.DocumentedEnum;
 
 /**
@@ -7,14 +10,17 @@ import org.opentripplanner.framework.doc.DocumentedEnum;
  *
  * Enum to specify the type of rental data that is allowed to be read from the data source.
  */
-public enum AllowedRentalType implements DocumentedEnum<AllowedRentalType> {
-  STATIONS("Only station data is allowed."),
-  VEHICLES("Only vehicle data is allowed."),
-  ALL("All types of rental data are allowed.");
+public enum RentalPickupType implements DocumentedEnum<RentalPickupType> {
+  STATION("Only station data is allowed."),
+  FREE_FLOATING("Only vehicle data is allowed.");
+
+  public static final Set<RentalPickupType> ALL = Collections.unmodifiableSet(
+    EnumSet.allOf(RentalPickupType.class)
+  );
 
   private final String description;
 
-  AllowedRentalType(String description) {
+  RentalPickupType(String description) {
     this.description = description.stripIndent().trim();
   }
 

@@ -22,8 +22,8 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +76,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
     List<VehicleRentalPlace> stations = new LinkedList<>();
-
-    if (params.allowRentalType(AllowedRentalType.STATIONS)) {
+    if (params.allowRentalType(RentalPickupType.STATION)) {
       // Both station information and status are required for all systems using stations
       GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
       GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
@@ -114,7 +113,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     }
 
     // Append the floating bike stations.
-    if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(AllowedRentalType.VEHICLES)) {
+    if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(RentalPickupType.FREE_FLOATING)) {
       GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
       if (freeBikeStatus != null) {
         GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(

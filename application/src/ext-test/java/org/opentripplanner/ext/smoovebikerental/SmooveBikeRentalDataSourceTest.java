@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.AllowedRentalType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 class SmooveBikeRentalDataSourceTest {
@@ -20,7 +20,7 @@ class SmooveBikeRentalDataSourceTest {
         null,
         true,
         HttpHeaders.empty(),
-        AllowedRentalType.ALL
+        RentalPickupType.ALL
       )
     );
     assertTrue(source.update());
@@ -87,7 +87,7 @@ class SmooveBikeRentalDataSourceTest {
         null,
         false,
         HttpHeaders.empty(),
-        AllowedRentalType.ALL
+        RentalPickupType.ALL
       )
     );
     assertTrue(source.update());
