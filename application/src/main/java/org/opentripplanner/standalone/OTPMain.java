@@ -52,7 +52,7 @@ public class OTPMain {
     try {
       Thread.currentThread().setName("main");
       CommandLineParameters params = parseAndValidateCmdLine(args);
-      OtpStartupInfo.logInfo();
+      OtpStartupInfo.logInfo(params.logInfo());
       startOTPServer(params);
     } catch (OtpAppException ae) {
       LOG.error(ae.getMessage(), ae);

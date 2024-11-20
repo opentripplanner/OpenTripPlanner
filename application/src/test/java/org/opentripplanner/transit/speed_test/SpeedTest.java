@@ -144,7 +144,7 @@ public class SpeedTest {
 
   public static void main(String[] args) {
     try {
-      OtpStartupInfo.logInfo();
+      OtpStartupInfo.logInfo("Run SpeedTest");
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
       var config = SpeedTestConfig.config(opts.rootDir());
