@@ -88,7 +88,9 @@ public class TripMatcherFactoryTest {
   void testMatchRouteId() {
     TripRequest request = TripRequest
       .of()
-      .withRoutes(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:route:1"))))
+      .withRoutes(
+        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
+      )
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -113,7 +115,7 @@ public class TripMatcherFactoryTest {
   void testMatchAgencyId() {
     TripRequest request = TripRequest
       .of()
-      .withAgencies(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:1"))))
+      .withAgencies(CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1"))))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -128,7 +130,9 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withServiceDates(
-        CriteriaCollection.of(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
+        CriteriaCollection.ofEmptyIsEverything(
+          List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23))
+        )
       )
       .build();
 

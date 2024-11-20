@@ -104,7 +104,7 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchOperatingDays() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.of(List.of(LocalDate.of(2024, 2, 22))))
+      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
       .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
@@ -118,11 +118,13 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchMultiple() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.of(List.of(LocalDate.of(2024, 2, 22))))
-      .withAgencies(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:1"))))
-      .withRoutes(CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:route:1"))))
+      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
+      .withAgencies(CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1"))))
+      .withRoutes(
+        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
+      )
       .withServiceJourneys(
-        CriteriaCollection.of(List.of(new FeedScopedId("F", "RUT:route:trip:1")))
+        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:trip:1")))
       )
       .build();
 
@@ -137,19 +139,19 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchMultipleServiceJourneyMatchers() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.of(List.of(LocalDate.of(2024, 2, 22))))
+      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
       .withAgencies(
-        CriteriaCollection.of(
+        CriteriaCollection.ofEmptyIsEverything(
           List.of(new FeedScopedId("F", "RUT:1"), new FeedScopedId("F", "RUT:2"))
         )
       )
       .withRoutes(
-        CriteriaCollection.of(
+        CriteriaCollection.ofEmptyIsEverything(
           List.of(new FeedScopedId("F", "RUT:route:1"), new FeedScopedId("F", "RUT:route:2"))
         )
       )
       .withServiceJourneys(
-        CriteriaCollection.of(
+        CriteriaCollection.ofEmptyIsEverything(
           List.of(
             new FeedScopedId("F", "RUT:route:trip:1"),
             new FeedScopedId("F", "RUT:route:trip:2")

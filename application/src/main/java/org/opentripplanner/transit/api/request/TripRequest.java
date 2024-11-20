@@ -23,10 +23,11 @@ public class TripRequest {
     CriteriaCollection<String> netexInternalPlanningCodes,
     CriteriaCollection<LocalDate> serviceDates
   ) {
-    this.agencies = CriteriaCollection.of(agencies);
-    this.routes = CriteriaCollection.of(routes);
-    this.netexInternalPlanningCodes = CriteriaCollection.of(netexInternalPlanningCodes);
-    this.serviceDates = CriteriaCollection.of(serviceDates);
+    this.agencies = CriteriaCollection.ofEmptyIsEverything(agencies);
+    this.routes = CriteriaCollection.ofEmptyIsEverything(routes);
+    this.netexInternalPlanningCodes =
+      CriteriaCollection.ofEmptyIsEverything(netexInternalPlanningCodes);
+    this.serviceDates = CriteriaCollection.ofEmptyIsEverything(serviceDates);
   }
 
   public static TripRequestBuilder of() {

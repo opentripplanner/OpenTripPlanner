@@ -31,16 +31,17 @@ public class TripOnServiceDateRequest {
     CriteriaCollection<String> netexInternalPlanningCodes,
     CriteriaCollection<TripAlteration> alterations
   ) {
-    if (serviceDates.values() == null || serviceDates.values().isEmpty()) {
+    if (serviceDates.get() == null || serviceDates.get().isEmpty()) {
       throw new IllegalArgumentException("operatingDays must have at least one date");
     }
-    this.serviceDates = CriteriaCollection.of(serviceDates);
-    this.agencies = CriteriaCollection.of(agencies);
-    this.routes = CriteriaCollection.of(routes);
-    this.serviceJourneys = CriteriaCollection.of(serviceJourneys);
-    this.replacementFor = CriteriaCollection.of(replacementFor);
-    this.netexInternalPlanningCodes = CriteriaCollection.of(netexInternalPlanningCodes);
-    this.alterations = CriteriaCollection.of(alterations);
+    this.serviceDates = CriteriaCollection.ofEmptyIsEverything(serviceDates);
+    this.agencies = CriteriaCollection.ofEmptyIsEverything(agencies);
+    this.routes = CriteriaCollection.ofEmptyIsEverything(routes);
+    this.serviceJourneys = CriteriaCollection.ofEmptyIsEverything(serviceJourneys);
+    this.replacementFor = CriteriaCollection.ofEmptyIsEverything(replacementFor);
+    this.netexInternalPlanningCodes =
+      CriteriaCollection.ofEmptyIsEverything(netexInternalPlanningCodes);
+    this.alterations = CriteriaCollection.ofEmptyIsEverything(alterations);
   }
 
   public static TripOnServiceDateRequestBuilder of() {

@@ -97,23 +97,25 @@ public class DatedServiceJourneyQuery {
         // The null safety checks are not needed here - they are taken care of by the request
         // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
-        var authorities = CriteriaCollection.of(
+        var authorities = CriteriaCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("authorities"))
         );
-        var lines = CriteriaCollection.of(mapIDsToDomainNullSafe(environment.getArgument("lines")));
-        var serviceJourneys = CriteriaCollection.of(
+        var lines = CriteriaCollection.ofEmptyIsEverything(
+          mapIDsToDomainNullSafe(environment.getArgument("lines"))
+        );
+        var serviceJourneys = CriteriaCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
         );
-        var replacementFor = CriteriaCollection.of(
+        var replacementFor = CriteriaCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
         );
-        var privateCodes = CriteriaCollection.of(
+        var privateCodes = CriteriaCollection.ofEmptyIsEverything(
           environment.<List<String>>getArgument("privateCodes")
         );
-        var operatingDays = CriteriaCollection.of(
+        var operatingDays = CriteriaCollection.ofEmptyIsEverything(
           environment.<List<LocalDate>>getArgument("operatingDays")
         );
-        var alterations = CriteriaCollection.of(
+        var alterations = CriteriaCollection.ofEmptyIsEverything(
           environment.<List<TripAlteration>>getArgument("alterations")
         );
 

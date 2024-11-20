@@ -26,11 +26,11 @@ public class ExpressionBuilder<T> {
     CriteriaCollection<V> criteria,
     Function<V, Matcher<T>> matcherProvider
   ) {
-    if (criteria.matchesAll()) {
+    if (criteria.includeEverything()) {
       return this;
     }
 
-    matchers.add(OrMatcher.of(criteria.values().stream().map(matcherProvider).toList()));
+    matchers.add(OrMatcher.of(criteria.get().stream().map(matcherProvider).toList()));
     return this;
   }
 

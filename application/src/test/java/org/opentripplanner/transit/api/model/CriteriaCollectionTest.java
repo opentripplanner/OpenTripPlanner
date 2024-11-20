@@ -8,19 +8,25 @@ import org.junit.jupiter.api.Test;
 class CriteriaCollectionTest {
 
   @Test
-  void testEmptyMatchesAll() {
-    CriteriaCollection<String> criteriaCollection = CriteriaCollection.of(List.of());
-    assertTrue(criteriaCollection.matchesAll());
+  void testEmptyIncludeEverything() {
+    CriteriaCollection<String> criteriaCollection = CriteriaCollection.ofEmptyIsEverything(
+      List.of()
+    );
+    assertTrue(criteriaCollection.includeEverything());
   }
 
   @Test
-  void testNullMatchesAll() {
+  void testNullIncludeEverything() {
     CriteriaCollection<String> nullCollection = null;
-    CriteriaCollection<String> criteriaCollection = CriteriaCollection.of(nullCollection);
-    assertTrue(criteriaCollection.matchesAll());
+    CriteriaCollection<String> criteriaCollection = CriteriaCollection.ofEmptyIsEverything(
+      nullCollection
+    );
+    assertTrue(criteriaCollection.includeEverything());
 
     List<String> nullList = null;
-    CriteriaCollection<String> criteriaCollection2 = CriteriaCollection.of(nullList);
-    assertTrue(criteriaCollection2.matchesAll());
+    CriteriaCollection<String> criteriaCollection2 = CriteriaCollection.ofEmptyIsEverything(
+      nullList
+    );
+    assertTrue(criteriaCollection2.includeEverything());
   }
 }

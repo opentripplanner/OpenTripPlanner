@@ -1302,16 +1302,16 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var authorities = CriteriaCollection.of(
+            var authorities = CriteriaCollection.ofEmptyIsEverything(
               mapIDsToDomainNullSafe(environment.getArgument("authorities"))
             );
-            var lineIds = CriteriaCollection.of(
+            var lineIds = CriteriaCollection.ofEmptyIsEverything(
               mapIDsToDomainNullSafe(environment.getArgument("lines"))
             );
-            var privateCodes = CriteriaCollection.of(
+            var privateCodes = CriteriaCollection.ofEmptyIsEverything(
               environment.<List<String>>getArgument("privateCodes")
             );
-            var activeServiceDates = CriteriaCollection.of(
+            var activeServiceDates = CriteriaCollection.ofEmptyIsEverything(
               environment.<List<LocalDate>>getArgument("activeDates")
             );
 

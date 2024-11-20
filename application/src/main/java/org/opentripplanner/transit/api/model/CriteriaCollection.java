@@ -22,22 +22,24 @@ public class CriteriaCollection<E> {
     this.criteria = criteria;
   }
 
-  public static <E> CriteriaCollection<E> of(@Nullable Collection<E> criteria) {
+  public static <E> CriteriaCollection<E> ofEmptyIsEverything(@Nullable Collection<E> criteria) {
     return new CriteriaCollection<>(criteria);
   }
 
-  public static <E> CriteriaCollection<E> of(@Nullable CriteriaCollection<E> criteria) {
+  public static <E> CriteriaCollection<E> ofEmptyIsEverything(
+    @Nullable CriteriaCollection<E> criteria
+  ) {
     if (criteria == null) {
       return new CriteriaCollection<>(null);
     }
     return criteria;
   }
 
-  public boolean matchesAll() {
+  public boolean includeEverything() {
     return criteria == null || criteria.isEmpty();
   }
 
-  public Collection<E> values() {
+  public Collection<E> get() {
     if (criteria == null) {
       throw new NoSuchElementException(
         "No values present, use matchesAll() before calling this method."
