@@ -6,30 +6,30 @@
     minimumLongitude: 18.80
   ) {
     __typename
-    allowPickupNow
-    lat
-    lon
-    operative
-    rentalNetwork {
-      networkId
-      url
-    }
-    rentalUris {
-      android
-      ios
-      web
-    }
     ... on RentalVehicle {
-      name
       vehicleId
+      name
+      allowPickupNow
+      lon
+      lat
+      rentalUris {
+        android
+        ios
+        web
+      }
+      operative
       vehicleType {
         formFactor
         propulsionType
       }
+      rentalNetwork {
+        networkId
+        url
+      }
     }
     ... on VehicleRentalStation {
-      name
       stationId
+      name
       vehiclesAvailable
       availableVehicles {
         byType {
@@ -55,8 +55,21 @@
       allowDropoff
       allowPickup
       allowDropoffNow
+      allowPickupNow
+      lon
+      lat
       capacity
       allowOverloading
+      rentalUris {
+        android
+        ios
+        web
+      }
+      operative
+      rentalNetwork {
+        networkId
+        url
+      }
     }
   }
 }
