@@ -39,7 +39,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return service
-      .getVehicleParkingGroups()
+      .listVehicleParkingGroups()
       .asMap()
       .entrySet()
       .stream()

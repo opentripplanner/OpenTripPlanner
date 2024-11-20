@@ -56,7 +56,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertEquals(8, updated.getAvailability().getCarSpaces());
     assertNull(updated.getAvailability().getBicycleSpaces());
@@ -73,7 +73,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertEquals(8, updated.getAvailability().getBicycleSpaces());
     assertNull(updated.getAvailability().getCarSpaces());
@@ -90,7 +90,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertNull(updated.getAvailability());
   }

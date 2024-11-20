@@ -33,7 +33,6 @@ class VehicleParkingUpdaterTest {
 
   private DataSource<VehicleParking> dataSource;
   private Graph graph;
-  private TimetableRepository timetableRepository;
   private DefaultRealTimeUpdateContext realTimeUpdateContext;
 
   private VehicleParkingUpdater vehicleParkingUpdater;
@@ -45,7 +44,7 @@ class VehicleParkingUpdaterTest {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
     graphData.initGraph();
     graph = graphData.getGraph();
-    timetableRepository = graphData.getTimetableRepository();
+    TimetableRepository timetableRepository = graphData.getTimetableRepository();
     parkingRepository = new DefaultVehicleParkingRepository();
     realTimeUpdateContext = new DefaultRealTimeUpdateContext(graph, timetableRepository);
 
@@ -105,7 +104,11 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    var vehicleParkingInGraph = parkingRepository.getVehicleParkings().findFirst().orElseThrow();
+    var vehicleParkingInGraph = parkingRepository
+      .listVehicleParkings()
+      .stream()
+      .findFirst()
+      .orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
@@ -118,7 +121,8 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    vehicleParkingInGraph = parkingRepository.getVehicleParkings().findFirst().orElseThrow();
+    vehicleParkingInGraph =
+      parkingRepository.listVehicleParkings().stream().findFirst().orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
   }
@@ -153,7 +157,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingRepository.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.listVehicleParkings().size());
     assertVehicleParkingNotLinked();
   }
 
@@ -170,10 +174,10 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingRepository.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.listVehicleParkings().size());
     assertEquals(
       vehiclePlaces,
-      parkingRepository.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+      parkingRepository.listVehicleParkings().stream().findFirst().orElseThrow().getAvailability()
     );
     assertVehicleParkingNotLinked();
 
@@ -189,10 +193,10 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingRepository.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.listVehicleParkings().size());
     assertEquals(
       vehiclePlaces,
-      parkingRepository.getVehicleParkings().findFirst().orElseThrow().getAvailability()
+      parkingRepository.listVehicleParkings().stream().findFirst().orElseThrow().getAvailability()
     );
     assertVehicleParkingNotLinked();
   }
@@ -207,12 +211,12 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, parkingRepository.getVehicleParkings().count());
+    assertEquals(1, parkingRepository.listVehicleParkings().size());
 
     when(dataSource.getUpdates()).thenReturn(List.of());
     runUpdaterOnce();
 
-    assertEquals(0, parkingRepository.getVehicleParkings().count());
+    assertEquals(0, parkingRepository.listVehicleParkings().size());
   }
 
   private void assertVehicleParkingsInGraph(int vehicleParkingNumber) {
@@ -253,17 +257,13 @@ class VehicleParkingUpdaterTest {
       );
     }
 
-    assertEquals(vehicleParkingNumber, parkingRepository.getVehicleParkings().count());
+    assertEquals(vehicleParkingNumber, parkingRepository.listVehicleParkings().size());
   }
 
   private void runUpdaterOnce() {
     class GraphUpdaterMock extends GraphUpdaterManager {
 
-      public GraphUpdaterMock(
-        Graph graph,
-        TimetableRepository timetableRepository,
-        List<GraphUpdater> updaters
-      ) {
+      public GraphUpdaterMock(List<GraphUpdater> updaters) {
         super(realTimeUpdateContext, updaters);
       }
 
@@ -274,11 +274,7 @@ class VehicleParkingUpdaterTest {
       }
     }
 
-    var graphUpdaterManager = new GraphUpdaterMock(
-      graph,
-      timetableRepository,
-      List.of(vehicleParkingUpdater)
-    );
+    var graphUpdaterManager = new GraphUpdaterMock(List.of(vehicleParkingUpdater));
     graphUpdaterManager.startUpdaters();
     graphUpdaterManager.stop(false);
   }

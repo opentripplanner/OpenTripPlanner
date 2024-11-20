@@ -8,7 +8,6 @@ import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
@@ -67,8 +66,8 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
   }
 
   @Override
-  public Stream<VehicleParking> getVehicleParkings() {
-    return vehicleParkings.stream();
+  public Collection<VehicleParking> listVehicleParkings() {
+    return Set.copyOf(vehicleParkings);
   }
 
   @Override

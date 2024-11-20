@@ -73,7 +73,8 @@ public class ParkAndRideResource {
     }
 
     var prs = vehicleParkingService
-      .getCarParks()
+      .listCarParks()
+      .stream()
       .filter(lot -> envelope.contains(lot.getCoordinate().asJtsCoordinate()))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))
       .map(ParkAndRideInfo::ofVehicleParking)

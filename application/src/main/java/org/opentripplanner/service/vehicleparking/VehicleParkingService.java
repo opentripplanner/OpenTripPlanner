@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehicleparking;
 
-import com.google.common.collect.ImmutableListMultimap;
-import java.util.stream.Stream;
+import com.google.common.collect.ListMultimap;
+import java.util.Collection;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
 
@@ -11,13 +11,13 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
  * For writing data see {@link VehicleParkingRepository}
  */
 public interface VehicleParkingService {
-  Stream<VehicleParking> getBikeParks();
+  Collection<VehicleParking> listBikeParks();
 
-  Stream<VehicleParking> getCarParks();
+  Collection<VehicleParking> listCarParks();
 
-  Stream<VehicleParking> getVehicleParkings();
+  Collection<VehicleParking> listVehicleParkings();
 
-  ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups();
+  ListMultimap<VehicleParkingGroup, VehicleParking> listVehicleParkingGroups();
 
   boolean hasBikeParking();
 

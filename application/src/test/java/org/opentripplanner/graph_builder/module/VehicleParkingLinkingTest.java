@@ -184,6 +184,6 @@ public class VehicleParkingLinkingTest {
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
 
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
-    assertEquals(0, vehicleParkingService.getVehicleParkings().count());
+    assertEquals(0, vehicleParkingService.listVehicleParkings().size());
   }
 }

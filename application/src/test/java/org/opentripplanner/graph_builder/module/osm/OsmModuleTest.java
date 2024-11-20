@@ -286,9 +286,9 @@ public class OsmModuleTest {
   void addParkingLotsToService() {
     var service = new DefaultVehicleParkingService(buildParkingLots().repository);
 
-    assertEquals(11, service.getVehicleParkings().count());
-    assertEquals(6, service.getBikeParks().count());
-    assertEquals(5, service.getCarParks().count());
+    assertEquals(11, service.listVehicleParkings().size());
+    assertEquals(6, service.listBikeParks().size());
+    assertEquals(5, service.listCarParks().size());
   }
 
   @Test

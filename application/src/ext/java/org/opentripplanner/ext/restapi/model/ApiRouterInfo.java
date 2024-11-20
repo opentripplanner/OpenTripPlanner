@@ -66,21 +66,21 @@ public class ApiRouterInfo {
     if (service == null) {
       return false;
     }
-    return service.getBikeParks().findAny().isPresent();
+    return service.listBikeParks().stream().findAny().isPresent();
   }
 
   public boolean mapHasCarPark(VehicleParkingService service) {
     if (service == null) {
       return false;
     }
-    return service.getCarParks().findAny().isPresent();
+    return service.listCarParks().stream().findAny().isPresent();
   }
 
   public boolean mapHasVehicleParking(VehicleParkingService service) {
     if (service == null) {
       return false;
     }
-    return service.getVehicleParkings().findAny().isPresent();
+    return service.listVehicleParkings().stream().findAny().isPresent();
   }
 
   public double getLowerLeftLatitude() {

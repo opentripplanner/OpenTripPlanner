@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.Serializable;
-import java.util.stream.Stream;
+import java.util.Collection;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -29,32 +29,40 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
   }
 
   @Override
-  public Stream<VehicleParking> getBikeParks() {
-    return repository.getVehicleParkings().filter(VehicleParking::hasBicyclePlaces);
+  public Collection<VehicleParking> listBikeParks() {
+    return repository
+      .listVehicleParkings()
+      .stream()
+      .filter(VehicleParking::hasBicyclePlaces)
+      .toList();
   }
 
   @Override
-  public Stream<VehicleParking> getCarParks() {
-    return repository.getVehicleParkings().filter(VehicleParking::hasAnyCarPlaces);
+  public Collection<VehicleParking> listCarParks() {
+    return repository
+      .listVehicleParkings()
+      .stream()
+      .filter(VehicleParking::hasAnyCarPlaces)
+      .toList();
   }
 
   @Override
-  public Stream<VehicleParking> getVehicleParkings() {
-    return repository.getVehicleParkings();
+  public Collection<VehicleParking> listVehicleParkings() {
+    return repository.listVehicleParkings();
   }
 
   @Override
-  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
+  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> listVehicleParkingGroups() {
     return repository.getVehicleParkingGroups();
   }
 
   @Override
   public boolean hasBikeParking() {
-    return repository.getVehicleParkings().anyMatch(VehicleParking::hasBicyclePlaces);
+    return repository.listVehicleParkings().stream().anyMatch(VehicleParking::hasBicyclePlaces);
   }
 
   @Override
   public boolean hasCarParking() {
-    return repository.getVehicleParkings().anyMatch(VehicleParking::hasAnyCarPlaces);
+    return repository.listVehicleParkings().stream().anyMatch(VehicleParking::hasAnyCarPlaces);
   }
 }
