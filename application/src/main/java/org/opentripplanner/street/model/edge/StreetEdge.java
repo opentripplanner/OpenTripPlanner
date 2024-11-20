@@ -979,6 +979,16 @@ public class StreetEdge
     return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
   }
 
+  /**
+   * Helper method for {@link #splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching}.
+   * Create a single new state, exiting a no-drop-off zone, in reverse, and continuing
+   * on a rental vehicle in the named network, or an unknown network if network is null,
+   * unless the named network is not accepted by the {@link RoutingPreferences} given.
+   * @param s0 The parent state (i.e. the following state, as we are in reverse)
+   * @param network Network name, or null if unknown
+   * @param preferences Active {@link RoutingPreferences}
+   * @return Newly generated {@link State}, or null if the state would have been forbidden.
+   */
   private State makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
     State s0,
     String network,
