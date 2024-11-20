@@ -11,8 +11,8 @@ import org.opentripplanner.framework.doc.DocumentedEnum;
  * Enum to specify the type of rental data that is allowed to be read from the data source.
  */
 public enum RentalPickupType implements DocumentedEnum<RentalPickupType> {
-  STATION("Only station data is allowed."),
-  FREE_FLOATING("Only vehicle data is allowed.");
+  STATION("Stations are imported."),
+  FREE_FLOATING("Free-floating vehicles are imported.");
 
   public static final Set<RentalPickupType> ALL = Collections.unmodifiableSet(
     EnumSet.allOf(RentalPickupType.class)
