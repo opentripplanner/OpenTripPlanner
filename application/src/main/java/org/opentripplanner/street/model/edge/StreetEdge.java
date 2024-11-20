@@ -1036,7 +1036,9 @@ public class StreetEdge
       .rentalRestrictions()
       .noDropOffNetworks()
       .stream()
-      .map(network -> makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network, preferences))
+      .map(network ->
+        makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, network, preferences)
+      )
       .filter(Objects::nonNull)
       .toList();
     var statesStream = states.stream();
@@ -1046,7 +1048,9 @@ public class StreetEdge
       // you have to check in the rental edge if this has search has been started in a no-drop off zone
       statesStream =
         Stream.concat(
-          Stream.of(makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, preferences)),
+          Stream.of(
+            makeStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, preferences)
+          ),
           statesStream
         );
     }

@@ -297,11 +297,19 @@ class StreetEdgeGeofencingTest {
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = Arrays.stream(states).filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork())).findFirst().get();
+      final State tierState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
 
-      final State birdState = Arrays.stream(states).filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork())).findFirst().get();
+      final State birdState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
       assertEquals(BICYCLE, birdState.currentMode());
     }
@@ -321,11 +329,19 @@ class StreetEdgeGeofencingTest {
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = Arrays.stream(states).filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork())).findFirst().get();
+      final State tierState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
 
-      final State birdState = Arrays.stream(states).filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork())).findFirst().get();
+      final State birdState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
       assertEquals(BICYCLE, birdState.currentMode());
     }
@@ -421,11 +437,18 @@ class StreetEdgeGeofencingTest {
         .build();
     }
 
-    private static StreetSearchRequest makeArriveByRequest(Set<String> allowedNetworks, Set<String> bannedNetworks) {
+    private static StreetSearchRequest makeArriveByRequest(
+      Set<String> allowedNetworks,
+      Set<String> bannedNetworks
+    ) {
       return StreetSearchRequest
         .of()
         .withPreferences(p ->
-          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)))
+          p.withBike(b ->
+            b.withRental(r ->
+              r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
+            )
+          )
         )
         .withMode(StreetMode.SCOOTER_RENTAL)
         .withArriveBy(true)
