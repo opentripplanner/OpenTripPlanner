@@ -49,6 +49,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove legacy bike access mapping [#6248](https://github.com/opentripplanner/OpenTripPlanner/pull/6248)
 - Filter import of rental data by pickup type [#6240](https://github.com/opentripplanner/OpenTripPlanner/pull/6240)
 - Apply stricter motor vehicle nothrough traffic rules in Finland [#6254](https://github.com/opentripplanner/OpenTripPlanner/pull/6254)
+- Add `vehicleRentalsByBbox` query to GTFS GraphQL API [#6186](https://github.com/opentripplanner/OpenTripPlanner/pull/6186)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
