@@ -43,8 +43,6 @@ export function LocationInputField({ id, label, tripQueryVariables, setTripQuery
         size="sm"
         placeholder="[Click in map]"
         className="input-medium"
-        // Intentionally empty for now, but needed because of
-        // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
         onChange={(e) => {
           setValue(e.target.value);
         }}
