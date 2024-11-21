@@ -255,7 +255,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(WALK, walkState.currentMode());
 
       // then the speculative renting case for unknown rental network
-      final State speculativeRenting = states[1];
+      final State speculativeRenting = states[2];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
       assertEquals(BICYCLE, speculativeRenting.currentMode());
       // null means that the vehicle has been rented speculatively and the rest of the backwards search
@@ -267,19 +267,11 @@ class StreetEdgeGeofencingTest {
       );
 
       // then the speculative renting cases for specific rental networks
-      final State tierState = states[2];
+      final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
       assertEquals(Set.of(), tierState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
-      /*
-      * These rental networks are not allowed in the request so they are no longer returned
-      final State birdState = states[3];
-      assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
-      assertEquals(BICYCLE, birdState.currentMode());
-      assertEquals(NETWORK_BIRD, birdState.getVehicleRentalNetwork());
-      assertEquals(Set.of(), birdState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
-       */
     }
 
     @Test
@@ -292,7 +284,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      final State unknownNetworkState = states[1];
+      final State unknownNetworkState = states[3];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
@@ -324,7 +316,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      final State unknownNetworkState = states[1];
+      final State unknownNetworkState = states[3];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
@@ -356,12 +348,12 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      final State unknownNetworkState = states[1];
+      final State unknownNetworkState = states[2];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = states[2];
+      final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
@@ -390,12 +382,12 @@ class StreetEdgeGeofencingTest {
       assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
       assertEquals(WALK, walkState.currentMode());
 
-      final State unknownNetworkState = states[1];
+      final State unknownNetworkState = states[2];
       assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = states[2];
+      final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
