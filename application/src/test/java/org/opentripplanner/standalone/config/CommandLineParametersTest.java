@@ -52,7 +52,7 @@ public class CommandLineParametersTest {
     assertTrue(subject.doBuildTransit());
     assertFalse(subject.doSaveGraph());
     assertFalse(subject.doServe());
-    assertEquals("BUILD STREET & TRANSIT GRAPH", subject.logInfo());
+    assertEquals("Build Street & Transit Graph", subject.logInfo());
 
     subject.save = true;
     subject.serve = false;
@@ -61,7 +61,7 @@ public class CommandLineParametersTest {
     assertTrue(subject.doSaveGraph());
     assertFalse(subject.doServe());
     subject.inferAndValidate();
-    assertEquals("BUILD STREET & TRANSIT GRAPH", subject.logInfo());
+    assertEquals("Build Street & Transit Graph", subject.logInfo());
 
     subject.save = false;
     subject.serve = true;
@@ -70,7 +70,7 @@ public class CommandLineParametersTest {
     assertFalse(subject.doSaveGraph());
     assertTrue(subject.doServe());
     subject.inferAndValidate();
-    assertEquals("BUILD STREET & TRANSIT GRAPH, RUN PLANNER", subject.logInfo());
+    assertEquals("Build Street & Transit Graph, Run Server", subject.logInfo());
 
     subject.save = true;
     subject.serve = true;
@@ -79,7 +79,7 @@ public class CommandLineParametersTest {
     assertTrue(subject.doSaveGraph());
     assertTrue(subject.doServe());
     subject.inferAndValidate();
-    assertEquals("BUILD STREET & TRANSIT GRAPH, RUN PLANNER", subject.logInfo());
+    assertEquals("Build Street & Transit Graph, Run Server", subject.logInfo());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class CommandLineParametersTest {
     assertFalse(subject.doBuildTransit());
     assertTrue(subject.doSaveStreetGraph());
     assertFalse(subject.doSaveGraph());
-    assertEquals("BUILD STREET GRAPH", subject.logInfo());
+    assertEquals("Build Street Graph", subject.logInfo());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class CommandLineParametersTest {
     subject.load = true;
     assertTrue(subject.doLoadGraph());
     assertTrue(subject.doServe());
-    assertEquals("RUN PLANNER", subject.logInfo());
+    assertEquals("Run Server", subject.logInfo());
   }
 
   @Test
@@ -107,7 +107,7 @@ public class CommandLineParametersTest {
     assertFalse(subject.doBuildStreet());
     assertFalse(subject.doSaveStreetGraph());
     assertFalse(subject.doSaveGraph());
-    assertEquals("BUILD TRANSIT GRAPH", subject.logInfo());
+    assertEquals("Build Transit Graph", subject.logInfo());
 
     subject.save = true;
     subject.serve = true;
@@ -128,7 +128,7 @@ public class CommandLineParametersTest {
 
     // Implicit given, but should be ok to set
     subject.serve = true;
-    assertEquals("RUN PLANNER", subject.logInfo());
+    assertEquals("Run Server", subject.logInfo());
 
     // No exception thrown
     subject.inferAndValidate();

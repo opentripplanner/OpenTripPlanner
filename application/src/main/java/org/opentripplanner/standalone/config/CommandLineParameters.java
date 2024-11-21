@@ -204,14 +204,14 @@ public class CommandLineParameters {
   public String logInfo() {
     var mainCommands = new ArrayList<String>();
     if (doBuildStreet() & doBuildTransit()) {
-      mainCommands.add("BUILD STREET & TRANSIT GRAPH");
+      mainCommands.add("Build Street & Transit Graph");
     } else if (doBuildStreet()) {
-      mainCommands.add("BUILD STREET GRAPH");
+      mainCommands.add("Build Street Graph");
     } else if (doBuildTransit()) {
-      mainCommands.add("BUILD TRANSIT GRAPH");
+      mainCommands.add("Build Transit Graph");
     }
     if (doServe()) {
-      mainCommands.add("RUN PLANNER");
+      mainCommands.add("Run Server");
     }
     return String.join(", ", mainCommands);
   }
