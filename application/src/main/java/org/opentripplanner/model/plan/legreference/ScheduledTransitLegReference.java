@@ -69,7 +69,7 @@ public record ScheduledTransitLegReference(
     Trip trip;
     TripOnServiceDate tripOnServiceDate = null;
     if (tripOnServiceDateId != null) {
-      tripOnServiceDate = transitService.findTripOnServiceDate(tripOnServiceDateId);
+      tripOnServiceDate = transitService.getTripOnServiceDate(tripOnServiceDateId);
       if (tripOnServiceDate == null) {
         LOG.info(
           "Invalid transit leg reference: trip on service date '{}' not found",

@@ -54,7 +54,7 @@ public class EntityResolver {
 
     if (journey.getDatedVehicleJourneyRef() != null) {
       String datedServiceJourneyId = journey.getDatedVehicleJourneyRef().getValue();
-      TripOnServiceDate tripOnServiceDate = transitService.findTripOnServiceDate(
+      TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDate(
         resolveId(datedServiceJourneyId)
       );
 
@@ -113,13 +113,13 @@ public class EntityResolver {
       return null;
     }
 
-    return transitService.findTripOnServiceDate(
+    return transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(resolveId(serviceJourneyId), serviceDate)
     );
   }
 
   public TripOnServiceDate resolveTripOnServiceDate(FeedScopedId datedServiceJourneyId) {
-    return transitService.findTripOnServiceDate(datedServiceJourneyId);
+    return transitService.getTripOnServiceDate(datedServiceJourneyId);
   }
 
   public FeedScopedId resolveDatedServiceJourneyId(

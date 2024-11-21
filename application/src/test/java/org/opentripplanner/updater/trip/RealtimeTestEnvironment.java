@@ -96,7 +96,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
    */
   public TripTimes getTripTimesForTrip(FeedScopedId tripId, LocalDate serviceDate) {
     var transitService = getTransitService();
-    var trip = transitService.findTripOnServiceDate(tripId).getTrip();
+    var trip = transitService.getTripOnServiceDate(tripId).getTrip();
     var pattern = transitService.findPattern(trip, serviceDate);
     var timetable = transitService.findTimetable(pattern, serviceDate);
     return timetable.getTripTimes(trip);
@@ -120,7 +120,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
 
   public TripPattern getPatternForTrip(FeedScopedId tripId, LocalDate serviceDate) {
     var transitService = getTransitService();
-    var trip = transitService.findTripOnServiceDate(tripId);
+    var trip = transitService.getTripOnServiceDate(tripId);
     return transitService.findPattern(trip.getTrip(), serviceDate);
   }
 

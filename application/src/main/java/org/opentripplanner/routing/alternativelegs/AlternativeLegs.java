@@ -229,7 +229,7 @@ public class AlternativeLegs {
       tripTimes.getArrivalTime(alightingPosition)
     );
 
-    TripOnServiceDate tripOnServiceDate = transitService.findTripOnServiceDate(
+    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(tripTimeOnDate.getTrip().getId(), tripTimeOnDate.getServiceDay())
     );
 

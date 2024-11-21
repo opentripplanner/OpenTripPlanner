@@ -212,7 +212,7 @@ public interface TransitService {
 
   Collection<GroupOfRoutes> listGroupsOfRoutes();
 
-  Collection<Route> findGroupsOfRoutes(GroupOfRoutes groupOfRoutes);
+  Collection<Route> findRoutes(GroupOfRoutes groupOfRoutes);
 
   @Nullable
   GroupOfRoutes getGroupOfRoutes(FeedScopedId id);
@@ -237,12 +237,12 @@ public interface TransitService {
    */
   boolean hasNewTripPatternsForModifiedTrips();
 
-  TripOnServiceDate findTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate);
+  TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate);
 
   /**
    * Return the TripOnServiceDate for a given id, including real-time updates.
    */
-  TripOnServiceDate findTripOnServiceDate(FeedScopedId datedServiceJourneyId);
+  TripOnServiceDate getTripOnServiceDate(FeedScopedId datedServiceJourneyId);
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
 

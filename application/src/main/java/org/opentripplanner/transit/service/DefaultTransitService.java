@@ -475,7 +475,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Route> findGroupsOfRoutes(GroupOfRoutes groupOfRoutes) {
+  public Collection<Route> findRoutes(GroupOfRoutes groupOfRoutes) {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepositoryIndex.getRoutesForGroupOfRoutes(groupOfRoutes);
   }
@@ -531,7 +531,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripOnServiceDate findTripOnServiceDate(FeedScopedId tripOnServiceDateId) {
+  public TripOnServiceDate getTripOnServiceDate(FeedScopedId tripOnServiceDateId) {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateById(
@@ -557,7 +557,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripOnServiceDate findTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
+  public TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(

@@ -70,7 +70,9 @@ public class GroupOfLinesType {
           .name("lines")
           .description("All lines part of this group of lines")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(LineType.REF))))
-          .dataFetcher(env -> GqlUtil.getTransitService(env).findGroupsOfRoutes(env.getSource()))
+          .dataFetcher(env ->
+            GqlUtil.getTransitService(env).findRoutes((GroupOfRoutes) env.getSource())
+          )
           .build()
       )
       .build();

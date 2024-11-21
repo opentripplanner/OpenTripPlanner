@@ -74,9 +74,9 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     Trip trip = transitService.getTrip(tripId);
     assertNotNull(trip);
     assertNotNull(transitService.findPattern(trip));
-    assertNotNull(transitService.findTripOnServiceDate(tripId));
+    assertNotNull(transitService.getTripOnServiceDate(tripId));
     assertNotNull(
-      transitService.findTripOnServiceDate(new TripIdAndServiceDate(tripId, SERVICE_DATE))
+      transitService.getTripOnServiceDate(new TripIdAndServiceDate(tripId, SERVICE_DATE))
     );
     assertEquals(
       numPatternForRoute + 1,
