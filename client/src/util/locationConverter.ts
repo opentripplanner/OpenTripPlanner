@@ -3,7 +3,7 @@ import { Location } from '../gql/graphql.ts';
 
 const DOUBLE_PATTERN = '-{0,1}\\d+(\\.\\d+){0,1}';
 
-const LAT_LON_PATTERN = '(' + DOUBLE_PATTERN + ')(\\s*,\\s*|\\s+)(' + DOUBLE_PATTERN + ')';
+const LAT_LON_PATTERN = '(' + DOUBLE_PATTERN + ')(\\s+)(' + DOUBLE_PATTERN + ')';
 
 export function parseLocation(value: string): Location | null {
   const latLonMatch = value.match(LAT_LON_PATTERN);
