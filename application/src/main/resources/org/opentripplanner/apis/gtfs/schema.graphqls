@@ -1744,7 +1744,7 @@ type QueryType {
     minimumLatitude: CoordinateValue!,
     "Western bound of the bounding box"
     minimumLongitude: CoordinateValue!
-  ): [RentalPlace]!
+  ): [RentalPlace!]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }
