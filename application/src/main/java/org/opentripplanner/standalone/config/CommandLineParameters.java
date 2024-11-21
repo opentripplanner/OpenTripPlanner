@@ -201,7 +201,7 @@ public class CommandLineParameters {
     return load || (serve && doBuildTransit());
   }
 
-  public String logInfo() {
+  public String logTaskInfo() {
     var mainCommands = new ArrayList<String>();
     if (doBuildStreet() & doBuildTransit()) {
       mainCommands.add("Build Street & Transit Graph");
