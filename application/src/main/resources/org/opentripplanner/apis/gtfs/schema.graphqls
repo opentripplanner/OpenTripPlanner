@@ -73,6 +73,9 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
+"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
+union RentalPlace = RentalVehicle | VehicleRentalStation
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -1768,6 +1771,17 @@ type QueryType {
     """
     ids: [String]
   ): [VehicleRentalStation]
+  "Get all rental vehicles within the specified bounding box"
+  vehicleRentalsByBbox(
+    "Northern bound of the bounding box"
+    maximumLatitude: CoordinateValue!,
+    "Eastern bound of the bounding box"
+    maximumLongitude: CoordinateValue!,
+    "Southern bound of the bounding box"
+    minimumLatitude: CoordinateValue!,
+    "Western bound of the bounding box"
+    minimumLongitude: CoordinateValue!
+  ): [RentalPlace!]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }
