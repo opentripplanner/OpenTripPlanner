@@ -161,6 +161,16 @@ class TimetableRepositoryIndex {
     return tripForId.get(tripId);
   }
 
+  /**
+   * Checks if the specified trip is contained within the index.
+   *
+   * @param tripId the identifier of the trip to check
+   * @return true if the trip exists in the index map, false otherwise
+   */
+  boolean containsTrip(FeedScopedId tripId) {
+    return tripForId.containsKey(tripId);
+  }
+
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate) {
     return tripOnServiceDateForTripAndDay.get(tripIdAndServiceDate);
   }
