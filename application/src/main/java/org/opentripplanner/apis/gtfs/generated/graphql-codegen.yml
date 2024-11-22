@@ -132,4 +132,5 @@ config:
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition
     RealTimeEstimate: org.opentripplanner.model.plan.LegRealTimeEstimate#LegRealTimeEstimate
     CallRealTimeEstimate: org.opentripplanner.transit.model.timetable.CallRealTimeEstimate#CallRealTimeEstimate
+    RentalPlace: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
 

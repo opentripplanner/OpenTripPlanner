@@ -124,6 +124,10 @@ public class StreetSearchRequest implements AStarRequest {
     return dataOverlayContext;
   }
 
+  public StreetSearchRequestBuilder copyOf(Instant time) {
+    return copyOf(this).withStartTime(time);
+  }
+
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
     return copyOf(this).withStartTime(time).withArriveBy(!arriveBy);
   }

@@ -531,6 +531,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<GraphQLPickupDropoffType> pickupType();
 
+    public DataFetcher<Iterable<Leg>> previousLegs();
+
     public DataFetcher<Boolean> realTime();
 
     public DataFetcher<GraphQLRealtimeState> realtimeState();
@@ -862,6 +864,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
+    public DataFetcher<Iterable<VehicleRentalPlace>> vehicleRentalsByBbox();
+
     public DataFetcher<Object> viewer();
   }
 
@@ -871,6 +875,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<java.time.OffsetDateTime> time();
   }
+
+  /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
+  public interface GraphQLRentalPlace extends TypeResolver {}
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {

@@ -2,6 +2,7 @@ import { TripQueryVariables } from '../../gql/graphql.ts';
 import { Marker } from 'react-map-gl';
 import markerFlagStart from '../../static/img/marker-flag-start-shadowed.png';
 import markerFlagEnd from '../../static/img/marker-flag-end-shadowed.png';
+import { useCoordinateResolver } from './useCoordinateResolver.ts';
 
 export function NavigationMarkers({
   setCursor,
@@ -14,13 +15,16 @@ export function NavigationMarkers({
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   loading: boolean;
 }) {
+  const fromCoordinates = useCoordinateResolver(tripQueryVariables.from);
+  const toCoordinates = useCoordinateResolver(tripQueryVariables.to);
+
   return (
     <>
-      {tripQueryVariables.from.coordinates && (
+      {fromCoordinates && (
         <Marker
           draggable
-          latitude={tripQueryVariables.from.coordinates?.latitude}
-          longitude={tripQueryVariables.from.coordinates?.longitude}
+          latitude={fromCoordinates.latitude}
+          longitude={fromCoordinates.longitude}
           onDragStart={() => setCursor('grabbing')}
           onDragEnd={(e) => {
             setCursor('auto');
@@ -36,11 +40,11 @@ export function NavigationMarkers({
           <img alt="" src={markerFlagStart} height={48} width={49} />
         </Marker>
       )}
-      {tripQueryVariables.to.coordinates && (
+      {toCoordinates && (
         <Marker
           draggable
-          latitude={tripQueryVariables.to.coordinates?.latitude}
-          longitude={tripQueryVariables.to.coordinates?.longitude}
+          latitude={toCoordinates.latitude}
+          longitude={toCoordinates.longitude}
           onDragStart={() => setCursor('grabbing')}
           onDragEnd={(e) => {
             setCursor('auto');

@@ -8,7 +8,7 @@ const getColorForMode = function (mode: Mode) {
   if (mode === Mode.Rail) return '#86BF8B';
   if (mode === Mode.Coach) return '#25642A';
   if (mode === Mode.Metro) return '#D9B250';
-  if (mode === Mode.Bus) return '#25642A';
+  if (mode === Mode.Bus) return '#fe0000';
   if (mode === Mode.Tram) return '#D9B250';
   if (mode === Mode.Trolleybus) return '#25642A';
   if (mode === Mode.Water) return '#81304C';
