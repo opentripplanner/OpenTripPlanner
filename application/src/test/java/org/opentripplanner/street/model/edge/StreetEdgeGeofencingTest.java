@@ -13,6 +13,8 @@ import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -213,14 +215,7 @@ class StreetEdgeGeofencingTest {
     public void pickupFloatingVehicleWhenLeavingAZone() {
       var req = defaultArriveByRequest();
 
-      // this is the state that starts inside a restricted zone (no drop off, no traversal or outside business area)
-      // and is walking towards finding a rental vehicle
-      var haveRentedState = State
-        .getInitialStates(Set.of(V2), req)
-        .stream()
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
+      var haveRentedState = makeHaveRentedState(V2, req);
 
       var edge = streetEdge(V1, V2);
       V2.addRentalRestriction(NO_TRAVERSAL);
@@ -244,22 +239,15 @@ class StreetEdgeGeofencingTest {
       V2.addRentalRestriction(NO_DROP_OFF_TIER);
       V2.addRentalRestriction(noDropOffRestriction(NETWORK_BIRD));
 
-      // this is the state that starts inside a no drop off
-      // and is walking towards finding a rental vehicle
-      var haveRentedState = State
-        .getInitialStates(Set.of(V2), req)
-        .stream()
-        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
-        .findAny()
-        .get();
+      var haveRentedState = makeHaveRentedState(V2, req);
 
       var edge = streetEdge(V1, V2);
 
       var states = edge.traverse(haveRentedState);
 
-      // we return 4 states: one for continuing walking, one for the speculative renting of
+      // we return 3 states: one for continuing walking, one for the speculative renting of
       // a vehicle, but with the information of which networks' no-drop-off zones it started in
-      assertEquals(4, states.length);
+      assertEquals(3, states.length);
 
       // first the fallback walk state
       final State walkState = states[0];
@@ -267,7 +255,7 @@ class StreetEdgeGeofencingTest {
       assertEquals(WALK, walkState.currentMode());
 
       // then the speculative renting case for unknown rental network
-      final State speculativeRenting = states[1];
+      final State speculativeRenting = states[2];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
       assertEquals(BICYCLE, speculativeRenting.currentMode());
       // null means that the vehicle has been rented speculatively and the rest of the backwards search
@@ -279,22 +267,181 @@ class StreetEdgeGeofencingTest {
       );
 
       // then the speculative renting cases for specific rental networks
-      final State tierState = states[2];
+      final State tierState = states[1];
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
       assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
       assertEquals(Set.of(), tierState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
+    }
 
-      final State birdState = states[3];
+    @Test
+    public void pickupFloatingVehiclesWhenStartedInNoDropOffZoneAllNetworksAllowedByDefault() {
+      var states = runTraverse(Collections.emptySet(), Collections.emptySet());
+
+      // Walking, unknown, Tier, Bird. (Order of last two not guaranteed)
+      assertEquals(4, states.length);
+      final State walkState = states[0];
+      assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
+      assertEquals(WALK, walkState.currentMode());
+
+      final State unknownNetworkState = states[3];
+      assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
+      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertNull(unknownNetworkState.getVehicleRentalNetwork());
+
+      final State tierState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
+      assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
+      assertEquals(BICYCLE, tierState.currentMode());
+
+      final State birdState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
       assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
       assertEquals(BICYCLE, birdState.currentMode());
-      assertEquals(NETWORK_BIRD, birdState.getVehicleRentalNetwork());
-      assertEquals(Set.of(), birdState.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
+    }
+
+    @Test
+    public void pickupFloatingVehiclesWhenStartedInNoDropOffZoneAllNetworksAllowed() {
+      var states = runTraverse(Set.of(NETWORK_TIER, NETWORK_BIRD), Collections.emptySet());
+
+      // Walking, unknown, Tier, Bird. (Order of last two not guaranteed)
+      assertEquals(4, states.length);
+      final State walkState = states[0];
+      assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
+      assertEquals(WALK, walkState.currentMode());
+
+      final State unknownNetworkState = states[3];
+      assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
+      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertNull(unknownNetworkState.getVehicleRentalNetwork());
+
+      final State tierState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
+      assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
+      assertEquals(BICYCLE, tierState.currentMode());
+
+      final State birdState = Arrays
+        .stream(states)
+        .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
+        .findFirst()
+        .get();
+      assertEquals(RENTING_FLOATING, birdState.getVehicleRentalState());
+      assertEquals(BICYCLE, birdState.currentMode());
+    }
+
+    @Test
+    public void pickupFloatingVehiclesWhenStartedInNoDropOffZoneSomeNetworksAllowed() {
+      var states = runTraverse(Set.of(NETWORK_TIER), Collections.emptySet());
+
+      // Walking, unknown, Tier.
+      assertEquals(3, states.length);
+      final State walkState = states[0];
+      assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
+      assertEquals(WALK, walkState.currentMode());
+
+      final State unknownNetworkState = states[2];
+      assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
+      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertNull(unknownNetworkState.getVehicleRentalNetwork());
+
+      final State tierState = states[1];
+      assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
+      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
+    }
+
+    @Test
+    public void pickupFloatingVehiclesWhenStartedInNoDropOffZoneAllNetworksBanned() {
+      var states = runTraverse(Collections.emptySet(), Set.of(NETWORK_TIER, NETWORK_BIRD));
+
+      // Should only have a walking state. The unknown network state should only be
+      // generated if there are known network states.
+      assertEquals(1, states.length);
+      final State walkState = states[0];
+      assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
+      assertEquals(WALK, walkState.currentMode());
+    }
+
+    @Test
+    public void pickupFloatingVehiclesWhenStartedInNoDropOffZoneSomeNetworksBanned() {
+      var states = runTraverse(Collections.emptySet(), Set.of(NETWORK_BIRD));
+
+      // Walking state, unknown network state, known network state for Tier (which wasn't banned)
+      assertEquals(3, states.length);
+
+      final State walkState = states[0];
+      assertEquals(HAVE_RENTED, walkState.getVehicleRentalState());
+      assertEquals(WALK, walkState.currentMode());
+
+      final State unknownNetworkState = states[2];
+      assertEquals(RENTING_FLOATING, unknownNetworkState.getVehicleRentalState());
+      assertEquals(BICYCLE, unknownNetworkState.currentMode());
+      assertNull(unknownNetworkState.getVehicleRentalNetwork());
+
+      final State tierState = states[1];
+      assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
+      assertEquals(BICYCLE, tierState.currentMode());
+      assertEquals(NETWORK_TIER, tierState.getVehicleRentalNetwork());
+    }
+
+    private State[] runTraverse(Set<String> allowedNetworks, Set<String> bannedNetworks) {
+      var req = makeArriveByRequest(allowedNetworks, bannedNetworks);
+
+      V2.addRentalRestriction(NO_DROP_OFF_TIER);
+      V2.addRentalRestriction(noDropOffRestriction(NETWORK_BIRD));
+
+      var haveRentedState = makeHaveRentedState(V2, req);
+
+      var edge = streetEdge(V1, V2);
+
+      return edge.traverse(haveRentedState);
+    }
+
+    private static State makeHaveRentedState(Vertex vertex, StreetSearchRequest req) {
+      // this is the state that starts inside a restricted zone
+      // (no drop off, no traversal or outside business area)
+      // and is walking towards finding a rental vehicle
+      return State
+        .getInitialStates(Set.of(vertex), req)
+        .stream()
+        .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
+        .findAny()
+        .get();
     }
 
     private static StreetSearchRequest defaultArriveByRequest() {
       return StreetSearchRequest
         .of()
+        .withPreferences(p ->
+          p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
+        )
+        .withMode(StreetMode.SCOOTER_RENTAL)
+        .withArriveBy(true)
+        .build();
+    }
+
+    private static StreetSearchRequest makeArriveByRequest(
+      Set<String> allowedNetworks,
+      Set<String> bannedNetworks
+    ) {
+      return StreetSearchRequest
+        .of()
+        .withPreferences(p ->
+          p.withBike(b ->
+            b.withRental(r ->
+              r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
+            )
+          )
+        )
         .withMode(StreetMode.SCOOTER_RENTAL)
         .withArriveBy(true)
         .build();
