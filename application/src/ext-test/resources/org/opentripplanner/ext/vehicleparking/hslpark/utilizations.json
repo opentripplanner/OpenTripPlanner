@@ -1,20 +1,20 @@
 [
-    {
-      "facilityId": 990,
-      "capacityType": "CAR",
-      "usage": "PARK_AND_RIDE",
-      "timestamp": "2021-12-21T08:42:39.000+02:00",
-      "spacesAvailable": 600,
-      "capacity": 1365,
-      "openNow": true
-    },
-    {
-      "facilityId": 894,
-      "capacityType": "BICYCLE",
-      "usage": "PARK_AND_RIDE",
-      "timestamp": "2019-12-31T11:58:13.000+02:00",
-      "spacesAvailable": 43,
-      "capacity": 80,
-      "openNow": true
-    }
+  {
+    "facilityId": 990,
+    "capacityType": "CAR",
+    "usage": "PARK_AND_RIDE",
+    "timestamp": "2021-12-21T08:42:39.000+02:00",
+    "spacesAvailable": 600,
+    "capacity": 1365,
+    "openNow": true
+  },
+  {
+    "facilityId": 894,
+    "capacityType": "BICYCLE",
+    "usage": "PARK_AND_RIDE",
+    "timestamp": "2019-12-31T11:58:13.000+02:00",
+    "spacesAvailable": 43,
+    "capacity": 80,
+    "openNow": true
+  }
 ]
