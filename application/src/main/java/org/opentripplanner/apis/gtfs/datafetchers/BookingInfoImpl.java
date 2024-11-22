@@ -32,7 +32,8 @@ public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
 
   @Override
   public DataFetcher<Long> maximumBookingNoticeSeconds() {
-    return environment -> getSource(environment).getMaximumBookingNotice().map(Duration::toSeconds).orElse(null);
+    return environment ->
+      getSource(environment).getMaximumBookingNotice().map(Duration::toSeconds).orElse(null);
   }
 
   @Override
@@ -42,7 +43,8 @@ public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
 
   @Override
   public DataFetcher<Long> minimumBookingNoticeSeconds() {
-    return environment -> getSource(environment).getMinimumBookingNotice().map(Duration::toSeconds).orElse(null);
+    return environment ->
+      getSource(environment).getMinimumBookingNotice().map(Duration::toSeconds).orElse(null);
   }
 
   @Override

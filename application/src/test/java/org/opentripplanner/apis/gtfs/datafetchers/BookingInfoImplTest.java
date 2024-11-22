@@ -2,42 +2,47 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
-import java.util.Locale;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 class BookingInfoImplTest {
 
-    @Test
-    void map() throws Exception {
+  private static final BookingInfoImpl SUBJECT = new BookingInfoImpl();
+  private static final Duration TEN_MINUTES = Duration.ofMinutes(10);
 
-      ExecutionInput executionInput = ExecutionInput
-        .newExecutionInput()
-        .query("")
-        .operationName("plan")
-        .locale(Locale.ENGLISH)
-        .build();
+  @Test
+  void emptyDurations() throws Exception {
+    var env = dataFetchingEnvironment(BookingInfo.of().build());
+    assertNull(SUBJECT.minimumBookingNoticeSeconds().get(env));
+    assertNull(SUBJECT.maximumBookingNoticeSeconds().get(env));
+  }
 
-      var executionContext = newExecutionContextBuilder()
-        .executionInput(executionInput)
-        .executionId(ExecutionId.from(this.getClass().getName()))
-        .build();
-      var env = DataFetchingEnvironmentImpl
-        .newDataFetchingEnvironment(executionContext)
-        .arguments(Map.of())
-        .source(BookingInfo.of().withMinimumBookingNotice(Duration.ofMinutes(10)).build())
-        .build();
-      var impl = new BookingInfoImpl();
-      var seconds = impl.minimumBookingNoticeSeconds().get(env);
-      assertEquals(600, seconds);
-    }
-  
-  
+  @Test
+  void durations() throws Exception {
+    var env = dataFetchingEnvironment(
+      BookingInfo
+        .of()
+        .withMinimumBookingNotice(TEN_MINUTES)
+        .withMaximumBookingNotice(TEN_MINUTES)
+        .build()
+    );
+    assertEquals(600, SUBJECT.minimumBookingNoticeSeconds().get(env));
+    assertEquals(600, SUBJECT.maximumBookingNoticeSeconds().get(env));
+  }
 
+  private DataFetchingEnvironment dataFetchingEnvironment(BookingInfo bookingInfo) {
+    var executionContext = newExecutionContextBuilder()
+      .executionId(ExecutionId.from(this.getClass().getName()))
+      .build();
+    return DataFetchingEnvironmentImpl
+      .newDataFetchingEnvironment(executionContext)
+      .source(bookingInfo)
+      .build();
+  }
 }
