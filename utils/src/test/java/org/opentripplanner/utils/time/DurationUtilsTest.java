@@ -98,15 +98,12 @@ public class DurationUtilsTest {
     assertEquals(D2h, DurationUtils.parseClockDuration("2"));
     assertEquals(D2h5m, DurationUtils.parseClockDuration("02:05"));
     assertEquals(D2h5m9s, DurationUtils.parseClockDuration("02:05:09"));
+    assertThrows(DateTimeParseException.class, () -> DurationUtils.parseClockDuration("02:65:09"));
     assertThrows(
       DateTimeParseException.class,
-      () -> DurationUtils.parseClockDuration("02:65:09"));
-    assertThrows(
-      DateTimeParseException.class,
-      () -> DurationUtils.parseClockDuration("02:05:09:00"));
-    assertThrows(
-      DateTimeParseException.class,
-      () -> DurationUtils.parseClockDuration("02:x5:09"));
+      () -> DurationUtils.parseClockDuration("02:05:09:00")
+    );
+    assertThrows(DateTimeParseException.class, () -> DurationUtils.parseClockDuration("02:x5:09"));
   }
 
   @Test

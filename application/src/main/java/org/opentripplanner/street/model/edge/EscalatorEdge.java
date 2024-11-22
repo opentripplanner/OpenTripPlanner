@@ -11,15 +11,11 @@ import org.opentripplanner.street.search.state.State;
 /** Represents an escalator. An escalator edge can only be traversed by walking */
 public class EscalatorEdge extends Edge {
 
-  /* A quick internet search gives escalator speed range of 0.3-0.6 m/s and angle of 30 degrees.
-   * Using the angle of 30 degrees and a speed of 0.5 m/s gives a horizontal component
-   * of approx. 0.43 m/s */
-  private static final double HORIZONTAL_SPEED = 0.45;
   private static final LocalizedString NAME = new LocalizedString("name.escalator");
   private final double length;
-  private final Long duration;
+  private final Integer duration;
 
-  private EscalatorEdge(Vertex v1, Vertex v2, double length, Long duration) {
+  private EscalatorEdge(Vertex v1, Vertex v2, double length, Integer duration) {
     super(v1, v2);
     this.length = length;
     this.duration = duration;
@@ -32,7 +28,7 @@ public class EscalatorEdge extends Edge {
       var s1 = s0.edit(this);
       double time;
       if (duration == null) {
-        time = getDistanceMeters() / HORIZONTAL_SPEED;
+        time = getDistanceMeters() / s0.getPreferences().street().escalator().horizontalSpeed();
       } else {
         time = duration;
       }
@@ -58,7 +54,12 @@ public class EscalatorEdge extends Edge {
     return NAME;
   }
 
-  public static EscalatorEdge createEscalatorEdge(Vertex from, Vertex to, double length, Long duration) {
+  public static EscalatorEdge createEscalatorEdge(
+    Vertex from,
+    Vertex to,
+    double length,
+    Integer duration
+  ) {
     return connectToGraph(new EscalatorEdge(from, to, length, duration));
   }
 }

@@ -132,11 +132,15 @@ public class OsmWay extends OsmWithTags {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
-  public Long getDurationSeconds() {
+  public Integer getDurationSeconds() {
     var duration = getTag("duration");
     if (duration != null) {
       try {
-        return DurationUtils.parseClockDuration(duration).getSeconds();
+        long seconds = DurationUtils.parseClockDuration(duration).getSeconds();
+        if (seconds < 0 || seconds > Integer.MAX_VALUE) {
+          return null;
+        }
+        return (int) seconds;
       } catch (DateTimeParseException e) {
         // For malformed duration tags, just pretend they weren't there.
         return null;

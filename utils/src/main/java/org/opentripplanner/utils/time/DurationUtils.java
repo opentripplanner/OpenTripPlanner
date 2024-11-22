@@ -146,7 +146,7 @@ public class DurationUtils {
             minutes = Long.parseLong(duration.substring(i + 1));
             break;
           default:
-          //case 2:
+            //case 2:
             i = duration.indexOf(':');
             j = duration.indexOf(':', i + 1);
             hours = Long.parseLong(duration.substring(0, i));
@@ -155,7 +155,8 @@ public class DurationUtils {
             break;
         }
         if (hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-          return Duration.ofHours(hours)
+          return Duration
+            .ofHours(hours)
             .plus(Duration.ofMinutes(minutes))
             .plus(Duration.ofSeconds(seconds));
         }

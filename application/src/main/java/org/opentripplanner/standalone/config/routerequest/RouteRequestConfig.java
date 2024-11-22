@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.TriangleOptimizationConfig.mapOptimizationTriangle;
@@ -458,6 +459,16 @@ ferries, where the check-in process needs to be done in good time before ride.
               .summary("How long does it take to advance one floor on an elevator?")
               .asInt(dftElevator.hopTime())
           );
+      })
+      .withEscalator(escalator -> {
+        var dftEscalator = dft.escalator();
+        escalator.withHorizontalSpeed(
+          c
+            .of("escalatorSpeed")
+            .since(V2_7)
+            .summary("How fast does an escalator move horizontally?")
+            .asDouble(dftEscalator.horizontalSpeed())
+        );
       })
       .withAccessEgress(accessEgress -> {
         var dftAccessEgress = dft.accessEgress();

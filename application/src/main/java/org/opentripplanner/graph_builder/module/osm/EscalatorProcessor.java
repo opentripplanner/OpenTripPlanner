@@ -27,7 +27,7 @@ class EscalatorProcessor {
       .boxed()
       .toList();
 
-    Long duration = escalatorWay.getDurationSeconds();
+    Integer duration = escalatorWay.getDurationSeconds();
     for (int i = 0; i < nodes.size() - 1; i++) {
       if (escalatorWay.isForwardEscalator()) {
         EscalatorEdge.createEscalatorEdge(
