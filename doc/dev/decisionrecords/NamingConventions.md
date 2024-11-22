@@ -44,7 +44,8 @@ Here is a list of common prefixes used and what to expect.
 | `listStops() : List/Stream<Stop>`                     | List ALL stops in context; return a Collection or Stream (List is preferred). |
 | `withStop(Stop stop) : Builder`                       | Set Stop in builder, replacing existing value; return `this` builder.         |
 | `initStop(Stop stop) : void`                          | Set property _once_; a second call throws an exception.                       |
-| `createStop(String name) : Stop`                      | Factory methods for creating objects should start with `create` prefix.       |
+| `createStop(String name, ...) : Stop`                   | Factory methods for creating objects should start with `create` prefix.       |
+|                                                         | See (Builder Conventions)[RecordsPOJOsBuilders.md#builder-conventions] for creating objects with builders. |
 | `addStop(Stop stop) : void/Builder`                   | Add a Stop to a collection of Stops.                                          |
 | `addStops(Collection<Stop> stops) : void/Builder`     | Add set of Stops to existing set.                                             |
 | `withBike(Consumer<BikePref.Builder> body) : Builder` | For nested builders, use lambdas.                                             |
