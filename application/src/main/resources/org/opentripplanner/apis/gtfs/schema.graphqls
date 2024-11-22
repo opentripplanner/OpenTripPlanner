@@ -73,8 +73,11 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
-"An instance of a trip, which can be cancelled, on a service date."
-union CancellableTripOnServiceDate = TripOnServiceDate
+"""
+Call is a visit to a location (a stop or an area) in a trip on service date. It can contain
+exact arrival and departure times and/or a scheduled time window.
+"""
+union Call = StopCall
 
 union StopPosition = PositionAtStop | PositionBetweenStops
 
@@ -2184,7 +2187,7 @@ type Stop implements Node & PlaceInterface {
 
 """
 Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-This can include real-time estimates.
+The times are exact (although can be changed by real-time updates), not time windows.
 """
 type StopCall {
   "Scheduled arrival time to the stop and a real-time estimate, if one exists."
@@ -2450,10 +2453,10 @@ type TripOccupancy {
   occupancyStatus: OccupancyStatus
 }
 
-"A regular (i.e. not flexible) trip on a specific service date"
+"A trip on a specific service date."
 type TripOnServiceDate {
   "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
-  end: StopCall!
+  end: Call!
   """
   The service date when the trip occurs.
     
@@ -2463,9 +2466,9 @@ type TripOnServiceDate {
   """
   serviceDate: LocalDate!
   "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
-  start: StopCall!
+  start: Call!
   "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopCalls: [StopCall!]!
+  stopCalls: [Call!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
 }
@@ -2501,7 +2504,7 @@ type TripOnServiceDateEdge {
   Trip on a service date as a node. Part of the
   [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
   """
-  node: CancellableTripOnServiceDate
+  node: TripOnServiceDate
 }
 
 "This is used for alert entities that we don't explicitly handle or they are missing."

@@ -33,7 +33,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CallRealTimeEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CallTimeImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.CancellableTripOnServiceDateTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.CallTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ContactInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
@@ -133,10 +133,7 @@ class GtfsGraphQLIndex {
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
-        .type(
-          "CancellableTripOnServiceDate",
-          type -> type.typeResolver(new CancellableTripOnServiceDateTypeResolver())
-        )
+        .type("Call", type -> type.typeResolver(new CallTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
         .type(typeWiring.build(BikeParkImpl.class))

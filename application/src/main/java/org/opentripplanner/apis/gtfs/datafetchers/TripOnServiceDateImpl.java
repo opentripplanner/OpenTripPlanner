@@ -24,7 +24,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   }
 
   @Override
-  public DataFetcher<TripTimeOnDate> end() {
+  public DataFetcher<Object> end() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getTrip(environment);
@@ -42,7 +42,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   }
 
   @Override
-  public DataFetcher<TripTimeOnDate> start() {
+  public DataFetcher<Object> start() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getTrip(environment);
@@ -60,7 +60,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
+  public DataFetcher<Iterable<Object>> stopCalls() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
       Trip trip = getTrip(environment);
@@ -73,7 +73,11 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
       if (timetable == null) {
         return List.of();
       }
-      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
+      return TripTimeOnDate
+        .fromTripTimes(timetable, trip, serviceDate, midnight)
+        .stream()
+        .map(Object.class::cast)
+        .toList();
     };
   }
 

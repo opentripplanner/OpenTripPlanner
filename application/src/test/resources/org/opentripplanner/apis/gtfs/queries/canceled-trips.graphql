@@ -8,9 +8,9 @@
     }
     edges {
       node {
-        ... on TripOnServiceDate {
-          serviceDate
-          end {
+        serviceDate
+        end {
+          ... on StopCall {
             arrival {
               estimated {
                 delay
@@ -19,7 +19,9 @@
               scheduledTime
             }
           }
-          start {
+        }
+        start {
+          ... on StopCall {
             departure {
               estimated {
                 delay
@@ -28,7 +30,9 @@
               scheduledTime
             }
           }
-          stopCalls {
+        }
+        stopCalls {
+          ... on StopCall {
             stop {
               gtfsId
             }
@@ -47,9 +51,9 @@
               }
             }
           }
-          trip {
-            gtfsId
-          }
+        }
+        trip {
+          gtfsId
         }
       }
     }

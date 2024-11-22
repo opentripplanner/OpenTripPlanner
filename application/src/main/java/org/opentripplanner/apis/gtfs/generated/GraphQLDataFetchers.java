@@ -242,6 +242,12 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> time();
   }
 
+  /**
+   * Call is a visit to a location (a stop or an area) in a trip on service date. It can contain
+   * exact arrival and departure times and/or a scheduled time window.
+   */
+  public interface GraphQLCall extends TypeResolver {}
+
   /** Real-time estimates for an arrival or departure at a certain place. */
   public interface GraphQLCallRealTimeEstimate {
     public DataFetcher<java.time.Duration> delay();
@@ -258,9 +264,6 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
-
-  /** An instance of a trip, which can be cancelled, on a service date. */
-  public interface GraphQLCancellableTripOnServiceDate extends TypeResolver {}
 
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
@@ -1065,7 +1068,7 @@ public class GraphQLDataFetchers {
 
   /**
    * Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-   * This can include real-time estimates.
+   * The times are exact (although can be changed by real-time updates), not time windows.
    */
   public interface GraphQLStopCall {
     public DataFetcher<CallTime> arrival();
@@ -1241,15 +1244,15 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLOccupancyStatus> occupancyStatus();
   }
 
-  /** A regular (i.e. not flexible) trip on a specific service date */
+  /** A trip on a specific service date. */
   public interface GraphQLTripOnServiceDate {
-    public DataFetcher<TripTimeOnDate> end();
+    public DataFetcher<Object> end();
 
     public DataFetcher<java.time.LocalDate> serviceDate();
 
-    public DataFetcher<TripTimeOnDate> start();
+    public DataFetcher<Object> start();
 
-    public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
+    public DataFetcher<Iterable<Object>> stopCalls();
 
     public DataFetcher<Trip> trip();
   }
@@ -1271,7 +1274,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLTripOnServiceDateEdge {
     public DataFetcher<String> cursor();
 
-    public DataFetcher<Object> node();
+    public DataFetcher<TripOnServiceDate> node();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */
