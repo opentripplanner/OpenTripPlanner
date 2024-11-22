@@ -10,10 +10,12 @@ public class TestFreeFloatingRentalVehicleBuilder {
   public static final double DEFAULT_LATITUDE = 47.520;
   public static final double DEFAULT_LONGITUDE = 19.01;
   public static final double DEFAULT_CURRENT_FUEL_PERCENT = 0.5;
+  public static final double DEFAULT_CURRENT_RANGE_METERS = 5500;
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
   private double currentFuelPercent = DEFAULT_CURRENT_FUEL_PERCENT;
+  private double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
@@ -34,6 +36,11 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   public TestFreeFloatingRentalVehicleBuilder withCurrentFuelPercent(double currentFuelPercent) {
     this.currentFuelPercent = currentFuelPercent;
+    return this;
+  }
+
+  public TestFreeFloatingRentalVehicleBuilder withCurrentRangeMeters(double currentRangeMeters) {
+    this.currentRangeMeters = currentRangeMeters;
     return this;
   }
 
@@ -93,6 +100,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.vehicleType = vehicleType;
     vehicle.system = system;
     vehicle.currentFuelPercent = currentFuelPercent;
+    vehicle.currentRangeMeters = currentRangeMeters;
     return vehicle;
   }
 }

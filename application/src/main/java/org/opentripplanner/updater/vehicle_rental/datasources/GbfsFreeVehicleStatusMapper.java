@@ -53,6 +53,7 @@ public class GbfsFreeVehicleStatusMapper {
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
       rentalVehicle.currentRangeMeters = vehicle.getCurrentRangeMeters();
+      rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
@@ -61,7 +62,6 @@ public class GbfsFreeVehicleStatusMapper {
         String webUri = rentalUris.getWeb();
         rentalVehicle.rentalUris = new VehicleRentalStationUris(androidUri, iosUri, webUri);
       }
-      rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
 
       return rentalVehicle;
     } else {

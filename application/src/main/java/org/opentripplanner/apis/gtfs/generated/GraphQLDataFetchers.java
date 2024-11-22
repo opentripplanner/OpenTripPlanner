@@ -899,6 +899,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> currentFuelPercent();
 
+    public DataFetcher<Double> currentRangeMeters();
+
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
     public DataFetcher<Double> lat();

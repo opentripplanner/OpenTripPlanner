@@ -138,4 +138,8 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public Double getCurrentFuelPercent() {
     return currentFuelPercent;
   }
+
+  public Double getCurrentRangeMeters() {
+    return currentRangeMeters;
+  }
 }

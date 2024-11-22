@@ -20,5 +20,6 @@
       url
     }
     currentFuelPercent
+    currentRangeMeters
   }
 }

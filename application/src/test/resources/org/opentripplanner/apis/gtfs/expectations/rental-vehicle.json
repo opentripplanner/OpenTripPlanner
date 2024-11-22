@@ -16,7 +16,8 @@
         "networkId": "Network-1",
         "url": "https://foo.bar"
       },
-      "currentFuelPercent": 0.5
+      "currentFuelPercent": 0.5,
+      "currentRangeMeters": 5500.0
     }
   }
 }
