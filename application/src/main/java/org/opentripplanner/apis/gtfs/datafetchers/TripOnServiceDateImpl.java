@@ -26,49 +26,49 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<Object> end() {
     return environment -> {
-      final Result result = getResult(environment);
-      if (result.timetable() == null) {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
         return null;
       }
-      return TripTimeOnDate.lastFromTripTimes(result.timetable(), result.trip(), result.serviceDate(), result.midnight());
+      return TripTimeOnDate.lastFromTripTimes(
+        arguments.timetable(),
+        arguments.trip(),
+        arguments.serviceDate(),
+        arguments.midnight()
+      );
     };
-  }
-
-  private Result getResult(DataFetchingEnvironment environment) {
-    TransitService transitService = getTransitService(environment);
-    Trip trip = getTrip(environment);
-    var serviceDate = getSource(environment).getServiceDate();
-
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(serviceDate, transitService.getTimeZone())
-      .toInstant();
-    Timetable timetable = getTimetable(environment, trip, serviceDate);
-    return new Result(trip, serviceDate, midnight, timetable);
-  }
-
-  private record Result(Trip trip, LocalDate serviceDate, Instant midnight, @Nullable Timetable timetable) {
   }
 
   @Override
   public DataFetcher<Object> start() {
     return environment -> {
-      var result = getResult(environment);
-      if (result.timetable() == null) {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
         return null;
       }
-      return TripTimeOnDate.firstFromTripTimes(result.timetable, result.trip, result.serviceDate, result.midnight);
+      return TripTimeOnDate.firstFromTripTimes(
+        arguments.timetable(),
+        arguments.trip(),
+        arguments.serviceDate(),
+        arguments.midnight()
+      );
     };
   }
 
   @Override
   public DataFetcher<Iterable<Object>> stopCalls() {
     return environment -> {
-      var result = getResult(environment);
-      if (result.timetable == null) {
+      var arguments = getFromTripTimesArguments(environment);
+      if (arguments.timetable() == null) {
         return List.of();
       }
       return TripTimeOnDate
-        .fromTripTimes(result.timetable, result.trip, result.serviceDate, result.midnight)
+        .fromTripTimes(
+          arguments.timetable(),
+          arguments.trip(),
+          arguments.serviceDate(),
+          arguments.midnight()
+        )
         .stream()
         .map(Object.class::cast)
         .toList();
@@ -107,4 +107,23 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   private TripOnServiceDate getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
+
+  private FromTripTimesArguments getFromTripTimesArguments(DataFetchingEnvironment environment) {
+    TransitService transitService = getTransitService(environment);
+    Trip trip = getTrip(environment);
+    var serviceDate = getSource(environment).getServiceDate();
+
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(serviceDate, transitService.getTimeZone())
+      .toInstant();
+    Timetable timetable = getTimetable(environment, trip, serviceDate);
+    return new FromTripTimesArguments(trip, serviceDate, midnight, timetable);
+  }
+
+  private record FromTripTimesArguments(
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight,
+    @Nullable Timetable timetable
+  ) {}
 }
