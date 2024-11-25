@@ -78,49 +78,49 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   @Test
   void noTripId() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().build();
-    assertEquals(TRIP.getId().getId(), matcher.match(FEED_ID, trip1).getTripId());
+    TripDescriptor trip = matchingTripUpdate().build();
+    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip).getTripId());
   }
 
   @Test
   void tripIdSetButNotInSchedule() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setTripId("does-not-exist-in-schedule").build();
-    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip1).getTripId());
+    TripDescriptor trip = matchingTripUpdate().setTripId("does-not-exist-in-schedule").build();
+    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip).getTripId());
   }
 
   @Test
   void tripIdExistsInSchedule() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setTripId(TRIP_ID).build();
-    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip1).getTripId());
+    TripDescriptor trip = matchingTripUpdate().setTripId(TRIP_ID).build();
+    assertEquals(TRIP_ID, matcher.match(FEED_ID, trip).getTripId());
   }
 
   @Test
   void incorrectRoute() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setRouteId("does-not-exists").build();
-    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+    TripDescriptor trip = matchingTripUpdate().setRouteId("does-not-exists").build();
+    assertFalse(matcher.match(FEED_ID, trip).hasTripId());
   }
 
   @Test
   void incorrectDateFormat() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setStartDate("ZZZ").build();
-    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+    TripDescriptor trip = matchingTripUpdate().setStartDate("ZZZ").build();
+    assertFalse(matcher.match(FEED_ID, trip).hasTripId());
   }
 
   @Test
   void incorrectDirection() {
     var matcher = matcher();
-    TripDescriptor trip1 = matchingTripUpdate().setDirectionId(1).build();
-    assertFalse(matcher.match(FEED_ID, trip1).hasTripId());
+    TripDescriptor trip = matchingTripUpdate().setDirectionId(1).build();
+    assertFalse(matcher.match(FEED_ID, trip).hasTripId());
   }
 
   @Test
   void noMatch() {
-    // Test matching with "real time", when schedule uses time grater than 24:00
-    var trip1 = TripDescriptor
+    // Test matching with "real time", when schedule uses time greater than 24:00
+    var trip = TripDescriptor
       .newBuilder()
       .setRouteId("4")
       .setDirectionId(0)
@@ -128,8 +128,8 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
       .setStartDate("20090915")
       .build();
     // No departure at this time
-    assertFalse(trip1.hasTripId());
-    trip1 =
+    assertFalse(trip.hasTripId());
+    trip =
       TripDescriptor
         .newBuilder()
         .setRouteId("1")
@@ -137,7 +137,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
         .setStartDate("20090915")
         .build();
     // Missing direction id
-    assertFalse(trip1.hasTripId());
+    assertFalse(trip.hasTripId());
   }
 
   @Nested
