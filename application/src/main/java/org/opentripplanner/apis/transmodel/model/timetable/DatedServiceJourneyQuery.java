@@ -14,7 +14,7 @@ import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.transit.api.model.CriteriaCollection;
+import org.opentripplanner.transit.api.model.FilterValueCollection;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -97,25 +97,25 @@ public class DatedServiceJourneyQuery {
         // The null safety checks are not needed here - they are taken care of by the request
         // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
-        var authorities = CriteriaCollection.ofEmptyIsEverything(
+        var authorities = FilterValueCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("authorities"))
         );
-        var lines = CriteriaCollection.ofEmptyIsEverything(
+        var lines = FilterValueCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("lines"))
         );
-        var serviceJourneys = CriteriaCollection.ofEmptyIsEverything(
+        var serviceJourneys = FilterValueCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
         );
-        var replacementFor = CriteriaCollection.ofEmptyIsEverything(
+        var replacementFor = FilterValueCollection.ofEmptyIsEverything(
           mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
         );
-        var privateCodes = CriteriaCollection.ofEmptyIsEverything(
+        var privateCodes = FilterValueCollection.ofEmptyIsEverything(
           environment.<List<String>>getArgument("privateCodes")
         );
-        var operatingDays = CriteriaCollection.ofEmptyIsEverything(
+        var operatingDays = FilterValueCollection.ofEmptyIsEverything(
           environment.<List<LocalDate>>getArgument("operatingDays")
         );
-        var alterations = CriteriaCollection.ofEmptyIsEverything(
+        var alterations = FilterValueCollection.ofEmptyIsEverything(
           environment.<List<TripAlteration>>getArgument("alterations")
         );
 

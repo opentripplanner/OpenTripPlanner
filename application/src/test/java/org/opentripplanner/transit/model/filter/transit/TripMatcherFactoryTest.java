@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.api.model.CriteriaCollection;
+import org.opentripplanner.transit.api.model.FilterValueCollection;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -89,7 +89,7 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withRoutes(
-        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
+        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
       )
       .build();
 
@@ -115,7 +115,9 @@ public class TripMatcherFactoryTest {
   void testMatchAgencyId() {
     TripRequest request = TripRequest
       .of()
-      .withAgencies(CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1"))))
+      .withAgencies(
+        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1")))
+      )
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -130,7 +132,7 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withServiceDates(
-        CriteriaCollection.ofEmptyIsEverything(
+        FilterValueCollection.ofEmptyIsEverything(
           List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23))
         )
       )

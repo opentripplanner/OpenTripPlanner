@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.filter.expr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.transit.api.model.CriteriaCollection;
+import org.opentripplanner.transit.api.model.FilterValueCollection;
 
 /**
  * A builder for creating complex matchers composed of other matchers.
@@ -23,14 +23,14 @@ public class ExpressionBuilder<T> {
   }
 
   public <V> ExpressionBuilder<T> atLeastOneMatch(
-    CriteriaCollection<V> criteria,
+    FilterValueCollection<V> filterValues,
     Function<V, Matcher<T>> matcherProvider
   ) {
-    if (criteria.includeEverything()) {
+    if (filterValues.includeEverything()) {
       return this;
     }
 
-    matchers.add(OrMatcher.of(criteria.get().stream().map(matcherProvider).toList()));
+    matchers.add(OrMatcher.of(filterValues.get().stream().map(matcherProvider).toList()));
     return this;
   }
 

@@ -1,52 +1,51 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.transit.api.model.CriteriaCollection;
+import org.opentripplanner.transit.api.model.FilterValueCollection;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * A request for {@link Trip}s.
  * </p>
- * This request is used to retrieve {@link Trip}s that match the provided criteria.
+ * This request is used to retrieve {@link Trip}s that match the provided filter values.
  */
 public class TripRequest {
 
-  private final CriteriaCollection<FeedScopedId> agencies;
-  private final CriteriaCollection<FeedScopedId> routes;
-  private final CriteriaCollection<String> netexInternalPlanningCodes;
-  private final CriteriaCollection<LocalDate> serviceDates;
+  private final FilterValueCollection<FeedScopedId> agencies;
+  private final FilterValueCollection<FeedScopedId> routes;
+  private final FilterValueCollection<String> netexInternalPlanningCodes;
+  private final FilterValueCollection<LocalDate> serviceDates;
 
   protected TripRequest(
-    CriteriaCollection<FeedScopedId> agencies,
-    CriteriaCollection<FeedScopedId> routes,
-    CriteriaCollection<String> netexInternalPlanningCodes,
-    CriteriaCollection<LocalDate> serviceDates
+    FilterValueCollection<FeedScopedId> agencies,
+    FilterValueCollection<FeedScopedId> routes,
+    FilterValueCollection<String> netexInternalPlanningCodes,
+    FilterValueCollection<LocalDate> serviceDates
   ) {
-    this.agencies = CriteriaCollection.ofEmptyIsEverything(agencies);
-    this.routes = CriteriaCollection.ofEmptyIsEverything(routes);
-    this.netexInternalPlanningCodes =
-      CriteriaCollection.ofEmptyIsEverything(netexInternalPlanningCodes);
-    this.serviceDates = CriteriaCollection.ofEmptyIsEverything(serviceDates);
+    this.agencies = agencies;
+    this.routes = routes;
+    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
+    this.serviceDates = serviceDates;
   }
 
   public static TripRequestBuilder of() {
     return new TripRequestBuilder();
   }
 
-  public CriteriaCollection<FeedScopedId> agencies() {
+  public FilterValueCollection<FeedScopedId> agencies() {
     return agencies;
   }
 
-  public CriteriaCollection<FeedScopedId> routes() {
+  public FilterValueCollection<FeedScopedId> routes() {
     return routes;
   }
 
-  public CriteriaCollection<String> netexInternalPlanningCodes() {
+  public FilterValueCollection<String> netexInternalPlanningCodes() {
     return netexInternalPlanningCodes;
   }
 
-  public CriteriaCollection<LocalDate> serviceDates() {
+  public FilterValueCollection<LocalDate> serviceDates() {
     return serviceDates;
   }
 }

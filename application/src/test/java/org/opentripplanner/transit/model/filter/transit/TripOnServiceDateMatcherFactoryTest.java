@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.api.model.CriteriaCollection;
+import org.opentripplanner.transit.api.model.FilterValueCollection;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -104,7 +104,9 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchOperatingDays() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
+      .withServiceDates(
+        FilterValueCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22)))
+      )
       .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
@@ -118,13 +120,19 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchMultiple() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
-      .withAgencies(CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1"))))
+      .withServiceDates(
+        FilterValueCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22)))
+      )
+      .withAgencies(
+        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1")))
+      )
       .withRoutes(
-        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
+        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
       )
       .withServiceJourneys(
-        CriteriaCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:trip:1")))
+        FilterValueCollection.ofEmptyIsEverything(
+          List.of(new FeedScopedId("F", "RUT:route:trip:1"))
+        )
       )
       .build();
 
@@ -139,19 +147,21 @@ class TripOnServiceDateMatcherFactoryTest {
   void testMatchMultipleServiceJourneyMatchers() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
       .of()
-      .withServiceDates(CriteriaCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22))))
+      .withServiceDates(
+        FilterValueCollection.ofEmptyIsEverything(List.of(LocalDate.of(2024, 2, 22)))
+      )
       .withAgencies(
-        CriteriaCollection.ofEmptyIsEverything(
+        FilterValueCollection.ofEmptyIsEverything(
           List.of(new FeedScopedId("F", "RUT:1"), new FeedScopedId("F", "RUT:2"))
         )
       )
       .withRoutes(
-        CriteriaCollection.ofEmptyIsEverything(
+        FilterValueCollection.ofEmptyIsEverything(
           List.of(new FeedScopedId("F", "RUT:route:1"), new FeedScopedId("F", "RUT:route:2"))
         )
       )
       .withServiceJourneys(
-        CriteriaCollection.ofEmptyIsEverything(
+        FilterValueCollection.ofEmptyIsEverything(
           List.of(
             new FeedScopedId("F", "RUT:route:trip:1"),
             new FeedScopedId("F", "RUT:route:trip:2")
