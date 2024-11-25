@@ -49,6 +49,10 @@ public class EscalatorEdge extends Edge {
     return length;
   }
 
+  public Integer getDuration() {
+    return duration;
+  }
+
   @Override
   public I18NString getName() {
     return NAME;

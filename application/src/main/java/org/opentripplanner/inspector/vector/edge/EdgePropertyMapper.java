@@ -22,7 +22,10 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     List<KeyValue> properties =
       switch (input) {
         case StreetEdge e -> mapStreetEdge(e);
-        case EscalatorEdge e -> List.of(kv("distance", e.getDistanceMeters()));
+        case EscalatorEdge e -> List.of(
+          kv("distance", e.getDistanceMeters()),
+          kv("duration", e.getDuration())
+        );
         default -> List.of();
       };
     return ListUtils.combine(baseProps, properties);
