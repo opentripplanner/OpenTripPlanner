@@ -1,8 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -32,11 +34,11 @@ class EscalatorProcessor {
       .boxed()
       .toList();
 
-    Integer duration = escalatorWay.getDurationSeconds();
-    if (duration != null) {
-      double speed = length / duration;
+    Optional<Duration> duration = escalatorWay.getDuration();
+    if (duration.isPresent()) {
+      double speed = length / duration.get().toSeconds();
       if (speed < SLOW_ESCALATOR_ERROR_CUTOFF || speed > FAST_ESCALATOR_ERROR_CUTOFF) {
-        duration = null;
+        duration = Optional.empty();
       }
     }
     for (int i = 0; i < nodes.size() - 1; i++) {

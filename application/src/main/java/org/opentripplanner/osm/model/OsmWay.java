@@ -2,7 +2,9 @@ package org.opentripplanner.osm.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
+import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -132,21 +134,17 @@ public class OsmWay extends OsmWithTags {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
-  public Integer getDurationSeconds() {
+  public Optional<Duration> getDuration() {
     var duration = getTag("duration");
     if (duration != null) {
       try {
-        long seconds = DurationUtils.parseClockDuration(duration).getSeconds();
-        if (seconds < 0 || seconds > Integer.MAX_VALUE) {
-          return null;
-        }
-        return (int) seconds;
+        return Optional.of(DurationUtils.parseClockDuration(duration));
       } catch (DateTimeParseException e) {
         // For malformed duration tags, just pretend they weren't there.
-        return null;
+        return Optional.empty();
       }
     }
-    return null;
+    return Optional.empty();
   }
 
   public boolean isForwardEscalator() {

@@ -1,5 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
+import java.time.Duration;
+import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -13,9 +15,9 @@ public class EscalatorEdge extends Edge {
 
   private static final LocalizedString NAME = new LocalizedString("name.escalator");
   private final double length;
-  private final Integer duration;
+  private final Optional<Duration> duration;
 
-  private EscalatorEdge(Vertex v1, Vertex v2, double length, Integer duration) {
+  private EscalatorEdge(Vertex v1, Vertex v2, double length, Optional<Duration> duration) {
     super(v1, v2);
     this.length = length;
     this.duration = duration;
@@ -27,10 +29,10 @@ public class EscalatorEdge extends Edge {
     if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {
       var s1 = s0.edit(this);
       double time;
-      if (duration == null) {
+      if (duration.isEmpty()) {
         time = getDistanceMeters() / s0.getPreferences().street().escalator().horizontalSpeed();
       } else {
-        time = duration;
+        time = duration.get().toSeconds();
       }
       s1.incrementWeight(s0.getPreferences().walk().escalatorReluctance() * time);
       s1.incrementTimeInSeconds((int) Math.round(time));
@@ -49,7 +51,7 @@ public class EscalatorEdge extends Edge {
     return length;
   }
 
-  public Integer getDuration() {
+  public Optional<Duration> getDuration() {
     return duration;
   }
 
@@ -62,7 +64,7 @@ public class EscalatorEdge extends Edge {
     Vertex from,
     Vertex to,
     double length,
-    Integer duration
+    Optional<Duration> duration
   ) {
     return connectToGraph(new EscalatorEdge(from, to, length, duration));
   }
