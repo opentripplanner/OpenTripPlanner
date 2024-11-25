@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
@@ -174,12 +176,12 @@ public class OsmWayTest {
     escalator.addTag("conveying", "yes");
     assertTrue(escalator.isEscalator());
 
-    assertNull(escalator.getDurationSeconds());
+    assertEquals(Optional.empty(), escalator.getDuration());
 
     escalator.addTag("duration", "00:00:61");
-    assertNull(escalator.getDurationSeconds());
+    assertEquals(Optional.empty(), escalator.getDuration());
     escalator.addTag("duration", "00:01:01");
-    assertEquals(61, escalator.getDurationSeconds());
+    assertEquals(Optional.of(Duration.ofSeconds(61)), escalator.getDuration());
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
