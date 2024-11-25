@@ -1,6 +1,8 @@
 package org.opentripplanner.osm.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -171,6 +173,13 @@ public class OsmWayTest {
 
     escalator.addTag("conveying", "yes");
     assertTrue(escalator.isEscalator());
+
+    assertNull(escalator.getDurationSeconds());
+
+    escalator.addTag("duration", "00:00:61");
+    assertNull(escalator.getDurationSeconds());
+    escalator.addTag("duration", "00:01:01");
+    assertEquals(61, escalator.getDurationSeconds());
 
     escalator.addTag("conveying", "whoknows?");
     assertFalse(escalator.isEscalator());
