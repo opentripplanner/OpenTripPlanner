@@ -152,6 +152,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
   ) {
+    for (var call : CallWrapper.of(journey)) {
+      if (StringUtils.hasNoValueOrNullAsString(call.getStopPointRef())) {
+        return UpdateError.result(null, EMPTY_STOP_POINT_REF, journey.getDataSource());
+      }
+    }
     boolean shouldAddNewTrip = false;
     try {
       shouldAddNewTrip = shouldAddNewTrip(journey, entityResolver);
@@ -228,16 +233,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       !TRUE.equals(estimatedVehicleJourney.isCancellation())
     ) {
       return UpdateError.result(trip != null ? trip.getId() : null, NOT_MONITORED, dataSource);
-    }
-
-    for (var call : CallWrapper.of(estimatedVehicleJourney)) {
-      if (StringUtils.hasNoValueOrNullAsString(call.getStopPointRef())) {
-        return UpdateError.result(
-          trip != null ? trip.getId() : null,
-          EMPTY_STOP_POINT_REF,
-          dataSource
-        );
-      }
     }
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
