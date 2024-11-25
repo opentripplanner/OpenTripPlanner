@@ -26,55 +26,49 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
   @Override
   public DataFetcher<Object> end() {
     return environment -> {
-      TransitService transitService = getTransitService(environment);
-      Trip trip = getTrip(environment);
-      var serviceDate = getSource(environment).getServiceDate();
-
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, transitService.getTimeZone())
-        .toInstant();
-      Timetable timetable = getTimetable(environment, trip, serviceDate);
-      if (timetable == null) {
+      final Result result = getResult(environment);
+      if (result.timetable() == null) {
         return null;
       }
-      return TripTimeOnDate.lastFromTripTimes(timetable, trip, serviceDate, midnight);
+      return TripTimeOnDate.lastFromTripTimes(result.timetable(), result.trip(), result.serviceDate(), result.midnight());
     };
+  }
+
+  private Result getResult(DataFetchingEnvironment environment) {
+    TransitService transitService = getTransitService(environment);
+    Trip trip = getTrip(environment);
+    var serviceDate = getSource(environment).getServiceDate();
+
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(serviceDate, transitService.getTimeZone())
+      .toInstant();
+    Timetable timetable = getTimetable(environment, trip, serviceDate);
+    return new Result(trip, serviceDate, midnight, timetable);
+  }
+
+  private record Result(Trip trip, LocalDate serviceDate, Instant midnight, @Nullable Timetable timetable) {
   }
 
   @Override
   public DataFetcher<Object> start() {
     return environment -> {
-      TransitService transitService = getTransitService(environment);
-      Trip trip = getTrip(environment);
-      var serviceDate = getSource(environment).getServiceDate();
-
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, transitService.getTimeZone())
-        .toInstant();
-      Timetable timetable = getTimetable(environment, trip, serviceDate);
-      if (timetable == null) {
+      var result = getResult(environment);
+      if (result.timetable() == null) {
         return null;
       }
-      return TripTimeOnDate.firstFromTripTimes(timetable, trip, serviceDate, midnight);
+      return TripTimeOnDate.firstFromTripTimes(result.timetable, result.trip, result.serviceDate, result.midnight);
     };
   }
 
   @Override
   public DataFetcher<Iterable<Object>> stopCalls() {
     return environment -> {
-      TransitService transitService = getTransitService(environment);
-      Trip trip = getTrip(environment);
-      var serviceDate = getSource(environment).getServiceDate();
-
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, transitService.getTimeZone())
-        .toInstant();
-      Timetable timetable = getTimetable(environment, trip, serviceDate);
-      if (timetable == null) {
+      var result = getResult(environment);
+      if (result.timetable == null) {
         return List.of();
       }
       return TripTimeOnDate
-        .fromTripTimes(timetable, trip, serviceDate, midnight)
+        .fromTripTimes(result.timetable, result.trip, result.serviceDate, result.midnight)
         .stream()
         .map(Object.class::cast)
         .toList();
