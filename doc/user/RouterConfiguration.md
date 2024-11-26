@@ -875,6 +875,12 @@ Used to group requests when monitoring OTP.
       "feedId" : "parking",
       "sourceType" : "siri-fm",
       "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
+    },
+    {
+      "type" : "siri-et-light",
+      "feedId" : "sta",
+      "url" : "https://example.com/siri-lite/estimated-timetable/xml",
+      "fuzzyTripMatching" : true
     }
   ],
   "rideHailingServices" : [

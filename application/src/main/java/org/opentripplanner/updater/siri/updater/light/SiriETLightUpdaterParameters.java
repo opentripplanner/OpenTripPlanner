@@ -1,7 +1,8 @@
-package org.opentripplanner.updater.siri.updater;
+package org.opentripplanner.updater.siri.updater.light;
 
 import java.net.URI;
 import java.time.Duration;
+import org.opentripplanner.updater.siri.updater.SiriUpdaterParameters;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 public record SiriETLightUpdaterParameters(
@@ -13,7 +14,7 @@ public record SiriETLightUpdaterParameters(
   boolean fuzzyTripMatching,
   HttpHeaders httpRequestHeaders
 )
-  implements SiriETUpdater.SiriUpdaterParameters, SiriETLightHttpTripUpdateSource.Parameters {
+  implements SiriUpdaterParameters, SiriETLightHttpTripUpdateSource.Parameters {
   public SiriETLightHttpTripUpdateSource.Parameters sourceParameters() {
     return this;
   }

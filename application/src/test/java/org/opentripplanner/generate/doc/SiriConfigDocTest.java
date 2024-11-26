@@ -29,7 +29,11 @@ public class SiriConfigDocTest {
   private static final File OUT_FILE = new File(USER_DOC_PATH, "sandbox/siri/SiriUpdater.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater", "siri-sx-updater");
+  private static final Set<String> INCLUDE_UPDATERS = Set.of(
+    "siri-et-updater",
+    "siri-et-light",
+    "siri-sx-updater"
+  );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 

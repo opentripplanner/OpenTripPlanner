@@ -1,17 +1,20 @@
-package org.opentripplanner.updater.siri.updater;
+package org.opentripplanner.updater.siri.updater.light;
 
 import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.updater.siri.updater.SiriHelper;
+import org.opentripplanner.updater.siri.updater.SiriLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
 /**
- * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP.
+ * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP via a single request
+ * that contains all updates.
  */
 public class SiriLightHttpLoader implements SiriLoader {
 

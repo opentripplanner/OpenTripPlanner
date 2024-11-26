@@ -43,10 +43,10 @@ import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirecto
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.SiriETLightUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.light.SiriETLightUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;

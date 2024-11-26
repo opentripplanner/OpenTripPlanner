@@ -1,12 +1,10 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.siri.updater.SiriETLightUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.light.SiriETLightUpdaterParameters;
 
 public class SiriETLightUpdaterConfig {
 
@@ -22,7 +20,7 @@ public class SiriETLightUpdaterConfig {
         .asUri(),
       c
         .of("frequency")
-        .since(V2_0)
+        .since(V2_7)
         .summary("How often the updates should be retrieved.")
         .asDuration(Duration.ofMinutes(1)),
       c
@@ -35,7 +33,7 @@ public class SiriETLightUpdaterConfig {
         .since(V2_7)
         .summary("If the fuzzy trip matcher should be used to match trips.")
         .asBoolean(false),
-      HttpHeadersConfig.headers(c, V2_3)
+      HttpHeadersConfig.headers(c, V2_7)
     );
   }
 }

@@ -16,7 +16,7 @@ public record SiriETUpdaterParameters(
   HttpHeaders httpRequestHeaders,
   boolean producerMetrics
 )
-  implements SiriETUpdater.SiriUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {
+  implements SiriUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {
     return this;
   }
