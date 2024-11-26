@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +28,7 @@ class EscalatorEdgeTest {
   @ParameterizedTest(name = "escalatorReluctance of {0} should lead to traversal costs of {1}")
   @MethodSource("args")
   void testWalking(double escalatorReluctance, double expectedWeight) {
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, Optional.empty());
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, null);
     var req = StreetSearchRequest
       .of()
       .withPreferences(p -> p.withWalk(w -> w.withEscalatorReluctance(escalatorReluctance)))
@@ -43,7 +42,7 @@ class EscalatorEdgeTest {
   @Test
   void testDuration() {
     // If duration is given, length does not affect timeDeltaSeconds, only duration does.
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, Optional.of(Duration.ofSeconds(60)));
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, Duration.ofSeconds(60));
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
     var res = edge.traverse(new State(from, req.build()))[0];
     assertEquals(60, res.getTimeDeltaSeconds());
@@ -51,7 +50,7 @@ class EscalatorEdgeTest {
 
   @Test
   void testCycling() {
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, Optional.empty());
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, null);
     var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
     var res = edge.traverse(new State(from, req.build()));
     assertThat(res).isEmpty();
@@ -59,7 +58,7 @@ class EscalatorEdgeTest {
 
   @Test
   void testWheelchair() {
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, Optional.empty());
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, null);
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchair(true);
     var res = edge.traverse(new State(from, req.build()));
     assertThat(res).isEmpty();
@@ -67,14 +66,14 @@ class EscalatorEdgeTest {
 
   @Test
   void name() {
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, Optional.empty());
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, null);
     assertEquals("Rolltreppe", edge.getName().toString(Locale.GERMANY));
     assertEquals("escalator", edge.getName().toString(Locale.ENGLISH));
   }
 
   @Test
   void geometry() {
-    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, Optional.empty());
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10, null);
     assertThat(edge.getGeometry().getCoordinates()).isNotEmpty();
   }
 }

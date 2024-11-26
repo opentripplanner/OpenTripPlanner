@@ -47,28 +47,28 @@ class EscalatorProcessor {
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
           length,
-          duration
+          duration.orElse(null)
         );
       } else if (escalatorWay.isBackwardEscalator()) {
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
           length,
-          duration
+          duration.orElse(null)
         );
       } else {
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
           length,
-          duration
+          duration.orElse(null)
         );
 
         EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
           length,
-          duration
+          duration.orElse(null)
         );
       }
     }
