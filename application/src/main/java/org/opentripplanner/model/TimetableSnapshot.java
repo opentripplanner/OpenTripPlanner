@@ -552,7 +552,39 @@ public class TimetableSnapshot {
    * @return true if the timetable changed as a result of the call
    */
   private boolean clearTimetables(String feedId) {
-    return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
+    var dirty = false;
+    dirtyTimetables.clear();
+
+    for (var entry : timetables.entrySet()) {
+      var pattern = entry.getKey();
+
+      if (feedId.equals(pattern.getFeedId())) {
+        var timetablesForPattern = entry.getValue();
+        var scheduledTimetable = pattern.getScheduledTimetable();
+
+        // remove scheduled timetables from the entry
+        var updatedTimetables = timetablesForPattern
+          .stream()
+          .filter(timetable ->
+            !timetable.equals(scheduledTimetable.copyForServiceDate(timetable.getServiceDate()))
+          );
+
+        // then restore updated timetables to scheduled timetables
+        var restoredTimetables = updatedTimetables
+          .map(timetable -> scheduledTimetable.copyForServiceDate(timetable.getServiceDate()))
+          .collect(ImmutableSortedSet.toImmutableSortedSet(new SortedTimetableComparator()));
+        dirty = dirty || !restoredTimetables.isEmpty();
+        restoredTimetables.forEach(updated ->
+          dirtyTimetables.put(
+            new TripPatternAndServiceDate(pattern, updated.getServiceDate()),
+            updated
+          )
+        );
+        entry.setValue(restoredTimetables);
+      }
+    }
+
+    return dirty;
   }
 
   /**

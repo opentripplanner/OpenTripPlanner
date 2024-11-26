@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -482,5 +483,34 @@ public class Timetable implements Serializable {
       // Pattern is created only for real-time updates
       return null;
     }
+  }
+
+  /**
+   * Get a copy of the scheduled timetable valid for the specified service date only
+   */
+  public Timetable copyForServiceDate(LocalDate date) {
+    if (serviceDate != null) {
+      throw new RuntimeException(
+        "Can only copy scheduled timetable for a specific date if a date hasn't been specified yet."
+      );
+    }
+    return copyOf().withServiceDate(date).build();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    Timetable timetable = (Timetable) o;
+    return (
+      Objects.equals(pattern, timetable.pattern) &&
+      Objects.equals(tripTimes, timetable.tripTimes) &&
+      Objects.equals(frequencyEntries, timetable.frequencyEntries) &&
+      Objects.equals(serviceDate, timetable.serviceDate)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(pattern, tripTimes, frequencyEntries, serviceDate);
   }
 }
