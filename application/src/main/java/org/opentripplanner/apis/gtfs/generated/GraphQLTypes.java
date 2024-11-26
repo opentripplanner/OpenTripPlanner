@@ -75,6 +75,63 @@ public class GraphQLTypes {
     ROUTE_TYPES,
   }
 
+  public static class GraphQLAlertAlertDescriptionTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertDescriptionTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertHeaderTextArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertHeaderTextArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class GraphQLAlertAlertUrlArgs {
+
+    private String language;
+
+    public GraphQLAlertAlertUrlArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   /** Cause of a alert */
   public enum GraphQLAlertCauseType {
     ACCIDENT,
@@ -1262,6 +1319,69 @@ public class GraphQLTypes {
     private List<GraphQLTransitMode> originModesWithParentStation;
 
     public GraphQLLegNextLegsArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("destinationModesWithParentStation") != null) {
+          this.destinationModesWithParentStation =
+            ((List<Object>) args.get("destinationModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof GraphQLTransitMode
+                  ? item
+                  : GraphQLTransitMode.valueOf((String) item)
+              )
+              .map(GraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+        this.numberOfLegs = (Integer) args.get("numberOfLegs");
+        if (args.get("originModesWithParentStation") != null) {
+          this.originModesWithParentStation =
+            ((List<Object>) args.get("originModesWithParentStation")).stream()
+              .map(item ->
+                item instanceof GraphQLTransitMode
+                  ? item
+                  : GraphQLTransitMode.valueOf((String) item)
+              )
+              .map(GraphQLTransitMode.class::cast)
+              .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLTransitMode> getGraphQLDestinationModesWithParentStation() {
+      return this.destinationModesWithParentStation;
+    }
+
+    public Integer getGraphQLNumberOfLegs() {
+      return this.numberOfLegs;
+    }
+
+    public List<GraphQLTransitMode> getGraphQLOriginModesWithParentStation() {
+      return this.originModesWithParentStation;
+    }
+
+    public void setGraphQLDestinationModesWithParentStation(
+      List<GraphQLTransitMode> destinationModesWithParentStation
+    ) {
+      this.destinationModesWithParentStation = destinationModesWithParentStation;
+    }
+
+    public void setGraphQLNumberOfLegs(Integer numberOfLegs) {
+      this.numberOfLegs = numberOfLegs;
+    }
+
+    public void setGraphQLOriginModesWithParentStation(
+      List<GraphQLTransitMode> originModesWithParentStation
+    ) {
+      this.originModesWithParentStation = originModesWithParentStation;
+    }
+  }
+
+  public static class GraphQLLegPreviousLegsArgs {
+
+    private List<GraphQLTransitMode> destinationModesWithParentStation;
+    private Integer numberOfLegs;
+    private List<GraphQLTransitMode> originModesWithParentStation;
+
+    public GraphQLLegPreviousLegsArgs(Map<String, Object> args) {
       if (args != null) {
         if (args.get("destinationModesWithParentStation") != null) {
           this.destinationModesWithParentStation =
@@ -4098,6 +4218,55 @@ public class GraphQLTypes {
 
     public void setGraphQLIds(List<String> ids) {
       this.ids = ids;
+    }
+  }
+
+  public static class GraphQLQueryTypeVehicleRentalsByBboxArgs {
+
+    private Double maximumLatitude;
+    private Double maximumLongitude;
+    private Double minimumLatitude;
+    private Double minimumLongitude;
+
+    public GraphQLQueryTypeVehicleRentalsByBboxArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.maximumLatitude = (Double) args.get("maximumLatitude");
+        this.maximumLongitude = (Double) args.get("maximumLongitude");
+        this.minimumLatitude = (Double) args.get("minimumLatitude");
+        this.minimumLongitude = (Double) args.get("minimumLongitude");
+      }
+    }
+
+    public Double getGraphQLMaximumLatitude() {
+      return this.maximumLatitude;
+    }
+
+    public Double getGraphQLMaximumLongitude() {
+      return this.maximumLongitude;
+    }
+
+    public Double getGraphQLMinimumLatitude() {
+      return this.minimumLatitude;
+    }
+
+    public Double getGraphQLMinimumLongitude() {
+      return this.minimumLongitude;
+    }
+
+    public void setGraphQLMaximumLatitude(Double maximumLatitude) {
+      this.maximumLatitude = maximumLatitude;
+    }
+
+    public void setGraphQLMaximumLongitude(Double maximumLongitude) {
+      this.maximumLongitude = maximumLongitude;
+    }
+
+    public void setGraphQLMinimumLatitude(Double minimumLatitude) {
+      this.minimumLatitude = minimumLatitude;
+    }
+
+    public void setGraphQLMinimumLongitude(Double minimumLongitude) {
+      this.minimumLongitude = minimumLongitude;
     }
   }
 

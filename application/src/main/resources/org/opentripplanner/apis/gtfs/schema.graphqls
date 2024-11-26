@@ -73,6 +73,9 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
+"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
+union RentalPlace = RentalVehicle | VehicleRentalStation
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -117,23 +120,32 @@ type Alert implements Node {
   "Alert cause"
   alertCause: AlertCauseType
   "Long description of the alert"
-  alertDescriptionText: String!
+  alertDescriptionText(
+    "Returns description with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String!
   "Long descriptions of the alert in all different available languages"
-  alertDescriptionTextTranslations: [TranslatedString!]!
+  alertDescriptionTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertDescriptionText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertDescriptionText` field.")
   "Alert effect"
   alertEffect: AlertEffectType
   "hashcode from the original GTFS-RT alert"
   alertHash: Int
   "Header of the alert, if available"
-  alertHeaderText: String
+  alertHeaderText(
+    "Returns header with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String
   "Header of the alert in all different available languages"
-  alertHeaderTextTranslations: [TranslatedString!]!
+  alertHeaderTextTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertHeaderText` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertHeaderText` field.")
   "Alert severity level"
   alertSeverityLevel: AlertSeverityLevelType
   "Url with more information"
-  alertUrl: String
+  alertUrl(
+    "Returns URL with the specified language, if found, otherwise returns the value with some default language."
+    language: String
+  ): String
   "Url with more information in all different available languages"
-  alertUrlTranslations: [TranslatedString!]!
+  alertUrlTranslations: [TranslatedString!]! @deprecated(reason : "Use `alertUrl` instead. `accept-language` header can be used for translations or the `language` parameter on the `alertUrl` field.")
   "Time when this alert is not in effect anymore. Format: Unix timestamp in seconds"
   effectiveEndDate: Long
   "Time when this alert comes into effect. Format: Unix timestamp in seconds"
@@ -724,6 +736,24 @@ type Leg {
   pickupBookingInfo: BookingInfo
   "This is used to indicate if boarding this leg is possible only with special arrangements."
   pickupType: PickupDropoffType
+  "Previous legs with same origin and destination stops or stations"
+  previousLegs(
+    """
+    Transportation modes for which all stops in the parent station are used as possible destination stops
+    for the previous legs. For modes not listed, only the exact destination stop of the leg is considered.
+    """
+    destinationModesWithParentStation: [TransitMode!],
+    """
+    The number of alternative legs searched. If fewer than the requested number are found,
+    then only the found legs are returned.
+    """
+    numberOfLegs: Int!,
+    """
+    Transportation modes for which all stops in the parent station are used as possible origin stops
+    for the previous legs. For modes not listed, only the exact origin stop of the leg is considered.
+    """
+    originModesWithParentStation: [TransitMode!]
+  ): [Leg!]
   "Whether there is real-time data about this Leg"
   realTime: Boolean
   "State of real-time data"
@@ -1741,6 +1771,17 @@ type QueryType {
     """
     ids: [String]
   ): [VehicleRentalStation]
+  "Get all rental vehicles within the specified bounding box"
+  vehicleRentalsByBbox(
+    "Northern bound of the bounding box"
+    maximumLatitude: CoordinateValue!,
+    "Eastern bound of the bounding box"
+    maximumLongitude: CoordinateValue!,
+    "Southern bound of the bounding box"
+    minimumLatitude: CoordinateValue!,
+    "Western bound of the bounding box"
+    minimumLongitude: CoordinateValue!
+  ): [RentalPlace!]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }
@@ -2205,10 +2246,10 @@ type Stoptime {
   "The stop where this arrival/departure happens"
   stop: Stop
   """
-  The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+  The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
   increasing integer sequence along the stops is valid.
     
-  The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+  The purpose of this field is to identify the stop within the trip so it can be cross-referenced
   between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
   However, it should be noted that real-time updates can change the values, so don't store it for
   longer amounts of time.
@@ -2217,6 +2258,15 @@ type Stoptime {
   even generated.
   """
   stopPosition: Int
+  """
+  The position of the stop in the pattern. This is required to start from 0 and be consecutive along
+  the pattern, up to n-1 for a pattern with n stops.
+    
+  The purpose of this field is to identify the position of the stop within the pattern so it can be
+  cross-referenced between different trips on the same pattern, as stopPosition can be different
+  between trips even within the same pattern.
+  """
+  stopPositionInPattern: Int!
   "true, if this stop is used as a time equalization stop. false otherwise."
   timepoint: Boolean
   "Trip which this stoptime is for"

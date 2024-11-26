@@ -28,8 +28,19 @@ export function LegLines({ tripPattern }: { tripPattern?: TripPattern }) {
                   'line-cap': 'round',
                 }}
                 paint={{
-                  'line-color': getColorForLeg(leg),
+                  'line-color': '#000',
                   'line-width': 5,
+                }}
+              />
+              <Layer
+                type="line"
+                layout={{
+                  'line-join': 'round',
+                  'line-cap': 'round',
+                }}
+                paint={{
+                  'line-color': getColorForLeg(leg),
+                  'line-width': 4,
                 }}
               />
             </Source>
