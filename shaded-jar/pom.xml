@@ -14,6 +14,7 @@
 
     <properties>
         <maven.source>skip</maven.source>
+        <skipShadeJar>false</skipShadeJar>
     </properties>
 
     <dependencies>
@@ -48,7 +49,6 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
                 <configuration>
                     <!--
                     We need to set the final name for two reasons:
@@ -71,6 +71,7 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <skip>${skipShadeJar}</skip>
                     <!-- The shaded JAR will not be the main artifact for the project, it will be attached
                       for deployment in the way source and docs are. -->
                     <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -107,28 +108,13 @@
                         </transformer>
                     </transformers>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>build-shaded-jar</id>
+                        <goals><goal>shade</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>shaded-jar</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
