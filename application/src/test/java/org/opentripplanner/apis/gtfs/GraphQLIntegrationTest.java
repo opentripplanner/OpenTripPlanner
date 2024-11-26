@@ -206,7 +206,7 @@ class GraphQLIntegrationTest {
           .addTripTimes(
             TripTimesFactory.tripTimes(
               tripToBeReplaced,
-              TEST_MODEL.stopTimesEvery5Minutes(3, tripToBeReplaced, T11_30),
+              TEST_MODEL.stopTimesEvery5Minutes(3, tripToBeReplaced, "11:30"),
               DEDUPLICATOR
             )
           )
