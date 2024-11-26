@@ -35,7 +35,9 @@ public class GtfsRealtimeFuzzyTripMatcher {
   }
 
   public TripDescriptor match(String feedId, TripDescriptor trip) {
-    if (trip.hasTripId()) {
+    if (
+      trip.hasTripId() && transitService.containsTrip(new FeedScopedId(feedId, trip.getTripId()))
+    ) {
       // trip_id already exists
       return trip;
     }

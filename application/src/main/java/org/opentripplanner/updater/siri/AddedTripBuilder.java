@@ -56,6 +56,7 @@ class AddedTripBuilder {
   private final Function<Trip, FeedScopedId> getTripPatternId;
   private final FeedScopedId tripId;
   private final Operator operator;
+  private final String dataSource;
   private final String lineRef;
   private final Route replacedRoute;
   private final LocalDate serviceDate;
@@ -81,10 +82,13 @@ class AddedTripBuilder {
     Objects.requireNonNull(newServiceJourneyRef, "EstimatedVehicleJourneyCode is required");
     tripId = entityResolver.resolveId(newServiceJourneyRef);
 
-    //OperatorRef of added trip
+    // OperatorRef of added trip
     Objects.requireNonNull(estimatedVehicleJourney.getOperatorRef(), "OperatorRef is required");
     String operatorRef = estimatedVehicleJourney.getOperatorRef().getValue();
     operator = entityResolver.resolveOperator(operatorRef);
+
+    // DataSource of added trip
+    dataSource = estimatedVehicleJourney.getDataSource();
 
     // LineRef of added trip
     Objects.requireNonNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
@@ -135,7 +139,8 @@ class AddedTripBuilder {
     boolean cancellation,
     String shortName,
     String headsign,
-    List<TripOnServiceDate> replacedTrips
+    List<TripOnServiceDate> replacedTrips,
+    String dataSource
   ) {
     this.transitService = transitService;
     this.entityResolver = entityResolver;
@@ -155,20 +160,21 @@ class AddedTripBuilder {
     this.shortName = shortName;
     this.headsign = headsign;
     this.replacedTrips = replacedTrips;
+    this.dataSource = dataSource;
   }
 
   Result<TripUpdate, UpdateError> build() {
     if (calls.size() < 2) {
-      return UpdateError.result(tripId, TOO_FEW_STOPS);
+      return UpdateError.result(tripId, TOO_FEW_STOPS, dataSource);
     }
 
     if (serviceDate == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
+      return UpdateError.result(tripId, NO_START_DATE, dataSource);
     }
 
     FeedScopedId calServiceId = transitService.getOrCreateServiceIdForDate(serviceDate);
     if (calServiceId == null) {
-      return UpdateError.result(tripId, NO_START_DATE);
+      return UpdateError.result(tripId, NO_START_DATE, dataSource);
     }
 
     boolean isAddedRoute = false;
@@ -176,7 +182,7 @@ class AddedTripBuilder {
     if (route == null) {
       Agency agency = resolveAgency();
       if (agency == null) {
-        return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY);
+        return UpdateError.result(tripId, CANNOT_RESOLVE_AGENCY, dataSource);
       }
       route = createRoute(agency);
       isAddedRoute = true;
@@ -201,7 +207,7 @@ class AddedTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        return UpdateError.result(tripId, NO_VALID_STOPS);
+        return UpdateError.result(tripId, NO_VALID_STOPS, dataSource);
       }
 
       aimedStopTimes.add(stopTime);
@@ -256,7 +262,7 @@ class AddedTripBuilder {
     try {
       updatedTripTimes.validateNonIncreasingTimes();
     } catch (DataValidationException e) {
-      return DataValidationExceptionMapper.toResult(e);
+      return DataValidationExceptionMapper.toResult(e, dataSource);
     }
 
     var tripOnServiceDate = TripOnServiceDate
@@ -273,7 +279,8 @@ class AddedTripBuilder {
         serviceDate,
         tripOnServiceDate,
         pattern,
-        isAddedRoute
+        isAddedRoute,
+        dataSource
       )
     );
   }

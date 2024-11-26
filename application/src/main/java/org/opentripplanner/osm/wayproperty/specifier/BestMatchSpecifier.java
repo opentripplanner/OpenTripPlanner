@@ -26,6 +26,10 @@ public class BestMatchSpecifier implements OsmSpecifier {
   public static final int NO_MATCH_SCORE = 0;
   private final Condition[] conditions;
 
+  /**
+   * @deprecated Logic is fuzzy and unpredictable, use ExactMatchSpecifier instead
+   */
+  @Deprecated
   public BestMatchSpecifier(String spec) {
     conditions = OsmSpecifier.parseConditions(spec, ";");
   }

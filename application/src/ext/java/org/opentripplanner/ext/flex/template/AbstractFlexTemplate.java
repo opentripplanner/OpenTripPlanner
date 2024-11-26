@@ -199,7 +199,7 @@ abstract class AbstractFlexTemplate {
       return null;
     }
 
-    final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], transferEdges);
+    final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState, transferEdges);
 
     return finalStateOpt
       .map(finalState -> {

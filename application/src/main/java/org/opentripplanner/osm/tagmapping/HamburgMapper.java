@@ -7,7 +7,6 @@ import org.opentripplanner.osm.model.OsmWithTags;
  *
  * @see GermanyMapper
  * @see OsmTagMapper
- * @see DefaultMapper
  *
  * @author Maintained by HBT (geofox-team@hbt.de)
  */

@@ -26,7 +26,7 @@ public final class RegularStopBuilder
 
   private ZoneId timeZone;
 
-  private TransitMode gtfsVehicleType;
+  private TransitMode vehicleType;
 
   private String netexVehicleSubmode;
 
@@ -45,7 +45,7 @@ public final class RegularStopBuilder
     this.platformCode = original.getPlatformCode();
     this.url = original.getUrl();
     this.timeZone = original.getTimeZone();
-    this.gtfsVehicleType = original.getGtfsVehicleType();
+    this.vehicleType = original.getVehicleType();
     this.netexVehicleSubmode = original.getNetexVehicleSubmode().name();
   }
 
@@ -68,11 +68,11 @@ public final class RegularStopBuilder
   }
 
   public TransitMode vehicleType() {
-    return gtfsVehicleType;
+    return vehicleType;
   }
 
   public RegularStopBuilder withVehicleType(TransitMode vehicleType) {
-    this.gtfsVehicleType = vehicleType;
+    this.vehicleType = vehicleType;
     return this;
   }
 
