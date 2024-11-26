@@ -323,7 +323,7 @@ type CallTime {
   "The estimated time of the event. If no real-time information is available, this is null."
   estimated: CallRealTimeEstimate
   "The scheduled time of the event."
-  scheduledTime: OffsetDateTime!
+  scheduledTime: OffsetDateTime
 }
 
 "Car park represents a location where cars can be parked."
