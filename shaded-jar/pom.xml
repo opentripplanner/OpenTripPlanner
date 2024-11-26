@@ -59,7 +59,7 @@
                         "otp-SNAPSHOT-shaded.pom". Changing the packaging of the project is not
                         what we want either.
                     -->
-                    <outputFile>${build.directory}/otp-${project.version}-shaded.jar</outputFile>
+                    <outputFile>${project.build.directory}/otp-${project.version}-shaded.jar</outputFile>
                     <filters>
                         <filter>
                             <!-- exclude signatures from merged JAR to avoid invalid signature messages -->
