@@ -188,7 +188,7 @@ class GraphQLIntegrationTest {
       .trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .build();
-    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
 
     var calendar = new CalendarServiceData();

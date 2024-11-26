@@ -73,13 +73,6 @@ public class ServiceJourneyType {
           )
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("serviceAlteration")
-      //                        .type(serviceAlterationEnum)
-      //                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
-      //                        .dataFetcher(environment -> (((Trip) trip(environment)).getServiceAlteration()))
-      //                        .build())
-
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -216,14 +209,16 @@ public class ServiceJourneyType {
 
             if (first != null && last != null) {
               throw new AssertException("Both first and last can't be defined simultaneously.");
-            } else if (first != null) {
-              if (first > stops.size()) {
-                return stops.subList(0, first);
-              }
-            } else if (last != null) {
-              if (last > stops.size()) {
-                return stops.subList(stops.size() - last, stops.size());
-              }
+            }
+
+            if ((first != null && first < 0) || (last != null && last < 0)) {
+              throw new AssertException("first and last must be positive integers.");
+            }
+
+            if (first != null && first < stops.size()) {
+              return stops.subList(0, first);
+            } else if (last != null && last < stops.size()) {
+              return stops.subList(stops.size() - last, stops.size());
             }
             return stops;
           })
@@ -319,17 +314,6 @@ public class ServiceJourneyType {
           )
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("keyValues")
-      //                        .description("List of keyValue pairs for the service journey.")
-      //                        .type(new GraphQLList(keyValueType))
-      //                        .dataFetcher(environment -> ((Trip) trip(environment)).getKeyValues())
-      //                        .build())
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("flexibleServiceType")
-      //                        .description("Type of flexible service, or null if service is not flexible.")
-      //                        .type(flexibleServiceTypeEnum)
-      //                        .build())
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()

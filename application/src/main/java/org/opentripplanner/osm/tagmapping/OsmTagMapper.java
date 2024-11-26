@@ -768,7 +768,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for bicycle is not allowed.
    */
-  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String bicycle = way.getTag("bicycle");
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
@@ -780,7 +780,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for walk is not allowed.
    */
-  public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);

@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
@@ -72,6 +73,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -152,17 +154,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    @Nullable GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
     List<TripUpdate> updates,
     String feedId
   ) {
-    if (updates == null) {
-      LOG.warn("updates is null");
-      return UpdateResult.empty();
-    }
-
     Map<ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
     List<Result<UpdateSuccess, UpdateError>> results = new ArrayList<>();
 
@@ -171,11 +168,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       snapshotManager.clearBuffer(feedId);
     }
 
-    LOG.debug("message contains {} trip updates", updates.size());
+    debug(feedId, "message contains {} trip updates", updates.size());
     int uIndex = 0;
     for (TripUpdate tripUpdate : updates) {
       if (!tripUpdate.hasTrip()) {
-        debug(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+        debug(feedId, "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
         continue;
       }
 
@@ -187,7 +184,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final TripDescriptor tripDescriptor = tripUpdate.getTrip();
 
       if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
-        debug(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
+        debug(feedId, "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
         results.add(Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE)));
         continue;
       }
@@ -201,6 +198,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         } catch (final ParseException e) {
           debug(
             tripId,
+            null,
             "Failed to parse start date in gtfs-rt trip update: {}",
             tripDescriptor.getStartDate()
           );
@@ -221,8 +219,24 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       uIndex += 1;
-      LOG.debug("trip update #{} ({} updates) :", uIndex, tripUpdate.getStopTimeUpdateCount());
-      LOG.trace("{}", tripUpdate);
+      if (LOG.isTraceEnabled()) {
+        trace(
+          tripId,
+          serviceDate,
+          "trip update #{} ({} updates): {}",
+          uIndex,
+          tripUpdate.getStopTimeUpdateCount(),
+          tripUpdate
+        );
+      } else {
+        debug(
+          tripId,
+          serviceDate,
+          "trip update #{} ({} updates)",
+          uIndex,
+          tripUpdate.getStopTimeUpdateCount()
+        );
+      }
 
       Result<UpdateSuccess, UpdateError> result;
       try {
@@ -267,8 +281,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       results.add(result);
       if (result.isFailure()) {
-        debug(tripId, "Failed to apply TripUpdate.");
-        LOG.trace(" Contents: {}", tripUpdate);
+        debug(tripId, serviceDate, "Failed to apply TripUpdate.");
         if (failuresByRelationship.containsKey(scheduleRelationship)) {
           var c = failuresByRelationship.get(scheduleRelationship);
           failuresByRelationship.put(scheduleRelationship, ++c);
@@ -356,7 +369,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
 
     if (!failuresByRelationship.isEmpty()) {
-      LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);
+      info(feedId, "Failures by scheduleRelationship {}", failuresByRelationship);
     }
 
     var warnings = Multimaps.index(updateResult.warnings(), w -> w);
@@ -364,7 +377,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .keySet()
       .forEach(key -> {
         var count = warnings.get(key).size();
-        LOG.info("[feedId: {}] {} warnings of type {}", feedId, count, key);
+        info(feedId, "{} warnings of type {}", count, key);
       });
   }
 
@@ -377,12 +390,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = getPatternForTripId(tripId);
 
     if (pattern == null) {
-      debug(tripId, "No pattern found for tripId, skipping TripUpdate.");
+      debug(tripId, serviceDate, "No pattern found for tripId, skipping TripUpdate.");
       return UpdateError.result(tripId, TRIP_NOT_FOUND);
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
-      debug(tripId, "TripUpdate contains no updates, skipping.");
+      debug(tripId, serviceDate, "TripUpdate contains no updates, skipping.");
       return UpdateError.result(tripId, NO_UPDATES);
     }
 
@@ -393,6 +406,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (!serviceDates.contains(serviceDate)) {
       debug(
         tripId,
+        serviceDate,
         "SCHEDULED trip has service date {} for which trip's service is not valid, skipping.",
         serviceDate.toString()
       );
@@ -477,18 +491,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
       // frequency based)?
-      debug(tripId, "Graph already contains trip id of ADDED trip, skipping.");
+      debug(tripId, serviceDate, "Graph already contains trip id of ADDED trip, skipping.");
       return UpdateError.result(tripId, TRIP_ALREADY_EXISTS);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      debug(tripId, "ADDED trip doesn't have a start date in TripDescriptor, skipping.");
+      debug(
+        tripId,
+        serviceDate,
+        "ADDED trip doesn't have a start date in TripDescriptor, skipping."
+      );
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
-    final List<StopTimeUpdate> stopTimeUpdates = removeUnknownStops(tripUpdate, tripId);
+    final List<StopTimeUpdate> stopTimeUpdates = removeUnknownStops(
+      tripUpdate,
+      tripId,
+      serviceDate
+    );
 
     var warnings = new ArrayList<UpdateSuccess.WarningType>(0);
 
@@ -498,12 +520,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // check if after filtering the stops we still have at least 2
     if (stopTimeUpdates.size() < 2) {
-      debug(tripId, "ADDED trip has fewer than two known stops, skipping.");
+      debug(tripId, serviceDate, "ADDED trip has fewer than two known stops, skipping.");
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
-    final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, stopTimeUpdates);
+    final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, serviceDate, stopTimeUpdates);
     if (stops == null) {
       return UpdateError.result(tripId, NO_VALID_STOPS);
     }
@@ -518,7 +540,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Remove any stop that is not know in the static transit data.
    */
-  private List<StopTimeUpdate> removeUnknownStops(TripUpdate tripUpdate, FeedScopedId tripId) {
+  private List<StopTimeUpdate> removeUnknownStops(
+    TripUpdate tripUpdate,
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
     return tripUpdate
       .getStopTimeUpdateList()
       .stream()
@@ -527,7 +553,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         var stopId = new FeedScopedId(tripId.getFeedId(), st.getStopId());
         var stopFound = transitEditorService.getRegularStop(stopId) != null;
         if (!stopFound) {
-          debug(tripId, "Stop '{}' not found in graph. Removing from ADDED trip.", st.getStopId());
+          debug(
+            tripId,
+            serviceDate,
+            "Stop '{}' not found in graph. Removing from ADDED trip.",
+            st.getStopId()
+          );
         }
         return stopFound;
       })
@@ -542,6 +573,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private List<StopLocation> checkNewStopTimeUpdatesAndFindStops(
     final FeedScopedId tripId,
+    LocalDate serviceDate,
     final List<StopTimeUpdate> stopTimeUpdates
   ) {
     Integer previousStopSequence = null;
@@ -557,13 +589,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Check non-negative
         if (stopSequence < 0) {
-          debug(tripId, "Trip update contains negative stop sequence, skipping.");
+          debug(tripId, serviceDate, "Trip update contains negative stop sequence, skipping.");
           return null;
         }
 
         // Check whether sequence is increasing
         if (previousStopSequence != null && previousStopSequence > stopSequence) {
-          debug(tripId, "Trip update contains decreasing stop sequence, skipping.");
+          debug(tripId, serviceDate, "Trip update contains decreasing stop sequence, skipping.");
           return null;
         }
         previousStopSequence = stopSequence;
@@ -583,13 +615,19 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         } else {
           debug(
             tripId,
+            serviceDate,
             "Graph doesn't contain stop id '{}' of trip update, skipping.",
             stopTimeUpdate.getStopId()
           );
           return null;
         }
       } else {
-        debug(tripId, "Trip update misses a stop id at stop time list index {}, skipping.", index);
+        debug(
+          tripId,
+          serviceDate,
+          "Trip update misses a stop id at stop time list index {}, skipping.",
+          index
+        );
         return null;
       }
 
@@ -598,12 +636,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getArrival().getTime();
         if (previousTime != null && previousTime > time) {
-          debug(tripId, "Trip update contains decreasing times, skipping.");
+          debug(tripId, serviceDate, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        debug(tripId, "Trip update misses arrival time, skipping.");
+        debug(tripId, serviceDate, "Trip update misses arrival time, skipping.");
         return null;
       }
 
@@ -612,12 +650,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getDeparture().getTime();
         if (previousTime != null && previousTime > time) {
-          debug(tripId, "Trip update contains decreasing times, skipping.");
+          debug(tripId, serviceDate, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        debug(tripId, "Trip update misses departure time, skipping.");
+        debug(tripId, serviceDate, "Trip update misses departure time, skipping.");
         return null;
       }
     }
@@ -673,6 +711,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // No service id exists: return error for now
       debug(
         tripId,
+        serviceDate,
         "ADDED trip has service date {} for which no service id is available, skipping.",
         serviceDate.toString()
       );
@@ -803,6 +842,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
+            serviceDate,
             "ADDED trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -817,6 +857,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
+            serviceDate,
             "ADDED trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
@@ -879,7 +920,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           .ifPresent(newTripTimes::updateWheelchairAccessibility);
       }
     }
-    LOG.trace(
+    trace(
+      trip.getId(),
+      serviceDate,
       "Trip pattern added with mode {} on {} from {} to {}",
       trip.getRoute().getMode(),
       serviceDate,
@@ -919,7 +962,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final Timetable timetable = pattern.getScheduledTimetable();
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        debug(tripId, "Could not cancel scheduled trip because it's not in the timetable");
+        debug(
+          tripId,
+          serviceDate,
+          "Could not cancel scheduled trip because it's not in the timetable"
+        );
       } else {
         final RealTimeTripTimes newTripTimes = timetable
           .getTripTimes(tripIndex)
@@ -961,7 +1008,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final Timetable timetable = snapshotManager.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        debug(tripId, "Could not cancel previously added trip on {}", serviceDate);
+        debug(tripId, serviceDate, "Could not cancel previously added trip on {}", serviceDate);
       } else {
         final RealTimeTripTimes newTripTimes = timetable
           .getTripTimes(tripIndex)
@@ -1003,14 +1050,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
-      debug(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
+      debug(tripId, serviceDate, "Feed does not contain trip id of MODIFIED trip, skipping.");
       return UpdateError.result(tripId, TRIP_NOT_FOUND);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      debug(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
+      debug(
+        tripId,
+        serviceDate,
+        "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping."
+      );
       return UpdateError.result(tripId, NO_START_DATE);
     } else {
       // Check whether service date is served by trip
@@ -1019,19 +1070,27 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
-        debug(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
+        debug(
+          tripId,
+          serviceDate,
+          "REPLACEMENT trip has a service date that is not served by trip, skipping."
+        );
         return UpdateError.result(tripId, NO_SERVICE_ON_DATE);
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      debug(tripId, "REPLACEMENT trip has less then two stops, skipping.");
+      debug(tripId, serviceDate, "REPLACEMENT trip has less then two stops, skipping.");
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
-    var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate.getStopTimeUpdateList());
+    var stops = checkNewStopTimeUpdatesAndFindStops(
+      tripId,
+      serviceDate,
+      tripUpdate.getStopTimeUpdateList()
+    );
     if (stops == null) {
       return UpdateError.result(tripId, NO_VALID_STOPS);
     }
@@ -1103,9 +1162,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     if (!cancelScheduledSuccess) {
-      debug(tripId, "No pattern found for tripId. Skipping cancellation.");
+      debug(tripId, serviceDate, "No pattern found for tripId. Skipping cancellation.");
       return UpdateError.result(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
+
+    debug(tripId, serviceDate, "Canceled trip");
+
     return Result.success(UpdateSuccess.noWarnings());
   }
 
@@ -1120,13 +1182,58 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return transitEditorService.getPatternForTrip(trip);
   }
 
-  private static void debug(FeedScopedId id, String message, Object... params) {
-    debug(id.getFeedId(), id.getId(), message, params);
+  private static void debug(
+    FeedScopedId id,
+    @Nullable LocalDate serviceDate,
+    String message,
+    Object... params
+  ) {
+    log(Level.DEBUG, id.getFeedId(), id.getId(), serviceDate, message, params);
   }
 
-  private static void debug(String feedId, String tripId, String message, Object... params) {
-    String m = "[feedId: %s, tripId: %s] %s".formatted(feedId, tripId, message);
-    LOG.debug(m, params);
+  private static void debug(String feedId, String message, Object... params) {
+    log(Level.DEBUG, feedId, null, null, message, params);
+  }
+
+  private static void trace(
+    FeedScopedId id,
+    @Nullable LocalDate serviceDate,
+    String message,
+    Object... params
+  ) {
+    log(Level.TRACE, id.getFeedId(), id.getId(), serviceDate, message, params);
+  }
+
+  private static void info(String feedId, String message, Object... params) {
+    log(Level.INFO, feedId, null, null, message, params);
+  }
+
+  /**
+   * This adds detailed per-update logging to allow tracking what feeds and updates were applied to
+   * a given trip.
+   * <p>
+   * The INFO level is used for aggregated statistics, while DEBUG/TRACE is used to link specific
+   * messages to a trip.
+   */
+  private static void log(
+    Level logLevel,
+    String feedId,
+    @Nullable String tripId,
+    @Nullable LocalDate serviceDate,
+    String message,
+    Object... params
+  ) {
+    if (LOG.isEnabledForLevel(logLevel)) {
+      String m = tripId != null || serviceDate != null
+        ? "[feedId: %s, tripId: %s, serviceDate: %s] %s".formatted(
+            feedId,
+            tripId,
+            serviceDate,
+            message
+          )
+        : "[feedId: %s] %s".formatted(feedId, message);
+      LOG.makeLoggingEventBuilder(logLevel).log(m, params);
+    }
   }
 
   private enum CancelationType {

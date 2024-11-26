@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
@@ -169,6 +170,11 @@ class DefaultTransitServiceTest {
   void getPatternForStopsWithRealTime() {
     Collection<TripPattern> patternsForStop = service.getPatternsForStop(STOP_B, true);
     assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, REAL_TIME_PATTERN), patternsForStop);
+  }
+
+  @Test
+  void containsTrip() {
+    assertFalse(service.containsTrip(new FeedScopedId("x", "x")));
   }
 
   @Test

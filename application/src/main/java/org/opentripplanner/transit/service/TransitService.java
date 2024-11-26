@@ -297,7 +297,7 @@ public interface TransitService {
   /**
    * For a {@link StopLocationsGroup} get all child stops and get their modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null)
    * or from the list of patterns that use the stop location.
    * <p>
    * The returning stream is ordered by the number of occurrences of the mode in the child stops.
@@ -307,10 +307,10 @@ public interface TransitService {
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
-   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * The mode is either taken from {@link StopLocation#getVehicleType()} (if non-null)
    * or from the list of patterns that use the stop location.
    * <p>
-   * If {@link StopLocation#getGtfsVehicleType()} is null the returning stream is ordered by the number
+   * If {@link StopLocation#getVehicleType()} is null the returning stream is ordered by the number
    * of occurrences of the mode in the stop.
    * <p>
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
@@ -330,4 +330,12 @@ public interface TransitService {
    * @return - A list of TripOnServiceDates
    */
   List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request);
+
+  /**
+   * Checks if a trip with the given ID exists in the model.
+   *
+   * @param id the {@link FeedScopedId} of the trip to check
+   * @return true if the trip exists, false otherwise
+   */
+  boolean containsTrip(FeedScopedId id);
 }
