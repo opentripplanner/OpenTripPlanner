@@ -1,4 +1,4 @@
-# SIRI Updater
+# SIRI Updaters
 
 Support for consuming SIRI ET and SX messages via HTTPS. The updaters aim to support the [Nordic
 and EPIP SIRI profiles](../../features-explained/Netex-Siri-Compatibility.md) which 
