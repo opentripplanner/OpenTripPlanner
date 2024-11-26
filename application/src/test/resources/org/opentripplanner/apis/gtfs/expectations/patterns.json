@@ -17,6 +17,7 @@
                 "scheduledArrival" : 39600,
                 "scheduledDeparture" : 39600,
                 "stopPosition" : 10,
+                "stopPositionInPattern" : 0,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
@@ -30,6 +31,7 @@
                 "scheduledArrival" : 39900,
                 "scheduledDeparture" : 39900,
                 "stopPosition" : 20,
+                "stopPositionInPattern" : 1,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
@@ -43,6 +45,7 @@
                 "scheduledArrival" : 40200,
                 "scheduledDeparture" : 40200,
                 "stopPosition" : 30,
+                "stopPositionInPattern" : 2,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"

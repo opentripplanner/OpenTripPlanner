@@ -79,6 +79,11 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
+  public DataFetcher<Integer> stopPositionInPattern() {
+    return environment -> getSource(environment).getStopIndex();
+  }
+
+  @Override
   public DataFetcher<Long> serviceDay() {
     return environment -> getSource(environment).getServiceDayMidnight();
   }

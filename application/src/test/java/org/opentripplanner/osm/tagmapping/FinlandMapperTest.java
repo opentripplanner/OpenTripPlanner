@@ -1,8 +1,12 @@
 package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -11,12 +15,15 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 
 public class FinlandMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
+  private WayPropertySet wps;
+  private OsmTagMapper mapper;
   static float epsilon = 0.01f;
 
-  static {
-    var source = new FinlandMapper();
-    source.populateProperties(wps);
+  @BeforeEach
+  public void setup() {
+    this.wps = new WayPropertySet();
+    this.mapper = new FinlandMapper();
+    this.mapper.populateProperties(this.wps);
   }
 
   /**
@@ -193,5 +200,37 @@ public class FinlandMapperTest {
     way.addTag("winter_road", "yes");
     wayData = wps.getDataForWay(way);
     assertEquals(wayData.getPermission(), NONE);
+  }
+
+  /**
+   * Test that biking is not allowed in footway areas and transit platforms
+   */
+  @Test
+  public void testArea() {
+    OsmWithTags way;
+    WayProperties wayData;
+
+    way = new OsmWay();
+    way.addTag("highway", "footway");
+    way.addTag("area", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN);
+
+    way = new OsmWay();
+    way.addTag("public_transport", "platform");
+    way.addTag("area", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN);
+    way.addTag("bicycle", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), PEDESTRIAN_AND_BICYCLE);
+  }
+
+  @Test
+  public void serviceNoThroughTraffic() {
+    var way = new OsmWay();
+    way.addTag("highway", "residential");
+    way.addTag("service", "driveway");
+    assertTrue(mapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(way));
   }
 }

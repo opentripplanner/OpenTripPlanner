@@ -39,6 +39,7 @@ public class SiriEtBuilder {
 
     // Set default values
     evj.setMonitored(true);
+    evj.setDataSource("DATASOURCE");
   }
 
   public List<EstimatedTimetableDeliveryStructure> buildEstimatedTimetableDeliveries() {
@@ -237,11 +238,15 @@ public class SiriEtBuilder {
     }
 
     public EstimatedCallsBuilder call(StopLocation stop) {
+      return call(stop.getId().getId());
+    }
+
+    public EstimatedCallsBuilder call(String stopPointRef) {
       var call = new EstimatedCall();
       call.setOrder(BigInteger.valueOf(orderOffset + calls.size()));
 
       var ref = new StopPointRef();
-      ref.setValue(stop.getId().getId());
+      ref.setValue(stopPointRef);
       call.setStopPointRef(ref);
 
       calls.add(call);

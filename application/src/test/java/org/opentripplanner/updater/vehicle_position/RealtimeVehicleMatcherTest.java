@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.vehicle_position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
@@ -92,7 +91,7 @@ public class RealtimeVehicleMatcherTest {
     var trip1 = TimetableRepositoryForTest.trip(tripId).build();
     var trip2 = TimetableRepositoryForTest.trip(secondTripId).build();
 
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip1, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip1, "11:00");
     var pattern = tripPattern(trip1, stopTimes);
 
     // Map positions to trips in feed
