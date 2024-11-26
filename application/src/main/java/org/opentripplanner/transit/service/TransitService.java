@@ -320,4 +320,12 @@ public interface TransitService {
    * @return - A list of TripOnServiceDates
    */
   List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request);
+
+  /**
+   * Checks if a trip with the given ID exists in the model.
+   *
+   * @param id the {@link FeedScopedId} of the trip to check
+   * @return true if the trip exists, false otherwise
+   */
+  boolean containsTrip(FeedScopedId id);
 }

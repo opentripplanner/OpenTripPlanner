@@ -59,7 +59,7 @@ class TimetableRepositoryIndex {
   private FlexIndex flexIndex = null;
 
   TimetableRepositoryIndex(TimetableRepository timetableRepository) {
-    LOG.info("Transit model index init...");
+    LOG.info("Timetable repository index init...");
 
     for (Agency agency : timetableRepository.getAgencies()) {
       this.agencyForId.put(agency.getId(), agency);
@@ -113,7 +113,7 @@ class TimetableRepositoryIndex {
       }
     }
 
-    LOG.info("Transit Model index init complete.");
+    LOG.info("Timetable repository index init complete.");
   }
 
   Agency getAgencyForId(FeedScopedId id) {
@@ -159,6 +159,16 @@ class TimetableRepositoryIndex {
 
   Trip getTripForId(FeedScopedId tripId) {
     return tripForId.get(tripId);
+  }
+
+  /**
+   * Checks if the specified trip is contained within the index.
+   *
+   * @param tripId the {@link FeedScopedId} of the trip to check
+   * @return true if the trip exists in the index map, false otherwise
+   */
+  boolean containsTrip(FeedScopedId tripId) {
+    return tripForId.containsKey(tripId);
   }
 
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate) {
