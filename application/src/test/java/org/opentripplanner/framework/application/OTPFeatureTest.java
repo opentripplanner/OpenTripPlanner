@@ -55,7 +55,7 @@ public class OTPFeatureTest {
         {
           otpFeatures : {
             APIBikeRental : false,
-            MinimumTransferTimeIsDefinitive : true
+            Co2Emissions : true
           }
         }
         """;
@@ -67,7 +67,7 @@ public class OTPFeatureTest {
 
     // Then
     assertTrue(OTPFeature.APIBikeRental.isOff());
-    assertTrue(OTPFeature.MinimumTransferTimeIsDefinitive.isOn());
+    assertTrue(OTPFeature.Co2Emissions.isOn());
   }
 
   @Test

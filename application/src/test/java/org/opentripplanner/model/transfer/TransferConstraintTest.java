@@ -3,7 +3,6 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.application.OTPFeature.MinimumTransferTimeIsDefinitive;
 import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import static org.opentripplanner.raptor.api.model.SearchDirection.FORWARD;
 import static org.opentripplanner.raptor.api.model.SearchDirection.REVERSE;
@@ -150,15 +149,8 @@ public class TransferConstraintTest {
     assertEquals(t0, GUARANTEED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
     assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
     assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
-
-    MinimumTransferTimeIsDefinitive.testOn(() -> {
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, FORWARD));
-    });
-    MinimumTransferTimeIsDefinitive.testOff(() -> {
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
-      assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, FORWARD));
-    });
+    assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, FORWARD));
   }
 
   @Test
@@ -181,14 +173,7 @@ public class TransferConstraintTest {
     assertEquals(t0, GUARANTEED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
     assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
     assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
-
-    MinimumTransferTimeIsDefinitive.testOn(() -> {
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, REVERSE));
-    });
-    MinimumTransferTimeIsDefinitive.testOff(() -> {
-      assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
-      assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, REVERSE));
-    });
+    assertEquals(expAt, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(txPlus, MIN_TX_TIME.calculateTransferTargetTime(t0, dt, txPlusOp, REVERSE));
   }
 }

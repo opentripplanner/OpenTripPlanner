@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -225,14 +224,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
       int minTransferTime = getMinTransferTime() + transferSlack;
       if (direction.isForward()) {
         int minTransferBoardTime = sourceTransitArrivalTime + minTransferTime;
-        return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
-          ? minTransferBoardTime
-          : Math.max(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
+        return Math.max(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
       } else {
         int minTransferBoardTime = sourceTransitArrivalTime - minTransferTime;
-        return OTPFeature.MinimumTransferTimeIsDefinitive.isOn()
-          ? minTransferBoardTime
-          : Math.min(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
+        return Math.min(minTransferBoardTime, calcRegularTransferTargetTime.getAsInt());
       }
     }
     // Transfers with priority only apply to the cost not the transfer time

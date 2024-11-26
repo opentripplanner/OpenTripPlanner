@@ -55,21 +55,6 @@ public enum OTPFeature {
     false,
     "Does vehicleRentalStation query also allow ids that are not feed scoped."
   ),
-  /**
-   * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
-   * time, but the definitive transfer time. Use this to override what we think the transfer will
-   * take according to OSM data, for example if you want to set a very low transfer time like 1
-   * minute, when walking the distance take 1m30s.
-   *
-   * TODO Harmonize the JavaDoc with the user doc and delete JavaDoc
-   */
-  MinimumTransferTimeIsDefinitive(
-    false,
-    false,
-    "If the minimum transfer time is a lower bound (default) or the definitive time for the " +
-    "transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives " +
-    "from OSM data."
-  ),
 
   OptimizeTransfers(
     true,

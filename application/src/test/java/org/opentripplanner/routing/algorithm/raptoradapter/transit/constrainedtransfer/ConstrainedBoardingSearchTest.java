@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
@@ -319,28 +318,6 @@ public class ConstrainedBoardingSearchTest {
       TRIP_1_INDEX,
       MIN_TRANSFER_TIME_10_MIN_CONSTRAINT
     );
-  }
-
-  @Test
-  void findDefinitiveMinTimeTransfer() {
-    OTPFeature.MinimumTransferTimeIsDefinitive.testOn(() -> {
-      // we set a very low minimum transfer time of 0 seconds. we expect this to work similar
-      // to a guaranteed transfer and hence it has the same expectation.
-      var txMinTransferTime = new ConstrainedTransfer(
-        ID,
-        STOP_B_TX_POINT,
-        STOP_B_TX_POINT,
-        MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
-      );
-
-      testTransferSearch(
-        STOP_B,
-        List.of(txMinTransferTime),
-        TRIP_1_INDEX,
-        TRIP_2_INDEX,
-        MIN_TRANSFER_TIME_0_MIN_CONSTRAINT
-      );
-    });
   }
 
   void testTransferSearch(
