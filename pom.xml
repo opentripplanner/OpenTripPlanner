@@ -94,10 +94,10 @@
     </distributionManagement>
 
     <modules>
-        <module>application</module>
-        <module>gtfs-realtime-protobuf</module>
         <module>utils</module>
         <module>raptor</module>
+        <module>gtfs-realtime-protobuf</module>
+        <module>application</module>
         <module>shaded-jar</module>
     </modules>
 
@@ -132,7 +132,6 @@
                             <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
                         </manifestEntries>
                     </archive>
-                    <skipIfEmpty>true</skipIfEmpty>
                 </configuration>
                 <executions>
                     <execution>

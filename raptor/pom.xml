@@ -17,7 +17,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>otp-utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 
