@@ -15,7 +15,7 @@ import uk.org.siri.siri20.Siri;
  */
 public class SiriLightHttpLoader implements SiriLoader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriHttpLoader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriLightHttpLoader.class);
   private final HttpHeaders headers;
   private final URI uri;
   private final Duration timeout;
