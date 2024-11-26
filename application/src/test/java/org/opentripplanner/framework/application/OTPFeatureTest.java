@@ -55,7 +55,7 @@ public class OTPFeatureTest {
         {
           otpFeatures : {
             APIBikeRental : false,
-            Co2Emissions : true
+            FaresV2 : true
           }
         }
         """;
@@ -67,7 +67,7 @@ public class OTPFeatureTest {
 
     // Then
     assertTrue(OTPFeature.APIBikeRental.isOff());
-    assertTrue(OTPFeature.Co2Emissions.isOn());
+    assertTrue(OTPFeature.FaresV2.isOn());
   }
 
   @Test
