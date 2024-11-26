@@ -18,7 +18,7 @@ class TransfersMapper {
     SiteRepository siteRepository,
     TransitService transitService
   ) {
-    List<List<Transfer>> transferByStopIndex = new ArrayList<>();
+    List<List<Transfer>> transfersByStopIndex = new ArrayList<>();
 
     for (int i = 0; i < siteRepository.stopIndexSize(); ++i) {
       var stop = siteRepository.stopByIndex(i);
@@ -45,10 +45,10 @@ class TransfersMapper {
       }
 
       // Create a copy to compact and make the inner lists immutable
-      transferByStopIndex.add(List.copyOf(list));
+      transfersByStopIndex.add(List.copyOf(list));
     }
 
     // Return an immutable copy
-    return List.copyOf(transferByStopIndex);
+    return List.copyOf(transfersByStopIndex);
   }
 }
