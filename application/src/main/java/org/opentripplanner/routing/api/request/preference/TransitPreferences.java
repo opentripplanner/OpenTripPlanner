@@ -137,6 +137,10 @@ public final class TransitPreferences implements Serializable {
     return relaxTransitGroupPriority;
   }
 
+  public boolean isRelaxTransitGroupPrioritySet() {
+    return !relaxTransitGroupPriority.isNormal();
+  }
+
   /**
    * When true, real-time updates are ignored during this search.
    */

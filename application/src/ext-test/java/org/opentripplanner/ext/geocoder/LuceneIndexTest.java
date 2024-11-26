@@ -136,8 +136,8 @@ class LuceneIndexTest {
 
       @Override
       public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        if (stop.getGtfsVehicleType() != null) {
-          return List.of(stop.getGtfsVehicleType());
+        if (stop.getVehicleType() != null) {
+          return List.of(stop.getVehicleType());
         } else {
           return List.copyOf(modes.get(stop));
         }

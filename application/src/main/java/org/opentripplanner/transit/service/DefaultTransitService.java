@@ -599,6 +599,18 @@ public class DefaultTransitService implements TransitEditorService {
     return getAllTripOnServiceDates().stream().filter(matcher::match).toList();
   }
 
+  @Override
+  public boolean containsTrip(FeedScopedId id) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      Trip trip = currentSnapshot.getRealTimeAddedTrip(id);
+      if (trip != null) {
+        return true;
+      }
+    }
+    return this.timetableRepositoryIndex.containsTrip(id);
+  }
+
   /**
    * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
    * this when doing the issue #3030.
@@ -731,8 +743,8 @@ public class DefaultTransitService implements TransitEditorService {
    * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
    */
   private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
-    if (stop.getGtfsVehicleType() != null) {
-      return Stream.of(stop.getGtfsVehicleType());
+    if (stop.getVehicleType() != null) {
+      return Stream.of(stop.getVehicleType());
     } else {
       return getPatternsForStop(stop).stream().map(TripPattern::getMode);
     }

@@ -11,10 +11,18 @@ import org.opentripplanner.transit.model.framework.Result;
 public record UpdateError(
   @Nullable FeedScopedId tripId,
   UpdateErrorType errorType,
-  @Nullable Integer stopIndex
+  @Nullable Integer stopIndex,
+  @Nullable String producer
 ) {
   public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
-    this(tripId, errorType, null);
+    this(tripId, errorType, null, null);
+  }
+
+  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, Integer stopIndex) {
+    this(tripId, errorType, stopIndex, null);
+  }
+  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType, String producer) {
+    this(tripId, errorType, null, producer);
   }
 
   public String debugId() {
@@ -33,6 +41,7 @@ public record UpdateError(
     TRIP_NOT_FOUND,
     TRIP_NOT_FOUND_IN_PATTERN,
     NO_FUZZY_TRIP_MATCH,
+    EMPTY_STOP_POINT_REF,
     NO_TRIP_FOR_CANCELLATION_FOUND,
     TRIP_ALREADY_EXISTS,
     NO_START_DATE,
@@ -54,6 +63,14 @@ public record UpdateError(
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {
     return Result.failure(new UpdateError(tripId, errorType));
+  }
+
+  public static <T> Result<T, UpdateError> result(
+    FeedScopedId tripId,
+    UpdateErrorType errorType,
+    String producer
+  ) {
+    return Result.failure(new UpdateError(tripId, errorType, producer));
   }
 
   public static UpdateError noTripId(UpdateErrorType errorType) {

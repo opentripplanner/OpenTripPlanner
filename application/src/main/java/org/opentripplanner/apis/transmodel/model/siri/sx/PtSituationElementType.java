@@ -241,7 +241,7 @@ public class PtSituationElementType {
             if (!siriUrls.isEmpty()) {
               return siriUrls;
             }
-            return null;
+            return emptyList();
           })
           .build()
       )

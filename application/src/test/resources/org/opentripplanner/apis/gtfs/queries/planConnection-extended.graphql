@@ -11,6 +11,16 @@
       location: { coordinate: { latitude: 45.4908, longitude: -122.5519 } }
       label: "Work"
     }
+    via: [
+      { passThrough: { label: "via1", stopLocationIds: ["F:BUS"] } }
+      {
+        visit: {
+          label: "via2"
+          stopLocationIds: ["F:RAIL"]
+          minimumWaitTime: "1h"
+        }
+      }
+    ]
     modes: {
       directOnly: false
       transitOnly: false

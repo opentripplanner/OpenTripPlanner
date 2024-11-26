@@ -10,7 +10,8 @@ class DebugLoggers {
       of("All OTP debuggers", "org.opentripplanner"),
       of("OTP request/response", "org.opentripplanner.routing.service.DefaultRoutingService"),
       of("Raptor request/response", "org.opentripplanner.raptor.RaptorService"),
-      of("Transfer Optimization", "org.opentripplanner.routing.algorithm.transferoptimization")
+      of("Transfer Optimization", "org.opentripplanner.routing.algorithm.transferoptimization"),
+      of("Trip Updates", "org.opentripplanner.updater.trip")
     );
   }
 

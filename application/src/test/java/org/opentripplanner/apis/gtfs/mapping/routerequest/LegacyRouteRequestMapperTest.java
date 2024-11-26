@@ -37,6 +37,8 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -46,7 +48,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   static {
     Graph graph = new Graph();
-    var timetableRepository = new TimetableRepository();
+    var testModel = TimetableRepositoryForTest.of();
+    var stopModelBuilder = testModel
+      .siteRepositoryBuilder()
+      .withRegularStop(testModel.stop("stop1").build());
+    var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     context =
@@ -135,11 +141,15 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       of(List.of(mode("BICYCLE")), "[ExcludeAllTransitFilter{}]"),
       of(
         List.of(mode("BUS")),
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS]}]}]"
+      ),
+      of(
+        List.of(mode("BUS"), mode("COACH")),
         "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH]}]}]"
       ),
       of(
         List.of(mode("BUS"), mode("MONORAIL")),
-        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, COACH, MONORAIL]}]}]"
+        "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS, MONORAIL]}]}]"
       )
     );
   }
@@ -242,7 +252,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   @Test
   void transferSlack() {
-    var seconds = 119L;
+    var seconds = 119;
     Map<String, Object> arguments = Map.of("minTransferTime", seconds);
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
@@ -253,6 +263,28 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
     var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
     assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
+  }
+
+  @Test
+  void via() {
+    Map<String, Object> arguments = Map.of(
+      "via",
+      List.of(
+        Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+      )
+    );
+
+    var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(arguments),
+      context
+    );
+    assertEquals(
+      "[PassThroughViaLocation{label: a label, stopLocationIds: [F:stop1]}]",
+      routeRequest.getViaLocations().toString()
+    );
+
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertEquals(List.of(), noParamsReq.getViaLocations());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

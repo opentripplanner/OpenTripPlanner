@@ -13,7 +13,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -38,7 +37,7 @@ public class TripPatternForDateMapperTest {
     var trip = TimetableRepositoryForTest.trip("1").build();
     var tripTimes = TripTimesFactory.tripTimes(
       trip,
-      TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
+      TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00"),
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);

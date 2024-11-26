@@ -56,6 +56,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -394,7 +395,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         case "Agency":
           return transitService.getAgencyForId(FeedScopedId.parse(id));
         case "Alert":
-          return null; //TODO
+          return transitService.getTransitAlertService().getAlertById(FeedScopedId.parse(id));
         case "BikePark":
           var bikeParkId = FeedScopedId.parse(id);
           return vehicleParkingService == null
@@ -925,6 +926,26 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       return vehicleRentalStationService.getVehicleRentalStations();
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<VehicleRentalPlace>> vehicleRentalsByBbox() {
+    return environment -> {
+      VehicleRentalService vehicleRentalService = environment
+        .<GraphQLRequestContext>getContext()
+        .vehicleRentalService();
+
+      var args = new GraphQLTypes.GraphQLQueryTypeVehicleRentalsByBboxArgs(
+        environment.getArguments()
+      );
+
+      return vehicleRentalService.getVehicleRentalPlacesForEnvelope(
+        args.getGraphQLMinimumLongitude(),
+        args.getGraphQLMinimumLatitude(),
+        args.getGraphQLMaximumLongitude(),
+        args.getGraphQLMaximumLatitude()
+      );
     };
   }
 
