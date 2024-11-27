@@ -29,6 +29,9 @@ artifacts may help, but none of these are required. Ask in the developer meeting
    - [ ] State diagram
    - [ ] Collaboration diagram
 
+We recommend using [draw.io](https://www.drawio.com/). It is free and available as an Intellij 
+plugin (Diagrams.net), web application and desktop application.
+
 
 ## Domain model
 
