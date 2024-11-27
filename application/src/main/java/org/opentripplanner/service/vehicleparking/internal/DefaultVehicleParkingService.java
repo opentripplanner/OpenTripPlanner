@@ -52,7 +52,7 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
   }
 
   @Override
-  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> listVehicleParkingGroups() {
+  public ListMultimap<VehicleParkingGroup, VehicleParking> listVehicleParkingGroups() {
     return repository.getVehicleParkingGroups();
   }
 
