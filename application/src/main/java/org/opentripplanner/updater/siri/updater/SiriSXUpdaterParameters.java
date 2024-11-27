@@ -14,4 +14,4 @@ public record SiriSXUpdaterParameters(
   boolean blockReadinessUntilInitialized,
   HttpHeaders requestHeaders
 )
-  implements SiriSXUpdater.BaseSiriSXUpdaterParameters {}
+  implements SiriSXUpdater.SiriSXUpdaterParameters {}

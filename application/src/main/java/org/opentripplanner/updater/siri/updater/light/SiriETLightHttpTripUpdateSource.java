@@ -16,10 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
+/**
+ * SIRI Light downloads periodically all messages as a single GET request.
+ */
 public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETLightHttpTripUpdateSource.class);
-  private static final String DUMMY_REQUESTOR_REF = "OTP";
+  /**
+   * The framework code requires a requestor ref but in SIRI Light this is not used.
+   */
+  private static final String DUMMY_REQUESTOR_REF = "OpenTripPlanner";
 
   private final Parameters parameters;
 

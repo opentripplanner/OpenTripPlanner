@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -37,7 +39,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
-    BaseSiriETUpdaterParameters config,
+    SiriETUpdaterParameters config,
     SiriTimetableSnapshotSource timetableSnapshotSource,
     EstimatedTimetableSource source,
     Consumer<UpdateResult> metricsConsumer
@@ -96,5 +98,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
   public String toString() {
     String s = (updateSource == null) ? "NONE" : updateSource.toString();
     return "Polling SIRI ET updater with update source = " + s;
+  }
+
+  public interface SiriETUpdaterParameters
+    extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+    boolean blockReadinessUntilInitialized();
+
+    boolean fuzzyTripMatching();
   }
 }
