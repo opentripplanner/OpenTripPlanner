@@ -1,9 +1,9 @@
 {
-  "data" : {
-    "vehicleParkings" : [
+  "data": {
+    "vehicleParkings": [
       {
-        "name" : "parking",
-        "vehicleParkingId" : "F:parking-1"
+        "name": "parking",
+        "vehicleParkingId": "F:parking-1"
       }
     ]
   }
