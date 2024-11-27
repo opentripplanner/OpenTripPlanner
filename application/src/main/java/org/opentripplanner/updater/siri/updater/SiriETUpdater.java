@@ -7,7 +7,6 @@ import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -35,15 +34,15 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   private final EstimatedTimetableHandler estimatedTimetableHandler;
 
-  private final Consumer<UpdateResult> recordMetrics;
+  private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
     SiriUpdaterParameters config,
     SiriTimetableSnapshotSource timetableSnapshotSource,
-    EstimatedTimetableSource source
+    EstimatedTimetableSource source,
+    Consumer<UpdateResult> metricsConsumer
   ) {
     super(config);
-    // Create update streamer from preferences
     this.feedId = config.feedId();
 
     this.updateSource = source;
@@ -51,7 +50,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info(
-      "Creating stop time updater (SIRI ET) running every {} seconds : {}",
+      "Creating SIRI ET updater running every {}: {}",
       pollingPeriod(),
       updateSource
     );
@@ -59,7 +58,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     estimatedTimetableHandler =
       new EstimatedTimetableHandler(timetableSnapshotSource, config.fuzzyTripMatching(), feedId);
 
-    recordMetrics = TripUpdateMetrics.streaming(config);
+    this.metricsConsumer = metricsConsumer;
   }
 
   @Override
@@ -88,7 +87,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
           saveResultOnGraph.execute(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
-            recordMetrics.accept(result);
+            metricsConsumer.accept(result);
             if (markPrimed) {
               primed = true;
             }

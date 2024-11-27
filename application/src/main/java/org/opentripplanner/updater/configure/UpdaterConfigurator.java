@@ -30,6 +30,7 @@ import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
@@ -188,7 +189,8 @@ public class UpdaterConfigurator {
         new SiriETUpdater(
           configItem,
           provideSiriTimetableSnapshot(),
-          new SiriETHttpTripUpdateSource(configItem.sourceParameters())
+          new SiriETHttpTripUpdateSource(configItem.sourceParameters()),
+          TripUpdateMetrics.streaming(configItem)
         )
       );
     }
@@ -197,7 +199,8 @@ public class UpdaterConfigurator {
         new SiriETUpdater(
           configItem,
           provideSiriTimetableSnapshot(),
-          new SiriETLightHttpTripUpdateSource(configItem.sourceParameters())
+          new SiriETLightHttpTripUpdateSource(configItem.sourceParameters()),
+          TripUpdateMetrics.batch(configItem)
         )
       );
     }
