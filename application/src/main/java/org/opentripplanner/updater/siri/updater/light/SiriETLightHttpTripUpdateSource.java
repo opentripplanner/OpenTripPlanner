@@ -61,7 +61,7 @@ public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource
     return ToStringBuilder
       .of(this.getClass())
       .addStr("feedId", parameters.feedId())
-      .addStr("uri", parameters.toString())
+      .addStr("uri", parameters.uri().toString())
       .toString();
   }
 

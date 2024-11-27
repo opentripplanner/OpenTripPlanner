@@ -37,7 +37,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
-    SiriUpdaterParameters config,
+    BaseSiriETUpdaterParameters config,
     SiriTimetableSnapshotSource timetableSnapshotSource,
     EstimatedTimetableSource source,
     Consumer<UpdateResult> metricsConsumer
@@ -49,11 +49,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
-    LOG.info(
-      "Creating SIRI ET updater running every {}: {}",
-      pollingPeriod(),
-      updateSource
-    );
+    LOG.info("Creating SIRI ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     estimatedTimetableHandler =
       new EstimatedTimetableHandler(timetableSnapshotSource, config.fuzzyTripMatching(), feedId);

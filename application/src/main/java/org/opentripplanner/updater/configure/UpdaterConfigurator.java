@@ -22,9 +22,11 @@ import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.updater.siri.updater.SiriETUpdater;
+import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
 import org.opentripplanner.updater.siri.updater.light.SiriETLightHttpTripUpdateSource;
+import org.opentripplanner.updater.siri.updater.light.SiriLightHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
@@ -208,7 +210,26 @@ public class UpdaterConfigurator {
       updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(new SiriSXUpdater(configItem, timetableRepository));
+      updaters.add(
+        new SiriSXUpdater(
+          configItem,
+          timetableRepository,
+          new SiriHttpLoader(configItem.url(), configItem.timeout(), configItem.requestHeaders())
+        )
+      );
+    }
+    for (var configItem : updatersParameters.getSiriSXLightUpdaterParameters()) {
+      updaters.add(
+        new SiriSXUpdater(
+          configItem,
+          timetableRepository,
+          new SiriLightHttpLoader(
+            configItem.uri(),
+            configItem.timeout(),
+            configItem.requestHeaders()
+          )
+        )
+      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));

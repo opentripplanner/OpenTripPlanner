@@ -9,6 +9,7 @@ import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.light.SiriETLightUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.light.SiriSXLightUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -35,6 +36,8 @@ public interface UpdatersParameters {
   List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters();
 
   List<SiriETLightUpdaterParameters> getSiriETLightUpdaterParameters();
+
+  List<SiriSXLightUpdaterParameters> getSiriSXLightUpdaterParameters();
 
   List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters();
 

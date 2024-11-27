@@ -31,8 +31,8 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeA
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLightUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXLightUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
@@ -47,6 +47,7 @@ import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.light.SiriETLightUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.light.SiriSXLightUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -191,6 +192,11 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
+  public List<SiriSXLightUpdaterParameters> getSiriSXLightUpdaterParameters() {
+    return getParameters(Type.SIRI_SX_LIGHT);
+  }
+
+  @Override
   public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
     return getParameters(MQTT_GTFS_RT_UPDATER);
   }
@@ -226,7 +232,8 @@ public class UpdatersConfig implements UpdatersParameters {
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
-    SIRI_ET_LIGHT(SiriETLightUpdaterConfig::create),
+    SIRI_ET_LIGHT(SiriSXLightUpdaterConfig::create),
+    SIRI_SX_LIGHT(SiriSXLightUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),

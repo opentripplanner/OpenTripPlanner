@@ -174,18 +174,29 @@ for GTFS-RT TripUpdates.
 <!-- siri-et-light BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
-|----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-et-light"     |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
-| feedId                     |     `string`    | The ID of the feed to apply the updates to.                                | *Required* |               |  2.7  |
-| frequency                  |    `duration`   | How often the updates should be retrieved.                                 | *Optional* | `"PT1M"`      |  2.7  |
-| fuzzyTripMatching          |    `boolean`    | If the fuzzy trip matcher should be used to match trips.                   | *Optional* | `false`       |  2.7  |
-| timeout                    |    `duration`   | The HTTP timeout to download the updates.                                  | *Optional* | `"PT15S"`     |  2.7  |
-| [url](#u__15__url)         |      `uri`      | The URL to send the HTTP requests to.                                      | *Required* |               |  2.7  |
-| [headers](#u__15__headers) | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.7  |
+| Config Parameter                 |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|----------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-et-light"           |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| [earlyStart](#u__15__earlyStart) |    `duration`   | This value is subtracted from the actual validity defined in the message.  | *Optional* | `"PT0S"`      |  2.0  |
+| feedId                           |     `string`    | The ID of the feed to apply the updates to.                                | *Required* |               |  2.7  |
+| frequency                        |    `duration`   | How often the updates should be retrieved.                                 | *Optional* | `"PT1M"`      |  2.7  |
+| timeout                          |    `duration`   | The HTTP timeout to download the updates.                                  | *Optional* | `"PT15S"`     |  2.7  |
+| [url](#u__15__url)               |      `uri`      | The URL to send the HTTP requests to.                                      | *Required* |               |  2.7  |
+| [headers](#u__15__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.7  |
 
 
 ##### Parameter details
+
+<h4 id="u__15__earlyStart">earlyStart</h4>
+
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
+**Path:** /updaters/[15] 
+
+This value is subtracted from the actual validity defined in the message.
+
+Normally the planned departure time is used, so setting this to 10s will cause the
+SX-message to be included in trip-results 10 seconds before the the planned departure
+time.
 
 <h4 id="u__15__url">url</h4>
 
