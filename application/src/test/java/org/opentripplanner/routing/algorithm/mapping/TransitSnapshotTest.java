@@ -64,7 +64,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  public void test_trip_planning_with_walk_only() {
+  public void testTripPlanningWithWalkOnly() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().direct().setMode(StreetMode.WALK);
@@ -77,7 +77,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  public void test_trip_planning_with_walk_only_stop() {
+  public void testTripPlanningWithWalkOnlyStop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().access().setMode(StreetMode.WALK);
@@ -93,7 +93,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  public void test_trip_planning_with_walk_only_stop_collection() {
+  public void testTripPlanningWithWalkOnlyStopCollection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().access().setMode(StreetMode.WALK);
@@ -110,7 +110,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  public void test_trip_planning_with_transit() {
+  public void testTripPlanningWithTransit() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().access().setMode(StreetMode.WALK);
@@ -126,7 +126,23 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   }
 
   @Test
-  public void test_trip_planning_with_transit_stop() {
+  public void testTripPlanningWithBikeTransit() {
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.BIKE);
+    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
+
+    request.setFrom(p1);
+    request.setTo(p2);
+
+    expectRequestResponseToMatchSnapshot(request);
+  }
+
+  @Test
+  public void testTripPlanningWithTransitStop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().access().setMode(StreetMode.WALK);
@@ -143,7 +159,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
 
   @Test
   @Disabled
-  public void test_trip_planning_with_transit_stop_collection() {
+  public void testTripPlanningWithTransitStopCollection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.journey().access().setMode(StreetMode.WALK);
