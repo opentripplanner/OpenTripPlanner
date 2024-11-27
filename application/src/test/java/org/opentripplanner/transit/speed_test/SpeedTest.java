@@ -5,9 +5,7 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,23 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
-import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.DebugUiConfig;
-import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
@@ -112,31 +106,34 @@ public class SpeedTest {
       timetableRepository.getUpdaterManager().startUpdaters();
     }
 
+    var raptorConfig = new RaptorConfig<TripSchedule>(
+      config.transitRoutingParams,
+      RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
+    );
+
     this.serverContext =
-      DefaultServerRequestContext.create(
-        config.transitRoutingParams,
-        config.request,
-        new RaptorConfig<>(
-          config.transitRoutingParams,
-          RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
-        ),
+      new DefaultServerRequestContext(
+        DebugUiConfig.DEFAULT,
+        config.flexConfig,
         graph,
-        new DefaultTransitService(timetableRepository),
         timer.getRegistry(),
-        VectorTileConfig.DEFAULT,
-        TestServerContext.createWorldEnvelopeService(),
+        raptorConfig,
         TestServerContext.createRealtimeVehicleService(transitService),
-        TestServerContext.createVehicleRentalService(),
+        List.of(),
+        config.request,
+        TestServerContext.createStreetLimitationParametersService(),
+        config.transitRoutingParams,
+        new DefaultTransitService(timetableRepository),
+        VectorTileConfig.DEFAULT,
         TestServerContext.createVehicleParkingService(),
+        TestServerContext.createVehicleRentalService(),
+        TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createEmissionsService(),
         null,
-        config.flexConfig,
-        List.of(),
-        null,
-        TestServerContext.createStreetLimitationParametersService(),
         null,
         null,
-        DebugUiConfig.DEFAULT
+        null,
+        null
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
