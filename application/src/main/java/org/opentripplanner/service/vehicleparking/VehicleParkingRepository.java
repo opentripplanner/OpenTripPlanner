@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehicleparking;
 
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.util.Collection;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
@@ -15,5 +15,5 @@ public interface VehicleParkingRepository {
   );
   Collection<VehicleParking> listVehicleParkings();
 
-  ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups();
+  ListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups();
 }

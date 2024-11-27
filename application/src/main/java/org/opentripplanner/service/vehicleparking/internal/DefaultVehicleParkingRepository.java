@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehicleparking.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -71,7 +72,7 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
   }
 
   @Override
-  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
+  public ListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
     return vehicleParkingGroups;
   }
 }

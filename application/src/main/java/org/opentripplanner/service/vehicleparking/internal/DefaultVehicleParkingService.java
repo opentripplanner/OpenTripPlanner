@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehicleparking.internal;
 
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.Serializable;
