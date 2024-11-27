@@ -1,6 +1,6 @@
 # Analysis and design
 
-We want to get better at design, so we want some documentation up font for large changes. If a 
+We want to get better at design, so we want some documentation up front for large changes. If a 
 problem is complex, changes the core OTP model, and/or the API significantly, then the developer
 requesting a change should be prepared to provide some design documentation.
 
@@ -19,7 +19,7 @@ A discussion in a developer meeting is usually a good point to start.
 ### Artifacts
 
 We usually do not require a long list of requirements and analyses documentation. But these 
-artifacts may help, none of these are required. Ask in the developer meeting what to expect. 
+artifacts may help, but none of these are required. Ask in the developer meeting what to expect. 
 
  - [ ] Summarise the discussion in the developer meeting in the issue or PR.
  - [ ] List use-cases, one sentence per use-case is often enough.
@@ -32,14 +32,14 @@ artifacts may help, none of these are required. Ask in the developer meeting wha
 
 ## Domain model
 
-A domain model focus on the language and the relationships. All implementation details can be left 
-out. Details witch is not relevant for the problem you are solving can also be left out, focus on 
+A domain model focusses on the language and the relationships. All implementation details can be left 
+out. Details which is not relevant for the problem you are solving can also be left out, focus on 
 the elements witch helps understand the problem. Use plain english and not tech to describe 
 the model. For example, only listing the field name, and not the type is ok if the type is obvious.
 
 Notation is not important, but try to follow the UML syntax below. You may use more advanced UML 
 syntax if you want, but keep in mind that you should be able to use the diagram to discuss the 
-problem with a none developer. A product-owner or other person who knows the domain should with 
+problem with a non-developer. A product-owner or other person who knows the domain should with 
 a little help be able to understand the main parts of the drawing.
 
 When doing review, focus on the domain problem, not syntax — ask about things you do not understand.
