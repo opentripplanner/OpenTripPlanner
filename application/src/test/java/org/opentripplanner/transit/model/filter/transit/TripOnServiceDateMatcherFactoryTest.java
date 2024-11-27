@@ -103,7 +103,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchOperatingDays() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(FilterValues.ofEmptyIsInvalid("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
+      .of(FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
       .build();
 
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(request);
@@ -116,7 +116,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchMultiple() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(FilterValues.ofEmptyIsInvalid("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
+      .of(FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
       .withAgencies(
         FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
       )
@@ -141,7 +141,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void testMatchMultipleServiceJourneyMatchers() {
     TripOnServiceDateRequest request = TripOnServiceDateRequest
-      .of(FilterValues.ofEmptyIsInvalid("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
+      .of(FilterValues.ofRequired("serviceDates", List.of(LocalDate.of(2024, 2, 22))))
       .withAgencies(
         FilterValues.ofEmptyIsEverything(
           "agencies",

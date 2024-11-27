@@ -51,7 +51,7 @@ public abstract class FilterValues<E> {
    * @param values - The {@link Collection} of filter values.
    * @return RequiredFilterValues
    */
-  public static <E> RequiredFilterValues<E> ofEmptyIsInvalid(
+  public static <E> RequiredFilterValues<E> ofRequired(
     String name,
     @Nullable Collection<E> values
   ) {

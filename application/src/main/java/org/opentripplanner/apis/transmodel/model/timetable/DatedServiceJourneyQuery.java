@@ -117,7 +117,7 @@ public class DatedServiceJourneyQuery {
           "privateCodes",
           environment.<List<String>>getArgument("privateCodes")
         );
-        var operatingDays = FilterValues.ofEmptyIsInvalid(
+        var operatingDays = FilterValues.ofRequired(
           "operatingDays",
           environment.<List<LocalDate>>getArgument("operatingDays")
         );
