@@ -1,65 +1,69 @@
 {
   "transitServiceStart": "-P3M",
-  "transitServiceEnd":  "P1Y",
-  "osmCacheDataInMem" : true,
-  "localFileNamePatterns" : {
-    "osm" : "(i?)\\.osm\\.pbf$",
-    "dem" : "(i?)\\.dem\\.tiff?$",
-    "gtfs" : "(?i)gtfs",
-    "netex" : "(?i)netex"
+  "transitServiceEnd": "P1Y",
+  "osmCacheDataInMem": true,
+  "localFileNamePatterns": {
+    "osm": "(i?)\\.osm\\.pbf$",
+    "dem": "(i?)\\.dem\\.tiff?$",
+    "gtfs": "(?i)gtfs",
+    "netex": "(?i)netex"
   },
 
   "osmDefaults": {
     "timeZone": "Europe/Rome",
     "osmTagMapping": "default"
   },
-  "osm": [{
-    "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
-    "timeZone" : "Europe/Oslo",
-    "osmTagMapping" : "norway"
-  }],
+  "osm": [
+    {
+      "source": "gs://my-bucket/otp-work-dir/norway.osm.pbf",
+      "timeZone": "Europe/Oslo",
+      "osmTagMapping": "norway"
+    }
+  ],
   "demDefaults": {
-    "elevationUnitMultiplier" : 1.0
+    "elevationUnitMultiplier": 1.0
   },
-  "dem": [{
-    "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
-    "elevationUnitMultiplier" : 2.5
-  }],
-  "netexDefaults" : {
-    "feedId" : "EN",
-    "sharedFilePattern" : "_stops.xml",
-    "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "ignoreFilePattern" : "(temp|tmp)",
-    "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
+  "dem": [
+    {
+      "source": "gs://my-bucket/otp-work-dir/norway.dem.tiff",
+      "elevationUnitMultiplier": 2.5
+    }
+  ],
+  "netexDefaults": {
+    "feedId": "EN",
+    "sharedFilePattern": "_stops.xml",
+    "sharedGroupFilePattern": "_(\\w{3})_shared_data.xml",
+    "groupFilePattern": "(\\w{3})_.*\\.xml",
+    "ignoreFilePattern": "(temp|tmp)",
+    "ferryIdsNotAllowedForBicycle": ["RUT:B107", "RUT:B209"]
   },
-  "gtfsDefaults" : {
-    "stationTransferPreference" : "recommended",
-    "removeRepeatedStops" : true,
+  "gtfsDefaults": {
+    "stationTransferPreference": "recommended",
+    "removeRepeatedStops": true,
     "discardMinTransferTimes": false,
     "blockBasedInterlining": true,
     "maxInterlineDistance": 200
   },
-  "islandPruning" : {
+  "islandPruning": {
     "islandWithStopsMaxSize": 2,
     "islandWithoutStopsMaxSize": 10,
     "adaptivePruningFactor": 50.0,
     "adaptivePruningDistance": 250
   },
-  "transitFeeds" : [
+  "transitFeeds": [
     {
-      "type" : "gtfs",
-      "feedId" : "SE",
-      "source" : "https://skanetrafiken.se/download/sweden.gtfs.zip"
+      "type": "gtfs",
+      "feedId": "SE",
+      "source": "https://skanetrafiken.se/download/sweden.gtfs.zip"
     },
     {
-      "type" : "netex",
-      "feedId" : "NO",
-      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
-      "sharedFilePattern" : "_stops.xml",
-      "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-      "groupFilePattern" : "(\\w{3})_.*\\.xml",
-      "ignoreFilePattern" : "(temp|tmp)"
+      "type": "netex",
+      "feedId": "NO",
+      "source": "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
+      "sharedFilePattern": "_stops.xml",
+      "sharedGroupFilePattern": "_(\\w{3})_shared_data.xml",
+      "groupFilePattern": "(\\w{3})_.*\\.xml",
+      "ignoreFilePattern": "(temp|tmp)"
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
     }
   ],

@@ -9,8 +9,8 @@
     },
     "networks": [
       {
-        "network" : "oslo-by-sykkel",
-        "geofencingZones" : true
+        "network": "oslo-by-sykkel",
+        "geofencingZones": true
       }
     ]
   }
