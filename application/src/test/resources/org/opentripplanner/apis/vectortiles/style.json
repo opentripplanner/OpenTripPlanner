@@ -419,6 +419,7 @@
         "class",
         "StreetEdge",
         "AreaEdge",
+        "LinearPlatformEdge",
         "EscalatorEdge",
         "PathwayEdge",
         "ElevatorHopEdge",
