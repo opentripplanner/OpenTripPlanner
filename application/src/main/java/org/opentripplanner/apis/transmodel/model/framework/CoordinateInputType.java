@@ -4,8 +4,16 @@ import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
+import java.util.Map;
+import java.util.Optional;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
+@SuppressWarnings("unchecked")
 public class CoordinateInputType {
+
+  /* Constants are package local to be used in unit-tests */
+  static final String LATITUDE = "latitude";
+  static final String LONGITUDE = "longitude";
 
   public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
     .newInputObject()
@@ -14,7 +22,7 @@ public class CoordinateInputType {
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
-        .name("latitude")
+        .name(LATITUDE)
         .description("The latitude of the place.")
         .type(new GraphQLNonNull(Scalars.GraphQLFloat))
         .build()
@@ -22,10 +30,42 @@ public class CoordinateInputType {
     .field(
       GraphQLInputObjectField
         .newInputObjectField()
-        .name("longitude")
+        .name(LONGITUDE)
         .description("The longitude of the place.")
         .type(new GraphQLNonNull(Scalars.GraphQLFloat))
         .build()
     )
     .build();
+
+  public static Optional<WgsCoordinate> mapToWsgCoordinate(
+    String fieldName,
+    Map<String, Object> input
+  ) {
+    Map<String, Object> coordinate = (Map<String, Object>) input.get(fieldName);
+
+    if (coordinate != null) {
+      return Optional.of(
+        new WgsCoordinate(
+          readCoordinateValue(LATITUDE, coordinate),
+          readCoordinateValue(LONGITUDE, coordinate)
+        )
+      );
+    }
+    return Optional.empty();
+  }
+
+  public static Map<String, Object> mapForTest(WgsCoordinate coordinate) {
+    return Map.ofEntries(
+      Map.entry(LATITUDE, coordinate.latitude()),
+      Map.entry(LONGITUDE, coordinate.longitude())
+    );
+  }
+
+  private static Double readCoordinateValue(String fieldName, Map<String, Object> coordinate) {
+    var value = (Double) coordinate.get(fieldName);
+    if (value == null) {
+      throw new IllegalArgumentException("The '%s' parameter is required.".formatted(fieldName));
+    }
+    return value;
+  }
 }
