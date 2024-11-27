@@ -39,7 +39,8 @@ for GTFS-RT TripUpdates.
 
 ### SIRI-SX Light
 
-This updater follows the same definition of SIRI light
+This updater follows the same definition of SIRI Light as the SIRI-ET one: it downloads the entire
+feed in a single HTTP GET request.
 
 <!-- INSERT: siri-sx-light -->
 
