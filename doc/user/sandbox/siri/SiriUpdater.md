@@ -161,7 +161,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- siri-sx-updater END -->
 
-### SIRI-ET Light via HTTPS
+### SIRI-ET Light
 
 SIRI Light is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
 [specified](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri),
@@ -239,6 +239,76 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```
 
 <!-- siri-et-light END -->
+
+### SIRI-SX Light
+
+<!-- siri-sx-light BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                 |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|----------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-sx-light"           |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| [earlyStart](#u__16__earlyStart) |    `duration`   | This value is subtracted from the actual validity defined in the message.  | *Optional* | `"PT0S"`      |  2.0  |
+| feedId                           |     `string`    | The ID of the feed to apply the updates to.                                | *Required* |               |  2.7  |
+| frequency                        |    `duration`   | How often the updates should be retrieved.                                 | *Optional* | `"PT1M"`      |  2.7  |
+| timeout                          |    `duration`   | The HTTP timeout to download the updates.                                  | *Optional* | `"PT15S"`     |  2.7  |
+| [url](#u__16__url)               |      `uri`      | The URL to send the HTTP requests to.                                      | *Required* |               |  2.7  |
+| [headers](#u__16__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.7  |
+
+
+##### Parameter details
+
+<h4 id="u__16__earlyStart">earlyStart</h4>
+
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
+**Path:** /updaters/[16] 
+
+This value is subtracted from the actual validity defined in the message.
+
+Normally the planned departure time is used, so setting this to 10s will cause the
+SX-message to be included in trip-results 10 seconds before the the planned departure
+time.
+
+<h4 id="u__16__url">url</h4>
+
+**Since version:** `2.7` ∙ **Type:** `uri` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[16] 
+
+The URL to send the HTTP requests to.
+
+Use the file protocol to set a directory for reading updates from a directory. The file
+loader will look for xml files: '*.xml' in the configured directory. The files are
+renamed by the loader when processed:
+
+&nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
+
+
+
+<h4 id="u__16__headers">headers</h4>
+
+**Since version:** `2.7` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[16] 
+
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
+{
+  "updaters" : [
+    {
+      "type" : "siri-sx-light",
+      "feedId" : "sta",
+      "url" : "https://example.com/siri-lite/situation-exchange/xml"
+    }
+  ]
+}
+```
+
+<!-- siri-sx-light END -->
 
 
 ## Changelog
