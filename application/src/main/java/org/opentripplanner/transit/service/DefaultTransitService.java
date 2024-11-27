@@ -531,17 +531,17 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TripOnServiceDate getTripOnServiceDate(FeedScopedId tripOnServiceDateId) {
+  public TripOnServiceDate getTripOnServiceDate(FeedScopedId id) {
     TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
     if (currentSnapshot != null) {
       TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateById(
-        tripOnServiceDateId
+        id
       );
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
     }
-    return timetableRepository.getTripOnServiceDateById(tripOnServiceDateId);
+    return timetableRepository.getTripOnServiceDateById(id);
   }
 
   @Override

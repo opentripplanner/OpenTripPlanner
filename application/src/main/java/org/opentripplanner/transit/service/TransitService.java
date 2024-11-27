@@ -242,7 +242,7 @@ public interface TransitService {
   /**
    * Return the TripOnServiceDate for a given id, including real-time updates.
    */
-  TripOnServiceDate getTripOnServiceDate(FeedScopedId datedServiceJourneyId);
+  TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
 
