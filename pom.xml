@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>171</otp.serialization.version.id>
+        <otp.serialization.version.id>172</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.0</geotools.version>
         <google.dagger.version>2.52</google.dagger.version>
@@ -285,6 +285,7 @@
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/**/*.json</inputGlob>
                         <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
                     </inputGlobs>
                 </configuration>

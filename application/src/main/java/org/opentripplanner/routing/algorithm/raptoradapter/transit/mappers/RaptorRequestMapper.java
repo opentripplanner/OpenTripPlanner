@@ -16,6 +16,7 @@ import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
+import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
@@ -26,6 +27,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.Pe
 import org.opentripplanner.routing.api.request.DebugEventType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
@@ -128,15 +130,20 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var pt = preferences.transit();
       var r = pt.raptor();
 
-      // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
-
-      // TODO - We need to handle via locations that are not pass-through-points here
       if (hasPassThroughOnly()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
+      } else if (hasViaLocationsOnly()) {
+        builder.searchParams().addViaLocations(mapViaLocations());
+        // relax transit group priority can be used with via-visit-stop, but not with pass-through
+        if (pt.isRelaxTransitGroupPrioritySet()) {
+          mapRelaxTransitGroupPriority(mcBuilder, pt);
+        }
+      } else if (pt.isRelaxTransitGroupPrioritySet()) {
+        mapRelaxTransitGroupPriority(mcBuilder, pt);
+      } else {
+        // The deprecated relaxGeneralizedCostAtDestination is only enabled, if there is no
+        // via location and the relaxTransitGroupPriority is not used (Normal).
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
-      } else if (!pt.relaxTransitGroupPriority().isNormal()) {
-        mcBuilder.withTransitPriorityCalculator(new DefaultTransitGroupPriorityCalculator());
-        mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
       }
     });
 
@@ -159,10 +166,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
-
-    if (hasViaLocationsOnly()) {
-      builder.searchParams().addViaLocations(mapViaLocations());
-    }
 
     var raptorDebugging = request.journey().transit().raptorDebugging();
 
@@ -269,6 +272,14 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       return RaptorConstants.TIME_NOT_SET;
     }
     return (int) (time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
+  }
+
+  private static void mapRelaxTransitGroupPriority(
+    MultiCriteriaRequest.Builder<?> mcBuilder,
+    TransitPreferences pt
+  ) {
+    mcBuilder.withTransitPriorityCalculator(new DefaultTransitGroupPriorityCalculator());
+    mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
   }
 
   private static void addLogListenerForEachEventTypeRequested(

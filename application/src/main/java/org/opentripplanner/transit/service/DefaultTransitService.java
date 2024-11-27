@@ -582,6 +582,18 @@ public class DefaultTransitService implements TransitEditorService {
     return listTripsOnServiceDate().stream().filter(matcher::match).toList();
   }
 
+  @Override
+  public boolean containsTrip(FeedScopedId id) {
+    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
+    if (currentSnapshot != null) {
+      Trip trip = currentSnapshot.getRealTimeAddedTrip(id);
+      if (trip != null) {
+        return true;
+      }
+    }
+    return this.timetableRepositoryIndex.containsTrip(id);
+  }
+
   /**
    * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
    * this when doing the issue #3030.
