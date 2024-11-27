@@ -1,10 +1,9 @@
 package org.opentripplanner.graph_builder.module.nearbystops;
 
-import java.time.Duration;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -49,6 +48,9 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     /* Track the closest stop on each flex trip nearby. */
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = new MinMap<>();
 
+    /* The end result */
+    Set<NearbyStop> uniqueStopsResult = new HashSet<>();
+
     /* Iterate over nearby stops via the street network or using straight-line distance. */
     for (NearbyStop nearbyStop : delegateNearbyStopFinder.findNearbyStops(
       vertex,
@@ -58,9 +60,17 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     )) {
       StopLocation ts1 = nearbyStop.stop;
 
-      if (ts1 instanceof RegularStop) {
+      if (ts1 instanceof RegularStop regularStop) {
         /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-        for (TripPattern pattern : transitService.getPatternsForStop(ts1)) {
+        Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(ts1);
+
+        if (OTPFeature.IncludeEmptyRailStopsInTransfers.isOn()) {
+          if (patternsForStop.isEmpty() && regularStop.isRailStop()) {
+            uniqueStopsResult.add(nearbyStop);
+          }
+        }
+
+        for (TripPattern pattern : patternsForStop) {
           if (
             reverseDirection
               ? pattern.canAlight(nearbyStop.stop)
@@ -85,10 +95,9 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
     }
 
     /* Make a transfer from the origin stop to each destination stop that was the closest stop on any pattern. */
-    Set<NearbyStop> uniqueStops = new HashSet<>();
-    uniqueStops.addAll(closestStopForFlexTrip.values());
-    uniqueStops.addAll(closestStopForPattern.values());
+    uniqueStopsResult.addAll(closestStopForFlexTrip.values());
+    uniqueStopsResult.addAll(closestStopForPattern.values());
     // TODO: don't convert to list
-    return uniqueStops.stream().toList();
+    return uniqueStopsResult.stream().toList();
   }
 }

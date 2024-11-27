@@ -18,6 +18,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +111,9 @@ public class VehicleRentalServiceDirectoryFetcher {
               networkName,
               networkParams.geofencingZones(),
               // overloadingAllowed - not part of GBFS, not supported here
-              false
+              false,
+              // rentalPickupType not supported
+              RentalPickupType.ALL
             )
           );
         } else {
