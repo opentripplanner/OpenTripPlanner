@@ -5,7 +5,6 @@ import java.util.Collection;
 /**
  * {@link RequiredFilterValues} is a subclass of {@link FilterValues} that requires at least one
  * value to be included.
- * @param <E>
  */
 public class RequiredFilterValues<E> extends FilterValues<E> {
 

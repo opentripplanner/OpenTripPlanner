@@ -5,7 +5,6 @@ import java.util.Collection;
 /**
  * {@link FilterValuesEmptyIsEverything} is a subclass of {@link FilterValues} that includes
  * everything if the values are null or empty.
- * @param <E>
  */
 public class FilterValuesEmptyIsEverything<E> extends FilterValues<E> {
 
