@@ -114,7 +114,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -1302,16 +1302,20 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var authorities = FilterValueCollection.ofEmptyIsEverything(
+            var authorities = FilterValues.ofEmptyIsEverything(
+              "authorities",
               mapIDsToDomainNullSafe(environment.getArgument("authorities"))
             );
-            var lineIds = FilterValueCollection.ofEmptyIsEverything(
+            var lineIds = FilterValues.ofEmptyIsEverything(
+              "lines",
               mapIDsToDomainNullSafe(environment.getArgument("lines"))
             );
-            var privateCodes = FilterValueCollection.ofEmptyIsEverything(
+            var privateCodes = FilterValues.ofEmptyIsEverything(
+              "privateCodes",
               environment.<List<String>>getArgument("privateCodes")
             );
-            var activeServiceDates = FilterValueCollection.ofEmptyIsEverything(
+            var activeServiceDates = FilterValues.ofEmptyIsEverything(
+              "activeDates",
               environment.<List<LocalDate>>getArgument("activeDates")
             );
 

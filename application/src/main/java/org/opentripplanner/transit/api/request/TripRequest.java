@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -12,16 +12,16 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class TripRequest {
 
-  private final FilterValueCollection<FeedScopedId> agencies;
-  private final FilterValueCollection<FeedScopedId> routes;
-  private final FilterValueCollection<String> netexInternalPlanningCodes;
-  private final FilterValueCollection<LocalDate> serviceDates;
+  private final FilterValues<FeedScopedId> agencies;
+  private final FilterValues<FeedScopedId> routes;
+  private final FilterValues<String> netexInternalPlanningCodes;
+  private final FilterValues<LocalDate> serviceDates;
 
   protected TripRequest(
-    FilterValueCollection<FeedScopedId> agencies,
-    FilterValueCollection<FeedScopedId> routes,
-    FilterValueCollection<String> netexInternalPlanningCodes,
-    FilterValueCollection<LocalDate> serviceDates
+    FilterValues<FeedScopedId> agencies,
+    FilterValues<FeedScopedId> routes,
+    FilterValues<String> netexInternalPlanningCodes,
+    FilterValues<LocalDate> serviceDates
   ) {
     this.agencies = agencies;
     this.routes = routes;
@@ -33,19 +33,19 @@ public class TripRequest {
     return new TripRequestBuilder();
   }
 
-  public FilterValueCollection<FeedScopedId> agencies() {
+  public FilterValues<FeedScopedId> agencies() {
     return agencies;
   }
 
-  public FilterValueCollection<FeedScopedId> routes() {
+  public FilterValues<FeedScopedId> routes() {
     return routes;
   }
 
-  public FilterValueCollection<String> netexInternalPlanningCodes() {
+  public FilterValues<String> netexInternalPlanningCodes() {
     return netexInternalPlanningCodes;
   }
 
-  public FilterValueCollection<LocalDate> serviceDates() {
+  public FilterValues<LocalDate> serviceDates() {
     return serviceDates;
   }
 }

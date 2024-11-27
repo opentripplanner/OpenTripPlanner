@@ -14,7 +14,7 @@ import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -97,31 +97,37 @@ public class DatedServiceJourneyQuery {
         // The null safety checks are not needed here - they are taken care of by the request
         // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
-        var authorities = FilterValueCollection.ofEmptyIsEverything(
+        var authorities = FilterValues.ofEmptyIsEverything(
+          "authorities",
           mapIDsToDomainNullSafe(environment.getArgument("authorities"))
         );
-        var lines = FilterValueCollection.ofEmptyIsEverything(
+        var lines = FilterValues.ofEmptyIsEverything(
+          "lines",
           mapIDsToDomainNullSafe(environment.getArgument("lines"))
         );
-        var serviceJourneys = FilterValueCollection.ofEmptyIsEverything(
+        var serviceJourneys = FilterValues.ofEmptyIsEverything(
+          "serviceJourneys",
           mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
         );
-        var replacementFor = FilterValueCollection.ofEmptyIsEverything(
+        var replacementFor = FilterValues.ofEmptyIsEverything(
+          "replacementFor",
           mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
         );
-        var privateCodes = FilterValueCollection.ofEmptyIsEverything(
+        var privateCodes = FilterValues.ofEmptyIsEverything(
+          "privateCodes",
           environment.<List<String>>getArgument("privateCodes")
         );
-        var operatingDays = FilterValueCollection.ofEmptyIsEverything(
+        var operatingDays = FilterValues.ofEmptyIsInvalid(
+          "operatingDays",
           environment.<List<LocalDate>>getArgument("operatingDays")
         );
-        var alterations = FilterValueCollection.ofEmptyIsEverything(
+        var alterations = FilterValues.ofEmptyIsEverything(
+          "alterations",
           environment.<List<TripAlteration>>getArgument("alterations")
         );
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
-          .of()
-          .withServiceDates(operatingDays)
+          .of(operatingDays)
           .withAgencies(authorities)
           .withRoutes(lines)
           .withServiceJourneys(serviceJourneys)

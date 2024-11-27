@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -89,7 +89,7 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withRoutes(
-        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:route:1")))
+        FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
       )
       .build();
 
@@ -116,7 +116,7 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withAgencies(
-        FilterValueCollection.ofEmptyIsEverything(List.of(new FeedScopedId("F", "RUT:1")))
+        FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
       )
       .build();
 
@@ -132,7 +132,8 @@ public class TripMatcherFactoryTest {
     TripRequest request = TripRequest
       .of()
       .withServiceDates(
-        FilterValueCollection.ofEmptyIsEverything(
+        FilterValues.ofEmptyIsEverything(
+          "operatingDays",
           List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23))
         )
       )

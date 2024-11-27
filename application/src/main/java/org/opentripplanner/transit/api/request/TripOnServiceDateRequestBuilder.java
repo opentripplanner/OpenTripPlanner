@@ -2,79 +2,72 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.model.RequiredFilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class TripOnServiceDateRequestBuilder {
 
-  private FilterValueCollection<FeedScopedId> agencies = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
+    "agencies",
     List.of()
   );
-  private FilterValueCollection<FeedScopedId> routes = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> routes = FilterValues.ofEmptyIsEverything("routes", List.of());
+  private FilterValues<FeedScopedId> serviceJourneys = FilterValues.ofEmptyIsEverything(
+    "serviceJourneys",
     List.of()
   );
-  private FilterValueCollection<FeedScopedId> serviceJourneys = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> replacementFor = FilterValues.ofEmptyIsEverything(
+    "replacementFor",
     List.of()
   );
-  private FilterValueCollection<FeedScopedId> replacementFor = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<String> netexInternalPlanningCodes = FilterValues.ofEmptyIsEverything(
+    "netexInternalPlanningCodes",
     List.of()
   );
-  private FilterValueCollection<String> netexInternalPlanningCodes = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<TripAlteration> alterations = FilterValues.ofEmptyIsEverything(
+    "alterations",
     List.of()
   );
-  private FilterValueCollection<TripAlteration> alterations = FilterValueCollection.ofEmptyIsEverything(
-    List.of()
-  );
-  private FilterValueCollection<LocalDate> serviceDates = FilterValueCollection.ofEmptyIsEverything(
-    List.of()
-  );
+  private RequiredFilterValues<LocalDate> serviceDates;
 
-  protected TripOnServiceDateRequestBuilder() {}
-
-  public TripOnServiceDateRequestBuilder withServiceDates(
-    FilterValueCollection<LocalDate> serviceDates
-  ) {
+  protected TripOnServiceDateRequestBuilder(RequiredFilterValues serviceDates) {
     this.serviceDates = serviceDates;
-    return this;
   }
 
-  public TripOnServiceDateRequestBuilder withAgencies(
-    FilterValueCollection<FeedScopedId> agencies
-  ) {
+  public TripOnServiceDateRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
     this.agencies = agencies;
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withRoutes(FilterValueCollection<FeedScopedId> routes) {
+  public TripOnServiceDateRequestBuilder withRoutes(FilterValues<FeedScopedId> routes) {
     this.routes = routes;
     return this;
   }
 
   public TripOnServiceDateRequestBuilder withServiceJourneys(
-    FilterValueCollection<FeedScopedId> serviceJourneys
+    FilterValues<FeedScopedId> serviceJourneys
   ) {
     this.serviceJourneys = serviceJourneys;
     return this;
   }
 
   public TripOnServiceDateRequestBuilder withReplacementFor(
-    FilterValueCollection<FeedScopedId> replacementFor
+    FilterValues<FeedScopedId> replacementFor
   ) {
     this.replacementFor = replacementFor;
     return this;
   }
 
   public TripOnServiceDateRequestBuilder withNetexInternalPlanningCodes(
-    FilterValueCollection<String> netexInternalPlanningCodes
+    FilterValues<String> netexInternalPlanningCodes
   ) {
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
 
-  public TripOnServiceDateRequestBuilder withAlterations(
-    FilterValueCollection<TripAlteration> alterations
-  ) {
+  public TripOnServiceDateRequestBuilder withAlterations(FilterValues<TripAlteration> alterations) {
     this.alterations = alterations;
     return this;
   }

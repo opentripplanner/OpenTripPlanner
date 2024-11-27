@@ -2,44 +2,45 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.opentripplanner.transit.api.model.FilterValueCollection;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private FilterValueCollection<FeedScopedId> agencies = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
+    "agencies",
     List.of()
   );
-  private FilterValueCollection<FeedScopedId> routes = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> routes = FilterValues.ofEmptyIsEverything("routes", List.of());
+  private FilterValues<String> netexInternalPlanningCodes = FilterValues.ofEmptyIsEverything(
+    "netexInternalPlanningCodes",
     List.of()
   );
-  private FilterValueCollection<String> netexInternalPlanningCodes = FilterValueCollection.ofEmptyIsEverything(
-    List.of()
-  );
-  private FilterValueCollection<LocalDate> serviceDates = FilterValueCollection.ofEmptyIsEverything(
+  private FilterValues<LocalDate> serviceDates = FilterValues.ofEmptyIsEverything(
+    "serviceDates",
     List.of()
   );
 
   protected TripRequestBuilder() {}
 
-  public TripRequestBuilder withAgencies(FilterValueCollection<FeedScopedId> agencies) {
+  public TripRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
     this.agencies = agencies;
     return this;
   }
 
-  public TripRequestBuilder withRoutes(FilterValueCollection<FeedScopedId> routes) {
+  public TripRequestBuilder withRoutes(FilterValues<FeedScopedId> routes) {
     this.routes = routes;
     return this;
   }
 
   public TripRequestBuilder withNetexInternalPlanningCodes(
-    FilterValueCollection<String> netexInternalPlanningCodes
+    FilterValues<String> netexInternalPlanningCodes
   ) {
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     return this;
   }
 
-  public TripRequestBuilder withServiceDates(FilterValueCollection<LocalDate> serviceDates) {
+  public TripRequestBuilder withServiceDates(FilterValues<LocalDate> serviceDates) {
     this.serviceDates = serviceDates;
     return this;
   }
