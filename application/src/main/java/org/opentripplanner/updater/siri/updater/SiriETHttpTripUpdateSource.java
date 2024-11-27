@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -18,11 +19,6 @@ import uk.org.siri.siri20.Siri;
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
-
-  /**
-   * Feed id that is used to match trip ids in the TripUpdates
-   */
-  private final String feedId;
 
   private final String url;
 
@@ -36,7 +32,6 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
   public SiriETHttpTripUpdateSource(Parameters parameters) {
-    this.feedId = parameters.feedId();
     this.url = parameters.url();
 
     this.requestorRef =
@@ -82,12 +77,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   }
 
   @Override
-  public String getFeedId() {
-    return this.feedId;
-  }
-
   public String toString() {
-    return "SiriETHttpTripUpdateSource(" + url + ")";
+    return ToStringBuilder.of(this.getClass()).addStr("url", url).toString();
   }
 
   private static SiriLoader createLoader(String url, Parameters parameters) {

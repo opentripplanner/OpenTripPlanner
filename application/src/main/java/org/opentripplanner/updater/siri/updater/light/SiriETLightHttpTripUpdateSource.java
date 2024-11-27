@@ -58,11 +58,6 @@ public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource
     return FULL_DATASET;
   }
 
-  @Override
-  public String getFeedId() {
-    return this.parameters.feedId();
-  }
-
   public String toString() {
     return ToStringBuilder
       .of(this.getClass())

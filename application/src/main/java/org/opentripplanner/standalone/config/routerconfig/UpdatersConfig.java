@@ -31,6 +31,7 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeA
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLightUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXLightUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
@@ -232,7 +233,7 @@ public class UpdatersConfig implements UpdatersParameters {
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
-    SIRI_ET_LIGHT(SiriSXLightUpdaterConfig::create),
+    SIRI_ET_LIGHT(SiriETLightUpdaterConfig::create),
     SIRI_SX_LIGHT(SiriSXLightUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),

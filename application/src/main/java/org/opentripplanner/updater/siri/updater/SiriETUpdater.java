@@ -9,6 +9,7 @@ import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -95,9 +96,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
     } while (moreData);
   }
 
+  @Override
   public String toString() {
-    String s = (updateSource == null) ? "NONE" : updateSource.toString();
-    return "Polling SIRI ET updater with update source = " + s;
+    return ToStringBuilder
+      .of(this.getClass())
+      .addStr("source", updateSource.toString())
+      .addDuration("frequency", pollingPeriod())
+      .toString();
   }
 
   public interface SiriETUpdaterParameters

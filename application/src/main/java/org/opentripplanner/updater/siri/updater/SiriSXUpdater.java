@@ -16,6 +16,7 @@ import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -51,7 +52,6 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     SiriLoader siriLoader
   ) {
     super(config);
-    // TODO: add options to choose different patch services
     this.url = config.url();
     this.requestorRef = config.requestorRef();
 
@@ -77,11 +77,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         .withOnRetry(this::updateRequestorRef)
         .build();
 
-    LOG.info(
-      "Creating SIRI-SX updater running every {}: {}",
-      pollingPeriod(),
-      url
-    );
+    LOG.info("Creating SIRI-SX updater running every {}: {}", pollingPeriod(), url);
   }
 
   @Override
@@ -93,13 +89,18 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     return transitAlertService;
   }
 
-  public String toString() {
-    return "SiriSXUpdater (" + url + ")";
-  }
-
   @Override
   protected void runPolling() throws InterruptedException {
     retry.execute(this::updateSiri);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(this.getClass())
+      .addStr("url", url)
+      .addDuration("frequency", pollingPeriod())
+      .toString();
   }
 
   /**

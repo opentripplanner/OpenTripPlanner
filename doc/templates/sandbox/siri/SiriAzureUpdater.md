@@ -30,5 +30,5 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 - Initial version (April 2022)
 - Minor changes in logging (November 2022)
 - Retry fetch from history endpoint if it failed (February 2023)
-- Solve a bug in SIRIAzureETUpdater and improve error logging (March 2023)
+- Solve a bug in SiriAzureETUpdater and improve error logging (March 2023)
 - Add support with federated identity authentication (February 2024)
