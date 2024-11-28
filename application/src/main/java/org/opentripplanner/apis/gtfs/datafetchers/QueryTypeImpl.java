@@ -56,9 +56,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
-import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -124,7 +123,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .vehicleParkingService();
 
       return vehicleParkingService
-        .getBikeParks()
+        .listBikeParks()
+        .stream()
         .filter(bikePark -> bikePark.getId().getId().equals(args.getGraphQLId()))
         .findAny()
         .orElse(null);
@@ -138,7 +138,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .<GraphQLRequestContext>getContext()
         .vehicleParkingService();
 
-      return vehicleParkingService.getBikeParks().toList();
+      return vehicleParkingService.listBikeParks().stream().toList();
     };
   }
 
@@ -211,7 +211,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .vehicleParkingService();
 
       return vehicleParkingService
-        .getCarParks()
+        .listCarParks()
+        .stream()
         .filter(carPark -> carPark.getId().getId().equals(args.getGraphQLId()))
         .findAny()
         .orElse(null);
@@ -232,14 +233,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
         if (!idList.isEmpty()) {
           Map<String, VehicleParking> carParkMap = vehicleParkingService
-            .getCarParks()
+            .listCarParks()
+            .stream()
             .collect(Collectors.toMap(station -> station.getId().getId(), station -> station));
 
           return idList.stream().map(carParkMap::get).toList();
         }
       }
 
-      return vehicleParkingService.getCarParks().toList();
+      return vehicleParkingService.listCarParks();
     };
   }
 
@@ -401,7 +403,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .getBikeParks()
+              .listBikeParks()
+              .stream()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findAny()
               .orElse(null);
@@ -422,7 +425,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .getCarParks()
+              .listCarParks()
+              .stream()
               .filter(carPark -> carPark.getId().equals(carParkId))
               .findAny()
               .orElse(null);
@@ -473,7 +477,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           return vehicleParkingService == null
             ? null
             : vehicleParkingService
-              .getVehicleParkings()
+              .listVehicleParkings()
+              .stream()
               .filter(bikePark -> bikePark.getId().equals(vehicleParkingId))
               .findAny()
               .orElse(null);
@@ -837,7 +842,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       var vehicleParkingId = FeedScopedId.parse(args.getGraphQLId());
       return vehicleParkingService
-        .getVehicleParkings()
+        .listVehicleParkings()
+        .stream()
         .filter(vehicleParking -> vehicleParking.getId().equals(vehicleParkingId))
         .findAny()
         .orElse(null);
@@ -858,14 +864,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
         if (!idList.isEmpty()) {
           Map<String, VehicleParking> vehicleParkingMap = vehicleParkingService
-            .getVehicleParkings()
+            .listVehicleParkings()
+            .stream()
             .collect(Collectors.toMap(station -> station.getId().toString(), station -> station));
 
           return idList.stream().map(vehicleParkingMap::get).toList();
         }
       }
 
-      return vehicleParkingService.getVehicleParkings().toList();
+      return vehicleParkingService.listVehicleParkings();
     };
   }
 

@@ -1,23 +1,23 @@
-package org.opentripplanner.routing.vehicle_parking;
+package org.opentripplanner.service.vehicleparking.internal;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import java.io.Serializable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
 
-/**
- * Service that holds all the {@link VehicleParking} instances and an index for fetching parking
- * locations within a {@link VehicleParkingGroup}. This class is thread-safe because the collections
- * held here are immutable and only updated in atomic operations that replace the existing
- * collection with a new copy.
- *
- * <P>THIS CLASS IS THREAD-SAFE<p>
- */
-public class VehicleParkingService implements Serializable {
+@Singleton
+public class DefaultVehicleParkingRepository implements VehicleParkingRepository {
+
+  @Inject
+  public DefaultVehicleParkingRepository() {}
 
   /**
    * To ensure that his is thread-safe, the set stored here should always be immutable.
@@ -38,6 +38,7 @@ public class VehicleParkingService implements Serializable {
    * service by replacing the existing with a new copy that includes old ones that were not removed
    * in the update and the new ones that were added in the update.
    */
+  @Override
   public void updateVehicleParking(
     Collection<VehicleParking> parkingToAdd,
     Collection<VehicleParking> parkingToRemove
@@ -65,27 +66,13 @@ public class VehicleParkingService implements Serializable {
     vehicleParkings = Set.copyOf(updatedVehicleParkings);
   }
 
-  public Stream<VehicleParking> getBikeParks() {
-    return vehicleParkings.stream().filter(VehicleParking::hasBicyclePlaces);
+  @Override
+  public Collection<VehicleParking> listVehicleParkings() {
+    return Set.copyOf(vehicleParkings);
   }
 
-  public Stream<VehicleParking> getCarParks() {
-    return vehicleParkings.stream().filter(VehicleParking::hasAnyCarPlaces);
-  }
-
-  public Stream<VehicleParking> getVehicleParkings() {
-    return vehicleParkings.stream();
-  }
-
-  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
+  @Override
+  public ListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
     return vehicleParkingGroups;
-  }
-
-  public boolean hasBikeParking() {
-    return vehicleParkings.stream().anyMatch(VehicleParking::hasBicyclePlaces);
-  }
-
-  public boolean hasCarParking() {
-    return vehicleParkings.stream().anyMatch(VehicleParking::hasAnyCarPlaces);
   }
 }
