@@ -597,7 +597,7 @@ public class DefaultTransitService implements TransitEditorService {
       request,
       this.getCalendarService()::getServiceDatesForServiceId
     );
-    return getAllTrips().stream().filter(matcher::match).toList();
+    return listTrips().stream().filter(matcher::match).toList();
   }
 
   /**

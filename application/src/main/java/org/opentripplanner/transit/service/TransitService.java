@@ -145,9 +145,6 @@ public interface TransitService {
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
 
-  @Nullable
-  AreaStop getAreaStop(FeedScopedId id);
-
   /**
    * Return the trip for the given id, including trips created in real time.
    */
