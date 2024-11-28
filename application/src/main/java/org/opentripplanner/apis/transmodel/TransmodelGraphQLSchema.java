@@ -1447,7 +1447,8 @@ public class TransmodelGraphQLSchema {
             var bikeParkId = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
             return GqlUtil
               .getVehicleParkingService(environment)
-              .getBikeParks()
+              .listBikeParks()
+              .stream()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findFirst()
               .orElse(null);
@@ -1464,7 +1465,8 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getVehicleParkingService(environment)
-              .getBikeParks()
+              .listBikeParks()
+              .stream()
               .collect(Collectors.toCollection(ArrayList::new))
           )
           .build()
