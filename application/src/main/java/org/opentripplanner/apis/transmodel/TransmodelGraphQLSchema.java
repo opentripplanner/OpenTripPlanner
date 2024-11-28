@@ -469,13 +469,10 @@ public class TransmodelGraphQLSchema {
             }
             TransitService transitService = GqlUtil.getTransitService(env);
             return transitService
-              .getStations()
+              .listStations()
               .stream()
               .map(station ->
-                new MonoOrMultiModalStation(
-                  station,
-                  transitService.getMultiModalStationForStation(station)
-                )
+                new MonoOrMultiModalStation(station, transitService.findMultiModalStation(station))
               )
               .collect(Collectors.toList());
           })
@@ -699,7 +696,7 @@ public class TransmodelGraphQLSchema {
                 boolean filterByInUse = TRUE.equals(environment.getArgument("filterByInUse"));
                 boolean inUse = !GqlUtil
                   .getTransitService(environment)
-                  .getPatternsForStop(stop, true)
+                  .findPatterns(stop, true)
                   .isEmpty();
                 return !filterByInUse || inUse;
               })
@@ -967,7 +964,7 @@ public class TransmodelGraphQLSchema {
                     if (placeAtDistance.place() instanceof StopLocation stop) {
                       return !GqlUtil
                         .getTransitService(environment)
-                        .getPatternsForStop(stop, true)
+                        .findPatterns(stop, true)
                         .isEmpty();
                     } else {
                       return true;
@@ -1014,7 +1011,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             return GqlUtil
               .getTransitService(environment)
-              .getAgencyForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
+              .getAgency(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
       )
@@ -1026,7 +1023,7 @@ public class TransmodelGraphQLSchema {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(authorityType)))
           .dataFetcher(environment -> {
-            return new ArrayList<>(GqlUtil.getTransitService(environment).getAgencies());
+            return new ArrayList<>(GqlUtil.getTransitService(environment).listAgencies());
           })
           .build()
       )
@@ -1047,7 +1044,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getOperatorForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+              .getOperator(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
           )
           .build()
       )
@@ -1059,7 +1056,7 @@ public class TransmodelGraphQLSchema {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(operatorType)))
           .dataFetcher(environment -> {
-            return new ArrayList<>(GqlUtil.getTransitService(environment).getAllOperators());
+            return new ArrayList<>(GqlUtil.getTransitService(environment).listOperators());
           })
           .build()
       )
@@ -1084,7 +1081,7 @@ public class TransmodelGraphQLSchema {
             }
             return GqlUtil
               .getTransitService(environment)
-              .getRouteForId(TransitIdMapper.mapIDToDomain(id));
+              .getRoute(TransitIdMapper.mapIDToDomain(id));
           })
           .build()
       )
@@ -1156,11 +1153,11 @@ public class TransmodelGraphQLSchema {
               return ((List<String>) environment.getArgument("ids")).stream()
                 .map(TransitIdMapper::mapIDToDomain)
                 .map(id -> {
-                  return GqlUtil.getTransitService(environment).getRouteForId(id);
+                  return GqlUtil.getTransitService(environment).getRoute(id);
                 })
                 .collect(Collectors.toList());
             }
-            Stream<Route> stream = GqlUtil.getTransitService(environment).getAllRoutes().stream();
+            Stream<Route> stream = GqlUtil.getTransitService(environment).listRoutes().stream();
 
             if ((boolean) environment.getArgument("flexibleOnly")) {
               Collection<Route> flexRoutes = GqlUtil
@@ -1228,7 +1225,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getGroupOfRoutesForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+              .getGroupOfRoutes(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
           )
           .build()
       )
@@ -1238,7 +1235,7 @@ public class TransmodelGraphQLSchema {
           .name("groupsOfLines")
           .description("Get all groups of lines")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(groupOfLinesType))))
-          .dataFetcher(environment -> GqlUtil.getTransitService(environment).getGroupsOfRoutes())
+          .dataFetcher(environment -> GqlUtil.getTransitService(environment).listGroupsOfRoutes())
           .build()
       )
       .field(
@@ -1258,7 +1255,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             return GqlUtil
               .getTransitService(environment)
-              .getTripForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
+              .getTrip(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
       )
@@ -1444,7 +1441,8 @@ public class TransmodelGraphQLSchema {
             var bikeParkId = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
             return GqlUtil
               .getVehicleParkingService(environment)
-              .getBikeParks()
+              .listBikeParks()
+              .stream()
               .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findFirst()
               .orElse(null);
@@ -1461,7 +1459,8 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getVehicleParkingService(environment)
-              .getBikeParks()
+              .listBikeParks()
+              .stream()
               .collect(Collectors.toCollection(ArrayList::new))
           )
           .build()

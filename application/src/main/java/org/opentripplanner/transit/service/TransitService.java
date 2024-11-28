@@ -65,67 +65,65 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
  */
 public interface TransitService {
-  Collection<String> getFeedIds();
+  Collection<String> listFeedIds();
 
-  Collection<Agency> getAgencies();
-  Optional<Agency> findAgencyById(FeedScopedId id);
+  Collection<Agency> listAgencies();
+  Optional<Agency> findAgency(FeedScopedId id);
 
   FeedInfo getFeedInfo(String feedId);
 
-  Collection<Notice> getNoticesByEntity(AbstractTransitEntity<?, ?> entity);
+  Collection<Notice> findNotices(AbstractTransitEntity<?, ?> entity);
 
   /**
    * Return a trip pattern by id, not including patterns created by real-time updates.
    */
-  TripPattern getTripPatternForId(FeedScopedId id);
+  TripPattern getTripPattern(FeedScopedId id);
 
   /**
    * Return all scheduled trip patterns, not including real-time created trip patterns.
    * TODO: verify this is the intended behavior and possibly change the method name to
    *       getAllScheduledTripPatterns
    */
-  Collection<TripPattern> getAllTripPatterns();
+  Collection<TripPattern> listTripPatterns();
 
-  Collection<Notice> getNotices();
-
-  Station getStationById(FeedScopedId id);
+  Station getStation(FeedScopedId id);
 
   MultiModalStation getMultiModalStation(FeedScopedId id);
 
-  Collection<Station> getStations();
+  Collection<Station> listStations();
 
-  Integer getServiceCodeForId(FeedScopedId id);
+  Integer getServiceCode(FeedScopedId id);
 
   TIntSet getServiceCodesRunningForDate(LocalDate date);
 
-  Agency getAgencyForId(FeedScopedId id);
+  Agency getAgency(FeedScopedId id);
 
   /**
    * Return a route for a given id, including routes created by real-time updates.
    *
    */
-  Route getRouteForId(FeedScopedId id);
+  Route getRoute(FeedScopedId id);
 
   /**
    * Return the routes using the given stop, not including real-time updates.
    */
-  Set<Route> getRoutesForStop(StopLocation stop);
+  Set<Route> findRoutes(StopLocation stop);
 
   /**
    * Return all the scheduled trip patterns for a specific stop
    * (not taking into account real-time updates).
    */
-  Collection<TripPattern> getPatternsForStop(StopLocation stop);
+  Collection<TripPattern> findPatterns(StopLocation stop);
 
   /**
    * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
    * added by realtime updates are added to the collection.
    */
-  Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
+  Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates);
 
-  Collection<Operator> getAllOperators();
+  Collection<Operator> listOperators();
 
-  Operator getOperatorForId(FeedScopedId id);
+  Operator getOperator(FeedScopedId id);
 
   RegularStop getRegularStop(FeedScopedId id);
 
@@ -141,54 +139,51 @@ public interface TransitService {
    * stop, area stop or stop group, then a list with one item is returned.
    * An empty list is if nothing is found.
    */
-  Collection<StopLocation> getStopOrChildStops(FeedScopedId id);
+  Collection<StopLocation> findStopOrChildStops(FeedScopedId id);
 
   Collection<StopLocationsGroup> listStopLocationGroups();
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
 
+  @Nullable
+  AreaStop getAreaStop(FeedScopedId id);
+
   /**
    * Return the trip for the given id, including trips created in real time.
    */
   @Nullable
-  Trip getTripForId(FeedScopedId id);
-
-  /**
-   * Return the trip for the given id, not including trips created in real time.
-   */
-  @Nullable
-  Trip getScheduledTripForId(FeedScopedId id);
+  Trip getTrip(FeedScopedId id);
 
   /**
    * Return all trips, including those created by real-time updates.
    */
-  Collection<Trip> getAllTrips();
+  Collection<Trip> listTrips();
 
   /**
    * Return all routes, including those created by real-time updates.
    */
-  Collection<Route> getAllRoutes();
+  Collection<Route> listRoutes();
 
   /**
    * Return the scheduled trip pattern for a given trip.
    * If the trip is an added trip (extra journey), return the initial trip pattern for this trip.
    */
-  TripPattern getPatternForTrip(Trip trip);
+  TripPattern findPattern(Trip trip);
 
   /**
    * Return the trip pattern for a given trip on a service date. The real-time updated version
    * is returned if it exists, otherwise the scheduled trip pattern is returned.
    */
-  TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate);
+  TripPattern findPattern(Trip trip, LocalDate serviceDate);
 
   /**
    * Return all the trip patterns used in the given route, including those added by real-time updates
    */
-  Collection<TripPattern> getPatternsForRoute(Route route);
+  Collection<TripPattern> findPatterns(Route route);
 
-  MultiModalStation getMultiModalStationForStation(Station station);
+  MultiModalStation findMultiModalStation(Station station);
 
-  List<StopTimesInPattern> stopTimesForStop(
+  List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
@@ -197,14 +192,14 @@ public interface TransitService {
     boolean includeCancelledTrips
   );
 
-  List<StopTimesInPattern> getStopTimesForStop(
+  List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
     LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   );
 
-  List<TripTimeOnDate> stopTimesForPatternAtStop(
+  List<TripTimeOnDate> findTripTimeOnDate(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -214,18 +209,19 @@ public interface TransitService {
     boolean includeCancellations
   );
 
-  Collection<GroupOfRoutes> getGroupsOfRoutes();
+  Collection<GroupOfRoutes> listGroupsOfRoutes();
 
-  Collection<Route> getRoutesForGroupOfRoutes(GroupOfRoutes groupOfRoutes);
+  Collection<Route> findRoutes(GroupOfRoutes groupOfRoutes);
 
-  GroupOfRoutes getGroupOfRoutesForId(FeedScopedId id);
+  @Nullable
+  GroupOfRoutes getGroupOfRoutes(FeedScopedId id);
 
   /**
    * Return the timetable for a given trip pattern and date, taking into account real-time updates.
    * If no real-times update are applied, fall back to scheduled data.
    */
   @Nullable
-  Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
+  Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate);
 
   /**
    * Return the real-time added pattern for a given tripId and a given service date.
@@ -233,23 +229,25 @@ public interface TransitService {
    * this date (that is: it is still using its scheduled trip pattern for this date).
    */
   @Nullable
-  TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate);
+  TripPattern findNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate);
 
   /**
    * Return true if at least one trip pattern has been modified by a real-time update.
    */
   boolean hasNewTripPatternsForModifiedTrips();
 
-  TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
+  TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate);
 
   /**
    * Return the TripOnServiceDate for a given id, including real-time updates.
    */
-  TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
+  TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
 
-  Set<TransitMode> getTransitModes();
+  Collection<TripOnServiceDate> listTripsOnServiceDate();
 
-  Collection<PathTransfer> getTransfersByStop(StopLocation stop);
+  Set<TransitMode> listTransitModes();
+
+  Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
   TransitLayer getTransitLayer();
 
@@ -286,7 +284,7 @@ public interface TransitService {
    * The returning stream is ordered by the number of occurrences of the mode in the child stops.
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
    */
-  List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station);
+  List<TransitMode> findTransitModes(StopLocationsGroup station);
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
@@ -298,11 +296,11 @@ public interface TransitService {
    * <p>
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
-  List<TransitMode> getModesOfStopLocation(StopLocation stop);
+  List<TransitMode> findTransitModes(StopLocation stop);
 
   Deduplicator getDeduplicator();
 
-  Set<LocalDate> getAllServiceCodes();
+  Set<LocalDate> listServiceDates();
 
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
 
@@ -312,7 +310,7 @@ public interface TransitService {
    * @param request - A TripOnServiceDateRequest object with filtering defined.
    * @return - A list of TripOnServiceDates
    */
-  List<TripOnServiceDate> getTripOnServiceDates(TripOnServiceDateRequest request);
+  List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request);
 
   /**
    * Returns a list of Trips that match the filtering defined in the request.

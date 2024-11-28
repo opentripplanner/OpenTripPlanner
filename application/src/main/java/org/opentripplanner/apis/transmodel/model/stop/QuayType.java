@@ -124,7 +124,7 @@ public class QuayType {
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
-                GqlUtil.getTransitService(env).getMultiModalStationForStation(station)
+                GqlUtil.getTransitService(env).findMultiModalStation(station)
               );
             } else {
               return null;
@@ -177,7 +177,7 @@ public class QuayType {
           .dataFetcher(env ->
             GqlUtil
               .getTransitService(env)
-              .getPatternsForStop(env.getSource(), true)
+              .findPatterns(env.getSource(), true)
               .stream()
               .map(TripPattern::getRoute)
               .distinct()
@@ -192,9 +192,7 @@ public class QuayType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of journey patterns servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
-          .dataFetcher(env ->
-            GqlUtil.getTransitService(env).getPatternsForStop(env.getSource(), true)
-          )
+          .dataFetcher(env -> GqlUtil.getTransitService(env).findPatterns(env.getSource(), true))
           .build()
       )
       .field(

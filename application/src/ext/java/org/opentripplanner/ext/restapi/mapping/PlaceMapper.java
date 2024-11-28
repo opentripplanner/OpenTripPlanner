@@ -15,7 +15,7 @@ import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlaceMapper {

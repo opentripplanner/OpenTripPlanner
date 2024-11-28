@@ -51,9 +51,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         .filter(EntitySelector.Agency.class::isInstance)
         .findAny()
         .map(EntitySelector.Agency.class::cast)
-        .map(entitySelector ->
-          getTransitService(environment).getAgencyForId(entitySelector.agencyId())
-        )
+        .map(entitySelector -> getTransitService(environment).getAgency(entitySelector.agencyId()))
         .orElse(null);
   }
 
@@ -170,24 +168,24 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
           }
           if (entitySelector instanceof EntitySelector.Agency) {
             FeedScopedId id = ((EntitySelector.Agency) entitySelector).agencyId();
-            Agency agency = getTransitService(environment).getAgencyForId(id);
+            Agency agency = getTransitService(environment).getAgency(id);
             return List.of(getAlertEntityOrUnknown(agency, id.toString(), "agency"));
           }
           if (entitySelector instanceof EntitySelector.Route) {
             FeedScopedId id = ((EntitySelector.Route) entitySelector).routeId();
-            Route route = getTransitService(environment).getRouteForId(id);
+            Route route = getTransitService(environment).getRoute(id);
             return List.of(getAlertEntityOrUnknown(route, id.toString(), "route"));
           }
           if (entitySelector instanceof EntitySelector.Trip) {
             FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId();
-            Trip trip = getTransitService(environment).getTripForId(id);
+            Trip trip = getTransitService(environment).getTrip(id);
             return List.of(getAlertEntityOrUnknown(trip, id.toString(), "trip"));
           }
           if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
             FeedScopedId stopId = stopAndRoute.stopId();
             FeedScopedId routeId = stopAndRoute.routeId();
             StopLocation stop = getTransitService(environment).getRegularStop(stopId);
-            Route route = getTransitService(environment).getRouteForId(routeId);
+            Route route = getTransitService(environment).getRoute(routeId);
             return List.of(
               stop != null && route != null
                 ? new StopOnRouteModel(stop, route)
@@ -205,7 +203,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
             FeedScopedId stopId = stopAndTrip.stopId();
             FeedScopedId tripId = stopAndTrip.tripId();
             StopLocation stop = getTransitService(environment).getRegularStop(stopId);
-            Trip trip = getTransitService(environment).getTripForId(tripId);
+            Trip trip = getTransitService(environment).getTrip(tripId);
             return List.of(
               stop != null && trip != null
                 ? new StopOnTripModel(stop, trip)
@@ -222,7 +220,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
           if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
             FeedScopedId agencyId = ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId();
             int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType();
-            Agency agency = getTransitService(environment).getAgencyForId(agencyId);
+            Agency agency = getTransitService(environment).getAgency(agencyId);
             return List.of(
               agency != null
                 ? new RouteTypeModel(agency, routeType, agency.getId().getFeedId())
@@ -244,10 +242,10 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
           if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
             Direction direction = ((DirectionAndRoute) entitySelector).direction();
             FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId();
-            Route route = getTransitService(environment).getRouteForId(routeId);
+            Route route = getTransitService(environment).getRoute(routeId);
             return route != null
               ? getTransitService(environment)
-                .getPatternsForRoute(route)
+                .findPatterns(route)
                 .stream()
                 .filter(pattern -> pattern.getDirection() == direction)
                 .collect(Collectors.toList())
@@ -301,9 +299,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
         .findAny()
         .map(EntitySelector.Route.class::cast)
-        .map(entitySelector ->
-          getTransitService(environment).getRouteForId(entitySelector.routeId())
-        )
+        .map(entitySelector -> getTransitService(environment).getRoute(entitySelector.routeId()))
         .orElse(null);
   }
 
@@ -331,7 +327,7 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
         .findAny()
         .map(EntitySelector.Trip.class::cast)
-        .map(entitySelector -> getTransitService(environment).getTripForId(entitySelector.tripId()))
+        .map(entitySelector -> getTransitService(environment).getTrip(entitySelector.tripId()))
         .orElse(null);
   }
 

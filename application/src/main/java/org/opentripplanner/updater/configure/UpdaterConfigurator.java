@@ -12,6 +12,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
@@ -49,6 +50,7 @@ public class UpdaterConfigurator {
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
+  private final VehicleParkingRepository parkingRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
@@ -56,6 +58,7 @@ public class UpdaterConfigurator {
     Graph graph,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -64,12 +67,14 @@ public class UpdaterConfigurator {
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
+    this.parkingRepository = parkingRepository;
   }
 
   public static void configure(
     Graph graph,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -77,6 +82,7 @@ public class UpdaterConfigurator {
       graph,
       realtimeVehicleRepository,
       vehicleRentalRepository,
+      parkingRepository,
       timetableRepository,
       updatersParameters
     )
@@ -195,22 +201,13 @@ public class UpdaterConfigurator {
             openingHoursCalendarService
           );
           updaters.add(
-            new VehicleParkingUpdater(
-              configItem,
-              source,
-              graph.getLinker(),
-              graph.getVehicleParkingService()
-            )
+            new VehicleParkingUpdater(configItem, source, graph.getLinker(), parkingRepository)
           );
         }
         case AVAILABILITY_ONLY -> {
           var source = AvailabilityDatasourceFactory.create(configItem);
           updaters.add(
-            new VehicleParkingAvailabilityUpdater(
-              configItem,
-              source,
-              graph.getVehicleParkingService()
-            )
+            new VehicleParkingAvailabilityUpdater(configItem, source, parkingRepository)
           );
         }
       }
