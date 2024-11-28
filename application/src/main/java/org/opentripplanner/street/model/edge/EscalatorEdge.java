@@ -31,7 +31,7 @@ public class EscalatorEdge extends Edge {
       var s1 = s0.edit(this);
       double time;
       if (duration == null) {
-        time = getDistanceMeters() / s0.getPreferences().street().escalator().horizontalSpeed();
+        time = getDistanceMeters() / s0.getPreferences().walk().escalatorSpeed();
       } else {
         time = duration.toSeconds();
       }
@@ -52,6 +52,10 @@ public class EscalatorEdge extends Edge {
     return length;
   }
 
+  /**
+   * Parsed content of duration tag in OSM, if any. Not a calculated value.
+   * @return Duration, or empty
+   */
   public Optional<Duration> getDuration() {
     return Optional.ofNullable(duration);
   }

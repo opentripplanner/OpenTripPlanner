@@ -30,8 +30,6 @@ public class DurationUtilsTest {
   private final Duration D5m = Duration.ofMinutes(5);
   private final Duration D9s = Duration.ofSeconds(9);
   private final Duration D3d5m9s = D3d.plus(D5m).plus(D9s);
-  private final Duration D2h5m = D2h.plus(D5m);
-  private final Duration D2h5m9s = D2h.plus(D5m).plus(D9s);
   private final int I9h31m = durationSec(9, 31, 0);
   private final int I9h36m55s = durationSec(9, 36, 55);
   private final int I13h33m57s = durationSec(13, 33, 57);
@@ -91,19 +89,6 @@ public class DurationUtilsTest {
     assertEquals(D9s, DurationUtils.duration("PT9s", ChronoUnit.DAYS), "ignore unit");
     assertEquals(D9s, DurationUtils.duration("9", ChronoUnit.SECONDS));
     assertEquals(-D9s.toSeconds(), DurationUtils.duration("-9", ChronoUnit.SECONDS).toSeconds());
-  }
-
-  @Test
-  public void parseClockDuration() {
-    assertEquals(D2h, DurationUtils.parseClockDuration("2"));
-    assertEquals(D2h5m, DurationUtils.parseClockDuration("02:05"));
-    assertEquals(D2h5m9s, DurationUtils.parseClockDuration("02:05:09"));
-    assertThrows(DateTimeParseException.class, () -> DurationUtils.parseClockDuration("02:65:09"));
-    assertThrows(
-      DateTimeParseException.class,
-      () -> DurationUtils.parseClockDuration("02:05:09:00")
-    );
-    assertThrows(DateTimeParseException.class, () -> DurationUtils.parseClockDuration("02:x5:09"));
   }
 
   @Test

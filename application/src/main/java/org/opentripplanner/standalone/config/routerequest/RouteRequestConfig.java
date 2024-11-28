@@ -460,16 +460,6 @@ ferries, where the check-in process needs to be done in good time before ride.
               .asInt(dftElevator.hopTime())
           );
       })
-      .withEscalator(escalator -> {
-        var dftEscalator = dft.escalator();
-        escalator.withHorizontalSpeed(
-          c
-            .of("escalatorSpeed")
-            .since(V2_7)
-            .summary("How fast does an escalator move horizontally?")
-            .asDouble(dftEscalator.horizontalSpeed())
-        );
-      })
       .withAccessEgress(accessEgress -> {
         var dftAccessEgress = dft.accessEgress();
         accessEgress
@@ -828,6 +818,14 @@ high values.
             "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
           )
           .asDouble(dft.escalatorReluctance())
+      )
+      .withEscalatorSpeed(
+        c
+          .of("escalatorSpeed")
+          .since(V2_7)
+          .summary("How fast does an escalator move horizontally?")
+          .description("Horizontal speed of escalator in m/s.")
+          .asDouble(dft.escalatorSpeed())
       );
   }
 }

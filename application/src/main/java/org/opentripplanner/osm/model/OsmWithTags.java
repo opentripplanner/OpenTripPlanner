@@ -1,5 +1,9 @@
 package org.opentripplanner.osm.model;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -219,6 +223,68 @@ public class OsmWithTags {
       }
     }
     return OptionalInt.empty();
+  }
+
+  /**
+   * Parse an OSM duration tag, which is one of:
+   *   mm
+   *   hh:mm
+   *   hh:mm:ss
+   * and where the leading value is not limited to any maximum.
+   * @param duration string in format mm, hh:mm, or hh:mm:ss
+   * @return Duration
+   * @throws DateTimeParseException on bad input
+   */
+  public static Duration parseOsmDuration(String duration) {
+    int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
+    if (colonCount <= 2) {
+      try {
+        int i, j;
+        long hours, minutes, seconds;
+        switch (colonCount) {
+          case 0:
+            minutes = Long.parseLong(duration);
+            if (minutes >= 0) {
+              return Duration.ofMinutes(minutes);
+            }
+            break;
+          case 1:
+            i = duration.indexOf(':');
+            hours = Long.parseLong(duration.substring(0, i));
+            minutes = Long.parseLong(duration.substring(i + 1));
+            if (hours >= 0 && minutes >= 0 && minutes < 60) {
+              return Duration.ofHours(hours).plusMinutes(minutes);
+            }
+            break;
+          default:
+            //case 2:
+            i = duration.indexOf(':');
+            j = duration.indexOf(':', i + 1);
+            hours = Long.parseLong(duration.substring(0, i));
+            minutes = Long.parseLong(duration.substring(i + 1, j));
+            seconds = Long.parseLong(duration.substring(j + 1));
+            if (hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+              return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+            }
+            break;
+        }
+      } catch (NumberFormatException e) {
+        // fallthrough
+      }
+    }
+    throw new DateTimeParseException("bad clock duration", duration, 0);
+  }
+
+  public Optional<Duration> getTagAsDuration(String tag, Consumer<String> errorHandler) {
+    String value = getTag(tag);
+    if (value != null) {
+      try {
+        return Optional.of(parseOsmDuration(value));
+      } catch (DateTimeParseException e) {
+        errorHandler.accept(value);
+      }
+    }
+    return Optional.empty();
   }
 
   /**

@@ -30,7 +30,6 @@ public final class StreetPreferences implements Serializable {
   private final double turnReluctance;
   private final DrivingDirection drivingDirection;
   private final ElevatorPreferences elevator;
-  private final EscalatorPreferences escalator;
   private final AccessEgressPreferences accessEgress;
   private final IntersectionTraversalModel intersectionTraversalModel;
   private final DurationForEnum<StreetMode> maxDirectDuration;
@@ -40,7 +39,6 @@ public final class StreetPreferences implements Serializable {
     this.turnReluctance = 1.0;
     this.drivingDirection = DrivingDirection.RIGHT;
     this.elevator = ElevatorPreferences.DEFAULT;
-    this.escalator = EscalatorPreferences.DEFAULT;
     this.accessEgress = AccessEgressPreferences.DEFAULT;
     this.intersectionTraversalModel = IntersectionTraversalModel.SIMPLE;
     this.maxDirectDuration = durationForStreetModeOf(ofHours(4));
@@ -51,7 +49,6 @@ public final class StreetPreferences implements Serializable {
     this.turnReluctance = Units.reluctance(builder.turnReluctance);
     this.drivingDirection = requireNonNull(builder.drivingDirection);
     this.elevator = requireNonNull(builder.elevator);
-    this.escalator = requireNonNull(builder.escalator);
     this.accessEgress = requireNonNull(builder.accessEgress);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
     this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
@@ -79,10 +76,6 @@ public final class StreetPreferences implements Serializable {
   /** Preferences for taking an elevator */
   public ElevatorPreferences elevator() {
     return elevator;
-  }
-
-  public EscalatorPreferences escalator() {
-    return escalator;
   }
 
   /** Preferences for access/egress routing */
@@ -117,7 +110,6 @@ public final class StreetPreferences implements Serializable {
       DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&
       drivingDirection == that.drivingDirection &&
       elevator.equals(that.elevator) &&
-      escalator.equals(that.escalator) &&
       routingTimeout.equals(that.routingTimeout) &&
       intersectionTraversalModel == that.intersectionTraversalModel &&
       maxDirectDuration.equals(that.maxDirectDuration) &&
@@ -146,7 +138,6 @@ public final class StreetPreferences implements Serializable {
       .addEnum("drivingDirection", drivingDirection, DEFAULT.drivingDirection)
       .addDuration("routingTimeout", routingTimeout, DEFAULT.routingTimeout())
       .addObj("elevator", elevator, DEFAULT.elevator)
-      .addObj("escalator", escalator, DEFAULT.escalator)
       .addObj(
         "intersectionTraversalModel",
         intersectionTraversalModel,
@@ -163,7 +154,6 @@ public final class StreetPreferences implements Serializable {
     private double turnReluctance;
     private DrivingDirection drivingDirection;
     private ElevatorPreferences elevator;
-    private EscalatorPreferences escalator;
     private IntersectionTraversalModel intersectionTraversalModel;
     private DurationForEnum<StreetMode> maxDirectDuration;
     private Duration routingTimeout;
@@ -174,7 +164,6 @@ public final class StreetPreferences implements Serializable {
       this.turnReluctance = original.turnReluctance;
       this.drivingDirection = original.drivingDirection;
       this.elevator = original.elevator;
-      this.escalator = original.escalator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
       this.accessEgress = original.accessEgress;
       this.maxDirectDuration = original.maxDirectDuration;
@@ -197,11 +186,6 @@ public final class StreetPreferences implements Serializable {
 
     public Builder withElevator(Consumer<ElevatorPreferences.Builder> body) {
       this.elevator = elevator.copyOf().apply(body).build();
-      return this;
-    }
-
-    public Builder withEscalator(Consumer<EscalatorPreferences.Builder> body) {
-      this.escalator = escalator.copyOf().apply(body).build();
       return this;
     }
 

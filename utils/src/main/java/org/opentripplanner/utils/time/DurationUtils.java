@@ -125,49 +125,6 @@ public class DurationUtils {
   }
 
   /**
-   * Parse a duration string in format hh:mm:ss.
-   * @param duration string in format hh:mm:ss
-   * @return Duration
-   * @throws DateTimeParseException on bad input
-   */
-  public static Duration parseClockDuration(String duration) {
-    int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
-    if (colonCount <= 2) {
-      try {
-        int i, j;
-        long hours, minutes = 0, seconds = 0;
-        switch (colonCount) {
-          case 0:
-            hours = Long.parseLong(duration);
-            break;
-          case 1:
-            i = duration.indexOf(':');
-            hours = Long.parseLong(duration.substring(0, i));
-            minutes = Long.parseLong(duration.substring(i + 1));
-            break;
-          default:
-            //case 2:
-            i = duration.indexOf(':');
-            j = duration.indexOf(':', i + 1);
-            hours = Long.parseLong(duration.substring(0, i));
-            minutes = Long.parseLong(duration.substring(i + 1, j));
-            seconds = Long.parseLong(duration.substring(j + 1));
-            break;
-        }
-        if (hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
-          return Duration
-            .ofHours(hours)
-            .plus(Duration.ofMinutes(minutes))
-            .plus(Duration.ofSeconds(seconds));
-        }
-      } catch (NumberFormatException e) {
-        // fallthrough
-      }
-    }
-    throw new DateTimeParseException("bad clock duration", duration, 0);
-  }
-
-  /**
    * This is used to parse a string which may be a number {@code NNNN}(number of seconds) or a
    * duration with format {@code NhNmNs}, where {@code N} is a decimal number and
    * {@code h} is hours, {@code m} minutes and {@code s} seconds.

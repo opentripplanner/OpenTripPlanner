@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -15,14 +17,19 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 class EscalatorProcessor {
 
   private final Map<Long, IntersectionVertex> intersectionNodes;
+  private final DataImportIssueStore issueStore;
 
   // If an escalator is tagged as moving less than 5 cm/s, or more than 5 m/s,
   // assume it's an error and ignore it.
   private static final double SLOW_ESCALATOR_ERROR_CUTOFF = 0.05;
   private static final double FAST_ESCALATOR_ERROR_CUTOFF = 5.0;
 
-  public EscalatorProcessor(Map<Long, IntersectionVertex> intersectionNodes) {
+  public EscalatorProcessor(
+    Map<Long, IntersectionVertex> intersectionNodes,
+    DataImportIssueStore issueStore
+  ) {
     this.intersectionNodes = intersectionNodes;
+    this.issueStore = issueStore;
   }
 
   public void buildEscalatorEdge(OsmWay escalatorWay, double length) {
@@ -34,11 +41,28 @@ class EscalatorProcessor {
       .boxed()
       .toList();
 
-    Optional<Duration> duration = escalatorWay.getDuration();
+    Optional<Duration> duration = escalatorWay.getDuration(v ->
+      issueStore.add(
+        Issue.issue(
+          "InvalidDuration",
+          "Duration for osm node %d is not a valid duration: '%s'; it's replaced with 'Optional.empty()' (unknown).",
+          escalatorWay.getId(),
+          v
+        )
+      )
+    );
     if (duration.isPresent()) {
       double speed = length / duration.get().toSeconds();
       if (speed < SLOW_ESCALATOR_ERROR_CUTOFF || speed > FAST_ESCALATOR_ERROR_CUTOFF) {
         duration = Optional.empty();
+        issueStore.add(
+          Issue.issue(
+            "InvalidDuration",
+            "Duration for osm node {} makes implied speed {} be outside acceptable range.",
+            escalatorWay.getId(),
+            speed
+          )
+        );
       }
     }
     for (int i = 0; i < nodes.size() - 1; i++) {

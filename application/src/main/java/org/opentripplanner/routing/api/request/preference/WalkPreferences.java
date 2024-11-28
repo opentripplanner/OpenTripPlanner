@@ -30,6 +30,7 @@ public final class WalkPreferences implements Serializable {
   private final double safetyFactor;
 
   private final double escalatorReluctance;
+  private final double escalatorSpeed;
 
   private WalkPreferences() {
     this.speed = 1.33;
@@ -39,6 +40,7 @@ public final class WalkPreferences implements Serializable {
     this.stairsTimeFactor = 3.0;
     this.safetyFactor = 1.0;
     this.escalatorReluctance = 1.5;
+    this.escalatorSpeed = 0.45;
   }
 
   private WalkPreferences(Builder builder) {
@@ -49,6 +51,7 @@ public final class WalkPreferences implements Serializable {
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
     this.safetyFactor = Units.reluctance(builder.safetyFactor);
     this.escalatorReluctance = Units.reluctance(builder.escalatorReluctance);
+    this.escalatorSpeed = Units.speed(builder.escalatorSpeed);
   }
 
   public static Builder of() {
@@ -108,6 +111,14 @@ public final class WalkPreferences implements Serializable {
     return safetyFactor;
   }
 
+  public double escalatorReluctance() {
+    return escalatorReluctance;
+  }
+
+  public double escalatorSpeed() {
+    return escalatorSpeed;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -120,7 +131,8 @@ public final class WalkPreferences implements Serializable {
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
-      doubleEquals(that.escalatorReluctance, escalatorReluctance)
+      doubleEquals(that.escalatorReluctance, escalatorReluctance) &&
+      doubleEquals(that.escalatorSpeed, escalatorSpeed)
     );
   }
 
@@ -133,7 +145,8 @@ public final class WalkPreferences implements Serializable {
       stairsReluctance,
       stairsTimeFactor,
       safetyFactor,
-      escalatorReluctance
+      escalatorReluctance,
+      escalatorSpeed
     );
   }
 
@@ -148,11 +161,8 @@ public final class WalkPreferences implements Serializable {
       .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
       .addNum("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
       .addNum("escalatorReluctance", escalatorReluctance, DEFAULT.escalatorReluctance)
+      .addNum("escalatorSpeed", escalatorSpeed, DEFAULT.escalatorSpeed)
       .toString();
-  }
-
-  public double escalatorReluctance() {
-    return escalatorReluctance;
   }
 
   public static class Builder {
@@ -166,6 +176,7 @@ public final class WalkPreferences implements Serializable {
     private double safetyFactor;
 
     private double escalatorReluctance;
+    private double escalatorSpeed;
 
     public Builder(WalkPreferences original) {
       this.original = original;
@@ -176,6 +187,7 @@ public final class WalkPreferences implements Serializable {
       this.stairsTimeFactor = original.stairsTimeFactor;
       this.safetyFactor = original.safetyFactor;
       this.escalatorReluctance = original.escalatorReluctance;
+      this.escalatorSpeed = original.escalatorSpeed;
     }
 
     public WalkPreferences original() {
@@ -248,6 +260,15 @@ public final class WalkPreferences implements Serializable {
 
     public Builder withEscalatorReluctance(double escalatorReluctance) {
       this.escalatorReluctance = escalatorReluctance;
+      return this;
+    }
+
+    public double escalatorSpeed() {
+      return escalatorSpeed;
+    }
+
+    public Builder withEscalatorSpeed(double escalatorSpeed) {
+      this.escalatorSpeed = escalatorSpeed;
       return this;
     }
 

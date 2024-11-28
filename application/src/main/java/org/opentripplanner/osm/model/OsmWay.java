@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -134,17 +135,8 @@ public class OsmWay extends OsmWithTags {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
-  public Optional<Duration> getDuration() {
-    var duration = getTag("duration");
-    if (duration != null) {
-      try {
-        return Optional.of(DurationUtils.parseClockDuration(duration));
-      } catch (DateTimeParseException e) {
-        // For malformed duration tags, just pretend they weren't there.
-        return Optional.empty();
-      }
-    }
-    return Optional.empty();
+  public Optional<Duration> getDuration(Consumer<String> errorHandler) {
+    return getTagAsDuration("duration", errorHandler);
   }
 
   public boolean isForwardEscalator() {

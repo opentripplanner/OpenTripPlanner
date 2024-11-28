@@ -528,7 +528,8 @@ Used to group requests when monitoring OTP.
       "reluctance" : 4.0,
       "stairsReluctance" : 1.65,
       "boardCost" : 600,
-      "escalatorReluctance" : 1.5
+      "escalatorReluctance" : 1.5,
+      "escalatorSpeed" : 0.45
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,

@@ -23,7 +23,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                                 | *Optional* | `90`             |  2.0  |
 | elevatorHopCost                                                                                              |        `integer`       | What is the cost of travelling one floor on an elevator?                                                                                                 | *Optional* | `20`             |  2.0  |
 | elevatorHopTime                                                                                              |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                               | *Optional* | `20`             |  2.0  |
-| escalatorSpeed                                                                                               |        `double`        | How fast does an escalator move horizontally?                                                                                                            | *Optional* | `0.45`           |  2.7  |
 | geoidElevation                                                                                               |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                                     | *Optional* | `false`          |  2.0  |
 | ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, real-time updates are ignored during this search.                                                                                             | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                              | *Optional* | `"simple"`       |  2.2  |
@@ -157,6 +156,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | walk                                                                                                         |        `object`        | Walking preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
 |    boardCost                                                                                                 |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.                       | *Optional* | `600`            |  2.0  |
 |    escalatorReluctance                                                                                       |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                                 | *Optional* | `1.5`            |  2.4  |
+|    [escalatorSpeed](#rd_walk_escalatorSpeed)                                                                 |        `double`        | How fast does an escalator move horizontally?                                                                                                            | *Optional* | `0.45`           |  2.7  |
 |    [reluctance](#rd_walk_reluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
 |    [safetyFactor](#rd_walk_safetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                            | *Optional* | `1.0`            |  2.2  |
 |    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                               | *Optional* | `1.33`           |  2.0  |
@@ -1072,6 +1072,15 @@ The ids of the routes that incur an extra cost when being used. Format: `FeedId:
 
 How much cost is added is configured in `unpreferredCost`.
 
+<h3 id="rd_walk_escalatorSpeed">escalatorSpeed</h3>
+
+**Since version:** `2.7` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.45`   
+**Path:** /routingDefaults/walk 
+
+How fast does an escalator move horizontally?
+
+Horizontal speed of escalator in m/s.
+
 <h3 id="rd_walk_reluctance">reluctance</h3>
 
 **Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
@@ -1215,7 +1224,8 @@ include stairs as a last result.
       "reluctance" : 4.0,
       "stairsReluctance" : 1.65,
       "boardCost" : 600,
-      "escalatorReluctance" : 1.5
+      "escalatorReluctance" : 1.5,
+      "escalatorSpeed" : 0.45
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,
