@@ -69,10 +69,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).getAlightRule() == null) {
+      var alightRule = getSource(environment).getAlightRule();
+      if (alightRule == null) {
         return PickDrop.SCHEDULED.name();
       }
-      return getSource(environment).getAlightRule().name();
+      if (alightRule == PickDrop.CANCELLED) {
+        return null;
+      }
+      return alightRule.name();
     };
   }
 
@@ -180,10 +184,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).getBoardRule() == null) {
+      var boardRule = getSource(environment).getBoardRule();
+      if (boardRule == null) {
         return PickDrop.SCHEDULED.name();
       }
-      return getSource(environment).getBoardRule().name();
+      if (boardRule == PickDrop.CANCELLED) {
+        return null;
+      }
+      return boardRule.name();
     };
   }
 
