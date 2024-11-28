@@ -339,8 +339,8 @@ public class SpeedTest {
   private void updateTimersWithGlobalCounters() {
     final var transitService = serverContext.transitService();
     timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
-    timer.globalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
-    timer.globalCount("transitdata_trips", transitService.getAllTrips().size());
+    timer.globalCount("transitdata_patterns", transitService.listTripPatterns().size());
+    timer.globalCount("transitdata_trips", transitService.listTrips().size());
 
     // we want to get the numbers after the garbage collection
     forceGCToAvoidGCLater();

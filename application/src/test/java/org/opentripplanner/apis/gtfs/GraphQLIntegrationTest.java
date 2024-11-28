@@ -212,7 +212,7 @@ class GraphQLIntegrationTest {
       );
 
       @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+      public List<TransitMode> findTransitModes(StopLocation stop) {
         return List.of(BUS, FERRY);
       }
 
@@ -222,7 +222,7 @@ class GraphQLIntegrationTest {
       }
 
       @Override
-      public Set<Route> getRoutesForStop(StopLocation stop) {
+      public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
     };

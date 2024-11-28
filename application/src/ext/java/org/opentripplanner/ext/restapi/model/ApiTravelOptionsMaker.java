@@ -34,7 +34,7 @@ public final class ApiTravelOptionsMaker {
     TransitService transitService
   ) {
     return makeOptions(
-      transitService.getTransitModes(),
+      transitService.listTransitModes(),
       vehicleRentalService.hasRentalBikes(),
       vehicleParkingService.hasBikeParking(),
       vehicleParkingService.hasCarParking()

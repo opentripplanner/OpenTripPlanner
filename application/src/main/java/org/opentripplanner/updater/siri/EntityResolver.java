@@ -54,7 +54,7 @@ public class EntityResolver {
 
     if (journey.getDatedVehicleJourneyRef() != null) {
       String datedServiceJourneyId = journey.getDatedVehicleJourneyRef().getValue();
-      TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
+      TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDate(
         resolveId(datedServiceJourneyId)
       );
 
@@ -65,9 +65,7 @@ public class EntityResolver {
 
     // It is possible that the trip has previously been added, resolve the added trip
     if (journey.getEstimatedVehicleJourneyCode() != null) {
-      var addedTrip = transitService.getTripForId(
-        resolveId(journey.getEstimatedVehicleJourneyCode())
-      );
+      var addedTrip = transitService.getTrip(resolveId(journey.getEstimatedVehicleJourneyCode()));
       if (addedTrip != null) {
         return addedTrip;
       }
@@ -115,13 +113,13 @@ public class EntityResolver {
       return null;
     }
 
-    return transitService.getTripOnServiceDateForTripAndDay(
+    return transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(resolveId(serviceJourneyId), serviceDate)
     );
   }
 
   public TripOnServiceDate resolveTripOnServiceDate(FeedScopedId datedServiceJourneyId) {
-    return transitService.getTripOnServiceDateById(datedServiceJourneyId);
+    return transitService.getTripOnServiceDate(datedServiceJourneyId);
   }
 
   public FeedScopedId resolveDatedServiceJourneyId(
@@ -182,7 +180,7 @@ public class EntityResolver {
   }
 
   public Trip resolveTrip(String serviceJourneyId) {
-    return transitService.getTripForId(resolveId(serviceJourneyId));
+    return transitService.getTrip(resolveId(serviceJourneyId));
   }
 
   /**
@@ -196,11 +194,11 @@ public class EntityResolver {
    * Resolve a {@link Route} from a line id.
    */
   public Route resolveRoute(String lineRef) {
-    return transitService.getRouteForId(resolveId(lineRef));
+    return transitService.getRoute(resolveId(lineRef));
   }
 
   public Operator resolveOperator(String operatorRef) {
-    return transitService.getOperatorForId(resolveId(operatorRef));
+    return transitService.getOperator(resolveId(operatorRef));
   }
 
   @Nullable
@@ -246,7 +244,7 @@ public class EntityResolver {
     if (trip == null) {
       return 0;
     }
-    var pattern = transitService.getPatternForTrip(trip);
+    var pattern = transitService.findPattern(trip);
     if (pattern == null) {
       return 0;
     }

@@ -174,7 +174,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
 
   private boolean stopHasPatternsWithMode(RegularStop stop, Set<TransitMode> modes) {
     return transitService
-      .getPatternsForStop(stop)
+      .findPatterns(stop)
       .stream()
       .map(TripPattern::getMode)
       .anyMatch(modes::contains);
@@ -234,7 +234,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private void handlePatternsAtStop(RegularStop stop, double distance) {
     if (includePatternAtStops) {
       List<TripPattern> patterns = transitService
-        .getPatternsForStop(stop)
+        .findPatterns(stop)
         .stream()
         .filter(pattern -> filterByModes.isEmpty() || filterByModes.contains(pattern.getMode()))
         .filter(pattern ->

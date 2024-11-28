@@ -34,7 +34,7 @@ public class DatedServiceJourneyQuery {
       .dataFetcher(environment -> {
         FeedScopedId id = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
 
-        return GqlUtil.getTransitService(environment).getTripOnServiceDateById(id);
+        return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
       .build();
   }
@@ -120,7 +120,7 @@ public class DatedServiceJourneyQuery {
 
         return GqlUtil
           .getTransitService(environment)
-          .getTripOnServiceDates(tripOnServiceDateRequestBuilder.build());
+          .findTripsOnServiceDate(tripOnServiceDateRequestBuilder.build());
       })
       .build();
   }
