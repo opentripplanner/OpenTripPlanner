@@ -244,7 +244,7 @@ class FinlandMapperTest {
     osmTagMapper.populateProperties(wps);
     var way = WayTestData.carTunnel();
     assertEquals(ALL, wps.getDataForWay(way).getPermission());
-    way.addTag("motorroad","yes");
+    way.addTag("motorroad", "yes");
     assertEquals(CAR, wps.getDataForWay(way).getPermission());
   }
 }

@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
@@ -168,16 +171,26 @@ class OsmTagMapperTest {
     assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
-  @Test
-  void motorroad() {
+  public static List<OsmWithTags> roadCases() {
+    return List.of(
+      WayTestData.carTunnel(),
+      WayTestData.southwestMayoStreet(),
+      WayTestData.southeastLaBonitaWay(),
+      WayTestData.fiveLanes(),
+      WayTestData.highwayTertiary()
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("roadCases")
+  void motorroad(OsmWithTags way) {
     OsmTagMapper osmTagMapper = new OsmTagMapper();
     WayPropertySet wps = new WayPropertySet();
     osmTagMapper.populateProperties(wps);
 
-    var way = WayTestData.carTunnel();
     assertEquals(ALL, wps.getDataForWay(way).getPermission());
 
-    way.addTag("motorroad","yes");
+    way.addTag("motorroad", "yes");
     assertEquals(CAR, wps.getDataForWay(way).getPermission());
   }
 
