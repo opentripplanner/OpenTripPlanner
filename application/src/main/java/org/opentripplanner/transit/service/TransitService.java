@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -128,8 +129,6 @@ public interface TransitService {
 
   Collection<StopLocation> listStopLocations();
 
-  Collection<RegularStop> listRegularStops();
-
   Collection<GroupStop> listGroupStops();
 
   StopLocation getStopLocation(FeedScopedId parseId);
@@ -145,9 +144,6 @@ public interface TransitService {
   Collection<StopLocationsGroup> listStopLocationGroups();
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
-
-  @Nullable
-  AreaStop getAreaStop(FeedScopedId id);
 
   /**
    * Return the trip for the given id, including trips created in real time.
@@ -312,6 +308,14 @@ public interface TransitService {
    * @return - A list of TripOnServiceDates
    */
   List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request);
+
+  /**
+   * Returns a list of Trips that match the filtering defined in the request.
+   *
+   * @param request - A TripRequest object with filtering defined.
+   * @return - A list of Trips
+   */
+  List<Trip> getTrips(TripRequest request);
 
   /**
    * Checks if a trip with the given ID exists in the model.

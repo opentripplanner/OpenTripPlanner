@@ -35,9 +35,11 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
+import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -167,11 +169,6 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public AreaStop getAreaStop(FeedScopedId id) {
-    return this.timetableRepository.getSiteRepository().getAreaStop(id);
-  }
-
-  @Override
   public Agency getAgency(FeedScopedId id) {
     return this.timetableRepositoryIndex.getAgencyForId(id);
   }
@@ -229,12 +226,6 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<StopLocation> listStopLocations() {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepository.getSiteRepository().listStopLocations();
-  }
-
-  @Override
-  public Collection<RegularStop> listRegularStops() {
-    OTPRequestTimeoutException.checkForTimeout();
-    return timetableRepository.getSiteRepository().listRegularStops();
   }
 
   @Override
@@ -592,6 +583,21 @@ public class DefaultTransitService implements TransitEditorService {
       }
     }
     return this.timetableRepositoryIndex.containsTrip(id);
+  }
+
+  /**
+   * Returns a list of Trips that match the filtering defined in the request.
+   *
+   * @param request - A TripRequest object with filtering defined.
+   * @return - A list Trips
+   */
+  @Override
+  public List<Trip> getTrips(TripRequest request) {
+    Matcher<Trip> matcher = TripMatcherFactory.of(
+      request,
+      this.getCalendarService()::getServiceDatesForServiceId
+    );
+    return listTrips().stream().filter(matcher::match).toList();
   }
 
   /**
