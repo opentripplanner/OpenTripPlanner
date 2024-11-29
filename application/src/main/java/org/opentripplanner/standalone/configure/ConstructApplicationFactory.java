@@ -66,7 +66,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
-    GeocoderModule.class
+    GeocoderModule.class,
   }
 )
 public interface ConstructApplicationFactory {
