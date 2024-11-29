@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -57,6 +58,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
+  private final FareService fareService;
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
 
@@ -83,7 +85,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
     @Nullable TraverseVisitor traverseVisitor,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    FareService fareService
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -105,6 +108,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
+    this.fareService = fareService;
   }
 
   /**
@@ -129,7 +133,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor traverseVisitor,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    FareService fareService
   ) {
     return new DefaultServerRequestContext(
       graph,
@@ -151,7 +156,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       streetLimitationParametersService,
       flexParameters,
       traverseVisitor,
-      luceneIndex
+      luceneIndex,
+      fareService
     );
   }
 
@@ -276,5 +282,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   public SorlandsbanenNorwayService sorlandsbanenService() {
     return sorlandsbanenService;
+  }
+
+  @Override
+  public FareService fareService() {
+    return fareService;
   }
 }

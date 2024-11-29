@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
+import org.opentripplanner.ext.fares.configure.FareServiceModule;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
@@ -17,6 +18,7 @@ import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServ
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -66,6 +68,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
     GeocoderModule.class,
+    FareServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -104,6 +107,8 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   LuceneIndex luceneIndex();
+
+  FareService fareService();
 
   @Component.Builder
   interface Builder {

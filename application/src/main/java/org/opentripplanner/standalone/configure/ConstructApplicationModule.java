@@ -14,6 +14,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -46,7 +47,8 @@ public class ConstructApplicationModule {
     EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    FareService fareService
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
@@ -69,7 +71,8 @@ public class ConstructApplicationModule {
       stopConsolidationService,
       streetLimitationParametersService,
       traverseVisitor,
-      luceneIndex
+      luceneIndex,
+      fareService
     );
   }
 

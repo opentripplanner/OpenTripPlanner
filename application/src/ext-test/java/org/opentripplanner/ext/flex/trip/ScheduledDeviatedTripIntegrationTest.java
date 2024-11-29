@@ -18,6 +18,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
@@ -112,7 +113,7 @@ class ScheduledDeviatedTripIntegrationTest {
       List.of(to)
     );
 
-    var filter = new DecorateWithFare(graph.getFareService());
+    var filter = new DecorateWithFare(new DefaultFareService());
 
     var itineraries = router
       .createFlexOnlyItineraries(false)
