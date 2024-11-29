@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -130,7 +131,8 @@ public class SpeedTest {
         null,
         TestServerContext.createStreetLimitationParametersService(),
         null,
-        null
+        null,
+        new DefaultFareService()
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
