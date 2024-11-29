@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -17,7 +18,8 @@ class VectorTileResponseFactoryTest {
 
   public static final OtpServerRequestContext SERVER_CONTEXT = TestServerContext.createServerContext(
     new Graph(),
-    new TimetableRepository()
+    new TimetableRepository(),
+    new DefaultFareService()
   );
 
   enum LayerType {

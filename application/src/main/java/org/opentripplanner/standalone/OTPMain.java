@@ -158,7 +158,8 @@ public class OTPMain {
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
         app.emissionsDataModel(),
         app.stopConsolidationRepository(),
-        app.streetLimitationParameters()
+        app.streetLimitationParameters(),
+        app.buildConfig().fareServiceFactory.makeFareService()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

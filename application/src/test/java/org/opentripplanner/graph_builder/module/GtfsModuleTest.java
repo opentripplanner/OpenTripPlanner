@@ -12,6 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -32,7 +34,9 @@ class GtfsModuleTest {
       List.of(bundle),
       model.timetableRepository,
       model.graph,
-      ServiceDateInterval.unbounded()
+      DataImportIssueStore.NOOP,
+      ServiceDateInterval.unbounded(),
+      new DefaultFareServiceFactory()
     );
 
     module.buildGraph();
@@ -63,7 +67,9 @@ class GtfsModuleTest {
       bundles,
       model.timetableRepository,
       model.graph,
-      ServiceDateInterval.unbounded()
+      DataImportIssueStore.NOOP,
+      ServiceDateInterval.unbounded(),
+      new DefaultFareServiceFactory()
     );
     assertThrows(IllegalArgumentException.class, module::buildGraph);
   }
@@ -111,7 +117,9 @@ class GtfsModuleTest {
         bundles,
         model.timetableRepository,
         model.graph,
-        ServiceDateInterval.unbounded()
+        DataImportIssueStore.NOOP,
+        ServiceDateInterval.unbounded(),
+        new DefaultFareServiceFactory()
       );
 
       module.buildGraph();

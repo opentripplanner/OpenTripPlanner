@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -22,7 +23,11 @@ class PlannerResourceTest {
   static OtpServerRequestContext context() {
     var timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
-    return TestServerContext.createServerContext(new Graph(), timetableRepository);
+    return TestServerContext.createServerContext(
+      new Graph(),
+      timetableRepository,
+      new DefaultFareService()
+    );
   }
 
   @Test

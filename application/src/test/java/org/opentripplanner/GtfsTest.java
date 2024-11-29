@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -197,17 +199,25 @@ public abstract class GtfsTest {
     graph = new Graph(deduplicator);
     timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
 
+    var fareServiceFactory = new DefaultFareServiceFactory();
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
       timetableRepository,
       graph,
-      ServiceDateInterval.unbounded()
+      DataImportIssueStore.NOOP,
+      ServiceDateInterval.unbounded(),
+      fareServiceFactory
     );
 
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
-    serverContext = TestServerContext.createServerContext(graph, timetableRepository);
+    serverContext =
+      TestServerContext.createServerContext(
+        graph,
+        timetableRepository,
+        fareServiceFactory.makeFareService()
+      );
     timetableSnapshotSource =
       new TimetableSnapshotSource(
         TimetableSnapshotSourceParameters.DEFAULT

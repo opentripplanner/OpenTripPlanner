@@ -30,7 +30,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -96,22 +95,6 @@ public class GtfsModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
-  }
-
-  public GtfsModule(
-    List<GtfsBundle> bundles,
-    TimetableRepository timetableRepository,
-    Graph graph,
-    ServiceDateInterval transitPeriodLimit
-  ) {
-    this(
-      bundles,
-      timetableRepository,
-      graph,
-      DataImportIssueStore.NOOP,
-      transitPeriodLimit,
-      new DefaultFareServiceFactory()
-    );
   }
 
   @Override
@@ -196,7 +179,6 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         fareServiceFactory.processGtfs(fareRulesData, otpTransitService);
-        var fareService = fareServiceFactory.makeFareService();
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

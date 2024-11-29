@@ -7,8 +7,8 @@ import java.util.List;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -39,7 +39,8 @@ public class TestServerContext {
   /** Create a context for unit testing, using the default RouteRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    FareService fareService
   ) {
     timetableRepository.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
@@ -67,7 +68,7 @@ public class TestServerContext {
       createStreetLimitationParametersService(),
       null,
       null,
-      new DefaultFareService()
+      fareService
     );
     creatTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
     return context;

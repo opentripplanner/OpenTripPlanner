@@ -23,6 +23,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -75,7 +76,8 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       weRepo,
       parkingRepository,
-      emissionsDataModel
+      emissionsDataModel,
+      model.fareServiceFactory()
     );
   }
 
@@ -93,7 +95,8 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       worldEnvelopeRepository,
       parkingRepository,
-      emissionsDataModel
+      emissionsDataModel,
+      model.fareServiceFactory()
     );
   }
 
@@ -194,7 +197,8 @@ public class GraphSerializationTest {
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
-    EmissionsDataModel emissionsDataModel
+    EmissionsDataModel emissionsDataModel,
+    FareServiceFactory fareServiceFactory
   ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
@@ -210,7 +214,8 @@ public class GraphSerializationTest {
       DataImportIssueSummary.empty(),
       emissionsDataModel,
       null,
-      streetLimitationParameters
+      streetLimitationParameters,
+      fareServiceFactory.makeFareService()
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);

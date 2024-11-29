@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -58,7 +60,6 @@ public class FlexIntegrationTest {
     TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     timetableRepository = model.timetableRepository();
-
     addGtfsToGraph(
       graph,
       timetableRepository,
@@ -66,9 +67,10 @@ public class FlexIntegrationTest {
         FlexIntegrationTestData.COBB_BUS_30_GTFS,
         FlexIntegrationTestData.MARTA_BUS_856_GTFS,
         FlexIntegrationTestData.COBB_FLEX_GTFS
-      )
+      ),
+      new DefaultFareServiceFactory()
     );
-    service = TestServerContext.createServerContext(graph, timetableRepository).routingService();
+    service = TestServerContext.createServerContext(graph, timetableRepository, model.fareServiceFactory().makeFareService()).routingService();
   }
 
   @Test
@@ -179,7 +181,8 @@ public class FlexIntegrationTest {
   private static void addGtfsToGraph(
     Graph graph,
     TimetableRepository timetableRepository,
-    List<File> gtfsFiles
+    List<File> gtfsFiles,
+    FareServiceFactory fareServiceFactory
   ) {
     // GTFS
     var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::new).toList();
@@ -187,7 +190,9 @@ public class FlexIntegrationTest {
       gtfsBundles,
       timetableRepository,
       graph,
-      ServiceDateInterval.unbounded()
+      DataImportIssueStore.NOOP,
+      ServiceDateInterval.unbounded(),
+      fareServiceFactory
     );
     gtfsModule.buildGraph();
 
