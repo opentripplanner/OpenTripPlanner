@@ -8,6 +8,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -31,16 +32,20 @@ public class Transfer {
 
   private final List<Edge> edges;
 
-  public Transfer(int toStop, List<Edge> edges) {
+  private final Set<StreetMode> modes;
+
+  public Transfer(int toStop, List<Edge> edges, Set<StreetMode> modes) {
     this.toStop = toStop;
     this.edges = edges;
     this.distanceMeters = (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    this.modes = modes;
   }
 
-  public Transfer(int toStopIndex, int distanceMeters) {
+  public Transfer(int toStopIndex, int distanceMeters, Set<StreetMode> modes) {
     this.toStop = toStopIndex;
     this.distanceMeters = distanceMeters;
     this.edges = null;
+    this.modes = modes;
   }
 
   public List<Coordinate> getCoordinates() {
@@ -66,6 +71,10 @@ public class Transfer {
 
   public List<Edge> getEdges() {
     return edges;
+  }
+
+  public Set<StreetMode> getModes() {
+    return modes;
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
