@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +37,7 @@ class TransferTest {
       // very long edge from Berlin to Boston that has of course a huge cost to traverse
       var edge = StreetModelForTest.streetEdge(BERLIN_V, BOSTON_V);
 
-      var veryLongTransfer = new Transfer(0, List.of(edge), Set.of(StreetMode.WALK));
+      var veryLongTransfer = new Transfer(0, List.of(edge), EnumSet.of(StreetMode.WALK));
       assertTrue(veryLongTransfer.getDistanceMeters() > 1_000_000);
       // cost would be too high, so it should be capped to a maximum value
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
@@ -45,7 +46,7 @@ class TransferTest {
     @Test
     void allowLowCost() {
       var edge = StreetModelForTest.streetEdge(BERLIN_V, BRANDENBURG_GATE_V);
-      var transfer = new Transfer(0, List.of(edge), Set.of(StreetMode.WALK));
+      var transfer = new Transfer(0, List.of(edge), EnumSet.of(StreetMode.WALK));
       assertTrue(transfer.getDistanceMeters() < 4000);
       final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
@@ -60,26 +61,26 @@ class TransferTest {
 
     @Test
     void overflow() {
-      var veryLongTransfer = new Transfer(0, Integer.MAX_VALUE, Set.of(StreetMode.WALK));
+      var veryLongTransfer = new Transfer(0, Integer.MAX_VALUE, EnumSet.of(StreetMode.WALK));
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
     void negativeCost() {
-      var veryLongTransfer = new Transfer(0, -5, Set.of(StreetMode.WALK));
+      var veryLongTransfer = new Transfer(0, -5, EnumSet.of(StreetMode.WALK));
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
     void limitMaxCost() {
-      var veryLongTransfer = new Transfer(0, 8_000_000, Set.of(StreetMode.WALK));
+      var veryLongTransfer = new Transfer(0, 8_000_000, EnumSet.of(StreetMode.WALK));
       // cost would be too high, so it will be capped before passing to RAPTOR
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
     void allowLowCost() {
-      var transfer = new Transfer(0, 200, Set.of(StreetMode.WALK));
+      var transfer = new Transfer(0, 200, EnumSet.of(StreetMode.WALK));
       final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
