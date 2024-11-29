@@ -6,10 +6,14 @@ import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Computes the fares of an itinerary and adds them.
- * <p>
- * TODO: Convert to a class - exposing a service in a DTO is a risk.
  */
-public record DecorateWithFare(FareService fareService) implements ItineraryDecorator {
+public final class DecorateWithFare implements ItineraryDecorator {
+  private final FareService fareService;
+
+  public DecorateWithFare(FareService fareService) {
+    this.fareService = fareService;
+  }
+
   @Override
   public void decorate(Itinerary itinerary) {
     var fare = fareService.calculateFares(itinerary);
@@ -18,4 +22,5 @@ public record DecorateWithFare(FareService fareService) implements ItineraryDeco
       FaresToItineraryMapper.addFaresToLegs(fare, itinerary);
     }
   }
+
 }
