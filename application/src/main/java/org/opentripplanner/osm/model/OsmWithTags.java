@@ -1,8 +1,6 @@
 package org.opentripplanner.osm.model;
 
 import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -236,34 +234,46 @@ public class OsmWithTags {
    * @throws DateTimeParseException on bad input
    */
   public static Duration parseOsmDuration(String duration) {
+    // Unfortunately DateFormatParserBuilder doesn't quite do enough for this case.
+    // It has the capability for expressing optional parts, so it could express hh(:mm(:ss)?)?
+    // but it cannot express (hh:)?mm(:ss)? where the existence of (:ss) implies the existence
+    // of (hh:). Even if it did, it would not be able to handle the cases where hours are
+    // greater than 23 or (if there is no hours part at all) minutes are greater than 59, which
+    // are both allowed by the spec and exist in OSM data. Durations are not LocalTimes after
+    // all, in parsing a LocalTime it makes sense and is correct that hours cannot be more than
+    // 23 or minutes more than 59, but in durations if you have capped the largest unit, it is
+    // reasonable for the amount of the largest unit to be as large as it needs to be.
     int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
     if (colonCount <= 2) {
       try {
         int i, j;
         long hours, minutes, seconds;
+        // The first :-separated element can be any width, and has no maximum. It still has
+        // to be non-negative. The following elements must be 2 characters wide, non-negative,
+        // and less than 60.
         switch (colonCount) {
-          case 0:
+          case 0: // case "m"
             minutes = Long.parseLong(duration);
             if (minutes >= 0) {
               return Duration.ofMinutes(minutes);
             }
             break;
-          case 1:
+          case 1: // case "h:mm"
             i = duration.indexOf(':');
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1));
-            if (hours >= 0 && minutes >= 0 && minutes < 60) {
+            if (duration.length() - i == 3 && hours >= 0 && minutes >= 0 && minutes < 60) {
               return Duration.ofHours(hours).plusMinutes(minutes);
             }
             break;
-          default:
+          default: // case "h:mm:ss"
             //case 2:
             i = duration.indexOf(':');
             j = duration.indexOf(':', i + 1);
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1, j));
             seconds = Long.parseLong(duration.substring(j + 1));
-            if (hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+            if (j - i == 3 && duration.length() - j == 3 && hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
               return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
             }
             break;

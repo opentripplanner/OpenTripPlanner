@@ -311,7 +311,11 @@ public class OsmWithTagsTest {
       Arguments.of("25:00:00", Optional.of(Duration.ofHours(25))),
       Arguments.of("22:60", Optional.empty()),
       Arguments.of("10:61:40", Optional.empty()),
-      Arguments.of("10:59:60", Optional.empty())
+      Arguments.of("10:59:60", Optional.empty()),
+      Arguments.of("1:12:34", Optional.of(Duration.ofHours(1).plusMinutes(12).plusSeconds(34))),
+      Arguments.of("1:2:34", Optional.empty()),
+      Arguments.of("1:12:3", Optional.empty()),
+      Arguments.of("1:2", Optional.empty())
     );
   }
 
