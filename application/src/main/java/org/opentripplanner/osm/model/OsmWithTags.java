@@ -273,7 +273,15 @@ public class OsmWithTags {
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1, j));
             seconds = Long.parseLong(duration.substring(j + 1));
-            if (j - i == 3 && duration.length() - j == 3 && hours >= 0 && minutes >= 0 && minutes < 60 && seconds >= 0 && seconds < 60) {
+            if (
+              j - i == 3 &&
+              duration.length() - j == 3 &&
+              hours >= 0 &&
+              minutes >= 0 &&
+              minutes < 60 &&
+              seconds >= 0 &&
+              seconds < 60
+            ) {
               return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
             }
             break;
