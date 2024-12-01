@@ -44,15 +44,24 @@ public class DebugStyleSpec {
     "© OpenStreetMap Contributors"
   );
   private static final TileSource POSITRON_BACKGROUND = new RasterSource(
-    "background-carto",
+    "background-positron",
     List.of("https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}${r}.png"),
     19,
     256,
     "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>"
   );
+  private static final TileSource TRIMET_BACKGROUND = new RasterSource(
+    "background-trimet",
+    List.of("https://maps.trimet.org/wms/reflect?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.0&request=GetMap&srs=EPSG:3857&width=256&height=256&layers=aerials"),
+    19,
+    256,
+    "TriMet"
+  );
+
   private static final List<TileSource> BACKGROUND_LAYERS = List.of(
     OSM_BACKGROUND,
-    POSITRON_BACKGROUND
+    POSITRON_BACKGROUND,
+    TRIMET_BACKGROUND
   );
   private static final String MAGENTA = "#f21d52";
   private static final String BRIGHT_GREEN = "#22DD9E";
