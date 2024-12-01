@@ -13,6 +13,7 @@ import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -50,18 +51,10 @@ public class DebugStyleSpec {
     256,
     "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>"
   );
-  private static final TileSource TRIMET_BACKGROUND = new RasterSource(
-    "background-trimet",
-    List.of("https://maps.trimet.org/wms/reflect?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.0&request=GetMap&srs=EPSG:3857&width=256&height=256&layers=aerials"),
-    19,
-    256,
-    "TriMet"
-  );
 
   private static final List<TileSource> BACKGROUND_LAYERS = List.of(
     OSM_BACKGROUND,
-    POSITRON_BACKGROUND,
-    TRIMET_BACKGROUND
+    POSITRON_BACKGROUND
   );
   private static final String MAGENTA = "#f21d52";
   private static final String BRIGHT_GREEN = "#22DD9E";
@@ -111,20 +104,33 @@ public class DebugStyleSpec {
     VectorSourceLayer areaStops,
     VectorSourceLayer groupStops,
     VectorSourceLayer edges,
-    VectorSourceLayer vertices
+    VectorSourceLayer vertices,
+    List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = List
+    List<TileSource> vectorSources = Stream
       .of(regularStops, edges, vertices)
-      .stream()
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
-    var allSources = ListUtils.combine(BACKGROUND_LAYERS, vectorSources);
+
+    List<TileSource> extraRasterSources = extraLayers
+      .stream()
+      .map(l ->
+        (TileSource) new RasterSource(
+          l.name(),
+          List.of(l.templateUrl()),
+          19,
+          l.tileSize(),
+          l.attribution()
+        )
+      )
+      .toList();
+    var allSources = ListUtils.combine(BACKGROUND_LAYERS, extraRasterSources, vectorSources);
     return new StyleSpec(
       "OTP Debug Tiles",
       allSources,
       ListUtils.combine(
-        backgroundLayers(),
+        backgroundLayers(extraRasterSources),
         wheelchair(edges),
         noThruTraffic(edges),
         traversalPermissions(edges),
@@ -135,12 +141,13 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> backgroundLayers() {
-    return BACKGROUND_LAYERS
+  private static List<StyleBuilder> backgroundLayers(List<TileSource> extraLayers) {
+    return ListUtils
+      .combine(BACKGROUND_LAYERS, extraLayers)
       .stream()
       .map(layer -> {
         var builder = StyleBuilder.ofId(layer.id()).typeRaster().source(layer).minZoom(0);
-        if(!layer.equals(OSM_BACKGROUND)){
+        if (!layer.equals(OSM_BACKGROUND)) {
           builder.intiallyHidden();
         }
         return builder;
