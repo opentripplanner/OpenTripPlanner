@@ -24,7 +24,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
         case StreetEdge e -> mapStreetEdge(e);
         case EscalatorEdge e -> List.of(
           kv("distance", e.getDistanceMeters()),
-          kv("duration", e.getDuration())
+          kv("duration", e.getDuration().map(d -> d.toString()).orElse(null))
         );
         default -> List.of();
       };

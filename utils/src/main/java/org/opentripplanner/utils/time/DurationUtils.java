@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * This class extend the Java {@link Duration} with utility functionality to parse and convert
